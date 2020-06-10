@@ -1,0 +1,45 @@
+{
+    "name": "con4gis/reservation",
+    "description": "Contao module for creating reservation forms. For example for tables, rooms or other objects.",
+    "keywords": ["con4gis", "reservation", "room", "table", "practice", "event", "seminar", "contao", "c4g"],
+    "type": "contao-bundle",
+    "homepage": "https://con4gis.org",
+    "license": "LGPL-3.0+",
+    "authors":[
+        {
+            "name":"Küstenschmiede GmbH Software & Design",
+            "homepage":"https://kuestenschmiede.de"
+        }
+    ],
+    "require": {
+        "contao/core-bundle": "^4.4",
+        "con4gis/projects": "~2.0"
+    },
+    "conflict": {
+        "contao/core": "*",
+        "contao/manager-plugin": "<2.0 || >=3.0"
+    },
+    "support": {
+        "issues": "https://github.com/Kuestenschmiede/ReservationBundle/issues"
+    },
+    "autoload": {
+        "psr-4": {
+            "con4gis\\ReservationBundle\\": ""
+        },
+        "classmap": [
+            "Resources/contao/"
+        ],
+        "exclude-from-classmap": [
+            "Resources/contao/config/",
+            "Resources/contao/dca /",
+            "Resources/contao/languages/",
+            "Resources/contao/templates/"
+        ]
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "extra":{
+        "contao-manager-plugin": "con4gis\\ReservationBundle\\ContaoManager\\Plugin"
+    }
+}

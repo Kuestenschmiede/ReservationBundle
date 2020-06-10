@@ -1,0 +1,35 @@
+<?php
+/**
+ * This file is part of con4gis,
+ * the gis-kit for Contao CMS.
+ *
+ * @package    con4gis
+ * @version    7
+ * @author     con4gis contributors (see "authors.txt")
+ * @license    LGPL-3.0-or-later
+ * @copyright  Küstenschmiede GmbH Software & Design
+ * @link       https://www.con4gis.org
+ */
+
+/** HEADLINE */
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['headline'] = 'Cancellation data';
+
+/** CONFIGURATION */
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['brick_caption'] = 'cancellation';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['brick_caption_plural'] = 'Cancellations';
+
+/** FIELDS */
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['lastname'] = 'Last name';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['firstname'] = 'firstname';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['reservation_id'] = 'identification key';
+
+/** DESCRIPTIONS */
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['desc_lastname'] = 'Enter your descendant.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['desc_firstname'] = 'Enter your first name.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['desc_reservation_id'] = 'Enter the 13-digit reservation ID here.';
+
+/** BUTTONS */
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['button_cancellation'] = 'Cancel appointment';
+
+/** MESSAGES */
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['cancellation_failed'] = 'The cancellation could not be executed.';

@@ -1,0 +1,51 @@
+.reservation_time_button .c4g_brick_radio_group input[type="radio"] {
+    left:-9999px;
+    position:absolute;
+    z-index: 999;
+}
+/*
+.ui-datepicker-calendar td.ui-state-disabled span.ui-state-default {
+    text-align:center;
+    background-color:rgba(204,0,0,1);
+    color:#fff;
+}
+.ui-datepicker-calendar td a.ui-state-default {
+    text-align:center;
+    background-color:#080;
+}*/
+.reservation_time_button .c4g_brick_radio_group label {
+    width:98%;
+    height:30px;
+    display:inline-block;
+    margin-right:2px;
+    margin-bottom:2px;
+    text-align:center;
+    background-color: green;
+    line-height:30px;
+    color:#fff;
+    cursor: pointer;
+}
+.reservation_time_button input[type = "radio"]:checked + label {
+    padding:0;
+    background-color: slategrey!important;
+}
+.reservation_time_button input[type="radio"][disabled] + label {
+    background-color: red;
+    cursor: no-drop;
+}
+
+.mod_C4gReservation .displayReservationObjects {
+    display: none;
+}
+
+.formdata .c4g_multicheckbox label[for='c4g_additional_params'] {
+    display: block!important;
+}
+
+.ui-datepicker-calendar .ui-state-default {
+    color: green!important;
+}
+
+.ui-datepicker-calendar .ui-state-disabled .ui-state-default {
+    color: red!important;
+}

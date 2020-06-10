@@ -1,0 +1,40 @@
+<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #ffcc23;
+        stroke: #bf991a;
+        stroke-miterlimit: 10;
+        stroke-width: 0.5px;
+      }
+
+      .cls-2 {
+        fill: #fbfbfb;
+      }
+
+      .cls-3 {
+        fill: #4bb0ff;
+      }
+
+      .cls-4 {
+        fill: #e8867c;
+      }
+    </style>
+  </defs>
+  <g>
+    <path class="cls-1" d="M13.8,8.37a1.52,1.52,0,0,0,1.51,1.52v2.22a1,1,0,0,1-1,1h-13a1,1,0,0,1-1-1V9.89a1.52,1.52,0,0,0,0-3V4.63a1,1,0,0,1,1-1h13a1,1,0,0,1,1,1V6.85A1.52,1.52,0,0,0,13.8,8.37Z"/>
+    <circle class="cls-2" cx="10.66" cy="8.37" r="0.61"/>
+    <circle class="cls-2" cx="10.66" cy="6.45" r="0.61"/>
+    <circle class="cls-2" cx="10.66" cy="4.63" r="0.61"/>
+    <circle class="cls-2" cx="10.66" cy="12.11" r="0.61"/>
+    <circle class="cls-2" cx="10.66" cy="10.19" r="0.61"/>
+    <rect class="cls-3" x="2.88" y="7.56" width="5.86" height="0.61"/>
+    <rect class="cls-3" x="2.88" y="8.78" width="3.84" height="0.61"/>
+    <rect class="cls-3" x="2.88" y="9.99" width="5.86" height="0.61"/>
+    <rect class="cls-4" x="2.88" y="6.05" width="0.81" height="0.81"/>
+    <rect class="cls-4" x="7.93" y="6.05" width="0.81" height="0.81"/>
+    <rect class="cls-4" x="5.4" y="6.05" width="0.81" height="0.81"/>
+    <rect class="cls-4" x="4.09" y="6.05" width="0.81" height="0.81"/>
+    <rect class="cls-4" x="6.72" y="6.05" width="0.81" height="0.81"/>
+  </g>
+</svg>

@@ -1,0 +1,43 @@
+<?php
+
+echo '<div class="'.$this->class.' block"'.$this->cssID;
+if ($this->style):
+echo 'style="'.$this->style.'"';
+endif;
+echo '>';
+
+?>
+
+<script>
+
+    (function() {
+            jQuery(document).ready(function() {
+                <?php
+                echo "jQuery('div#". $this->c4gData['div']."' ).c4gGui({".
+                    "id: ".$this->c4gData['id'].", ".
+                    "height: '" . $this->c4gData['height'] ."', ".
+                    "width: '" . $this->c4gData['width'] ."', ".
+                    "ajaxUrl: '" . $this->c4gData['ajaxUrl'] . "', ".
+                    "ajaxData: '" . $this->c4gData['ajaxData'] ."', ".
+                    "initData: " . $this->c4gData['initData'] .", ".
+                    "jquiBreadcrumb: true, ".
+                    "jquiButtons: true, ".
+                    "embedDialogs: '". $this->c4gData['embedDialogs'] ."', ".
+                    "jquiEmbeddedDialogs: '". $this->c4gData['jquiEmbeddedDialogs'] ."', ";
+                    if ($this->c4gData['navPanel']) {
+                    echo "navPanel: true";
+                }
+                    else {
+                    echo "navPanel: false";
+                }
+                    echo "});";
+                ?>
+                });
+                })();
+</script>
+<div id="<?php echo $this->c4gData['div']; ?>"></div>
+<br />
+
+<?php
+	echo '</div>';
+?>
