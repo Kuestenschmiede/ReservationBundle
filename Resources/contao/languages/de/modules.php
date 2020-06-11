@@ -13,9 +13,9 @@
 
 $GLOBALS['TL_LANG']['MOD']['Reservation']     = array('con4gis Reservation', 'www.con4gis.org');
 $GLOBALS['TL_LANG']['MOD']['C4gReservation']  = array('Reservierungen', 'Welche Zeiten wurden bereits reserviert?');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationObject'] = array('Reservierbare Objekte', 'Definieren Sie buchbare Objekte (z.B. Räume, Tische).');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationObjectPrices'] = array('Reservierungsobjekt Preise', 'Definieren Sie die Preise für die Reservierungsobjekte (z.B. Räume, Tische).');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservierungsarten', 'Definieren Sie die Auswahl der Reservierungsarten (optional).');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationObject'] = array('Reservierungsobjekte', 'Definieren Sie buchbare Objekte (z.B. Räume, Tische).');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationObjectPrices'] = array('Objektpreise', 'Definieren Sie die Preise für die Reservierungsobjekte (optional).');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservierungsarten', 'Definieren Sie die Auswahl der Reservierungsarten.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationParams'] = array('Buchungsoptionen', 'Definieren Sie Zusätze für Reservierungen (optional).');
 
 $GLOBALS['TL_LANG']['FMD']['C4gReservation']  = array('con4gis-Reservation: Reservierung', 'Reservierung');

@@ -13,7 +13,7 @@
 
 /** FIELDS */
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['periodType'] = array("Zeitspannenart", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['price'] = array("Preis", "Bestimmen sie den Preis (bsp. 50.00)");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['price'] = array("Preis", "Bestimmen sie den Preis (bspw.: 50.00)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['minute'] = array("Minuten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['hour'] = array("Stunden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['openingHours'] = array("Öffnungszeiten");

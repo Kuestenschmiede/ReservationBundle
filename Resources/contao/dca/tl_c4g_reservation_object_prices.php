@@ -163,7 +163,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('rpxp'=>'digit','mandatory'=>true, 'maxlength'=>6, 'feEditable'=>true,    'feViewable'=>true, 'tl_class'=>'w50 clr'),
+            'eval'                    => array('rpxp'=>'digit','mandatory'=>true, 'maxlength'=>6, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
             'sql'                     => "double(5,2) NOT NULL default '0.00'"
 
         ),
@@ -172,7 +172,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
             'exclude'                 => true,
             'filter'                  => true,
             'inputType'               => 'checkbox',
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false,'alwaysSave'=>true),
+            'eval'                    => array('tl_class'=>'w50 clr','mandatory'=>false, 'multiple'=>false,'alwaysSave'=>true),
             'sql'                     => "int(1) unsigned NULL default 1"
         ),
     )

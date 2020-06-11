@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{type_legend}, caption, options;{periodType_legend},periodType,objectCount,additional_params ,description,published,auto_del;',
+        'default'   =>  '{type_legend},caption,description,options,periodType,objectCount,additional_params,published;{expert_legend:hide},auto_del;',
        '__selector__' => array('periodType','auto_del')
     ),
 
@@ -325,7 +325,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'sorting'                 => false,
             'inputType'               => 'textarea',
             'default'                 => '',
-            'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
+            'eval'                    => array('mandatory'=>false, 'rte'=>'tinyMCE', 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
             'sql'                     => "text NULL"
         ),
 

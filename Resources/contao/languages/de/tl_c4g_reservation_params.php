@@ -12,7 +12,7 @@
  */
 
 /** FIELDS */
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['price'] = array("Preis", "Bestimmen sie den Preis (bsp. 50.00)");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['price'] = array("Preis", "Bestimmen sie den Preis (bspw.: 50.00)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['caption'] = array("Beschriftung", "Beschriftung der Buchungs Option");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['language'] = array("Sprache", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['published'] = array("Veröffentlichen.","Soll dieses Objekt im Frontend angezeigt werden ?");

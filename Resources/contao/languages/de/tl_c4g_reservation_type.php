@@ -26,19 +26,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['hour'] = array("Stunden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['daily'] = array("Intervall löschen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['openingHours'] = array("Öffnungszeiten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['md'] = array("Mehrtägig");
-/*$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minute_interval'] = array("Minutenintervall", "Alle wie viele Minuten kann das Reservierungsobjekt während der Öffnungszeiten gebucht werden.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['hour_interval'] = array("Stundenintervall", "Alle wie viele Stunden kann das Reservierungsobjekt während der Öffnungszeiten gebucht werden.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_monday'] = array("Montag", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_tuesday'] = array("Dienstag", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_wednesday'] = array("Mittwoch", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_thursday'] = array("Donnerstag", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_friday'] = array("Freitag", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_saturday'] = array("Samstag", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_sunday'] = array("Sonntag", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_caption'] = array("Eventname", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_begin'] = array("Beginn", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_end'] = array("Ende", "");*/
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['published'] = array("Veröffentlichen.","Soll dieses Objekt im Frontend angezeigt werden?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['published'] = array("Veröffentlichen","Soll die Reservierungsart im Frontend angeboten werden?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['beginDate'] = array("Startdatum", "Am welchen Tag beginnt der Zeitraum?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['endDate'] = array("Enddatum", "Am welchen Tag endet der Zeitraum");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_id'] = array("Contao-Event","Wählen Sie das passende Contao-Event aus.");
@@ -53,23 +41,11 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['timeBegin'] = array("Uhrzeitbegi
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['timeEnd'] = array("Uhrzeitende");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayBegin'] = array("Starttag");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayEnd'] = array("Endtag");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additional_params'] = array(" Reservierungsoptionen.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array(" Beschreibung.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additional_params'] = array("Buchungsoptionen");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Beschreibung");
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Angaben zur Reservierungsart";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Reservierungsart";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['md_legend'] = "Mehrtägig";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType_legend'] = "Zeit";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minute_legend'] = "Minuteneinstellung";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['hour_legend'] = "Stundeneinstellung";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['opening_hours_monday_legend'] = "Öffnungszeiten Montags";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['opening_hours_tuesday_legend'] = "Öffnungszeiten Dienstags";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['opening_hours_wednesday_legend'] = "Öffnungszeiten Mittwochs";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['opening_hours_thursday_legend'] = "Öffnungszeiten Donnerstags";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['opening_hours_friday_legend'] = "Öffnungszeiten Freitags";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['opening_hours_saturday_legend'] = "Öffnungszeiten Samstags";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['opening_hours_sunday_legend'] = "Öffnungszeiten Sonntags";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['new'] = array("Reservierungsart hinzufügen","Reservierungsart hinzufügen");

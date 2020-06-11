@@ -49,3 +49,16 @@
 .ui-datepicker-calendar .ui-state-disabled .ui-state-default {
     color: red!important;
 }
+
+.mod_C4gReservation table.c4g_brick_table_rows td {
+    padding-right: 1.5%;
+}
+
+.mod_C4gReservation table.c4g_brick_table_rows td {
+    width: auto;
+}
+
+.mod_C4gReservation table.c4g_brick_table_rows {
+    margin-top: 2.5%!important;
+    margin-bottom: 0!important;
+}

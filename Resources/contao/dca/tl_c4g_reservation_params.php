@@ -154,6 +154,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'exclude'                 => true,
             'filter'                  => true,
             'inputType'               => 'checkbox',
+            'eval'                    => array('tl_class'=>'w50 clr'),
             'sql'                     => "int(1) unsigned NULL default 1"
         ),
 

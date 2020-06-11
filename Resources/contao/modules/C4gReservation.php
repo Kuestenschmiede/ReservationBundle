@@ -19,7 +19,6 @@ use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickCondition;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickConditionType;
-use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickDialog;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
@@ -41,7 +40,6 @@ use con4gis\ReservationBundle\Resources\contao\models\C4gReservationModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel;
-use Contao\DataContainer;
 use Contao\StringUtil;
 
 class C4gReservation extends C4GBrickModuleParent
