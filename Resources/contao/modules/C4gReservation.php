@@ -100,6 +100,12 @@ class C4gReservation extends C4GBrickModuleParent
                         continue;
                     }
                 }
+
+                $objects = C4gReservationObjectModel::getReservationObjectList(array($type->id));
+                if (!$objects || (count($objects) <= 0)) {
+                    continue;
+                }
+
                 $captions = unserialize($type->options);
                 if ($captions) {
                     foreach ($captions as $caption) {
@@ -108,7 +114,8 @@ class C4gReservation extends C4GBrickModuleParent
                                 'id' => $type->id,
                                 'name' => $caption['caption'],
                                 'periodType' => $type->periodType,
-                                'additionalParams' => unserialize($type->additional_params)
+                                'additionalParams' => unserialize($type->additional_params),
+                                'objects' => $objects
                             );
 
                             if (!$firstType) {
@@ -143,7 +150,7 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         foreach ($typelist as $type) {
-            $reservationObjects = C4gReservationObjectModel::getReservationObjectList(array($type['id']));
+            $reservationObjects = $type['objects'];
 
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $type['id']);
 
@@ -670,6 +677,15 @@ class C4gReservation extends C4GBrickModuleParent
         $salutationField->setNotificationField(true);
         $fieldList[] = $salutationField;
 
+        $firstnameField = new C4GTextField();
+        $firstnameField->setFieldName('firstname');
+        $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
+        $firstnameField->setColumnWidth(10);
+        $firstnameField->setSortColumn(false);
+        $firstnameField->setTableColumn(true);
+        $firstnameField->setMandatory(true);
+        $firstnameField->setNotificationField(true);
+        $fieldList[] = $firstnameField;
 
         $lastnameField = new C4GTextField();
         $lastnameField->setFieldName('lastname');
@@ -680,16 +696,6 @@ class C4gReservation extends C4GBrickModuleParent
         $lastnameField->setMandatory(true);
         $lastnameField->setNotificationField(true);
         $fieldList[] = $lastnameField;
-
-        $firstnameField = new C4GTextField();
-        $firstnameField->setFieldName('firstname');
-        $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
-        $firstnameField->setColumnWidth(10);
-        $firstnameField->setSortColumn(false);
-        $firstnameField->setTableColumn(true);
-        $firstnameField->setMandatory(true);
-        $firstnameField->setNotificationField(true);
-        $fieldList[] = $firstnameField;
 
         $emailField = new C4GEmailField();
         $emailField->setFieldName('email');
