@@ -19,9 +19,9 @@ use con4gis\CoreBundle\Classes\C4GVersionProvider;
  */
 
 if (C4GVersionProvider::isInstalled('con4gis/maps')) {
-    $default = '{type_legend}, caption, quantity, options, description, desiredCapacityMin, desiredCapacityMax, viewableTypes, additionalBookingParams, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{location_legend},locgeox, locgeoy;{publish_legend}, published';
+    $default = '{type_legend}, caption, quantity, options, description, vcard_show,business_phone,business_street,business_postal,business_city, desiredCapacityMin, desiredCapacityMax, viewableTypes, additionalBookingParams, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{location_legend},locgeox, locgeoy;{publish_legend}, published';
 } else {
-    $default = '{type_legend}, caption, quantity, options, description, desiredCapacityMin, desiredCapacityMax, viewableTypes, additionalBookingParams, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
+    $default = '{type_legend}, caption, quantity, options, description, vcard_show,business_phone,business_street,business_postal,business_city, desiredCapacityMin, desiredCapacityMax, viewableTypes, additionalBookingParams, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
 }
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
@@ -53,7 +53,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'label' => array
         (
-            'fields'            => array('caption','quantity','desiredCapacityMin','desiredCapacityMax','viewableTypes:tl_c4g_reservation_type.caption','time_interval'),
+            'fields'            => array('caption','quantity','vcard_show','desiredCapacityMin','desiredCapacityMax','viewableTypes:tl_c4g_reservation_type.caption','time_interval','residence_time'),
             'label_callback'    => array('tl_c4g_reservation_object', 'listFields'),
             'showColumns'       => true
         ),
@@ -206,8 +206,48 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 //            'inputType'         => 'checkbox',
 //            'sql'               => "int(1) unsigned NULL default 1"
 //        ),
+        'vcard_show' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['vcard_show'],
+            'inputType'         => 'checkbox',
+            'eval'              => array('mandatory'=>false,'tl_class'=>'long clr','alwaysSave'=> true,),
+            'sql'               => "blob NULL "
+        ),
+        'business_phone' => array
+        (
+            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr '),
+            'sql'               =>"varchar(255) NOT NULL default ''"
+        ),
+        'business_street' => array
+        (
+            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_street'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'sql'               =>"varchar(255) NOT NULL default ''"
+        ),
+        'business_postal' => array
+        (
+            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_postal'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'sql'               =>"varchar(255) NOT NULL default ''"
+        ),
+        'business_city' => array
+        (
+            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_city'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'sql'               =>"varchar(255) NOT NULL default ''"
+        ),
 
-        'desiredCapacityMin' => array
+
+            'desiredCapacityMin' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMin'],
             'exclude'                 => false,
@@ -284,6 +324,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'eval'              => array('rgxp'=>'digit', 'maxval'=> 60, 'mandatory'=>false, 'tl_class'=>'long clr'),
             'sql'               => "smallint(5) unsigned NOT NULL default 0"
         ),
+        'residence_time' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['residence_time'],
+            'inputType'         => 'text',
+            'default'           => '0',
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'long'),
+            'sql'               => "smallint(5) unsigned NOT NULL default 1"
+        ),
+
         'oh_monday' => array
         (
             'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_monday'],

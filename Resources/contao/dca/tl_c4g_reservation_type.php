@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{type_legend},caption,description,options,periodType,objectCount,additional_params,published;{expert_legend:hide},auto_del;',
+        'default'   =>  '{type_legend},caption,description,options,business_name,business_phone,business_email,business_street,business_postal,business_city,periodType,objectCount,additional_params,published;{expert_legend:hide},auto_del;',
        '__selector__' => array('periodType','auto_del')
     ),
 
@@ -192,7 +192,57 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'sql' => "blob NULL "
         ),
 
-       'periodType' => array(
+       'business_name' => array
+       (
+           'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_name'],
+           'exclude'           => true,
+           'inputType'         => 'text',
+           'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
+           'sql'               =>"varchar(255) NOT NULL default ''"
+       ),
+        'business_phone' => array
+        (
+            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr '),
+            'sql'               =>"varchar(255) NOT NULL default ''"
+        ),
+        'business_email' => array
+        (
+            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_email'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              =>array('rgxp'=>'email','mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'sql'               =>"varchar(255) NOT NULL default ''"
+        ),
+        'business_street' => array
+        (
+            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_street'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'sql'               =>"varchar(255) NOT NULL default ''"
+        ),
+        'business_postal' => array
+        (
+            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_postal'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'sql'               =>"varchar(255) NOT NULL default ''"
+        ),
+        'business_city' => array
+        (
+            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_city'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'sql'               =>"varchar(255) NOT NULL default ''"
+        ),
+
+       'periodType' => array
+       (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'],
             'exclude'           => true,
             'inputType'         => 'select',

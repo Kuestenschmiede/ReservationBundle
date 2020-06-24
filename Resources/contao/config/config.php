@@ -65,9 +65,9 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
     'con4gis_reservation'   => array
     (
         'recipients'           => array('admin_email','email'),
-        'email_subject'        => array('admin_email', 'reservation_type','desiredCapacity', 'reservation_date','reservation_time', 'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'email', 'phone', 'address', 'postal', 'city',  'comment', 'reservation_id'),
-        'email_text'           => array('reservation_type','desiredCapacity','reservation_date','reservation_time',  'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'reservation_id'),
-        'email_html'           => array('reservation_type','desiredCapacity','reservation_date', 'reservation_time',  'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'reservation_id'),
+        'email_subject'        => array('admin_email', 'reservation_type','desiredCapacity', 'reservation_date','reservation_time', 'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'email', 'phone', 'address', 'postal', 'city',  'comment', 'internal_comment', 'reservation_id'),
+        'email_text'           => array('reservation_type','desiredCapacity','reservation_date','reservation_time',  'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'internal_comment', 'reservation_id'),
+        'email_html'           => array('reservation_type','desiredCapacity','reservation_date', 'reservation_time',  'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'internal_comment', 'reservation_id'),
         'email_sender_name'    => array('admin_email','email'),
         'email_sender_address' => array('admin_email','email'),
         'email_recipient_cc'   => array('admin_email','email'),

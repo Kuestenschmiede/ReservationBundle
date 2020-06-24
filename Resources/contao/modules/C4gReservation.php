@@ -13,6 +13,7 @@
 
 namespace con4gis\ReservationBundle\Resources\contao\modules;
 
+use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Actions\C4GSaveAndRedirectDialogAction;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
@@ -41,6 +42,9 @@ use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel;
 use Contao\StringUtil;
+use Contao\System;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\File;
 
 class C4gReservation extends C4GBrickModuleParent
 {
@@ -848,6 +852,87 @@ class C4gReservation extends C4GBrickModuleParent
         $this->fieldList = $fieldList;
     }
 
+
+    public function createIcs($begin_date,$begin_time, $objectId,$typeId)
+    {
+        $checkdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
+            ->execute($objectId);
+
+        $vcard= $checkdb->vcard_show;
+
+        if($vcard == 1)
+        {
+            $icsdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=?")
+                ->execute($typeId);
+            $business_street= $icsdb->business_street;
+            $business_postal= $icsdb->business_postal;
+            $business_city= $icsdb->business_city;
+        }
+        if($vcard == 0)
+        {
+            $business_street= $checkdb->business_street;
+            $business_postal= $checkdb->business_postal;
+            $business_city= $checkdb->business_city;
+        }
+
+        $businessdata = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=?")
+            ->execute($typeId);
+        $business_name= $businessdata->business_name;
+        $business_email= $businessdata->business_email;
+
+        $icstimezone = 'TZID=Europe/Berlin';
+        $icsdaylightsaving= date('I');
+        $icsprodid = $business_name;
+        $icslocation = $business_street ." ". $business_postal." ". $business_city;
+        $icsuid = $business_email;
+
+            if($icsdaylightsaving == 1)
+            {
+                $begin_time= $begin_time - 7200;
+            }
+            if($icsdaylightsaving == 0)
+            {
+                $begin_time= $begin_time - 3600;
+            }
+
+        $b_date =date('Ymd', strtotime($begin_date));
+        $b_time = date('His', $begin_time);
+        $icsdate=$b_date . 'T' . $b_time . 'Z';
+
+        $dbResult = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
+            ->execute($objectId);
+
+        $residence = $dbResult->residence_time;
+        $time_int = $dbResult->time_interval;
+        $icssummary = $dbResult->caption;
+
+            if($residence != 0)
+            {
+                $residence = $residence * 3600;
+                $e_date = date('Ymd',strtotime($begin_date));
+                $e_time = $begin_time + $residence;
+                $e_time = date('His',$e_time) ;
+                $icsenddate =$e_date . 'T' . $e_time. 'Z';
+            }
+            else
+            {
+                $time_int = $time_int * 3600;
+                $e_date = date('Ymd',strtotime($begin_date));
+                $e_time = $begin_time + $time_int;
+                $e_time = date('His',$e_time) ;
+                $icsenddate =$e_date . 'T' . $e_time. 'Z';
+            }
+        $filename = System::getContainer()->getParameter("kernel.project_dir") . "/files/Kalendereintrag.ics";
+            try {
+                $ics = new File($filename);
+            } catch (\Exception $exception) {
+                $fs = new Filesystem();
+                $fs->touch($filename);
+                $ics = new File($filename);
+            }
+        $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nEND:VEVENT\nEND:VCALENDAR\n");
+    }
+
     public function clickReservation($values, $putVars)
     {
         $type = $putVars['reservation_type'];
@@ -861,8 +946,25 @@ class C4gReservation extends C4GBrickModuleParent
             $newFieldList[] = $field;
         }
 
+
+
         $action = new C4GSaveAndRedirectDialogAction($this->dialogParams, $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
+        foreach ($putVars as $key => $value) {
+            if (strpos($key, "beginDate_") !== false) {
+                $beginDate = $value;
+            }
+            if (strpos($key, "beginTime_") !== false) {
+                $beginTime = $value;
+            }
+            if (strpos($key, "reservation_object_") !== false) {
+                $resObject = $value;
+            }
+            if (strpos($key, "reservation_type") !== false) {
+                $resType = $value;
+            }
+        }
+        $this->createIcs($beginDate, $beginTime, $resObject, $resType);
         return $result = $action->run();
     }
 

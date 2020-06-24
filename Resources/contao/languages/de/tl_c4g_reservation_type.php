@@ -15,6 +15,12 @@
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['caption'] = array("Backend Bezeichnung","Bezeichnung zur Auswahl im Backend.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['options'] = array("Frontend Bezeichnung","Werden je nach Sprache im Auswahlfeld im Frontend dargestellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("Option","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_name'] = array("Unternehmensname","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'] = array("Telefonnummer","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_email'] = array("Emailadresse","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_street'] = array("Straße","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_postal'] = array("Postleitzahl","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_city'] = array("Ort","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("Zeitspannenart","Art der Zeitspanne deklarieren");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'] = array("Maximale Anzahl Objekte pro Zeitspanne","Maximale Anzahl der Gleichzeitig buchbaren Objekte");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['language'] = array("Sprache","");
