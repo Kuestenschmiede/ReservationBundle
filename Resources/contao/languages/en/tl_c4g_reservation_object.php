@@ -19,6 +19,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'] = array("Reser
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['additionalBookingParams'] = array("Additional Reservation Options", "Select additional booking options.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['option'] = array("Option","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['vcard_show'] = array("Different address data to the reservation type", "Address is taken from reservation type");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['alert_time'] = array("Automatic calendar reminder", "Number of hours before appointment starts");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['business_name'] = array("Businessname","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['business_phone'] = array("Phone","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['business_email'] = array("Email","");

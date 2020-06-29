@@ -15,7 +15,8 @@
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'] = array("Bezeichnung", "Benennen Sie Ihr Reservierungsobjekt. Beispiele: Raum1, Tisch7, Fachkraft3");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['options'] = array("Frontendbezeichnung","Werden je nach Sprache im Frontend dargestellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['quantity'] = array("Verfügbare Anzahl","Wie viele Objekte dieses Typs stehen zur Verfügung? (Standard 1)");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['vcard_show'] = array("Abweichende Adressdaten zur Reservierungsart","Adresse wird von Reservierungsart übernommen");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['vcard_show'] = array("Adressdaten abweichend von Reservierungsart","Adresse wird von Reservierungsart übernommen");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['alert_time'] = array("Automatische Kalendererinnerung","Anzahl der Stunden bevor Termin beginnt");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'] = array("Reservierungsarten","Ordnen Sie das Reservierungsobjekt zu den Reservierungsarten zu.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['additionalBookingParams'] = array("Zusätzliche Reservierungsoptionen","Wählen Sie zusätzliche Buchungsoptionen aus.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['option'] = array("Option","");

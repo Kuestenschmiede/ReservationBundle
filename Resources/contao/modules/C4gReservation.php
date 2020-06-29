@@ -849,8 +849,57 @@ class C4gReservation extends C4GBrickModuleParent
         $buttonField->setWithoutLabel(true);
         $fieldList[] = $buttonField;
 
+
+        $business_name = new C4GTextField();
+        $business_name->setFieldName('business_name');
+        $business_name->setSortColumn(false);
+        $business_name->setFormField(false);
+        $business_name->setTableColumn(true);
+        $business_name->setNotificationField(true);
+        $fieldList[] = $business_name;
+
+        $business_phone = new C4GTelField();
+        $business_phone->setFieldName('business_phone');
+        $business_phone->setFormField(false);
+        $business_phone->setTableColumn(false);
+        $business_phone->setNotificationField(true);
+        $fieldList[] = $business_phone;
+
+        $business_email = new C4GEmailField();
+        $business_email->setFieldName('business_email');
+        $business_email->setTableColumn(false);
+        $business_email->setFormField(false);
+        $business_email->setNotificationField(true);
+        $fieldList[] = $business_email;
+
+
+        $business_street = new C4GTextField();
+        $business_street->setFieldName('business_street');
+        $business_street->setTableColumn(false);
+        $business_street->setFormField(false);
+        $business_street->setNotificationField(true);
+        $fieldList[] = $business_street;
+
+
+        $business_postal = new C4GPostalField();
+        $business_postal->setFieldName('business_postal');
+        $business_postal->setFormField(false);
+        $business_postal->setTableColumn(false);
+        $business_postal->setNotificationField(true);
+        $fieldList[] = $business_postal;
+
+
+        $business_city = new C4GTextField();
+        $business_city->setFieldName('business_city');
+        $business_city->setTableColumn(false);
+        $business_city->setFormField(false);
+        $business_city->setNotificationField(true);
+        $fieldList[] = $business_city;
+
         $this->fieldList = $fieldList;
     }
+
+
 
 
     public function createIcs($begin_date,$begin_time, $objectId,$typeId)
@@ -860,25 +909,23 @@ class C4gReservation extends C4GBrickModuleParent
 
         $vcard= $checkdb->vcard_show;
 
-        if($vcard == 1)
-        {
+        if ($vcard == null) {
             $icsdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=?")
                 ->execute($typeId);
-            $business_street= $icsdb->business_street;
-            $business_postal= $icsdb->business_postal;
-            $business_city= $icsdb->business_city;
+            $business_street = $icsdb->business_street;
+            $business_postal = $icsdb->business_postal;
+            $business_city = $icsdb->business_city;
         }
-        if($vcard == 0)
-        {
-            $business_street= $checkdb->business_street;
-            $business_postal= $checkdb->business_postal;
-            $business_city= $checkdb->business_city;
+        if ($vcard == 1) {
+            $business_street = $checkdb->business_street;
+            $business_postal = $checkdb->business_postal;
+            $business_city = $checkdb->business_city;
         }
 
         $businessdata = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=?")
             ->execute($typeId);
-        $business_name= $businessdata->business_name;
-        $business_email= $businessdata->business_email;
+        $business_name = $businessdata->business_name;
+        $business_email = $businessdata->business_email;
 
         $icstimezone = 'TZID=Europe/Berlin';
         $icsdaylightsaving= date('I');
@@ -886,62 +933,100 @@ class C4gReservation extends C4GBrickModuleParent
         $icslocation = $business_street ." ". $business_postal." ". $business_city;
         $icsuid = $business_email;
 
-            if($icsdaylightsaving == 1)
-            {
-                $begin_time= $begin_time - 7200;
-            }
-            if($icsdaylightsaving == 0)
-            {
-                $begin_time= $begin_time - 3600;
-            }
+        if ($icsdaylightsaving == 1) {
+            $begin_time = $begin_time - 7200;
+        }
+        if ($icsdaylightsaving == 0) {
+            $begin_time = $begin_time - 3600;
+        }
 
         $b_date =date('Ymd', strtotime($begin_date));
         $b_time = date('His', $begin_time);
-        $icsdate=$b_date . 'T' . $b_time . 'Z';
+        $icsdate = $b_date . 'T' . $b_time . 'Z';
 
         $dbResult = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
             ->execute($objectId);
 
+        $icsalert = $dbResult->alert_time;
         $residence = $dbResult->residence_time;
         $time_int = $dbResult->time_interval;
         $icssummary = $dbResult->caption;
 
-            if($residence != 0)
-            {
-                $residence = $residence * 3600;
-                $e_date = date('Ymd',strtotime($begin_date));
-                $e_time = $begin_time + $residence;
-                $e_time = date('His',$e_time) ;
-                $icsenddate =$e_date . 'T' . $e_time. 'Z';
-            }
-            else
-            {
-                $time_int = $time_int * 3600;
-                $e_date = date('Ymd',strtotime($begin_date));
-                $e_time = $begin_time + $time_int;
-                $e_time = date('His',$e_time) ;
-                $icsenddate =$e_date . 'T' . $e_time. 'Z';
-            }
+        $icsalert = $icsalert * 60;
+        $icsalert = '-PT'.$icsalert.'M';
+
+        if ($residence != 0) {
+            $residence = $residence * 3600;
+            $e_date = date('Ymd',strtotime($begin_date));
+            $e_time = $begin_time + $residence;
+            $e_time = date('His',$e_time) ;
+            $icsenddate =$e_date . 'T' . $e_time. 'Z';
+        } else {
+            $time_int = $time_int * 3600;
+            $e_date = date('Ymd',strtotime($begin_date));
+            $e_time = $begin_time + $time_int;
+            $e_time = date('His',$e_time) ;
+            $icsenddate =$e_date . 'T' . $e_time. 'Z';
+        }
         $filename = System::getContainer()->getParameter("kernel.project_dir") . "/files/Kalendereintrag.ics";
-            try {
-                $ics = new File($filename);
-            } catch (\Exception $exception) {
-                $fs = new Filesystem();
-                $fs->touch($filename);
-                $ics = new File($filename);
-            }
-        $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nEND:VEVENT\nEND:VCALENDAR\n");
+        try {
+            $ics = new File($filename);
+        } catch (\Exception $exception) {
+            $fs = new Filesystem();
+            $fs->touch($filename);
+            $ics = new File($filename);
+        }
+        $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nDESCRIPTION:$icssummary\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
+
     }
+
 
     public function clickReservation($values, $putVars)
     {
+
+
         $type = $putVars['reservation_type'];
+        $key = "reservation_object_" . $type;
+        $resObject = $putVars[$key];
         $newFieldList = [];
         foreach ($this->getFieldList() as $field) {
             $additionalId = $field->getAdditionalID();
             if ($additionalId && (($additionalId != $type) && (strpos(strval($additionalId), strval($type * 100)) === false))) {
                 continue;
             }
+            $checkdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
+                ->execute($resObject);
+
+            $vcard= $checkdb->vcard_show;
+
+            if ($vcard == null) {
+                $icsdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=?")
+                    ->execute($type);
+                $business_street = $icsdb->business_street;
+                $business_phone = $icsdb->business_phone;
+                $business_postal = $icsdb->business_postal;
+                $business_city = $icsdb->business_city;
+            }
+            if ($vcard == 1) {
+                $checkdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
+                    ->execute($resObject);
+                $business_street = $checkdb->business_street;
+                $business_phone = $checkdb->business_phone;
+                $business_postal = $checkdb->business_postal;
+                $business_city = $checkdb->business_city;
+            }
+
+            $businessdata = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=?")
+                ->execute($type);
+            $business_name = $businessdata->business_name;
+            $business_email = $businessdata->business_email;
+
+            $putVars['business_name'] =$business_name;
+            $putVars['business_phone'] =$business_phone;
+            $putVars['business_email'] =$business_email;
+            $putVars['business_street'] =$business_street;
+            $putVars['business_postal'] =$business_postal;
+            $putVars['business_city'] =$business_city;
 
             $newFieldList[] = $field;
         }
