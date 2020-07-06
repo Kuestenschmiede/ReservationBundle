@@ -212,8 +212,7 @@ class C4gReservationObjectModel extends \Model
 
             foreach ($objects as $object) {
                 $min = $object->getMinReservationDay();
-
-                if ($min && ($min < $firstmin)) {
+                if ($min && ($min > $firstmin)) {
                     $firstmin = $min;
                 }
             }
