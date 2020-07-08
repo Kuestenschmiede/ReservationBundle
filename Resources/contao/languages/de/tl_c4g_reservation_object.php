@@ -20,6 +20,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['alert_time'] = array("Automati
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'] = array("Reservierungsarten","Ordnen Sie das Reservierungsobjekt zu den Reservierungsarten zu.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['additionalBookingParams'] = array("Zusätzliche Reservierungsoptionen","Wählen Sie zusätzliche Buchungsoptionen aus.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['option'] = array("Option","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['business_name'] = array("Unternehmensname","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['business_phone'] = array("Telefonnummer","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['business_email'] = array("Emailadresse","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['business_street'] = array("Adresse","");

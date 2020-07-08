@@ -29,8 +29,6 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['del_time'] = array("Wert für In
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minute'] = array("Minuten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['no_delete'] = array("Nur Manuelles löschen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['hour'] = array("Stunden");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['hour_period'] = array("Stündlich");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minute_period'] = array("Minütlich");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['daily'] = array("Intervall löschen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['openingHours'] = array("Öffnungszeiten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['md'] = array("Mehrtägig");
@@ -54,6 +52,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Beschreib
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Angaben zur Reservierungsart";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Experten einstellungen";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['new'] = array("Reservierungsart hinzufügen","Reservierungsart hinzufügen");

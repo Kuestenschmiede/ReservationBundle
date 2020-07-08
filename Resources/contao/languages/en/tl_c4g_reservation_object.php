@@ -55,6 +55,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['minute'] = array("minutes");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['hour'] = array("hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['openingHours'] = array("booking hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'] = array("time interval", "Specify how many X minutes/ X hours the object can be booked (depends on which reservation type the object is assigned to");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_exclusion_end'] = array("Exclusion end", "Put the last Date of exlusion in");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_residence_time'] = array("Maximum residence time", "If the customer can choose the maximum length of stay in hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_residence_time'] = array("Minimum residence time", "If customer can choose length of stay at least how many hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['md'] = array("Several days");
@@ -63,6 +64,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_object'] = array("event 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['contao_event'] = array("Contao Event");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['published'] = array("Publish.", "Should this object be displayed in the frontend?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMin'] = array("Minimum number of persons", "How many persons may appear at least?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMax'] = array("Maximum number of persons", "How many persons may appear at least?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location_legend'] = array("Settings for the location");
 
 
 /** LEGENDS **/

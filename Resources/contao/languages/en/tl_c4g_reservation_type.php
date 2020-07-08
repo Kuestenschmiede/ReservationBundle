@@ -50,6 +50,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayEnd'] = array("end day");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additional_params'] = array("Reservation options");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Description");
 
+
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Details of the type of reservation";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Expert settings";
