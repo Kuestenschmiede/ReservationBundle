@@ -14,7 +14,7 @@
 /**
  * Table tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,additionalDuration,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservationCancellation'] = '{title_legend},name,headline,type;{reservation_legend},reservation_types; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site';
 
@@ -27,6 +27,15 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_types'] = array
     'inputType'               => 'checkbox',
     'options_callback'        => array('tl_module_c4g_reservation','getAllTypes'),
     'eval'                    => array('mandatory'=>false, 'multiple'=>true),
+    'sql'                     => "blob NULL"
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['additionalDuration'] = array
+(
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['additionalDuration'],
+    'exclude'                 => true,
+    'inputType'               => 'checkbox',
+    'eval'                    => array('multiple' => false,'mandatory'=>false,'includeBlankOption'=>true),
     'sql'                     => "blob NULL"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['hide_selection'] = array

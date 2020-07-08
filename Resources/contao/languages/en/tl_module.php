@@ -27,3 +27,4 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas']          
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['mandatory'] = array("Mandatory field?","");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['binding'] = array("Mandatory field?", "Should this data field be displayed as mandatory field in the frontend");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['hide_selection'] = array("Add data fields","");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['additionalDuration'] = array("Customer can specify length of stay", "If checked, a new field appears in the frontend in which the customer specifies his length of stay");

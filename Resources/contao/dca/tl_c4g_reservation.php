@@ -44,7 +44,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
 
         'label' => array
         (
-            'fields'            => array('id','beginDate','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object:tl_c4g_reservation_object.caption','reservation_id','confirmed','cancellation'),
+            'fields'            => array('id','beginDate','endTime','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object:tl_c4g_reservation_object.caption','reservation_id','confirmed','cancellation'),
             'label_callback'    => array('tl_c4g_reservation', 'listFields'),
             'showColumns'       => true,
         ),
@@ -100,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{reservation_legend}, reservation_type, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservation_object, reservation_id, confirmed, cancellation; {person_legend},organisation,salutation, lastname, firstname, email, phone, address, postal, city, comment,internal_comment, agreed;',
+        'default'   =>  '{reservation_legend}, reservation_type, additional_params, desiredCapacity, duration ,beginDate, endDate, beginTime, endTime, reservation_object, reservation_id, confirmed, cancellation; {person_legend},organisation,salutation, lastname, firstname, email, phone, address, postal, city, comment,internal_comment, agreed;',
     ),
 
 
@@ -176,6 +176,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         ),
 */
 
+        'duration' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['duration'],
+            'inputType'         => 'text',
+            'default'           => '1',
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'               => "smallint(5) unsigned NOT NULL default 1"
+        ),
+
         'periodType' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'],
             'exclude'                 => true,
@@ -233,6 +242,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['endTime'],
             'exclude'                 => true,
             'filter'                  => false,
+            'default'                 => '-',
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50','date','datepicker'=>true),
@@ -516,6 +526,7 @@ class tl_c4g_reservation extends Backend
 
         $arrRow['reservation_object'] = $reservationObjects;
         $arrRow['beginDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['beginTime']);
+        $arrRow['endTime']= date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']);
         //$arrRow['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']);
 
         $type = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel::findByPk($arrRow['reservation_type']);
@@ -526,6 +537,7 @@ class tl_c4g_reservation extends Backend
         $result = [
             $arrRow['id'],
             $arrRow['beginDate'],
+            $arrRow['endTime'],
             $arrRow['desiredCapacity'],
             $arrRow['reservation_type'],
             $arrRow['lastname'],

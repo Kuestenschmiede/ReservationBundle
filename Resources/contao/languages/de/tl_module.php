@@ -29,3 +29,4 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas']          
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['mandatory']           = array("Pflichtfeld?","");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['binding']           = array("Pflichtfeld?","Soll dieses Datenfeld als Pflichtfeld im Frontend angezeigt werden");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['hide_selection']           = array("Datenfelder Hinzufügen","");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['additionalDuration']           = array("Kunde kann Verweildauer selber angeben","Mit anhaken erscheint im Frontend ein neues Feld in welchem der Kunde seine verweildauer angibt");

@@ -22,6 +22,7 @@ class C4gReservationFrontendObject
     private $caption = '';
     private $quantity = 1;
     private $timeinterval = '30';
+    private $duration = '2';
     private $reservationTypes = [];
     private $opening_hours = ['mo','tu','we','th','fr','sa','su'];
     private $dates_exclusion = [];
@@ -99,6 +100,22 @@ class C4gReservationFrontendObject
     public function setTimeinterval(string $timeinterval): void
     {
         $this->timeinterval = $timeinterval;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDuration(): string
+    {
+        return $this->duration;
+    }
+
+    /**
+     * @param string $duration
+     */
+    public function setDuration(string $duration): void
+    {
+        $this->duration = $duration;
     }
 
     /**

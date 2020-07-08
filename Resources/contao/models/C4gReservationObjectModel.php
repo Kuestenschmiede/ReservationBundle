@@ -13,7 +13,9 @@
 namespace con4gis\ReservationBundle\Resources\contao\models;
 
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
+use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ReservationBundle\Classes\C4gReservationFrontendObject;
+use Contao\StringUtil;
 
 /**
  * Class C4gReservationObjectModel
@@ -306,7 +308,7 @@ class C4gReservationObjectModel extends \Model
         return false;
     }
 
-    public static function getReservationTimes($list, $type, $weekday = -1, $date = null)
+    public static function getReservationTimes($list, $type, $weekday = -1, $date = null,$duration=0)
     {
         $result = array();
 
@@ -354,23 +356,38 @@ class C4gReservationObjectModel extends \Model
                     continue;
                 }
 
-
-                $oh = $object->getOpeningHours();
-                switch ($periodType) {
-                  case 'minute':
-                      $interval = $object->getTimeinterval() * 60;
-                      break;
-                  case 'hour':
-                      $interval = $object->getTimeinterval() * 3600;
-                      break;
+                if($duration >= 1)
+                {
+                    $oh = $object->getOpeningHours();
+                    switch ($periodType) {
+                        case 'minute':
+                            $interval = 1 * 60;
+                            break;
+                        case 'hour':
+                            $interval =1 * 3600;
+                            break;
+                        default: '';
+                    }
+                }else{
+                    $oh = $object->getOpeningHours();
+                    switch ($periodType) {
+                        case 'minute':
+                            $interval = $object->getTimeinterval() * 60;
+                            break;
+                        case 'hour':
+                            $interval = $object->getTimeinterval() * 3600;
+                            break;
 //                    case 'minute_period':
 //                        $interval = $object->getTimeinterval() * 60;
 //                        break;
 //                    case 'hour_period':
 //                        $interval = $object->getTimeinterval() * 3600;
 //                        break;
-                  default: '';
+                        default: '';
+                    }
                 }
+
+
 
                 if ($interval && ($interval > 0)) {
                     if ($interval > 0) {

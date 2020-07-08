@@ -13,11 +13,14 @@
 namespace con4gis\ReservationBundle\Resources\contao\models;
 
 
+use Contao\Database;
+use Contao\Model;
+
 /**
  * Class C4gReservationModel
  * @package c4g\projects
  */
-class C4gReservationModel extends \Model
+class C4gReservationModel extends Model
 {
 
     /**
@@ -25,5 +28,17 @@ class C4gReservationModel extends \Model
      * @var string
      */
     protected static $strTable = 'tl_c4g_reservation';
+
+    public static function getDialog($id)
+    {
+        $database=Database::getInstance();
+
+        $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
+            ->execute($objectId);
+
+
+
+
+    }
 
 }

@@ -16,6 +16,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['id'] = array("#", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_type'] = array("Reservierungsart", "Um welche Reservierungsart handelt es sich");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_additional_option'] = array("Zusätzliche Buchungsoption", "Soll eine zusätzliche Option gebucht werden?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['desiredCapacity'] = array("Anzahl der Personen", "Wie viele Personen werden maximal erscheinen?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['duration'] = array("Verweildauer", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'] = array("Zeitspannenart");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['minute'] = array("Minuten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['hour'] = array("Stunden");

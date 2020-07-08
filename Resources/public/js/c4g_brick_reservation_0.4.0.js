@@ -140,6 +140,10 @@ function setTimeset(object, id, additionalId, callFunction) {
         elementId = "c4g_beginDate_"+additionalId;
         date = document.getElementById(elementId).value;
     }
+    var durationNode = document.getElementById("c4g_duration");
+    if (durationNode) {
+        var duration = durationNode.value;
+    }
 
     //ToDo
     C4GCallOnChangeMethodswitchFunction(object);
@@ -148,25 +152,27 @@ function setTimeset(object, id, additionalId, callFunction) {
     if (id && callFunction && date && additionalId) {
         jQuery.ajax({
             dataType: "json",
-            url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+"?id=0",
+            url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
             success: function (data) {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"00"+getWeekdate(date));
                 var radioGroups = timeGroup.getElementsByClassName("c4g_brick_radio_group");
                 var timeList = [];
                 var objectList = [];
 
-                var keys = Object.keys(data['times']);
-                var size = keys.length;
+                var times = data['times'];
+
+
+                var size = times.length;
 
                 $(document.getElementsByClassName('reservation_time_button_'+additionalId)) ? $(document.getElementsByClassName('reservation_time_button_'+additionalId)).show() : false;
-
-                for (i = 0; i < size; i++) {
-                    var dataTime = data['times'][keys[i]].id;
+                for (var i = 0; i < size; i++) {
+                    var dataTime = times[i].id;
                     timeList[i] = dataTime;
 
-                    var dataObject = data['times'][keys[i]].object;
+                    var dataObject = times[i].object;
                     objectList[i] = dataObject;
                 }
+
 
                 //if (radioGroups.style && radioGroups.style != "display:none") {
                 for (i = 0; i < radioGroups.length; i++) {

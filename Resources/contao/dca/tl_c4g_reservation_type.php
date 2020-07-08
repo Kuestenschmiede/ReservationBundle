@@ -237,7 +237,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_city'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr long'),
             'sql'               =>"varchar(255) NOT NULL default ''"
         ),
 
@@ -246,7 +246,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'],
             'exclude'           => true,
             'inputType'         => 'select',
-            'options'           => array('minute',/*'minute_period'*/'hour',/*'hour_period','md','event','contao_event'*/),
+            'options'           => array('minute','hour'/*,'minute_period','hour_period','md','event','contao_event'*/),
             'reference'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
             'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>true, 'submitOnChange' => true),
             'sql'               => "char(25) NOT NULL default ''"
