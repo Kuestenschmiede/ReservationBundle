@@ -53,7 +53,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'label' => array
         (
-            'fields'            => array('caption','quantity','vcard_show','alert_time','desiredCapacityMin','desiredCapacityMax','viewableTypes:tl_c4g_reservation_type.caption','time_interval','residence_time'),
+            'fields'            => array('caption','quantity','desiredCapacityMin','desiredCapacityMax','viewableTypes:tl_c4g_reservation_type.caption','time_interval','residence_time'),
             'label_callback'    => array('tl_c4g_reservation_object', 'listFields'),
             'showColumns'       => true
         ),
