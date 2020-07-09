@@ -178,7 +178,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationDesiredCapacity->setFormField(true);
             $reservationDesiredCapacity->setEditable(true);
             $reservationDesiredCapacity->setCondition(array($condition));
-            $reservationDesiredCapacity->setInitialValue(1);
+            $reservationDesiredCapacity->setInitialValue(0);
             $reservationDesiredCapacity->setMandatory(true);
             $reservationDesiredCapacity->setCallOnChange(true);
             $reservationDesiredCapacity->setCallOnChangeFunction("setTimeset(this, " . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
