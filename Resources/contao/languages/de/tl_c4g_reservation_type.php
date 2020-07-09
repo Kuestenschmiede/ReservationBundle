@@ -53,6 +53,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Beschreib
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Angaben zur Reservierungsart";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Experten einstellungen";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_data'] = "Veranschalter Angaben";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['new'] = array("Reservierungsart hinzufügen","Reservierungsart hinzufügen");

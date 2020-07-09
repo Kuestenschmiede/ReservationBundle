@@ -16,7 +16,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['id'] = array("#", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_type'] = array("Reservierungsart", "Um welche Reservierungsart handelt es sich");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_additional_option'] = array("Zusätzliche Buchungsoption", "Soll eine zusätzliche Option gebucht werden?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['desiredCapacity'] = array("Anzahl der Personen", "Wie viele Personen werden maximal erscheinen?");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['duration'] = array("Verweildauer", "");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['duration'] = array("Verweildauer", "Angabe in Stunden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'] = array("Zeitspannenart");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['minute'] = array("Minuten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['hour'] = array("Stunden");
@@ -40,17 +40,17 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone'] = array("Telefonnummer", "Tel
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['address'] = array("Straße", "Straße");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal'] = array("Postleitzahl", "Postleitzahl");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['city'] = array("Ort", "Ort");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'] = array("Ihre Nachricht an uns", "Kommentarfeld zur Reservierung.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['internal_comment'] = array("Kommentar durch Mitarbeiter", "Kommentar durch Mitarbeiter");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'] = array("Anmerkung vom Kunden", "Kommentarfeld zur Reservierung.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['internal_comment'] = array("Nachricht an Kunde", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'] = array("Datenschutzerklärung", "Wird vom Nutzer im Frontend ausgewählt.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Bestätigt", "Wurde der Termin bestätigt? Wenn es zutreffend ist, dieses Feld anwählen (otpional).");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Storniert", "Wenn der Termin stoniert ist dieses Feld anwählen");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Bestätigt", "Wurde der Termin bestätigt?(Optional)");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Storniert", "Wenn der Termin storniert wird, ist dieses Feld anwählen");
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes'] = 'ja';
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend'] = "Reservierungsdaten";
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['person_legend']      = "Personendaten";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['person_legend']      = "Kontaktdaten";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['new'] = array("Reservierung hinzufügen","Reservierung hinzufügen");

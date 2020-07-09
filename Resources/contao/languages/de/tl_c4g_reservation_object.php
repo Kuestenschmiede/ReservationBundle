@@ -12,7 +12,7 @@
  */
 
 /** FIELDS */
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'] = array("Bezeichnung", "Benennen Sie Ihr Reservierungsobjekt. Beispiele: Raum1, Tisch7, Fachkraft3");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'] = array("Bezeichnung", "Bezeichnung im Frontend sowie Backend.Benennen Sie Ihr Reservierungsobjekt. Beispiele: Raum1, Tisch7, Fachkraft3");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['options'] = array("Frontendbezeichnung","Werden je nach Sprache im Frontend dargestellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['quantity'] = array("Verfügbare Anzahl","Wie viele Objekte dieses Typs stehen zur Verfügung? (Standard 1)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['vcard_show'] = array("Adressdaten abweichend von Reservierungsart","Adresse wird von Reservierungsart übernommen");
@@ -49,15 +49,15 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_dayBegin'] = array("Even
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_dayEnd'] = array("Eventende","Am welchen Tag endet das Event.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_timeBegin'] = array("Eventstart","Um wieviel Uhr startet das Event.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_timeEnd'] = array("Eventende","Um wieviel Uhr endet das EVent.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['description'] = array("Beschreibung","Beschreibung des Reservierungsobjektes.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['description'] = array("Beschreibung"," Backend Beschreibung des Reservierungsobjektes.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['locgeox'] = array("X-Koordinate","Geben Sie die X-Koordinate an.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['locgeoy'] = array("Y-Koordinate","Geben Sie die Y-Koordinate an.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['minute'] = array("Minuten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['hour'] = array("Stunden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['openingHours'] = array("Buchungszeiten");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'] = array("Zeitintervall","Geben sie an wie viele X Minuten/ X Stunden das Objekt gebucht werden kann (hängt davon ab welcher Reservierungsart das Objekt zugeordnet ist");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_residence_time'] = array("Minimale Verweildauer","Wenn Kunde Verweildauer wählen kann mindestens wieviele Stunden");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_residence_time'] = array("Maximale Verweildauer","Wenn Kunde Verweildauer wählen kann wie lange Maximal in Stunden");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'] = array("Zeitintervall","Geben sie an wie viele X Minuten/ X Stunden das Objekt gebucht werden kann (hängt davon ab welcher Reservierungs-und zeitspannenart das Objekt zugeordnet ist");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_residence_time'] = array("Minimale Verweildauer(optional)","Wenn Kunde Verweildauer wählen kann mindestens wieviele Stunden");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_residence_time'] = array("Maximale Verweildauer(optional)","Wenn Kunde Verweildauer wählen kann wie lange Maximal in Stunden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['md'] = array("Mehrtägig");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_selection'] = array("Eventtyp");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_object'] = array("Event Objekt");
