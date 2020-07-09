@@ -523,10 +523,10 @@ class tl_c4g_reservation extends Backend
                 }
             }
         //}
-
+        $arrRow['endTime'] = $arrRow['beginDate'] + $arrRow['endTime'];
         $arrRow['reservation_object'] = $reservationObjects;
         $arrRow['beginDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['beginTime']);
-        $arrRow['endTime']= date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']);
+        $arrRow['endTime']= date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endTime']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']);
         //$arrRow['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']);
 
         $type = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel::findByPk($arrRow['reservation_type']);
