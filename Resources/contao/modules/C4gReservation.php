@@ -266,6 +266,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $suReservationTimeField->setFormField(true);
                 $suReservationTimeField->setOptions(C4gReservationObjectModel::getReservationTimes($reservationObjects, $type['id'], 'su', date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getMinDate($reservationObjects)),$additionalDuration));
                 $suReservationTimeField->setMandatory(true);
+                $suReservationTimeField->setInitInvisible(true);
                 $suReservationTimeField->setSort(false);
                 $suReservationTimeField->setCondition($suConditionArr);
                 $suReservationTimeField->setCallOnChange(true);
@@ -289,6 +290,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $moReservationTimeField->setFormField(true);
                 $moReservationTimeField->setOptions(C4gReservationObjectModel::getReservationTimes($reservationObjects, $type['id'], 'mo', date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getMinDate($reservationObjects)),$additionalDuration));
                 $moReservationTimeField->setMandatory(true);
+                $moReservationTimeField->setInitInvisible(true);
                 $moReservationTimeField->setSort(false);
                 $moReservationTimeField->setCondition($moConditionArr);
                 $moReservationTimeField->setCallOnChange(true);
@@ -312,6 +314,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $tuReservationTimeField->setFormField(true);
                 $tuReservationTimeField->setOptions(C4gReservationObjectModel::getReservationTimes($reservationObjects, $type['id'], 'tu', date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getMinDate($reservationObjects)),$additionalDuration));
                 $tuReservationTimeField->setMandatory(true);
+                $tuReservationTimeField->setInitInvisible(true);
                 $tuReservationTimeField->setSort(false);
                 $tuReservationTimeField->setCondition($tuConditionArr);
                 $tuReservationTimeField->setCallOnChange(true);
@@ -335,6 +338,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $weReservationTimeField->setFormField(true);
                 $weReservationTimeField->setOptions(C4gReservationObjectModel::getReservationTimes($reservationObjects, $type['id'], 'we', date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getMinDate($reservationObjects)),$additionalDuration));
                 $weReservationTimeField->setMandatory(true);
+                $weReservationTimeField->setInitInvisible(true);
                 $weReservationTimeField->setSort(false);
                 $weReservationTimeField->setCondition($weConditionArr);
                 $weReservationTimeField->setCallOnChange(true);
@@ -358,6 +362,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $thReservationTimeField->setFormField(true);
                 $thReservationTimeField->setOptions(C4gReservationObjectModel::getReservationTimes($reservationObjects, $type['id'], 'th', date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getMinDate($reservationObjects)),$additionalDuration));
                 $thReservationTimeField->setMandatory(true);
+                $thReservationTimeField->setInitInvisible(true);
                 $thReservationTimeField->setSort(false);
                 $thReservationTimeField->setCondition($thConditionArr);
                 $thReservationTimeField->setCallOnChange(true);
@@ -381,6 +386,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $frReservationTimeField->setFormField(true);
                 $frReservationTimeField->setOptions(C4gReservationObjectModel::getReservationTimes($reservationObjects, $type['id'], 'fr', date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getMinDate($reservationObjects)),$additionalDuration));
                 $frReservationTimeField->setMandatory(true);
+                $frReservationTimeField->setInitInvisible(true);
                 $frReservationTimeField->setSort(false);
                 $frReservationTimeField->setCondition($frConditionArr);
                 $frReservationTimeField->setCallOnChange(true);
@@ -404,7 +410,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $saReservationTimeField->setFormField(true);
                 $saReservationTimeField->setEditable(false);
                 $saReservationTimeField->setOptions(C4gReservationObjectModel::getReservationTimes($reservationObjects, $type['id'], 'sa', date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getMinDate($reservationObjects)),$additionalDuration));
-                $saReservationTimeField->setMandatory(true); //true doesn't work
+                $saReservationTimeField->setMandatory(true);
+                $saReservationTimeField->setInitInvisible(true);
                 $saReservationTimeField->setSort(false);
                 $saReservationTimeField->setCondition($saConditionArr);
                 $saReservationTimeField->setCallOnChange(true);
