@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{type_legend},caption,description,options,{business_data}business_name,business_phone,business_email,business_street,business_postal,business_city,periodType,objectCount,additional_params,published;{expert_legend:hide},auto_del;',
+        'default'   =>  '{type_legend},caption,description,options;{business_data},business_name,business_phone,business_email,business_street,business_postal,business_city,periodType,objectCount,additional_params,published;{expert_legend:hide},auto_del;',
        '__selector__' => array('periodType','auto_del')
     ),
 

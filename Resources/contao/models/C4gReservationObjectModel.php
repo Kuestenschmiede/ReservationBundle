@@ -15,6 +15,7 @@ namespace con4gis\ReservationBundle\Resources\contao\models;
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ReservationBundle\Classes\C4gReservationFrontendObject;
+use Contao\Database;
 use Contao\StringUtil;
 
 /**
@@ -64,15 +65,86 @@ class C4gReservationObjectModel extends \Model
     public static function getDateExclusionString($list)
     {
         $result = '';
+
         if ($list) {
             $dates = array();
             foreach ($list as $object) {
+                if(!$object instanceof C4gReservationFrontendObject){
+                    break;
+                }
                 $exclusionPeriods = $object->getDatesExclusion();
+                $id= $object->getId();
+                $database = Database::getInstance();
+                $dates = $database->prepare("SELECT DISTINCT beginDate FROM `tl_c4g_reservation` WHERE reservation_object=?")
+                    ->execute($id)->fetchAllAssoc();
+                $times = $database->prepare("SELECT  * FROM `tl_c4g_reservation` WHERE reservation_object=?")
+                    ->execute($id)->fetchAllAssoc();
+                $objectData = $database->prepare("SELECT * FROM `tl_c4g_reservation_object` WHERE id=?")
+                    ->execute($id)->fetchAssoc();
+                $quantity = $objectData['quantity'];
 
+                foreach ($dates as $date){
+                    $beginDate = $date['beginDate'];
+                    $weekday = date(w,$beginDate);
+                    $interval = $objectData['time_interval'];
+
+                    if($weekday = 0){
+                        $array = StringUtil::deserialize($objectData['oh_sunday']);
+                        $begin = $array['time_begin'];
+                        $end = $array['time_end'];
+                    }
+                    if($weekday = 1){
+                        $array = StringUtil::deserialize($objectData['oh_monday']);
+                        $begin = $array['time_begin'];
+                        $end = $array['time_end'];
+                    }
+                    if($weekday = 2){
+                        $array = StringUtil::deserialize($objectData['oh_tuesday']);
+                        $begin = $array['time_begin'];
+                        $end = $array['time_end'];
+                    }
+                    if($weekday = 3){
+                        $array = StringUtil::deserialize($objectData['oh_wednesday']);
+                        $begin = $array['time_begin'];
+                        $end = $array['time_end'];
+                    }
+                    if($weekday = 4){
+                        $array = StringUtil::deserialize($objectData['oh_thursday']);
+                        $begin = $array['time_begin'];
+                        $end = $array['time_end'];
+                    }
+                    if($weekday = 5){
+                        $array = StringUtil::deserialize($objectData['oh_friday']);
+                        $begin = $array['time_begin'];
+                        $end = $array['time_end'];
+                    }
+                    if($weekday = 6){
+                        $array = StringUtil::deserialize($objectData['oh_saturday']);
+                        $begin = $array['time_begin'];
+                        $end = $array['time_end'];
+                    }
+                    $time = ($begin / (60*60)) - ($end / (60*60));
+                    $possibleBookings = $time / $interval;
+                    $possibleBookings= $possibleBookings * $quantity;
+
+                    $count = $database->prepare("SELECT COUNT(*) AS count FROM `tl_c4g_reservation` WHERE reservation_object=? AND beginDate=?")
+                        ->execute($id,$date['beginDate'])->fetchAllAssoc();
+
+                    if($count >= $possibleBookings)
+                    {
+                        $exclusionPeriods[] = [
+                            'date_exclusion'=> $date['beginDate'],
+                            'date_exclusion_end'=> $date['beginDate'],
+                        ];
+
+                    }
+
+                }
                 foreach ($exclusionPeriods as $period) {
                     if ($period) {
                         $exclusionBegin = $period['date_exclusion'];
                         $exclusionEnd =  $period['date_exclusion_end'];
+
 
                         $current = $exclusionBegin;
                         while($current <= $exclusionEnd) {
@@ -430,9 +502,9 @@ class C4gReservationObjectModel extends \Model
                                             if ($tsdate) {
                                                 if ($maxCount && ($count[$tsdate][$time] >= intval($maxCount))) {
                                                     $result = self::addTime($result, $time, -1);
-                                                } /*else if ($objectQuantity && ($objectCount[$tsdate][$time] >= intval($objectQuantity))) {
+                                                } else if ($objectQuantity && ($objectCount[$tsdate][$time] >= intval($objectQuantity))) {
                                                    $result = self::addTime($result, $time, -1);
-                                                }*/ else {
+                                                } else {
                                                     $result = self::addTime($result, $time, $id);
                                                 }
                                             }
