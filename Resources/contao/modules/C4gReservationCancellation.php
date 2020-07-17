@@ -34,8 +34,8 @@ class C4gReservationCancellation extends C4GBrickModuleParent
     protected $languageFile = 'fe_c4g_reservation_cancellation';
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION_CANCELLATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
-    protected $brickScript  = 'bundles/con4gisreservation/js/c4g_brick_reservation_0.4.0.js';
-    protected $brickStyle   = 'bundles/con4gisreservation/css/c4g_brick_reservation_0.4.0.css';
+    protected $brickScript  = 'bundles/con4gisreservation/js/c4g_brick_reservation.js';
+    protected $brickStyle   = 'bundles/con4gisreservation/css/c4g_brick_reservation.css';
     protected $withNotification = true;
 
 
