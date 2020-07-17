@@ -1,10 +1,21 @@
 function getWeekdate(date) {
+
+    //ToDo internationalize
     if (date.indexOf(".") > 0) {
         var arrDate = date.split(".")
         var y = arrDate[2];
         var m = arrDate[1];
         var d = arrDate[0];
+        //important for safari browser
+        m = m<10?"0"+m:m;
+        d = d<10?"0"+d:d;
 
+        date = y + "/" + m + "/" + d;
+    } else if (date.indexOf("/") > 0) {
+        var arrDate = date.split("/")
+        var y = arrDate[2];
+        var m = arrDate[1];
+        var d = arrDate[0];
         //important for safari browser
         m = m<10?"0"+m:m;
         d = d<10?"0"+d:d;
@@ -145,9 +156,14 @@ function setTimeset(object, id, additionalId, callFunction) {
         var duration = durationNode.value;
     }
 
-    //ToDo
     C4GCallOnChangeMethodswitchFunction(object);
     C4GCallOnChange(object);
+
+    //hotfix dates with slashes
+    if (date.indexOf("/")) {
+        date = date.replace("/", "~");
+        date = date.replace("/", "~");
+    }
 
     if (id && callFunction && date && additionalId) {
         jQuery.ajax({

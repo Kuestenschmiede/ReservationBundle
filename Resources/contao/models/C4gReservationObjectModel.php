@@ -62,6 +62,7 @@ class C4gReservationObjectModel extends \Model
         return $result;
     }
 
+    //ToDo Anpassen, so passt es nicht! (siehe auch TK)
     public static function getDateExclusionString($list)
     {
         $result = '';
@@ -387,13 +388,26 @@ class C4gReservationObjectModel extends \Model
         if ($list) {
             shuffle($list);
 
+            //hotfix dates with slashes
+            $date = str_replace("~", "/", $date);
             if ($date) {
                 $format = $GLOBALS['TL_CONFIG']['dateFormat'];
+
                 $tsdate = \DateTime::createFromFormat($format, $date);
                 if ($tsdate) {
                     $tsdate->Format($format);
-                    $tsdate->setTime(0, 0, 0);
+                    $tsdate->setTime(0,0,0);
                     $tsdate = $tsdate->getTimestamp();
+                } else {
+                    $format = "d/m/Y";
+                    $tsdate = \DateTime::createFromFormat($format, $date);
+                    if ($tsdate) {
+                        $tsdate->Format($format);
+                        $tsdate->setTime(0,0,0);
+                        $tsdate = $tsdate->getTimestamp();
+                    } else {
+                        $tsdate = strtotime($date);
+                    }
                 }
             }
 

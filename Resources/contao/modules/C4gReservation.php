@@ -939,8 +939,30 @@ class C4gReservation extends C4GBrickModuleParent
         $duration = $values[4];
         $weekday = -1;
         $wd = -1;
-        if ($date) {
-            $datetime = strtotime($date);
+
+        //hotfix dates with slashes
+        $date = str_replace("~", "/", $date);
+        if ($date)  {
+            $format = $GLOBALS['TL_CONFIG']['dateFormat'];
+
+            $tsdate = \DateTime::createFromFormat($format, $date);
+            if ($tsdate) {
+                $tsdate->Format($format);
+                $tsdate->setTime(0,0,0);
+                $tsdate = $tsdate->getTimestamp();
+            } else {
+                $format = "d/m/Y";
+                $tsdate = \DateTime::createFromFormat($format, $date);
+                if ($tsdate) {
+                    $tsdate->Format($format);
+                    $tsdate->setTime(0,0,0);
+                    $tsdate = $tsdate->getTimestamp();
+                } else {
+                    $tsdate = strtotime($date);
+                }
+            }
+
+            $datetime = $tsdate;//strtotime($date);
             $wd = date("w", $datetime);
             switch ($wd) {
                 case 0:
