@@ -160,7 +160,7 @@ function setTimeset(object, id, additionalId, callFunction) {
     C4GCallOnChange(object);
 
     //hotfix dates with slashes
-    if (date.indexOf("/")) {
+    if (date && date.indexOf("/")) {
         date = date.replace("/", "~");
         date = date.replace("/", "~");
     }
@@ -171,7 +171,7 @@ function setTimeset(object, id, additionalId, callFunction) {
             url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
             success: function (data) {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"00"+getWeekdate(date));
-                var radioGroups = timeGroup.getElementsByClassName("c4g_brick_radio_group");
+                var radioGroups = timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group");
                 var timeList = [];
                 var objectList = [];
 

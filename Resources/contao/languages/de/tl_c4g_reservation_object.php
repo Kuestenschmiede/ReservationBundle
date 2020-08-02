@@ -63,8 +63,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_selection'] = array("Eve
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_object'] = array("Event Objekt");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['contao_event'] = array("Contao Event");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['published'] = array("Veröffentlichen.","Soll dieses Objekt im Frontend angezeigt werden?");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMin'] = array("Minimale Anzahl der Personen", "Wie viele Personen dürfen mindestens erscheinen?");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMax'] = array("Maximale Anzahl der Personen", "Wie viele Personen dürfen maximal erscheinen?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMin'] = array("Minimale Anzahl der Personen", "Wie viele Personen dürfen mindestens erscheinen? Beim Standard 0 wird die Anzahl nicht ausgewertet.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMax'] = array("Maximale Anzahl der Personen", "Wie viele Personen dürfen maximal erscheinen? Beim Standard 0 wird die Anzahl nicht ausgewertet.");
 
 
 /** LEGENDS **/

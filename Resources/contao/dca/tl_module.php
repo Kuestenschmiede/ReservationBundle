@@ -14,7 +14,7 @@
 /**
  * Table tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,additionalDuration,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,withCapacity,additionalDuration,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservationCancellation'] = '{title_legend},name,headline,type;{reservation_legend},reservation_types; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site';
 
@@ -29,7 +29,13 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_types'] = array
     'eval'                    => array('mandatory'=>false, 'multiple'=>true),
     'sql'                     => "blob NULL"
 );
-
+$GLOBALS['TL_DCA']['tl_module']['fields']['withCapacity'] = array
+(   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withCapacity'],
+    'exclude'           => true,
+    'filter'            => true,
+    'inputType'         => 'checkbox',
+    'sql'               => "int(1) unsigned NULL default 0"
+);
 $GLOBALS['TL_DCA']['tl_module']['fields']['additionalDuration'] = array
 (
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['additionalDuration'],
@@ -148,16 +154,14 @@ class tl_module_c4g_reservation extends Backend {
 
     public function getOptional($dc)
     {
-
         System::loadLanguageFile('tl_c4g_reservation');
         $columnsFormatted=[];
-            $columnsFormatted['organisation'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation'][0];
-            $columnsFormatted['phone'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone'][0];
-            $columnsFormatted['address'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['address'][0];
-            $columnsFormatted['postal'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal'][0];
-            $columnsFormatted['city'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['city'][0];
-            $columnsFormatted['comment'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'][0];
-
+        $columnsFormatted['organisation'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation'][0];
+        $columnsFormatted['phone'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone'][0];
+        $columnsFormatted['address'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['address'][0];
+        $columnsFormatted['postal'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal'][0];
+        $columnsFormatted['city'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['city'][0];
+        $columnsFormatted['comment'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'][0];
 
         return $columnsFormatted;
 

@@ -255,8 +255,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'               =>"varchar(255) NOT NULL default ''"
         ),
 
-
-            'desiredCapacityMin' => array
+        'desiredCapacityMin' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMin'],
             'exclude'                 => false,
@@ -265,7 +264,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'eval'                    => array('mandatory'=>true, 'maxlength'=>3, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'w50 clr'),
             'sql'                     => "int(3) unsigned NOT NULL default 0"
         ),
-
 
         'desiredCapacityMax' => array
         (
@@ -810,23 +808,6 @@ class tl_c4g_reservation_object extends Backend
             ->execute($intId);
         $this->createNewVersion('tl_c4g_reservation_object', $intId);
     }
-
-
-    /**
-     * Return all themes as array
-     * @return array
-     */
-    public function getAllThemes()
-    {
-        $return = array();
-        $themes = $this->Database->prepare("SELECT id,name FROM tl_c4g_reservation_object ORDER BY name")
-            ->execute();
-        while ($themes->next()) {
-            $return[$themes->id] = $themes->name;
-        }
-        return $return;
-    }
-
 
     /** Validate Center Lon*/
     public function setCenterLon($varValue, DataContainer $dc)

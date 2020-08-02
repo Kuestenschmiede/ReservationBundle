@@ -33,12 +33,8 @@ class C4gReservationModel extends Model
     {
         $database=Database::getInstance();
 
-        $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
+        $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
             ->execute($objectId);
-
-
-
-
     }
 
 }

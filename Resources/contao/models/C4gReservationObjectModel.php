@@ -62,29 +62,91 @@ class C4gReservationObjectModel extends \Model
         return $result;
     }
 
-    //ToDo Anpassen, so passt es nicht! (siehe auch TK)
-    public static function getDateExclusionString($list)
+    public static function getMaxObjectCountPerDate($list, $date, $type) {
+        $result = 0;
+        $database = Database::getInstance();
+        foreach ($list as $object) {
+            $id= $object->getId();
+            $objectData = $database->prepare("SELECT * FROM `tl_c4g_reservation_object` WHERE id=? AND published='1'")
+                ->execute($id)->fetchAssoc();
+            $weekday = date(w,$date);
+            $quantity = $objectData['quantity'];
+            $periodType = $type['periodType'];
+            $interval = $object->getTimeInterval();
+
+            if($weekday == 0){
+                $array = unserialize($objectData['oh_sunday']);
+            }
+            if($weekday == 1){
+                $array = unserialize($objectData['oh_monday']);
+            }
+            if($weekday == 2){
+                $array = unserialize($objectData['oh_tuesday']);
+            }
+            if($weekday == 3){
+                $array = unserialize($objectData['oh_wednesday']);
+            }
+            if($weekday == 4){
+                $array = unserialize($objectData['oh_thursday']);
+            }
+            if($weekday == 5){
+                $array = unserialize($objectData['oh_friday']);
+            }
+            if($weekday == 6){
+                $array = unserialize($objectData['oh_saturday']);
+            }
+
+            $possibleBookings = 0;
+            foreach($array as $timeset) {
+                $possibleSeconds = $timeset['time_end'] - $timeset['time_begin'];
+
+                switch ($periodType) {
+                    case 'minute':
+                        $toSecond = 60;
+                        break;
+                    case 'hour':
+                        $toSecond = 3600;
+                        break;
+                    default: '';
+                }
+
+                if ($possibleSeconds) {
+                    $possibleBookings = $possibleBookings + (($possibleSeconds / $toSecond / $interval) * $quantity);
+                }
+            }
+
+            if ($possibleBookings > 0) {
+                $result++;
+            }
+        }
+
+        return $result;
+    }
+
+    public static function getDateExclusionString($list, $type)
     {
         $result = '';
 
         if ($list) {
             $alldates = array();
             $exclusionObjects = array();
+            $database = Database::getInstance();
+
             foreach ($list as $object) {
                 if(!$object instanceof C4gReservationFrontendObject){
                     break;
                 }
                 $exclusionPeriods = $object->getDatesExclusion();
-                $id= $object->getId();
-                $database = Database::getInstance();
-                $dates = $database->prepare("SELECT DISTINCT beginDate FROM `tl_c4g_reservation` WHERE reservation_object=?")
+                $id = $object->getId();
+                $dates = $database->prepare("SELECT DISTINCT beginDate FROM `tl_c4g_reservation` WHERE reservation_object=? AND NOT cancellation='1'")
                     ->execute($id)->fetchAllAssoc();
-                $times = $database->prepare("SELECT  * FROM `tl_c4g_reservation` WHERE reservation_object=?")
+                $times = $database->prepare("SELECT  * FROM `tl_c4g_reservation` WHERE reservation_object=? AND NOT cancellation='1'")
                     ->execute($id)->fetchAllAssoc();
-                $objectData = $database->prepare("SELECT * FROM `tl_c4g_reservation_object` WHERE id=?")
+                $objectData = $database->prepare("SELECT * FROM `tl_c4g_reservation_object` WHERE id=? AND published='1'")
                     ->execute($id)->fetchAssoc();
+
                 $quantity = $objectData['quantity'];
-                $periodType = $objectData['periodType'];
+                $periodType = $type['periodType'];
 
                 foreach ($dates as $date){
                     $beginDate = $date['beginDate'];
@@ -92,25 +154,25 @@ class C4gReservationObjectModel extends \Model
 
                     $interval = $objectData['time_interval'];
 
-                    if($weekday = 0){
+                    if($weekday == 0){
                         $array = StringUtil::deserialize($objectData['oh_sunday']);
                     }
-                    if($weekday = 1){
+                    if($weekday == 1){
                         $array = StringUtil::deserialize($objectData['oh_monday']);
                     }
-                    if($weekday = 2){
+                    if($weekday == 2){
                         $array = StringUtil::deserialize($objectData['oh_tuesday']);
                     }
-                    if($weekday = 3){
+                    if($weekday == 3){
                         $array = StringUtil::deserialize($objectData['oh_wednesday']);
                     }
-                    if($weekday = 4){
+                    if($weekday == 4){
                         $array = StringUtil::deserialize($objectData['oh_thursday']);
                     }
-                    if($weekday = 5){
+                    if($weekday == 5){
                         $array = StringUtil::deserialize($objectData['oh_friday']);
                     }
-                    if($weekday = 6){
+                    if($weekday == 6){
                         $array = StringUtil::deserialize($objectData['oh_saturday']);
                     }
 
@@ -120,37 +182,28 @@ class C4gReservationObjectModel extends \Model
 
                         switch ($periodType) {
                             case 'minute':
-                                $interval = 1 * 60;
+                                $toSecond = 60;
                                 break;
                             case 'hour':
-                                $interval = 1 * 3600;
+                                $toSecond = 3600;
                                 break;
                             default: '';
                         }
 
-                        $possibleBookings = ($possibleBookings + ($possibleSeconds / $interval)) * $quantity;
+                        if ($possibleSeconds) {
+                            $possibleBookings = $possibleBookings + (($possibleSeconds / $toSecond / $interval) * $quantity);
+                        }
                     }
 
+                    $resultArr = $database->prepare("SELECT COUNT(*) AS count FROM `tl_c4g_reservation` WHERE reservation_object=? AND beginDate=? AND NOT cancellation='1'")
+                        ->execute($id,$date['beginDate'])->fetchAssoc();
 
-                    $count = $database->prepare("SELECT COUNT(*) AS count FROM `tl_c4g_reservation` WHERE reservation_object=? AND beginDate=?")
-                        ->execute($id,$date['beginDate'])->fetchAllAssoc();
-
-                    if ($count && $possibleBookings && ($count >= $possibleBookings))
+                    if ($resultArr && $possibleBookings && ($resultArr['count'] >= $possibleBookings))
                     {
-                        $exclusionObjects[$date['reservation_date']] = $exclusionObjects[$date['reservation_date']] ? $exclusionObjects[$date['reservation_date']] + 1 : 1;
+                        $exclusionObjects[$date['beginDate']] = $exclusionObjects[$date['beginDate']] ? $exclusionObjects[$date['beginDate']] + 1 : 1;
                     }
-
-
-                    if($count >= $possibleBookings)
-                    {
-                        $exclusionPeriods[] = [
-                            'date_exclusion'=> $date['beginDate'],
-                            'date_exclusion_end'=> $date['beginDate'],
-                        ];
-
-                    }
-
                 }
+
                 foreach ($exclusionPeriods as $period) {
                     if ($period) {
                         $exclusionBegin = $period['date_exclusion'];
@@ -161,6 +214,7 @@ class C4gReservationObjectModel extends \Model
                         while($current <= $exclusionEnd) {
                             $dates[] = $current;
                             $current = $current + 86400;
+                            $alldates[] = $current;
                         }
                     }
                 }
@@ -168,7 +222,8 @@ class C4gReservationObjectModel extends \Model
 
             //add dates without free rooms
             foreach ($exclusionObjects as $date=>$count) {
-                if ($date && $count && ($count >= 2)) {
+                $maxCount = C4gReservationObjectModel::getMaxObjectCountPerDate($list, $date, $type);
+                if ($date && $count && ($count >= $maxCount)) {
                     $alldates[] = $date;
                 }
             }
@@ -319,35 +374,18 @@ class C4gReservationObjectModel extends \Model
         $lastmax = 365;
         $today = time();
         if ($objects) {
-
             foreach ($objects as $object) {
                 $max = intval($object->getMaxReservationDay());
-              //  $max_str = ' +' . $max . ' days';
 
-                if($max === 0){
-
+                if ($max === 0) {
                     $result = $today + (365 * 3600 * 24);
-                }
-
-
-                elseif ($max < $lastmax) {
-
+                } elseif ($max < $lastmax) {
                     $result = $today + ($max * 3600 * 24);
-
-                }
-                /*if ($max > $lastmax) */else{
+                } else{
                     $lastmax = $max;
-
                     $result = $today + ($lastmax * 3600 * 24);
-
                 }
-
-
-
-
-
             }
-
         }
 
         return $result;
@@ -434,6 +472,10 @@ class C4gReservationObjectModel extends \Model
                 return [];
             }
             $periodType = $typeObject->periodType;
+
+            //ToDo ???
+            //$maxCount = $typeObject->;
+
             $maxCount = $typeObject->objectCount;
             $count = [];
             //$objectQuantity = [];
@@ -461,14 +503,14 @@ class C4gReservationObjectModel extends \Model
                     $oh = $object->getOpeningHours();
                     switch ($periodType) {
                         case 'minute':
-                            $interval = 1 * 60;
+                            $interval = 60;
                             break;
                         case 'hour':
-                            $interval =1 * 3600;
+                            $interval = 3600;
                             break;
                         default: '';
                     }
-                }else{
+                } else {
                     $oh = $object->getOpeningHours();
                     switch ($periodType) {
                         case 'minute':
@@ -486,8 +528,6 @@ class C4gReservationObjectModel extends \Model
                         default: '';
                     }
                 }
-
-
 
                 if ($interval && ($interval > 0)) {
                     if ($interval > 0) {
@@ -507,7 +547,7 @@ class C4gReservationObjectModel extends \Model
                                             if ($date && $tsdate) {
                                                 $t = 'tl_c4g_reservation';
                                                 //$objectCount = [];
-                                                $arrColumns = array("$t.beginDate=$tsdate AND $t.beginTime=$time AND NOT $t.cancellation=1");
+                                                $arrColumns = array("$t.beginDate=$tsdate AND $t.beginTime=$time AND NOT $t.cancellation='1'");
                                                 $arrValues = array();
                                                 $arrOptions = array();
 
@@ -650,10 +690,9 @@ class C4gReservationObjectModel extends \Model
                     }
 
                     $frontendObject->setWeekdayExclusion($weekdays);
-
                     $frontendObject->setOpeningHours($opening_hours);
-
                     $frontendObject->setDatesExclusion(unserialize($object->days_exclusion));
+
                     $objectList[] = $frontendObject;
                 }
             }

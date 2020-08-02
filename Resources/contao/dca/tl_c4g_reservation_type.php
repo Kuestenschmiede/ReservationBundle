@@ -200,20 +200,20 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
            'sql'               =>"varchar(255) NOT NULL default ''"
        ),
-        'business_phone' => array
-        (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'],
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr '),
-            'sql'               =>"varchar(255) NOT NULL default ''"
+       'business_phone' => array
+       (
+           'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'],
+           'exclude'           => true,
+           'inputType'         => 'text',
+           'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'long clr '),
+           'sql'               =>"varchar(255) NOT NULL default ''"
         ),
         'business_email' => array
         (
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_email'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              =>array('rgxp'=>'email','mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'eval'              =>array('rgxp'=>'email','mandatory'=>false, 'tl_class'=>'long clr'),
             'sql'               =>"varchar(255) NOT NULL default ''"
         ),
         'business_street' => array
@@ -221,7 +221,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_street'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'eval'              =>array('mandatory'=>false, 'tl_class'=>'long clr'),
             'sql'               =>"varchar(255) NOT NULL default ''"
         ),
         'business_postal' => array
@@ -229,7 +229,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_postal'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               =>"varchar(255) NOT NULL default ''"
         ),
         'business_city' => array
@@ -237,7 +237,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_city'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr long'),
+            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               =>"varchar(255) NOT NULL default ''"
         ),
 

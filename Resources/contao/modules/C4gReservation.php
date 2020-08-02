@@ -34,6 +34,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSelectField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimepickerField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBrickModuleParent;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
@@ -171,26 +172,26 @@ class C4gReservation extends C4GBrickModuleParent
 //                //$reservationObjMehrtägig TestectField->setNotificationField(true);
 //                $fieldList[] = $reservationPeriodType;
 
-            $conditionCapacity = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_'.$type['id']);
-            $reservationDesiredCapacity = new C4GNumberField();
-            $reservationDesiredCapacity->setFieldName('desiredCapacity');
-            $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
-            $reservationDesiredCapacity->setFormField(true);
-            $reservationDesiredCapacity->setEditable(true);
-            $reservationDesiredCapacity->setCondition(array($condition));
-            $reservationDesiredCapacity->setInitialValue(0);
-            $reservationDesiredCapacity->setMandatory(true);
-            $reservationDesiredCapacity->setCallOnChange(true);
-            $reservationDesiredCapacity->setCallOnChangeFunction("setTimeset(this, " . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
-            $reservationDesiredCapacity->setNotificationField(true);
-            $reservationDesiredCapacity->setAdditionalID($type['id']);
-            $fieldList[] = $reservationDesiredCapacity;
+
+            if ($this->withCapacity) {
+                $conditionCapacity = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_'.$type['id']);
+                $reservationDesiredCapacity = new C4GNumberField();
+                $reservationDesiredCapacity->setFieldName('desiredCapacity');
+                $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
+                $reservationDesiredCapacity->setFormField(true);
+                $reservationDesiredCapacity->setEditable(true);
+                $reservationDesiredCapacity->setCondition(array($condition));
+                $reservationDesiredCapacity->setInitialValue(0);
+                $reservationDesiredCapacity->setMandatory(true);
+                $reservationDesiredCapacity->setCallOnChange(true);
+                $reservationDesiredCapacity->setCallOnChangeFunction("setTimeset(this, " . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
+                $reservationDesiredCapacity->setNotificationField(true);
+                $reservationDesiredCapacity->setAdditionalID($type['id']);
+                $fieldList[] = $reservationDesiredCapacity;
+            }
 
             $additionalDuration = StringUtil::deserialize($this->additionalDuration);
-
-
                 if ($additionalDuration == "1") {
-
                     $durationField = new C4GTextField();
                     $durationField->setFieldName('duration');
                     $durationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['duration']);
@@ -213,7 +214,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationBeginDateField->setMinDate(C4gReservationObjectModel::getMinDate($reservationObjects));
                 $reservationBeginDateField->setMaxDate(C4gReservationObjectModel::getMaxDate($reservationObjects));
                 $reservationBeginDateField->setExcludeWeekdays(C4gReservationObjectModel::getWeekdayExclusionString($reservationObjects));
-                $reservationBeginDateField->setExcludeDates(C4gReservationObjectModel::getDateExclusionString($reservationObjects));
+                $reservationBeginDateField->setExcludeDates(C4gReservationObjectModel::getDateExclusionString($reservationObjects, $type));
                 $reservationBeginDateField->setFieldName('beginDate');
                 $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
                 $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
@@ -753,13 +754,13 @@ class C4gReservation extends C4GBrickModuleParent
 
     public function createIcs($begin_date,$begin_time, $objectId,$typeId)
     {
-        $checkdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
+        $checkdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
             ->execute($objectId);
 
         $vcard= $checkdb->vcard_show;
 
         if ($vcard == null) {
-            $icsdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=?")
+            $icsdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
                 ->execute($typeId);
             $business_street = $icsdb->business_street;
             $business_postal = $icsdb->business_postal;
@@ -771,7 +772,7 @@ class C4gReservation extends C4GBrickModuleParent
             $business_city = $checkdb->business_city;
         }
 
-        $businessdata = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=?")
+        $businessdata = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
             ->execute($typeId);
         $business_name = $businessdata->business_name;
         $business_email = $businessdata->business_email;
@@ -793,7 +794,7 @@ class C4gReservation extends C4GBrickModuleParent
         $b_time = date('His', $begin_time);
         $icsdate = $b_date . 'T' . $b_time . 'Z';
 
-        $dbResult = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
+        $dbResult = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
             ->execute($objectId);
 
         $icsalert = $dbResult->alert_time;
@@ -846,32 +847,24 @@ class C4gReservation extends C4GBrickModuleParent
             }
 
 
-            $checkdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
+            $reservationObject = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
                 ->execute($resObject);
-
-            $vcard= $checkdb->vcard_show;
-
-            if ($vcard == null) {
-                $icsdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=?")
-                    ->execute($type);
-                $business_street = $icsdb->business_street;
-                $business_phone = $icsdb->business_phone;
-                $business_postal = $icsdb->business_postal;
-                $business_city = $icsdb->business_city;
-            }
-            if ($vcard == 1) {
-                $checkdb = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
-                    ->execute($resObject);
-                $business_street = $checkdb->business_street;
-                $business_phone = $checkdb->business_phone;
-                $business_postal = $checkdb->business_postal;
-                $business_city = $checkdb->business_city;
-            }
-
-            $businessdata = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=?")
+            $reservationType = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
                 ->execute($type);
-            $business_name = $businessdata->business_name;
-            $business_email = $businessdata->business_email;
+            $business_name = $reservationType->business_name;
+            $business_email = $reservationType->business_email;
+            $vcard = $reservationObject->vcard_show;
+            if ($vcard) {
+                $business_street = $reservationObject->business_street;
+                $business_phone = $reservationObject->business_phone;
+                $business_postal = $reservationObject->business_postal;
+                $business_city = $reservationObject->business_city;
+            } else {
+                $business_street = $reservationType->business_street;
+                $business_phone = $reservationType->business_phone;
+                $business_postal = $reservationType->business_postal;
+                $business_city = $reservationType->business_city;
+            }
 
             $putVars['business_name'] = $business_name;
             $putVars['business_phone'] = $business_phone;
@@ -891,43 +884,43 @@ class C4gReservation extends C4GBrickModuleParent
                 $beginTime = $value;
 
             }
-            if (strpos($key, "reservation_object_") !== false) {
-                $resObject = $value;
-            }
-            if (strpos($key, "reservation_type") !== false) {
-                $resType = $value;
-            }
+//            if (strpos($key, "reservation_object_") !== false) {
+//                $resObject = $value;
+//            }
+//            if (strpos($key, "reservation_type") !== false) {
+//                $resType = $value;
+//            }
+        }
+
+        $time_interval = $reservationObject->time_interval;
+        $min_residence_time = $reservationObject->min_residence_time;
+        $max_residence_time = $reservationObject->max_residence_time;
+
+        switch ($reservationType->periodType) {
+            case 'minute':
+                $interval = 60;
+                break;
+            case 'hour':
+                $interval = 3600;
+                break;
+            default: '';
         }
 
         $duration = $putVars['duration'];
-        $residenceTime= $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
-            ->execute($resObject);
-
-        $time_interval = $residenceTime->time_interval;
-        $min_residence_time = $residenceTime->min_residence_time;
-        $max_residence_time = $residenceTime->max_residence_time;
-
-        if($duration >= $min_residence_time && $duration <= $max_residence_time)
-        {
+        if (($duration >= $min_residence_time) && ($duration <= $max_residence_time)) {
             $duration = $duration;
-        }
-        if($duration === "") {
-            $duration = $time_interval;
-        }if($duration <= $min_residence_time || $duration >= $max_residence_time) {
+        } else {
             $duration = $time_interval;
         }
 
-        $duration = $duration * 60 * 60;
+        $duration = $duration * $interval;
         $endTime = $beginTime + $duration;
-        $endTime = $endTime . "";
-        $putVars['endTime'] = $endTime;
-        $putVars['duration'] = $duration / 60 / 60;
+
+        $putVars['endTime'] = $endTime+3600; //ToDo lost hour
 
         $action = new C4GSaveAndRedirectDialogAction($this->dialogParams, $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
-
-        $this->createIcs($beginDate, $beginTime, $resObject, $resType);
-
+        $this->createIcs($beginDate, $beginTime, $resObject, $type);
 
         return $result = $action->run();
     }
@@ -989,10 +982,11 @@ class C4gReservation extends C4GBrickModuleParent
             }
         }
         $times = [];
-        if ($additionalParam) {
-            $objects = C4gReservationObjectModel::getReservationObjectList(array($additionalParam));
-            $times = C4gReservationObjectModel::getReservationTimes($objects, $additionalParam, $weekday, $date,$duration);
+        $objects = C4gReservationObjectModel::getReservationObjectList(array($additionalParam));
+        $times = C4gReservationObjectModel::getReservationTimes($objects, $additionalParam, $weekday, $date,$duration);
 
+        //ToDo ???
+        if ($additionalParam) {
             if ($this->fieldList) {
                 foreach ($this->fieldList as $key => $field) {
                     if (($field->getFieldName() == 'beginTime') && ($field->getAdditionalId() == $additionalParam . '00' . $wd)) {
