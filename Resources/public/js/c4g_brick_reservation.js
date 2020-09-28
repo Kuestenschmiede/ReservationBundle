@@ -87,16 +87,16 @@ function setObjectId(object, typeid) {
     var className = object.className;
     var typeId = typeid;
     var selectField = document.getElementById("c4g_reservation_object_"+typeId);
-    var reservationObjects = $(document.getElementsByClassName("displayReservationObjects"));
+    var reservationObjects = jQuery(document.getElementsByClassName("displayReservationObjects"));
     var emptyOption = null;
 
     if (selectField) {
-        $(selectField).show();
+        jQuery(selectField).show();
         reservationObjects ? reservationObjects.show() : false;
         if (className) {
             var val = className.split("_")[2];
             if (selectField.options[val] && (selectField.options[val].style == "display:block")) {
-                $(selectField).val(val).change();
+                jQuery(selectField).val(val).change();
             }
         }
     }
@@ -113,7 +113,7 @@ function hideOptions(reservationObjects,typeId) {
                 var option = selectField.options[i];
                 var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 0;
                 var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
-                var desiredCapacity = $(document.getElementById("c4g_desiredCapacity_"+typeId));
+                var desiredCapacity = jQuery(document.getElementById("c4g_desiredCapacity_"+typeId));
                 var capacity = desiredCapacity ? desiredCapacity.value || desiredCapacity.val() : 0;
 
                 if (min && max && capacity && capacity > 0) {
@@ -129,11 +129,11 @@ function hideOptions(reservationObjects,typeId) {
             }
 
             if (parseInt(first) >= 0) {
-                $(selectField).value ? $(selectField).value = first : $(selectField).val(first).change();
+                jQuery(selectField).value ? jQuery(selectField).value = first : jQuery(selectField).val(first).change();
                 selectField.options[0].style = "display:none";
             } else {
                 selectField.options[0].style = "display:block";
-                $(selectField).value ? $(selectField).value = "-1" : $(selectField).val("-1").change();
+                jQuery(selectField).value ? jQuery(selectField).value = "-1" : jQuery(selectField).val("-1").change();
             }
         }
     }
@@ -145,8 +145,8 @@ function setTimeset(object, id, additionalId, callFunction) {
     var date = 0;
 
     if (additionalId == -1) {
-        $(document.getElementsByClassName('reservation_time_button')) ? $(document.getElementsByClassName('reservation_time_button')).hide() : false;
-        $(document.getElementsByClassName('displayReservationObjects')) ? $(document.getElementsByClassName('displayReservationObjects')).hide() : false;
+        jQuery(document.getElementsByClassName('reservation_time_button')) ? jQuery(document.getElementsByClassName('reservation_time_button')).hide() : false;
+        jQuery(document.getElementsByClassName('displayReservationObjects')) ? jQuery(document.getElementsByClassName('displayReservationObjects')).hide() : false;
     } else {
         elementId = "c4g_beginDate_"+additionalId;
         date = document.getElementById(elementId).value;
@@ -180,7 +180,7 @@ function setTimeset(object, id, additionalId, callFunction) {
 
                 var size = times.length;
 
-                $(document.getElementsByClassName('reservation_time_button_'+additionalId)) ? $(document.getElementsByClassName('reservation_time_button_'+additionalId)).show() : false;
+                jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)) ? jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)).show() : false;
                 for (var i = 0; i < size; i++) {
                     var dataTime = times[i].id;
                     timeList[i] = dataTime;
