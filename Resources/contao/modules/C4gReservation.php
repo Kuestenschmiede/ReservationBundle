@@ -118,7 +118,7 @@ class C4gReservation extends C4GBrickModuleParent
                         if ($caption['language'] == $GLOBALS['TL_LANGUAGE']) {
                             $typelist[$type->id] = array(
                                 'id' => $type->id,
-                                'name' => $caption['caption'],
+                                'name' => $caption['caption'] ? $caption['caption'] : $type->caption,
                                 'periodType' => $type->periodType,
                                 'additionalParams' => unserialize($type->additional_params),
                                 'objects' => $objects
