@@ -541,7 +541,7 @@ class C4gReservationObjectModel extends \Model
                                         $time = $time_begin;
 
                                         $reservation = null;
-                                        while ($time <= $time_end) {
+                                        while ($time <= ($time_end - $interval)) {
                                             //$foundObject = false;
                                             $id = $object->getId();
                                             if ($date && $tsdate) {
