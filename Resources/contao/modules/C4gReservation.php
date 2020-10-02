@@ -529,6 +529,8 @@ class C4gReservation extends C4GBrickModuleParent
         $salutationField->setCallOnChange(true);
         $salutationField->setInitialCallOnChange(false);
         $salutationField->setNotificationField(true);
+        $salutationField->setCondition(array($condition));
+        $salutationField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $salutationField;
 
         $firstnameField = new C4GTextField();
@@ -539,6 +541,8 @@ class C4gReservation extends C4GBrickModuleParent
         $firstnameField->setTableColumn(true);
         $firstnameField->setMandatory(true);
         $firstnameField->setNotificationField(true);
+        $firstnameField->setCondition(array($condition));
+        $firstnameField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $firstnameField;
 
         $lastnameField = new C4GTextField();
@@ -549,6 +553,8 @@ class C4gReservation extends C4GBrickModuleParent
         $lastnameField->setTableColumn(true);
         $lastnameField->setMandatory(true);
         $lastnameField->setNotificationField(true);
+        $lastnameField->setCondition(array($condition));
+        $lastnameField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $lastnameField;
 
         $emailField = new C4GEmailField();
@@ -559,6 +565,8 @@ class C4gReservation extends C4GBrickModuleParent
         $emailField->setTableColumn(false);
         $emailField->setMandatory(true);
         $emailField->setNotificationField(true);
+        $emailField->setCondition(array($condition));
+        $emailField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $emailField;
 
         $additionaldatas = StringUtil::deserialize($this->hide_selection);
@@ -577,6 +585,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $organisationField->setMandatory($rowMandatory);
                 $organisationField->setNotificationField(true);
                 //   if()
+                $organisationField->setCondition(array($condition));
+                $organisationField->setRemoveWithEmptyCondition(true);
                 $fieldList[] = $organisationField;
 
             } else if ($rowField == "phone") {
@@ -588,6 +598,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $phoneField->setMandatory($rowMandatory);
                 $phoneField->setTableColumn(false);
                 $phoneField->setNotificationField(true);
+                $phoneField->setCondition(array($condition));
+                $phoneField->setRemoveWithEmptyCondition(true);
                 $fieldList[] = $phoneField;
 
             } else if ($rowField == "address") {
@@ -599,6 +611,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $addressField->setTableColumn(false);
                 $addressField->setMandatory($rowMandatory);
                 $addressField->setNotificationField(true);
+                $addressField->setCondition(array($condition));
+                $addressField->setRemoveWithEmptyCondition(true);
                 $fieldList[] = $addressField;
 
             } else if ($rowField == "postal") {
@@ -611,6 +625,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $postalField->setTableColumn(false);
                 $postalField->setMandatory($rowMandatory);
                 $postalField->setNotificationField(true);
+                $postalField->setCondition(array($condition));
+                $postalField->setRemoveWithEmptyCondition(true);
                 $fieldList[] = $postalField;
 
             } else if ($rowField == "city") {
@@ -622,6 +638,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $cityField->setTableColumn(false);
                 $cityField->setMandatory($rowMandatory);
                 $cityField->setNotificationField(true);
+                $cityField->setCondition(array($condition));
+                $cityField->setRemoveWithEmptyCondition(true);
                 $fieldList[] = $cityField;
 
             } else if ($rowField == "comment") {
@@ -634,6 +652,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $commentField->setTableColumn(false);
                 $commentField->setMandatory($rowMandatory);
                 $commentField->setNotificationField(true);
+                $commentField->setCondition(array($condition));
+                $commentField->setRemoveWithEmptyCondition(true);
                 $fieldList[] = $commentField;
             }
         }
@@ -657,6 +677,8 @@ class C4gReservation extends C4GBrickModuleParent
         $reservationIdField->setDatabaseField(true);
         $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id_exists']);
         $reservationIdField->setDbUniqueAdditionalCondition("tl_c4g_reservation.cancellation <> '1' AND tl_c4g_reservation.reservation_date > UNIX_TIMESTAMP(NOW())");
+        $reservationIdField->setCondition(array($condition));
+        $reservationIdField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $reservationIdField;
 
         if ($this->privacy_policy_text) {
@@ -674,6 +696,8 @@ class C4gReservation extends C4GBrickModuleParent
             $privacyPolicyText->setDatabaseField(false);
             $privacyPolicyText->setMandatory(false);
             $privacyPolicyText->setNotificationField(false);
+            $privacyPolicyText->setCondition(array($condition));
+            $privacyPolicyText->setRemoveWithEmptyCondition(true);
             $fieldList[] = $privacyPolicyText;
         }
 
@@ -690,6 +714,8 @@ class C4gReservation extends C4GBrickModuleParent
         $agreedField->setTableColumn(false);
         $agreedField->setMandatory(true);
         $agreedField->setNotificationField(true);
+        $agreedField->setCondition(array($condition));
+        $agreedField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $agreedField;
 
         $clickButton = new C4GBrickButton(C4GBrickConst::BUTTON_CLICK, $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'], $visible = true, $enabled = true, $action = '', $accesskey = '', $defaultByEnter = true);
@@ -697,6 +723,8 @@ class C4gReservation extends C4GBrickModuleParent
         $buttonField->setOnClickType(C4GBrickConst::ONCLICK_TYPE_SERVER);
         $buttonField->setOnClick('clickReservation');
         $buttonField->setWithoutLabel(true);
+        $buttonField->setCondition(array($condition));
+        $buttonField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $buttonField;
 
 
