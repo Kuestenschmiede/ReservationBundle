@@ -96,19 +96,20 @@ function setObjectId(object, typeid) {
         reservationObjects ? reservationObjects.show() : false;
         if (className) {
             val = className.split("_")[2];
+            var objects = val.split('-');
             //if (jQuery(selectField.options[value=val]).style == "display:block") {
-                jQuery(selectField).val(val).change();
+                jQuery(selectField).val(objects[0]).change();
             //}
         }
     }
-    hideOptions(reservationObjects,typeId, val);
+    hideOptions(reservationObjects,typeId, objects ? objects : val);
     return true;
 }
 
-function hideOptions(reservationObjects,typeId,firstValue) {
+function hideOptions(reservationObjects,typeId,values) {
     if (reservationObjects) {
         var selectField = document.getElementById("c4g_reservation_object_"+typeId);
-        var first = firstValue;
+        var first = jQuery.isArray(values) ? values[0] : values;
         if (selectField) {
             for (i = 0; i < selectField.options.length; i++) {
                 var option = selectField.options[i];
@@ -117,13 +118,28 @@ function hideOptions(reservationObjects,typeId,firstValue) {
                 var desiredCapacity = jQuery(document.getElementById("c4g_desiredCapacity_"+typeId));
                 var capacity = desiredCapacity ? desiredCapacity.value || desiredCapacity.val() : 0;
 
-                if (min && max && capacity && capacity > 0) {
-                    if ((capacity < min) || (capacity > max)) {
-                        option.style = "display:none";
-                    } else {
-                        option.style = "display:block";
-                        if ((first == -1) && (option.value != -1)) {
-                            first = option.value;
+                //not in values
+                var foundValue = false;
+                if (jQuery.isArray(values)) {
+                    for (j = 0; j < values.length; j++) {
+                        if (values[j] == option.value) {
+                            foundValue = true;
+                        }
+                    }
+                }
+
+                if (!foundValue) {
+                    jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
+                } else {
+                    jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                    if (min && max && capacity && capacity > 0) {
+                        if ((capacity < min) || (capacity > max)) {
+                            jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
+                        } else {
+                            jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                            if ((first == -1) && (option.value != -1)) {
+                                first = option.value;
+                            }
                         }
                     }
                 }
@@ -193,7 +209,6 @@ function setTimeset(object, id, additionalId, callFunction) {
                     objectList[i] = dataObjects;
                 }
 
-
                 //if (radioGroups.style && radioGroups.style != "display:none") {
                 for (i = 0; i < radioGroups.length; i++) {
                     try {
@@ -217,7 +232,8 @@ function setTimeset(object, id, additionalId, callFunction) {
                                     //jQuery(radioGroups[i].children[j].children[k]).attr("onchange", "setObjectId(this,"+objectList[arrIndex][0]+");");
 
                                     if ((!disabled)) {
-                                        jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objectList[arrIndex][0]);
+                                        let objStr = objectList[arrIndex].join('-');
+                                        jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objStr);
                                         val = objectList[arrIndex][0];
                                     } else {
                                         jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
