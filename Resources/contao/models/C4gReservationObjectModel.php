@@ -317,33 +317,25 @@ class C4gReservationObjectModel extends \Model
     private static function addTime($list, $time, $obj)
     {
         if ($obj == -1) {
-            /*foreach ($list as $key => $item) {
-                //Ist der Termin schon in der Auflistung?
-                if ($item['id'] == $time) {
-                    return $list;
-                }
-            }*/
-
-            //$key = '_' . $time;
             $key = $time;
-            $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time), 'object' => $obj);
+            $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time), 'objects' => [$obj]);
         } else {
             foreach ($list as $key => $item) {
                 //Ist der Termin schon in der Auflistung?
                 if ($item['id'] == $time) {
                     $first_obj = $item['object'];
-                    $rnd = rand(2, 4);
+                    //$rnd = rand(2, 4);
 
-                    if (($first_obj != -1) && (($first_obj != $obj) && ($rnd % 2))) {
-                        $list[$key]['object'] = $obj;
-                    }                                      
+                    //if (($first_obj != -1) && (($first_obj != $obj) && ($rnd % 2))) {
+                    $list[$key]['objects'][] = $obj;
+                    //}
                     return $list;
                 }
             }
 
             //$key = $obj . $time;
             $key = $time;
-            $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time), 'object' => $obj);
+            $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time), 'objects' => [$obj]);
         }
 
         return $list;
