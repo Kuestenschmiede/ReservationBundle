@@ -149,8 +149,8 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationTypeField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect']);
             $reservationTypeField->setCallOnChange(true);
             $reservationTypeField->setCallOnChangeFunction("setTimeset(this, " . $this->id . ", -1 ,'getCurrentTimeset')");
-            $reservationTypeField->setInitialCallOnChange(false);
-            $reservationTypeField->setInitialValue(-1);
+            //$reservationTypeField->setInitialCallOnChange(true); //ToDo doesn't work
+            $reservationTypeField->setInitialValue(-1); //$firstType
             $reservationTypeField->setNotificationField(true);
             $fieldList[] = $reservationTypeField;
         }
@@ -461,20 +461,27 @@ class C4gReservation extends C4GBrickModuleParent
                     'max' => $reservationObject->getDesiredCapacity()[1]);
             }
 
+//            $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginTime_' . $type['id']); //ToDo
+//            $obj_condition->setModel(C4gReservationObjectModel::class);
+//            $obj_condition->setFunction('isTimePicked');
+//            $objConditionArr = [$obj_condition,$condition];
+
             $reservationObjectField = new C4GSelectField();
             $reservationObjectField->setFieldName('reservation_object');
             $reservationObjectField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object']);
             $reservationObjectField->setFormField(true);
-            $reservationObjectField->setEditable(true);
+            $reservationObjectField->setEditable(false); //
+            //$reservationObjectField->setEditableWithSelection(true);
             $reservationObjectField->setOptions($objects);
             $reservationObjectField->setMandatory(true);
+            //$reservationObjectField->setInitInvisible(true);
             $reservationObjectField->setNotificationField(true);
             $reservationObjectField->setRangeField('desiredCapacity_' . $type['id']);
             $reservationObjectField->setStyleClass('displayReservationObjects');
-            $reservationObjectField->setWithEmptyOption(true);
-            $reservationObjectField->setShowIfEmpty(true);
+            $reservationObjectField->setWithEmptyOption(true); //ToDo
+            $reservationObjectField->setShowIfEmpty(true); //ToDo
             $reservationObjectField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
-            $reservationObjectField->setCondition(array($condition));
+            $reservationObjectField->setCondition([$condition]);
             $reservationObjectField->setRemoveWithEmptyCondition(true);
             $reservationObjectField->setAdditionalID($type['id']);
             $fieldList[] = $reservationObjectField;
@@ -677,8 +684,8 @@ class C4gReservation extends C4GBrickModuleParent
         $reservationIdField->setDatabaseField(true);
         $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id_exists']);
         $reservationIdField->setDbUniqueAdditionalCondition("tl_c4g_reservation.cancellation <> '1' AND tl_c4g_reservation.reservation_date > UNIX_TIMESTAMP(NOW())");
-        $reservationIdField->setCondition(array($condition));
-        $reservationIdField->setRemoveWithEmptyCondition(true);
+        //$reservationIdField->setCondition(array($condition));
+        //$reservationIdField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $reservationIdField;
 
         if ($this->privacy_policy_text) {
@@ -696,8 +703,8 @@ class C4gReservation extends C4GBrickModuleParent
             $privacyPolicyText->setDatabaseField(false);
             $privacyPolicyText->setMandatory(false);
             $privacyPolicyText->setNotificationField(false);
-            $privacyPolicyText->setCondition(array($condition));
-            $privacyPolicyText->setRemoveWithEmptyCondition(true);
+            //$privacyPolicyText->setCondition(array($condition));
+            //$privacyPolicyText->setRemoveWithEmptyCondition(true);
             $fieldList[] = $privacyPolicyText;
         }
 
@@ -714,8 +721,8 @@ class C4gReservation extends C4GBrickModuleParent
         $agreedField->setTableColumn(false);
         $agreedField->setMandatory(true);
         $agreedField->setNotificationField(true);
-        $agreedField->setCondition(array($condition));
-        $agreedField->setRemoveWithEmptyCondition(true);
+        //$agreedField->setCondition(array($condition));
+        //$agreedField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $agreedField;
 
         $clickButton = new C4GBrickButton(C4GBrickConst::BUTTON_CLICK, $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'], $visible = true, $enabled = true, $action = '', $accesskey = '', $defaultByEnter = true);
@@ -723,8 +730,8 @@ class C4gReservation extends C4GBrickModuleParent
         $buttonField->setOnClickType(C4GBrickConst::ONCLICK_TYPE_SERVER);
         $buttonField->setOnClick('clickReservation');
         $buttonField->setWithoutLabel(true);
-        $buttonField->setCondition(array($condition));
-        $buttonField->setRemoveWithEmptyCondition(true);
+        //$buttonField->setCondition(array($condition));
+        //$buttonField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $buttonField;
 
 

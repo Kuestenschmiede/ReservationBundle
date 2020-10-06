@@ -130,10 +130,13 @@ function hideOptions(reservationObjects,typeId) {
 
             if (parseInt(first) >= 0) {
                 jQuery(selectField).value ? jQuery(selectField).value = first : jQuery(selectField).val(first).change();
-                selectField.options[0].style = "display:none";
+                jQuery(selectField).val(first);
+                jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
+
+                jQuery(selectField).removeAttr('disabled');
             } else {
-                selectField.options[0].style = "display:block";
                 jQuery(selectField).value ? jQuery(selectField).value = "-1" : jQuery(selectField).val("-1").change();
+                jQuery(selectField).prop("disabled", true);
             }
         }
     }

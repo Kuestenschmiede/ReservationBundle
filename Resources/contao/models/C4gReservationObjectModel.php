@@ -238,6 +238,11 @@ class C4gReservationObjectModel extends \Model
         return $result;
     }
 
+    public static function isTimePicked($date)
+    {
+
+    }
+
     public static function isSunday($date)
     {
 

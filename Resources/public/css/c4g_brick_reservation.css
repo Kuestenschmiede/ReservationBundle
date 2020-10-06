@@ -24,17 +24,30 @@
     line-height:30px;
     color:#fff;
     cursor: pointer;
+    font-weight: normal;
 }
 .reservation_time_button input[type = "radio"]:checked + label {
     padding:0;
-    background-color: slategrey!important;
+    background-color: darkgreen;
+    border-bottom: yellow;
+    font-weight: bold;
 }
 .reservation_time_button input[type="radio"][disabled] + label {
     background-color: red;
     cursor: no-drop;
+    font-weight: normal;
 }
 
 .mod_C4gReservation .displayReservationObjects {
+    display: none;
+}
+
+.mod_C4gReservation .displayReservationObjects select {
+    font-weight: bold;
+    color: black;
+}
+
+.mod_C4gReservation .displayReservationObjects select option:disabled {
     display: none;
 }
 
