@@ -190,16 +190,21 @@ class C4gReservation extends C4GBrickModuleParent
                 $fieldList[] = $reservationDesiredCapacity;
             }
 
+
+            //ToDo Funktioniert nicht immer.
             $additionalDuration = StringUtil::deserialize($this->additionalDuration);
                 if ($additionalDuration == "1") {
-                    $durationField = new C4GTextField();
+                    $durationField = new C4GNumberField();
                     $durationField->setFieldName('duration');
                     $durationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['duration']);
                     $durationField->setColumnWidth(10);
                     $durationField->setFormField(true);
                     $durationField->setSortColumn(true);
                     $durationField->setTableColumn(true);
-                    $durationField->setMandatory(false);
+                    $durationField->setMandatory(true);
+                    $durationField->setCallOnChange(true);
+                    $durationField->setCallOnChangeFunction("setTimeset(this, " . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
+                    $durationField->setCondition(array($condition));
                     $durationField->setNotificationField(true);
                     $fieldList[] = $durationField;
                 } else {
