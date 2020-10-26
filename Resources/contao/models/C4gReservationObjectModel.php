@@ -16,6 +16,7 @@ use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ReservationBundle\Classes\C4gReservationFrontendObject;
 use Contao\Database;
+use Contao\Date;
 use Contao\StringUtil;
 
 /**
@@ -150,7 +151,10 @@ class C4gReservationObjectModel extends \Model
 
                 foreach ($dates as $date){
                     $beginDate = $date['beginDate'];
-                    $weekday = date(w,$beginDate);
+                    if (!$beginDate) {
+                        continue;
+                    }
+                    $weekday = date('w',$beginDate);
 
                     $interval = $objectData['time_interval'];
 
@@ -314,9 +318,9 @@ class C4gReservationObjectModel extends \Model
         }
     }
 
-    private static function addTime($list, $time, $obj)
+    private static function addTime($list, $time, $obj, $interval)
     {
-        if ($obj == -1) {
+        if ($obj && ($obj['id'] == -1)) {
             $key = $time;
             $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time), 'objects' => [$obj]);
         } else {
@@ -335,7 +339,11 @@ class C4gReservationObjectModel extends \Model
 
             //$key = $obj . $time;
             $key = $time;
-            $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time), 'objects' => [$obj]);
+            if ($interval) {
+                $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time).' - '.date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval), 'objects' => [$obj]);
+            } else {
+                $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time), 'objects' => [$obj]);
+            }
         }
 
         return $list;
@@ -360,6 +368,29 @@ class C4gReservationObjectModel extends \Model
 
             return $today + ($firstmin * 3600 * 24);
         }
+    }
+
+    public static function getNextWeekday($objects, $weekday)
+    {
+        $result = '';
+        $firstmin = 0;
+        $today = time();
+        $wd = date('N', $today);
+        $diff = $weekday - $wd;
+        if ($diff < 0) {
+            $diff = 7 - $diff;
+        }
+
+        if ($objects) {
+            foreach ($objects as $object) {
+                $min = $object->getMinReservationDay();
+                if ($min && ($min > $firstmin)) {
+                    $firstmin = $min;
+                }
+            }
+        }
+
+        return $today + (($firstmin+$diff) * 3600 * 24);
     }
 
     /**
@@ -430,7 +461,7 @@ class C4gReservationObjectModel extends \Model
         return false;
     }
 
-    public static function getReservationTimes($list, $type, $weekday = -1, $date = null,$duration=0)
+    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false)
     {
         $result = array();
 
@@ -458,6 +489,16 @@ class C4gReservationObjectModel extends \Model
                         $tsdate = strtotime($date);
                     }
                 }
+
+                $nowDate = new \DateTime();
+                if ($nowDate) {
+                    $nowDate->Format($format);
+                    $nowDate->setTime(0,0,0);
+                    $nowDate = $nowDate->getTimestamp();
+                }
+
+                $objDate = new Date(date("H:i",time()), Date::getFormatFromRgxp('time'));
+                $nowTime = $objDate->tstamp;
             }
 
             if (!$type) {
@@ -539,6 +580,7 @@ class C4gReservationObjectModel extends \Model
 
                                         $reservation = null;
                                         while ($time <= ($time_end - $interval)) {
+
                                             //$foundObject = false;
                                             $id = $object->getId();
                                             if ($date && $tsdate) {
@@ -549,6 +591,7 @@ class C4gReservationObjectModel extends \Model
                                                 $arrOptions = array();
 
                                                 $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
+                                                $actPersons = 0;
                                                 if ($reservations) {
                                                     foreach ($reservations as $reservation) {
                                                         if ($reservation->reservation_object) {
@@ -557,6 +600,7 @@ class C4gReservationObjectModel extends \Model
                                                                    // $foundObject = true;
                                                                     $count[$tsdate][$time] = $count[$tsdate][$time] ? $count[$tsdate][$time] + 1 : 1;
                                                                     $objectCount[$tsdate][$time] = $objectCount[$tsdate][$time] ? $objectCount[$tsdate][$time] + 1 : 1;
+                                                                    $actPersons = $actPersons + $reservation->desiredCapacity;
                                                                 }
 //                                                            }
                                                         }
@@ -564,13 +608,27 @@ class C4gReservationObjectModel extends \Model
                                                 }
                                             }
 
-                                            if ($tsdate) {
+                                            $endTimeInterval = $interval;
+                                            if (!$withEndTimes) {
+                                                $endTimeInterval = 0;
+                                            }
+
+                                            if ($showFreeSeats) {
+                                                $capacity = $objectQuantity * $object->getDesiredCapacity()[1]; //ToDo
+                                            } else {
+                                                $capacity = 0;
+                                                $actPersons = 0;
+                                            }
+
+                                            $timeObj = ['obj'=>-1,'act'=>$actPersons,'max'=>$capacity];
+                                            if ($tsdate && (($nowDate < $tsdate) || (($nowDate == $tsdate) && ($time > $nowTime)))) {
                                                 if ($maxCount && ($count[$tsdate][$time] >= intval($maxCount))) {
-                                                    $result = self::addTime($result, $time, -1);
+                                                   $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else if ($objectQuantity && ($objectCount[$tsdate][$time] >= intval($objectQuantity))) {
-                                                   $result = self::addTime($result, $time, -1);
+                                                   $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else {
-                                                    $result = self::addTime($result, $time, $id);
+                                                   $timeObj = ['id'=>$id,'act'=>$actPersons,'max'=>$capacity];
+                                                   $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 }
                                             }
 
@@ -585,7 +643,11 @@ class C4gReservationObjectModel extends \Model
                 }
             }
 
-            return ArrayHelper::sortArrayByFields($result,'name');
+            if ($result) {
+                return ArrayHelper::sortArrayByFields($result,'name');
+            } else {
+                return [];
+            }
 
         }
     }
