@@ -29,5 +29,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas']          
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['mandatory']           = array("Pflichtfeld?","");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['binding']           = array("Pflichtfeld?","Soll dieses Datenfeld als Pflichtfeld im Frontend angezeigt werden");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['hide_selection'] = array("Datenfelder Hinzufügen","");
-$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['additionalDuration'] = array("Kunde kann Verweildauer selber angeben","Mit anhaken erscheint im Frontend ein neues Feld in welchem der Kunde seine verweildauer angibt");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['additionalDuration'] = array("Kunde kann Verweildauer selber angeben (BETA)","Mit anhaken erscheint im Frontend ein neues Feld in welchem der Kunde seine verweildauer angibt");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withCapacity'] = array("Kunde kann Personenanzahl angeben","Der Kunde kann die Personenanzahl angeben. Dieses wird bspw. für eine Tischreservierung im Restaurant benötigt.");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showFreeSeats'] = array("Freie Plätze anzeigen","Offene Plätze werden dargestellt.");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showEndTime'] = array("Die Endzeiten werden mit ausgegeben","Die Endzeiten werden mit dargestellt (abhängig von der Konfiguration).");

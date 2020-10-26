@@ -199,6 +199,7 @@ function setTimeset(object, id, additionalId, callFunction) {
                 var times = data['times'];
 
                 var size = times.length;
+                //var size = Object.keys(times).length;
 
                 jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)) ? jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)).show() : false;
                 for (var i = 0; i < size; i++) {
@@ -224,17 +225,51 @@ function setTimeset(object, id, additionalId, callFunction) {
 
                                 if (value && parseInt(value)) {
                                     var arrIndex = jQuery.inArray(parseInt(value), timeList);
+
+                                    var objectListIds = -1
+                                    for (l = 0; l < objectList[arrIndex].length; l++) {
+                                        objectListIds = objectList[arrIndex][l]['id'] != -1 ? objectList[arrIndex][l]['id'] : objectListIds;
+                                    }
+
                                     var disabled = (
-                                        (arrIndex === -1) || (objectList[arrIndex] == -1)
+                                        (arrIndex === -1) || (objectListIds == -1)
                                     );
 
                                     jQuery(radioGroups[i].children[j].children[k]).attr('disabled', disabled);
                                     //jQuery(radioGroups[i].children[j].children[k]).attr("onchange", "setObjectId(this,"+objectList[arrIndex][0]+");");
 
                                     if ((!disabled)) {
-                                        let objStr = objectList[arrIndex].join('-');
+                                        let objStr = '';
+                                        for (l = 0; l < objectList[arrIndex].length; l++) {
+                                            if (l == 0) {
+                                                objStr = objStr + objectList[arrIndex][l]['id'];
+                                            } else {
+                                                objStr = objStr + ' - ' + objectList[arrIndex][l]['id'];
+                                            }
+                                            var selectField = document.getElementById("c4g_reservation_object_"+additionalId)[0];
+                                            var optionIdx = -1;
+                                            for (var m = 0; m < jQuery(selectField).length; m++) {
+                                                if (jQuery(selectField)[m].value == objectList[arrIndex][l]['id']) {
+                                                    optionIdx = m;
+                                                    break;
+                                                }
+                                            }
+
+                                            if (optionIdx !== -1) {
+                                                var optionText = jQuery(selectField)[optionIdx].innerHTML;
+                                                var pos = optionText.lastIndexOf('[');
+                                                if (pos != -1) {
+                                                    optionText = optionText.substr(0, pos-1);
+                                                }
+
+                                                jQuery(selectField)[optionIdx].innerHTML = optionText +
+                                                    ' ['+objectList[arrIndex][l]['act']+'/'+objectList[arrIndex][l]['max']+']';
+                                            }
+
+                                        }
                                         jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objStr);
-                                        val = objectList[arrIndex][0];
+
+                                        val = objectList[arrIndex][0]['id'];
                                     } else {
                                         jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
                                     }

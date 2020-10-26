@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{type_legend},caption,description,options;{business_data},business_name,business_phone,business_email,business_street,business_postal,business_city,periodType,objectCount,additional_params,published;{expert_legend:hide},auto_del;',
+        'default'   =>  '{type_legend},caption,description,options;{business_data},business_name,business_phone,business_email,business_street,business_postal,business_city,periodType,objectCount,severalBookings,additional_params,published;{expert_legend:hide},auto_del;',
        '__selector__' => array('periodType','auto_del')
     ),
 
@@ -260,6 +260,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'sql'               => "smallint(5) unsigned NULL"
         ),
 
+        'severalBookings' => array(
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'],
+            'exclude'                 => true,
+            'filter'                  => true,
+            'inputType'               => 'checkbox',
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false),
+            'sql'                     => "int(1) unsigned NULL default 0"
+        ),
+
         'auto_del' => array
         (
             'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_del'],
@@ -386,264 +395,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'eval'                    => array('mandatory'=>false, 'multiple'=>false,'alwaysSave'=>true),
             'sql'                     => "int(1) unsigned NULL default 1"
-        ),
-
-   /*     'minute_interval' => array
-        (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minute_interval'],
-            'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'maxval'=> 60, 'mandatory'=>'true', 'tl_class'=>'long clr'),
-            'sql'               => "smallint(5) unsigned NOT NULL default '0'"
-        ),
-
-        'hour_interval' => array
-        (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['hour_interval'],
-            'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'maxval'=> 24, 'mandatory'=>'true', 'tl_class'=>'long clr'),
-            'sql'               => "smallint(5) unsigned NOT NULL default '0'"
-        ),
-*/
-
-/*        'oh_monday' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_monday'],
-            'default'                 => time(),
-            'exclude'                 => true,
-            'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
-            (
-                'time_begin' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_begin'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                ),
-                'time_end' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_end'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                )
-            )),
-            'sql'                     => "blob NULL"
-        ),
-
-
-        'oh_tuesday' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_tuesday'],
-            'default'                 => time(),
-            'exclude'                 => true,
-            'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
-            (
-                'time_begin' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_begin'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                ),
-                'time_end' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_end'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                )
-            )),
-            'sql'                     => "blob NULL"
-        ),
-
-
-        'oh_wednesday' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_wednesday'],
-            'default'                 => time(),
-            'exclude'                 => true,
-            'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
-            (
-                'time_begin' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_begin'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                ),
-                'time_end' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_end'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                )
-            )),
-            'sql'                     => "blob NULL"
-        ),
-
-
-        'oh_thursday' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_thursday'],
-            'default'                 => time(),
-            'exclude'                 => true,
-            'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
-            (
-                'time_begin' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_begin'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                ),
-                'time_end' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_end'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                )
-            )),
-            'sql'                     => "blob NULL"
-        ),
-
-
-        'oh_friday' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_friday'],
-            'default'                 => time(),
-            'exclude'                 => true,
-            'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
-            (
-                'time_begin' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_begin'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                ),
-                'time_end' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_end'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                )
-            )),
-            'sql'                     => "blob NULL"
-        ),
-
-
-        'oh_saturday' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_saturday'],
-            'default'                 => time(),
-            'exclude'                 => true,
-            'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
-            (
-                'time_begin' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_begin'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                ),
-                'time_end' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_end'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                )
-            )),
-            'sql'                     => "blob NULL"
-        ),
-
-
-        'oh_sunday' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['oh_sunday'],
-            'default'                 => time(),
-            'exclude'                 => true,
-            'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
-            (
-                'time_begin' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_begin'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                ),
-                'time_end' => array
-                (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['time_end'],
-                    'exclude'                 => true,
-                    'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
-                )
-            )),
-            'sql'                     => "blob NULL"
-        ),
-
-*/
-/*      'dayBegin' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayBegin'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-            'sql'                     => "int(10) unsigned NULL"
-        ),
-
-        'timeBegin' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['timeBegin'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50 wizard','datepicker'=>true),
-            'sql'                     => "int(10) unsigned NULL"
-        ),
-
-        'dayEnd' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayEnd'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-            'sql'                     => "int(10) unsigned NULL"
-        ),
-
-        'timeEnd' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['timeEnd'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50 wizard','datepicker'=>true),
-            'sql'                     => "int(10) unsigned NULL"
-        ),
-*/
+        )
     )
 
 );

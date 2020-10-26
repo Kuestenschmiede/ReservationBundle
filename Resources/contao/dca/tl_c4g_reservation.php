@@ -248,20 +248,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50','date','datepicker'=>true),
             'sql'                     => "int(10) unsigned NULL"
         ),
-/*
-         'reservation_time' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_time'],
-            'default'                 => time(),
-            'exclude'                 => true,
-            'filter'                  => false,
-            'sorting'                 => false,
-            'flag'                    => 8,
-            'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'time', 'mandatory'=>true, 'doNotCopy'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "int(10) unsigned NULL"
-        ),
-*/
+
         'reservation_object' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_object'],
