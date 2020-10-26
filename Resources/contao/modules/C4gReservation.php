@@ -536,6 +536,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationObjectField = new C4GSelectField();
             $reservationObjectField->setFieldName('reservation_object');
             $reservationObjectField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object']);
+            $reservationObjectField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object']);
             $reservationObjectField->setFormField(true);
             $reservationObjectField->setEditable(false); //
             //$reservationObjectField->setEditableWithSelection(true);

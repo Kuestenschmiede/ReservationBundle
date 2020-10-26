@@ -108,6 +108,10 @@ function setObjectId(object, typeid) {
 
 function hideOptions(reservationObjects,typeId,values) {
     if (reservationObjects) {
+        if (typeId == -1) {
+            var typeField = document.getElementById("c4g_reservation_type");
+            typeId = typeField ? typeField.value : -1;
+        }
         var selectField = document.getElementById("c4g_reservation_object_"+typeId);
         var first = jQuery.isArray(values) ? values[0] : values;
         if (selectField) {
