@@ -188,7 +188,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationDesiredCapacity->setMin(1);
                 $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                 $reservationDesiredCapacity->setCallOnChange(true);
-                $reservationDesiredCapacity->setCallOnChangeFunction("setTimeset(this, " . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
+                $reservationDesiredCapacity->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_".$type['id']."')," . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
                 $reservationDesiredCapacity->setNotificationField(true);
                 $reservationDesiredCapacity->setAdditionalID($type['id']);
                 $fieldList[] = $reservationDesiredCapacity;
@@ -558,7 +558,9 @@ class C4gReservation extends C4GBrickModuleParent
             $additionalParamsArr = [];
             foreach ($params as $paramId) {
                 $additionalParam = C4gReservationParamsModel::findByPk($paramId);
-                if ($additionalParam && $additionalParam->caption) {
+                if ($additionalParam && $additionalParam->caption && $additionalParam->price) {
+                    $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption." [".$additionalParam->price." Euro]"]; //ToDO Einheit, Foratierung
+                } else if ($additionalParam && $additionalParam->caption) {
                     $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
                 }
             }
