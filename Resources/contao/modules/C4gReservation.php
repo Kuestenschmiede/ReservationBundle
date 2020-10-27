@@ -59,8 +59,12 @@ class C4gReservation extends C4GBrickModuleParent
     protected $sendEMails   = null;
     protected $brickScript  = 'bundles/con4gisreservation/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/css/c4g_brick_reservation.css';
+    protected $strTemplate  = 'mod_c4g_brick_simple';
     protected $withNotification = true;
 
+    protected $jQueryUseTable = false;
+    protected $jQueryUseScrollPane = false;
+    protected $jQueryUsePopups = false;
 
     public function initBrickModule($id)
     {
@@ -74,8 +78,6 @@ class C4gReservation extends C4GBrickModuleParent
         $this->dialogParams->setWithoutGuiHeader(true);
         $this->dialogParams->setRedirectSite($this->reservation_redirect_site);
         $this->dialogParams->setSaveWithoutSavingMessage(true);
- //       $this->dialogParams->setSaveOnMandatory(false);
-//        $this->dialogParams->addButton(C4GBrickConst::BUTTON_SAVE_AND_REDIRECT, $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'], $visible=true, $enabled=true, $action = '', $accesskey = '', $defaultByEnter = true);
         $this->brickCaption = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption'];
         $this->brickCaptionPlural = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural'];
     }
@@ -92,10 +94,6 @@ class C4gReservation extends C4GBrickModuleParent
         $idField->setSortColumn(false);
         $fieldList[] = $idField;
 
-//        $headlineReservationField = new C4GHeadlineField();
-//        $headlineReservationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data']);
-//        $fieldList[] = $headlineReservationField;
-//
         $typelist = array();
         $types = C4gReservationTypeModel::findBy('published', '1');
         $firstType = 0;
@@ -146,12 +144,10 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationTypeField->setSize(1);
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
-            //$reservationTypeField->setChosen(true);
             $reservationTypeField->setWithEmptyOption(true);
             $reservationTypeField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect']);
             $reservationTypeField->setCallOnChange(true);
             $reservationTypeField->setCallOnChangeFunction("setTimeset(this, " . $this->id . ", -1 ,'getCurrentTimeset')");
-            //$reservationTypeField->setInitialCallOnChange(true); //ToDo doesn't work
             $reservationTypeField->setInitialValue(-1); //$firstType
             $reservationTypeField->setNotificationField(true);
             $fieldList[] = $reservationTypeField;
@@ -981,20 +977,16 @@ class C4gReservation extends C4GBrickModuleParent
             $newFieldList[] = $field;
         }
 
-        foreach ($putVars as $key => $value) {
-            if (strpos($key, "beginDate_") !== false) {
-                $beginDate = $value;
-            }
-            if (strpos($key, "beginTime_") !== false) {
-                $beginTime = $value;
+        $beginDate = $putVars['beginDate_'.$type];
 
+        $beginTime = 0;
+        foreach ($putVars as $key => $value) {
+            if (strpos($key, "beginTime_".$type) !== false) {
+                if ($value) {
+                    $beginTime = $value;
+                    break;
+                }
             }
-//            if (strpos($key, "reservation_object_") !== false) {
-//                $resObject = $value;
-//            }
-//            if (strpos($key, "reservation_type") !== false) {
-//                $resType = $value;
-//            }
         }
 
         $time_interval = $reservationObject->time_interval;
@@ -1012,7 +1004,7 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         $duration = $putVars['duration'];
-        if (($duration >= $min_residence_time) && ($duration <= $max_residence_time)) {
+        if ($duration && (($duration >= $min_residence_time) && ($duration <= $max_residence_time))) {
             $duration = $duration;
         } else {
             $duration = $time_interval;
