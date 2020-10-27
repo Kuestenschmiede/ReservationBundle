@@ -113,14 +113,14 @@ function hideOptions(reservationObjects,typeId,values) {
             typeId = typeField ? typeField.value : -1;
         }
         var selectField = document.getElementById("c4g_reservation_object_"+typeId);
-        var first = jQuery.isArray(values) ? values[0] : values;
+        var first = -1;//jQuery.isArray(values) ? values[0] : values;
         if (selectField) {
             for (i = 0; i < selectField.options.length; i++) {
                 var option = selectField.options[i];
                 var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 0;
                 var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
-                var desiredCapacity = jQuery(document.getElementById("c4g_desiredCapacity_"+typeId));
-                var capacity = desiredCapacity ? desiredCapacity.value || desiredCapacity.val() : 0;
+                var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);
+                var capacity = desiredCapacity ? desiredCapacity.value : 0;
 
                 //not in values
                 var foundValue = false;
@@ -150,13 +150,14 @@ function hideOptions(reservationObjects,typeId,values) {
             }
 
             if (parseInt(first) >= 0) {
-                jQuery(selectField).value ? jQuery(selectField).value = first : jQuery(selectField).val(first).change();
+                selectField.value ? selectField.value = first : jQuery(selectField).val(first).change();
                 jQuery(selectField).val(first);
                 jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
 
                 jQuery(selectField).removeAttr('disabled');
             } else {
-                jQuery(selectField).value ? jQuery(selectField).value = "-1" : jQuery(selectField).val("-1").change();
+                jQuery(selectField).children('option[value="-1"]').removeAttr('disabled');
+                selectField.value ? selectField.value = "-1" : jQuery(selectField).val("-1").change();
                 jQuery(selectField).prop("disabled", true);
             }
         }
@@ -199,20 +200,42 @@ function setTimeset(object, id, additionalId, callFunction) {
                 var radioGroups = timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group");
                 var timeList = [];
                 var objectList = [];
-
                 var times = data['times'];
-
                 var size = times.length;
+                // var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);
+                // var capacity = desiredCapacity ? desiredCapacity.value : 0;
                 //var size = Object.keys(times).length;
 
                 jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)) ? jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)).show() : false;
-                for (var i = 0; i < size; i++) {
-                    var dataTime = times[i].id;
-                    timeList[i] = dataTime;
+                var iterator = 0;
+                for (let key in times) {
+                    var dataTime = times[key]['id'];
+                    var dataObjects = times[key]['objects'];
 
-                    var dataObjects = times[i].objects;
-                    objectList[i] = dataObjects;
+                    timeList[iterator] = dataTime;
+                    objectList[iterator] = dataObjects;
+                    iterator++;
                 }
+
+                var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
+                var capMin = -1;
+                var capMax = -1;
+                if (selectField) {
+                    for (i = 0; i < selectField.options.length; i++) {
+                        var option = selectField.options[i];
+                        var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 0;
+                        if ((min == -1) || (min < capMin)) {
+                            capMin = min;
+                        }
+                        var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
+                        if ((max == -1) || (max > capMax)) {
+                            capMax = max;
+                        }
+                    }
+                }
+
+                var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+additionalId);
+                var capacity = desiredCapacity ? desiredCapacity.value : 0;
 
                 //if (radioGroups.style && radioGroups.style != "display:none") {
                 for (i = 0; i < radioGroups.length; i++) {
@@ -223,24 +246,27 @@ function setTimeset(object, id, additionalId, callFunction) {
                             }
 
                             for (k = 0; k < jQuery(radioGroups[i].children[j].children).length; k++) {
-                                jQuery(radioGroups[i].children[j].children[k]).removeAttr("checked");
-
                                 var value = jQuery(radioGroups[i].children[j].children[k]).val();
+                                // if (jQuery(radioGroups[i].children[j].children[k]).hasAttribute('checked')) {
+                                //     jQuery(radioGroups[i].children[j].children[k]).removeAttr('checked');
+                                // }
 
                                 if (value && parseInt(value)) {
                                     var arrIndex = jQuery.inArray(parseInt(value), timeList);
-
                                     var objectListIds = -1
                                     for (l = 0; l < objectList[arrIndex].length; l++) {
-                                        objectListIds = objectList[arrIndex][l]['id'] != -1 ? objectList[arrIndex][l]['id'] : objectListIds;
+                                        objectListIds = ((objectList[arrIndex][l]['id'] != -1) && (objectList[arrIndex][l]['act'] < capacity)) ? objectList[arrIndex][l]['id'] : objectListIds;
                                     }
 
                                     var disabled = (
-                                        (arrIndex === -1) || (objectListIds == -1)
+                                        (arrIndex === -1) || (objectListIds == -1) || ((capMin != -1) && (capacity < capMin)) || ((capMax != -1) && (capacity > capMax))
                                     );
 
                                     jQuery(radioGroups[i].children[j].children[k]).attr('disabled', disabled);
                                     //jQuery(radioGroups[i].children[j].children[k]).attr("onchange", "setObjectId(this,"+objectList[arrIndex][0]+");");
+
+                                    //min max check
+
 
                                     if ((!disabled)) {
                                         let objStr = '';
@@ -250,7 +276,7 @@ function setTimeset(object, id, additionalId, callFunction) {
                                             } else {
                                                 objStr = objStr + ' - ' + objectList[arrIndex][l]['id'];
                                             }
-                                            var selectField = document.getElementById("c4g_reservation_object_"+additionalId)[0];
+
                                             var optionIdx = -1;
                                             for (var m = 0; m < jQuery(selectField).length; m++) {
                                                 if (jQuery(selectField)[m].value == objectList[arrIndex][l]['id']) {
