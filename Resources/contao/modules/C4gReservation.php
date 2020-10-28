@@ -554,8 +554,8 @@ class C4gReservation extends C4GBrickModuleParent
             $additionalParamsArr = [];
             foreach ($params as $paramId) {
                 $additionalParam = C4gReservationParamsModel::findByPk($paramId);
-                if ($additionalParam && $additionalParam->caption && $additionalParam->price) {
-                    $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption." [".$additionalParam->price." Euro]"]; //ToDO Einheit, Foratierung
+                if ($additionalParam && $additionalParam->caption && ($additionalParam->price && $this->showPrices)) {
+                    $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption."<span class='price'>(+".number_format($additionalParam->price,2)." Euro)</span>"]; //ToDO Einheit, Foratierung
                 } else if ($additionalParam && $additionalParam->caption) {
                     $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
                 }

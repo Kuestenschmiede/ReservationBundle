@@ -33,3 +33,4 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['additionalDuratio
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withCapacity'] = array("Customer can specify number of persons","The customer can specify the number of persons. This is required, for example, for a table reservation in a restaurant.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showFreeSeats'] = array("Show free seats", "Open seats are displayed.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showEndTime'] = array("The end times are also output", "The end times are also displayed (depending on the configuration).");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'] = array("Show prices","Prices are displayed");
