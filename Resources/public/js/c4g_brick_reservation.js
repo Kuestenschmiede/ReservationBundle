@@ -118,7 +118,7 @@ function hideOptions(reservationObjects,typeId,values) {
                 var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 0;
                 var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
                 var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);
-                var capacity = desiredCapacity ? desiredCapacity.value : 0;
+                var capacity = desiredCapacity ? desiredCapacity.value : 1;
 
                 //not in values
                 var foundValue = false;
@@ -234,7 +234,7 @@ function setTimeset(object, id, additionalId, callFunction) {
                 }
 
                 var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+additionalId);
-                var capacity = desiredCapacity ? desiredCapacity.value : 0;
+                var capacity = desiredCapacity ? desiredCapacity.value : 1;
 
                 //if (radioGroups.style && radioGroups.style != "display:none") {
                 for (i = 0; i < radioGroups.length; i++) {
