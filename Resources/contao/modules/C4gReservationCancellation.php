@@ -13,6 +13,7 @@
 
 namespace con4gis\ReservationBundle\Resources\contao\modules;
 
+use con4gis\ProjectsBundle\Classes\Actions\C4GSaveAndRedirectDialogAction;
 use con4gis\ProjectsBundle\Classes\Actions\C4GSendEmailNotificationAction;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
@@ -50,10 +51,6 @@ class C4gReservationCancellation extends C4GBrickModuleParent
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
         $this->dialogParams->setWithoutGuiHeader(true);
         $this->dialogParams->setRedirectSite($this->reservation_redirect_site);
-//        $this->dialogParams->setSaveWithoutSavingMessage(true);
-//
-//        $this->dialogParams->addButton(C4GBrickConst::BUTTON_SAVE_AND_REDIRECT, $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['button_cancellation'], $visible=true, $enabled=true, $action = '', $accesskey = '', $defaultByEnter = true);
-
         $this->brickCaption = $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['brick_caption'];
         $this->brickCaptionPlural = $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['brick_caption_plural'];
     }
@@ -111,15 +108,20 @@ class C4gReservationCancellation extends C4GBrickModuleParent
             return array('usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']);
         }
 
-        if (C4gReservationCancellationModel::cancellation($lastname, $key)) {
+        $reservation = C4gReservationModel::findOneBy('reservation_id',$key);
+        if ($reservation) {
+            $putVars['email'] = $reservation->email;
+        }
 
+        if (C4gReservationCancellationModel::cancellation($lastname, $key)) {
             $action = new C4GSendEmailNotificationAction($this->getDialogParams(), $this->getListParams(), $this->getFieldList(), $putVars, $this->getBrickDatabase());
             $action->setModule($this);
+            $action->setCloseDialog(false);
             $result = $action->run();
 
             if ($this->dialogParams->getRedirectSite() && (($jumpTo = \PageModel::findByPk($this->dialogParams->getRedirectSite())) !== null)) {
-                $return['jump_to_url'] = $jumpTo->getFrontendUrl();
-                return $return;
+                $result['jump_to_url'] = $jumpTo->getFrontendUrl();
+                return $result;
             }
         } else {
             return array('usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['cancellation_failed']);

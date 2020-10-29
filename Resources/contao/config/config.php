@@ -78,15 +78,15 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
     'con4gis_cancellation'   => array
     (
         'recipients'           => array('admin_email','email'),
-        'email_subject'        => array('admin_email','lastname','reservation_id'),
-        'email_text'           => array('lastname','business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id'),
-        'email_html'           => array('lastname','business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id'),
+        'email_subject'        => array('lastname','reservation_id'),
+        'email_text'           => array('lastname','reservation_id'), //'business_name','business_email','business_phone','business_street','business_postal','business_city',
+        'email_html'           => array('lastname','reservation_id'), //'business_name','business_email','business_phone','business_street','business_postal','business_city',
         'email_sender_name'    => array('admin_email','email'),
         'email_sender_address' => array('admin_email','email'),
         'email_recipient_cc'   => array('admin_email','email'),
         'email_recipient_bcc'  => array('admin_email','email'),
         'email_replyTo'        => array('admin_email','email'),
-        'file_content'         => array('reservation_type','desiredCapacity','reservation_date','reservation_time',  'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'internal_comment','business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id')
+        'file_content'         => array('lastname','reservation_id')
 
     )
 );
