@@ -580,12 +580,9 @@ class C4gReservationObjectModel extends \Model
 
                                         $reservation = null;
                                         while ($time <= ($time_end - $interval)) {
-
-                                            //$foundObject = false;
                                             $id = $object->getId();
                                             if ($date && $tsdate) {
                                                 $t = 'tl_c4g_reservation';
-                                                //$objectCount = [];
                                                 $arrColumns = array("$t.beginDate=$tsdate AND $t.beginTime=$time AND NOT $t.cancellation='1'");
                                                 $arrValues = array();
                                                 $arrOptions = array();
@@ -595,14 +592,11 @@ class C4gReservationObjectModel extends \Model
                                                 if ($reservations) {
                                                     foreach ($reservations as $reservation) {
                                                         if ($reservation->reservation_object) {
-//                                                            foreach (unserialize($reservation->reservation_object) as $key=>$value) {
-                                                                if ($reservation->reservation_object == $id) {
-                                                                   // $foundObject = true;
-                                                                    $count[$tsdate][$time] = $count[$tsdate][$time] ? $count[$tsdate][$time] + 1 : 1;
-                                                                    $objectCount[$tsdate][$time] = $objectCount[$tsdate][$time] ? $objectCount[$tsdate][$time] + 1 : 1;
-                                                                    $actPersons = $actPersons + $reservation->desiredCapacity;
-                                                                }
-//                                                            }
+                                                            if ($reservation->reservation_object == $id) {
+                                                                $count[$tsdate][$time] = $count[$tsdate][$time] ? $count[$tsdate][$time] + 1 : 1;
+                                                                $objectCount[$tsdate][$time] = $objectCount[$tsdate][$time] ? $objectCount[$tsdate][$time] + 1 : 1;
+                                                                $actPersons = $actPersons + intval($reservation->desiredCapacity); //ToDo
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -620,11 +614,11 @@ class C4gReservationObjectModel extends \Model
                                                 $actPersons = 0;
                                             }
 
-                                            $timeObj = ['obj'=>-1,'act'=>$actPersons,'max'=>$capacity];
+                                            $timeObj = ['id'=>-1,'act'=>$actPersons,'max'=>$capacity];
                                             if ($tsdate && (($nowDate < $tsdate) || (($nowDate == $tsdate) && ($time > $nowTime)))) {
                                                 if ($maxCount && ($count[$tsdate][$time] >= intval($maxCount))) {
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
-                                                } else if ($objectQuantity && ($objectCount[$tsdate][$time] >= intval($objectQuantity))) {
+                                                } else if ($capacity && ($objectCount[$tsdate][$time] >= intval($capacity))) {
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else {
                                                    $timeObj = ['id'=>$id,'act'=>$actPersons,'max'=>$capacity];

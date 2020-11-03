@@ -148,14 +148,13 @@ function hideOptions(reservationObjects,typeId,values) {
             }
 
             if (parseInt(first) >= 0) {
-                selectField.value ? selectField.value = first : jQuery(selectField).val(first).change();
-                jQuery(selectField).val(first);
+                jQuery(selectField).val(first).change();
                 jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
 
                 jQuery(selectField).removeAttr('disabled');
             } else {
                 jQuery(selectField).children('option[value="-1"]').removeAttr('disabled');
-                selectField.value ? selectField.value = "-1" : jQuery(selectField).val("-1").change();
+                jQuery(selectField).val("-1").change();
                 jQuery(selectField).prop("disabled", true);
             }
         }
@@ -201,9 +200,6 @@ function setTimeset(object, id, additionalId, callFunction) {
                 var objectList = [];
                 var times = data['times'];
                 var size = times.length;
-                // var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);
-                // var capacity = desiredCapacity ? desiredCapacity.value : 0;
-                //var size = Object.keys(times).length;
 
                 jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)) ? jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)).show() : false;
                 var iterator = 0;
@@ -236,7 +232,6 @@ function setTimeset(object, id, additionalId, callFunction) {
                 var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+additionalId);
                 var capacity = desiredCapacity ? desiredCapacity.value : 1;
 
-                //if (radioGroups.style && radioGroups.style != "display:none") {
                 for (i = 0; i < radioGroups.length; i++) {
                     try {
                         for (j = 0; j < jQuery(radioGroups[i].children).length; j++) {
@@ -251,7 +246,7 @@ function setTimeset(object, id, additionalId, callFunction) {
                                     var arrIndex = jQuery.inArray(parseInt(value), timeList);
                                     var objectListIds = -1
                                     for (l = 0; l < objectList[arrIndex].length; l++) {
-                                        objectListIds = ((objectList[arrIndex][l]['id'] != -1) && (objectList[arrIndex][l]['act'] < capacity)) ? objectList[arrIndex][l]['id'] : objectListIds;
+                                        objectListIds = ((objectList[arrIndex][l]['id'] != -1) && (objectList[arrIndex][l]['act'] < objectList[arrIndex][l]['max'] )) ? objectList[arrIndex][l]['id'] : objectListIds;
                                     }
 
                                     var disabled = (
@@ -259,40 +254,42 @@ function setTimeset(object, id, additionalId, callFunction) {
                                     );
 
                                     jQuery(radioGroups[i].children[j].children[k]).attr('disabled', disabled);
-                                    //jQuery(radioGroups[i].children[j].children[k]).attr("onchange", "setObjectId(this,"+objectList[arrIndex][0]+");");
 
-                                    if ((!disabled)) {
+                                    if (!disabled) {
                                         let objStr = '';
                                         for (l = 0; l < objectList[arrIndex].length; l++) {
+                                            let listObj = objectList[arrIndex][l];
                                             if (l == 0) {
-                                                objStr = objStr + objectList[arrIndex][l]['id'];
+                                                objStr = objStr + objlistObj['id'];
                                             } else {
-                                                objStr = objStr + ' - ' + objectList[arrIndex][l]['id'];
+                                                objStr = objStr + '-' + listObj['id'];
                                             }
 
                                             var optionIdx = -1;
                                             for (var m = 0; m < jQuery(selectField).length; m++) {
-                                                if (jQuery(selectField)[m].value == objectList[arrIndex][l]['id']) {
+                                                if (selectField[m].value == listObj['id']) {
                                                     optionIdx = m;
                                                     break;
                                                 }
                                             }
 
                                             if (optionIdx !== -1) {
-                                                var optionText = jQuery(selectField)[optionIdx].innerHTML;
+                                                var optionText = selectField[optionIdx].text;
                                                 var pos = optionText.lastIndexOf('[');
                                                 if (pos != -1) {
                                                     optionText = optionText.substr(0, pos-1);
                                                 }
 
-                                                jQuery(selectField)[optionIdx].innerHTML = optionText +
-                                                    ' ['+objectList[arrIndex][l]['act']+'/'+objectList[arrIndex][l]['max']+']';
+                                                selectField[optionIdx].text = optionText + ' ['+listObj['act']+'/'+listObj['max']+']';
                                             }
 
                                         }
-                                        jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objStr);
 
-                                        val = objectList[arrIndex][0]['id'];
+                                        if (objStr != 'undefined') {
+                                            jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objStr);
+                                        }
+
+                                        val = objectList[arrIndex][0]['id']; //First valid option
                                     } else {
                                         jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
                                     }
@@ -308,8 +305,6 @@ function setTimeset(object, id, additionalId, callFunction) {
                     if (valueElement) {
                         valueElement.value = '';
                     }
-
-                    //ToDo click active button
 
                     var reservation_time_button = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
                     reservation_time_button.prop( "checked", false );
