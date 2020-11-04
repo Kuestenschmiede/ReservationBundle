@@ -187,6 +187,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationDesiredCapacity->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_".$type['id']."')," . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
                 $reservationDesiredCapacity->setNotificationField(true);
                 $reservationDesiredCapacity->setAdditionalID($type['id']);
+                //$reservationDesiredCapacity->setHidden(!$this->withCapacity);
                 $fieldList[] = $reservationDesiredCapacity;
             }
 
@@ -520,8 +521,9 @@ class C4gReservation extends C4GBrickModuleParent
                 $objects[] = array(
                     'id' => $reservationObject->getId(),
                     'name' => $reservationObject->getCaption(),
-                    'min' => $reservationObject->getDesiredCapacity()[0],
-                    'max' => $reservationObject->getDesiredCapacity()[1]);
+                    'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
+                    'max' => $reservationObject->getDesiredCapacity()[1] ? $reservationObject->getDesiredCapacity()[1] : 1
+                );
             }
 
 //            $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginTime_' . $type['id']); //ToDo

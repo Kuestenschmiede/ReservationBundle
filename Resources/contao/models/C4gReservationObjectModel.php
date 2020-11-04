@@ -595,7 +595,7 @@ class C4gReservationObjectModel extends \Model
                                                             if ($reservation->reservation_object == $id) {
                                                                 $count[$tsdate][$time] = $count[$tsdate][$time] ? $count[$tsdate][$time] + 1 : 1;
                                                                 $objectCount[$tsdate][$time] = $objectCount[$tsdate][$time] ? $objectCount[$tsdate][$time] + 1 : 1;
-                                                                $actPersons = $actPersons + intval($reservation->desiredCapacity); //ToDo
+                                                                $actPersons = $actPersons + intval($reservation->desiredCapacity);
                                                             }
                                                         }
                                                     }
@@ -608,9 +608,10 @@ class C4gReservationObjectModel extends \Model
                                             }
 
                                             if ($showFreeSeats) {
-                                                $capacity = $objectQuantity * $object->getDesiredCapacity()[1]; //ToDo
+                                                $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
+                                                $capacity = $objectQuantity * $desiredCapacity;
                                             } else {
-                                                $capacity = 0;
+                                                $capacity = 1;
                                                 $actPersons = 0;
                                             }
 

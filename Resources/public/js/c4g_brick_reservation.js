@@ -115,8 +115,8 @@ function hideOptions(reservationObjects,typeId,values) {
         if (selectField) {
             for (i = 0; i < selectField.options.length; i++) {
                 var option = selectField.options[i];
-                var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 0;
-                var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
+                var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 1;
+                var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 1;
                 var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);
                 var capacity = desiredCapacity ? desiredCapacity.value : 1;
 
@@ -218,11 +218,11 @@ function setTimeset(object, id, additionalId, callFunction) {
                 if (selectField) {
                     for (i = 0; i < selectField.options.length; i++) {
                         var option = selectField.options[i];
-                        var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 0;
+                        var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 1;
                         if ((min == -1) || (min < capMin)) {
                             capMin = min;
                         }
-                        var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
+                        var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 1;
                         if ((max == -1) || (max > capMax)) {
                             capMax = max;
                         }

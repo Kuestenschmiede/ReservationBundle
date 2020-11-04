@@ -157,7 +157,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'maxlength'=>3, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'w50'),
-            'sql'                     => "int(3) unsigned NOT NULL default 0"
+            'sql'                     => "int(3) unsigned NOT NULL default 1"
         ),
 
 /*
