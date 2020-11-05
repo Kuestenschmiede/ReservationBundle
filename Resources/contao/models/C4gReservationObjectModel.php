@@ -613,17 +613,15 @@ class C4gReservationObjectModel extends \Model
                                                 $endTimeInterval = 0;
                                             }
 
-//                                            If ($showFreeSeats) {
-//                                                $actPersons = 0;
-//                                            }
-
                                             $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
                                             $capacity = $objectQuantity * $desiredCapacity;
                                             $timeObj = ['id'=>-1,'act'=>$actPersons,'max'=>$capacity,'showSeats'=>$showFreeSeats];
 
                                             if ($tsdate && (($nowDate < $tsdate) || (($nowDate == $tsdate) && ($time > $nowTime)))) {
-                                                if ($maxCount && (!empty($count)) && ($count[$tsdate][$time] >= intval($maxCount * $capacity))) {  //n times for type
-                                                   $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                if ($actPersons && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                } else if ($maxCount && (!empty($count)) && ($count[$tsdate][$time] >= intval($maxCount * $capacity))) {  //n times for type
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else if ($capacity && (!empty($objectCount)) && ($objectCount[$tsdate][$time] >= intval($capacity))) { //n times for object
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else {
