@@ -306,7 +306,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $moReservationTimeField->setFormField(true);
                 $moReservationTimeField->setOptions(
                     C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects, $type['id'],
+                        $reservationObjects,
+                        $type['id'],
                         'mo',
                         date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 1)),
                         $additionalDuration,
@@ -338,7 +339,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $tuReservationTimeField->setFormField(true);
                 $tuReservationTimeField->setOptions(
                     C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects, $type['id'],
+                        $reservationObjects,
+                        $type['id'],
                         'tu',
                         date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 2)),
                         $additionalDuration,
@@ -370,7 +372,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $weReservationTimeField->setFormField(true);
                 $weReservationTimeField->setOptions(
                     C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects, $type['id'],
+                        $reservationObjects,
+                        $type['id'],
                         'we',
                         date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 3)),
                         $additionalDuration,
@@ -402,7 +405,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $thReservationTimeField->setFormField(true);
                 $thReservationTimeField->setOptions(
                     C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects, $type['id'],
+                        $reservationObjects,
+                        $type['id'],
                         'th',
                         date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 4)),
                         $additionalDuration,
@@ -468,7 +472,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $saReservationTimeField->setEditable(false);
                 $saReservationTimeField->setOptions(
                     C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects, $type['id'],
+                        $reservationObjects,
+                        $type['id'],
                         'sa',
                         date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 6)),
                         $additionalDuration,
@@ -1082,7 +1087,7 @@ class C4gReservation extends C4GBrickModuleParent
         }
         $times = [];
         $objects = C4gReservationObjectModel::getReservationObjectList(array($additionalParam));
-        $withEndTimes = $this->showEndTimes;
+        $withEndTimes = $this->showEndTime;
         $withFreeSeats = $this->showFreeSeats;
         $times = C4gReservationObjectModel::getReservationTimes($objects, $additionalParam, $weekday, $date, $duration, $withEndTimes, $withFreeSeats);
 

@@ -213,8 +213,8 @@ function setTimeset(object, id, additionalId, callFunction) {
                 }
 
                 var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
-                var capMin = -1;
-                var capMax = -1;
+                var capMin = 1;
+                var capMax = 1;
                 if (selectField) {
                     for (i = 0; i < selectField.options.length; i++) {
                         var option = selectField.options[i];
@@ -232,74 +232,81 @@ function setTimeset(object, id, additionalId, callFunction) {
                 var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+additionalId);
                 var capacity = desiredCapacity ? desiredCapacity.value : 1;
 
-                for (i = 0; i < radioGroups.length; i++) {
-                    try {
-                        for (j = 0; j < jQuery(radioGroups[i].children).length; j++) {
-                            if (radioGroups[i].children.style && radioGroups[i].children.style == "display:none") {
+                if (radioGroups) {
+                    for (i = 0; i < radioGroups.length; i++) {
+                        //try {
+                        for (j = 0; j < radioGroups[i].children.length; j++) {
+                            if (radioGroups[i].children[j].style && radioGroups[i].children[j].style == "display:none") {
                                 continue;
                             }
 
-                            for (k = 0; k < jQuery(radioGroups[i].children[j].children).length; k++) {
+                            for (k = 0; k < radioGroups[i].children[j].children.length; k++) {
                                 var value = jQuery(radioGroups[i].children[j].children[k]).val();
                                 if (value && parseInt(value)) {
-                                    nameField = radioGroups[i].children[j].children[k].getAttribute('name').substr(1);
-                                    var arrIndex = jQuery.inArray(parseInt(value), timeList);
-                                    var objectListIds = -1
-                                    for (l = 0; l < objectList[arrIndex].length; l++) {
-                                        objectListIds = ((objectList[arrIndex][l]['id'] != -1) && (objectList[arrIndex][l]['act'] < objectList[arrIndex][l]['max'] )) ? objectList[arrIndex][l]['id'] : objectListIds;
+                                    namefield = radioGroups[i].children[j].children[k].getAttribute('name').substr(1);
+                                    var arrindex = jQuery.inArray(parseInt(value), timeList);
+                                    var activateTimeButton = -1;
+                                    if (arrindex !== -1) {
+                                        for (l = 0; l < objectList[arrindex].length; l++) {
+                                            if (objectList[arrindex][l]['id'] != -1) {
+                                                if ((objectList[arrindex][l]['act'] < objectList[arrindex][l]['max'] )) {
+                                                    activateTimeButton = (activateTimeButton < objectList[arrindex][l]['act']) ? objectList[arrindex][l]['act'] : activateTimeButton;
+                                                }
+                                            }
+                                        }
                                     }
 
-                                    var disabled = (
-                                        (arrIndex === -1) || (objectListIds == -1) || ((capMin != -1) && (capacity < capMin)) || ((capMax != -1) && (capacity > capMax))
-                                    );
-
-                                    jQuery(radioGroups[i].children[j].children[k]).attr('disabled', disabled);
-
-                                    if (!disabled) {
-                                        let objStr = '';
-                                        for (l = 0; l < objectList[arrIndex].length; l++) {
-                                            let listObj = objectList[arrIndex][l];
+                                    if ((activateTimeButton >= 0) && (activateTimeButton < capMax) && (capacity >= capMin) && (capacity <= capMax)) {
+                                        let objstr = '';
+                                        for (l = 0; l < objectList[arrindex].length; l++) {
+                                            let listObj = objectList[arrindex][l];
                                             if (l == 0) {
-                                                objStr = objStr + objlistObj['id'];
+                                                objstr = objstr + listObj['id'];
                                             } else {
-                                                objStr = objStr + '-' + listObj['id'];
+                                                objstr = objstr + '-' + listObj['id'];
                                             }
 
-                                            var optionIdx = -1;
+                                            var optionidx = -1;
                                             for (var m = 0; m < jQuery(selectField).length; m++) {
                                                 if (selectField[m].value == listObj['id']) {
-                                                    optionIdx = m;
+                                                    optionidx = m;
                                                     break;
                                                 }
                                             }
 
-                                            if (optionIdx !== -1) {
-                                                var optionText = selectField[optionIdx].text;
-                                                var pos = optionText.lastIndexOf('[');
-                                                if (pos != -1) {
-                                                    optionText = optionText.substr(0, pos-1);
-                                                }
-
-                                                selectField[optionIdx].text = optionText + ' ['+listObj['act']+'/'+listObj['max']+']';
-                                            }
+                                            //ToDo wrong position move to setObjectId
+                                            // if (optionidx !== -1) {
+                                            //     if (listObj['showSeats']) {
+                                            //         var optionText = selectField[optionidx].text;
+                                            //         var pos = optionText.lastIndexOf('[');
+                                            //         if (pos != -1) {
+                                            //             optionText = optionText.substr(0, pos-1);
+                                            //         }
+                                            //         selectField[optionidx].text = optionText + ' ['+listObj['act']+'/'+listObj['max']+']';
+                                            //     }
+                                            // }
 
                                         }
 
-                                        if (objStr != 'undefined') {
-                                            jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objStr);
+                                        if (objstr != 'undefined') {
+                                            jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objstr);
+                                            jQuery(radioGroups[i].children[j].children[k]).attr('disabled', false);
                                         }
 
-                                        val = objectList[arrIndex][0]['id']; //First valid option
+                                        val = objectList[arrindex][0]['id']; //first valid option
                                     } else {
                                         jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
+                                        jQuery(radioGroups[i].children[j].children[k]).attr('disabled', true);
                                     }
                                 }
                             }
                         }
-                    } catch (err) {
-                        //ToDo
+                        /*} catch (err) {
+                            console.log(err);
+                        }*/
                     }
                 }
+
                 if (nameField) {
                     var valueElement = document.getElementById(nameField);
                     if (valueElement) {

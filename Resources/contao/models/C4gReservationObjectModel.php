@@ -66,6 +66,7 @@ class C4gReservationObjectModel extends \Model
     public static function getMaxObjectCountPerDate($list, $date, $type) {
         $result = 0;
         $database = Database::getInstance();
+
         foreach ($list as $object) {
             $id= $object->getId();
             $objectData = $database->prepare("SELECT * FROM `tl_c4g_reservation_object` WHERE id=? AND published='1'")
@@ -73,6 +74,7 @@ class C4gReservationObjectModel extends \Model
             $weekday = date(w,$date);
             $quantity = $objectData['quantity'];
             $periodType = $type['periodType'];
+            $maxPerTime = $type['objectCount']; //ToDo check max count per interval
             $interval = $object->getTimeInterval();
 
             if($weekday == 0){
@@ -112,6 +114,7 @@ class C4gReservationObjectModel extends \Model
                 }
 
                 if ($possibleSeconds) {
+
                     $possibleBookings = $possibleBookings + (($possibleSeconds / $toSecond / $interval) * $quantity);
                 }
             }
@@ -124,7 +127,7 @@ class C4gReservationObjectModel extends \Model
         return $result;
     }
 
-    public static function getDateExclusionString($list, $type)
+     public static function getDateExclusionString($list, $type)
     {
         $result = '';
 
@@ -141,15 +144,18 @@ class C4gReservationObjectModel extends \Model
                 $id = $object->getId();
                 $dates = $database->prepare("SELECT DISTINCT beginDate FROM `tl_c4g_reservation` WHERE reservation_object=? AND NOT cancellation='1'")
                     ->execute($id)->fetchAllAssoc();
-                $times = $database->prepare("SELECT  * FROM `tl_c4g_reservation` WHERE reservation_object=? AND NOT cancellation='1'")
-                    ->execute($id)->fetchAllAssoc();
+//                $times = $database->prepare("SELECT  * FROM `tl_c4g_reservation` WHERE reservation_object=? AND NOT cancellation='1'")
+//                    ->execute($id)->fetchAllAssoc();
                 $objectData = $database->prepare("SELECT * FROM `tl_c4g_reservation_object` WHERE id=? AND published='1'")
                     ->execute($id)->fetchAssoc();
 
-                $quantity = $objectData['quantity'];
+
+                $desiredCapacity = $objectData['desiredCapacityMax'] ? $objectData['desiredCapacityMax'] : 1;
+                $quantity = $objectData['quantity'] * $desiredCapacity;
+
                 $periodType = $type['periodType'];
 
-                foreach ($dates as $date){
+                foreach ($dates as $date) {
                     $beginDate = $date['beginDate'];
                     if (!$beginDate) {
                         continue;
@@ -195,11 +201,11 @@ class C4gReservationObjectModel extends \Model
                         }
 
                         if ($possibleSeconds) {
-                            $possibleBookings = $possibleBookings + (($possibleSeconds / $toSecond / $interval) * $quantity);
+                            $possibleBookings = $possibleBookings + (($possibleSeconds / ($toSecond * $interval)) * $quantity);
                         }
                     }
 
-                    $resultArr = $database->prepare("SELECT COUNT(*) AS count FROM `tl_c4g_reservation` WHERE reservation_object=? AND beginDate=? AND NOT cancellation='1'")
+                    $resultArr = $database->prepare("SELECT SUM(desiredCapacity) AS count FROM `tl_c4g_reservation` WHERE reservation_object=? AND beginDate=? AND NOT cancellation='1'")
                         ->execute($id,$date['beginDate'])->fetchAssoc();
 
                     if ($resultArr && $possibleBookings && ($resultArr['count'] >= $possibleBookings))
@@ -216,9 +222,8 @@ class C4gReservationObjectModel extends \Model
 
                         $current = $exclusionBegin;
                         while($current <= $exclusionEnd) {
-                            $dates[] = $current;
-                            $current = $current + 86400;
                             $alldates[] = $current;
+                            $current = $current + 86400;
                         }
                     }
                 }
@@ -320,29 +325,33 @@ class C4gReservationObjectModel extends \Model
 
     private static function addTime($list, $time, $obj, $interval)
     {
+
         if ($obj && ($obj['id'] == -1)) {
             $key = $time;
-            $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time), 'objects' => [$obj]);
+            $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
+            if ($interval) {
+                $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval);
+                $list[$key] = array('id' => $time, 'name' => $begin.' - '.$end, 'objects' => [$obj]);
+            } else {
+                $list[$key] = array('id' => $time, 'name' => $begin, 'objects' => [$obj]);
+            }
         } else {
             foreach ($list as $key => $item) {
                 //Ist der Termin schon in der Auflistung?
                 if ($item['id'] == $time) {
-                    $first_obj = $item['object'];
-                    //$rnd = rand(2, 4);
-
-                    //if (($first_obj != -1) && (($first_obj != $obj) && ($rnd % 2))) {
                     $list[$key]['objects'][] = $obj;
-                    //}
                     return $list;
                 }
             }
 
-            //$key = $obj . $time;
             $key = $time;
+            $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
+
             if ($interval) {
-                $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time).' - '.date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval), 'objects' => [$obj]);
+                $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval);
+                $list[$key] = array('id' => $time, 'name' => $begin.' - '.$end, 'objects' => [$obj]);
             } else {
-                $list[$key] = array('id' => $time, 'name' => date($GLOBALS['TL_CONFIG']['timeFormat'], $time), 'objects' => [$obj]);
+                $list[$key] = array('id' => $time, 'name' => $begin, 'objects' => [$obj]);
             }
         }
 
@@ -511,16 +520,13 @@ class C4gReservationObjectModel extends \Model
             }
             $periodType = $typeObject->periodType;
 
-            //ToDo ???
-            //$maxCount = $typeObject->;
-
             $maxCount = $typeObject->objectCount;
-            $count = [];
-            //$objectQuantity = [];
+            $count = []; //count over all objects
+
             foreach ($list as $object) {
                 $found = false;
-                $objectCount = [];
-                $objectQuantity = $object->getQuantity();
+                $objectCount = []; //count for one object
+                $objectQuantity = $object->getQuantity() ?  $object->getQuantity() : 1;
                 $reservationTypes = $object->getReservationTypes();
                 
                 if ($reservationTypes) {
@@ -607,22 +613,21 @@ class C4gReservationObjectModel extends \Model
                                                 $endTimeInterval = 0;
                                             }
 
-                                            if ($showFreeSeats) {
-                                                $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
-                                                $capacity = $objectQuantity * $desiredCapacity;
-                                            } else {
-                                                $capacity = 1;
-                                                $actPersons = 0;
-                                            }
+//                                            If ($showFreeSeats) {
+//                                                $actPersons = 0;
+//                                            }
 
-                                            $timeObj = ['id'=>-1,'act'=>$actPersons,'max'=>$capacity];
+                                            $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
+                                            $capacity = $objectQuantity * $desiredCapacity;
+                                            $timeObj = ['id'=>-1,'act'=>$actPersons,'max'=>$capacity,'showSeats'=>$showFreeSeats];
+
                                             if ($tsdate && (($nowDate < $tsdate) || (($nowDate == $tsdate) && ($time > $nowTime)))) {
-                                                if ($maxCount && ($count[$tsdate][$time] >= intval($maxCount))) {
+                                                if ($maxCount && (!empty($count)) && ($count[$tsdate][$time] >= intval($maxCount * $capacity))) {  //n times for type
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
-                                                } else if ($capacity && ($objectCount[$tsdate][$time] >= intval($capacity))) {
+                                                } else if ($capacity && (!empty($objectCount)) && ($objectCount[$tsdate][$time] >= intval($capacity))) { //n times for object
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else {
-                                                   $timeObj = ['id'=>$id,'act'=>$actPersons,'max'=>$capacity];
+                                                   $timeObj = ['id'=>$id,'act'=>$actPersons,'max'=>$capacity,'showSeats'=>$showFreeSeats];
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 }
                                             }
