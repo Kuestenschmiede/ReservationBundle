@@ -22,6 +22,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     (
         'dataContainer'     => 'Table',
         'enableVersioning'  => 'true',
+        'ctable'            => ['tl_c4g_reservation_participants'],
         'sql'               => array
         (
             'keys' => array
@@ -86,6 +87,12 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
                 'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation']['show'],
                 'href'          => 'act=show',
                 'icon'          => 'show.gif',
+            ),
+            'participants' => array
+            (
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['participants'],
+                'href'                => 'table=tl_c4g_reservation_participants',
+                'icon'                => 'mgroup.svg'
             ),
             'toggle' => array
             (

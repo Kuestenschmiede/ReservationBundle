@@ -48,6 +48,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Canceled", "I
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes'] = 'yes';
 
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['participants'] = 'Participants';
+
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend'] = "reservation data";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['person_legend'] = "personal data";
