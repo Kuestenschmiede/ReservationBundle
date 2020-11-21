@@ -25,6 +25,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'end date';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Please select a time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Ends at';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration'] = 'Duration';
+
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object'] = 'Reservation options';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none'] = 'Reservation request not available.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id'] = 'Identification key: ';

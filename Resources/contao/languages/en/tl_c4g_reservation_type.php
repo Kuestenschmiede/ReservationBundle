@@ -15,6 +15,9 @@
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['caption'] = array("backend name", "name for selection in backend.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['options'] = array("Frontend name", "Displayed in the selection field in the frontend depending on the language.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("option","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'] = array("Object type", "Reservation objects and Contao events can be reserved.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][1] = 'Default';
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][2] = 'Events';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_name'] = array("Businessname","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'] = array("Phone","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_email'] = array("Email","");
@@ -50,11 +53,13 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['published'] = array("Publish", "
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayEnd'] = array("end day");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additional_params'] = array("Reservation options");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Description");
-
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = array("Maximum number of participants per booking", "Here you can limit the number of participants in the entry per booking. 0 = unlimited.");
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Details of the type of reservation";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['object_legend'] = "Basic settings for the objects";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Expert settings";
+
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['new'] = array("add reservation type", "add reservation type");

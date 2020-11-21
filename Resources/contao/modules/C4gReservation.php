@@ -25,6 +25,8 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GHeadlineField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLabelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
@@ -32,6 +34,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GNumberField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GRadioGroupField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSelectField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSubDialogField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
@@ -144,11 +147,12 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationTypeField->setSize(1);
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
-            $reservationTypeField->setWithEmptyOption(true);
+            $reservationTypeField->setWithEmptyOption(true);//($typelist && (count($typelist) >= 1)) ? true : false);
             $reservationTypeField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect']);
             $reservationTypeField->setCallOnChange(true);
             $reservationTypeField->setCallOnChangeFunction("setTimeset(this, " . $this->id . ", -1 ,'getCurrentTimeset')");
-            $reservationTypeField->setInitialValue(-1); //$firstType
+            //$reservationTypeField->setInitialCallOnChange(true);
+            $reservationTypeField->setInitialValue(-1);//array_key_first($typelist));
             $reservationTypeField->setNotificationField(true);
             $fieldList[] = $reservationTypeField;
         }
@@ -593,6 +597,10 @@ class C4gReservation extends C4GBrickModuleParent
             $fieldList[] = $reservationNoneTypeField;
         }
 
+        $bookerHeadline = new C4GHeadlineField();
+        $bookerHeadline->setTitle('Ihre Daten'); //ToDo
+        $fieldList[] = $bookerHeadline;
+
         $salutation = [
             ['id' => 'man' ,'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
             ['id' => 'woman','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
@@ -735,6 +743,68 @@ class C4gReservation extends C4GBrickModuleParent
 //                $commentField->setCondition(array($condition));
 //                $commentField->setRemoveWithEmptyCondition(true);
                 $fieldList[] = $commentField;
+            } else if ($rowField == "participants") {
+
+                $participantsHeadline = new C4GHeadlineField();
+                $participantsHeadline->setTitle('Bitte tragen Sie hier alle Teilnehmer ein'); //ToDo
+                $fieldList[] = $participantsHeadline;
+
+                $participantsKey = new C4GKeyField();
+                $participantsKey->setFieldName('id');
+                $participantsKey->setComparable(false);
+                $participantsKey->setEditable(false);
+                $participantsKey->setHidden(true);
+                $participantsKey->setFormField(true);
+
+                $participantsForeign = new C4GForeignKeyField();
+                $participantsForeign->setFieldName('pid');
+                $participantsForeign->setHidden(true);
+                $participantsForeign->setFormField(true);
+
+                $participants = [];
+
+                $firstnameField = new C4GTextField();
+                $firstnameField->setFieldName('firstname');
+                $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
+                $firstnameField->setColumnWidth(10);
+                $firstnameField->setSortColumn(false);
+                $firstnameField->setTableColumn(true);
+                $firstnameField->setMandatory(true);
+                $firstnameField->setNotificationField(true);
+                $participants[] = $firstnameField;
+
+                $lastnameField = new C4GTextField();
+                $lastnameField->setFieldName('lastname');
+                $lastnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
+                $lastnameField->setColumnWidth(10);
+                $lastnameField->setSortColumn(false);
+                $lastnameField->setTableColumn(true);
+                $lastnameField->setMandatory(true);
+                $lastnameField->setNotificationField(true);
+                $participants[] = $lastnameField;
+
+                $emailField = new C4GEmailField();
+                $emailField->setFieldName('email');
+                $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
+                $emailField->setColumnWidth(10);
+                $emailField->setSortColumn(false);
+                $emailField->setTableColumn(false);
+                $emailField->setMandatory(false);
+                $emailField->setNotificationField(true);
+                $participants[] = $emailField;
+
+                $reservationParticipants = new C4GSubDialogField();
+                $reservationParticipants->setFieldName('participants');
+                $reservationParticipants->setTitle('Teilnehmer'); //ToDo Language
+                $reservationParticipants->setAddButton('Teilnehmer hinzufügen');
+                $reservationParticipants->setRemoveButton('Teilnehmer entfernen');
+                $reservationParticipants->setTable('tl_c4g_reservation_participants');
+                $reservationParticipants->addFields($participants);
+                $reservationParticipants->setKeyField($participantsKey);
+                $reservationParticipants->setForeignKeyField($participantsForeign);
+                $reservationParticipants->setMandatory($rowMandatory);
+                $reservationParticipants->setMax(intval($type->maxParticipantsPerBooking) > 0 ? $type->maxParticipantsPerBooking : -1); //ToDo Test
+                $fieldList[] = $reservationParticipants;
             }
         }
 

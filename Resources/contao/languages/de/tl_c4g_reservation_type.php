@@ -15,6 +15,10 @@
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['caption'] = array("Backend Bezeichnung","Bezeichnung zur Auswahl im Backend.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['options'] = array("Frontend Bezeichnung","Werden je nach Sprache im Auswahlfeld im Frontend dargestellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("Option","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'] = array("Objekttyp", "Es können Reserverierungsobjekte und Contao Events reserviert werden.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][1] = 'Standard';
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][2] = 'Events';
+//$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['calendar'] = array("Kalenderauswahl", "Hier können Sie die Reservierung auf bestimmte Kalender eingrenzen.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_name'] = array("Unternehmensname","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'] = array("Telefonnummer","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_email'] = array("Emailadresse","");
@@ -50,9 +54,11 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayBegin'] = array("Starttag");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayEnd'] = array("Endtag");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additional_params'] = array("Buchungsoptionen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Beschreibung");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = array("Maximale Teilnehmerzahl pro Buchung", "Hierüber können Sie die Teilnehmerzahl in der Eingabe pro Buchung begrenzen. 0 = unbegrenzt.");
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Angaben zur Reservierungsart";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['object_legend'] = "Grundsätzliche Einstellungen zu den Objekten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Experten einstellungen";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_data'] = "Veranstalterangaben";
 

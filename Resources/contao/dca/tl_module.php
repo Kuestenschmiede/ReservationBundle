@@ -184,6 +184,7 @@ class tl_module_c4g_reservation extends Backend {
         $columnsFormatted['postal'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal'][0];
         $columnsFormatted['city'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['city'][0];
         $columnsFormatted['comment'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'][0];
+        $columnsFormatted['participants'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['participants'];
 
         return $columnsFormatted;
 

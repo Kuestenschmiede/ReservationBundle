@@ -15,19 +15,28 @@
  * Table tl_module
  */
 
+use con4gis\CoreBundle\Classes\Helper\InputHelper;
+
 $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
 (
     //config
     'config' => array
     (
-        'dataContainer'     => 'Table',
-        'enableVersioning'  => 'true',
-        'ctable'            => ['tl_c4g_reservation_participants'],
-        'sql'               => array
+        'dataContainer'      => 'Table',
+        'enableVersioning'   => 'true',
+        //'ptable'             => 'tl_calendar_events',
+        'ctable'             => ['tl_c4g_reservation_participants'],
+        //'ondelete_callback'  => [['tl_c4g_reservation', 'doNotDeleteDataWithoutParent']],
+        'onload_callback'    => [['tl_c4g_reservation', 'setParent']],
+        'doNotDeleteRecords' => true,
+        'doNotCopyRecords'   => true,
+        'sql'                => array
         (
             'keys' => array
             (
-                'id' => 'primary'
+                'id' => 'primary',
+                'reservation_type' => 'index',
+                'reservation_object' => 'index'
             )
         )
     ),
@@ -39,14 +48,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         'sorting' => array
         (
             'mode'              => 2,
-            'fields'            => array('id','beginDate','lastname'),
+            'fields'            => ['id','beginDate','lastname'],
+            'filter'            => (Input::get('do') == "calendar") ? array(array('reservation_object=? AND reservationObjectType=2',Input::get('id'))) : null,
             'panelLayout'       => 'filter;sort,search,limit',
         ),
 
         'label' => array
         (
-            'fields'            => array('id','beginDate','endTime','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object:tl_c4g_reservation_object.caption','reservation_id','confirmed','cancellation'),
-            'label_callback'    => array('tl_c4g_reservation', 'listFields'),
+            'label_callback'    => ['tl_c4g_reservation', 'listFields'],
             'showColumns'       => true,
         ),
 
@@ -58,7 +67,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
                 'href'          => 'act=select',
                 'class'         => 'header_edit_all',
                 'attributes'    => 'onclick="Backend.getScrollOffSet()" accesskey="e"'
-            )
+            ),
+            'back' => [
+                //'href'                => 'key=back',
+                'class'               => 'header_back',
+                //'button_callback'     => ['\con4gis\CoreBundle\Classes\Helper\DcaHelper', 'back'],
+                'href'                => $this->Input->get('pid') ? 'do=calendar&table=tl_calendar_events&id='.$this->Input->get('pid') : 'do=calendar&table=tl_calendar_events&id='.$this->Input->get('id'),
+                //'button_callback'     => ['\con4gis\CoreBundle\Classes\Helper\DcaHelper', 'back'],
+                'icon'                => 'back.svg',
+                'label'               => &$GLOBALS['TL_LANG']['MSC']['backBT'],
+            ]
         ),
 
         'operations' => array
@@ -92,7 +110,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['participants'],
                 'href'                => 'table=tl_c4g_reservation_participants',
-                'icon'                => 'mgroup.svg'
+                'icon'                => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_participants.svg',
             ),
             'toggle' => array
             (
@@ -107,11 +125,17 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{reservation_legend}, reservation_type, additional_params, desiredCapacity, duration ,beginDate, endDate, beginTime, endTime, reservation_object, reservation_id, confirmed, cancellation; {person_legend},organisation,salutation, lastname, firstname, email, phone, address, postal, city, comment,internal_comment, agreed;',
+        '__selector__' => ['reservationObjectType'],
+        'default'   =>  '{reservation_legend}, reservation_type, additional_params, desiredCapacity, duration ,beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id, confirmed, cancellation; {person_legend},organisation,salutation, lastname, firstname, email, phone, address, postal, city, comment,internal_comment, agreed;',
     ),
 
-
-    //Fields
+    // Subpalettes
+    'subpalettes' =>
+    [
+        'reservationObjectType_1' => 'reservation_object',
+        'reservationObjectType_2' => 'reservation_object',
+    ],
+//Fields
     'fields' => array
     (
         'id' => array
@@ -256,17 +280,39 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sql'                     => "int(10) unsigned NULL"
         ),
 
+        'reservationObjectType' =>
+        [
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservationObjectType'],
+            'exclude'                 => true,
+            'inputType'               => 'radio',
+            'default'                 => '1',
+            'options'                 => ['1','2'],
+            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'],
+            'eval'                    => ['tl_class'=>'clr long','submitOnChange' => true],
+            'sql'                     => "varchar(255) NOT NULL default '1'"
+        ],
+
         'reservation_object' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_object'],
             'exclude'                 => true,
             'filter'                  => true,
             'inputType'               => 'select',
-            'foreignKey'              => 'tl_c4g_reservation_object.caption',
+            'options_callback'        => ['tl_c4g_reservation', 'getActObjects'],
+            //'foreignKey'              => 'tl_c4g_reservation_object.caption',
             'eval'                    => array('mandatory'=>false, 'includeBlankOption' => true, /*'blankOptionLabel' => ' - ', */'tl_class' => 'long clr', 'multiple'=>false, 'chosen'=>true),
             //'relation'                => array('type'=>'belongsTo', 'load'=>'eager'),
             'sql'                     => "varchar(254) NOT NULL default ''"
         ),
+
+//        'event' => array
+//        (
+//            'inputType'         => 'select',
+//            'options_callback'  => ['tl_c4g_reservation', 'getActEvent'],
+//            'eval'              => array('includeBlankOption' => true, 'mandatory' => false, 'disabled' => true, 'tl_class' => 'long clr'),
+//            'sql'               => "int(10) unsigned NOT NULL default 0"/*,
+//            'relation'          => array('type' => 'belongsToMany', 'load' => 'lazy'),*/
+//        ),
 
         'organisation' => array
         (
@@ -501,24 +547,25 @@ class tl_c4g_reservation extends Backend
 
     public function listFields($arrRow)
     {
+        $objectType = $arrRow['reservationObjectType'];
         $object_id = $arrRow['reservation_object'];
 
-        //fields
-        // array('id','beginDate','endDate','lastname','firstname','reservation_object:tl_c4g_reservation_object.caption','confirmed','cancellation'),
-
         $reservationObjects = '';
-        //foreach ($object_ids as $object_id) {
+        if ($objectType === '2') {
+            $event = CalendarEventsModel::findByPk($object_id);
+            if ($event) {
+                $object = $event->title;
+            }
+        } else {
             $reservation_object = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel::findByPk($object_id);
             if ($reservation_object) {
-                if ($reservationObjects == '') {
-                    $reservationObjects .= $reservation_object->caption;
-                } else {
-                    $reservationObjects .= ','.$reservation_object->caption;
-                }
+                $object = $reservation_object->caption;
             }
-        //}
+        }
+
+
         $arrRow['endTime'] = $arrRow['beginDate'] + $arrRow['endTime'];
-        $arrRow['reservation_object'] = $reservationObjects;
+        $arrRow['reservation_object'] = $object;
         $arrRow['beginDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['beginTime']);
         $arrRow['endTime']= date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endTime']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']);
         //$arrRow['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']);
@@ -528,6 +575,8 @@ class tl_c4g_reservation extends Backend
             $arrRow['reservation_type'] = $type->caption;
         }
 
+        //$object = $arrRow['pid'] > 0 ? $arrRow['pid'] : $arrRow['reservation_object'];
+
         $result = [
             $arrRow['id'],
             $arrRow['beginDate'],
@@ -536,11 +585,69 @@ class tl_c4g_reservation extends Backend
             $arrRow['reservation_type'],
             $arrRow['lastname'],
             $arrRow['firstname'],
-            $arrRow['reservation_object'],
-            $arrRow['reservation_id'],
-            $arrRow['confirmed'] ? $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes']  : '',
-            $arrRow['cancellation'] ? $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes'] : ''
+            $arrRow['reservation_object']
+//            $arrRow['reservation_id'],
+//            $arrRow['confirmed'] ? $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes']  : '',
+//            $arrRow['cancellation'] ? $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes'] : ''
         ];
         return $result;
+    }
+
+    /**
+     * Return all themes as array
+     * @return array
+     */
+    public function getActObjects(DataContainer $dc)
+    {
+        $return = [];
+
+        if ($dc && ($dc->activeRecord) && ($dc->activeRecord->reservationObjectType === '2')) {
+            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
+                ->execute();
+
+            while ($events->next()) {
+                $return[$events->id] = $events->title;
+            }
+        } else {
+            $dc->reservationObjectType = '1';
+            $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
+                ->execute();
+
+            while ($objects->next()) {
+                $return[$objects->id] = $objects->caption;
+            }
+
+        }
+
+        return $return;
+    }
+
+    /**
+     * @param DataContainer $dc
+     */
+    public function doNotDeleteDataWithoutParent(DataContainer $dc)
+    {
+        //return;
+    }
+
+    /**
+     * @param \Contao\DataContainer $dc
+     */
+    public function setParent(Contao\DataContainer $dc)
+    {
+        \Contao\Message::addInfo('Hier kommt ein Infotext!!!'); //ToDO
+
+        $do = $this->Input->get('do');
+        $id = $this->Input->get('id');
+
+        $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
+            ['id','beginDate','endTime','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object'];
+
+        if ($id && $do && ($do == 'calendar')) {
+            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['default'] = '2';
+            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['eval']['disabled'] = true;
+            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservation_object']['default'] = $id;
+            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservation_object']['eval']['disabled'] = true;
+        }
     }
 }

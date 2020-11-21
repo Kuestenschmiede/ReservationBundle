@@ -56,6 +56,27 @@ $GLOBALS['BE_MOD']['con4gis'] = array_merge($GLOBALS['BE_MOD']['con4gis'], [
         'brick' => 'reservation',
         'tables'    => array('tl_c4g_reservation_params'),
         'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_params.svg'
+    ),
+
+    'C4gReservationEventAudience' => array
+    (
+        'brick' => 'reservation',
+        'tables'    => array('tl_c4g_reservation_event_audience'),
+        'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_audience.svg',
+    ),
+
+    'C4gReservationEventSpeaker' => array
+    (
+        'brick' => 'reservation',
+        'tables'    => array('tl_c4g_reservation_event_speaker'),
+        'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_speaker.svg',
+    ),
+
+    'C4gReservationEventTopic' => array
+    (
+        'brick' => 'reservation',
+        'tables'    => array('tl_c4g_reservation_event_topic'),
+        'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_topic.svg',
     )
 ]);
 
@@ -98,5 +119,7 @@ $GLOBALS['TL_MODELS']['tl_c4g_reservation_params'] = \con4gis\ReservationBundle\
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_object_prices'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectPrices::class;
 $GLOBALS['TL_CRON']['daily'][] = [\con4gis\ReservationBundle\Classes\Cron::class, 'onDaily'];
 
-
+$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_event';
+$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation';
+$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_participants';
 
