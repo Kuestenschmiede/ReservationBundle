@@ -323,7 +323,7 @@ class C4gReservationObjectModel extends \Model
         }
     }
 
-    private static function addTime($list, $time, $obj, $interval)
+    private static function addTime($list, $time, $obj, $interval, $endTime = 0)
     {
 
         if ($obj && ($obj['id'] == -1)) {
@@ -349,7 +349,10 @@ class C4gReservationObjectModel extends \Model
 
             if ($interval) {
                 $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval);
-                $list[$key] = array('id' => $time, 'name' => $begin.' - '.$end, 'objects' => [$obj]);
+                $list[$key] = array('id' => $time, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
+            } else if ($endTime && ($endTime != $time)) {
+                $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
+                $list[$key] = array('id' => $time, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else {
                 $list[$key] = array('id' => $time, 'name' => $begin, 'objects' => [$obj]);
             }
@@ -542,7 +545,7 @@ class C4gReservationObjectModel extends \Model
                     continue;
                 }
 
-                if($duration >= 1)
+                if ($duration >= 1)
                 {
                     $oh = $object->getOpeningHours();
                     switch ($periodType) {
@@ -650,6 +653,33 @@ class C4gReservationObjectModel extends \Model
         }
     }
 
+    public static function getReservationEventTime($object, $withEndTimes=false, $showFreeSeats=false) {
+        $t = 'tl_c4g_reservation';
+        $id = $object->getId();
+        $arrColumns = array("$t.reservation_object=$id AND NOT $t.cancellation='1'");
+        $arrValues = array();
+        $arrOptions = array();
+        $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
+        $actPersons = 0;
+        if ($reservations) {
+            foreach ($reservations as $reservation) {
+//                $count[$tsdate][$time] = $count[$tsdate][$time] ? $count[$tsdate][$time] + 1 : 1;
+//                $objectCount[$tsdate][$time] = $objectCount[$tsdate][$time] ? $objectCount[$tsdate][$time] + 1 : 1;
+                $actPersons = $actPersons + intval($reservation->desiredCapacity);
+            }
+        }
+
+        $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
+        $capacity = $desiredCapacity;
+        $timeObj = ['id'=>$id,'act'=>$actPersons,'max'=>$capacity,'showSeats'=>$showFreeSeats];
+
+        $endTime = 0;
+        if ($withEndTimes) {
+            $endTime = $object->getEndTime();
+        }
+        return self::addTime([], $object->getBeginTime(), $timeObj, false, $endTime);
+    }
+
     /**
      * @return array
      */
@@ -677,113 +707,147 @@ class C4gReservationObjectModel extends \Model
      */
     public static function getReservationObjectEventList($moduleTypes = null)
     {
-        //ToDo
+        $objectList = array();
+
+        $db = Database::getInstance();
+        //$types = implode(",",$moduleTypes);
+
+        $idString = "(" ;
+        foreach ($moduleTypes as $key => $typeId) {
+            $idString .= "\"$typeId\"";
+            if (!(array_key_last($moduleTypes) === $key)) {
+                $idString .= ",";
+            }
+        }
+        $idString .= ")";
+
+        $allEvents = $db->prepare("SELECT pid,minParticipants,maxParticipants FROM tl_c4g_reservation_event WHERE reservationType IN $idString")->execute()->fetchAllAssoc();
+        if ($allEvents) {
+            foreach ($allEvents as $event) {
+                $eventObject = \CalendarEventsModel::findByPk($event['pid']);
+                if ($eventObject && $eventObject->published) { //ToDo nur Events in der Zukunft zulassen
+                    $frontendObject = new C4gReservationFrontendObject();
+                    $frontendObject->setType(2);
+                    $frontendObject->setId($eventObject->id);
+                    $frontendObject->setCaption($eventObject->title);
+                    $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
+                    $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
+                    $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
+                    $frontendObject->setEndDate($eventObject->endDate ? $eventObject->endDate : 0);
+                    $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
+                    $objectList[] = $frontendObject;
+                }
+            }
+        }
+
+        return $objectList;
     }
 
-        /**
-         * @return array
-         */
-        public static function getReservationObjectDefaultList($moduleTypes = null)
-        {
-            $objectList = array();
-            $t = static::$strTable;
-            $arrOptions = array();
-            $allObjects = self::findBy('published','1');
-            if ($moduleTypes) {
-                $types = $moduleTypes;
-                $objects = [];
-                foreach ($allObjects as $object) {
-                    $objectTypes = unserialize($object->viewableTypes);
-                    foreach($objectTypes as $objectType) {
-                        if (in_array($objectType, $types)) {
-                            $objects[] = $object;
+    /**
+     * @return array
+     */
+    public static function getReservationObjectDefaultList($moduleTypes = null)
+    {
+        $objectList = array();
+        $t = static::$strTable;
+        $arrOptions = array();
+        $allObjects = self::findBy('published','1');
+        if ($moduleTypes) {
+            $types = $moduleTypes;
+            $objects = [];
+            foreach ($allObjects as $object) {
+                $objectTypes = unserialize($object->viewableTypes);
+                foreach($objectTypes as $objectType) {
+                    if (in_array($objectType, $types)) {
+                        $objects[] = $object;
+                        break;
+                    }
+                }
+            }
+        } else {
+            $objects = $allObjects;
+        }
+
+        if ($objects) {
+            foreach ($objects as $object) {
+                $frontendObject = new C4gReservationFrontendObject();
+                $frontendObject->setType(1);
+                $frontendObject->setId($object->id);
+
+                $frontendObject->setCaption($object->caption);
+                $captions = $object->options;
+                if ($captions) {
+                    foreach ($captions as $caption) {
+                        if ($caption['language'] == $GLOBALS['TL_LANGUAGE']) {
+                            $frontendObject->setCaption($caption['caption']);
                             break;
                         }
                     }
                 }
-            } else {
-                $objects = $allObjects;
-            }
 
-            if ($objects) {
-                foreach ($objects as $object) {
-                    $frontendObject = new C4gReservationFrontendObject();
-                    $frontendObject->setId($object->id);
+                $frontendObject->setTimeinterval($object->time_interval);
+                $frontendObject->setMinReservationDay($object->min_reservation_day);
+                $frontendObject->setMaxReservationDay($object->max_reservation_day);
+                $frontendObject->setReservationTypes(unserialize($object->viewableTypes));
+                $frontendObject->setDesiredCapacity([$object->desiredCapacityMin, $object->desiredCapacityMax]);
+                $frontendObject->setQuantity($object->quantity);
 
-                    $frontendObject->setCaption($object->caption);
-                    $captions = $object->options;
-                    if ($captions) {
-                        foreach ($captions as $caption) {
-                            if ($caption['language'] == $GLOBALS['TL_LANGUAGE']) {
-                                $frontendObject->setCaption($caption['caption']);
-                                break;
-                            }
-                        }
-                    }
+                $opening_hours = array();
+                $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);
 
-                    $frontendObject->setTimeinterval($object->time_interval);
-                    $frontendObject->setMinReservationDay($object->min_reservation_day);
-                    $frontendObject->setMaxReservationDay($object->max_reservation_day);
-                    $frontendObject->setReservationTypes(unserialize($object->viewableTypes));
-                    $frontendObject->setDesiredCapacity([$object->desiredCapacityMin, $object->desiredCapacityMax]);
-                    $frontendObject->setQuantity($object->quantity);
+                $opening_hours['su'] = unserialize($object->oh_sunday);
+                $opening_hours['mo'] = unserialize($object->oh_monday);
+                $opening_hours['tu'] = unserialize($object->oh_tuesday);
+                $opening_hours['we'] = unserialize($object->oh_wednesday);
+                $opening_hours['th'] = unserialize($object->oh_thursday);
+                $opening_hours['fr'] = unserialize($object->oh_friday);
+                $opening_hours['sa'] = unserialize($object->oh_saturday);
 
-                    $opening_hours = array();
-                    $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);
-
-                    $opening_hours['su'] = unserialize($object->oh_sunday);
-                    $opening_hours['mo'] = unserialize($object->oh_monday);
-                    $opening_hours['tu'] = unserialize($object->oh_tuesday);
-                    $opening_hours['we'] = unserialize($object->oh_wednesday);
-                    $opening_hours['th'] = unserialize($object->oh_thursday);
-                    $opening_hours['fr'] = unserialize($object->oh_friday);
-                    $opening_hours['sa'] = unserialize($object->oh_saturday);
-
-                   //ToDo array duchgehen falls nur der erste Datensatz leer ist.
-                    if ($opening_hours['su'] != false) {
-                        if ($opening_hours['su'][0]['time_begin'] && $opening_hours['su'][0]['time_end']) {
-                            $weekdays['0'] = true;
-                        }
+               //ToDo array duchgehen falls nur der erste Datensatz leer ist.
+                if ($opening_hours['su'] != false) {
+                    if ($opening_hours['su'][0]['time_begin'] && $opening_hours['su'][0]['time_end']) {
+                        $weekdays['0'] = true;
                     }
-                    if ($opening_hours['mo'] != false) {
-                        if ($opening_hours['mo'][0]['time_begin'] && $opening_hours['mo'][0]['time_end']) {
-                            $weekdays['1'] = true;
-                        }
-                    }
-                    if ($opening_hours['tu'] != false) {
-                        if ($opening_hours['tu'][0]['time_begin'] && $opening_hours['tu'][0]['time_end']) {
-                            $weekdays['2'] = true;
-                        }
-                    }
-                    if ($opening_hours['we'] != false) {
-                        if ($opening_hours['we'][0]['time_begin'] && $opening_hours['we'][0]['time_end']) {
-                            $weekdays['3'] = true;
-                        }
-                    }
-                    if ($opening_hours['th'] != false) {
-                        if ($opening_hours['th'][0]['time_begin'] && $opening_hours['th'][0]['time_end']) {
-                            $weekdays['4'] = true;
-                        }
-                    }
-                    if ($opening_hours['fr'] != false) {
-                        if ($opening_hours['fr'][0]['time_begin'] && $opening_hours['fr'][0]['time_end']) {
-                            $weekdays['5'] = true;
-                        }
-                    }
-                    if ($opening_hours['sa'] != false) {
-                        if ($opening_hours['sa'][0]['time_begin'] && $opening_hours['sa'][0]['time_end']) {
-                            $weekdays['6'] = true;
-                        }
-                    }
-
-                    $frontendObject->setWeekdayExclusion($weekdays);
-                    $frontendObject->setOpeningHours($opening_hours);
-                    $frontendObject->setDatesExclusion(unserialize($object->days_exclusion));
-
-                    $objectList[] = $frontendObject;
                 }
-            }
+                if ($opening_hours['mo'] != false) {
+                    if ($opening_hours['mo'][0]['time_begin'] && $opening_hours['mo'][0]['time_end']) {
+                        $weekdays['1'] = true;
+                    }
+                }
+                if ($opening_hours['tu'] != false) {
+                    if ($opening_hours['tu'][0]['time_begin'] && $opening_hours['tu'][0]['time_end']) {
+                        $weekdays['2'] = true;
+                    }
+                }
+                if ($opening_hours['we'] != false) {
+                    if ($opening_hours['we'][0]['time_begin'] && $opening_hours['we'][0]['time_end']) {
+                        $weekdays['3'] = true;
+                    }
+                }
+                if ($opening_hours['th'] != false) {
+                    if ($opening_hours['th'][0]['time_begin'] && $opening_hours['th'][0]['time_end']) {
+                        $weekdays['4'] = true;
+                    }
+                }
+                if ($opening_hours['fr'] != false) {
+                    if ($opening_hours['fr'][0]['time_begin'] && $opening_hours['fr'][0]['time_end']) {
+                        $weekdays['5'] = true;
+                    }
+                }
+                if ($opening_hours['sa'] != false) {
+                    if ($opening_hours['sa'][0]['time_begin'] && $opening_hours['sa'][0]['time_end']) {
+                        $weekdays['6'] = true;
+                    }
+                }
 
-            return $objectList;
+                $frontendObject->setWeekdayExclusion($weekdays);
+                $frontendObject->setOpeningHours($opening_hours);
+                $frontendObject->setDatesExclusion(unserialize($object->days_exclusion));
+
+                $objectList[] = $frontendObject;
+            }
         }
+
+        return $objectList;
+    }
 }

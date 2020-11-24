@@ -1,4 +1,4 @@
-.reservation_time_button .c4g_brick_radio_group input[type="radio"] {
+.reservation_time_button .c4g_brick_radio_group input[type="radio"], .reservation_time_event_button .c4g_brick_radio_group input[type="radio"] {
     left:-9999px;
     position:absolute;
     z-index: 999;
@@ -13,7 +13,7 @@
     text-align:center;
     background-color:#080;
 }*/
-.reservation_time_button .c4g_brick_radio_group label {
+.reservation_time_button .c4g_brick_radio_group label, .reservation_time_event_button .c4g_brick_radio_group label {
     width:98%;
     height:30px;
     display:inline-block;
@@ -26,13 +26,13 @@
     cursor: pointer;
     font-weight: normal;
 }
-.reservation_time_button input[type = "radio"]:checked + label {
+.reservation_time_button input[type = "radio"]:checked + label, .reservation_time_event_button input[type = "radio"]:checked + label {
     padding:0;
     background-color: darkgreen;
     border-bottom: yellow;
     font-weight: bold;
 }
-.reservation_time_button input[type="radio"][disabled] + label {
+.reservation_time_button input[type="radio"][disabled] + label, .reservation_time_event_button input[type="radio"][disabled] + label {
     background-color: red;
     cursor: no-drop;
     font-weight: normal;

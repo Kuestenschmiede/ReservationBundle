@@ -40,7 +40,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
 
         $result = Database::getInstance()->prepare("SELECT id FROM tl_c4g_reservation_event WHERE pid=? LIMIT 1")->execute($row['id'])->fetchAssoc();
         if ($result) {
-            $href = "/contao?do=$do&table=tl_c4g_reservation_event&amp;act=edit&id=".$row['id']."&pid=".$row['pid']."&rt=".$rt."&ref=".$ref;
+            $href = "/contao?do=$do&table=tl_c4g_reservation_event&amp;act=edit&id=".$result['id']."&pid=".$row['pid']."&rt=".$rt."&ref=".$ref;
         } else {
             $href = "/contao?do=$do&table=tl_c4g_reservation_event&amp;act=create&id=".$row['id']."&pid=".$row['pid']."&rt=".$rt."&ref=".$ref;
         }

@@ -160,7 +160,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['reservationType'],
             'inputType'         => 'select',
-            'foreignKey'        => 'tl_c4g_reservation_type.caption',
+            'foreignKey'        => 'tl_c4g_reservation_type.caption', //ToDo Auswahl einschränken auf Type event
             'eval'              => array('mandatory' => true, 'tl_class' => 'long clr'),
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
             'sql'               => "int(10) unsigned NOT NULL default 0"
@@ -301,12 +301,14 @@ class tl_c4g_reservation_event extends Backend
     {
         \Contao\Message::addInfo('Hier kommt ein Infotext!!!'); //ToDO
 
-        if (!$db->id) {
+        $id = Input::get('id');
+
+        if (!$id) {
             return;
         }
 
-        $dc->pid = $dc->id;
-        $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $dc->id;
+        $dc->pid = $id;
+        $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $id;
 
         return $dc;
     }
@@ -319,16 +321,15 @@ class tl_c4g_reservation_event extends Backend
     {
         $return = [];
 
-        $do = Input::get('do');
-        $id = Input::get('id');
-
-        if ($do && $id) {
-            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events WHERE id=".$id)
-                ->execute();
-        } else {
-            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
-                ->execute();
-        }
+//        $do = Input::get('do');
+//        $id = Input::get('id');
+//
+//        if ($do && $id) {
+//            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events WHERE id=".$id)
+//                ->execute();
+//        } else {
+            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")->execute();
+//        }
 
         while ($events->next()) {
             $return[$events->id] = $events->title;

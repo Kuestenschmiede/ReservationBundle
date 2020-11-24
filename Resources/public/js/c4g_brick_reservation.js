@@ -195,7 +195,7 @@ function setTimeset(object, id, additionalId, callFunction) {
             url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
             success: function (data) {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"00"+getWeekdate(date));
-                var radioGroups = timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group");
+                var radioGroups = timeGroup.parentElement.getElementsByClassName("reservation_time_button");
                 var timeList = [];
                 var objectList = [];
                 var times = data['times'];

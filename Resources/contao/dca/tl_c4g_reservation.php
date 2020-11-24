@@ -273,7 +273,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['endTime'],
             'exclude'                 => true,
             'filter'                  => false,
-            'default'                 => time()+3600,
+            'default'                 => 0,//time()+3600,
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50','date','datepicker'=>true),
@@ -564,18 +564,14 @@ class tl_c4g_reservation extends Backend
         }
 
 
-        $arrRow['endTime'] = $arrRow['beginDate'] + $arrRow['endTime'];
         $arrRow['reservation_object'] = $object;
         $arrRow['beginDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['beginTime']);
         $arrRow['endTime']= date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endTime']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']);
-        //$arrRow['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']);
 
         $type = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel::findByPk($arrRow['reservation_type']);
         if ($type) {
             $arrRow['reservation_type'] = $type->caption;
         }
-
-        //$object = $arrRow['pid'] > 0 ? $arrRow['pid'] : $arrRow['reservation_object'];
 
         $result = [
             $arrRow['id'],
@@ -586,9 +582,6 @@ class tl_c4g_reservation extends Backend
             $arrRow['lastname'],
             $arrRow['firstname'],
             $arrRow['reservation_object']
-//            $arrRow['reservation_id'],
-//            $arrRow['confirmed'] ? $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes']  : '',
-//            $arrRow['cancellation'] ? $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes'] : ''
         ];
         return $result;
     }

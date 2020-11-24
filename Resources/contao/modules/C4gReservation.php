@@ -47,6 +47,7 @@ use con4gis\ReservationBundle\Resources\contao\models\C4gReservationModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel;
+use Contao\Date;
 use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\Filesystem\Filesystem;
@@ -124,7 +125,8 @@ class C4gReservation extends C4GBrickModuleParent
                                 'name' => $caption['caption'] ? $caption['caption'] : $type->caption,
                                 'periodType' => $type->periodType,
                                 'additionalParams' => unserialize($type->additional_params),
-                                'objects' => $objects
+                                'objects' => $objects,
+                                'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false
                             );
 
                             if (!$firstType) {
@@ -158,22 +160,10 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         foreach ($typelist as $type) {
+            $isEvent = $type['isEvent'];
             $reservationObjects = $type['objects'];
 
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $type['id']);
-
-//                $reservationPeriodType = new C4GSelectField();
-//                $reservationPeriodType->setFieldName('periodType');
-//                $reservationPeriodType->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['periodType']);
-//                $reservationPeriodType->setFormField(true);
-//                $reservationPeriodType->setEditable(false);
-//                $reservationPeriodType->setCondition($condition);
-//                $reservationPeriodType->setMandatory(false);
-//                $reservationPeriodType->setOptions(array(array('id' => $type->id, 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation'][$type['periodType']])));
-//                //$reservationPeriodType->setCallOnChange(true);
-//                //$reservationObjMehrtägig TestectField->setNotificationField(true);
-//                $fieldList[] = $reservationPeriodType;
-
 
             if ($this->withCapacity) {
                 $conditionCapacity = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_'.$type['id']);
@@ -188,7 +178,12 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationDesiredCapacity->setMin(1);
                 $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                 $reservationDesiredCapacity->setCallOnChange(true);
-                $reservationDesiredCapacity->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_".$type['id']."')," . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
+                if ($isEvent) {
+                    //ToDo
+                    //$reservationDesiredCapacity->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_".$type['id']."')," . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
+                } else {
+                    $reservationDesiredCapacity->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_".$type['id']."')," . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
+                }
                 $reservationDesiredCapacity->setNotificationField(true);
                 $reservationDesiredCapacity->setAdditionalID($type['id']);
                 //$reservationDesiredCapacity->setHidden(!$this->withCapacity);
@@ -196,8 +191,16 @@ class C4gReservation extends C4GBrickModuleParent
             }
 
 
-            //ToDo Funktioniert nicht immer.
-            $additionalDuration = StringUtil::deserialize($this->additionalDuration);
+            //Default fields
+            if (!$isEvent) {
+                //set reservationObjectType to default
+                $reservationObjectTypeField = new C4GNumberField();
+                $reservationObjectTypeField->setInitialValue('1');
+                $reservationObjectTypeField->setDatabaseField(true);
+                $reservationObjectTypeField->setFormField(false);
+                $fieldList[] = $reservationObjectTypeField;
+
+                $additionalDuration = StringUtil::deserialize($this->additionalDuration);
                 if ($additionalDuration == "1") {
                     $durationField = new C4GNumberField();
                     $durationField->setFieldName('duration');
@@ -216,36 +219,35 @@ class C4gReservation extends C4GBrickModuleParent
                     $additionalDuration = 0;
                 }
 
+                if (($type['periodType'] === 'minute') || ($type['periodType'] === 'hour')) {
+                    $conditionDate = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'beginDate_'.$type['id']);
+                    $reservationBeginDateField = new C4GDateField();
+                    $reservationBeginDateField->setMinDate(C4gReservationObjectModel::getMinDate($reservationObjects));
+                    $reservationBeginDateField->setMaxDate(C4gReservationObjectModel::getMaxDate($reservationObjects));
+                    $reservationBeginDateField->setExcludeWeekdays(C4gReservationObjectModel::getWeekdayExclusionString($reservationObjects));
+                    $reservationBeginDateField->setExcludeDates(C4gReservationObjectModel::getDateExclusionString($reservationObjects, $type));
+                    $reservationBeginDateField->setFieldName('beginDate');
+                    $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
+                    $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
+                    $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate']);
+                    $reservationBeginDateField->setEditable(true);
+                    //$reservationBeginDateField->setInitialValue(C4gReservationObjectModel::getMinDate($reservationObjects));
+                    $reservationBeginDateField->setComparable(false);
+                    $reservationBeginDateField->setSortColumn(true);
+                    $reservationBeginDateField->setSortSequence('de_datetime');
+                    $reservationBeginDateField->setTableColumn(true);
+                    $reservationBeginDateField->setFormField(true);
+                    $reservationBeginDateField->setColumnWidth(10);
+                    $reservationBeginDateField->setMandatory(true);
+                    $reservationBeginDateField->setCondition(array($condition));
+                    $reservationBeginDateField->setCallOnChange(true);
+                    $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this, " . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
+                    $reservationBeginDateField->setNotificationField(true);
+                    $reservationBeginDateField->setAdditionalID($type['id']);
+                    $fieldList[] = $reservationBeginDateField;
+                }
 
-
-            if (($type['periodType'] === 'minute') || ($type['periodType'] === 'hour') /* || ($type['periodType'] === 'event') || ($type['periodType'] === 'hour_period') || ($type['periodType'] === 'minute_period')*/ ) {
-                $conditionDate = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'beginDate_'.$type['id']);
-                $reservationBeginDateField = new C4GDateField();
-                $reservationBeginDateField->setMinDate(C4gReservationObjectModel::getMinDate($reservationObjects));
-                $reservationBeginDateField->setMaxDate(C4gReservationObjectModel::getMaxDate($reservationObjects));
-                $reservationBeginDateField->setExcludeWeekdays(C4gReservationObjectModel::getWeekdayExclusionString($reservationObjects));
-                $reservationBeginDateField->setExcludeDates(C4gReservationObjectModel::getDateExclusionString($reservationObjects, $type));
-                $reservationBeginDateField->setFieldName('beginDate');
-                $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
-                $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
-                $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate']);
-                $reservationBeginDateField->setEditable(true);
-                //$reservationBeginDateField->setInitialValue(C4gReservationObjectModel::getMinDate($reservationObjects));
-                $reservationBeginDateField->setComparable(false);
-                $reservationBeginDateField->setSortColumn(true);
-                $reservationBeginDateField->setSortSequence('de_datetime');
-                $reservationBeginDateField->setTableColumn(true);
-                $reservationBeginDateField->setFormField(true);
-                $reservationBeginDateField->setColumnWidth(10);
-                $reservationBeginDateField->setMandatory(true);
-                $reservationBeginDateField->setCondition(array($condition));
-                $reservationBeginDateField->setCallOnChange(true);
-                $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this, " . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
-                $reservationBeginDateField->setNotificationField(true);
-                $reservationBeginDateField->setAdditionalID($type['id']);
-                $fieldList[] = $reservationBeginDateField;
-            }
-
+                //ToDo why? just for saving?
                 $reservationendTimeField = new C4GTextField();
                 $reservationendTimeField->setFieldName('endTime');
                 $reservationendTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime']);
@@ -257,309 +259,416 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationendTimeField->setCallOnChange(true);
                 $reservationendTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
                 $reservationendTimeField->setNotificationField(true);
-//                $reservationendTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
-//                $reservationendTimeField->setTurnButton(true);
                 $reservationendTimeField->setRemoveWithEmptyCondition(true);
                 $reservationendTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
                 $fieldList[] = $reservationendTimeField;
 
-//                }
+                if (($type['periodType'] === 'hour') || ($type['periodType'] === 'minute')) {
+                    $su_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
+                    $su_condition->setModel(C4gReservationObjectModel::class);
+                    $su_condition->setFunction('isSunday');
+                    $suConditionArr = [$su_condition,$condition];
 
-            if (($type['periodType'] === 'hour') || ($type['periodType'] === 'minute')/*|| ($type['periodType'] === 'hour_period')|| ($type['periodType'] === 'minute_period')*/) {
-                $su_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
-                $su_condition->setModel(C4gReservationObjectModel::class);
-                $su_condition->setFunction('isSunday');
-                $suConditionArr = [$su_condition,$condition];
+                    $suReservationTimeField = new C4GRadioGroupField();
+                    $suReservationTimeField->setFieldName('beginTime');
+                    $suReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                    $suReservationTimeField->setFormField(true);
+                    $suReservationTimeField->setOptions(
+                        C4gReservationObjectModel::getReservationTimes(
+                            $reservationObjects,
+                            $type['id'],
+                            'su',
+                            date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 0)),
+                            $additionalDuration,
+                            $this->showEndTime,
+                            $this->showFreeSeats
+                        ));
+                    $suReservationTimeField->setMandatory(true);
+                    $suReservationTimeField->setInitInvisible(true);
+                    $suReservationTimeField->setSort(false);
+                    $suReservationTimeField->setCondition($suConditionArr);
+                    $suReservationTimeField->setCallOnChange(true);
+                    $suReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
+                    $suReservationTimeField->setAdditionalID($type['id'].'000');
+                    $suReservationTimeField->setNotificationField(true);
+                    $suReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                    $suReservationTimeField->setTurnButton(true);
+                    $suReservationTimeField->setRemoveWithEmptyCondition(true);
+                    $suReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
+                    $fieldList[] = $suReservationTimeField;
 
-                $suReservationTimeField = new C4GRadioGroupField();
-                $suReservationTimeField->setFieldName('beginTime');
-                $suReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
-                $suReservationTimeField->setFormField(true);
-                $suReservationTimeField->setOptions(
-                    C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects,
-                        $type['id'],
-                        'su',
-                        date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 0)),
-                        $additionalDuration,
-                        $this->showEndTime,
-                        $this->showFreeSeats
-                    ));
-                $suReservationTimeField->setMandatory(true);
-                $suReservationTimeField->setInitInvisible(true);
-                $suReservationTimeField->setSort(false);
-                $suReservationTimeField->setCondition($suConditionArr);
-                $suReservationTimeField->setCallOnChange(true);
-                $suReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
-                $suReservationTimeField->setAdditionalID($type['id'].'000');
-                $suReservationTimeField->setNotificationField(true);
-                $suReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
-                $suReservationTimeField->setTurnButton(true);
-                $suReservationTimeField->setRemoveWithEmptyCondition(true);
-                $suReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
-                $fieldList[] = $suReservationTimeField;
+                    $mo_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
+                    $mo_condition->setModel(C4gReservationObjectModel::class);
+                    $mo_condition->setFunction('isMonday');
+                    $moConditionArr = [$mo_condition,$condition];
 
-                $mo_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
-                $mo_condition->setModel(C4gReservationObjectModel::class);
-                $mo_condition->setFunction('isMonday');
-                $moConditionArr = [$mo_condition,$condition];
+                    $moReservationTimeField = new C4GRadioGroupField();
+                    $moReservationTimeField->setFieldName('beginTime');
+                    $moReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                    $moReservationTimeField->setFormField(true);
+                    $moReservationTimeField->setOptions(
+                        C4gReservationObjectModel::getReservationTimes(
+                            $reservationObjects,
+                            $type['id'],
+                            'mo',
+                            date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 1)),
+                            $additionalDuration,
+                            $this->showEndTime,
+                            $this->showFreeSeats
+                        ));
+                    $moReservationTimeField->setMandatory(true);
+                    $moReservationTimeField->setInitInvisible(true);
+                    $moReservationTimeField->setSort(false);
+                    $moReservationTimeField->setCondition($moConditionArr);
+                    $moReservationTimeField->setCallOnChange(true);
+                    $moReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
+                    $moReservationTimeField->setAdditionalID($type['id'].'001');
+                    $moReservationTimeField->setNotificationField(true);
+                    $moReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                    $moReservationTimeField->setTurnButton(true);
+                    $moReservationTimeField->setRemoveWithEmptyCondition(true);
+                    $moReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
+                    $fieldList[] = $moReservationTimeField;
 
-                $moReservationTimeField = new C4GRadioGroupField();
-                $moReservationTimeField->setFieldName('beginTime');
-                $moReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
-                $moReservationTimeField->setFormField(true);
-                $moReservationTimeField->setOptions(
-                    C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects,
-                        $type['id'],
-                        'mo',
-                        date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 1)),
-                        $additionalDuration,
-                        $this->showEndTime,
-                        $this->showFreeSeats
-                    ));
-                $moReservationTimeField->setMandatory(true);
-                $moReservationTimeField->setInitInvisible(true);
-                $moReservationTimeField->setSort(false);
-                $moReservationTimeField->setCondition($moConditionArr);
-                $moReservationTimeField->setCallOnChange(true);
-                $moReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
-                $moReservationTimeField->setAdditionalID($type['id'].'001');
-                $moReservationTimeField->setNotificationField(true);
-                $moReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
-                $moReservationTimeField->setTurnButton(true);
-                $moReservationTimeField->setRemoveWithEmptyCondition(true);
-                $moReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
-                $fieldList[] = $moReservationTimeField;
+                    $tu_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
+                    $tu_condition->setModel(C4gReservationObjectModel::class);
+                    $tu_condition->setFunction('isTuesday');
+                    $tuConditionArr = [$tu_condition,$condition];
 
-                $tu_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
-                $tu_condition->setModel(C4gReservationObjectModel::class);
-                $tu_condition->setFunction('isTuesday');
-                $tuConditionArr = [$tu_condition,$condition];
+                    $tuReservationTimeField = new C4GRadioGroupField();
+                    $tuReservationTimeField->setFieldName('beginTime');
+                    $tuReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                    $tuReservationTimeField->setFormField(true);
+                    $tuReservationTimeField->setOptions(
+                        C4gReservationObjectModel::getReservationTimes(
+                            $reservationObjects,
+                            $type['id'],
+                            'tu',
+                            date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 2)),
+                            $additionalDuration,
+                            $this->showEndTime,
+                            $this->showFreeSeats
+                        ));
+                    $tuReservationTimeField->setMandatory(true);
+                    $tuReservationTimeField->setInitInvisible(true);
+                    $tuReservationTimeField->setSort(false);
+                    $tuReservationTimeField->setCondition($tuConditionArr);
+                    $tuReservationTimeField->setCallOnChange(true);
+                    $tuReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
+                    $tuReservationTimeField->setAdditionalID($type['id'].'002');
+                    $tuReservationTimeField->setNotificationField(true);
+                    $tuReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                    $tuReservationTimeField->setTurnButton(true);
+                    $tuReservationTimeField->setRemoveWithEmptyCondition(true);
+                    $tuReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
+                    $fieldList[] = $tuReservationTimeField;
 
-                $tuReservationTimeField = new C4GRadioGroupField();
-                $tuReservationTimeField->setFieldName('beginTime');
-                $tuReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
-                $tuReservationTimeField->setFormField(true);
-                $tuReservationTimeField->setOptions(
-                    C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects,
-                        $type['id'],
-                        'tu',
-                        date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 2)),
-                        $additionalDuration,
-                        $this->showEndTime,
-                        $this->showFreeSeats
-                    ));
-                $tuReservationTimeField->setMandatory(true);
-                $tuReservationTimeField->setInitInvisible(true);
-                $tuReservationTimeField->setSort(false);
-                $tuReservationTimeField->setCondition($tuConditionArr);
-                $tuReservationTimeField->setCallOnChange(true);
-                $tuReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
-                $tuReservationTimeField->setAdditionalID($type['id'].'002');
-                $tuReservationTimeField->setNotificationField(true);
-                $tuReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
-                $tuReservationTimeField->setTurnButton(true);
-                $tuReservationTimeField->setRemoveWithEmptyCondition(true);
-                $tuReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
-                $fieldList[] = $tuReservationTimeField;
+                    $we_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
+                    $we_condition->setModel(C4gReservationObjectModel::class);
+                    $we_condition->setFunction('isWednesday');
+                    $weConditionArr = [$we_condition,$condition];
 
-                $we_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
-                $we_condition->setModel(C4gReservationObjectModel::class);
-                $we_condition->setFunction('isWednesday');
-                $weConditionArr = [$we_condition,$condition];
+                    $weReservationTimeField = new C4GRadioGroupField();
+                    $weReservationTimeField->setFieldName('beginTime');
+                    $weReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                    $weReservationTimeField->setFormField(true);
+                    $weReservationTimeField->setOptions(
+                        C4gReservationObjectModel::getReservationTimes(
+                            $reservationObjects,
+                            $type['id'],
+                            'we',
+                            date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 3)),
+                            $additionalDuration,
+                            $this->showEndTime,
+                            $this->showFreeSeats
+                        ));
+                    $weReservationTimeField->setMandatory(true);
+                    $weReservationTimeField->setInitInvisible(true);
+                    $weReservationTimeField->setSort(false);
+                    $weReservationTimeField->setCondition($weConditionArr);
+                    $weReservationTimeField->setCallOnChange(true);
+                    $weReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
+                    $weReservationTimeField->setAdditionalID($type['id'].'003');
+                    $weReservationTimeField->setNotificationField(true);
+                    $weReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                    $weReservationTimeField->setTurnButton(true);
+                    $weReservationTimeField->setRemoveWithEmptyCondition(true);
+                    $weReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
+                    $fieldList[] = $weReservationTimeField;
 
-                $weReservationTimeField = new C4GRadioGroupField();
-                $weReservationTimeField->setFieldName('beginTime');
-                $weReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
-                $weReservationTimeField->setFormField(true);
-                $weReservationTimeField->setOptions(
-                    C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects,
-                        $type['id'],
-                        'we',
-                        date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 3)),
-                        $additionalDuration,
-                        $this->showEndTime,
-                        $this->showFreeSeats
-                    ));
-                $weReservationTimeField->setMandatory(true);
-                $weReservationTimeField->setInitInvisible(true);
-                $weReservationTimeField->setSort(false);
-                $weReservationTimeField->setCondition($weConditionArr);
-                $weReservationTimeField->setCallOnChange(true);
-                $weReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
-                $weReservationTimeField->setAdditionalID($type['id'].'003');
-                $weReservationTimeField->setNotificationField(true);
-                $weReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
-                $weReservationTimeField->setTurnButton(true);
-                $weReservationTimeField->setRemoveWithEmptyCondition(true);
-                $weReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
-                $fieldList[] = $weReservationTimeField;
+                    $th_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
+                    $th_condition->setModel(C4gReservationObjectModel::class);
+                    $th_condition->setFunction('isThursday');
+                    $thConditionArr = [$th_condition,$condition];
 
-                $th_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
-                $th_condition->setModel(C4gReservationObjectModel::class);
-                $th_condition->setFunction('isThursday');
-                $thConditionArr = [$th_condition,$condition];
+                    $thReservationTimeField = new C4GRadioGroupField();
+                    $thReservationTimeField->setFieldName('beginTime');
+                    $thReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                    $thReservationTimeField->setFormField(true);
+                    $thReservationTimeField->setOptions(
+                        C4gReservationObjectModel::getReservationTimes(
+                            $reservationObjects,
+                            $type['id'],
+                            'th',
+                            date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 4)),
+                            $additionalDuration,
+                            $this->showEndTime,
+                            $this->showFreeSeats
+                        ));
+                    $thReservationTimeField->setMandatory(true);
+                    $thReservationTimeField->setInitInvisible(true);
+                    $thReservationTimeField->setSort(false);
+                    $thReservationTimeField->setCondition($thConditionArr);
+                    $thReservationTimeField->setCallOnChange(true);
+                    $thReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
+                    $thReservationTimeField->setAdditionalID($type['id'].'004');
+                    $thReservationTimeField->setNotificationField(true);
+                    $thReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                    $thReservationTimeField->setTurnButton(true);
+                    $thReservationTimeField->setRemoveWithEmptyCondition(true);
+                    $thReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
+                    $fieldList[] = $thReservationTimeField;
 
-                $thReservationTimeField = new C4GRadioGroupField();
-                $thReservationTimeField->setFieldName('beginTime');
-                $thReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
-                $thReservationTimeField->setFormField(true);
-                $thReservationTimeField->setOptions(
-                    C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects,
-                        $type['id'],
-                        'th',
-                        date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 4)),
-                        $additionalDuration,
-                        $this->showEndTime,
-                        $this->showFreeSeats
-                    ));
-                $thReservationTimeField->setMandatory(true);
-                $thReservationTimeField->setInitInvisible(true);
-                $thReservationTimeField->setSort(false);
-                $thReservationTimeField->setCondition($thConditionArr);
-                $thReservationTimeField->setCallOnChange(true);
-                $thReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
-                $thReservationTimeField->setAdditionalID($type['id'].'004');
-                $thReservationTimeField->setNotificationField(true);
-                $thReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
-                $thReservationTimeField->setTurnButton(true);
-                $thReservationTimeField->setRemoveWithEmptyCondition(true);
-                $thReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
-                $fieldList[] = $thReservationTimeField;
+                    $fr_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
+                    $fr_condition->setModel(C4gReservationObjectModel::class);
+                    $fr_condition->setFunction('isFriday');
+                    $frConditionArr = [$fr_condition,$condition];
 
-                $fr_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
-                $fr_condition->setModel(C4gReservationObjectModel::class);
-                $fr_condition->setFunction('isFriday');
-                $frConditionArr = [$fr_condition,$condition];
+                    $frReservationTimeField = new C4GRadioGroupField();
+                    $frReservationTimeField->setFieldName('beginTime');
+                    $frReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                    $frReservationTimeField->setFormField(true);
+                    $frReservationTimeField->setOptions(
+                        C4gReservationObjectModel::getReservationTimes(
+                            $reservationObjects,
+                            $type['id'],
+                            'fr',
+                            date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 5)),
+                            $additionalDuration,
+                            $this->showEndTime,
+                            $this->showFreeSeats
+                        ));
+                    $frReservationTimeField->setMandatory(true);
+                    $frReservationTimeField->setInitInvisible(true);
+                    $frReservationTimeField->setSort(false);
+                    $frReservationTimeField->setCondition($frConditionArr);
+                    $frReservationTimeField->setCallOnChange(true);
+                    $frReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
+                    $frReservationTimeField->setAdditionalID($type['id'].'005');
+                    $frReservationTimeField->setNotificationField(true);
+                    $frReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                    $frReservationTimeField->setTurnButton(true);
+                    $frReservationTimeField->setRemoveWithEmptyCondition(true);
+                    $frReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
+                    $fieldList[] = $frReservationTimeField;
 
-                $frReservationTimeField = new C4GRadioGroupField();
-                $frReservationTimeField->setFieldName('beginTime');
-                $frReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
-                $frReservationTimeField->setFormField(true);
-                $frReservationTimeField->setOptions(
-                    C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects,
-                        $type['id'],
-                        'fr',
-                        date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 5)),
-                        $additionalDuration,
-                        $this->showEndTime,
-                        $this->showFreeSeats
-                    ));
-                $frReservationTimeField->setMandatory(true);
-                $frReservationTimeField->setInitInvisible(true);
-                $frReservationTimeField->setSort(false);
-                $frReservationTimeField->setCondition($frConditionArr);
-                $frReservationTimeField->setCallOnChange(true);
-                $frReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
-                $frReservationTimeField->setAdditionalID($type['id'].'005');
-                $frReservationTimeField->setNotificationField(true);
-                $frReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
-                $frReservationTimeField->setTurnButton(true);
-                $frReservationTimeField->setRemoveWithEmptyCondition(true);
-                $frReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
-                $fieldList[] = $frReservationTimeField;
+                    $sa_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
+                    $sa_condition->setModel(C4gReservationObjectModel::class);
+                    $sa_condition->setFunction('isSaturday');
+                    $saConditionArr = [$sa_condition,$condition];
 
-                $sa_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $type['id']);
-                $sa_condition->setModel(C4gReservationObjectModel::class);
-                $sa_condition->setFunction('isSaturday');
-                $saConditionArr = [$sa_condition,$condition];
+                    $saReservationTimeField = new C4GRadioGroupField();
+                    $saReservationTimeField->setFieldName('beginTime');
+                    $saReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                    $saReservationTimeField->setFormField(true);
+                    $saReservationTimeField->setEditable(false);
+                    $saReservationTimeField->setOptions(
+                        C4gReservationObjectModel::getReservationTimes(
+                            $reservationObjects,
+                            $type['id'],
+                            'sa',
+                            date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 6)),
+                            $additionalDuration,
+                            $this->showEndTime,
+                            $this->showFreeSeats
+                        ));
+                    $saReservationTimeField->setMandatory(true);
+                    $saReservationTimeField->setInitInvisible(true);
+                    $saReservationTimeField->setSort(false);
+                    $saReservationTimeField->setCondition($saConditionArr);
+                    $saReservationTimeField->setCallOnChange(true);
+                    $saReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
+                    $saReservationTimeField->setAdditionalID($type['id'].'006');
+                    $saReservationTimeField->setNotificationField(true);
+                    $saReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                    $saReservationTimeField->setTurnButton(true);
+                    $saReservationTimeField->setRemoveWithEmptyCondition(true);
+                    $saReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
+                    $fieldList[] = $saReservationTimeField;
 
-                $saReservationTimeField = new C4GRadioGroupField();
-                $saReservationTimeField->setFieldName('beginTime');
-                $saReservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
-                $saReservationTimeField->setFormField(true);
-                $saReservationTimeField->setEditable(false);
-                $saReservationTimeField->setOptions(
-                    C4gReservationObjectModel::getReservationTimes(
-                        $reservationObjects,
-                        $type['id'],
-                        'sa',
-                        date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 6)),
-                        $additionalDuration,
-                        $this->showEndTime,
-                        $this->showFreeSeats
-                    ));
-                $saReservationTimeField->setMandatory(true);
-                $saReservationTimeField->setInitInvisible(true);
-                $saReservationTimeField->setSort(false);
-                $saReservationTimeField->setCondition($saConditionArr);
-                $saReservationTimeField->setCallOnChange(true);
-                $saReservationTimeField->setCallOnChangeFunction('setObjectId(this,'.$type['id'].')');
-                $saReservationTimeField->setAdditionalID($type['id'].'006');
-                $saReservationTimeField->setNotificationField(true);
-                $saReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
-                $saReservationTimeField->setTurnButton(true);
-                $saReservationTimeField->setRemoveWithEmptyCondition(true);
-                $saReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_'.$type['id']);
-                $fieldList[] = $saReservationTimeField;
+                }
 
+                $objects = [];
+                foreach ($reservationObjects as $reservationObject) {
+
+                    //ToDo Check Capacity
+                    $objects[] = array(
+                        'id' => $reservationObject->getId(),
+                        'name' => $reservationObject->getCaption(),
+                        'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
+                        'max' => $reservationObject->getDesiredCapacity()[1] ? $reservationObject->getDesiredCapacity()[1] : 1
+                    );
+                }
+            } else { //event
+                //set reservationObjectType to event
+                $reservationObjectTypeDBField = new C4GNumberField();
+                $reservationObjectTypeDBField->setFieldName('reservationObjectType');
+                $reservationObjectTypeDBField->setInitialValue('2');
+                $reservationObjectTypeDBField->setDatabaseField(true);
+                $reservationObjectTypeDBField->setFormField(false);
+                $fieldList[] = $reservationObjectTypeDBField;
+
+                $objects = [];
+                foreach ($reservationObjects as $reservationObject) {
+
+                    //ToDo Check Capacity
+                    $objects[] = array(
+                        'id' => $reservationObject->getId(),
+                        'name' => $reservationObject->getCaption(),
+                        'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
+                        'max' => $reservationObject->getDesiredCapacity()[1] ? $reservationObject->getDesiredCapacity()[1] : 1
+                    );
+                }
+
+                //save event id as reservation object
+                $reservationObjectDBField = new C4GNumberField();
+                $reservationObjectDBField->setFieldName('reservation_object');
+                //$reservationObjectField->setInitialValue($reservationObject->getId());
+                $reservationObjectDBField->setDatabaseField(true);
+                $reservationObjectDBField->setFormField(false);
+                $fieldList[] = $reservationObjectDBField;
+
+                //save beginDate
+                $reservationBeginDateDBField = new C4GNumberField();
+                $reservationBeginDateDBField->setFieldName('beginDate');
+                $reservationBeginDateDBField->setInitialValue(0);
+                $reservationBeginDateDBField->setDatabaseField(true);
+                $reservationBeginDateDBField->setFormField(false);
+                $reservationBeginDateDBField->setMax(999999999999);
+//                $reservationBeginDateDBField->setComparable(false);
+//                $reservationBeginDateDBField->setHidden(true);
+                $fieldList[] = $reservationBeginDateDBField;
+
+                //save beginTime
+                $reservationBeginTimeDBField = new C4GNumberField();
+                $reservationBeginTimeDBField->setFieldName('beginTime');
+                $reservationBeginTimeDBField->setInitialValue(0);
+                $reservationBeginTimeDBField->setDatabaseField(true);
+                $reservationBeginTimeDBField->setFormField(false);
+                $reservationBeginTimeDBField->setMax(999999999999);
+//                $reservationBeginTimeDBField->setComparable(false);
+//                $reservationBeginTimeDBField->setHidden(true);
+                $fieldList[] = $reservationBeginTimeDBField;
+
+                //save endDate
+                $reservationEndDateDBField = new C4GNumberField();
+                $reservationEndDateDBField->setFieldName('endDate');
+                $reservationEndDateDBField->setInitialValue(0);
+                $reservationEndDateDBField->setDatabaseField(true);
+                $reservationEndDateDBField->setFormField(false);
+                $reservationEndDateDBField->setMax(9999999999999);
+//                $reservationEndDateDBField->setComparable(false);
+//                $reservationEndDateDBField->setHidden(true);
+                $fieldList[] = $reservationEndDateDBField;
+
+                //save endTime
+                $reservationEndTimeDBField = new C4GNumberField();
+                $reservationEndTimeDBField->setFieldName('endTime');
+                $reservationEndTimeDBField->setInitialValue(0);
+                $reservationEndTimeDBField->setDatabaseField(true);
+                $reservationEndTimeDBField->setFormField(false);
+                $reservationEndTimeDBField->setMax(9999999999999);
+//                $reservationEndTimeDBField->setComparable(false);
+//                $reservationEndTimeDBField->setHidden(true);
+                $fieldList[] = $reservationEndTimeDBField;
             }
-
-
-//          Booking of several days and event bookings will be added in upcoming versions
-//            if ($type['periodType'] === 'md')
-//                  {
-//                  }
-//
-//        else if ($type['periodType'] === 'event') {
-//                $reservationTimeBegin = new C4GTimepickerField();
-//                $reservationTimeBegin->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
-//                $reservationTimeBegin->setFieldName('beginTime');
-//                $reservationTimeBegin->setComparable(false);
-//                $reservationTimeBegin->setSortColumn(true);
-//                $reservationTimeBegin->setSortSequence('de_datetime');
-//                $reservationTimeBegin->setTableColumn(true);
-//                $reservationTimeBegin->setFormField(true);
-//                $reservationTimeBegin->setColumnWidth(10);
-//                $reservationTimeBegin->setMandatory(true);
-//                $reservationTimeBegin->setCondition(array($condition));
-//                $reservationTimeBegin->setRemoveWithEmptyCondition(true);
-//                $fieldList[] = $reservationTimeBegin;
-//            }
-
-
-            $objects = [];
-            foreach ($reservationObjects as $reservationObject) {
-
-                //ToDo Check Capacity
-                $objects[] = array(
-                    'id' => $reservationObject->getId(),
-                    'name' => $reservationObject->getCaption(),
-                    'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
-                    'max' => $reservationObject->getDesiredCapacity()[1] ? $reservationObject->getDesiredCapacity()[1] : 1
-                );
-            }
-
-//            $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginTime_' . $type['id']); //ToDo
-//            $obj_condition->setModel(C4gReservationObjectModel::class);
-//            $obj_condition->setFunction('isTimePicked');
-//            $objConditionArr = [$obj_condition,$condition];
 
             $reservationObjectField = new C4GSelectField();
-            $reservationObjectField->setFieldName('reservation_object');
-            $reservationObjectField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object']);
+            $reservationObjectField->setFieldName($isEvent ? 'reservation_object_event' : 'reservation_object');
+            $reservationObjectField->setTitle($isEvent ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object']);
             $reservationObjectField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object']);
             $reservationObjectField->setFormField(true);
-            $reservationObjectField->setEditable(false); //
-            //$reservationObjectField->setEditableWithSelection(true);
+            $reservationObjectField->setEditable($isEvent ? true : false); //
             $reservationObjectField->setOptions($objects);
             $reservationObjectField->setMandatory(true);
-            //$reservationObjectField->setInitInvisible(true);
             $reservationObjectField->setNotificationField(true);
             $reservationObjectField->setRangeField('desiredCapacity_' . $type['id']);
             $reservationObjectField->setStyleClass('displayReservationObjects');
-            $reservationObjectField->setWithEmptyOption(true); //ToDo
+            $reservationObjectField->setWithEmptyOption(!$isEvent); //ToDo
             $reservationObjectField->setShowIfEmpty(true); //ToDo
+            $reservationObjectField->setDatabaseField(!$isEvent);
             $reservationObjectField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
             $reservationObjectField->setCondition([$condition]);
             $reservationObjectField->setRemoveWithEmptyCondition(true);
+            $reservationObjectField->setCallOnChange($isEvent);
             $reservationObjectField->setAdditionalID($type['id']);
             $fieldList[] = $reservationObjectField;
+
+            if ($isEvent) {
+                foreach ($reservationObjects as $reservationObject) {
+                    $conditionObject = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_'.$type['id'], $reservationObject->getId());
+
+                    $reservationBeginDateField = new C4GDateField();
+                    $reservationBeginDateField->setFieldName('beginDateEvent');
+                    $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
+                    $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
+                    $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent']);
+                    $reservationBeginDateField->setEditable(false);
+                    $reservationBeginDateField->setComparable(false);
+                    $reservationBeginDateField->setDatabaseField(false);
+                    $reservationBeginDateField->setSortColumn(true);
+                    $reservationBeginDateField->setSortSequence('de_datetime');
+                    $reservationBeginDateField->setTableColumn(false);
+                    $reservationBeginDateField->setFormField(true);
+                    $reservationBeginDateField->setColumnWidth(10);
+                    $reservationBeginDateField->setMandatory(false);
+                    $reservationBeginDateField->setCondition([$conditionObject]);
+                    $reservationBeginDateField->setInitialValue($reservationObject->getBeginDate());
+                    $reservationBeginDateField->setNotificationField(true);
+                    $reservationBeginDateField->setAdditionalID($type['id'].'22'.$reservationObject->getId());
+                    $fieldList[] = $reservationBeginDateField;
+
+                    $reservationEndDateField = new C4GDateField();
+                    $reservationEndDateField->setFieldName('endDateEvent');
+                    $reservationEndDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
+                    $reservationEndDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
+                    $reservationEndDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent']);
+                    $reservationEndDateField->setEditable(false);
+                    $reservationEndDateField->setComparable(false);
+                    $reservationEndDateField->setSortColumn(true);
+                    $reservationEndDateField->setSortSequence('de_datetime');
+                    $reservationEndDateField->setDatabaseField(false);
+                    $reservationEndDateField->setTableColumn(false);
+                    $reservationEndDateField->setFormField(true);
+                    $reservationEndDateField->setColumnWidth(10);
+                    $reservationEndDateField->setMandatory(false);
+                    $reservationEndDateField->setCondition([$conditionObject]);
+                    $reservationEndDateField->setInitialValue($reservationObject->getEndDate());
+                    $reservationEndDateField->setNotificationField(true);
+                    $reservationEndDateField->setAdditionalID($type['id'].'22'.$reservationObject->getId());
+                    $reservationEndDateField->setShowIfEmpty(false);
+                    $fieldList[] = $reservationEndDateField;
+
+
+                    $reservationBeginTimeField = new C4GRadioGroupField();
+                    $reservationBeginTimeField->setFieldName('beginTimeEvent');
+                    $reservationBeginTimeField->setTitle($isEvent ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                    $reservationBeginTimeField->setFormField(true);
+                    $reservationBeginTimeField->setOptions(C4gReservationObjectModel::getReservationEventTime($reservationObject, $this->showEndTime, $this->showFreeSeats));
+                    $reservationBeginTimeField->setMandatory(false);
+                    $reservationBeginTimeField->setInitialValue($reservationObject->getBeginTime());
+                    $reservationBeginTimeField->setDatabaseField(false);
+                    $reservationBeginTimeField->setSort(false);
+                    $reservationBeginTimeField->setCondition([$conditionObject]);
+                    $reservationBeginTimeField->setAdditionalID($type['id'].'22'.$reservationObject->getId());
+                    $reservationBeginTimeField->setNotificationField(true);
+                    $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                    $reservationBeginTimeField->setTurnButton(true);
+                    $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
+                    $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_'.$type['id'].'22'.$reservationObject->getId());
+                    $fieldList[] = $reservationBeginTimeField;
+                }
+            }
 
             $params = $type['additionalParams'];
             $additionalParamsArr = [];
@@ -584,7 +693,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $additionalParams->setNotificationField(true);
                 $additionalParams->setCondition(array($condition));
                 $additionalParams->setRemoveWithEmptyCondition(true);
-                $additionalParams->setAdditionalID($type['id']);
+                $additionalParams->setAdditionalID($type['id'].'00'.$reservationObject->getId());
                 $fieldList[] = $additionalParams;
             }
         }
@@ -1011,11 +1120,7 @@ class C4gReservation extends C4GBrickModuleParent
 
     public function clickReservation($values, $putVars)
     {
-
-
         $type = $putVars['reservation_type'];
-        $key = "reservation_object_" . $type;
-        $resObject = $putVars[$key];
         $newFieldList = [];
 
         foreach ($this->getFieldList() as $field) {
@@ -1024,11 +1129,21 @@ class C4gReservation extends C4GBrickModuleParent
                 continue;
             }
 
-
-            $reservationObject = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
-                ->execute($resObject);
             $reservationType = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
                 ->execute($type);
+            $isEvent = $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
+            if ($isEvent) {
+                $key = "reservation_object_event_" . $type;
+                $resObject = $putVars[$key];
+                $reservationObject = $this->Database->prepare("SELECT * FROM tl_calendar_events WHERE id=? AND published='1'")
+                    ->execute($resObject);
+            } else {
+                $key = "reservation_object_" . $type;
+                $resObject = $putVars[$key];
+                $reservationObject = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
+                    ->execute($resObject);
+            }
+
             $business_name = $reservationType->business_name;
             $business_email = $reservationType->business_email;
             $vcard = $reservationObject->vcard_show;
@@ -1054,47 +1169,61 @@ class C4gReservation extends C4GBrickModuleParent
             $newFieldList[] = $field;
         }
 
-        $beginDate = $putVars['beginDate_'.$type];
+        if ($isEvent) {
+            $putVars['reservation_object'] = $putVars['reservation_object_event_'.$type];
 
-        $beginTime = 0;
-        foreach ($putVars as $key => $value) {
-            if (strpos($key, "beginTime_".$type) !== false) {
-                if ($value) {
-                    $beginTime = $value;
-                    break;
+            //implement all event possibilities
+            $putVars['beginDate'] = $reservationObject->startDate ? intvaL($reservationObject->startDate) : 0; //ToDo undefined check
+            $putVars['beginTime'] = $reservationObject->startTime ? intval($reservationObject->startTime) : 0;
+            $putVars['endDate'] = $reservationObject->endDate ? intval($reservationObject->endDate) : 0;
+            $putVars['endTime'] = $reservationObject->endTime ? intval($reservationObject->endTime) : 0;
+       } else {
+            $beginDate = $putVars['beginDate_'.$type];
+
+            $beginTime = 0;
+            foreach ($putVars as $key => $value) {
+                if (strpos($key, "beginTime_".$type) !== false) {
+                    if ($value) {
+                        $beginTime = $value;
+                        break;
+                    }
                 }
             }
+
+            $time_interval = $reservationObject->time_interval;
+            $min_residence_time = $reservationObject->min_residence_time;
+            $max_residence_time = $reservationObject->max_residence_time;
+
+            switch ($reservationType->periodType) {
+                case 'minute':
+                    $interval = 60;
+                    break;
+                case 'hour':
+                    $interval = 3600;
+                    break;
+                default: '';
+            }
+
+            $duration = $putVars['duration'];
+            if ($duration && (($duration >= $min_residence_time) && ($duration <= $max_residence_time))) {
+                //$duration = $duration;
+            } else {
+                $duration = $time_interval;
+            }
+
+            $duration = $duration * $interval;
+            $endTime = $beginTime + $duration;
+
+            $putVars['endTime'] = $endTime+3600; //ToDo lost hour
         }
-
-        $time_interval = $reservationObject->time_interval;
-        $min_residence_time = $reservationObject->min_residence_time;
-        $max_residence_time = $reservationObject->max_residence_time;
-
-        switch ($reservationType->periodType) {
-            case 'minute':
-                $interval = 60;
-                break;
-            case 'hour':
-                $interval = 3600;
-                break;
-            default: '';
-        }
-
-        $duration = $putVars['duration'];
-        if ($duration && (($duration >= $min_residence_time) && ($duration <= $max_residence_time))) {
-            $duration = $duration;
-        } else {
-            $duration = $time_interval;
-        }
-
-        $duration = $duration * $interval;
-        $endTime = $beginTime + $duration;
-
-        $putVars['endTime'] = $endTime+3600; //ToDo lost hour
 
         $action = new C4GSaveAndRedirectDialogAction($this->dialogParams, $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
-        $this->createIcs($beginDate, $beginTime, $resObject, $type);
+
+        //ToDo check with events
+        if (!$isEvent) {
+            $this->createIcs($beginDate, $beginTime, $resObject, $type);
+        }
 
         return $result = $action->run();
     }
@@ -1155,7 +1284,7 @@ class C4gReservation extends C4GBrickModuleParent
                     break;
             }
         }
-        $times = [];
+        
         $objects = C4gReservationObjectModel::getReservationObjectList(array($additionalParam));
         $withEndTimes = $this->showEndTime;
         $withFreeSeats = $this->showFreeSeats;
@@ -1171,7 +1300,6 @@ class C4gReservation extends C4GBrickModuleParent
                 }
             }
         }
-
 
         return array(
             'times' => $times

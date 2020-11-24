@@ -19,6 +19,7 @@ namespace con4gis\ReservationBundle\Classes;
 class C4gReservationFrontendObject
 {
     private $id = -1;
+    private $type = 1; //1=default, 2=event
     private $caption = '';
     private $quantity = 1;
     private $timeinterval = '30';
@@ -30,6 +31,10 @@ class C4gReservationFrontendObject
     private $min_reservation_day = '1';
     private $max_reservation_day = '365';
     private $desiredCapacity = [];
+    private $beginDate = 0;
+    private $beginTime = 0;
+    private $endDate = 0;
+    private $endTime = 0;
 
     /**
      * C4gReservationFrontendObject constructor.
@@ -229,4 +234,85 @@ class C4gReservationFrontendObject
     {
         $this->desiredCapacity = $desiredCapacity;
     }
+
+    /**
+     * @return int
+     */
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param int $type
+     */
+    public function setType(int $type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBeginDate(): int
+    {
+        return $this->beginDate;
+    }
+
+    /**
+     * @param int $beginDate
+     */
+    public function setBeginDate(int $beginDate): void
+    {
+        $this->beginDate = $beginDate;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBeginTime(): int
+    {
+        return $this->beginTime;
+    }
+
+    /**
+     * @param int $beginTime
+     */
+    public function setBeginTime(int $beginTime): void
+    {
+        $this->beginTime = $beginTime;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEndDate(): int
+    {
+        return $this->endDate;
+    }
+
+    /**
+     * @param int $endDate
+     */
+    public function setEndDate(int $endDate): void
+    {
+        $this->endDate = $endDate;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEndTime(): int
+    {
+        return $this->endTime;
+    }
+
+    /**
+     * @param int $endTime
+     */
+    public function setEndTime(int $endTime): void
+    {
+        $this->endTime = $endTime;
+    }
+
 }
