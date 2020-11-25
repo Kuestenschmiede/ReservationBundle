@@ -55,7 +55,9 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['event'] = 'Event';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect'] = 'Please select';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText'] = 'No times available';
 
-
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'] = 'Participants';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant'] = 'Add participant';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant'] = 'Remove participant';
 
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'reservation form';

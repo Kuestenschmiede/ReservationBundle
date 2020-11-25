@@ -912,9 +912,9 @@ class C4gReservation extends C4GBrickModuleParent
 
                 $reservationParticipants = new C4GSubDialogField();
                 $reservationParticipants->setFieldName('participants');
-                $reservationParticipants->setTitle('Teilnehmer'); //ToDo Language
-                $reservationParticipants->setAddButton('Teilnehmer hinzufügen');
-                $reservationParticipants->setRemoveButton('Teilnehmer entfernen');
+                $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
+                $reservationParticipants->setAddButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant']);
+                $reservationParticipants->setRemoveButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant']);
                 $reservationParticipants->setTable('tl_c4g_reservation_participants');
                 $reservationParticipants->addFields($participants);
                 $reservationParticipants->setKeyField($participantsKey);
