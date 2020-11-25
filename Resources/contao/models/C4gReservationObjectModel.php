@@ -644,7 +644,7 @@ class C4gReservationObjectModel extends \Model
                 }
             }
 
-            if ($result) {
+            if ($result && is_array($result) && (count($result) > 0)) {
                 return ArrayHelper::sortArrayByFields($result,'name');
             } else {
                 return [];
