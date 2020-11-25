@@ -920,6 +920,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationParticipants->setKeyField($participantsKey);
                 $reservationParticipants->setForeignKeyField($participantsForeign);
                 $reservationParticipants->setMandatory($rowMandatory);
+                $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
                 $reservationParticipants->setMax(intval($type->maxParticipantsPerBooking) > 0 ? $type->maxParticipantsPerBooking : -1); //ToDo Test
                 $fieldList[] = $reservationParticipants;
             }
