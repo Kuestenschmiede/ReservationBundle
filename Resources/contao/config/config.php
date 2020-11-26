@@ -26,7 +26,7 @@ $GLOBALS['BE_MOD']['con4gis'] = array_merge($GLOBALS['BE_MOD']['con4gis'], [
     'C4gReservation' => array
     (
         'brick' => 'reservation',
-        'tables'    => array('tl_c4g_reservation', 'tl_c4g_reservation_participants'),
+        'tables'    => array('tl_c4g_reservation'),
         'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation.svg',
     ),
 
@@ -85,28 +85,28 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
     // Type
     'con4gis_reservation'   => array
     (
-        'recipients'           => array('admin_email','email'),
-        'email_subject'        => array('admin_email', 'reservation_type','desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'email', 'phone', 'address', 'postal', 'city',  'comment', 'internal_comment', 'business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id'),
-        'email_text'           => array('reservation_type','desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'internal_comment','business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id'),
-        'email_html'           => array('reservation_type','desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'internal_comment', 'business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id'),
-        'email_sender_name'    => array('admin_email','email'),
-        'email_sender_address' => array('admin_email','email'),
-        'email_recipient_cc'   => array('admin_email','email'),
-        'email_recipient_bcc'  => array('admin_email','email'),
-        'email_replyTo'        => array('admin_email','email'),
-        'file_content'         => array('reservation_type','desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'internal_comment','business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id')
+        'recipients'           => array('admin_email','email','business_email'),
+        'email_subject'        => array('admin_email', 'reservation_type','desiredCapacity', 'reservation_date','reservation_time', 'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'email', 'phone', 'address', 'postal', 'city',  'comment', 'internal_comment', 'business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id','organisation'),
+        'email_text'           => array('reservation_type','desiredCapacity','reservation_date','reservation_time',  'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'internal_comment','business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id','organisation'),
+        'email_html'           => array('reservation_type','desiredCapacity','reservation_date', 'reservation_time',  'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'internal_comment', 'business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id','organisation'),
+        'email_sender_name'    => array('admin_email','email','business_email'),
+        'email_sender_address' => array('admin_email','email','business_email'),
+        'email_recipient_cc'   => array('admin_email','email','business_email'),
+        'email_recipient_bcc'  => array('admin_email','email','business_email'),
+        'email_replyTo'        => array('admin_email','email','business_email'),
+        'file_content'         => array('reservation_type','desiredCapacity','reservation_date','reservation_time',  'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_object', 'additional_params', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city', 'comment', 'internal_comment','business_name','business_email','business_phone','business_street','business_postal','business_city','reservation_id')
     ),
     'con4gis_cancellation'   => array
     (
-        'recipients'           => array('admin_email','email'),
+        'recipients'           => array('admin_email','email','business_email'),
         'email_subject'        => array('lastname','reservation_id'),
         'email_text'           => array('lastname','reservation_id'), //'business_name','business_email','business_phone','business_street','business_postal','business_city',
         'email_html'           => array('lastname','reservation_id'), //'business_name','business_email','business_phone','business_street','business_postal','business_city',
-        'email_sender_name'    => array('admin_email','email'),
-        'email_sender_address' => array('admin_email','email'),
-        'email_recipient_cc'   => array('admin_email','email'),
-        'email_recipient_bcc'  => array('admin_email','email'),
-        'email_replyTo'        => array('admin_email','email'),
+        'email_sender_name'    => array('admin_email','email','business_email'),
+        'email_sender_address' => array('admin_email','email','business_email'),
+        'email_recipient_cc'   => array('admin_email','email','business_email'),
+        'email_recipient_bcc'  => array('admin_email','email','business_email'),
+        'email_replyTo'        => array('admin_email','email','business_email'),
         'file_content'         => array('lastname','reservation_id')
 
     )
