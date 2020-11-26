@@ -31,8 +31,8 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'] = 'Enddatum';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] = 'zu folgender Uhrzeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'] = 'Endet um';
 
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object'] = 'Reservierungsmöglichkeiten';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] = 'Veranstaltungen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object'] = 'Reservierungsmöglichkeit';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] = 'Veranstaltung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none'] = 'Bitte Zeitpunkt wählen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional_params'] = 'Zusatzoptionen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id'] = 'Reservierungsschlüssel: ';

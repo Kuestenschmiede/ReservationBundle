@@ -162,12 +162,11 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationTypeField->setSize(1);
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
-            $reservationTypeField->setWithEmptyOption(true);//($typelist && (count($typelist) >= 1)) ? true : false);
-            $reservationTypeField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect']);
             $reservationTypeField->setCallOnChange(true);
             $reservationTypeField->setCallOnChangeFunction("setTimeset(this, " . $this->id . ", -1 ,'getCurrentTimeset')");
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
+            $reservationTypeField->setHidden(count($typelist) == 1);
             $fieldList[] = $reservationTypeField;
         }
 
@@ -596,7 +595,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationObjectField->setTitle($isEvent ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object']);
             $reservationObjectField->setDescription($isEvent ? '' : $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object']);
             $reservationObjectField->setFormField(true);
-            $reservationObjectField->setEditable($isEvent);
+            $reservationObjectField->setEditable($isEvent && (count($objects) > 1));
             $reservationObjectField->setOptions($objects);
             $reservationObjectField->setMandatory(true);
             $reservationObjectField->setNotificationField(true);
@@ -621,7 +620,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $obj_condition->setFunction('isEventObject');
                     $objConditionArr = [$obj_condition,$val_condition];
 
-                    $reservationBeginDateField = new C4GDateField();
+                    $reservationBeginDateField = new C4gDateField();
                     $reservationBeginDateField->setFieldName('beginDateEvent');
                     $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
                     $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
