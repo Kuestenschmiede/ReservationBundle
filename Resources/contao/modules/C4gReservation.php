@@ -596,17 +596,17 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationObjectField->setCondition([$condition]);
             $reservationObjectField->setRemoveWithEmptyCondition(true);
             $reservationObjectField->setCallOnChange(true);
-            //$reservationObjectField->setCallOnChangeFunction("checkEventFields(".$type["id"].")");
+            $reservationObjectField->setCallOnChangeFunction("checkEventFields(this)");
             $reservationObjectField->setAdditionalID($type["id"]);
             $fieldList[] = $reservationObjectField;
 
             if ($isEvent) {
                 foreach ($reservationObjects as $reservationObject) {
-                    //$val_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $type['id'], $reservationObject->getId());
-                    $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'reservation_type');
+                    $val_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $type['id'], $reservationObject->getId());
+                    $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'reservation_object_event_' . $type['id']);
                     $obj_condition->setModel(C4gReservationObjectModel::class);
                     $obj_condition->setFunction('isEventObject');
-                    $objConditionArr = [$obj_condition];
+                    $objConditionArr = [$obj_condition,$val_condition];
 
                     $reservationBeginDateField = new C4GDateField();
                     $reservationBeginDateField->setFieldName('beginDateEvent');
@@ -652,7 +652,6 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationEndDateField->setShowIfEmpty(false);
                     $reservationEndDateField->setStyleClass('enddate-event');
                     $fieldList[] = $reservationEndDateField;
-
 
                     $reservationBeginTimeField = new C4GRadioGroupField();
                     $reservationBeginTimeField->setFieldName('beginTimeEvent');

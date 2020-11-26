@@ -26,7 +26,7 @@ $GLOBALS['BE_MOD']['con4gis'] = array_merge($GLOBALS['BE_MOD']['con4gis'], [
     'C4gReservation' => array
     (
         'brick' => 'reservation',
-        'tables'    => array('tl_c4g_reservation'),
+        'tables'    => array('tl_c4g_reservation','tl_c4g_reservation_participants'),
         'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation.svg',
     ),
 
