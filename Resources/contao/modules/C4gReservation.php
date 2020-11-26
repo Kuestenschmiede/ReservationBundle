@@ -588,20 +588,25 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationObjectField->setMandatory(true);
             $reservationObjectField->setNotificationField(true);
             $reservationObjectField->setRangeField('desiredCapacity_' . $type['id']);
-            $reservationObjectField->setStyleClass('reservation-object displayReservationObjects');
+            $reservationObjectField->setStyleClass($isEvent ? 'reservation-event-object displayReservationObjects' : 'reservation-object displayReservationObjects');
             $reservationObjectField->setWithEmptyOption(!$isEvent); //ToDo
             $reservationObjectField->setShowIfEmpty(true); //ToDo
             $reservationObjectField->setDatabaseField(!$isEvent);
             $reservationObjectField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
             $reservationObjectField->setCondition([$condition]);
             $reservationObjectField->setRemoveWithEmptyCondition(true);
-            $reservationObjectField->setCallOnChange($isEvent);
-            $reservationObjectField->setAdditionalID($type['id']);
+            $reservationObjectField->setCallOnChange(true);
+            //$reservationObjectField->setCallOnChangeFunction("checkEventFields(".$type["id"].")");
+            $reservationObjectField->setAdditionalID($type["id"]);
             $fieldList[] = $reservationObjectField;
 
             if ($isEvent) {
                 foreach ($reservationObjects as $reservationObject) {
-                    $conditionObject = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_'.$type['id'], $reservationObject->getId());
+                    //$val_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $type['id'], $reservationObject->getId());
+                    $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'reservation_type');
+                    $obj_condition->setModel(C4gReservationObjectModel::class);
+                    $obj_condition->setFunction('isEventObject');
+                    $objConditionArr = [$obj_condition];
 
                     $reservationBeginDateField = new C4GDateField();
                     $reservationBeginDateField->setFieldName('beginDateEvent');
@@ -617,11 +622,12 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationBeginDateField->setFormField(true);
                     $reservationBeginDateField->setColumnWidth(10);
                     $reservationBeginDateField->setMandatory(false);
-                    $reservationBeginDateField->setCondition([$conditionObject]);
+                    $reservationBeginDateField->setCondition($objConditionArr);
                     $reservationBeginDateField->setRemoveWithEmptyCondition(true);
                     $reservationBeginDateField->setInitialValue($reservationObject->getBeginDate());
                     $reservationBeginDateField->setNotificationField(true);
                     $reservationBeginDateField->setAdditionalID($type['id'].'22'.$reservationObject->getId());
+                    $reservationBeginDateField->setStyleClass('begindate-event');
                     $fieldList[] = $reservationBeginDateField;
 
                     $reservationEndDateField = new C4GDateField();
@@ -638,12 +644,13 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationEndDateField->setFormField(true);
                     $reservationEndDateField->setColumnWidth(10);
                     $reservationEndDateField->setMandatory(false);
-                    $reservationEndDateField->setCondition([$conditionObject]);
+                    $reservationEndDateField->setCondition($objConditionArr);
                     $reservationEndDateField->setRemoveWithEmptyCondition(true);
                     $reservationEndDateField->setInitialValue($reservationObject->getEndDate());
                     $reservationEndDateField->setNotificationField(true);
                     $reservationEndDateField->setAdditionalID($type['id'].'22'.$reservationObject->getId());
                     $reservationEndDateField->setShowIfEmpty(false);
+                    $reservationEndDateField->setStyleClass('enddate-event');
                     $fieldList[] = $reservationEndDateField;
 
 
@@ -656,7 +663,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationBeginTimeField->setInitialValue($reservationObject->getBeginTime());
                     $reservationBeginTimeField->setDatabaseField(false);
                     $reservationBeginTimeField->setSort(false);
-                    $reservationBeginTimeField->setCondition([$conditionObject]);
+                    $reservationBeginTimeField->setCondition($objConditionArr);
                     $reservationBeginTimeField->setAdditionalID($type['id'].'22'.$reservationObject->getId());
                     $reservationBeginTimeField->setNotificationField(true);
                     $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);

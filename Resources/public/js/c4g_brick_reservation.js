@@ -322,4 +322,61 @@ function setTimeset(object, id, additionalId, callFunction) {
 
     var reservationObjects = document.getElementsByClassName("displayReservationObjects");
     hideOptions(reservationObjects,additionalId, val);
+    checkEventFields(additionalId);
+}
+
+function checkEventFields(typeid) {
+    if (typeid == -1) {
+        var typeField = document.getElementById("c4g_reservation_type");
+        typeid = typeField ? typeField.value : -1;
+    }
+
+    var selectField = jQuery('.reservation-event-object select');
+    if (selectField) {
+        for (i = 0; i < selectField.length; i++) {
+            if (selectField[i] && selectField[i].value) {
+                var additional = typeid.toString() + "22" + selectField[i].value.toString();
+                var dateFields = document.getElementsByClassName('c4g_date_field_input');
+                if (dateFields) {
+                    for (j = 0; j < dateFields.length; j++) {
+                        if (jQuery(dateFields[j]).hasClass('c4g_beginDateEvent_' + additional)) {
+                            jQuery(dateFields[j]).show();
+                        } else {
+                            jQuery(dateFields[j]).hide();
+                        }
+                    }
+                }
+
+                var timeFields = document.getElementsByClassName('reservation_time_event_button');
+                if (timeFields) {
+                    for (j = 0; j < timeFields.length; j++) {
+                        if (jQuery(timeFields[j]).hasClass('reservation_time_event_button_' + additional)) {
+                            jQuery(timeFields[j]).show();
+                        } else {
+                            jQuery(timeFields[j]).hide();
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        var dateFields = document.getElementsByClassName('c4g_date_field_input');
+        if (dateFields) {
+            for (j = 0; j < dateFields.length; j++) {
+                if (jQuery(dateFields[j]).hasClass('begindate-event')) {
+                    jQuery(dateFields[j]).hide();
+                }
+            }
+        }
+
+        var timeFields = document.getElementsByClassName('reservation_time_event_button');
+        if (timeFields) {
+            for (j = 0; j < timeFields.length; j++) {
+                if (jQuery(timeFields[j]).hasClass('reservation_time_event_button')) {
+                    jQuery(timeFields[j]).hide();
+                }
+            }
+        }
+    }
+
 }
