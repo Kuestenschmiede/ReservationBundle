@@ -685,16 +685,18 @@ class C4gReservationObjectModel extends \Model
     }
 
     /**
+     * @param null $moduleTypes
+     * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectList($moduleTypes = null)
+    public static function getReservationObjectList($moduleTypes = null, $objectId = 0)
     {
         $objectlist = array();
         foreach ($moduleTypes as $moduleType) {
             if ($moduleType) {
                 $type = C4gReservationTypeModel::findByPk($moduleType);
                 if ($type && $type->reservationObjectType === '2') {
-                    $objectlist = C4gReservationObjectModel::getReservationObjectEventList($moduleTypes);
+                    $objectlist = C4gReservationObjectModel::getReservationObjectEventList($moduleTypes, $objectId);
                     break; //ToDo check
                 } else {
                     $objectlist = C4gReservationObjectModel::getReservationObjectDefaultList($moduleTypes);
@@ -707,39 +709,56 @@ class C4gReservationObjectModel extends \Model
     }
 
     /**
+     * @param null $moduleTypes
+     * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectEventList($moduleTypes = null)
+    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0)
     {
         $objectList = array();
-
         $db = Database::getInstance();
-        //$types = implode(",",$moduleTypes);
 
-        $idString = "(" ;
-        foreach ($moduleTypes as $key => $typeId) {
-            $idString .= "\"$typeId\"";
-            if (!(array_key_last($moduleTypes) === $key)) {
-                $idString .= ",";
+        if ($objectId) {
+            $event = C4gReservationEventModel::findBy('pid',$objectId);
+            $eventObject = \CalendarEventsModel::findByPk($objectId);
+            if ($eventObject && $eventObject->published) { //ToDo nur Events in der Zukunft zulassen
+                $frontendObject = new C4gReservationFrontendObject();
+                $frontendObject->setType(2);
+                $frontendObject->setId($eventObject->id);
+                $frontendObject->setCaption($eventObject->title);
+                $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
+                $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
+                $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
+                $frontendObject->setEndDate($eventObject->endDate ? $eventObject->endDate : 0);
+                $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
+                $objectList[] = $frontendObject;
             }
-        }
-        $idString .= ")";
+        } else {
+            $idString = "(" ;
+            foreach ($moduleTypes as $key => $typeId) {
+                $idString .= "\"$typeId\"";
+                if (!(array_key_last($moduleTypes) === $key)) {
+                    $idString .= ",";
+                }
+            }
+            $idString .= ")";
 
-        $allEvents = $db->prepare("SELECT pid,minParticipants,maxParticipants FROM tl_c4g_reservation_event WHERE reservationType IN $idString")->execute()->fetchAllAssoc();
-        if ($allEvents) {
-            foreach ($allEvents as $event) {
-                $eventObject = \CalendarEventsModel::findByPk($event['pid']);
-                if ($eventObject && $eventObject->published) { //ToDo nur Events in der Zukunft zulassen
-                    $frontendObject = new C4gReservationFrontendObject();
-                    $frontendObject->setType(2);
-                    $frontendObject->setId($eventObject->id);
-                    $frontendObject->setCaption($eventObject->title);
-                    $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
-                    $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
-                    $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
-                    $frontendObject->setEndDate($eventObject->endDate ? $eventObject->endDate : 0);
-                    $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
-                    $objectList[] = $frontendObject;
+            $allEvents = $db->prepare("SELECT pid,minParticipants,maxParticipants FROM tl_c4g_reservation_event WHERE reservationType IN $idString")->execute()->fetchAllAssoc();
+            if ($allEvents) {
+                foreach ($allEvents as $event) {
+                    $eventObject = \CalendarEventsModel::findByPk($event['pid']);
+                    if ($eventObject && $eventObject->published) { //ToDo nur Events in der Zukunft zulassen
+                        $frontendObject = new C4gReservationFrontendObject();
+                        $frontendObject->setType(2);
+                        $frontendObject->setId($eventObject->id);
+                        $frontendObject->setCaption($eventObject->title);
+                        $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
+                        $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
+                        $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
+                        $frontendObject->setEndDate($eventObject->endDate ? $eventObject->endDate : 0);
+                        $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
+                        $objectList[] = $frontendObject;
+                    }
                 }
             }
         }

@@ -17,16 +17,15 @@ use Contao\Database;
 use Contao\Model;
 
 /**
- * Class C4gReservationModel
- * @package con4gis\reservation
+ * Class C4gReservationEventModel
+ * @package con4gis/reservation
  */
-class C4gReservationModel extends Model
+class C4gReservationEventModel extends \Model
 {
 
     /**
      * Table name
      * @var string
      */
-    protected static $strTable = 'tl_c4g_reservation';
-
+    protected static $strTable = 'tl_c4g_reservation_event';
 }

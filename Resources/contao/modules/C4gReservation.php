@@ -13,6 +13,7 @@
 
 namespace con4gis\ReservationBundle\Resources\contao\modules;
 
+use con4gis\CoreBundle\Classes\Helper\InputHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Actions\C4GSaveAndRedirectDialogAction;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
@@ -43,6 +44,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimepickerField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBrickModuleParent;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
 use con4gis\ReservationBundle\Classes\C4gReservationBrickTypes;
+use con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
@@ -69,6 +71,7 @@ class C4gReservation extends C4GBrickModuleParent
     protected $jQueryUseTable = false;
     protected $jQueryUseScrollPane = false;
     protected $jQueryUsePopups = false;
+    protected $loadChosenResources = false;
 
     public function initBrickModule($id)
     {
@@ -99,8 +102,17 @@ class C4gReservation extends C4GBrickModuleParent
         $fieldList[] = $idField;
 
         $typelist = array();
-        $types = C4gReservationTypeModel::findBy('published', '1');
-        $firstType = 0;
+
+        $eventId  = $this->Input->get('event') ? $this->Input->get('event') : 0;
+        $event    = $eventId ? \CalendarEventsModel::findByPk($eventId) : false;
+        $eventObj = $event && $event->published ? C4gReservationEventModel::findOneBy('pid', $event->id) : false;
+        if ($eventObj) {
+            $typeId = $eventObj->reservationType;
+            $types[] = C4gReservationTypeModel::findByPk($typeId); //ToDo check published
+        } else {
+            $types = C4gReservationTypeModel::findBy('published', '1');
+        }
+
         if ($types) {
             $moduleTypes = unserialize($this->reservation_types);
             foreach ($types as $type) {
@@ -111,7 +123,7 @@ class C4gReservation extends C4GBrickModuleParent
                     }
                 }
 
-                $objects = C4gReservationObjectModel::getReservationObjectList(array($type->id));
+                $objects = C4gReservationObjectModel::getReservationObjectList(array($type->id), $eventId);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
@@ -128,11 +140,6 @@ class C4gReservation extends C4GBrickModuleParent
                                 'objects' => $objects,
                                 'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false
                             );
-
-                            if (!$firstType) {
-                                $firstType = $type->id;
-                            }
-
                         }
                     }
                 }
@@ -140,6 +147,12 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         if (count($typelist) > 0) {
+            $firstType = array_key_first($typelist);
+
+            $onLoadScript = $this->getDialogParams()->getOnloadScript();
+            $onLoadScript .= ' jQuery("#c4g_reservation_type").trigger("change");';
+            $this->getDialogParams()->setOnloadScript(trim($onLoadScript));
+
             $reservationTypeField = new C4GSelectField();
             $reservationTypeField->setFieldName('reservation_type');
             $reservationTypeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type']);
@@ -153,9 +166,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationTypeField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect']);
             $reservationTypeField->setCallOnChange(true);
             $reservationTypeField->setCallOnChangeFunction("setTimeset(this, " . $this->id . ", -1 ,'getCurrentTimeset')");
-            //$reservationTypeField->setInitialCallOnChange(true);
-            $reservationTypeField->setInitialValue(-1);//array_key_first($typelist));
-            $reservationTypeField->setNotificationField(true);
+            $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
             $fieldList[] = $reservationTypeField;
         }
@@ -579,9 +590,11 @@ class C4gReservation extends C4GBrickModuleParent
             }
 
             $reservationObjectField = new C4GSelectField();
+            //$reservationObjectField->setChosen(true);
+            //$reservationObjectField->setMinChosenCount(1);
             $reservationObjectField->setFieldName($isEvent ? 'reservation_object_event' : 'reservation_object');
             $reservationObjectField->setTitle($isEvent ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object']);
-            $reservationObjectField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object']);
+            $reservationObjectField->setDescription($isEvent ? '' : $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object']);
             $reservationObjectField->setFormField(true);
             $reservationObjectField->setEditable($isEvent);
             $reservationObjectField->setOptions($objects);

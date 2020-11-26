@@ -66,8 +66,6 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage'] = 'Teilneh
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect'] = 'Bitte auswählen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText'] = 'Keine Zeiten verfügbar.';
 
-
-
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'Reservierungsformular';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['person_data'] = 'Ihre Daten';
@@ -75,13 +73,13 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['person_data'] = 'Ihre Daten';
 /** MESSAGES */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['min_max_failed'] = 'Wir können Ihre Reservierung nicht durchführen. Der Termin ist außerhalb des buchbaren Bereichs.';
 
-/** DESCRIPTIONS */    /**DKo 13.02.19*/
+/** DESCRIPTIONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Wählen Sie die Reservierungsart aus.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_beginDate'] = 'Wählen Sie das Datum, am welchen Tag die Veranstaltung beginnt.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_endDate'] = 'Wählen Sie das Datum, am welchen Tag die Veranstaltung endet.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_beginTime'] = 'Wählen Sie die Uhrzeit aus, wann die Veranstaltung beginnt (9:00-12:00 & 14:00-18:00).';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_endTime'] = 'Wählen Sie die Uhrzeit aus, wann die Veranstaltung endet (9:00-12:00 & 14:00-18:00).';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object'] = 'Bei "Bitte Zeitpunkt wählen" wählen Sie bitte einen anderen Zeitraum.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object'] = 'Bei \"Bitte Zeitpunkt wählen\" wählen Sie bitte einen anderen Zeitraum.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_id'] = 'Diesen Schlüssel senden wir Ihnen per E-Mail zu. Sie benötigen ihn für Änderungen oder Stornierungen.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_lastname'] = 'Geben Sie Ihren Nachnachmen ein.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_firstname'] = 'Geben Sie Ihren Vornamen ein.';

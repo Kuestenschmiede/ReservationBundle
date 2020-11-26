@@ -116,7 +116,8 @@ $GLOBALS['TL_MODELS']['tl_c4g_reservation'] = \con4gis\ReservationBundle\Resourc
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_object'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_type'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_params'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel::class;
-$GLOBALS['TL_MODELS']['tl_c4g_reservation_object_prices'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectPrices::class;
+$GLOBALS['TL_MODELS']['tl_c4g_reservation_object_prices'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectPricesModel::class;
+$GLOBALS['TL_MODELS']['tl_c4g_reservation_event'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventModel::class;
 $GLOBALS['TL_CRON']['daily'][] = [\con4gis\ReservationBundle\Classes\Cron::class, 'onDaily'];
 
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_event';
