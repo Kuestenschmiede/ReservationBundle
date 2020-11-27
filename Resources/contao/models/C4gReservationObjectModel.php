@@ -223,7 +223,7 @@ class C4gReservationObjectModel extends \Model
                         $current = $exclusionBegin;
                         while($current <= $exclusionEnd) {
                             $alldates[] = $current;
-                            $current = $current + 86400;
+                            $current = intval($current) + 86400;
                         }
                     }
                 }
@@ -649,7 +649,7 @@ class C4gReservationObjectModel extends \Model
             }
 
             if ($result && is_array($result) && (count($result) > 0)) {
-                return ArrayHelper::sortArrayByFields($result,'name');
+                return ArrayHelper::sortArrayByFields($result,['name' => SORT_ASC]);
             } else {
                 return [];
             }

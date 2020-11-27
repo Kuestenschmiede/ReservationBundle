@@ -165,6 +165,35 @@ function hideOptions(reservationObjects,typeId,values) {
     checkEventFields(-1);
 }
 
+function setReservationForm(object, id, additionalId, callFunction) {
+    var typeField = document.getElementById("c4g_reservation_type");
+    var typeId = typeField ? typeField.value : -1;
+
+    setTimeset(object, id, additionalId, callFunction);
+
+    var dateFields = document.getElementsByClassName('c4g_date_field_input');
+    if (dateFields) {
+        for (i = 0; i < dateFields.length; i++) {
+            var dateField = dateFields[i];
+            if (dateField && dateField.value && jQuery(dateField).is(":visible")) {
+                jQuery(dateField).trigger("change");
+                break;
+            }
+        }
+    }
+
+    var radioButton = jQuery('.reservation_time_button input[type = "radio"]:checked');
+    if (radioButton) {
+        for (i = 0; i < radioButton.length; i++) {
+            var button = radioButton[i];
+
+            if (button && jQuery(button).hasClass("radio_object_"+typeId)) {
+                setObjectId(button, typeId);
+            }
+        }
+    }
+}
+
 function setTimeset(object, id, additionalId, callFunction) {
     var brick_api = apiBaseUrl+"/c4g_brick_ajax";
     var elementId = 0;
@@ -177,7 +206,7 @@ function setTimeset(object, id, additionalId, callFunction) {
         jQuery(document.getElementsByClassName('displayReservationObjects')) ? jQuery(document.getElementsByClassName('displayReservationObjects')).hide() : false;
     } else {
         elementId = "c4g_beginDate_"+additionalId;
-        date = document.getElementById(elementId).value;
+        date = document.getElementById(elementId) ? document.getElementById(elementId).value : 0;
     }
     var durationNode = document.getElementById("c4g_duration");
     if (durationNode) {
@@ -199,7 +228,7 @@ function setTimeset(object, id, additionalId, callFunction) {
             url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
             success: function (data) {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"00"+getWeekdate(date));
-                var radioGroups = timeGroup.parentElement.getElementsByClassName("reservation_time_button");
+                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("reservation_time_button") : document.getElementsByClassName("reservation_time_button"); //ToDo
                 var timeList = [];
                 var objectList = [];
                 var times = data['times'];

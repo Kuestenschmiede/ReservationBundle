@@ -154,6 +154,7 @@ class C4gReservation extends C4GBrickModuleParent
             $this->getDialogParams()->setOnloadScript(trim($onLoadScript));
 
             $reservationTypeField = new C4GSelectField();
+            $reservationTypeField->setChosen(false);
             $reservationTypeField->setFieldName('reservation_type');
             $reservationTypeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type']);
             $reservationTypeField->setSortColumn(false);
@@ -163,7 +164,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
             $reservationTypeField->setCallOnChange(true);
-            $reservationTypeField->setCallOnChangeFunction("setTimeset(this, " . $this->id . ", -1 ,'getCurrentTimeset')");
+            $reservationTypeField->setCallOnChangeFunction("setReservationForm(this, " . $this->id . ", -1 ,'getCurrentTimeset')");
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
             $reservationTypeField->setHidden(count($typelist) == 1);
@@ -233,7 +234,8 @@ class C4gReservation extends C4GBrickModuleParent
                 }
 
                 if (($type['periodType'] === 'minute') || ($type['periodType'] === 'hour')) {
-                    $conditionDate = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'beginDate_'.$type['id']);
+                    //$conditionDate = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'beginDate_'.$type['id']);
+
                     $reservationBeginDateField = new C4GDateField();
                     $reservationBeginDateField->setMinDate(C4gReservationObjectModel::getMinDate($reservationObjects));
                     $reservationBeginDateField->setMaxDate(C4gReservationObjectModel::getMaxDate($reservationObjects));
@@ -589,13 +591,12 @@ class C4gReservation extends C4GBrickModuleParent
             }
 
             $reservationObjectField = new C4GSelectField();
-            //$reservationObjectField->setChosen(true);
-            //$reservationObjectField->setMinChosenCount(1);
+            $reservationObjectField->setChosen(false);
             $reservationObjectField->setFieldName($isEvent ? 'reservation_object_event' : 'reservation_object');
             $reservationObjectField->setTitle($isEvent ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object']);
             $reservationObjectField->setDescription($isEvent ? '' : $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object']);
             $reservationObjectField->setFormField(true);
-            $reservationObjectField->setEditable($isEvent && (count($objects) > 1));
+            $reservationObjectField->setEditable($isEvent && !$eventId);
             $reservationObjectField->setOptions($objects);
             $reservationObjectField->setMandatory(true);
             $reservationObjectField->setNotificationField(true);
@@ -687,12 +688,15 @@ class C4gReservation extends C4GBrickModuleParent
 
             $params = $type['additionalParams'];
             $additionalParamsArr = [];
-            foreach ($params as $paramId) {
-                $additionalParam = C4gReservationParamsModel::findByPk($paramId);
-                if ($additionalParam && $additionalParam->caption && ($additionalParam->price && $this->showPrices)) {
-                    $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption."<span class='price'>(+".number_format($additionalParam->price,2)." Euro)</span>"]; //ToDO Einheit, Foratierung
-                } else if ($additionalParam && $additionalParam->caption) {
-                    $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
+
+            if ($params) {
+                foreach ($params as $paramId) {
+                    $additionalParam = C4gReservationParamsModel::findByPk($paramId);
+                    if ($additionalParam && $additionalParam->caption && ($additionalParam->price && $this->showPrices)) {
+                        $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption."<span class='price'>(+".number_format($additionalParam->price,2)." Euro)</span>"]; //ToDO Einheit, Foratierung
+                    } else if ($additionalParam && $additionalParam->caption) {
+                        $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
+                    }
                 }
             }
 
