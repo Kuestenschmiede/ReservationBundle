@@ -25,6 +25,22 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'end date';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Please select a time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Ends at';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration'] = 'Duration';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'] = 'Begin date';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'] = 'End date';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] = 'Begin time';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'] = 'End time';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] = 'Event';
+
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'] = 'o\'clock'; //ToDo a.m. / p.m.
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'] = 'Target audience';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'] = 'Topic';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'] = 'Speaker';
+
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] = 'Overview';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'] = 'Location';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'] = 'Address';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventnumber'] = 'Number';
+
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object'] = 'Reservation options';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none'] = 'Reservation request not available.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id'] = 'Identification key: ';
@@ -54,7 +70,10 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['event'] = 'Event';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect'] = 'Please select';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText'] = 'No times available';
 
-
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'] = 'Participants';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant'] = 'Add participant';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant'] = 'Remove participant';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage'] = 'Really remove participant';
 
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'reservation form';
@@ -84,6 +103,3 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] = 'Privacy Po
 
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'] = 'Reserve appointment';
-
-
-

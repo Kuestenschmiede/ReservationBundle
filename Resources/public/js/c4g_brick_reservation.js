@@ -111,7 +111,7 @@ function hideOptions(reservationObjects,typeId,values) {
             typeId = typeField ? typeField.value : -1;
         }
         var selectField = document.getElementById("c4g_reservation_object_"+typeId);
-        var first = jQuery.isArray(values) ? values[0] : values;
+        var first = -1;//jQuery.isArray(values) ? values[0] : -1;//values;
         if (selectField) {
             for (i = 0; i < selectField.options.length; i++) {
                 var option = selectField.options[i];
@@ -130,9 +130,9 @@ function hideOptions(reservationObjects,typeId,values) {
                     }
                 }
 
-                if (!foundValue) {
+                if (!foundValue && (option.value != -1)) {
                     jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
-                } else {
+                } else if (option.value != -1) {
                     jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
                     if (min && max && capacity && capacity > 0) {
                         if ((capacity < min) || (capacity > max)) {
@@ -143,12 +143,18 @@ function hideOptions(reservationObjects,typeId,values) {
                                 first = option.value;
                             }
                         }
+                    } else {
+                        jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                        if ((first == -1) && (option.value != -1)) {
+                            first = option.value;
+                        }
                     }
                 }
             }
 
             if (parseInt(first) >= 0) {
                 jQuery(selectField).val(first).change();
+                jQuery(selectField).children('option[value="'+first+'"]').removeAttr('disabled');
                 jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
 
                 jQuery(selectField).removeAttr('disabled');
@@ -156,6 +162,40 @@ function hideOptions(reservationObjects,typeId,values) {
                 jQuery(selectField).children('option[value="-1"]').removeAttr('disabled');
                 jQuery(selectField).val("-1").change();
                 jQuery(selectField).prop("disabled", true);
+            }
+
+            //checkEventFields(selectField.value);
+        }
+    }
+
+    checkEventFields(-1);
+}
+
+function setReservationForm(object, id, additionalId, callFunction) {
+    var typeField = document.getElementById("c4g_reservation_type");
+    var typeId = typeField ? typeField.value : -1;
+
+    setTimeset(object, id, additionalId, callFunction);
+
+    var dateFields = document.getElementsByClassName('c4g_date_field_input');
+    if (dateFields) {
+        for (i = 0; i < dateFields.length; i++) {
+            var dateField = dateFields[i];
+            if (dateField && dateField.value && jQuery(dateField).is(":visible")) {
+                jQuery(dateField).trigger("change");
+                break;
+            }
+        }
+    }
+
+    var radioButton = jQuery('.reservation_time_button input[type = "radio"]:checked');
+    if (radioButton) {
+        for (i = 0; i < radioButton.length; i++) {
+            var button = radioButton[i];
+
+            if (button && jQuery(button).hasClass("radio_object_"+typeId)) {
+                setObjectId(button, typeId);
+                break;
             }
         }
     }
@@ -173,7 +213,7 @@ function setTimeset(object, id, additionalId, callFunction) {
         jQuery(document.getElementsByClassName('displayReservationObjects')) ? jQuery(document.getElementsByClassName('displayReservationObjects')).hide() : false;
     } else {
         elementId = "c4g_beginDate_"+additionalId;
-        date = document.getElementById(elementId).value;
+        date = document.getElementById(elementId) ? document.getElementById(elementId).value : 0;
     }
     var durationNode = document.getElementById("c4g_duration");
     if (durationNode) {
@@ -194,8 +234,8 @@ function setTimeset(object, id, additionalId, callFunction) {
             dataType: "json",
             url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
             success: function (data) {
-                var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"00"+getWeekdate(date));
-                var radioGroups = timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group");
+                var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
+                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("reservation_time_button") : document.getElementsByClassName("reservation_time_button"); //ToDo
                 var timeList = [];
                 var objectList = [];
                 var times = data['times'];
@@ -322,4 +362,68 @@ function setTimeset(object, id, additionalId, callFunction) {
 
     var reservationObjects = document.getElementsByClassName("displayReservationObjects");
     hideOptions(reservationObjects,additionalId, val);
+}
+
+function checkEventFields(object) {
+    var typeField = document.getElementById("c4g_reservation_type");
+    var typeId = typeField ? typeField.value : -1;
+
+    var selectField = jQuery('.reservation-event-object select');
+    if (selectField && selectField.is(":visible")) {
+        for (i = 0; i < selectField.length; i++) {
+            if (selectField[i]) {
+                var additional = -1;
+                if (selectField[i].value) {
+                    additional = typeId.toString() + "-22" + selectField[i].value.toString();
+                }
+
+                var dateFields = document.getElementsByClassName('begindate-event');
+                if (dateFields) {
+                    for (j = 0; j < dateFields.length; j++) {
+                        if ((additional != -1) && jQuery(dateFields[j]).children().children('input').hasClass('c4g_beginDateEvent_' + additional)) {
+                            jQuery(dateFields[j]).show();
+                            jQuery(dateFields[j]).children().show();
+                        } else {
+                            jQuery(dateFields[j]).hide();
+                            jQuery(dateFields[j]).children().hide();
+                        }
+                    }
+                }
+
+                //ToDo roar
+                var timeFields = jQuery('.c4g_brick_radio_group_wrapper .reservation_time_event_button');
+                if (timeFields) {
+                    for (j = 0; j < timeFields.length; j++) {
+                        if ((additional != -1) && jQuery(timeFields[j]).hasClass('reservation_time_event_button_' + additional)) {
+                            jQuery(timeFields[j]).show();
+                            jQuery(timeFields[j]).children('label').show();
+                            jQuery(timeFields[j]).parent().show();
+                            jQuery(timeFields[j]).parent().parent().show();
+                            jQuery(timeFields[j]).parent().parent().parent().show();
+                        } else {
+                            jQuery(timeFields[j]).hide();
+                            jQuery(timeFields[j]).children('label').hide();
+                            jQuery(timeFields[j]).parent().hide();
+                            jQuery(timeFields[j]).parent().parent().hide();
+                            jQuery(timeFields[j]).parent().parent().parent().hide();
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        var dateFields = jQuery('.begindate-event');
+        if (dateFields) {
+            for (i = 0; i < dateFields.length; i++) {
+                jQuery(dateFields[i]).hide();
+            }
+        }
+
+        var timeFields = jQuery('.reservation_time_event_button');
+        if (timeFields) {
+            for (i = 0; i < timeFields.length; i++) {
+                jQuery(timeFields[i]).hide();
+            }
+        }
+    }
 }

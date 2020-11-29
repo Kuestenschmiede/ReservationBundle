@@ -13,6 +13,7 @@
 
 /** FIELDS */ /**DKo 13.02.19*/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['id'] = array("#", "");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['pid'] = array("Booked", "Set automatically.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_type'] = array("Reservation type", "What type of reservation is it");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_additional_option'] = array("Additional booking option", "Should an additional option be booked?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['desiredCapacity'] = array("Number of people", "What is the maximum number of people that will appear?");
@@ -25,6 +26,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['beginDate'] = array("begin");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['endDate'] = array("end");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['beginTime'] = array("start time", "when does the event start");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['endTime'] = array("time end", "when does the event end?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservationObjectType'] = array("Object type", "Reservation objects and Contao events can be reserved.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][1] = 'Default';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][2] = 'Event';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_object'] = array("reservation object", "Which object should be reserved?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_id'] = array("reservation key", "Please enter a reservation key for identification");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation'] = 'Company / Organization / School';

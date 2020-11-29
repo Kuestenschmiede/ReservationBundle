@@ -221,7 +221,7 @@ class tl_c4g_reservation_params extends Backend
         }
 
         // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation_type SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE id=?")
+        $this->Database->prepare("UPDATE tl_c4g_reservation_params SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE id=?")
             ->execute($intId);
         $this->createNewVersion('tl_c4g_reservation_params', $intId);
     }

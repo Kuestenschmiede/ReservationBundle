@@ -17,6 +17,10 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationObject'] = array('Reservierungsobjekte
 $GLOBALS['TL_LANG']['MOD']['C4gReservationObjectPrices'] = array('Objektpreise', 'Vorgabe der Objektpreise (optional).');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservierungsarten', 'Definition der Reservierungsarten (z.B. Tischreservierung, Raumreservierung)');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationParams'] = array('Buchungsoptionen', 'Erfassung weiterer Buchungsoptionen (optional).');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationEvent']  = array('Event <=> Reservierung', 'Hier können Veranstaltungen und Reservierungen verknüpft werden.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationEventAudience'] = array('Zielpublikum', 'Hier können Sie Zielgruppen hinterlegen.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Referenten', 'Hier können Sie die Referenten pflegen.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Themen', 'Hier können Sie bspw. die Seminarthemen hinterlegen.');
 
 $GLOBALS['TL_LANG']['FMD']['C4gReservation']  = array('con4gis-Reservation: Reservierung', 'Reservierung');
 $GLOBALS['TL_LANG']['FMD']['C4gReservationCancellation']  = array('con4gis-Reservation: Stornierung', 'Reservierung');

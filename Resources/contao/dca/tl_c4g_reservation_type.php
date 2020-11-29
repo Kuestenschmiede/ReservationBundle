@@ -38,14 +38,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'sorting' => array
         (
             'mode'              => 2,
-            'fields'            => array('caption','periodType','objectCount'),
+            'fields'            => array('caption','reservationObjectType','periodType','objectCount'),
             'panelLayout'       => 'filter;sort,search,limit',
             'headerFields'      => array('caption','periodType','objectCount'),
         ),
 
         'label' => array
         (
-            'fields'            => array('caption','periodType','objectCount'),
+            'fields'            => array('caption','reservationObjectType','periodType','objectCount'),
             //'label_callback'    => array('tl_c4g_reservation_type', 'listTypes'),
             'showColumns'       => true
         ),
@@ -101,19 +101,19 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{type_legend},caption,description,options;{business_data},business_name,business_phone,business_email,business_street,business_postal,business_city,periodType,objectCount,severalBookings,additional_params,published;{expert_legend:hide},auto_del;',
-       '__selector__' => array('periodType','auto_del')
+        '__selector__'  => array('periodType','auto_del','reservationObjectType'),
+        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,additional_params;{business_data},business_name,business_phone,business_email,business_street,business_postal,business_city,published;{expert_legend:hide},auto_del;'
     ),
 
     //Subpalettes
    'subpalettes' => array(
-        'periodType_md'                 =>'beginDate, endDate;',
-        'periodType_event'              =>'{event_legend},event_dayBegin, event_timeBegin, event_dayEnd, event_timeEnd;',
-        'periodType_contao_event'       =>'{event_legend},event_id;',
-        'auto_del_daily'                =>'del_time;',
-
+        'periodType_md'                 => 'beginDate, endDate;',
+        'periodType_event'              => '{event_legend},event_dayBegin, event_timeBegin, event_dayEnd, event_timeEnd;',
+        'periodType_contao_event'       => '{event_legend},event_id;',
+        'auto_del_daily'                => 'del_time;',
+        'reservationObjectType_1'       => 'periodType,objectCount,severalBookings',
+        'reservationObjectType_2'       => '',//'calendar',
     ),
-
 
     //Fields
     'fields' => array
@@ -142,6 +142,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'caption' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['caption'],
+            'default'           => '',
             'sorting'           => true,
             'flag'              => 1,
             'search'            => true,
@@ -154,6 +155,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'event_caption' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_caption'],
+            'default'           => '',
             'sorting'           => true,
             'flag'              => 1,
             'search'            => true,
@@ -189,12 +191,34 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
                 )
             ),
 
-            'sql' => "blob NULL "
+            'sql' => "blob NULL"
         ),
 
+        'reservationObjectType' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'],
+            'exclude'                 => true,
+            'inputType'               => 'radio',
+            'default'                 => '1',
+            'options'                 => ['1','2'],
+            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'],
+            'eval'                    => ['tl_class'=>'clr long','submitOnChange' => true],
+            'sql'                     => "varchar(255) NOT NULL default '1'"
+        ),
+//        'calendar' => array
+//        (
+//            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['calendar'],
+//            'exclude'                 => true,
+//            'inputType'               => 'select',
+//            'foreignKey'              => 'tl_calendar.title',
+//            //'options_callback'        => array('tl_c4g_reservation_type', 'getCalendars'),
+//            'eval'                    => array('chosen'=>true, 'mandatory'=>true, 'multiple'=>true, 'includeBlankOption'=>true),
+//            'sql'                     => "blob NULL"
+//        ),
        'business_name' => array
        (
            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_name'],
+           'default'           => '',
            'exclude'           => true,
            'inputType'         => 'text',
            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
@@ -203,6 +227,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
        'business_phone' => array
        (
            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'],
+           'default'           => '',
            'exclude'           => true,
            'inputType'         => 'text',
            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'long clr '),
@@ -211,6 +236,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'business_email' => array
         (
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_email'],
+            'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              =>array('rgxp'=>'email','mandatory'=>false, 'tl_class'=>'long clr'),
@@ -219,6 +245,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'business_street' => array
         (
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_street'],
+            'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              =>array('mandatory'=>false, 'tl_class'=>'long clr'),
@@ -227,6 +254,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'business_postal' => array
         (
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_postal'],
+            'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50'),
@@ -235,6 +263,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'business_city' => array
         (
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_city'],
+            'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50'),
@@ -244,6 +273,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
        'periodType' => array
        (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'],
+            'default'           => '',
             'exclude'           => true,
             'inputType'         => 'select',
             'options'           => array('minute','hour'/*,'minute_period','hour_period','md','event','contao_event'*/),
@@ -255,13 +285,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'objectCount' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'],
+            'default'           => 0,
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50 clr'),
-            'sql'               => "smallint(5) unsigned NULL"
+            'sql'               => "smallint(5) unsigned NULL default 0"
         ),
 
         'severalBookings' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'],
+            'default'                 => 0,
             'exclude'                 => true,
             'filter'                  => true,
             'inputType'               => 'checkbox',
@@ -269,9 +301,19 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'sql'                     => "int(1) unsigned NULL default 0"
         ),
 
+        'maxParticipantsPerBooking' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'],
+            'default'           => 0,
+            'inputType'         => 'text',
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'sql'               => "smallint(5) unsigned NULL default 0"
+        ),
+
         'auto_del' => array
         (
             'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_del'],
+            'default'               => '',
             'exclude'               => true,
             'inputType'             => 'select',
             'reference'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
@@ -283,6 +325,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'del_time' => array
         (
             'label'                    =>&$GLOBALS['TL_LANG']['tl_c4g_reservations_type']['del_time'],
+            'default'                  => 0,
             'exclude'                  =>true,
             'inputType'                =>'text',
             'default'                  =>'30',
@@ -322,6 +365,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'event_id' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_id'],
+            'default'           => 0,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_calendar_events.title',
             'eval'              => array('mandatory' => false, 'tl_class' => 'long'),
@@ -332,6 +376,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'event_dayBegin' => array
         (
             'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_dayBegin'],
+            'default'                 => 0,
             'exclude'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
@@ -341,6 +386,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'event_timeBegin' => array
         (
             'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_timeBegin'],
+            'default'                 => 0,
             'exclude'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50 wizard', 'datepicker'=>true),
@@ -350,6 +396,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'event_dayEnd' => array
         (
             'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_dayEnd'],
+            'default'                 => 0,
             'exclude'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
@@ -359,6 +406,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'event_timeEnd' => array
         (
             'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_timeEnd'],
+            'default'                 => 0,
             'exclude'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50 wizard', 'datepicker'=>true),
@@ -372,7 +420,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_c4g_reservation_params.caption',
             'eval'                    => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
-            'sql'                     =>"blob NULL "
+            'sql'                     => "blob NULL"
             ),
 
         'description' => array
@@ -390,6 +438,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
 
         'published' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['published'],
+            'default'                 => 1,
             'exclude'                 => true,
             'filter'                  => true,
             'inputType'               => 'checkbox',
