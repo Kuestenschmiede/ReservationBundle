@@ -21,15 +21,24 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_time'] = 'Uhrzeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity'] = 'Für wie viele Personen reservieren Sie?';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'] = "Zeitspannenart";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration'] = "Verweildauer in Stunden";
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'] = 'An welchem Tag möchten Sie reservieren?'; //ToDo with endDate
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'Enddatum';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'] = 'An welchem Tag möchten Sie reservieren?';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'Endet am';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Bitte wählen Sie eine Uhrzeit aus';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Endet um';
 
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'] = 'Die Veranstaltung findet statt am'; //ToDo with endDate
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'] = 'Enddatum';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] = 'zu folgender Uhrzeit';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'] = 'Startet am';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'] = 'Endet am';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] = 'Startet um';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'] = 'Endet um';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'] = 'Uhr';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'] = 'Zielgruppen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'] = 'Themen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'] = 'Referenten';
+
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] = 'Übersicht';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'] = 'Ort';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'] = 'Adresse';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventnumber'] = 'Nr.';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object'] = 'Reservierungsmöglichkeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] = 'Veranstaltung';

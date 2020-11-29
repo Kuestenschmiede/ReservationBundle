@@ -56,19 +56,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
 
         'global_operations' => array
         (
-            'all' => array
-            (
-                'label'         => $GLOBALS['TL_LANG']['MSC']['all'],
-                'href'          => 'act=select',
-                'class'         => 'header_edit_all',
-                'attributes'    => 'onclick="Backend.getScrollOffSet()" accesskey="e"'
-            ),
             'back' => [
-                //'href'                => 'key=back',
                 'class'               => 'header_back',
-                //'button_callback'     => ['\con4gis\CoreBundle\Classes\Helper\DcaHelper', 'back'],
-                'href'                => $this->Input->get('pid') ? 'do=calendar&table=tl_calendar_events&id='.$this->Input->get('pid') : 'do=calendar&table=tl_calendar_events&id='.$this->Input->get('id'),
-                //'button_callback'     => ['\con4gis\CoreBundle\Classes\Helper\DcaHelper', 'back'],
+                'href'                => 'do=calendar&table=tl_calendar_events&id='.$this->Input->get('pid'),
                 'icon'                => 'back.svg',
                 'label'               => &$GLOBALS['TL_LANG']['MSC']['backBT'],
             ]
@@ -123,11 +113,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         'pid' => array
         (
             'inputType'         => 'select',
-            //'foreignKey'        => 'tl_calendar_events.title',
             'options_callback'  => ['tl_c4g_reservation_event', 'getActEvent'],
             'eval'              => array('mandatory' => false, 'disabled' => true, 'tl_class' => 'long clr'),
-            'sql'               => "int(10) unsigned NOT NULL default 0"/*,
-            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),*/
+            'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
         'tstamp' => array
         (
@@ -160,9 +148,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['reservationType'],
             'inputType'         => 'select',
-            'foreignKey'        => 'tl_c4g_reservation_type.caption', //ToDo Auswahl einschränken auf Type event
-            'eval'              => array('mandatory' => true, 'tl_class' => 'long clr'),
-            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+            'options_callback'  => ['tl_c4g_reservation_event', 'getReservationTypes'],
+            'eval'              => ['mandatory' => true, 'tl_class' => 'long clr'],
+            'relation'          => ['type' => 'hasOne', 'load' => 'lazy'],
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
 
@@ -190,9 +178,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['speaker'],
             'inputType'         => 'checkbox',
-            'foreignKey'        => 'tl_c4g_reservation_event_speaker.lastname', //ToDo
+            'options_callback'  => ['tl_c4g_reservation_event', 'getSpeakerName'],
             'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true),
-            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
             'sql'               => "blob NULL"
         ),
 
@@ -252,54 +239,12 @@ class tl_c4g_reservation_event extends Backend
         }
     }
 
-//    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-//    {
-//        $this->import('BackendUser', 'User');
-//
-//        if (strlen($this->Input->get('tid')))
-//        {
-//            $this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 1));
-//            $this->redirect($this->getReferer());
-//        }
-//
-//        $href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.$row[''];
-//
-//        if ($row['cancellation'])
-//        {
-//            $icon = 'invisible.gif';
-//        }
-//
-//        return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
-//
-//    }
-//
-//    public function toggleVisibility($intId, $blnCancellation)
-//    {
-//
-//        $this->createInitialVersion('tl_c4g_reservation_event', $intId);
-//
-//        // Trigger the save_callback
-//        if (is_array($GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['cancellation']['save_callback']))
-//        {
-//            foreach ($GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['cancellation']['save_callback'] as $callback)
-//            {
-//                $this->import($callback[0]);
-//                $blnCancellation = $this->$callback[0]->$callback[1](!$blnCancellation, $this);
-//            }
-//        }
-//
-//        // Update the database
-//        $this->Database->prepare("UPDATE tl_c4g_reservation_event SET tstamp=". time() .", cancellation='" . ($blnCancellation ? '0' : '1') . "' WHERE id=?")
-//            ->execute($intId);
-//        $this->createNewVersion('tl_c4g_reservation_event', $intId);
-//    }
-
     /**
      * @param \Contao\DataContainer $dc
      */
     public function setParent(Contao\DataContainer $dc)
     {
-        \Contao\Message::addInfo('Hier kommt ein Infotext!!!'); //ToDO
+        \Contao\Message::addInfo($GLOBALS['TL_LANG']['tl_c4g_reservation_event']['infoEvent']);
 
         $id = Input::get('id');
 
@@ -321,18 +266,53 @@ class tl_c4g_reservation_event extends Backend
     {
         $return = [];
 
-//        $do = Input::get('do');
-//        $id = Input::get('id');
-//
-//        if ($do && $id) {
-//            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events WHERE id=".$id)
-//                ->execute();
-//        } else {
-            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")->execute();
-//        }
+        $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")->execute();
 
         while ($events->next()) {
             $return[$events->id] = $events->title;
+        }
+
+        return $return;
+    }
+
+    /**
+     * Return all event types as array
+     * @return array
+     */
+    public function getReservationTypes(DataContainer $dc)
+    {
+        $return = [];
+
+        $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_type WHERE reservationObjectType = 2")
+            ->execute();
+
+        while ($objects->next()) {
+            $return[$objects->id] = $objects->caption;
+        }
+
+        return $return;
+    }
+
+    /**
+     * Return all speaker as array
+     * @return array
+     */
+    public function getSpeakerName(DataContainer $dc)
+    {
+        $return = [];
+
+        $objects = $this->Database->prepare("SELECT id,title,firstname,lastname FROM tl_c4g_reservation_event_speaker")
+            ->execute();
+
+        while ($objects->next()) {
+            $name = '';
+            if ($objects->title) {
+                $name = $objects->title.' '.$objects->firstname.' '.$objects->lastname;
+            } else {
+                $name = $objects->firstname.' '.$objects->lastname;
+            }
+
+            $return[$objects->id] = $name;
         }
 
         return $return;

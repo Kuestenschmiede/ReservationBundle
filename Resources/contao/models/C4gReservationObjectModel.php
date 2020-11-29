@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of con4gis,
  * the gis-kit for Contao CMS.

@@ -15,16 +15,14 @@ $str = 'tl_c4g_reservation_event';
 
 $GLOBALS['TL_LANG'][$str]['id'] = array("#", "");
 $GLOBALS['TL_LANG'][$str]['pid'] = array("Contao Event", "Wählen Sie ein Contao Event.");
-$GLOBALS['TL_LANG'][$str]['number'] = array("Nummer", "Hier können Sie eine Kennung für Ihre Veranstaltung eingeben. Bspw. eine Seminarnummer.");
+$GLOBALS['TL_LANG'][$str]['number'] = array("Nummer", "Hier können Sie eine Kennung für die Veranstaltung eingeben. Bspw. eine Seminarnummer.");
 $GLOBALS['TL_LANG'][$str]['reservationType'] = array("Reservierungsart", "Um welche Reservierungsart handelt es sich?");
 $GLOBALS['TL_LANG'][$str]['speaker'] = array("Referent(en)", "Wer leitet die Veranstaltung?");
-$GLOBALS['TL_LANG'][$str]['topic'] = array("Thema/Themen", "Hier können Sie Ihre Veranstaltungsthemen verknüpfen.");
-$GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Zielgruppe(n)", "Wählen Sie Ihr Zielpublikum.");
+$GLOBALS['TL_LANG'][$str]['topic'] = array("Thema/Themen", "Hier können Sie Veranstaltungsthemen verknüpfen.");
+$GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Zielgruppe(n)", "Wählen Sie das Zielpublikum.");
 $GLOBALS['TL_LANG'][$str]['minParticipants'] = array("Minimale Teilnehmerzahl", "Standard: 1");
 $GLOBALS['TL_LANG'][$str]['maxParticipants'] = array("Maximale Teilnehmerzahl", "Standard: 0 (unbegrenzt)");
 $GLOBALS['TL_LANG'][$str]['state'] = array("Aktueller Status", "grün, gelb, rot");
-
-
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['event_legend'] = "Daten zur Veranstaltung";
@@ -37,3 +35,6 @@ $GLOBALS['TL_LANG'][$str]['copy'] = array("Event kopieren","Kopieren der Veranst
 $GLOBALS['TL_LANG'][$str]['delete'] = array("Event löschen","Löschen der Veranstaltung ID %s");
 $GLOBALS['TL_LANG'][$str]['show'] = array("Event anzeigen","Anzeigen der Veranstaltung ID %s");
 $GLOBALS['TL_LANG'][$str]['TOGGLE'] = array("Event aktivieren","Aktivieren der Veranstaltung ID %s");
+
+/** INFO */
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['infoEvent'] = "";

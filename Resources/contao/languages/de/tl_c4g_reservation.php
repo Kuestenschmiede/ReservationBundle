@@ -66,3 +66,6 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['copy'] = array("Reservierung kopieren
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['delete'] = array("Reservierung löschen","Löschen der Reservierung ID %s");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['show'] = array("Reservierung anzeigen","Anzeigen der Reservierung ID %s");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['TOGGLE'] = array("Reservierung aktivieren","Aktivieren der Reservierung ID %s");
+
+/** INFOTEXT */
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['infoReservation'] = '';

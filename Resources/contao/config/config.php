@@ -124,3 +124,4 @@ $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_even
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation';
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_participants';
 
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array(\con4gis\ReservationBundle\Classes\C4gReservationInsertTags::class, 'replaceTag');

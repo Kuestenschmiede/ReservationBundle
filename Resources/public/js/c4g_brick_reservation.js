@@ -111,7 +111,7 @@ function hideOptions(reservationObjects,typeId,values) {
             typeId = typeField ? typeField.value : -1;
         }
         var selectField = document.getElementById("c4g_reservation_object_"+typeId);
-        var first = jQuery.isArray(values) ? values[0] : values;
+        var first = -1;//jQuery.isArray(values) ? values[0] : -1;//values;
         if (selectField) {
             for (i = 0; i < selectField.options.length; i++) {
                 var option = selectField.options[i];
@@ -130,9 +130,9 @@ function hideOptions(reservationObjects,typeId,values) {
                     }
                 }
 
-                if (!foundValue) {
+                if (!foundValue && (option.value != -1)) {
                     jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
-                } else {
+                } else if (option.value != -1) {
                     jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
                     if (min && max && capacity && capacity > 0) {
                         if ((capacity < min) || (capacity > max)) {
@@ -143,12 +143,18 @@ function hideOptions(reservationObjects,typeId,values) {
                                 first = option.value;
                             }
                         }
+                    } else {
+                        jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                        if ((first == -1) && (option.value != -1)) {
+                            first = option.value;
+                        }
                     }
                 }
             }
 
             if (parseInt(first) >= 0) {
                 jQuery(selectField).val(first).change();
+                jQuery(selectField).children('option[value="'+first+'"]').removeAttr('disabled');
                 jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
 
                 jQuery(selectField).removeAttr('disabled');
@@ -189,6 +195,7 @@ function setReservationForm(object, id, additionalId, callFunction) {
 
             if (button && jQuery(button).hasClass("radio_object_"+typeId)) {
                 setObjectId(button, typeId);
+                break;
             }
         }
     }
@@ -227,7 +234,7 @@ function setTimeset(object, id, additionalId, callFunction) {
             dataType: "json",
             url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
             success: function (data) {
-                var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"00"+getWeekdate(date));
+                var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
                 var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("reservation_time_button") : document.getElementsByClassName("reservation_time_button"); //ToDo
                 var timeList = [];
                 var objectList = [];
@@ -367,7 +374,7 @@ function checkEventFields(object) {
             if (selectField[i]) {
                 var additional = -1;
                 if (selectField[i].value) {
-                    additional = typeId.toString() + "22" + selectField[i].value.toString();
+                    additional = typeId.toString() + "-22" + selectField[i].value.toString();
                 }
 
                 var dateFields = document.getElementsByClassName('begindate-event');

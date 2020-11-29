@@ -13,6 +13,7 @@
 
 /** FIELDS */ /**DKo 13.02.19*/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['id'] = array("#", "");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['pid'] = array("Booked", "Set automatically.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_type'] = array("Reservation type", "What type of reservation is it");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_additional_option'] = array("Additional booking option", "Should an additional option be booked?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['desiredCapacity'] = array("Number of people", "What is the maximum number of people that will appear?");

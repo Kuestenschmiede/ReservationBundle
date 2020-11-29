@@ -126,13 +126,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     'palettes' => array
     (
         '__selector__' => ['reservationObjectType'],
-        'default'   =>  '{reservation_legend}, reservation_type, additional_params, desiredCapacity, duration ,beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id, confirmed, cancellation; {person_legend},organisation,salutation, lastname, firstname, email, phone, address, postal, city, comment,internal_comment, agreed;',
+        'default'   =>  '{reservation_legend}, reservation_type, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id, confirmed, cancellation; {person_legend},organisation,salutation, lastname, firstname, email, phone, address, postal, city, comment,internal_comment, agreed;',
     ),
 
     // Subpalettes
     'subpalettes' =>
     [
-        'reservationObjectType_1' => 'reservation_object',
+        'reservationObjectType_1' => 'reservation_object, duration',
         'reservationObjectType_2' => 'reservation_object',
     ],
 //Fields
@@ -191,22 +191,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sql'                     => "int(3) unsigned NOT NULL default 1"
         ),
 
-/*
-          'reservation_date' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_date'],
-            'default'                 => time(),
-            'filter'                  => true,
-            'sorting'                 => true,
-            'search'                  => false,
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'flag'                    => 6,
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>true, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-            'sql'                     => "int(10) unsigned NULL"
-        ),
-*/
-
         'duration' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['duration'],
@@ -225,7 +209,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation'],
             'eval'                    => array('tl_class'=>'w50','unique' =>true,'feViewable'=>true, 'mandatory'=>true),
             'sql'                     => "char(25) NOT NULL default ''"
-
         ),
 
          'beginDate' => array
@@ -299,20 +282,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'filter'                  => true,
             'inputType'               => 'select',
             'options_callback'        => ['tl_c4g_reservation', 'getActObjects'],
-            //'foreignKey'              => 'tl_c4g_reservation_object.caption',
-            'eval'                    => array('mandatory'=>false, 'includeBlankOption' => true, /*'blankOptionLabel' => ' - ', */'tl_class' => 'long clr', 'multiple'=>false, 'chosen'=>true),
-            //'relation'                => array('type'=>'belongsTo', 'load'=>'eager'),
+            'eval'                    => array('mandatory'=>false, 'includeBlankOption' => true, 'tl_class' => 'long clr', 'multiple'=>false, 'chosen'=>true),
             'sql'                     => "varchar(254) NOT NULL default ''"
         ),
-
-//        'event' => array
-//        (
-//            'inputType'         => 'select',
-//            'options_callback'  => ['tl_c4g_reservation', 'getActEvent'],
-//            'eval'              => array('includeBlankOption' => true, 'mandatory' => false, 'disabled' => true, 'tl_class' => 'long clr'),
-//            'sql'               => "int(10) unsigned NOT NULL default 0"/*,
-//            'relation'          => array('type' => 'belongsToMany', 'load' => 'lazy'),*/
-//        ),
 
         'organisation' => array
         (
@@ -628,7 +600,7 @@ class tl_c4g_reservation extends Backend
      */
     public function setParent(Contao\DataContainer $dc)
     {
-        \Contao\Message::addInfo('Hier kommt ein Infotext!!!'); //ToDO
+        \Contao\Message::addInfo($GLOBALS['TL_LANG']['tl_c4g_reservation']['infoReservation']);
 
         $do = $this->Input->get('do');
         $id = $this->Input->get('id');
@@ -640,7 +612,13 @@ class tl_c4g_reservation extends Backend
             $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['default'] = '2';
             $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['eval']['disabled'] = true;
             $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservation_object']['default'] = $id;
+            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservation_object']['eval']['chosen'] = false;
             $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservation_object']['eval']['disabled'] = true;
+
+            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['beginDate']['eval']['disabled'] = true;
+            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['beginTime']['eval']['disabled'] = true;
+            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['endDate']['eval']['disabled'] = true;
+            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['endTime']['eval']['disabled'] = true;
         }
     }
 }

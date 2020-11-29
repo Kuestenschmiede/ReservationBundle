@@ -18,7 +18,6 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("Option","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'] = array("Objekttyp", "Es können Reserverierungsobjekte und Contao Events reserviert werden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][1] = 'Standard';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][2] = 'Events';
-//$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['calendar'] = array("Kalenderauswahl", "Hier können Sie die Reservierung auf bestimmte Kalender eingrenzen.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_name'] = array("Unternehmensname","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'] = array("Telefonnummer","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_email'] = array("Emailadresse","");

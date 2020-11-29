@@ -59,7 +59,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = ar
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Details of the type of reservation";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['object_legend'] = "Basic settings for the objects";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Expert settings";
-
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_data'] = "Organiser details";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['new'] = array("add reservation type", "add reservation type");

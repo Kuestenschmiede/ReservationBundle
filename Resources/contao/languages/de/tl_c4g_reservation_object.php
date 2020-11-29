@@ -12,7 +12,7 @@
  */
 
 /** FIELDS */
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'] = array("Bezeichnung", "Bezeichnung im Frontend sowie Backend.Benennen Sie Ihr Reservierungsobjekt. Beispiele: Raum1, Tisch7, Fachkraft3");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'] = array("Bezeichnung", "Bezeichnung im Frontend sowie Backend. Benennen Sie das Reservierungsobjekt. Beispiele: Raum1, Tisch7, Fachkraft3");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['options'] = array("Frontendbezeichnung","Werden je nach Sprache im Frontend dargestellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['quantity'] = array("Verfügbare Anzahl","Wie viele Objekte dieses Typs stehen zur Verfügung? (Standard 1)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['vcard_show'] = array("Adressdaten abweichend von Reservierungsart","Adresse wird von Reservierungsart übernommen");
