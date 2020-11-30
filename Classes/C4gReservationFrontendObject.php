@@ -35,6 +35,7 @@ class C4gReservationFrontendObject
     private $beginTime = 0;
     private $endDate = 0;
     private $endTime = 0;
+    private $almostFullyBookedAt = 0;
 
     /**
      * C4gReservationFrontendObject constructor.
@@ -313,6 +314,22 @@ class C4gReservationFrontendObject
     public function setEndTime(int $endTime): void
     {
         $this->endTime = $endTime;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAlmostFullyBookedAt(): int
+    {
+        return $this->almostFullyBookedAt;
+    }
+
+    /**
+     * @param int $almostFullyBookedAt
+     */
+    public function setAlmostFullyBookedAt(int $almostFullyBookedAt): void
+    {
+        $this->almostFullyBookedAt = $almostFullyBookedAt;
     }
 
 }

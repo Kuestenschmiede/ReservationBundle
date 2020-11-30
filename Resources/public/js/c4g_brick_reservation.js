@@ -235,7 +235,7 @@ function setTimeset(object, id, additionalId, callFunction) {
             url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
             success: function (data) {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
-                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("reservation_time_button") : document.getElementsByClassName("reservation_time_button"); //ToDo
+                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group") : document.getElementsByClassName("c4g_brick_radio_group"); //ToDo
                 var timeList = [];
                 var objectList = [];
                 var times = data['times'];
@@ -274,7 +274,6 @@ function setTimeset(object, id, additionalId, callFunction) {
 
                 if (radioGroups) {
                     for (i = 0; i < radioGroups.length; i++) {
-                        //try {
                         for (j = 0; j < radioGroups[i].children.length; j++) {
                             if (radioGroups[i].children[j].style && radioGroups[i].children[j].style == "display:none") {
                                 continue;
@@ -285,12 +284,14 @@ function setTimeset(object, id, additionalId, callFunction) {
                                 if (value && parseInt(value)) {
                                     namefield = radioGroups[i].children[j].children[k].getAttribute('name').substr(1);
                                     var arrindex = jQuery.inArray(parseInt(value), timeList);
-                                    var activateTimeButton = -1;
+                                    var activateTimeButton = -1
+                                    var percent = 0;
                                     if (arrindex !== -1) {
                                         for (l = 0; l < objectList[arrindex].length; l++) {
                                             if (objectList[arrindex][l]['id'] != -1) {
                                                 if ((objectList[arrindex][l]['act'] < objectList[arrindex][l]['max'] )) {
                                                     activateTimeButton = (activateTimeButton < objectList[arrindex][l]['act']) ? objectList[arrindex][l]['act'] : activateTimeButton;
+                                                    percent = objectList[arrindex][l]['percent'];
                                                 }
                                             }
                                         }
@@ -333,6 +334,10 @@ function setTimeset(object, id, additionalId, callFunction) {
                                             jQuery(radioGroups[i].children[j].children[k]).attr('disabled', false);
                                         }
 
+                                        if (percent > 0) {
+                                            jQuery(radioGroups[i].children[j].children[k]).addClass("radio_object_hurry_up");
+                                        }
+
                                         val = objectList[arrindex][0]['id']; //first valid option
                                     } else {
                                         jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
@@ -341,9 +346,6 @@ function setTimeset(object, id, additionalId, callFunction) {
                                 }
                             }
                         }
-                        /*} catch (err) {
-                            console.log(err);
-                        }*/
                     }
                 }
 

@@ -1347,6 +1347,7 @@ class C4gReservation extends C4GBrickModuleParent
         $objects = C4gReservationObjectModel::getReservationObjectList(array($additionalParam));
         $withEndTimes = $this->showEndTime;
         $withFreeSeats = $this->showFreeSeats;
+
         $times = C4gReservationObjectModel::getReservationTimes($objects, $additionalParam, $weekday, $date, $duration, $withEndTimes, $withFreeSeats);
 
         if ($additionalParam) {

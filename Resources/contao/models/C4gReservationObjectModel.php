@@ -593,6 +593,9 @@ class C4gReservationObjectModel extends \Model
                                         $time = $time_begin;
 
                                         $reservation = null;
+
+                                        $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
+                                        $capacity = $objectQuantity * $desiredCapacity;
                                         while ($time <= ($time_end - $interval)) {
                                             $id = $object->getId();
                                             if ($date && $tsdate) {
@@ -603,6 +606,7 @@ class C4gReservationObjectModel extends \Model
 
                                                 $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
                                                 $actPersons = 0;
+                                                $actPercent = 0;
                                                 if ($reservations) {
                                                     foreach ($reservations as $reservation) {
                                                         if ($reservation->reservation_object) {
@@ -610,6 +614,13 @@ class C4gReservationObjectModel extends \Model
                                                                 $count[$tsdate][$time] = $count[$tsdate][$time] ? $count[$tsdate][$time] + 1 : 1;
                                                                 $objectCount[$tsdate][$time] = $objectCount[$tsdate][$time] ? $objectCount[$tsdate][$time] + 1 : 1;
                                                                 $actPersons = $actPersons + intval($reservation->desiredCapacity);
+
+                                                                if ($object->getAlmostFullyBookedAt()) {
+                                                                    $percent = ($actPersons / $capacity) * 100;
+                                                                    if ($percent >= $object->getAlmostFullyBookedAt()) {
+                                                                        $actPercent = $percent;
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -621,9 +632,7 @@ class C4gReservationObjectModel extends \Model
                                                 $endTimeInterval = 0;
                                             }
 
-                                            $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
-                                            $capacity = $objectQuantity * $desiredCapacity;
-                                            $timeObj = ['id'=>-1,'act'=>$actPersons,'max'=>$capacity,'showSeats'=>$showFreeSeats];
+                                            $timeObj = ['id'=>-1,'act'=>$actPersons, 'percent'=>$actPercent, 'max'=>$capacity,'showSeats'=>$showFreeSeats];
 
                                             if ($tsdate && (($nowDate < $tsdate) || (($nowDate == $tsdate) && ($time > $nowTime)))) {
                                                 if ($actPersons && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
@@ -633,7 +642,7 @@ class C4gReservationObjectModel extends \Model
                                                 } else if ($capacity && (!empty($objectCount)) && ($objectCount[$tsdate][$time] >= intval($capacity))) { //n times for object
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else {
-                                                   $timeObj = ['id'=>$id,'act'=>$actPersons,'max'=>$capacity,'showSeats'=>$showFreeSeats];
+                                                   $timeObj = ['id'=>$id,'act'=>$actPersons,'percent'=>$actPercent, 'max'=>$capacity,'showSeats'=>$showFreeSeats];
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 }
                                             }
@@ -697,10 +706,10 @@ class C4gReservationObjectModel extends \Model
             if ($moduleType) {
                 $type = C4gReservationTypeModel::findByPk($moduleType);
                 if ($type && $type->reservationObjectType === '2') {
-                    $objectlist = C4gReservationObjectModel::getReservationObjectEventList($moduleTypes, $objectId);
+                    $objectlist = C4gReservationObjectModel::getReservationObjectEventList($moduleTypes, $objectId, $type->almostFullyBookedAt);
                     break; //ToDo check
                 } else {
-                    $objectlist = C4gReservationObjectModel::getReservationObjectDefaultList($moduleTypes);
+                    $objectlist = C4gReservationObjectModel::getReservationObjectDefaultList($moduleTypes, $type->almostFullyBookedAt);
                     break; //ToDo check
                 }
             }
@@ -714,7 +723,7 @@ class C4gReservationObjectModel extends \Model
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0)
+    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0, $almostFullyBookedAt = 0)
     {
         $objectList = array();
         $db = Database::getInstance();
@@ -758,6 +767,7 @@ class C4gReservationObjectModel extends \Model
                         $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
                         $frontendObject->setEndDate($eventObject->endDate ? $eventObject->endDate : 0);
                         $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
+                        $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                         $objectList[] = $frontendObject;
                     }
                 }
@@ -770,7 +780,7 @@ class C4gReservationObjectModel extends \Model
     /**
      * @return array
      */
-    public static function getReservationObjectDefaultList($moduleTypes = null)
+    public static function getReservationObjectDefaultList($moduleTypes = null, $almostFullyBookedAt = false)
     {
         $objectList = array();
         $t = static::$strTable;
@@ -815,6 +825,7 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject->setReservationTypes(unserialize($object->viewableTypes));
                 $frontendObject->setDesiredCapacity([$object->desiredCapacityMin, $object->desiredCapacityMax]);
                 $frontendObject->setQuantity($object->quantity);
+                $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
 
                 $opening_hours = array();
                 $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);

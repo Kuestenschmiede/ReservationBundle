@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,additional_params;{business_data},business_name,business_phone,business_email,business_street,business_postal,business_city,published;{expert_legend:hide},auto_del;'
+        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,additional_params;{business_data},business_name,business_phone,business_email,business_street,business_postal,business_city,published;{expert_legend:hide},auto_del;'
     ),
 
     //Subpalettes
@@ -308,6 +308,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50 clr'),
             'sql'               => "smallint(5) unsigned NULL default 0"
+        ),
+
+        'almostFullyBookedAt' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['almostFullyBookedAt'],
+            'default'           => 0,
+            'inputType'         => 'text',
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'               => "smallint(3) unsigned NULL default 0"
         ),
 
         'auto_del' => array

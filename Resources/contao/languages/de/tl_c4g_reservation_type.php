@@ -54,6 +54,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayEnd'] = array("Endtag");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additional_params'] = array("Buchungsoptionen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Beschreibung");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = array("Maximale Teilnehmerzahl pro Buchung", "Hierüber können Sie die Teilnehmerzahl in der Eingabe pro Buchung begrenzen. 0 = unbegrenzt.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['almostFullyBookedAt'] = array("Fast ausgebucht bei wieviel %", "Hiermit kann der Gelb-Status festgelegt werden. 0 = kein Gelb-Status");
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Angaben zur Reservierungsart";

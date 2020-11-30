@@ -32,6 +32,9 @@
     border-bottom: yellow;
     font-weight: bold;
 }
+.reservation_time_button .radio_object_hurry_up + label {
+    background-color: darkorange;
+}
 .reservation_time_button input[type="radio"][disabled] + label, .reservation_time_event_button input[type="radio"][disabled] + label {
     background-color: red;
     cursor: no-drop;
