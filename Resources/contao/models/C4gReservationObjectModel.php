@@ -529,6 +529,9 @@ class C4gReservationObjectModel extends \Model
             $periodType = $typeObject->periodType;
 
             $maxCount = $typeObject->objectCount;
+
+            $objectType = $typeObject->reservationObjectType;
+
             $count = []; //count over all objects
 
             foreach ($list as $object) {
@@ -581,6 +584,9 @@ class C4gReservationObjectModel extends \Model
                     }
                 }
 
+                $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
+                $capacity = $objectQuantity * $desiredCapacity;
+
                 if ($interval && ($interval > 0)) {
                     if ($interval > 0) {
                         foreach ($oh as $key => $day) {
@@ -594,13 +600,11 @@ class C4gReservationObjectModel extends \Model
 
                                         $reservation = null;
 
-                                        $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
-                                        $capacity = $objectQuantity * $desiredCapacity;
                                         while ($time <= ($time_end - $interval)) {
                                             $id = $object->getId();
                                             if ($date && $tsdate) {
                                                 $t = 'tl_c4g_reservation';
-                                                $arrColumns = array("$t.beginDate=$tsdate AND $t.beginTime=$time AND NOT $t.cancellation='1'");
+                                                $arrColumns = array("$t.beginDate=$tsdate AND $t.beginTime=$time AND $t.reservationObjectType=$objectType AND NOT $t.cancellation='1'");
                                                 $arrValues = array();
                                                 $arrOptions = array();
 
@@ -614,14 +618,14 @@ class C4gReservationObjectModel extends \Model
                                                                 $count[$tsdate][$time] = $count[$tsdate][$time] ? $count[$tsdate][$time] + 1 : 1;
                                                                 $objectCount[$tsdate][$time] = $objectCount[$tsdate][$time] ? $objectCount[$tsdate][$time] + 1 : 1;
                                                                 $actPersons = $actPersons + intval($reservation->desiredCapacity);
-
-                                                                if ($object->getAlmostFullyBookedAt()) {
-                                                                    $percent = ($actPersons / $capacity) * 100;
-                                                                    if ($percent >= $object->getAlmostFullyBookedAt()) {
-                                                                        $actPercent = $percent;
-                                                                    }
-                                                                }
                                                             }
+                                                        }
+                                                    }
+
+                                                    if ($object->getAlmostFullyBookedAt()) {
+                                                        $percent = ($actPersons / $capacity) * 100;
+                                                        if ($percent >= $object->getAlmostFullyBookedAt()) {
+                                                            $actPercent = $percent;
                                                         }
                                                     }
                                                 }
