@@ -150,7 +150,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'inputType'         => 'select',
             'options_callback'  => ['tl_c4g_reservation_event', 'getReservationTypes'],
             'eval'              => ['mandatory' => true, 'tl_class' => 'long clr'],
-            'relation'          => ['type' => 'hasOne', 'load' => 'lazy'],
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
 
