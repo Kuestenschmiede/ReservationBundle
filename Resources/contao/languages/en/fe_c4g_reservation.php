@@ -35,6 +35,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'] = 'o\'clock'; //ToDo a.m. / p
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'] = 'Target audience';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'] = 'Topic';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'] = 'Speaker';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'] = 'Continue to reservation';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] = 'Overview';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'] = 'Location';

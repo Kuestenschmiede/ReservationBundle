@@ -34,13 +34,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
         'sorting' => array
         (
             'mode'              => 2,
-            'fields'            => array('firstname','lastname'),
+            'fields'            => array('title','firstname','lastname'),
             'panelLayout'       => 'filter;sort,search,limit'
         ),
 
         'label' => array
         (
-            'fields'            => array('firstname','lastname'),
+            'fields'            => array('title','firstname','lastname'),
             'showColumns'       => true,
         ),
 
@@ -88,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{speaker_legend}, memberId, title, firstname, lastname, email, phone, address, postal, city, website, vita, image;'
+        'default'   =>  '{speaker_legend},title, firstname, lastname, email, phone, address, postal, city, website, vita, photo, speakerForwarding;'
     ),
 
 
@@ -106,10 +106,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'sql'               => "int(10) unsigned NOT NULL default '0'"
         ),
 
-
-        //memberId [OPTIONAL]
-        //image [OPTIONAL]
-        //website [OPTIONAL]
+        //ToDo memberId [OPTIONAL] for member linking
 
         'title' => array (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['title'],
@@ -127,8 +124,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['firstname'],
             'exclude'                 => true,
             'filter'                  => false,
-            'search'                  => false,
-            'sorting'                 => false,
+            'search'                  => true,
+            'sorting'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
             'sql'                     => "varchar(255) NOT NULL default ''"
@@ -139,8 +136,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['lastname'],
             'exclude'                 => true,
             'filter'                  => false,
-            'search'                  => false,
-            'sorting'                 => false,
+            'search'                  => true,
+            'sorting'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) NOT NULL default ''"
@@ -209,7 +206,41 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'eval'                    => ['mandatory'=>false, 'rte'=>'tinyMCE', 'helpwizard'=>true, 'tl_class'=>'long clr'],
             'explanation'             => 'insertTags',
             'sql'                     => "text NULL"
+        ),
+
+        'photo' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['photo'],
+            'inputType'         => 'fileTree',
+            'sorting'           => false,
+            'search'            => false,
+            'extensions'        => 'jpg, jpeg, png, tif',
+            'exclude'           => true,
+            'eval'              => array('filesOnly'=>true, 'files'=>true, 'fieldType'=>'radio', 'tl_class'=>'long clr', 'extensions'=>Config::get('validImageTypes')),
+            'sql'               => "blob NULL"
+        ),
+
+        'website' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['website'],
+            'exclude'                 => true,
+            'search'                  => true,
+            'inputType'               => 'text',
+            'eval'                    => array('rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>255, 'fieldType'=>'radio', 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'forum', 'memberLink' => true, 'tl_class'=>'clr w50'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+
+        'speakerForwarding' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['speakerForwarding'],
+            'exclude'                 => true,
+            'inputType'               => 'pageTree',
+            'foreignKey'              => 'tl_page.title',
+            'eval'                    => array('tl_class'=>'w50 wizard','mandatory'=>true, 'fieldType'=>'radio'),
+            'sql'                     => "int(10) unsigned NOT NULL default '0'",
+            'relation'                => array('type'=>'hasOne', 'load'=>'eager')
         )
+
     )
 );
 

@@ -115,7 +115,7 @@ class C4gReservationInsertTags
                             if ($settings->numRows && $settings->reservationForwarding) {
                                 $url = Controller::replaceInsertTags("{{link_url::".$settings->reservationForwarding."}}");
                                 if ($url) {
-                                    return '<a href="'.$url.'?event='.$pid.'" title="Reservieren" itemprop="url">Reservieren</a>'; //ToDo
+                                    return '<a href="'.$url.'?event='.$pid.'" title="Reservieren" itemprop="url">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'].'</a>';
                                 }
                             }
                         case 'lon':
@@ -160,16 +160,23 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $speakers .= ")";
-                                $speakerElements = $this->db->prepare("SELECT title,firstname,lastname FROM $tableSpeaker WHERE id IN $speakers")
+                                $speakerElements = $this->db->prepare("SELECT id,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE id IN $speakers")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($speakerElements as $speaker) {
                                     $speakerStr = $speaker['title'] ? $speaker['title'].' '.$speaker['firstname'].' '.$speaker['lastname'] : $speaker['firstname'].' '.$speaker['lastname'];
+                                    if ($speakerStr && $speaker['speakerForwarding']) {
+                                        $url = Controller::replaceInsertTags("{{link_url::" . $speaker['speakerForwarding'] . "}}");
+                                        if ($url) {
+                                            $speakerStr = '<a href="' . $url . '?speaker=' . $speaker['id'] . '" title="' . $speakerStr . '" itemprop="url">' . $speakerStr . '</a>';
+                                        }
+                                    }
+
                                     $result = $result ? $result.', '.$speakerStr : $speakerStr;
                                 }
 
                                 return $result ? $this->getHtmlSkeleton('speaker',$GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'],$result) : '';
-                            }
+                            };
                             break;
                         case 'topic';
                             $topicIds = unserialize($reservationEventObject->topic);

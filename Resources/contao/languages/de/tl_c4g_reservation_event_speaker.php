@@ -24,7 +24,8 @@ $GLOBALS['TL_LANG'][$str]['postal'] = array("Postleitzahl", "Postleitzahl des Re
 $GLOBALS['TL_LANG'][$str]['city'] = array("Ort", "Ort des Referenten");
 $GLOBALS['TL_LANG'][$str]['website'] = array("Website", "Website des Referenten");
 $GLOBALS['TL_LANG'][$str]['vita'] = array("Vita", "Vita des Referenten");
-$GLOBALS['TL_LANG'][$str]['image'] = array("Photo", "Photo des Referenten");
+$GLOBALS['TL_LANG'][$str]['photo'] = array("Photo", "Photo des Referenten");
+$GLOBALS['TL_LANG'][$str]['speakerForwarding'] = array("Weiterleitung", "Diese Seite wird aufgerufen, nach einem Klick auf den Referenten.");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['speaker_legend'] = "Referent bearbeiten";

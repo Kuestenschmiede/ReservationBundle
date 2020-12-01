@@ -24,7 +24,8 @@ $GLOBALS['TL_LANG'][$str]['postal'] = array("postal code", "speaker's postal cod
 $GLOBALS['TL_LANG'][$str]['city'] = array("city", "speaker's city");
 $GLOBALS['TL_LANG'][$str]['website'] = array("website", "speaker's website");
 $GLOBALS['TL_LANG'][$str]['vita'] = array("vita", "vita of the speaker");
-$GLOBALS['TL_LANG'][$str]['image'] = array("photo", "photo of the speaker");
+$GLOBALS['TL_LANG'][$str]['photo'] = array("photo", "photo of the speaker");
+$GLOBALS['TL_LANG'][$str]['speakerForwarding'] = array("Forwarding", "This page is called up after clicking on the speaker.");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['speaker_legend'] = "Edit speaker";

@@ -754,12 +754,9 @@ class C4gReservation extends C4GBrickModuleParent
         $salutationField->setTableColumn(false);
         $salutationField->setOptions($salutation);
         $salutationField->setMandatory(false);
-        //$reservationTypeField->setChosen(true);
         $salutationField->setCallOnChange(true);
         $salutationField->setInitialCallOnChange(false);
         $salutationField->setNotificationField(true);
-//        $salutationField->setCondition(array($condition));
-//        $salutationField->setRemoveWithEmptyCondition(true);
         $salutationField->setStyleClass('salutation');
         $fieldList[] = $salutationField;
 
@@ -771,8 +768,6 @@ class C4gReservation extends C4GBrickModuleParent
         $firstnameField->setTableColumn(true);
         $firstnameField->setMandatory(true);
         $firstnameField->setNotificationField(true);
-//        $firstnameField->setCondition(array($condition));
-//        $firstnameField->setRemoveWithEmptyCondition(true);
         $firstnameField->setStyleClass('firsname');
         $fieldList[] = $firstnameField;
 
@@ -784,8 +779,6 @@ class C4gReservation extends C4GBrickModuleParent
         $lastnameField->setTableColumn(true);
         $lastnameField->setMandatory(true);
         $lastnameField->setNotificationField(true);
-//        $lastnameField->setCondition(array($condition));
-//        $lastnameField->setRemoveWithEmptyCondition(true);
         $lastnameField->setStyleClass('lastname');
         $fieldList[] = $lastnameField;
 
@@ -797,8 +790,6 @@ class C4gReservation extends C4GBrickModuleParent
         $emailField->setTableColumn(false);
         $emailField->setMandatory(true);
         $emailField->setNotificationField(true);
-//        $emailField->setCondition(array($condition));
-//        $emailField->setRemoveWithEmptyCondition(true);
         $emailField->setStyleClass('email');
         $fieldList[] = $emailField;
 
@@ -817,8 +808,6 @@ class C4gReservation extends C4GBrickModuleParent
                 $organisationField->setTableColumn(true);
                 $organisationField->setMandatory($rowMandatory);
                 $organisationField->setNotificationField(true);
-//                $organisationField->setCondition(array($condition));
-//                $organisationField->setRemoveWithEmptyCondition(true);
                 $organisationField->setStyleClass('organisation');
                 $fieldList[] = $organisationField;
 
@@ -831,8 +820,6 @@ class C4gReservation extends C4GBrickModuleParent
                 $phoneField->setMandatory($rowMandatory);
                 $phoneField->setTableColumn(false);
                 $phoneField->setNotificationField(true);
-//                $phoneField->setCondition(array($condition));
-//                $phoneField->setRemoveWithEmptyCondition(true);
                 $phoneField->setStyleClass('phone');
                 $fieldList[] = $phoneField;
 
@@ -846,8 +833,6 @@ class C4gReservation extends C4GBrickModuleParent
                 $addressField->setMandatory($rowMandatory);
                 $addressField->setNotificationField(true);
                 $addressField->setStyleClass('address');
-//                $addressField->setCondition(array($condition));
-//                $addressField->setRemoveWithEmptyCondition(true);
                 $fieldList[] = $addressField;
 
             } else if ($rowField == "postal") {
@@ -860,8 +845,6 @@ class C4gReservation extends C4GBrickModuleParent
                 $postalField->setTableColumn(false);
                 $postalField->setMandatory($rowMandatory);
                 $postalField->setNotificationField(true);
-//                $postalField->setCondition(array($condition));
-//                $postalField->setRemoveWithEmptyCondition(true);
                 $postalField->setStyleClass('postal');
                 $fieldList[] = $postalField;
 
@@ -874,8 +857,6 @@ class C4gReservation extends C4GBrickModuleParent
                 $cityField->setTableColumn(false);
                 $cityField->setMandatory($rowMandatory);
                 $cityField->setNotificationField(true);
-//                $cityField->setCondition(array($condition));
-//                $cityField->setRemoveWithEmptyCondition(true);
                 $cityField->setStyleClass('city');
                 $fieldList[] = $cityField;
 
@@ -883,14 +864,11 @@ class C4gReservation extends C4GBrickModuleParent
                 $commentField = new C4GTextareaField();
                 $commentField->setFieldName('comment');
                 $commentField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['comment']);
-                //$commentField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_comment']);
                 $commentField->setColumnWidth(60);
                 $commentField->setSortColumn(false);
                 $commentField->setTableColumn(false);
                 $commentField->setMandatory($rowMandatory);
                 $commentField->setNotificationField(true);
-//                $commentField->setCondition(array($condition));
-//                $commentField->setRemoveWithEmptyCondition(true);
                 $commentField->setStyleClass('comment');
                 $fieldList[] = $commentField;
             } else if ($rowField == "participants") {
@@ -969,7 +947,6 @@ class C4gReservation extends C4GBrickModuleParent
         $reservationIdField->setMandatory(true);
         $reservationIdField->setInitialValue(C4GBrickCommon::getUUID());
         $reservationIdField->setTableRow(true);
-        //$reservationIdField->setTableRowLabelWidth(98);
         $reservationIdField->setEditable(false);
         $reservationIdField->setUnique(true);
         $reservationIdField->setNotificationField(true);
@@ -978,8 +955,6 @@ class C4gReservation extends C4GBrickModuleParent
         $reservationIdField->setDatabaseField(true);
         $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id_exists']);
         $reservationIdField->setDbUniqueAdditionalCondition("tl_c4g_reservation.cancellation <> '1' AND tl_c4g_reservation.beginDate > UNIX_TIMESTAMP(NOW())");
-        //$reservationIdField->setCondition(array($condition));
-        //$reservationIdField->setRemoveWithEmptyCondition(true);
         $reservationIdField->setStyleClass('reservation-id');
         $fieldList[] = $reservationIdField;
 
@@ -989,17 +964,11 @@ class C4gReservation extends C4GBrickModuleParent
             $privacyPolicyText->setFieldName('privacy_policy_text');
             $privacyPolicyText->setInitialValue(\Contao\Controller::replaceInsertTags($this->privacy_policy_text));
             $privacyPolicyText->setSize(4);
-            //$privacyPolicyText->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['privacy_policy_text']);
-            //$privacyPolicyText->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_comment']);
-            //$privacyPolicyText->setColumnWidth(60);
-            //$privacyPolicyText->setSortColumn(false);
             $privacyPolicyText->setTableColumn(false);
             $privacyPolicyText->setEditable(false);
             $privacyPolicyText->setDatabaseField(false);
             $privacyPolicyText->setMandatory(false);
             $privacyPolicyText->setNotificationField(false);
-            //$privacyPolicyText->setCondition(array($condition));
-            //$privacyPolicyText->setRemoveWithEmptyCondition(true);
             $privacyPolicyText->setStyleClass('privacy-policy-text');
             $fieldList[] = $privacyPolicyText;
         }
@@ -1017,8 +986,6 @@ class C4gReservation extends C4GBrickModuleParent
         $agreedField->setTableColumn(false);
         $agreedField->setMandatory(true);
         $agreedField->setNotificationField(true);
-        //$agreedField->setCondition(array($condition));
-        //$agreedField->setRemoveWithEmptyCondition(true);
         $agreedField->setStyleClass('agreed');
         $fieldList[] = $agreedField;
 
@@ -1035,8 +1002,6 @@ class C4gReservation extends C4GBrickModuleParent
         $buttonField->setOnClickType(C4GBrickConst::ONCLICK_TYPE_SERVER);
         $buttonField->setOnClick('clickReservation');
         $buttonField->setWithoutLabel(true);
-        //$buttonField->setCondition(array($condition));
-        //$buttonField->setRemoveWithEmptyCondition(true);
         $fieldList[] = $buttonField;
 
 
