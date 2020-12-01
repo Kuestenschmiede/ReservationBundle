@@ -1022,7 +1022,15 @@ class C4gReservation extends C4GBrickModuleParent
         $agreedField->setStyleClass('agreed');
         $fieldList[] = $agreedField;
 
-        $clickButton = new C4GBrickButton(C4GBrickConst::BUTTON_CLICK, $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'], $visible = true, $enabled = true, $action = '', $accesskey = '', $defaultByEnter = true);
+        $clickButton = new C4GBrickButton(
+            C4GBrickConst::BUTTON_CLICK,
+            $this->reservationButtonCaption ? \Contao\Controller::replaceInsertTags($this->reservationButtonCaption) : $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'],
+            $visible = true,
+            $enabled = true,
+            $action = '',
+            $accesskey = '',
+            $defaultByEnter = true);
+
         $buttonField = new C4GButtonField($clickButton);
         $buttonField->setOnClickType(C4GBrickConst::ONCLICK_TYPE_SERVER);
         $buttonField->setOnClick('clickReservation');

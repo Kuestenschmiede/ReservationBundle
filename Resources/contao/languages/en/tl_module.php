@@ -20,6 +20,7 @@ $GLOBALS['TL_LANG']['tl_module']['reservation_jquery_theme_legend'] = 'jQuery UI
 $GLOBALS['TL_LANG']['tl_module']['reservation_redirect_legend'] = 'forwarding';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_types'] = array('reservation types', 'Select the reservation types (rooms, tables, ...) to be considered in the reservation in the frontend. If no selection is made, all reservation objects are loaded.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['appearance_themeroller_css'] = array('jQuery UI ThemeRoller CSS file', 'Optional: select a CSS file created with the jQuery UI ThemeRoller to customize the style of the module accordingly');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationButtonCaption'] = array('Button label', 'This allows you to change the button text.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site'] = array('Forwarding page', 'After booking, you will be forwarded here.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type'] = array('notification', 'Select notification');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_site']  = array('Link to privacy policy', 'This page is linked for the confirmation of the privacy policy.');

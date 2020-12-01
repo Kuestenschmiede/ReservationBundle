@@ -15,7 +15,7 @@
  * Table tl_module
  */
 //ToDo showFreeSeats, additionalDuration
-$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,withCapacity,showEndTime,showPrices,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,withCapacity,showEndTime,showPrices,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservationCancellation'] = '{title_legend},name,headline,type;{reservation_legend},reservation_types; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;'; //{caption_legend}, captionReservationType, captionBeginDate, captionReservationObject, captionAdditionalParams, captionComment, captionReservationId';
 
@@ -125,7 +125,15 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['appearance_themeroller_css'] = array
     'eval'                    => array('tl_class'=>'w50 wizard', 'fieldType'=>'radio', 'files'=>true, 'extensions'=>'css'),
     'sql'                     => "binary(16) NULL"
 );
-
+$GLOBALS['TL_DCA']['tl_module']['fields']['reservationButtonCaption'] = array
+(
+    'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationButtonCaption'],
+    'sorting'           => true,
+    'search'            => true,
+    'inputType'         => 'text',
+    'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 255),
+    'sql'               => "varchar(255) NOT NULL default ''"
+);
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_redirect_site'] = array
 (
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site'],
