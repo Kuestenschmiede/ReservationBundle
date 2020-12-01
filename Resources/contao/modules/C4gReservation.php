@@ -681,7 +681,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $reservationBeginTimeField->setTurnButton(true);
                     $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
-                    $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_'.$type['id'].'-22'.$reservationObject->getId());
+                    $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_'.$type['id'].'-22'.$reservationObject->getId().C4gReservationObjectModel::getButtonStateClass($reservationObject));
                     $fieldList[] = $reservationBeginTimeField;
 
                     //ToDo implement additional event information
@@ -1227,10 +1227,25 @@ class C4gReservation extends C4GBrickModuleParent
 
         if ($isEvent) {
             $putVars['reservationObjectType'] = '2';
-            $putVars['reservation_object'] = $putVars['reservation_object_event_'.$type];
+            $objectId = $putVars['reservation_object_event_' . $type];
+            $t = 'tl_c4g_reservation';
+            $arrColumns = array("$t.reservation_object=$objectId AND $t.reservationObjectType='2' AND NOT $t.cancellation='1'");
+            $arrValues = array();
+            $arrOptions = array();
+            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
+
+            $reservationCount = count($reservations);
+            $reservationEventObject = C4gReservationEventModel::findOneBy('pid', $objectId);
+            $desiredCapacity =  $reservationEventObject && $reservationEventObject->maxParticipants ? $reservationEventObject->maxParticipants : 0;
+
+            if ($desiredCapacity && ((($reservationCount / $desiredCapacity) * 100) >= 100)) {
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked']];
+            }
+
+            $putVars['reservation_object'] = $objectId;
 
             //implement all event possibilities
-            $putVars['beginDate'] = $reservationObject->startDate ? intvaL($reservationObject->startDate) : 0; //ToDo undefined check
+            $putVars['beginDate'] = $reservationObject->startDate ? intvaL($reservationObject->startDate) : 0;
             $putVars['beginTime'] = $reservationObject->startTime ? intval($reservationObject->startTime) : 0;
             $putVars['endDate'] = $reservationObject->endDate ? intval($reservationObject->endDate) : 0;
             $putVars['endTime'] = $reservationObject->endTime ? intval($reservationObject->endTime) : 0;

@@ -85,6 +85,7 @@ function isSaturday(date, fieldName) {
 
 function setObjectId(object, typeid) {
     var className = object.className;
+    className = className.split(" ")[0];
     var typeId = typeid;
     var selectField = document.getElementById("c4g_reservation_object_"+typeId);
     var reservationObjects = jQuery(document.getElementsByClassName("displayReservationObjects"));
@@ -235,7 +236,7 @@ function setTimeset(object, id, additionalId, callFunction) {
             url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
             success: function (data) {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
-                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group") : document.getElementsByClassName("c4g_brick_radio_group"); //ToDo
+                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group") : document.getElementsByClassName("c4g_brick_radio_group");
                 var timeList = [];
                 var objectList = [];
                 var times = data['times'];

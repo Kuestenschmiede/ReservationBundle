@@ -81,6 +81,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['person_data'] = 'your data';
 
 /** MESSAGES */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['min_max_failed'] = 'We cannot process your reservation. The date is outside the bookable range.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked'] = 'Reservations are no longer possible. The date is already fully booked.';
 
 /** DESCRIPTIONS */ /**DKo 13.02.19*/
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Select the reservation type';

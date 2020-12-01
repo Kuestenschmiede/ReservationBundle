@@ -336,7 +336,7 @@ class C4gReservationObjectModel extends \Model
             $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
             if ($interval) {
                 $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval);
-                $list[$key] = array('id' => $time, 'name' => $begin.' - '.$end, 'objects' => [$obj]);
+                $list[$key] = array('id' => $time, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else {
                 $list[$key] = array('id' => $time, 'name' => $begin, 'objects' => [$obj]);
             }
@@ -574,12 +574,6 @@ class C4gReservationObjectModel extends \Model
                         case 'hour':
                             $interval = $object->getTimeinterval() * 3600;
                             break;
-//                    case 'minute_period':
-//                        $interval = $object->getTimeinterval() * 60;
-//                        break;
-//                    case 'hour_period':
-//                        $interval = $object->getTimeinterval() * 3600;
-//                        break;
                         default: '';
                     }
                 }
@@ -671,25 +665,57 @@ class C4gReservationObjectModel extends \Model
         }
     }
 
+    public static function getButtonStateClass($object) {
+        $result = '';
+
+        if ($object && $object->getAlmostFullyBookedAt() &&  $object->getDesiredCapacity() &&  $object->getDesiredCapacity()[1]) {  //yellow state
+            $t = 'tl_c4g_reservation';
+            $id = $object->getId();
+            $arrColumns = array("$t.reservation_object=$id AND $t.reservationObjectType='2' AND NOT $t.cancellation='1'");
+            $arrValues = array();
+            $arrOptions = array();
+            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
+
+            $percent = $object->getAlmostFullyBookedAt();
+            $reservationCount = count($reservations);
+            $desiredCapacity = $object->getDesiredCapacity()[1];
+
+            if ((($reservationCount / $desiredCapacity) * 100) >= 100) {
+                $result = ' c4g_radio_object_fully_booked';
+            } else if ((($reservationCount / $desiredCapacity) * 100) >= $percent) {
+                $result = ' c4g_radio_object_hurry_up';
+            }
+        }
+        
+        return $result;
+    }
+
     public static function getReservationEventTime($object, $withEndTimes=false, $showFreeSeats=false) {
         $t = 'tl_c4g_reservation';
         $id = $object->getId();
-        $arrColumns = array("$t.reservation_object=$id AND NOT $t.cancellation='1'");
+        $arrColumns = array("$t.reservation_object=$id AND $t.reservationObjectType='2' AND NOT $t.cancellation='1'");
         $arrValues = array();
         $arrOptions = array();
         $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
         $actPersons = 0;
+        $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
+        $capacity = $desiredCapacity;
         if ($reservations) {
             foreach ($reservations as $reservation) {
 //                $count[$tsdate][$time] = $count[$tsdate][$time] ? $count[$tsdate][$time] + 1 : 1;
 //                $objectCount[$tsdate][$time] = $objectCount[$tsdate][$time] ? $objectCount[$tsdate][$time] + 1 : 1;
                 $actPersons = $actPersons + intval($reservation->desiredCapacity);
             }
+
+            if ($object->getAlmostFullyBookedAt()) {
+                $percent = ($actPersons / intval($capacity)) * 100;
+                if ($percent >= $object->getAlmostFullyBookedAt()) {
+                    $actPercent = $percent;
+                }
+            }
         }
 
-        $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
-        $capacity = $desiredCapacity;
-        $timeObj = ['id'=>$id,'act'=>$actPersons,'max'=>$capacity,'showSeats'=>$showFreeSeats];
+        $timeObj = ['id'=>$id,'act'=>$actPersons,'percent'=>$actPercent,'max'=>$capacity,'showSeats'=>$showFreeSeats];
 
         $endTime = 0;
         if ($withEndTimes) {

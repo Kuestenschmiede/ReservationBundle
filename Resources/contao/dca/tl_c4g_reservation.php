@@ -573,7 +573,7 @@ class tl_c4g_reservation extends Backend
             while ($events->next()) {
                 $return[$events->id] = $events->title;
             }
-        } else {
+        } else if ($dc && ($dc->activeRecord) && ($dc->activeRecord->reservationObjectType === '1')) {
             $dc->reservationObjectType = '1';
             $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
                 ->execute();
@@ -581,7 +581,21 @@ class tl_c4g_reservation extends Backend
             while ($objects->next()) {
                 $return[$objects->id] = $objects->caption;
             }
+        } else {
+            //ToDo all elemente for filter -> duplicated ids
+            $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
+                ->execute();
 
+            while ($objects->next()) {
+                $return[$objects->id] = $objects->caption;
+            }
+
+//            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
+//                ->execute();
+//
+//            while ($events->next()) {
+//                $return[$events->id] = $events->title;
+//            }
         }
 
         return $return;

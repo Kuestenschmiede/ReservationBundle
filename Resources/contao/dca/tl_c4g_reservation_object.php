@@ -111,16 +111,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
     'palettes' => array
     (
         'default'   =>  $default,
-
- /*       '__selector__' => array('event_selection')
-    ),
-
-    //Subpalettes
-       'subpalettes' => array(
-        'event_selection_event_object'             =>'{event_object_legend}, event_dayBegin, event_timeBegin, event_dayEnd, event_timeEnd ;',
-       'event_selection_contao_event'             =>'{event_object_legend}, event_id  ;'
-*/
-
     ),
 
     //Fields
@@ -151,43 +141,11 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'],
             'sorting'           => true,
-            //'flag'              => 1,
             'search'            => true,
             'inputType'         => 'text',
             'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 255),
             'sql'               => "varchar(255) NOT NULL default ''"
         ),
-
-    /*    'options' => array
-        (
-            'label'			=> &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['options'],
-            'exclude' 		=> true,
-            'inputType'     => 'multiColumnWizard',
-            'eval' 			=> array
-            (
-                'columnFields' => array
-                (
-                    'caption' => array
-                    (
-                        'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['option'],
-                        'exclude'               => true,
-                        'inputType'             => 'text', clr
-                        'eval' 			        => array('tl_class'=>'w50')
-                    ),
-                    'language' => array
-                    (
-                        'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['language'],
-                        'exclude'               => true,
-                        'inputType'             => 'select',
-                        'options'               => \System::getLanguages(),
-                        'eval'                  => array('chosen' => true, style=>'width: 200px')
-                    )
-                )
-            ),
-
-            'sql' => "blob NULL"
-        ),
-*/
 
         'quantity' => array
         (
@@ -198,14 +156,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'               => "smallint(5) unsigned NOT NULL default 1"
         ),
 
-//
-//        'multiple_booking' => array(
-//            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['multiple_booking'],
-//            'exclude'           => true,
-//            'filter'            => true,
-//            'inputType'         => 'checkbox',
-//            'sql'               => "int(1) unsigned NULL default 1"
-//        ),
         'vcard_show' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['vcard_show'],
@@ -284,46 +234,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'               => "blob NULL "
         ),
 
-/*        'additionalBookingParams' => array
-        (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['additionalBookingParams'],
-            'inputType'         => 'checkbox',
-            'foreignKey'        => 'tl_c4g_reservation_params.caption' ,
-            'eval'              => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true,),
-            'sql'               => "blob NULL default ''"
-        ),
-*/
-
-/*        'event_selection' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_selection'],
-            'exclude'           => true,
-            'inputType'         => 'select',
-            'options'           => array('event_object','contao_event'),
-            'reference'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object'],
-            'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'submitOnChange' => true),
-            'sql'               => "char(25) NOT NULL default ''"
-        ),
-*/
-    /*   'minute_interval' => array
-        (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['minute_interval'],
-            'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'maxval'=> 60, 'mandatory'=>'false', 'tl_class'=>'long clr'),
-            'sql'               => "smallint(5) unsigned NOT NULL default '0'"
-        ),
-*/
-//        'time_selection' => array
-//        (
-//            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_selection'],
-//            'exclude'               => true,
-//            'inputType'             => 'select',
-//            'default'               => 'time_int',
-//            'reference'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object'],
-//            'options'               => array('time_int','customers_determined'),
-//            'eval'                  => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'submitOnChange' => true),
-//            'sql'                   => "char(25) default ''"
-//
-//        ),
         'time_interval' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'],
