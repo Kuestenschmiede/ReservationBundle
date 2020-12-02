@@ -54,11 +54,49 @@ class C4gReservationInsertTags
      */
     private function getHtmlSkeleton($fieldname, $label, $value, $itemProp = '') {
         $result = '';
-        if ($label && $value) {
+        if ($value) {
             $result = '<p class="c4g_reservation_details c4g_reservation_details_'.$fieldname.'">'.
                 '<label class="c4g_reservation_details_label" for="c4g_reservation_details_value">'.$label.'</label>'.
                 '<span class="c4g_reservation_details_value '.$fieldname.'">'.$value.'</span></p>';
         }
+        return $result;
+    }
+
+    //ToDo find central point for saving state to db
+    /**
+     * @param $reservationEventObject
+     * @param $calendarEvent
+     */
+    private function getState($reservationEventObject)
+    {
+        $result = 0;
+        $id = $reservationEventObject->pid;
+        $max = $reservationEventObject->maxParticipants;
+        if ($id && $max > 0) {
+            $tableReservation = 'tl_c4g_reservation';
+            $reservationObject = $this->db->prepare("SELECT COUNT(id) AS reservationCount, reservation_type FROM $tableReservation WHERE reservation_object = $id AND reservationObjectType = '2'")->execute()->fetchAllAssoc();;
+            if ($reservationObject) {
+                $reservationType = $reservationObject[0]['reservation_type'];
+                $reservationCount = $reservationObject[0]['reservationCount'];
+
+                if ($reservationType && $reservationCount > 0) {
+                    $tableReservationType = 'tl_c4g_reservation_type';
+                    $almostFullyBookedAt = $this->db->prepare("SELECT almostFullyBookedAt FROM $tableReservationType WHERE id=?")
+                        ->limit(1)
+                        ->execute($reservationType,1);
+
+                    $percent = ($reservationCount / $max) * 100;
+                    if ($percent > 100) {
+                        $result = 3;
+                    } else if ($percent > $almostFullyBookedAt) {
+                        $result = 2;
+                    } else {
+                        $result = 1;
+                    }
+                }
+            }
+        }
+
         return $result;
     }
 
@@ -106,6 +144,16 @@ class C4gReservationInsertTags
                     switch($key) {
                         case 'check':
                             return true;
+                        case 'state':
+                            $state = $this->getState($reservationEventObject);
+                            if ($state) {
+                                switch($state) {
+                                    case '1': return $this->getHtmlSkeleton('state', $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'], '<img class="c4g_reservation_state c4g_reservation_state_green img-fluid" loading="lazy" height="32px" width="32px" src="bundles/con4gisreservation/images/circle_green.svg" alt="'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'].'" title="'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'].'">');
+                                    case '2': return $this->getHtmlSkeleton('state', $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'], '<img class="c4g_reservation_state c4g_reservation_state_green img-fluid" loading="lazy" height="32px" width="32px" src="bundles/con4gisreservation/images/circle_orange.svg" alt="'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'].'" title="'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'].'">');
+                                    case '3': return $this->getHtmlSkeleton('state', $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'], '<img class="c4g_reservation_state c4g_reservation_state_green img-fluid" loading="lazy" height="32px" width="32px" src="bundles/con4gisreservation/images/circle_red.svg" alt="'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'].'" title="'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'].'">');
+                                }
+                            }
+                            return '';
                         case 'headline':
                             return '<div class=" c4g_reservation_details_headline">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'].'</div>';
                         case 'button':

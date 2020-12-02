@@ -205,7 +205,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['state'],
             'exclude'           => true,
             'filter'            => true,
-            'options'           => [0,1,2,3],
+            'options'           => [0,1,2,3], //none, green, orange, red
             'inputType'         => 'select',
             'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true,),
             'sql'               => "char(1) NOT NULL default '0'"

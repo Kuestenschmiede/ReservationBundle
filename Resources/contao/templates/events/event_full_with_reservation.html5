@@ -38,6 +38,7 @@
 
   <!--reservation demo data-->
   {{c4gevent::<?= $this->id ?>::headline}}
+  {{c4gevent::<?= $this->id ?>::state}}
   {{c4gevent::<?= $this->id ?>::number}}
   {{c4gevent::<?= $this->id ?>::title}}
   {{c4gevent::<?= $this->id ?>::topic}}
