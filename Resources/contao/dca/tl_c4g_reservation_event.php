@@ -15,6 +15,7 @@
  * Table tl_module
  */
 
+use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use Contao\Image;
 use Contao\StringUtil;
 
@@ -245,14 +246,14 @@ class tl_c4g_reservation_event extends Backend
     {
         \Contao\Message::addInfo($GLOBALS['TL_LANG']['tl_c4g_reservation_event']['infoEvent']);
 
-        $id = Input::get('id');
+        $pid = Input::get('pid');
 
-        if (!$id) {
+        if (!$pid) {
             return;
         }
 
-        $dc->pid = $id;
-        $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $id;
+        $dc->pid = $pid;
+        $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $pid;
 
         return $dc;
     }
@@ -265,7 +266,7 @@ class tl_c4g_reservation_event extends Backend
     {
         $return = [];
 
-        $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")->execute();
+        $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events ORDER BY title")->execute();
 
         while ($events->next()) {
             $return[$events->id] = $events->title;
@@ -282,7 +283,7 @@ class tl_c4g_reservation_event extends Backend
     {
         $return = [];
 
-        $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_type WHERE reservationObjectType = 2")
+        $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_type WHERE reservationObjectType = 2 ORDER BY caption")
             ->execute();
 
         while ($objects->next()) {
@@ -300,15 +301,15 @@ class tl_c4g_reservation_event extends Backend
     {
         $return = [];
 
-        $objects = $this->Database->prepare("SELECT id,title,firstname,lastname FROM tl_c4g_reservation_event_speaker")
+        $objects = $this->Database->prepare("SELECT id,title,firstname,lastname FROM tl_c4g_reservation_event_speaker ORDER BY lastname")
             ->execute();
 
         while ($objects->next()) {
             $name = '';
             if ($objects->title) {
-                $name = $objects->title.' '.$objects->firstname.' '.$objects->lastname;
+                $name = $objects->lastname.','.$objects->firstname.','.$objects->title;
             } else {
-                $name = $objects->firstname.' '.$objects->lastname;
+                $name = $objects->lastname.','.$objects->firstname;
             }
 
             $return[$objects->id] = $name;
