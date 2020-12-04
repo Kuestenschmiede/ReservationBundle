@@ -88,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_topic'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  'topic;'
+        'default'   =>  '{topic_legend}, topic;'
     ),
 
 
