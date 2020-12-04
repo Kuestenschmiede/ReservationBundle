@@ -69,11 +69,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
                 'attributes'    => 'onclick="Backend.getScrollOffSet()" accesskey="e"'
             ),
             'back' => [
-                //'href'                => 'key=back',
                 'class'               => 'header_back',
-                //'button_callback'     => ['\con4gis\CoreBundle\Classes\Helper\DcaHelper', 'back'],
-                'href'                => $this->Input->get('pid') ? 'do=calendar&table=tl_calendar_events&id='.$this->Input->get('pid') : 'do=calendar&table=tl_calendar_events&id='.$this->Input->get('id'),
-                //'button_callback'     => ['\con4gis\CoreBundle\Classes\Helper\DcaHelper', 'back'],
+                'href'                => Input::get('pid') ? 'do=calendar&table=tl_calendar_events&id='.Input::get('pid') : 'do=calendar&table=tl_calendar_events&id='.Input::get('id'),
                 'icon'                => 'back.svg',
                 'label'               => &$GLOBALS['TL_LANG']['MSC']['backBT'],
             ]
