@@ -18,13 +18,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("option","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'] = array("Object type", "Reservation objects and Contao events can be reserved.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][1] = 'Default';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][2] = 'Events';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_name'] = array("Businessname","");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'] = array("Phone","");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_email'] = array("Email","");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_street'] = array("Street","");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_postal'] = array("Postal","");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_city'] = array("City","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('notification', 'Select notification');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location'] = array("Event location", "Where will the event take place?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("period type","Declare the type of time period");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'] = array("Maximum number of objects per time span","Maximum number of simultaneously bookable objects. This is useful, for example, to minimize simultaneous table reservations in the catering trade.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'] = array("Objects can be booked multiple times", "All objects of the type can be booked multiple times. Only useful with personal data. An already booked number of persons is subtracted.");
@@ -52,7 +47,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['timeEnd'] = array("time end");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayBegin'] = array("start day");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['published'] = array("Publish", "Should the reservation type displayed in the frontend?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayEnd'] = array("end day");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additional_params'] = array("Reservation options");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['included_params'] = array("Included services");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additional_params'] = array("Bookable services");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Description");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = array("Maximum number of participants per booking", "Here you can limit the number of participants in the entry per booking. 0 = unlimited.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['almostFullyBookedAt'] = array("Almost fully booked at how much %", "This can be used to set the yellow status. 0 = no yellow status");
@@ -61,7 +57,6 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['almostFullyBookedAt'] = array("A
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Details of the type of reservation";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['object_legend'] = "Basic settings for the objects";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Expert settings";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_data'] = "Organiser details";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['new'] = array("add reservation type", "add reservation type");
