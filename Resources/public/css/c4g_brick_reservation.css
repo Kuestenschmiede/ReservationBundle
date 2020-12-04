@@ -55,8 +55,9 @@
     display: none;
 }
 
-.formdata .c4g_multicheckbox label[for='c4g_additional_params'] {
-    display: block!important;
+.mod_C4gReservation .c4g_multicheckbox label.additional_params,
+.mod_C4gReservation .c4g_multicheckbox label.included_params {
+    display: inline-block!important;
 }
 
 .ui-datepicker-calendar .ui-state-default {
