@@ -17,25 +17,18 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['price'] = array("price"
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['minute'] = array("minutes");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['hour'] = array("hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['openingHours'] = array("opening hours");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['event'] = array("event");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['md'] = array("multi-day");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['priceoption'] = array("Price setting", "What should the price be calculated according to");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pMin'] = array("price per minute");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pHour'] = array("price per hour");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pDay'] = array("price per day");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pEvent'] = array("price per event");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['published'] = array("Publish.", "Should this object be displayed in the frontend?");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['event'] = array("price for use in event");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_object'] = array("Reservation objects", "Which reservation objects should fall under this price category.");
-
-
-
-
-
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_object'] = array("Does this price setting apply to these objects", "To which objects does this price setting apply?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_event'] = array("Applies to these events", "For which events does this price setting apply");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['objectprices_legend'] = "Addition for reservations";
-
-
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['new'] = array("add object", "add object");

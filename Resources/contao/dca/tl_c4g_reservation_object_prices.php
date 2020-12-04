@@ -36,14 +36,11 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
             'mode'              => 2,
             'fields'            => array('priceoption','price'),
             'panelLayout'       => 'filter;sort,search,limit',
-//            'headerFields'      => array('lastname','firstname'),
         ),
 
         'label' => array
         (
             'fields'            => array('priceoption','price'),
-            //'format'            => '<span class="reservation_date" style="color:#E30518">%s</span><span class="reservation_time" style="color:#E30518">%s</span><span class="reservation_id" style="color:#E30518">%s</span><span class="lastname" style="color:#E30518">%s</span><span class="firstname" style="color:#E30518">%s</span>',
-            //'label_callback'    => array('tl_c4g_reservation', 'listDates'),
             'showColumns'       => true,
         ),
 
@@ -98,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  'priceoption, reservation_object, price, published;',
+        'default'   =>  'price, priceoption, reservation_object, reservation_event, published;',
     ),
 
 
@@ -116,48 +113,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
             'sql'               => "int(10) unsigned NOT NULL default '0'"
         ),
 
-
-/*
-        'periodType' => array(
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['periodType'],
-            'exclude'                 => true,
-            'search'                  => false,
-            'inputType'               => 'select',
-            'options'                 => array('minute','hour','openingHours','md','event','fixed'),
-            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices'],
-            'eval'                    => array('tl_class'=>'w50','unique' =>true,'feViewable'=>true, 'mandatory'=>true),
-            'sql'                     => "char(25) NOT NULL default ''"
-
-        ),
-*/
-
-        'priceoption' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['priceoption'],
-            'exclude'                 => true,
-            'inputType'               => 'radio',
-            'options'                 => array('pMin','pHour'/*,'pDay','event'*/),
-            'default'                 => '',
-            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices'],
-            'eval'                    => array('mandatory'=>true, 'tl_class' => 'long clr'),
-            'sql'                     => "varchar(50) NOT NULL default ''"
-        ),
-
-
-
-        'reservation_object' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_object'],
-            'exclude'                 => true,
-            'filter'                  => true,
-            'inputType'               => 'checkbox',
-            'foreignKey'              => 'tl_c4g_reservation_object.caption',
-            'eval'                    => array('mandatory'=>false, 'tl_class' => 'long clr', 'multiple'=>true),
-            //'relation'                => array('type'=>'belongsTo', 'load'=>'eager'),
-            'sql'                     => "blob NULL'"
-        ),
-
-
         'price' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['price'],
             'exclude'                 => true,
@@ -167,6 +122,41 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
             'sql'                     => "double(5,2) NOT NULL default '0.00'"
 
         ),
+
+        'priceoption' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['priceoption'],
+            'exclude'                 => true,
+            'inputType'               => 'radio',
+            'options'                 => array('pMin','pHour','pDay','pEvent'),
+            'default'                 => '',
+            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices'],
+            'eval'                    => array('mandatory'=>true, 'tl_class' => 'long clr'),
+            'sql'                     => "varchar(50) NOT NULL default ''"
+        ),
+
+        'reservation_object' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_object'],
+            'exclude'                 => true,
+            'filter'                  => true,
+            'inputType'               => 'checkbox',
+            'foreignKey'              => 'tl_c4g_reservation_object.caption',
+            'eval'                    => array('mandatory'=>false, 'tl_class' => 'long clr', 'multiple'=>true),
+            'sql'                     => "blob NULL'"
+        ),
+
+        'reservation_event' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_event'],
+            'exclude'                 => true,
+            'filter'                  => true,
+            'inputType'               => 'checkbox',
+            'foreignKey'              => 'tl_calendar_events.title',
+            'eval'                    => array('mandatory'=>false, 'tl_class' => 'long clr', 'multiple'=>true),
+            'sql'                     => "blob NULL'"
+        ),
+
         'published' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['published'],
             'exclude'                 => true,

@@ -215,7 +215,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['icsAlert'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'maxval'=> '480', 'mandatory'=>false, 'tl_class'=>'w50 clr '),
+            'eval'              => array('rgxp'=>'digit', 'maxval'=> '480', 'mandatory'=>false, 'tl_class'=>'w50 clr'),
             'sql'               => "smallint(5) unsigned NOT NULL default 0"
         ),
         'icsPath'  => array

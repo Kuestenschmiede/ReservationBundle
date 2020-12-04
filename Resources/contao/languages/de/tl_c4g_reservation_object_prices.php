@@ -17,15 +17,15 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['price'] = array("Preis"
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['minute'] = array("Minuten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['hour'] = array("Stunden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['openingHours'] = array("Öffnungszeiten");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['event'] = array("Event");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['md'] = array("Mehrtägig");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['priceoption'] = array("Preiseinstellung", "Wonach soll der Preis berechnet werden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pMin'] = array("Preis pro Minute");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pHour'] = array("Preis pro Stunde");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pDay'] = array("Preis pro Tag");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pEvent'] = array("Preis pro Veranstaltung");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['published'] = array("Veröffentlichen.","Soll dieses Objekt im Frontend angezeigt werden ?") ;
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['event'] = array("Preis für die Nutzung im Event");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_object'] = array("Reservierungsobjekte","Welche Reservierungsobjekte sollen unter diese Preis Kategorie fallen");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_object'] = array("Gilt für diese Objekte","Für welche Objekte gilt diese Preiseinstellung?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_event'] = array("Gilt für diese Events","Für welche Veranstaltungen gilt diese Preiseinstellung");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['objectprices_legend'] = "Zusatz für Reservierungen";
