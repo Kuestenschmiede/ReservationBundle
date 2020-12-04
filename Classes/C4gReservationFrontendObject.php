@@ -36,6 +36,12 @@ class C4gReservationFrontendObject
     private $endDate = 0;
     private $endTime = 0;
     private $almostFullyBookedAt = 0;
+    private $number = '';
+    private $topic = array();
+    private $audience = array();
+    private $speaker = array();
+    private $location = '';
+    private $eventDuration = ''; //ToDo
 
     /**
      * C4gReservationFrontendObject constructor.
@@ -330,6 +336,102 @@ class C4gReservationFrontendObject
     public function setAlmostFullyBookedAt(int $almostFullyBookedAt): void
     {
         $this->almostFullyBookedAt = $almostFullyBookedAt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNumber(): string
+    {
+        return $this->number;
+    }
+
+    /**
+     * @param string $number
+     */
+    public function setNumber(string $number): void
+    {
+        $this->number = $number;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTopic(): array
+    {
+        return $this->topic;
+    }
+
+    /**
+     * @param array $topic
+     */
+    public function setTopic(array $topic): void
+    {
+        $this->topic = $topic;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAudience(): array
+    {
+        return $this->audience;
+    }
+
+    /**
+     * @param array $audience
+     */
+    public function setAudience(array $audience): void
+    {
+        $this->audience = $audience;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSpeaker(): array
+    {
+        return $this->speaker;
+    }
+
+    /**
+     * @param array $speaker
+     */
+    public function setSpeaker(array $speaker): void
+    {
+        $this->speaker = $speaker;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocation(): string
+    {
+        return $this->location;
+    }
+
+    /**
+     * @param string $location
+     */
+    public function setLocation(string $location): void
+    {
+        $this->location = $location;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEventDuration(): string
+    {
+        return $this->eventDuration;
+    }
+
+    /**
+     * @param string $eventDuration
+     */
+    public function setEventDuration(string $eventDuration): void
+    {
+        $this->eventDuration = $eventDuration;
     }
 
 }

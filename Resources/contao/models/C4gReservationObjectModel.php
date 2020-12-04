@@ -771,6 +771,13 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
                 $frontendObject->setEndDate($eventObject->endDate ? $eventObject->endDate : 0);
                 $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
+                $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
+                $frontendObject->setNumber($event['number']);
+                $frontendObject->setAudience(unserialize($event['targetAudience'])); //ToDo
+                $frontendObject->setEventDuration(''); //ToDo
+                $frontendObject->setSpeaker(unserialize($event['speaker'])); //ToDo
+                $frontendObject->setTopic(unserialize($event['topic'])); //ToDo
+                $frontendObject->setLocation($eventObject->location && $eventObject->address ? $eventObject->location."&nbsp;(".$eventObject->address.")" : $eventObject->location);
                 $objectList[] = $frontendObject;
             }
         } else {
@@ -783,7 +790,7 @@ class C4gReservationObjectModel extends \Model
             }
             $idString .= ")";
 
-            $allEvents = $db->prepare("SELECT pid,minParticipants,maxParticipants FROM tl_c4g_reservation_event WHERE reservationType IN $idString")->execute()->fetchAllAssoc();
+            $allEvents = $db->prepare("SELECT * FROM tl_c4g_reservation_event WHERE reservationType IN $idString")->execute()->fetchAllAssoc();
             if ($allEvents) {
                 foreach ($allEvents as $event) {
                     $eventObject = \CalendarEventsModel::findByPk($event['pid']);
@@ -798,6 +805,12 @@ class C4gReservationObjectModel extends \Model
                         $frontendObject->setEndDate($eventObject->endDate ? $eventObject->endDate : 0);
                         $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
                         $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
+                        $frontendObject->setNumber($event['number']);
+                        $frontendObject->setAudience(unserialize($event['targetAudience'])); //ToDo
+                        $frontendObject->setEventDuration(''); //ToDo
+                        $frontendObject->setSpeaker(unserialize($event['speaker'])); //ToDo
+                        $frontendObject->setTopic(unserialize($event['topic'])); //ToDo
+                        $frontendObject->setLocation($eventObject->location && $eventObject->address ? $eventObject->location."&nbsp;(".$eventObject->address.")" : $eventObject->location);
                         $objectList[] = $frontendObject;
                     }
                 }
