@@ -621,6 +621,48 @@ class C4gReservation extends C4GBrickModuleParent
                     $obj_condition->setFunction('isEventObject');
                     $objConditionArr = [$obj_condition,$val_condition];
 
+                    //ToDo implement additional event information
+//                    $reservationNumberField = new C4GTextField();
+//                    $reservationNumberField->setFieldName('number');
+//                    $reservationNumberField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['eventnumber']);
+//                    $reservationNumberField->setFormField(true);
+//                    $reservationNumberField->setEditable(false);
+//                    $reservationNumberField->setDatabaseField(false);
+//                    $reservationNumberField->setCondition($objConditionArr);
+//                    $reservationNumberField->setInitialValue($reservationObject->getNumber());
+//                    $reservationNumberField->setMandatory(false);
+//                    $reservationNumberField->setShowIfEmpty(false);
+//                    $reservationNumberField->setAdditionalID($type['id'].'-22'.$reservationObject->getId());
+//                    $reservationNumberField->setRemoveWithEmptyCondition(true);
+//                    $reservationNumberField->setNotificationField(true);
+//                    $reservationNumberField->setSimpleTextWithoutEditing(true);
+//                    $fieldList[] = $reservationNumberField;
+//
+//                    $reservationLocationField = new C4GTextField();
+//                    $reservationLocationField->setFieldName('location');
+//                    $reservationLocationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation']);
+//                    $reservationLocationField->setFormField(true);
+//                    $reservationLocationField->setEditable(false);
+//                    $reservationLocationField->setDatabaseField(false);
+//                    $reservationLocationField->setCondition($objConditionArr);
+//                    $reservationLocationField->setInitialValue($reservationObject->getLocation());
+//                    $reservationLocationField->setMandatory(false);
+//                    $reservationLocationField->setShowIfEmpty(false);
+//                    $reservationLocationField->setAdditionalID($type['id'].'-22'.$reservationObject->getId());
+//                    $reservationLocationField->setRemoveWithEmptyCondition(true);
+//                    $reservationLocationField->setNotificationField(true);
+//                    $reservationLocationField->setSimpleTextWithoutEditing(true);
+//                    $fieldList[] = $reservationLocationField;
+//                    /*
+/*                      {{c4gevent::<?= $this->id ?>::number}}<br>*/
+/*                      {{c4gevent::<?= $this->id ?>::title}}<br>*/
+/*                      {{c4gevent::<?= $this->id ?>::topic}}<br>*/
+/*                      {{c4gevent::<?= $this->id ?>::audience}}<br>*/
+/*                      {{c4gevent::<?= $this->id ?>::speaker}}<br>*/
+/*                      {{c4gevent::<?= $this->id ?>::location}}<br>*/
+/*                      {{c4gevent::<?= $this->id ?>::address}}<br>*/
+//                     */
+
                     $reservationBeginDateField = new C4gDateField();
                     $reservationBeginDateField->setFieldName('beginDateEvent');
                     $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
@@ -683,17 +725,6 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
                     $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_'.$type['id'].'-22'.$reservationObject->getId().C4gReservationObjectModel::getButtonStateClass($reservationObject));
                     $fieldList[] = $reservationBeginTimeField;
-
-                    //ToDo implement additional event information
-                    /*
-                      {{c4gevent::<?= $this->id ?>::number}}<br>
-                      {{c4gevent::<?= $this->id ?>::title}}<br>
-                      {{c4gevent::<?= $this->id ?>::topic}}<br>
-                      {{c4gevent::<?= $this->id ?>::audience}}<br>
-                      {{c4gevent::<?= $this->id ?>::speaker}}<br>
-                      {{c4gevent::<?= $this->id ?>::location}}<br>
-                      {{c4gevent::<?= $this->id ?>::address}}<br>
-                     */
                 }
             }
 
@@ -1144,6 +1175,12 @@ class C4gReservation extends C4GBrickModuleParent
     public function clickReservation($values, $putVars)
     {
         $type = $putVars['reservation_type'];
+
+        //ToDO Test
+        if ($type && $type['notification_type']) {
+            $this->dialogParams->setNotificationType($type['notification_type']);
+            $this->notification_type = $type['notification_type'];
+        }
         $newFieldList = [];
         $removedFromList = [];
         foreach ($this->getFieldList() as $key=>$field) {

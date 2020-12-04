@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,additional_params;{business_data},business_name,business_phone,business_email,business_street,business_postal,business_city,published;{expert_legend:hide},auto_del;'
+        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,additional_params,notification_type;{business_data},business_name,business_phone,business_email,business_street,business_postal,business_city,published;{expert_legend:hide},auto_del;'
     ),
 
     //Subpalettes
@@ -317,6 +317,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => "smallint(3) unsigned NULL default 0"
+        ),
+
+        'notification_type'  => array
+        (
+            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'],
+            'exclude'                 => true,
+            'inputType'               => 'checkbox',
+            'foreignKey'              => 'tl_nc_notification.title',
+            'eval'                    => array('multiple' => true),
+            'sql'                     => "varchar(255) NOT NULL default ''"
         ),
 
         'auto_del' => array

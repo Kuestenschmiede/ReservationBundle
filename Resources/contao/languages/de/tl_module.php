@@ -24,7 +24,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationButton
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site']              = array('Weiterleitungsseite', 'Nach der Buchung wird hierhin weitergeleitet.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_site']        = array('Link zur Datenschutzerklärung', 'Diese Seite wird für die Bestätigung der Datenschutzerklärung verlinkt.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_text']        = array('Datenschutzkommentar', 'Dieser Datenschutzkommentar taucht vor der Checkbox zur Einwilligung auf.');
-$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type']          = array('Benachrichtigung', 'Wählen Sie die Benachrichtigung aus');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type']          = array('Benachrichtigung', 'Wählen Sie die Benachrichtigung aus. Die Einstellung kann in der Reservierungsart überschrieben werden.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type_contact_request']  = array('Benachrichtigung der Kontaktanfrage', 'Wählen Sie die Benachrichtigung für das Versenden der Kontaktanfrage aus');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas']           = array("Optionale Datenfelder.","Reihenfolge hier entspricht der Anzeige im Frontend");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['mandatory']           = array("Pflichtfeld?","");

@@ -24,6 +24,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_email'] = array("Email"
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_street'] = array("Street","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_postal'] = array("Postal","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_city'] = array("City","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('notification', 'Select notification');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("period type","Declare the type of time period");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'] = array("Maximum number of objects per time span","Maximum number of simultaneously bookable objects. This is useful, for example, to minimize simultaneous table reservations in the catering trade.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'] = array("Objects can be booked multiple times", "All objects of the type can be booked multiple times. Only useful with personal data. An already booked number of persons is subtracted.");

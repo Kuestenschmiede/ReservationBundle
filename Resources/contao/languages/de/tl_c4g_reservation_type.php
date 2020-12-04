@@ -24,6 +24,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_email'] = array("Emaila
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_street'] = array("Straße","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_postal'] = array("Postleitzahl","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_city'] = array("Ort","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('Benachrichtigung', 'Wählen Sie die Benachrichtigung aus. Diese Einstellung überschreibt die Moduleinstellungen.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("Zeitspannenart","Art der Zeitspanne deklarieren");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'] = array("Maximale Anzahl Objekte pro Zeitspanne","Maximale Anzahl der Gleichzeitig buchbaren Objekte. Das ist sinnvoll um bspw. in der Gastronomie gleichzeitige Tischreservierungen zu minimieren.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'] = array("Objekte mehrfach buchbar","Alle Objekte des Typs können mehrfach gebucht werden. Nur sinnvoll mit Personenangabe. Eine bereits gebuchte Personenzahl wird subrahiert.");
