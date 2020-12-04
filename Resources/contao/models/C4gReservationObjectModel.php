@@ -777,7 +777,7 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject->setEventDuration(''); //ToDo
                 $frontendObject->setSpeaker(unserialize($event['speaker'])); //ToDo
                 $frontendObject->setTopic(unserialize($event['topic'])); //ToDo
-                $frontendObject->setLocation($eventObject->location && $eventObject->address ? $eventObject->location."&nbsp;(".$eventObject->address.")" : $eventObject->location);
+                $frontendObject->setLocation($eventObject->location && $eventObject->address ? $eventObject->location."&nbsp;(".$eventObject->address.")" : $eventObject->location); //ToDo
                 $objectList[] = $frontendObject;
             }
         } else {

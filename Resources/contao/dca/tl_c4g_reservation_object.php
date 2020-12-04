@@ -19,9 +19,9 @@ use con4gis\CoreBundle\Classes\C4GVersionProvider;
  */
 
 if (C4GVersionProvider::isInstalled('con4gis/maps')) {
-    $default = '{type_legend}, caption, quantity, options, description, vcard_show,alert_time,business_phone,business_street,business_postal,business_city, desiredCapacityMin, desiredCapacityMax, viewableTypes, additionalBookingParams, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{location_legend},locgeox, locgeoy;{publish_legend}, published';
+    $default = '{type_legend}, caption, quantity, options, description, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
 } else {
-    $default = '{type_legend}, caption, quantity, options, description, vcard_show, alert_time,business_phone,business_street,business_postal,business_city, desiredCapacityMin, desiredCapacityMax, viewableTypes, additionalBookingParams, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
+    $default = '{type_legend}, caption, quantity, options, description, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
 }
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
@@ -156,53 +156,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'               => "smallint(5) unsigned NOT NULL default 1"
         ),
 
-        'vcard_show' => array
+        'location'  => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['vcard_show'],
-            'inputType'         => 'checkbox',
-            'eval'              => array('mandatory'=>false,'tl_class'=>'long clr','alwaysSave'=> true,),
-            'sql'               => "blob NULL "
-        ),
-        'business_phone' => array
-        (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_phone'],
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location'],
             'exclude'           => true,
-            'inputType'         => 'text',
-            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr '),
-            'sql'               =>"varchar(255) NOT NULL default ''"
-        ),
-        'business_street' => array
-        (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_street'],
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
-            'sql'               =>"varchar(255) NOT NULL default ''"
-        ),
-        'business_postal' => array
-        (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_postal'],
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr'),
-            'sql'               =>"varchar(255) NOT NULL default ''"
-        ),
-        'business_city' => array
-        (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['business_city'],
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'eval'              =>array('mandatory'=>false, 'tl_class'=>'w50 clr'),
-            'sql'               =>"varchar(255) NOT NULL default ''"
-        ),
-
-        'alert_time' => array
-        (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['alert_time'],
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'eval'              =>array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr '),
-            'sql'               =>"varchar(255) NOT NULL default ''"
+            'default'           => 0,
+            'inputType'         => 'select',
+            'foreignKey'        => 'tl_c4g_reservation_location.name',
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long'),
+            'sql'               => "int(10) unsigned NOT NULL default 0",
+            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
         ),
 
         'desiredCapacityMin' => array
@@ -482,63 +445,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'                     => "blob NULL"
         ),
 
-        /*'type_select' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['type_select'],
-            'exclude'           => true,
-            'inputType'         => 'select',
-            'options'           => array('fixed','individual','openingHours','event'),
-            'reference'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object'],
-            'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>true, 'submitOnChange' => true),
-            'sql'               => "char(25) NOT NULL default ''"
-
-        ),*/
-
-/*        'event_id' => array
-        (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_id'],
-            'inputType'         => 'select',
-            'foreignKey'        => 'tl_calendar_events.title',
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long'),
-            'sql'               => "int(10) unsigned NOT NULL default 0",
-            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
-        ),
-
-        'event_dayBegin' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_dayBegin'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-            'sql'                     => "int(10) unsigned NULL default 0"
-        ),
-
-        'event_timeBegin' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_timeBegin'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50 wizard', 'datepicker'=>true),
-            'sql'                     => "int(10) unsigned NULL default 0"
-        ),
-
-        'event_dayEnd' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_dayEnd'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-            'sql'                     => "int(10) unsigned NULL default 0"
-        ),
-
-        'event_timeEnd' => array
-        (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_timeEnd'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50 wizard', 'datepicker'=>true),
-            'sql'                     => "int(10) unsigned NULL default 0"
-        ),
-*/
         'days_exclusion' => array
         (
             'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['days_exclusion'],
@@ -599,30 +505,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'inputType'               => 'textarea',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'rte'=>'tinyMCE', 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
             'sql'                     => "text NULL"
-        ),
-
-        'locgeox' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['locgeox'],
-            'exclude'                 => true,
-            'inputType'               => 'c4g_text',
-            'default'                 => '',
-            'eval'                    => array('tl_class'=>'w50 wizard', 'require_input'=>true ),
-            'save_callback'           => array(array('tl_c4g_reservation_object','setCenterLon')),
-            'wizard'                  => [['con4gis\MapsBundle\Classes\GeoPicker', 'getPickerLink']],
-            'sql'                     =>"varchar(20) NOT NULL default ''"
-        ),
-
-        'locgeoy' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['locgeoy'],
-            'exclude'                 => true,
-            'inputType'               => 'c4g_text',
-            'default'                 => '',
-            'eval'                    => array('tl_class'=>'w50 wizard', 'require_input'=>true ),
-            'save_callback'           => array(array('tl_c4g_reservation_object','setCenterLat')),
-            'wizard'                  => [['con4gis\MapsBundle\Classes\GeoPicker', 'getPickerLink']],
-            'sql'                     =>"varchar(20) NOT NULL default ''"
         ),
 
         'published' => array(
@@ -717,24 +599,6 @@ class tl_c4g_reservation_object extends Backend
         $this->Database->prepare("UPDATE tl_c4g_reservation_object SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE id=?")
             ->execute($intId);
         $this->createNewVersion('tl_c4g_reservation_object', $intId);
-    }
-
-    /** Validate Center Lon*/
-    public function setCenterLon($varValue, DataContainer $dc)
-    {
-        if (C4GVersionProvider::isInstalled('con4gis/maps') && !\con4gis\MapsBundle\Classes\Utils::validateLon($varValue)) {
-            throw new Exception($GLOBALS['TL_LANG']['tl_c4g_reservation_object']['geox_invalid']);
-        }
-        return $varValue;
-    }
-
-    /** Validate Center Lat*/
-    public function setCenterLat($varValue, DataContainer $dc)
-    {
-        if (C4GVersionProvider::isInstalled('con4gis/maps') && !\con4gis\MapsBundle\Classes\Utils::validateLat($varValue)) {
-            throw new Exception($GLOBALS['TL_LANG']['tl_c4g_reservation_object']['geoy_invalid']);
-        }
-        return $varValue;
     }
 
     public function listFields($arrRow)

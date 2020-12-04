@@ -27,15 +27,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['published'] = array("Ve
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['event'] = array("Preis für die Nutzung im Event");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_object'] = array("Reservierungsobjekte","Welche Reservierungsobjekte sollen unter diese Preis Kategorie fallen");
 
-
-
-
-
-
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['objectprices_legend'] = "Zusatz für Reservierungen";
-
-
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['new'] = array("Buchungsoptionen Hinzufügen","Buchungsoptionen Hinzufügen");

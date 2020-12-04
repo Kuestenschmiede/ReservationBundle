@@ -69,7 +69,8 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['various'] = ' - ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['minute'] = 'minutes';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['hour'] = 'hours';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['openingHours'] = 'opening hours';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['additional_params'] = 'Additional options';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['included_params'] = 'Included services';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['additional_params'] = 'Bookable services';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['md'] = 'several days';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['event'] = 'Event';
 

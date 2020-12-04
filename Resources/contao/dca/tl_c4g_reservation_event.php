@@ -98,7 +98,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{event_legend}, pid, number, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants;',
+        'default'   =>  '{event_legend}, pid, number, location, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants;',
     ),
 
 
@@ -143,6 +143,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50 clr'),
             'sql'                     => "varchar(128) NOT NULL default ''"
+        ),
+
+        'location'  => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['location'],
+            'exclude'           => true,
+            'default'           => 0,
+            'inputType'         => 'select',
+            'foreignKey'        => 'tl_c4g_reservation_location.name',
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long'),
+            'sql'               => "int(10) unsigned NOT NULL default 0",
+            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
         ),
 
         'reservationType' => array
