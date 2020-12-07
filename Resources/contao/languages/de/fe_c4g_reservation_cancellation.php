@@ -24,7 +24,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['firstname']        = 'Vo
 $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['reservation_id']   = 'Reservierungsschlüssel';
 
 /** DESCRIPTIONS */
-$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['desc_lastname']         = 'Geben Sie Ihren Nachnachmen ein.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['desc_lastname']         = 'Geben Sie Ihren Nachnamen ein.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['desc_firstname']        = 'Geben Sie Ihren Vornamen ein.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['desc_reservation_id']    	   = 'Geben Sie hier die 13-stellige Reservation ID an.';
 
