@@ -164,8 +164,6 @@ function hideOptions(reservationObjects,typeId,values) {
                 jQuery(selectField).val("-1").change();
                 jQuery(selectField).prop("disabled", true);
             }
-
-            //checkEventFields(selectField.value);
         }
     }
 
@@ -367,17 +365,25 @@ function setTimeset(object, id, additionalId, callFunction) {
     hideOptions(reservationObjects,additionalId, val);
 }
 
+/**
+ *
+ * @param object
+ */
 function checkEventFields(object) {
     var typeField = document.getElementById("c4g_reservation_type");
     var typeId = typeField ? typeField.value : -1;
-
     var selectField = jQuery('.reservation-event-object select');
+
+    jQuery('.eventdata').hide();
+
     if (selectField && selectField.is(":visible")) {
         for (i = 0; i < selectField.length; i++) {
             if (selectField[i]) {
                 var additional = -1;
                 if (selectField[i].value) {
                     additional = typeId.toString() + "-22" + selectField[i].value.toString();
+                    jQuery('.eventdata_' + additional).show();
+                    jQuery('.eventdata_' + additional).children().show();
                 }
 
                 var dateFields = document.getElementsByClassName('begindate-event');
@@ -393,7 +399,6 @@ function checkEventFields(object) {
                     }
                 }
 
-                //ToDo roar
                 var timeFields = jQuery('.c4g_brick_radio_group_wrapper .reservation_time_event_button');
                 if (timeFields) {
                     for (j = 0; j < timeFields.length; j++) {

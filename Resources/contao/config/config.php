@@ -97,17 +97,20 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
             'reservation_object', 'additional_params', 'admin_email',
             'salutation', 'title', 'organisation', 'firstname', 'lastname', 'email', 'phone', 'address', 'postal', 'city',
             'salutation2', 'title2', 'organisation2', 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2',
-            'comment', 'internal_comment', 'contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id'),
+            'comment', 'internal_comment', 'contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id',
+            'number','location','speaker','topic','audience'),
         'email_text'           => array('reservation_type','desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime',
             'reservation_object', 'additional_params', 'admin_email',
             'salutation', 'title', 'organisation', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city',
             'salutation2', 'title2', 'organisation2', 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2',
-            'comment', 'internal_comment','contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id'),
+            'comment', 'internal_comment','contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id',
+            'number','location','speaker','topic','audience'),
         'email_html'           => array('reservation_type','desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime',
             'reservation_object', 'additional_params',
             'salutation', 'title', 'organisation', 'firstname', 'lastname', 'admin_email', 'email', 'phone', 'address', 'postal', 'city',
             'salutation2', 'title2', 'organisation2', 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2',
-            'comment', 'internal_comment', 'contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id'),
+            'comment', 'internal_comment', 'contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id',
+            'number','location','speaker','topic','audience'),
         'email_sender_name'    => array('admin_email','email','contact_email'),
         'email_sender_address' => array('admin_email','email','contact_email'),
         'email_recipient_cc'   => array('admin_email','email','contact_email'),
@@ -117,7 +120,8 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
             'reservation_object', 'additional_params', 'admin_email',
             'salutation', 'title', 'organisation', 'firstname', 'lastname', 'email', 'phone', 'address', 'postal', 'city',
             'salutation2', 'title2', 'organisation2', 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2',
-            'comment', 'internal_comment','contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id')
+            'comment', 'internal_comment','contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id',
+            'number','location','speaker','topic','audience')
     ),
     'con4gis_cancellation'   => array
     (
@@ -141,6 +145,11 @@ $GLOBALS['TL_MODELS']['tl_c4g_reservation_type'] = \con4gis\ReservationBundle\Re
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_params'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_object_prices'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectPricesModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_event'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventModel::class;
+$GLOBALS['TL_MODELS']['tl_c4g_reservation_location'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationLocationModel::class;
+$GLOBALS['TL_MODELS']['tl_c4g_reservation_event_speaker'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventSpeakerModel::class;
+$GLOBALS['TL_MODELS']['tl_c4g_reservation_event_audience'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventAudienceModel::class;
+$GLOBALS['TL_MODELS']['tl_c4g_reservation_event_topic'] = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventTopicModel::class;
+
 $GLOBALS['TL_CRON']['daily'][] = [\con4gis\ReservationBundle\Classes\Cron::class, 'onDaily'];
 
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_event';

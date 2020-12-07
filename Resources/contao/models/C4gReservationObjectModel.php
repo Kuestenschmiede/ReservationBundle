@@ -773,11 +773,11 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                 $frontendObject->setNumber($event['number']);
-                $frontendObject->setAudience(unserialize($event['targetAudience'])); //ToDo
-                $frontendObject->setEventDuration(''); //ToDo
-                $frontendObject->setSpeaker(unserialize($event['speaker'])); //ToDo
-                $frontendObject->setTopic(unserialize($event['topic'])); //ToDo
-                $frontendObject->setLocation($eventObject->location && $eventObject->address ? $eventObject->location."&nbsp;(".$eventObject->address.")" : $eventObject->location); //ToDo
+                $frontendObject->setAudience(unserialize($event['targetAudience']));
+                $frontendObject->setEventDuration('');
+                $frontendObject->setSpeaker(unserialize($event['speaker']));
+                $frontendObject->setTopic(unserialize($event['topic']));
+                $frontendObject->setLocation($event['location']);
                 $objectList[] = $frontendObject;
             }
         } else {
@@ -806,11 +806,11 @@ class C4gReservationObjectModel extends \Model
                         $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
                         $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                         $frontendObject->setNumber($event['number']);
-                        $frontendObject->setAudience(unserialize($event['targetAudience'])); //ToDo
-                        $frontendObject->setEventDuration(''); //ToDo
-                        $frontendObject->setSpeaker(unserialize($event['speaker'])); //ToDo
-                        $frontendObject->setTopic(unserialize($event['topic'])); //ToDo
-                        $frontendObject->setLocation($eventObject->location && $eventObject->address ? $eventObject->location."&nbsp;(".$eventObject->address.")" : $eventObject->location);
+                        $frontendObject->setAudience(unserialize($event['targetAudience']));
+                        $frontendObject->setEventDuration('');
+                        $frontendObject->setSpeaker(unserialize($event['speaker']));
+                        $frontendObject->setTopic(unserialize($event['topic']));
+                        $frontendObject->setLocation($event['location']);
                         $objectList[] = $frontendObject;
                     }
                 }

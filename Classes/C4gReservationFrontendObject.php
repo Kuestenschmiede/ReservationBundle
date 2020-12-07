@@ -40,7 +40,7 @@ class C4gReservationFrontendObject
     private $topic = array();
     private $audience = array();
     private $speaker = array();
-    private $location = '';
+    private $location = 0;
     private $eventDuration = ''; //ToDo
 
     /**
@@ -403,17 +403,17 @@ class C4gReservationFrontendObject
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getLocation(): string
+    public function getLocation(): int
     {
         return $this->location;
     }
 
     /**
-     * @param string $location
+     * @param int $location
      */
-    public function setLocation(string $location): void
+    public function setLocation(int $location): void
     {
         $this->location = $location;
     }

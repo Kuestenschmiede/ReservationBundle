@@ -152,7 +152,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_c4g_reservation_location.name',
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long'),
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr','includeBlankOption'=>true),
             'sql'               => "int(10) unsigned NOT NULL default 0",
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
         ),
@@ -191,7 +191,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['speaker'],
             'inputType'         => 'checkbox',
             'options_callback'  => ['tl_c4g_reservation_event', 'getSpeakerName'],
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true),
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true),
             'sql'               => "blob NULL"
         ),
 
@@ -200,7 +200,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['topic'],
             'inputType'         => 'checkbox',
             'foreignKey'        => 'tl_c4g_reservation_event_topic.topic',
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true),
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true),
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
             'sql'               => "blob NULL"
         ),
@@ -210,7 +210,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['targetAudience'],
             'inputType'         => 'checkbox',
             'foreignKey'        => 'tl_c4g_reservation_event_audience.targetAudience',
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true),
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true),
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
             'sql'               => "blob NULL"
         ),
@@ -220,7 +220,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'filter'            => true,
             'options'           => [0,1,2,3], //none, green, orange, red
             'inputType'         => 'select',
-            'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true,),
+            'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true),
             'sql'               => "char(1) NOT NULL default '0'"
         )
     )
