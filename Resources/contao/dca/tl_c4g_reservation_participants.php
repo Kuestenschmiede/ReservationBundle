@@ -40,13 +40,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
         'sorting' => array
         (
             'mode'              => 2,
-            'fields'            => array('id','lastname','firstname','email'),
+            'fields'            => array('id','title','lastname','firstname','email'),
             'panelLayout'       => 'filter;sort,search,limit',
         ),
 
         'label' => array
         (
-            'fields'            => array('id','lastname','firstname','email','cancellation'),
+            'fields'            => array('id','title','lastname','firstname','email','cancellation'),
             'label_callback'    => array('tl_c4g_reservation_participants', 'listFields'),
             'showColumns'       => true,
         ),
@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{participants_legend}, lastname, firstname, email, comment, cancellation;',
+        'default'   =>  '{participants_legend}, title, lastname, firstname, email, comment, cancellation;',
     ),
 
 
@@ -133,6 +133,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'eval'              => array('doNotCopy'=>true, 'maxlength'=>128),
             'save_callback'     => array(array('tl_c4g_reservation_participants','generateUuid')),
             'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
+        ),
+
+        'title' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['title'],
+            'exclude'                 => true,
+            'search'                  => true,
+            'sorting'                 => true,
+            'flag'                    => 1,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
+            'sql'                     => "varchar(50) NOT NULL default ''"
         ),
 
         'lastname' => array
@@ -305,6 +317,7 @@ class tl_c4g_reservation_participants extends Backend
     {
         $result = [
             $arrRow['id'],
+            $arrRow['title'],
             $arrRow['lastname'],
             $arrRow['firstname'],
             $arrRow['email'],

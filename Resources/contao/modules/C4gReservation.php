@@ -1078,6 +1078,16 @@ class C4gReservation extends C4GBrickModuleParent
 
                 $participants = [];
 
+
+                $titleField = new C4GTextField();
+                $titleField->setFieldName('title');
+                $titleField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
+                $titleField->setSortColumn(false);
+                $titleField->setTableColumn(false);
+                $titleField->setMandatory(false);
+                $titleField->setNotificationField(true);
+                $participants[] = $titleField;
+
                 $firstnameField = new C4GTextField();
                 $firstnameField->setFieldName('firstname');
                 $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);

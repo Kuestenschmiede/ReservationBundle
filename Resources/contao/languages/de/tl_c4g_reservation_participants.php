@@ -17,6 +17,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['salutation'] = ['Anrede:
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['man'] = ['Herr'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['woman'] = ['Frau'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['various'] = [' - '];
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['title']  = array("Titel", "Titel");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['lastname']  = array("Nachname", "Nachname");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['firstname'] = array("Vorname", "Vorname");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['email'] = array("E-Mail-Adresse", "E-Mail-Adresse");
