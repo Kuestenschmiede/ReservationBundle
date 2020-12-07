@@ -759,25 +759,25 @@ class C4gReservationObjectModel extends \Model
         $db = Database::getInstance();
 
         if ($objectId) {
-            $event = C4gReservationEventModel::findBy('pid',$objectId);
+            $event = C4gReservationEventModel::findOneBy('pid',$objectId);
             $eventObject = \CalendarEventsModel::findByPk($objectId);
-            if ($eventObject && $eventObject->published) { //ToDo nur Events in der Zukunft zulassen
+            if ($event && $eventObject && $eventObject->published) { //ToDo nur Events in der Zukunft zulassen
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject->id);
                 $frontendObject->setCaption($eventObject->title);
-                $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
+                $frontendObject->setDesiredCapacity([$event->minParticipants,$event->maxParticipants]);
                 $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
                 $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
                 $frontendObject->setEndDate($eventObject->endDate ? $eventObject->endDate : 0);
                 $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
-                $frontendObject->setNumber($event['number']);
-                $frontendObject->setAudience(unserialize($event['targetAudience']));
+                $frontendObject->setNumber($event->number ? $event->number : '');
+                $frontendObject->setAudience($event->targetAudience ? unserialize($event->targetAudience) : []);
                 $frontendObject->setEventDuration('');
-                $frontendObject->setSpeaker(unserialize($event['speaker']));
-                $frontendObject->setTopic(unserialize($event['topic']));
-                $frontendObject->setLocation($event['location']);
+                $frontendObject->setSpeaker($event->speaker ? unserialize($event->speaker) : []);
+                $frontendObject->setTopic($event->topic ? unserialize($event->topic) : []);
+                $frontendObject->setLocation($event->location ? $event->location : 0);
                 $objectList[] = $frontendObject;
             }
         } else {

@@ -545,7 +545,7 @@ class C4gReservation extends C4GBrickModuleParent
                     //ToDo Check Capacity
                     $objects[] = array(
                         'id' => $reservationObject->getId(),
-                        'name' => $reservationObject->getCaption(),
+                        'name' => $reservationObject->getNumber() ? '['.$reservationObject->getNumber().']&nbsp;'.$reservationObject->getCaption() : $reservationObject->getCaption(),
                         'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
                         'max' => $reservationObject->getDesiredCapacity()[1] ? $reservationObject->getDesiredCapacity()[1] : 1
                     );
@@ -626,22 +626,68 @@ class C4gReservation extends C4GBrickModuleParent
                     $obj_condition->setFunction('isEventObject');
                     $objConditionArr = [$obj_condition,$val_condition];
 
-                    $reservationNumberField = new C4GTextField();
-                    $reservationNumberField->setFieldName('number');
-                    $reservationNumberField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['eventnumber']);
-                    $reservationNumberField->setFormField(true);
-                    $reservationNumberField->setEditable(false);
-                    $reservationNumberField->setDatabaseField(false);
-                    $reservationNumberField->setCondition($objConditionArr);
-                    $reservationNumberField->setInitialValue($reservationObject->getNumber());
-                    $reservationNumberField->setMandatory(false);
-                    $reservationNumberField->setShowIfEmpty(false);
-                    $reservationNumberField->setAdditionalID($type['id'].'-22'.$reservationObject->getId());
-                    $reservationNumberField->setRemoveWithEmptyCondition(true);
-                    $reservationNumberField->setNotificationField(true);
-                    $reservationNumberField->setSimpleTextWithoutEditing(true);
-                    $reservationNumberField->setStyleClass('eventdata eventdata_'.$type['id'].'-22'.$reservationObject->getId().' event-number');
-                    $fieldList[] = $reservationNumberField;
+                    $reservationBeginDateField = new C4gDateField();
+                    $reservationBeginDateField->setFieldName('beginDateEvent');
+                    $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
+                    $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
+                    $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent']);
+                    $reservationBeginDateField->setEditable(false);
+                    $reservationBeginDateField->setComparable(false);
+                    $reservationBeginDateField->setDatabaseField(false);
+                    $reservationBeginDateField->setSortColumn(true);
+                    $reservationBeginDateField->setSortSequence('de_datetime');
+                    $reservationBeginDateField->setTableColumn(false);
+                    $reservationBeginDateField->setFormField(true);
+                    $reservationBeginDateField->setColumnWidth(10);
+                    $reservationBeginDateField->setMandatory(false);
+                    $reservationBeginDateField->setCondition($objConditionArr);
+                    $reservationBeginDateField->setRemoveWithEmptyCondition(true);
+                    $reservationBeginDateField->setInitialValue($reservationObject->getBeginDate());
+                    $reservationBeginDateField->setNotificationField(true);
+                    $reservationBeginDateField->setAdditionalID($type['id'].'-22'.$reservationObject->getId());
+                    $reservationBeginDateField->setStyleClass('begindate-event');
+                    $fieldList[] = $reservationBeginDateField;
+
+                    $reservationEndDateField = new C4GDateField();
+                    $reservationEndDateField->setFieldName('endDateEvent');
+                    $reservationEndDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
+                    $reservationEndDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
+                    $reservationEndDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent']);
+                    $reservationEndDateField->setEditable(false);
+                    $reservationEndDateField->setComparable(false);
+                    $reservationEndDateField->setSortColumn(true);
+                    $reservationEndDateField->setSortSequence('de_datetime');
+                    $reservationEndDateField->setDatabaseField(false);
+                    $reservationEndDateField->setTableColumn(false);
+                    $reservationEndDateField->setFormField(true);
+                    $reservationEndDateField->setColumnWidth(10);
+                    $reservationEndDateField->setMandatory(false);
+                    $reservationEndDateField->setCondition($objConditionArr);
+                    $reservationEndDateField->setRemoveWithEmptyCondition(true);
+                    $reservationEndDateField->setInitialValue($reservationObject->getEndDate());
+                    $reservationEndDateField->setNotificationField(true);
+                    $reservationEndDateField->setAdditionalID($type['id'].'-22'.$reservationObject->getId());
+                    $reservationEndDateField->setShowIfEmpty(false);
+                    $reservationEndDateField->setStyleClass('enddate-event');
+                    $fieldList[] = $reservationEndDateField;
+
+                    $reservationBeginTimeField = new C4GRadioGroupField();
+                    $reservationBeginTimeField->setFieldName('beginTimeEvent');
+                    $reservationBeginTimeField->setTitle($isEvent ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                    $reservationBeginTimeField->setFormField(true);
+                    $reservationBeginTimeField->setOptions(C4gReservationObjectModel::getReservationEventTime($reservationObject, $this->showEndTime, $this->showFreeSeats));
+                    $reservationBeginTimeField->setMandatory(false);
+                    $reservationBeginTimeField->setInitialValue($reservationObject->getBeginTime());
+                    $reservationBeginTimeField->setDatabaseField(false);
+                    $reservationBeginTimeField->setSort(false);
+                    $reservationBeginTimeField->setCondition($objConditionArr);
+                    $reservationBeginTimeField->setAdditionalID($type['id'].'-22'.$reservationObject->getId());
+                    $reservationBeginTimeField->setNotificationField(true);
+                    $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                    $reservationBeginTimeField->setTurnButton(true);
+                    $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
+                    $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_'.$type['id'].'-22'.$reservationObject->getId().C4gReservationObjectModel::getButtonStateClass($reservationObject));
+                    $fieldList[] = $reservationBeginTimeField;
 
                     $locationId = $reservationObject->getLocation();
                     if ($locationId) {
@@ -756,69 +802,6 @@ class C4gReservation extends C4GBrickModuleParent
                             $fieldList[] = $audienceField;
                         }
                     }
-
-                    $reservationBeginDateField = new C4gDateField();
-                    $reservationBeginDateField->setFieldName('beginDateEvent');
-                    $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
-                    $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
-                    $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent']);
-                    $reservationBeginDateField->setEditable(false);
-                    $reservationBeginDateField->setComparable(false);
-                    $reservationBeginDateField->setDatabaseField(false);
-                    $reservationBeginDateField->setSortColumn(true);
-                    $reservationBeginDateField->setSortSequence('de_datetime');
-                    $reservationBeginDateField->setTableColumn(false);
-                    $reservationBeginDateField->setFormField(true);
-                    $reservationBeginDateField->setColumnWidth(10);
-                    $reservationBeginDateField->setMandatory(false);
-                    $reservationBeginDateField->setCondition($objConditionArr);
-                    $reservationBeginDateField->setRemoveWithEmptyCondition(true);
-                    $reservationBeginDateField->setInitialValue($reservationObject->getBeginDate());
-                    $reservationBeginDateField->setNotificationField(true);
-                    $reservationBeginDateField->setAdditionalID($type['id'].'-22'.$reservationObject->getId());
-                    $reservationBeginDateField->setStyleClass('begindate-event');
-                    $fieldList[] = $reservationBeginDateField;
-
-                    $reservationEndDateField = new C4GDateField();
-                    $reservationEndDateField->setFieldName('endDateEvent');
-                    $reservationEndDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
-                    $reservationEndDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
-                    $reservationEndDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent']);
-                    $reservationEndDateField->setEditable(false);
-                    $reservationEndDateField->setComparable(false);
-                    $reservationEndDateField->setSortColumn(true);
-                    $reservationEndDateField->setSortSequence('de_datetime');
-                    $reservationEndDateField->setDatabaseField(false);
-                    $reservationEndDateField->setTableColumn(false);
-                    $reservationEndDateField->setFormField(true);
-                    $reservationEndDateField->setColumnWidth(10);
-                    $reservationEndDateField->setMandatory(false);
-                    $reservationEndDateField->setCondition($objConditionArr);
-                    $reservationEndDateField->setRemoveWithEmptyCondition(true);
-                    $reservationEndDateField->setInitialValue($reservationObject->getEndDate());
-                    $reservationEndDateField->setNotificationField(true);
-                    $reservationEndDateField->setAdditionalID($type['id'].'-22'.$reservationObject->getId());
-                    $reservationEndDateField->setShowIfEmpty(false);
-                    $reservationEndDateField->setStyleClass('enddate-event');
-                    $fieldList[] = $reservationEndDateField;
-
-                    $reservationBeginTimeField = new C4GRadioGroupField();
-                    $reservationBeginTimeField->setFieldName('beginTimeEvent');
-                    $reservationBeginTimeField->setTitle($isEvent ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
-                    $reservationBeginTimeField->setFormField(true);
-                    $reservationBeginTimeField->setOptions(C4gReservationObjectModel::getReservationEventTime($reservationObject, $this->showEndTime, $this->showFreeSeats));
-                    $reservationBeginTimeField->setMandatory(false);
-                    $reservationBeginTimeField->setInitialValue($reservationObject->getBeginTime());
-                    $reservationBeginTimeField->setDatabaseField(false);
-                    $reservationBeginTimeField->setSort(false);
-                    $reservationBeginTimeField->setCondition($objConditionArr);
-                    $reservationBeginTimeField->setAdditionalID($type['id'].'-22'.$reservationObject->getId());
-                    $reservationBeginTimeField->setNotificationField(true);
-                    $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
-                    $reservationBeginTimeField->setTurnButton(true);
-                    $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
-                    $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_'.$type['id'].'-22'.$reservationObject->getId().C4gReservationObjectModel::getButtonStateClass($reservationObject));
-                    $fieldList[] = $reservationBeginTimeField;
                 }
             }
 
@@ -1415,7 +1398,6 @@ class C4gReservation extends C4GBrickModuleParent
                     $icsenddate =$e_date . 'T' . $e_time. 'Z';
                 } else if ($type->reservationObjectType == '2') {  //event
                     $e_date = date('Ymd', $beginDate);
-                    $e_time = $begiTime + $time_int;
                     $e_time = date('His', $beginTime);
                     $icsenddate =$e_date . 'T' . $e_time. 'Z';
                 }
