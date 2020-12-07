@@ -24,9 +24,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     (
         'dataContainer'      => 'Table',
         'enableVersioning'   => 'true',
-        //'ptable'             => 'tl_calendar_events',
         'ctable'             => ['tl_c4g_reservation_participants'],
-        //'ondelete_callback'  => [['tl_c4g_reservation', 'doNotDeleteDataWithoutParent']],
         'onload_callback'    => [['tl_c4g_reservation', 'setParent']],
         'doNotDeleteRecords' => true,
         'doNotCopyRecords'   => true,
@@ -123,7 +121,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     'palettes' => array
     (
         '__selector__' => ['reservationObjectType'],
-        'default'   =>  '{reservation_legend}, reservation_type, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id, confirmed, cancellation; {person_legend},organisation,salutation, lastname, firstname, email, phone, address, postal, city, comment,internal_comment, agreed;',
+        'default'   =>  '{reservation_legend}, reservation_type, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id, confirmed, cancellation; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {comment_legend}, comment,internal_comment, agreed;',
     ),
 
     // Subpalettes
@@ -305,6 +303,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
 
         ),
 
+        'title' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['title'],
+            'exclude'                 => true,
+            'search'                  => true,
+            'sorting'                 => true,
+            'flag'                    => 1,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
+            'sql'                     => "varchar(50) NOT NULL default ''"
+        ),
+
         'lastname' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['lastname'],
@@ -371,6 +381,116 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
 
         'city' => array (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['city'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+
+        ),
+
+        'organisation2' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation2'],
+            'exclude'                 => true,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long clr'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+
+        'salutation2' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['salutation2'],
+            'exclude'                 => true,
+            'inputType'               => 'select',
+            'default'                 => 'various',
+            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation'],
+            'options'                 => array('man','woman','various'),
+            'eval'                    => array('tl_class'=>'w50 clr','feViewable'=>true, 'mandatory'=>false),
+            'sql'                     => "char(25) NOT NULL default ''"
+
+        ),
+
+        'title2' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['title2'],
+            'exclude'                 => true,
+            'search'                  => true,
+            'sorting'                 => true,
+            'flag'                    => 1,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
+            'sql'                     => "varchar(50) NOT NULL default ''"
+        ),
+
+        'lastname2' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['lastname2'],
+            'exclude'                 => true,
+            'search'                  => true,
+            'sorting'                 => true,
+            'flag'                    => 1,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+
+        'firstname2' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['firstname2'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'sorting'                 => false,
+            'flag'                    => 1,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+
+        'email2' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['email2'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+
+        'phone2' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['phone2'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
+            'sql'                     => "varchar(64) NOT NULL default ''"
+        ),
+
+        'address2' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['address2'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+
+        'postal2' => array(
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>32, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(32) NOT NULL default ''"
+
+        ),
+
+        'city2' => array (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'],
             'exclude'                 => true,
             'filter'                  => false,
             'search'                  => false,
@@ -586,13 +706,6 @@ class tl_c4g_reservation extends Backend
             while ($objects->next()) {
                 $return[$objects->id] = $objects->caption;
             }
-
-//            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
-//                ->execute();
-//
-//            while ($events->next()) {
-//                $return[$events->id] = $events->title;
-//            }
         }
 
         return $return;

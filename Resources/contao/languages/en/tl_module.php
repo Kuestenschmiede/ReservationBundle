@@ -26,9 +26,10 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_site']  = array('Link to privacy policy', 'This page is linked for the confirmation of the privacy policy.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_text']  = array('Privacy Comment', 'This privacy comment appears before the consent checkbox.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type_contact_request'] = array('Contact request notification', 'Select the notification for sending the contact request');
-$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas'] =array("Optional data fields","Which additional data should be specified in the front end?");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas'] =array("Optional data fields","Which additional data should be specified in the front end? Except for the heading, each field can only be used once.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['mandatory'] = array("Mandatory field?","");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['binding'] = array("Mandatory field?", "Should this data field be displayed as mandatory field in the frontend");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['initialValue'] = array("Initial value", "Here you can enter an initial value. Important for the heading - otherwise optional.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['hide_selection'] = array("Add data fields","");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['additionalDuration'] = array("Customer can specify length of stay (BETA)", "If checked, a new field appears in the frontend in which the customer specifies his length of stay");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withCapacity'] = array("Customer can specify number of persons","The customer can specify the number of persons. This is required, for example, for a table reservation in a restaurant.");

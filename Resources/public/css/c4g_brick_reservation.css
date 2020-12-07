@@ -42,6 +42,14 @@
     font-weight: normal;
 }
 
+.mod_C4gReservation .c4g_brick_dialog input[type='checkbox'], .mod_C4gReservation label.agreed.c4g_agreed, .mod_C4gReservation label.reservation_id.c4g_reservation_id {
+    display: inline-block;
+}{
+
+}
+.mod_C4gReservation div#c4g_reservation_id {
+    display: inline;
+}
 .mod_C4gReservation .displayReservationObjects {
     display: none;
 }

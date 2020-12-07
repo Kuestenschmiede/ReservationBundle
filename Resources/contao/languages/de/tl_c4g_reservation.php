@@ -33,11 +33,12 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][1] = 'Standard
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][2] = 'Event';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_object'] = array("Gebucht wurde", "Welches Objekt soll reserviert werden?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_id'] = array("Reservierungsschlüssel", "Bitte einen Reservierungsschlüssel zur Identifizierung angeben.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation'] = ['Firma / Organisation / Schule','Bitte Firmenname , Organisations oder Schulenname angeben'];
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['salutation'] = ['Anrede: ','Bitte Wählen Herr, Frau oder keine Angabe'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['man'] = ['Herr'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'] = ['Frau'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['various'] = [' - '];
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation'] = ['Firma / Organisation / Schule','Bitte Firmenname, Organisations oder Schulenname angeben'];
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['salutation'] = ['Anrede','Bitte Wählen Herr, Frau oder keine Angabe'];
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['title'] = ['Titel', 'Titel der Person'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['lastname']  = array("Nachname", "Nachname");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['firstname'] = array("Vorname", "Vorname");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['email'] = array("E-Mail-Adresse", "E-Mail-Adresse");
@@ -45,11 +46,24 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone'] = array("Telefonnummer", "Tel
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['address'] = array("Straße", "Straße");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal'] = array("Postleitzahl", "Postleitzahl");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['city'] = array("Ort", "Ort");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation2'] = ['Firma / Organisation / Schule (2)','Bitte Firmenname, Organisations oder Schulenname angeben'];
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['salutation2'] = ['Anrede (2)','Bitte Wählen Herr, Frau oder keine Angabe'];
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['title2'] = ['Titel (2)', 'Titel der Person'];
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['lastname2']  = array("Nachname (2)", "Nachname");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['firstname2'] = array("Vorname (2)", "Vorname");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['email2'] = array("E-Mail-Adresse (2)", "E-Mail-Adresse");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['phone2'] = array("Telefonnummer (2)", "Telefonnummer");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['address2'] = array("Straße (2)", "Straße");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'] = array("Postleitzahl (2)", "Postleitzahl");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'] = array("Ort (2)", "Ort");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'] = array("Anmerkung vom Kunden", "Kommentarfeld zur Reservierung.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['internal_comment'] = array("Nachricht an Kunde", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'] = array("Datenschutzerklärung", "Wird vom Nutzer im Frontend ausgewählt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Bestätigt", "Wurde der Termin bestätigt? (Optional)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Storniert", "Wenn der Termin storniert wird, ist dieses Feld anzuwählen");
+
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['billingAddress'] = array("Rechnungsadresse", "Rechnungsadresse");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['additionalHeadline'] = "Überschrift";
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes'] = 'ja';
 
@@ -58,6 +72,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['participants'] = 'Teilnehmer';
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend'] = "Reservierungsdaten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['person_legend']      = "Kontaktdaten";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['person2_legend']     = "Rechnungsadresse / Sonstige Personendaten";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['comment_legend']     = "Kommentare";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['new'] = array("Reservierung hinzufügen","Reservierung hinzufügen");

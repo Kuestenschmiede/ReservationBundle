@@ -810,7 +810,7 @@ class C4gReservation extends C4GBrickModuleParent
             ['id' => 'woman','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
             ['id' => 'various','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
         ];
-        
+
         $salutationField = new C4GSelectField();
         $salutationField->setFieldName('salutation');
         $salutationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation']);
@@ -818,8 +818,6 @@ class C4gReservation extends C4GBrickModuleParent
         $salutationField->setTableColumn(false);
         $salutationField->setOptions($salutation);
         $salutationField->setMandatory(false);
-        $salutationField->setCallOnChange(true);
-        $salutationField->setInitialCallOnChange(false);
         $salutationField->setNotificationField(true);
         $salutationField->setStyleClass('salutation');
         $fieldList[] = $salutationField;
@@ -860,10 +858,10 @@ class C4gReservation extends C4GBrickModuleParent
         $additionaldatas = StringUtil::deserialize($this->hide_selection);
         foreach ($additionaldatas as $rowdata) {
             $rowField = $rowdata['additionaldatas'];
+            $initialValue = $rowdata['initialValue'];
             $rowMandatory = $rowdata['binding'];
 
             if ($rowField == "organisation") {
-
                 $organisationField = new C4GTextField();
                 $organisationField->setFieldName('organisation');
                 $organisationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation']);
@@ -873,8 +871,18 @@ class C4gReservation extends C4GBrickModuleParent
                 $organisationField->setMandatory($rowMandatory);
                 $organisationField->setNotificationField(true);
                 $organisationField->setStyleClass('organisation');
+                $organisationField->setInitialValue($initialValue);
                 $fieldList[] = $organisationField;
-
+            } else if ($rowField == "title") {
+                $titleField = new C4GTextField();
+                $titleField->setFieldName('title');
+                $titleField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
+                $titleField->setSortColumn(false);
+                $titleField->setTableColumn(false);
+                $titleField->setMandatory(false);
+                $titleField->setNotificationField(true);
+                $titleField->setStyleClass('title');
+                $fieldList[] = $titleField;
             } else if ($rowField == "phone") {
                 $phoneField = new C4GTelField();
                 $phoneField->setFieldName('phone');
@@ -885,8 +893,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $phoneField->setTableColumn(false);
                 $phoneField->setNotificationField(true);
                 $phoneField->setStyleClass('phone');
+                $phoneField->setInitialValue($initialValue);
                 $fieldList[] = $phoneField;
-
             } else if ($rowField == "address") {
                 $addressField = new C4GTextField();
                 $addressField->setFieldName('address');
@@ -897,8 +905,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $addressField->setMandatory($rowMandatory);
                 $addressField->setNotificationField(true);
                 $addressField->setStyleClass('address');
+                $addressField->setInitialValue($initialValue);
                 $fieldList[] = $addressField;
-
             } else if ($rowField == "postal") {
                 $postalField = new C4GPostalField();
                 $postalField->setFieldName('postal');
@@ -910,8 +918,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $postalField->setMandatory($rowMandatory);
                 $postalField->setNotificationField(true);
                 $postalField->setStyleClass('postal');
+                $postalField->setInitialValue($initialValue);
                 $fieldList[] = $postalField;
-
             } else if ($rowField == "city") {
                 $cityField = new C4GTextField();
                 $cityField->setFieldName('city');
@@ -922,8 +930,123 @@ class C4gReservation extends C4GBrickModuleParent
                 $cityField->setMandatory($rowMandatory);
                 $cityField->setNotificationField(true);
                 $cityField->setStyleClass('city');
+                $cityField->setInitialValue($initialValue);
                 $fieldList[] = $cityField;
-
+            } else if ($rowField == "salutation2") {
+                $salutationField2 = new C4GSelectField();
+                $salutationField2->setFieldName('salutation2');
+                $salutationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation']);
+                $salutationField2->setSortColumn(false);
+                $salutationField2->setTableColumn(false);
+                $salutationField2->setOptions($salutation);
+                $salutationField2->setMandatory($rowMandatory);
+                $salutationField2->setNotificationField(true);
+                $salutationField2->setStyleClass('salutation');
+                $fieldList[] = $salutationField2;
+            } else if ($rowField == "title2") {
+                $titleField2 = new C4GTextField();
+                $titleField2->setFieldName('title2');
+                $titleField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
+                $titleField2->setSortColumn(false);
+                $titleField2->setTableColumn(false);
+                $titleField2->setMandatory(false);
+                $titleField2->setNotificationField(true);
+                $titleField2->setStyleClass('title');
+                $fieldList[] = $titleField2;
+            } else if ($rowField == "firstname2") {
+                $firstnameField2 = new C4GTextField();
+                $firstnameField2->setFieldName('firstname2');
+                $firstnameField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
+                $firstnameField2->setColumnWidth(10);
+                $firstnameField2->setSortColumn(false);
+                $firstnameField2->setTableColumn(true);
+                $firstnameField2->setMandatory($rowMandatory);
+                $firstnameField2->setNotificationField(true);
+                $firstnameField2->setStyleClass('firsname');
+                $fieldList[] = $firstnameField2;
+            } else if ($rowField == "lastname2") {
+                $lastnameField2 = new C4GTextField();
+                $lastnameField2->setFieldName('lastname2');
+                $lastnameField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
+                $lastnameField2->setColumnWidth(10);
+                $lastnameField2->setSortColumn(false);
+                $lastnameField2->setTableColumn(true);
+                $lastnameField2->setMandatory($rowMandatory);
+                $lastnameField2->setNotificationField(true);
+                $lastnameField2->setStyleClass('lastname');
+                $fieldList[] = $lastnameField2;
+            } else if ($rowField == "email2") {
+                $emailField2 = new C4GEmailField();
+                $emailField2->setFieldName('email2');
+                $emailField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
+                $emailField2->setColumnWidth(10);
+                $emailField2->setSortColumn(false);
+                $emailField2->setTableColumn(false);
+                $emailField2->setMandatory($rowMandatory);
+                $emailField2->setNotificationField(true);
+                $emailField2->setStyleClass('email');
+                $fieldList[] = $emailField2;
+            }if ($rowField == "organisation2") {
+                $organisationField2 = new C4GTextField();
+                $organisationField2->setFieldName('organisation2');
+                $organisationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation']);
+                $organisationField2->setColumnWidth(10);
+                $organisationField2->setSortColumn(false);
+                $organisationField2->setTableColumn(true);
+                $organisationField2->setMandatory($rowMandatory);
+                $organisationField2->setNotificationField(true);
+                $organisationField2->setStyleClass('organisation');
+                $organisationField2->setInitialValue($initialValue);
+                $fieldList[] = $organisationField2;
+            } else if ($rowField == "phone2") {
+                $phoneField2 = new C4GTelField();
+                $phoneField2->setFieldName('phone2');
+                $phoneField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['phone']);
+                $phoneField2->setColumnWidth(10);
+                $phoneField2->setSortColumn(false);
+                $phoneField2->setMandatory($rowMandatory);
+                $phoneField2->setTableColumn(false);
+                $phoneField2->setNotificationField(true);
+                $phoneField2->setStyleClass('phone');
+                $phoneField2->setInitialValue($initialValue);
+                $fieldList[] = $phoneField2;
+            } else if ($rowField == "address2") {
+                $addressField2 = new C4GTextField();
+                $addressField2->setFieldName('address2');
+                $addressField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['address']);
+                $addressField2->setColumnWidth(60);
+                $addressField2->setSortColumn(false);
+                $addressField2->setTableColumn(false);
+                $addressField2->setMandatory($rowMandatory);
+                $addressField2->setNotificationField(true);
+                $addressField2->setStyleClass('address');
+                $addressField2->setInitialValue($initialValue);
+                $fieldList[] = $addressField2;
+            } else if ($rowField == "postal2") {
+                $postalField2 = new C4GPostalField();
+                $postalField2->setFieldName('postal2');
+                $postalField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['postal']);
+                $postalField2->setColumnWidth(60);
+                $postalField2->setSize(5); //international 32
+                $postalField2->setSortColumn(false);
+                $postalField2->setTableColumn(false);
+                $postalField2->setMandatory($rowMandatory);
+                $postalField2->setNotificationField(true);
+                $postalField2->setStyleClass('postal');
+                $postalField2->setInitialValue($initialValue);
+                $fieldList[] = $postalField2;
+            } else if ($rowField == "city2") {
+                $cityField2 = new C4GTextField();
+                $cityField2->setFieldName('city2');
+                $cityField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['city']);
+                $cityField2->setColumnWidth(60);
+                $cityField2->setSortColumn(false);
+                $cityField2->setTableColumn(false);
+                $cityField2->setMandatory($rowMandatory);
+                $cityField2->setNotificationField(true);
+                $cityField2->setStyleClass('city');
+                $cityField2->setInitialValue($initialValue);
+                $fieldList[] = $cityField2;
             } else if ($rowField == "comment") {
                 $commentField = new C4GTextareaField();
                 $commentField->setFieldName('comment');
@@ -934,13 +1057,13 @@ class C4gReservation extends C4GBrickModuleParent
                 $commentField->setMandatory($rowMandatory);
                 $commentField->setNotificationField(true);
                 $commentField->setStyleClass('comment');
+                $commentField->setInitialValue($initialValue);
                 $fieldList[] = $commentField;
+            } else if ($rowField == "additionalHeadline") {
+                $headlineField = new C4GHeadlineField();
+                $headlineField->setTitle($initialValue);
+                $fieldList[] = $headlineField;
             } else if ($rowField == "participants") {
-
-                $participantsHeadline = new C4GHeadlineField();
-                $participantsHeadline->setTitle('Bitte tragen Sie hier alle Teilnehmer ein'); //ToDo
-                $fieldList[] = $participantsHeadline;
-
                 $participantsKey = new C4GKeyField();
                 $participantsKey->setFieldName('id');
                 $participantsKey->setComparable(false);
@@ -1008,14 +1131,14 @@ class C4gReservation extends C4GBrickModuleParent
         $reservationIdField->setColumnWidth(10);
         $reservationIdField->setSortColumn(true);
         $reservationIdField->setTableColumn(true);
-        $reservationIdField->setMandatory(true);
+        $reservationIdField->setMandatory(false);
         $reservationIdField->setInitialValue(C4GBrickCommon::getUUID());
-        $reservationIdField->setTableRow(true);
+        $reservationIdField->setTableRow(false);
         $reservationIdField->setEditable(false);
         $reservationIdField->setUnique(true);
         $reservationIdField->setNotificationField(true);
         $reservationIdField->setDbUnique(true);
-        $reservationIdField->setSimpleTextWithoutEditing(false);
+        $reservationIdField->setSimpleTextWithoutEditing(true);
         $reservationIdField->setDatabaseField(true);
         $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id_exists']);
         $reservationIdField->setDbUniqueAdditionalCondition("tl_c4g_reservation.cancellation <> '1' AND tl_c4g_reservation.beginDate > UNIX_TIMESTAMP(NOW())");
@@ -1044,7 +1167,7 @@ class C4gReservation extends C4GBrickModuleParent
             $href = \Contao\Controller::replaceInsertTags('{{link_url::' . $this->privacy_policy_site . '}}');
             $agreedField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . '<a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>');
         }
-        $agreedField->setTableRow(true);
+        $agreedField->setTableRow(false);
         $agreedField->setColumnWidth(5);
         $agreedField->setSortColumn(false);
         $agreedField->setTableColumn(false);
