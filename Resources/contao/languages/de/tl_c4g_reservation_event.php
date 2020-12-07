@@ -15,7 +15,7 @@ $str = 'tl_c4g_reservation_event';
 
 $GLOBALS['TL_LANG'][$str]['id'] = array("#", "");
 $GLOBALS['TL_LANG'][$str]['pid'] = array("Contao Event", "Wählen Sie ein Contao Event.");
-$GLOBALS['TL_LANG'][$str]['number'] = array("Nummer", "Hier können Sie eine Kennung für die Veranstaltung eingeben. Bspw. eine Seminarnummer.");
+$GLOBALS['TL_LANG'][$str]['number'] = array("Nummer", "Hier können Sie eine Kennung für die Veranstaltung eingeben, bspw. eine Seminarnummer.");
 $GLOBALS['TL_LANG'][$str]['reservationType'] = array("Reservierungsart", "Um welche Reservierungsart handelt es sich?");
 $GLOBALS['TL_LANG'][$str]['location'] = array("Veranstaltungsort", "Wo findet die Veranstaltung statt?");
 $GLOBALS['TL_LANG'][$str]['speaker'] = array("Referent(en)", "Wer leitet die Veranstaltung?");
