@@ -214,6 +214,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
             'sql'               => "blob NULL"
         ),
+
         'state' => array(
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['state'],
             'exclude'           => true,
