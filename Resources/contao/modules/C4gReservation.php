@@ -556,6 +556,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationObjectDBField->setFieldName('reservation_object');
                 $reservationObjectDBField->setDatabaseField(true);
                 $reservationObjectDBField->setFormField(false);
+                $reservationObjectDBField->setOptions($objects);
+                $reservationObjectDBField->setNotificationField(true);
                 $fieldList[] = $reservationObjectDBField;
 
                 //save beginDate
@@ -565,6 +567,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationBeginDateDBField->setDatabaseField(true);
                 $reservationBeginDateDBField->setFormField(false);
                 $reservationBeginDateDBField->setMax(999999999999);
+                $reservationBeginDateDBField->setNotificationField(true);
                 $fieldList[] = $reservationBeginDateDBField;
 
                 //save beginTime
@@ -574,6 +577,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationBeginTimeDBField->setDatabaseField(true);
                 $reservationBeginTimeDBField->setFormField(false);
                 $reservationBeginTimeDBField->setMax(999999999999);
+                $reservationBeginTimeDBField->setNotificationField(true);
                 $fieldList[] = $reservationBeginTimeDBField;
             }
 
@@ -584,6 +588,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationEndDateDBField->setDatabaseField(true);
             $reservationEndDateDBField->setFormField(false);
             $reservationEndDateDBField->setMax(9999999999999);
+            $reservationEndDateDBField->setNotificationField(true);
             $fieldList[] = $reservationEndDateDBField;
 
             //save endTime
@@ -593,6 +598,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationEndTimeDBField->setDatabaseField(true);
             $reservationEndTimeDBField->setFormField(false);
             $reservationEndTimeDBField->setMax(9999999999999);
+            $reservationEndTimeDBField->setNotificationField(true);
             $fieldList[] = $reservationEndTimeDBField;
 
             $reservationObjectField = new C4GSelectField();
@@ -842,11 +848,13 @@ class C4gReservation extends C4GBrickModuleParent
 
             if ($params) {
                 foreach ($params as $paramId) {
-                    $additionalParam = C4gReservationParamsModel::findByPk($paramId);
-                    if ($additionalParam && $additionalParam->caption && ($additionalParam->price && $this->showPrices)) {
-                        $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption."<span class='price'>&nbsp;(+".number_format($additionalParam->price,2)." €)</span>"];
-                    } else if ($additionalParam && $additionalParam->caption) {
-                        $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
+                    if ($paramId) {
+                        $additionalParam = C4gReservationParamsModel::findByPk($paramId);
+                        if ($additionalParam && $additionalParam->caption && ($additionalParam->price && $this->showPrices)) {
+                            $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption."<span class='price'>&nbsp;(+".number_format($additionalParam->price,2)." €)</span>"];
+                        } else if ($additionalParam && $additionalParam->caption) {
+                            $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
+                        }
                     }
                 }
             }

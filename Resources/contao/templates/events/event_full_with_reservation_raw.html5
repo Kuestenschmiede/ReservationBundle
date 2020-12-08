@@ -37,20 +37,20 @@
   <?php endif; ?>
 
   <!--reservation demo data-->
-  {{c4gevent::<?= $this->id ?>::headline}}
-  {{c4gevent::<?= $this->id ?>::state}}
-  {{c4gevent::<?= $this->id ?>::number}}
-  {{c4gevent::<?= $this->id ?>::title}}
-  {{c4gevent::<?= $this->id ?>::topic}}
-  {{c4gevent::<?= $this->id ?>::audience}}
-  {{c4gevent::<?= $this->id ?>::speaker}}
-  {{c4gevent::<?= $this->id ?>::eventlocation}} <!-- ::location for event entry -->
-  {{c4gevent::<?= $this->id ?>::eventaddress}} <!-- ::address for event entry -->
-  {{c4gevent::<?= $this->id ?>::beginDate}}
-  {{c4gevent::<?= $this->id ?>::beginTime}}
-  {{c4gevent::<?= $this->id ?>::endDate}}
-  {{c4gevent::<?= $this->id ?>::endTime}}
-  {{c4gevent::<?= $this->id ?>::button}}
+  {{c4gevent::<?= $this->id ?>::headline_raw}}
+  {{c4gevent::<?= $this->id ?>::state_raw}}
+  {{c4gevent::<?= $this->id ?>::number_raw}}
+  {{c4gevent::<?= $this->id ?>::title_raw}}
+  {{c4gevent::<?= $this->id ?>::topic_raw}}
+  {{c4gevent::<?= $this->id ?>::audience_raw}}
+  {{c4gevent::<?= $this->id ?>::speaker_raw}}
+  {{c4gevent::<?= $this->id ?>::eventlocation_raw}} <!-- ::location_raw for event entry -->
+  {{c4gevent::<?= $this->id ?>::eventaddress_raw}} <!-- ::address_raw for event entry -->
+  {{c4gevent::<?= $this->id ?>::beginDate_raw}}
+  {{c4gevent::<?= $this->id ?>::beginTime_raw}}
+  {{c4gevent::<?= $this->id ?>::endDate_raw}}
+  {{c4gevent::<?= $this->id ?>::endTime_raw}}
+  {{c4gevent::<?= $this->id ?>::button_raw}}
 
   <?php if ($this->enclosure): ?>
     <ul class="enclosure">

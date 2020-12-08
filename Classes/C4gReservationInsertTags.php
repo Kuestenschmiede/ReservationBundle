@@ -126,6 +126,7 @@ class C4gReservationInsertTags
                 $tableAudience = 'tl_c4g_reservation_event_audience';
                 $tableSpeaker = 'tl_c4g_reservation_event_speaker';
                 $tableTopic = 'tl_c4g_reservation_event_topic';
+                $tableLocation = 'tl_c4g_reservation_location';
 
                 $reservationEventObject = $this->db->prepare("SELECT * FROM $tableEventObject WHERE pid=?")
                     ->limit(1)
@@ -154,8 +155,12 @@ class C4gReservationInsertTags
                                 }
                             }
                             return '';
+                        case 'state_raw':
+                            return $this->getState($reservationEventObject);
                         case 'headline':
                             return '<div class=" c4g_reservation_details_headline">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'].'</div>';
+                        case 'headline_raw':
+                            return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'];
                         case 'button':
                             $settings = $this->db->prepare("SELECT reservationForwarding FROM $tableSettings")
                                 ->limit(1)
@@ -176,6 +181,8 @@ class C4gReservationInsertTags
                                 $value = $this->getHtmlSkeleton('eventnumber', $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventnumber'], $value);
                             }
                             return $value;
+                        case 'number_raw':
+                            return $reservationEventObject->number;
                         case 'audience':
                             $audienceIds = unserialize($reservationEventObject->targetAudience);
                             if ($audienceIds && count($audienceIds) > 0) {
@@ -195,6 +202,27 @@ class C4gReservationInsertTags
                                 }
 
                                 return $result ? $this->getHtmlSkeleton('targetAudience',$GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'],$result) : '';
+                            }
+                            break;
+                        case 'audience_raw':
+                            $audienceIds = unserialize($reservationEventObject->targetAudience);
+                            if ($audienceIds && count($audienceIds) > 0) {
+                                $audiences = "(" ;
+                                foreach ($audienceIds as $key => $audienceId) {
+                                    $audiences .= "\"$audienceId\"";
+                                    if (!(array_key_last($audienceIds) === $key)) {
+                                        $audiences .= ",";
+                                    }
+                                }
+                                $audiences .= ")";
+                                $audienceElements = $this->db->prepare("SELECT targetAudience FROM $tableAudience WHERE id IN $audiences")
+                                    ->execute()->fetchAllAssoc();
+
+                                foreach ($audienceElements as $audience) {
+                                    $result[] = $audience['targetAudience'];
+                                }
+
+                                return $result ? serialize($result) : [];
                             }
                             break;
                         case 'speaker':
@@ -226,6 +254,29 @@ class C4gReservationInsertTags
                                 return $result ? $this->getHtmlSkeleton('speaker',$GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'],$result) : '';
                             };
                             break;
+                        case 'speaker_raw':
+                            $speakerIds = unserialize($reservationEventObject->speaker);
+                            if ($speakerIds && count($speakerIds) > 0) {
+                                $speakers = "(" ;
+                                foreach ($speakerIds as $key => $speakerId) {
+                                    $speakers .= "\"$speakerId\"";
+                                    if (!(array_key_last($speakerIds) === $key)) {
+                                        $speakers .= ",";
+                                    }
+                                }
+                                $speakers .= ")";
+                                $speakerElements = $this->db->prepare("SELECT id,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE id IN $speakers")
+                                    ->execute()->fetchAllAssoc();
+
+                                foreach ($speakerElements as $speaker) {
+                                    $speakerStr = $speaker['title'] ? $speaker['lastname'].', '.$speaker['firstname'].', '.$speaker['title'] : $speaker['lastname'].', '.$speaker['firstname'];
+
+                                    $result[] = $speakerStr;
+                                }
+
+                                return $result ? serialize($result) : [];
+                            };
+                            break;
                         case 'topic';
                             $topicIds = unserialize($reservationEventObject->topic);
                             if ($topicIds && count($topicIds) > 0) {
@@ -247,48 +298,135 @@ class C4gReservationInsertTags
                                 return $result ? $this->getHtmlSkeleton('topic', $GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'],$result) : '';
                             }
                             break;
+                        case 'topic_raw';
+                            $topicIds = unserialize($reservationEventObject->topic);
+                            if ($topicIds && count($topicIds) > 0) {
+                                $topics = "(" ;
+                                foreach ($topicIds as $key => $topicId) {
+                                    $topics .= "\"$topicId\"";
+                                    if (!(array_key_last($topicIds) === $key)) {
+                                        $topics .= ",";
+                                    }
+                                }
+                                $topics .= ")";
+                                $topicElements = $this->db->prepare("SELECT topic FROM $tableTopic WHERE id IN $topics")
+                                    ->execute()->fetchAllAssoc();
+
+                                foreach ($topicElements as $topic) {
+                                    $result[] = $topic['topic'];
+                                }
+
+                                return $result ? serialize($result) : [];
+                            }
+                            break;
                         case 'beginDate':
                             $value = date($dateFormat, $calendarEvent->startDate);
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('beginDate',$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'],$value);
                             }
                             return $value;
+                        case 'beginDate_raw':
+                            return date($dateFormat, $calendarEvent->startDate);
                         case 'endDate':
                             $value = $calendarEvent->endDate ? date($dateFormat, $calendarEvent->endDate) : false;
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('endDate',$GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'],$value);
                             }
                             return $value;
+                        case 'endDate_raw':
+                            return $calendarEvent->endDate ? date($dateFormat, $calendarEvent->endDate) : '';
                         case 'beginTime':
                             $value = $calendarEvent->startTime ? date($timeFormat, $calendarEvent->startTime) : false;
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('beginTime',$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'],$value.' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']);
                             }
                             return $value;
+                        case 'beginTime_raw':
+                            return $calendarEvent->startTime ? date($dateFormat, $calendarEvent->startTime) : '';
                         case 'endTime':
                             $value = $calendarEvent->startTime < $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : false;
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('endTime',$GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'],$value.' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']);
                             }
                             return $value;
+                        case 'endTime_raw':
+                            return $calendarEvent->endTime ? date($dateFormat, $calendarEvent->endTime) : '';
                         case 'title':
                             $value = $calendarEvent->title;
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('title',$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'],$value);
                             }
                             return $value;
+                        case 'title_raw':
+                            return $calendarEvent->title;
                         case 'location':
                             $value = $calendarEvent->location;
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('location',$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'],$value);
                             }
                             return $value;
+                        case 'location_raw':
+                            return $calendarEvent->location;
+                        case 'eventlocation':
+                            $locationId = $reservationEventObject->location;
+                            if ($locationId) {
+                                $locationElement = $this->db->prepare("SELECT name FROM $tableLocation WHERE id=$locationId")
+                                    ->execute()->fetchAssoc();
+
+                                if ($locationElement) {
+                                    $result = $locationElement['name'];
+                                }
+
+                                return $result ? $this->getHtmlSkeleton('eventlocation', $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'], $result) : '';
+                            }
+                            break;
+                        case 'eventlocation_raw':
+                            $locationId = $reservationEventObject->location;
+                            if ($locationId) {
+                                $locationElement = $this->db->prepare("SELECT name FROM $tableLocation WHERE id=$locationId")
+                                    ->execute()->fetchAssoc();
+
+                                if ($locationElement) {
+                                    $result = $locationElement['name'];
+                                }
+
+                                return $result ? $result : '';
+                            }
+                            break;
                         case 'address':
                             $value = $calendarEvent->address;
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('address',$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'],$value);
                             }
                             return $value;
+                        case 'address_raw':
+                            return $calendarEvent->address;
+                        case 'eventaddress':
+                            $locationId = $reservationEventObject->location;
+                            if ($locationId) {
+                                $locationElement = $this->db->prepare("SELECT contact_street,contact_postal,contact_city FROM $tableLocation WHERE id=$locationId")
+                                    ->execute()->fetchAssoc();
+
+                                if ($locationElement && $locationElement['contact_street'] && $locationElement['contact_postal'] && $locationElement['contact_city']) {
+                                    $result = $locationElement['contact_street'].', '.$locationElement['contact_postal'].' '.$locationElement['contact_city'];
+                                }
+
+                                return $result ? $this->getHtmlSkeleton('eventaddress', $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'], $result) : '';
+                            }
+                            break;
+                        case 'eventaddress_raw':
+                            $locationId = $reservationEventObject->location;
+                            if ($locationId) {
+                                $locationElement = $this->db->prepare("SELECT contact_street,contact_postal,contact_city FROM $tableLocation WHERE id=$locationId")
+                                    ->execute()->fetchAssoc();
+
+                                if ($locationElement && $locationElement['contact_street'] && $locationElement['contact_postal'] && $locationElement['contact_city']) {
+                                    $result = $locationElement['contact_street'].', '.$locationElement['contact_postal'].' '.$locationElement['contact_city'];
+                                }
+
+                                return $result ? $result : '';
+                            }
+                            break;
                     }
                 }
             }

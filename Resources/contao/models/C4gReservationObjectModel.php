@@ -478,6 +478,16 @@ class C4gReservationObjectModel extends \Model
         return false;
     }
 
+    /**
+     * @param $list
+     * @param $type
+     * @param int $weekday
+     * @param null $date
+     * @param int $duration
+     * @param false $withEndTimes
+     * @param false $showFreeSeats
+     * @return array|mixed
+     */
     public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false)
     {
         $result = array();
