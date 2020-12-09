@@ -52,6 +52,12 @@
   {{c4gevent::<?= $this->id ?>::endTime_raw}}
   {{c4gevent::<?= $this->id ?>::button_raw}}
 
+  <!--reservation demo listdata-->
+  {{c4gevent::topic_raw}}
+  {{c4gevent::audience_raw}}
+  {{c4gevent::speaker_raw}}
+  {{c4gevent::eventlocation_raw}}
+
   <?php if ($this->enclosure): ?>
     <ul class="enclosure">
       <?php foreach ($this->enclosure as $enclosure): ?>

@@ -114,12 +114,153 @@ class C4gReservationInsertTags
         //{{c4gobject::ID::KEY}}
 
         //event reservations
-        if ($arrSplit && (($arrSplit[0] == 'c4gevent')) && isset($arrSplit[1]))
-        {
-            $pid = $arrSplit[1];
-            $key = $arrSplit[2];
+        if ($arrSplit && (($arrSplit[0] == 'c4gevent')) && isset($arrSplit[1])) {
+            if (count($arrSplit) == 2) {
+                $key = $arrSplit[1];
+                $tableEventObject = 'tl_c4g_reservation_event';
+                $tableCalendarEvent = 'tl_calendar_events';
+                $tableSettings = 'tl_c4g_settings';
+                $tableAudience = 'tl_c4g_reservation_event_audience';
+                $tableSpeaker = 'tl_c4g_reservation_event_speaker';
+                $tableTopic = 'tl_c4g_reservation_event_topic';
+                $tableLocation = 'tl_c4g_reservation_location';
 
-            if ($pid && $key) {
+                $reservationEventObject = $this->db->prepare("SELECT * FROM $tableEventObject")
+                    ->execute()->fetchAllAssoc();
+
+                if ($reservationEventObject) {
+                    System::loadLanguageFile('fe_c4g_reservation');
+
+                    switch ($key) {
+                        case 'check':
+                            return true;
+                        case 'audience_raw':
+                            if ($reservationEventObject) {
+                                $audienceIds = [];
+                                foreach ($reservationEventObject as $eventObject) {
+                                    $eventAudiences = unserialize($eventObject['targetAudience']);
+                                    foreach ($eventAudiences as $audienceId) {
+                                        $audienceIds[$audienceId] = $audienceId;
+                                    }
+                                }
+                            }
+
+                            if ($audienceIds && count($audienceIds) > 0) {
+                                $audiences = "(";
+                                foreach ($audienceIds as $key => $audienceId) {
+                                    $audiences .= "\"$audienceId\"";
+                                    if (!(array_key_last($audienceIds) === $key)) {
+                                        $audiences .= ",";
+                                    }
+                                }
+                                $audiences .= ")";
+                                $audienceElements = $this->db->prepare("SELECT targetAudience FROM $tableAudience WHERE id IN $audiences")
+                                    ->execute()->fetchAllAssoc();
+
+                                foreach ($audienceElements as $audience) {
+                                    $result[] = $audience['targetAudience'];
+                                }
+
+                                return $result ? serialize($result) : [];
+                            }
+                            break;
+                        case 'speaker_raw':
+                            if ($reservationEventObject) {
+                                $speakerIds = [];
+                                foreach ($reservationEventObject as $eventObject) {
+                                    $eventSpeakers = unserialize($eventObject['speaker']);
+                                    foreach ($eventSpeakers as $speakerId) {
+                                        $speakerIds[$speakerId] = $speakerId;
+                                    }
+                                }
+                            }
+
+                            if ($speakerIds && count($speakerIds) > 0) {
+                                $speakers = "(";
+                                foreach ($speakerIds as $key => $speakerId) {
+                                    $speakers .= "\"$speakerId\"";
+                                    if (!(array_key_last($speakerIds) === $key)) {
+                                        $speakers .= ",";
+                                    }
+                                }
+                                $speakers .= ")";
+                                $speakerElements = $this->db->prepare("SELECT id,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE id IN $speakers")
+                                    ->execute()->fetchAllAssoc();
+
+                                foreach ($speakerElements as $speaker) {
+                                    $speakerStr = $speaker['title'] ? $speaker['lastname'] . ', ' . $speaker['firstname'] . ', ' . $speaker['title'] : $speaker['lastname'] . ', ' . $speaker['firstname'];
+
+                                    $result[] = $speakerStr;
+                                }
+
+                                return $result ? serialize($result) : [];
+                            };
+                            break;
+                        case 'topic_raw';
+                            if ($reservationEventObject) {
+                                $topicIds = [];
+                                foreach ($reservationEventObject as $eventObject) {
+                                    $eventTopics = unserialize($eventObject['topic']);
+                                    foreach ($eventTopics as $topicId) {
+                                        $topicIds[$topicId] = $topicId;
+                                    }
+                                }
+                            }
+
+                            if ($topicIds && count($topicIds) > 0) {
+                                $topics = "(";
+                                foreach ($topicIds as $key => $topicId) {
+                                    $topics .= "\"$topicId\"";
+                                    if (!(array_key_last($topicIds) === $key)) {
+                                        $topics .= ",";
+                                    }
+                                }
+                                $topics .= ")";
+                                $topicElements = $this->db->prepare("SELECT topic FROM $tableTopic WHERE id IN $topics")
+                                    ->execute()->fetchAllAssoc();
+
+                                foreach ($topicElements as $topic) {
+                                    $result[] = $topic['topic'];
+                                }
+
+                                return $result ? serialize($result) : [];
+                            }
+                            break;
+                        case 'eventlocation_raw':
+                            if ($reservationEventObject) {
+                                $locationIds = [];
+                                foreach ($reservationEventObject as $eventObject) {
+                                    $locationId = $eventObject['location'];
+                                    if ($locationId) {
+                                        $locationIds[$locationId] = $locationId;
+                                    }
+                                }
+                            }
+
+                            if ($locationIds && count($locationIds) > 0) {
+                                $locations = "(";
+                                foreach ($locationIds as $key => $locationId) {
+                                    $locations .= "\"$locationId\"";
+                                    if (!(array_key_last($locationIds) === $key)) {
+                                        $locations .= ",";
+                                    }
+                                }
+                                $locations .= ")";
+                                $locationElements = $this->db->prepare("SELECT name FROM $tableLocation WHERE id IN $locations")
+                                    ->execute()->fetchAllAssoc();
+
+                                foreach ($locationElements as $location) {
+                                    $result[] = $location['name'];
+                                }
+
+                                return $result ? serialize($result) : [];
+                            }
+                            break;
+                    }
+                }
+            } else if ($arrSplit[1] && $arrSplit[2]) {
+                $pid = $arrSplit[1];
+                $key = $arrSplit[2];
                 $tableEventObject = 'tl_c4g_reservation_event';
                 $tableCalendarEvent = 'tl_calendar_events';
                 $tableSettings = 'tl_c4g_settings';
@@ -342,7 +483,7 @@ class C4gReservationInsertTags
                             }
                             return $value;
                         case 'beginTime_raw':
-                            return $calendarEvent->startTime ? date($dateFormat, $calendarEvent->startTime) : '';
+                            return $calendarEvent->startTime ? date($timeFormat, $calendarEvent->startTime) : '';
                         case 'endTime':
                             $value = $calendarEvent->startTime < $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : false;
                             if ($value) {
@@ -350,7 +491,7 @@ class C4gReservationInsertTags
                             }
                             return $value;
                         case 'endTime_raw':
-                            return $calendarEvent->endTime ? date($dateFormat, $calendarEvent->endTime) : '';
+                            return $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : '';
                         case 'title':
                             $value = $calendarEvent->title;
                             if ($value) {
