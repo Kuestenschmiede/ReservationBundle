@@ -256,6 +256,36 @@ class C4gReservationInsertTags
                                 return $result ? serialize($result) : [];
                             }
                             break;
+                        case 'city_raw':
+                            if ($reservationEventObject) {
+                                $locationIds = [];
+                                foreach ($reservationEventObject as $eventObject) {
+                                    $locationId = $eventObject['location'];
+                                    if ($locationId) {
+                                        $locationIds[$locationId] = $locationId;
+                                    }
+                                }
+                            }
+
+                            if ($locationIds && count($locationIds) > 0) {
+                                $locations = "(";
+                                foreach ($locationIds as $key => $locationId) {
+                                    $locations .= "\"$locationId\"";
+                                    if (!(array_key_last($locationIds) === $key)) {
+                                        $locations .= ",";
+                                    }
+                                }
+                                $locations .= ")";
+                                $locationElements = $this->db->prepare("SELECT contact_city FROM $tableLocation WHERE id IN $locations")
+                                    ->execute()->fetchAllAssoc();
+
+                                foreach ($locationElements as $location) {
+                                    $result[] = $location['contact_city'];
+                                }
+
+                                return $result ? serialize($result) : [];
+                            }
+                            break;
                     }
                 }
             } else if ($arrSplit[1] && $arrSplit[2]) {
@@ -529,6 +559,32 @@ class C4gReservationInsertTags
 
                                 if ($locationElement) {
                                     $result = $locationElement['name'];
+                                }
+
+                                return $result ? $result : '';
+                            }
+                            break;
+                        case 'city':
+                            $locationId = $reservationEventObject->location;
+                            if ($locationId) {
+                                $locationElement = $this->db->prepare("SELECT contact_city FROM $tableLocation WHERE id=$locationId")
+                                    ->execute()->fetchAssoc();
+
+                                if ($locationElement) {
+                                    $result = $locationElement['contact_city'];
+                                }
+
+                                return $result ? $this->getHtmlSkeleton('city', $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'], $result) : '';
+                            }
+                            break;
+                        case 'city_raw':
+                            $locationId = $reservationEventObject->location;
+                            if ($locationId) {
+                                $locationElement = $this->db->prepare("SELECT contact_city FROM $tableLocation WHERE id=$locationId")
+                                    ->execute()->fetchAssoc();
+
+                                if ($locationElement) {
+                                    $result = $locationElement['contact_city'];
                                 }
 
                                 return $result ? $result : '';

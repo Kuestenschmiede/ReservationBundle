@@ -57,6 +57,7 @@
   {{c4gevent::audience_raw}}
   {{c4gevent::speaker_raw}}
   {{c4gevent::eventlocation_raw}}
+  {{c4gevent::city_raw}}
 
   <?php if ($this->enclosure): ?>
     <ul class="enclosure">
