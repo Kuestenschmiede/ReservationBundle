@@ -1272,6 +1272,7 @@ class C4gReservation extends C4GBrickModuleParent
         $agreedField->setMandatory(true);
         $agreedField->setNotificationField(true);
         $agreedField->setStyleClass('agreed');
+        $agreedField->setWithoutDescriptionLineBreak(true);
         $fieldList[] = $agreedField;
 
         $clickButton = new C4GBrickButton(
