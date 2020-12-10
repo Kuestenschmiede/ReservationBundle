@@ -654,8 +654,18 @@ class tl_c4g_reservation extends Backend
 
 
         $arrRow['reservation_object'] = $object;
-        $arrRow['beginDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['beginTime']);
-        $arrRow['endTime']= date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endTime']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']);
+
+        if ($arrRow['beginDate']) {
+            $arrRow['beginDate'] = $arrRow['beginDate'] && $arrRow['beginTime'] ? date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['beginTime']) : date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']);
+        } else {
+            $arrRow['beginDate'] = '';
+        }
+
+        if ($arrRow['endDate']) {
+            $arrRow['endDate'] = $arrRow['endDate'] && $arrRow['endTime'] ? date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']) : date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']);
+        } else {
+            $arrRow['endDate'] = '';
+        }
 
         $type = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel::findByPk($arrRow['reservation_type']);
         if ($type) {
@@ -665,7 +675,7 @@ class tl_c4g_reservation extends Backend
         $result = [
             $arrRow['id'],
             $arrRow['beginDate'],
-            $arrRow['endTime'],
+            $arrRow['endDate'],
             $arrRow['desiredCapacity'],
             $arrRow['reservation_type'],
             $arrRow['lastname'],
