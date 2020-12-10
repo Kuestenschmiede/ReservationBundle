@@ -192,13 +192,14 @@ function setReservationForm(object, id, additionalId, callFunction) {
     }
 
     var radioButton = jQuery('.reservation_time_button input[type = "radio"]:checked');
+    radioButton.prop( "checked", false );
     if (radioButton) {
         for (i = 0; i < radioButton.length; i++) {
             var button = radioButton[i];
 
             if (button && jQuery(button).hasClass("radio_object_"+typeId)) {
                 setObjectId(button, typeId);
-                break;
+                radioButton.prop( "checked", true );
             }
         }
     }
