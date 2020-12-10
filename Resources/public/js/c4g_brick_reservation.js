@@ -174,17 +174,21 @@ function setReservationForm(object, id, additionalId, callFunction) {
     var typeField = document.getElementById("c4g_reservation_type");
     var typeId = typeField ? typeField.value : -1;
 
-    setTimeset(object, id, additionalId, callFunction);
-
+    var dateFieldVisible = false;
     var dateFields = document.getElementsByClassName('c4g_date_field_input');
     if (dateFields) {
         for (i = 0; i < dateFields.length; i++) {
             var dateField = dateFields[i];
             if (dateField && dateField.value && jQuery(dateField).is(":visible")) {
-                jQuery(dateField).trigger("change");
+                dateFieldVisible = true;
+                setTimeset(dateField, id, additionalId, callFunction);
                 break;
             }
         }
+    }
+
+    if (!dateFieldVisible) {
+        setTimeset(null, id, additionalId, callFunction);
     }
 
     var radioButton = jQuery('.reservation_time_button input[type = "radio"]:checked');
@@ -200,7 +204,7 @@ function setReservationForm(object, id, additionalId, callFunction) {
     }
 }
 
-function setTimeset(object, id, additionalId, callFunction) {
+function setTimeset(dateField, id, additionalId, callFunction) {
     var brick_api = apiBaseUrl+"/c4g_brick_ajax";
     var elementId = 0;
     var date = 0;
@@ -211,16 +215,21 @@ function setTimeset(object, id, additionalId, callFunction) {
         jQuery(document.getElementsByClassName('reservation_time_button')) ? jQuery(document.getElementsByClassName('reservation_time_button')).hide() : false;
         jQuery(document.getElementsByClassName('displayReservationObjects')) ? jQuery(document.getElementsByClassName('displayReservationObjects')).hide() : false;
     } else {
-        elementId = "c4g_beginDate_"+additionalId;
-        date = document.getElementById(elementId) ? document.getElementById(elementId).value : 0;
+        if (!dateField) {
+            dateField = document.getElementById('c4g_beginDate_'+additionalId);
+        }
+
+        //elementId = "c4g_beginDate_"+additionalId;
+        date = dateField ? dateField.value : 0;
     }
+
     var durationNode = document.getElementById("c4g_duration");
     if (durationNode) {
         var duration = durationNode.value;
     }
 
-    C4GCallOnChangeMethodswitchFunction(object);
-    C4GCallOnChange(object);
+    C4GCallOnChangeMethodswitchFunction(document.getElementById("c4g_reservation_object_"+additionalId));
+    C4GCallOnChange(document.getElementById("c4g_reservation_object_"+additionalId));
 
     //hotfix dates with slashes
     if (date && date.indexOf("/")) {

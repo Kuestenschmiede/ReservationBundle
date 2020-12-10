@@ -230,7 +230,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $durationField->setTableColumn(true);
                     $durationField->setMandatory(true);
                     $durationField->setCallOnChange(true);
-                    $durationField->setCallOnChangeFunction("setTimeset(this, " . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
+                    $durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_".$type['id']."'), " . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
                     $durationField->setCondition(array($condition));
                     $durationField->setNotificationField(true);
                     $durationField->setStyleClass('duration');
@@ -1566,7 +1566,7 @@ class C4gReservation extends C4GBrickModuleParent
         $action->setModule($this);
 
         $vcardObject = $reservationEventObject ? $reservationEventObject : $reservationObject;
-        $this->createIcs($beginDate, $beginTime, $endDate, $endtTime, $vcardObject, $reservationType);
+        $this->createIcs($beginDate, $beginTime, $endDate, $endTime, $vcardObject, $reservationType);
 
         return $result = $action->run();
     }
@@ -1632,7 +1632,7 @@ class C4gReservation extends C4GBrickModuleParent
         $withEndTimes = $this->showEndTime;
         $withFreeSeats = $this->showFreeSeats;
 
-        $times = C4gReservationObjectModel::getReservationTimes($objects, $additionalParam, $weekday, $date, $duration, $withEndTimes, $withFreeSeats);
+        $times = C4gReservationObjectModel::getReservationTimes($objects, $additionalParam, $weekday, $date, $duration, $withEndTimes, $withFreeSeats, true);
 
         if ($additionalParam) {
             if ($this->fieldList) {

@@ -220,7 +220,6 @@ class C4gReservationObjectModel extends \Model
                         $exclusionBegin = $period['date_exclusion'];
                         $exclusionEnd =  $period['date_exclusion_end'];
 
-
                         $current = $exclusionBegin;
                         while($current <= $exclusionEnd) {
                             $alldates[] = $current;
@@ -488,7 +487,7 @@ class C4gReservationObjectModel extends \Model
      * @param false $showFreeSeats
      * @return array|mixed
      */
-    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false)
+    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false)
     {
         $result = array();
 
@@ -642,7 +641,8 @@ class C4gReservationObjectModel extends \Model
 
                                             $timeObj = ['id'=>-1,'act'=>$actPersons, 'percent'=>$actPercent, 'max'=>$capacity,'showSeats'=>$showFreeSeats];
 
-                                            if ($tsdate && (($nowDate < $tsdate) || (($nowDate == $tsdate) && ($time > $nowTime)))) {
+                                            //ToDo nowDate isFrontendStuff
+                                            if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $time)))) {
                                                 if ($actPersons && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
                                                     $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else if ($maxCount && (!empty($count)) && ($count[$tsdate][$time] >= intval($maxCount * $capacity))) {  //n times for type
