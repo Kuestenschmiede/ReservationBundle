@@ -72,7 +72,7 @@ class C4gReservationObjectModel extends \Model
             $id= $object->getId();
             $objectData = $database->prepare("SELECT * FROM `tl_c4g_reservation_object` WHERE id=? AND published='1'")
                 ->execute($id)->fetchAssoc();
-            $weekday = date(w,$date);
+            $weekday = date("w",$date);
             $quantity = $objectData['quantity'];
             $periodType = $type['periodType'];
             $maxPerTime = $type['objectCount']; //ToDo check max count per interval

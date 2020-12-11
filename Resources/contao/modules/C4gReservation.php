@@ -53,6 +53,7 @@ use con4gis\ReservationBundle\Resources\contao\models\C4gReservationModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel;
+use Contao\Controller;
 use Contao\Date;
 use Contao\StringUtil;
 use Contao\System;
@@ -1374,8 +1375,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $icslocation = $contact_street ." ". $contact_postal." ". $contact_city;
                 $icsuid = $contact_email;
 
-                $local_tz = new DateTimeZone($timezone);
-                $localTime = new DateTime($beginTime, $local_tz); //ToDo Test
+                $local_tz = new \DateTimeZone($timezone);
+                $localTime = $beginTime+date("Z");//new \DateTime(intval($beginTime), $local_tz);
 //                $difference = $beginTime->diff($local);
 //
 //                if ($icsdaylightsaving == 1) {
@@ -1417,16 +1418,24 @@ class C4gReservation extends C4GBrickModuleParent
                     $icsenddate =$e_date . 'T' . $e_time. 'Z';
                 }
 
-               $fileId = sprintf("%05d", $type->id).sprintf("%05d",$object->id);
-               $filename = $location->icsPath.'/'.$fileId.'/'.'reservation.isc';
-                try {
-                    $ics = new File($filename);
-                } catch (\Exception $exception) {
-                    $fs = new Filesystem();
-                    $fs->touch($filename);
-                    $ics = new File($filename);
+                $fileId = sprintf("%05d", $type->id).sprintf("%05d",$object->id);
+                $pathUuid = $location->icsPath;
+                $pathUuid = StringUtil::binToUuid($pathUuid);
+
+                if ($pathUuid) {
+                    $path = Controller::replaceInsertTags("{{file::$pathUuid}}");
+
+                    $filename = $path.'/'.$fileId.'/'.'reservation.isc';
+                    try {
+                        mkdir($path.'/'.$fileId.'/');
+                        $ics = new File($filename);
+                    } catch (\Exception $exception) {
+                        $fs = new Filesystem();
+                        $fs->touch($filename);
+                        $ics = new File($filename);
+                    }
+                    $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nDESCRIPTION:$icssummary\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
                 }
-                $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nDESCRIPTION:$icssummary\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
             }
         }
     }
@@ -1434,8 +1443,9 @@ class C4gReservation extends C4GBrickModuleParent
     public function clickReservation($values, $putVars)
     {
         $type = $putVars['reservation_type'];
+        $reservationType = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
+            ->execute($type);
 
-        //ToDO Test
         if ($type && $type['notification_type']) {
             $this->dialogParams->setNotificationType($type['notification_type']);
             $this->notification_type = $type['notification_type'];
@@ -1452,8 +1462,6 @@ class C4gReservation extends C4GBrickModuleParent
                 unset($putVars[$field->getFieldName()]);
             }
 
-            $reservationType = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
-                ->execute($type);
             $isEvent = $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
             if ($isEvent) {
                 $key = "reservation_object_event_" . $type;
