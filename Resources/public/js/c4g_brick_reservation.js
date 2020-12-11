@@ -199,7 +199,7 @@ function setReservationForm(object, id, additionalId, callFunction) {
 
             if (button && jQuery(button).hasClass("radio_object_"+typeId)) {
                 setObjectId(button, typeId);
-                radioButton.prop( "checked", true );
+                //radioButton.prop( "checked", true );
             }
         }
     }

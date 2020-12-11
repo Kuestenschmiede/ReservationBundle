@@ -168,7 +168,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['privacy_policy_site'] = array
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',
-    'eval'                    => array('mandatory'=>true, 'fieldType'=>'radio'),
+    'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
     'sql'                     => "int(10) unsigned NOT NULL default '0'",
     'relation'                => array('type'=>'hasOne', 'load'=>'eager')
 );
