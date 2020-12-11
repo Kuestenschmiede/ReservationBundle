@@ -119,6 +119,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_city'] = 'Geben Sie Ort oder Sta
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_comment'] = 'Hier können Sie optional eine Nachricht an uns hinterlassen.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten finden Sie in unserer ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] = 'Datenschutzerklärung.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten finden Sie in unserer Datenschutzerklärung.';
 
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'] = 'Jetzt reservieren';
