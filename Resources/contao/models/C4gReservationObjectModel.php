@@ -816,10 +816,10 @@ class C4gReservationObjectModel extends \Model
                         $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
                         $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                         $frontendObject->setNumber($event['number']);
-                        $frontendObject->setAudience(unserialize($event['targetAudience']));
+                        $frontendObject->setAudience($event['targetAudience'] ? unserialize($event['targetAudience']) : []);
                         $frontendObject->setEventDuration('');
-                        $frontendObject->setSpeaker(unserialize($event['speaker']));
-                        $frontendObject->setTopic(unserialize($event['topic']));
+                        $frontendObject->setSpeaker($event['speaker'] ? unserialize($event['speaker']) : []);
+                        $frontendObject->setTopic($event['topic'] ? unserialize($event['topic']) : []);
                         $frontendObject->setLocation($event['location']);
                         $objectList[] = $frontendObject;
                     }

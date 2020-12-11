@@ -1420,9 +1420,8 @@ class C4gReservation extends C4GBrickModuleParent
 
                 $fileId = sprintf("%05d", $type->id).sprintf("%05d",$object->id);
                 $pathUuid = $location->icsPath;
-                $pathUuid = StringUtil::binToUuid($pathUuid);
-
                 if ($pathUuid) {
+                    $pathUuid = StringUtil::binToUuid($pathUuid);
                     $path = Controller::replaceInsertTags("{{file::$pathUuid}}");
 
                     $filename = $path.'/'.$fileId.'/'.'reservation.isc';
