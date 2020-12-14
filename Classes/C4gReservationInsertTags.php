@@ -12,11 +12,13 @@
  */
 namespace con4gis\ReservationBundle\Classes;
 
+use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickDialogParams;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GGalleryField;
 use Contao\Controller;
 use Contao\Database;
 use Contao\Frontend;
+use Contao\StringUtil;
 use Contao\System;
 
 /**
@@ -45,19 +47,18 @@ class C4gReservationInsertTags
         }
     }
 
-
     /**
      * @param $fieldname
      * $param $label
      * @param $value
-     * @param string $itemProp
+     * @param string $className
      */
-    private function getHtmlSkeleton($fieldname, $label, $value, $itemProp = '') {
+    private function getHtmlSkeleton($fieldname, $label, $value, $className = 'c4g_reservation_details') {
         $result = '';
         if ($value) {
-            $result = '<p class="c4g_reservation_details c4g_reservation_details_'.$fieldname.'">'.
-                '<label class="c4g_reservation_details_label" for="c4g_reservation_details_value">'.$label.'</label>'.
-                '<span class="c4g_reservation_details_value '.$fieldname.'">'.$value.'</span></p>';
+            $result = '<p class="'.$className.' '.$className.'_'.$fieldname.'">'.
+                '<label class="'.$className.'_label" for="'.$className.'_value">'.$label.'</label>'.
+                '<span class="'.$className.'_value '.$fieldname.'">'.$value.'</span></p>';
         }
         return $result;
     }
@@ -625,6 +626,45 @@ class C4gReservationInsertTags
                             }
                             break;
                     }
+                }
+            }
+        } else  if ($arrSplit && (($arrSplit[0] == 'c4gspeaker')) && isset($arrSplit[1])) {
+            $speakerId = $arrSplit[1];
+            $key = $arrSplit[2];
+            $tableSpeaker = 'tl_c4g_reservation_event_speaker';
+
+            $speakerObject = $this->db->prepare("SELECT * FROM $tableSpeaker WHERE id=?")
+                ->limit(1)
+                ->execute($speakerId);
+
+            if ($speakerObject->numRows) {
+                System::loadLanguageFile('fe_c4g_reservation');
+                $dateFormat = $GLOBALS['TL_CONFIG']['dateFormat'];
+                $datimFormat = $GLOBALS['TL_CONFIG']['datimFormat'];
+                $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
+
+                switch($key) {
+                    case 'check':
+                        return true;
+                    case 'name':
+                        $speakerStr = $this->getHtmlSkeleton($key,'', $speakerObject->title ? $speakerObject->title.' '.$speakerObject->firstname.' '.$speakerObject->lastname : $speakerObject->firstname.' '.$speakerObject->lastname, 'c4g_speaker_details');
+                        return $speakerStr;
+                    case 'zipAndCity':
+                        $cityStr = $this->getHtmlSkeleton($key,'', $speakerObject->postal.' '.$speakerObject->city, 'c4g_speaker_details');
+                        return $cityStr;
+                    case 'photo':
+                        $uuid = $speakerObject->photo;
+                        if ($uuid) {
+                            if (StringHelper::isBinary($uuid)) {
+                                $uuid = StringUtil::binToUuid($uuid);
+                            }
+                            return $this->getHtmlSkeleton($key, '', Controller::replaceInsertTags("{{image::$uuid?height=400&mode=proportional&class=img-fluid}}"), 'c4g_speaker_details');
+                        }
+                        break;
+                    default:
+                        if ($speakerObject->$key) {
+                            return $this->getHtmlSkeleton($key, '', $speakerObject->$key, 'c4g_speaker_details');
+                        }
                 }
             }
         }
