@@ -50,6 +50,8 @@
   {{c4gevent::<?= $this->id ?>::beginTime}}
   {{c4gevent::<?= $this->id ?>::endDate}}
   {{c4gevent::<?= $this->id ?>::endTime}}
+  {{c4gevent::<?= $this->id ?>::additional}}
+  {{c4gevent::<?= $this->id ?>::included}}
   {{c4gevent::<?= $this->id ?>::button}}
 
   <?php if ($this->enclosure): ?>

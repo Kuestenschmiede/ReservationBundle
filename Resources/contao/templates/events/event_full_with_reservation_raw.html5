@@ -50,6 +50,8 @@
   {{c4gevent::<?= $this->id ?>::beginTime_raw}}
   {{c4gevent::<?= $this->id ?>::endDate_raw}}
   {{c4gevent::<?= $this->id ?>::endTime_raw}}
+  {{c4gevent::<?= $this->id ?>::additional_raw}}
+  {{c4gevent::<?= $this->id ?>::included_raw}}
   {{c4gevent::<?= $this->id ?>::button_raw}}
 
   <!--reservation demo listdata-->

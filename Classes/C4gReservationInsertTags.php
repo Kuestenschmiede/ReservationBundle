@@ -15,6 +15,7 @@ namespace con4gis\ReservationBundle\Classes;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickDialogParams;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GGalleryField;
+use con4gis\ReservationBundle\Resources\contao\models\C4GReservationParamsModel;
 use Contao\Controller;
 use Contao\Database;
 use Contao\Frontend;
@@ -287,6 +288,30 @@ class C4gReservationInsertTags
                                 return $result ? serialize($result) : [];
                             }
                             break;
+                        case 'included_raw':
+                            $includedParams = $this->db->prepare("SELECT included_params FROM tl_c4g_reservation_type WHERE id = ?")
+                                ->execute($reservationEventObject->reservationType)->fetchAssoc();
+                            $params = $includedParams ? unserialize($includedParams['additional_params']) : [];
+                            $includedParamsArr = [];
+                            foreach ($params as $param) {
+                                $includedParam = C4gReservationParamsModel::findByPk($param);
+                                if ($includedParam && $includedParam->caption) {
+                                    $includedParamsArr[$param] = $includedParam->caption;
+                                }
+                            }
+                            return serialize($includedParamsArr);
+                        case 'additional_raw':
+                            $additionalParams = $this->db->prepare("SELECT additional_params FROM tl_c4g_reservation_type WHERE id = ?")
+                                ->execute($reservationEventObject->reservationType)->fetchAssoc();
+                            $params = $additionalParams ? unserialize($additionalParams['additional_params']) : [];
+                            $additionalParamsArr = [];
+                            foreach ($params as $param) {
+                                $additionalParam = C4gReservationParamsModel::findByPk($param);
+                                if ($additionalParam && $additionalParam->caption) {
+                                    $additionalParamsArr[$param] = $additionalParam->caption;
+                                }
+                            }
+                            return serialize($additionalParamsArr);
                     }
                 }
             } else if ($arrSplit[1] && $arrSplit[2]) {
@@ -625,6 +650,56 @@ class C4gReservationInsertTags
                                 return $result ? $result : '';
                             }
                             break;
+                        case 'included':
+                            $includedParams = $this->db->prepare("SELECT included_params FROM tl_c4g_reservation_type WHERE id = ?")
+                                ->execute($reservationEventObject->reservationType)->fetchAssoc();
+                            $params = $includedParams ? unserialize($includedParams['included_params']) : [];
+                            $result = '';
+                            foreach ($params as $param) {
+                                $includedParam = C4gReservationParamsModel::findByPk($param);
+                                if ($includedParam && $includedParam->caption) {
+                                    $result = $result ? $result.', '.$includedParam->caption : $includedParam->caption;
+                                }
+                            }
+
+                            return $result ? $this->getHtmlSkeleton('includedParams', /*$GLOBALS['TL_LANG']['fe_c4g_reservation']['includedParams']*/'', $result) : '';
+                        case 'included_raw':
+                            $includedParams = $this->db->prepare("SELECT included_params FROM tl_c4g_reservation_type WHERE id = ?")
+                                ->execute($reservationEventObject->reservationType)->fetchAssoc();
+                            $params = $includedParams ? unserialize($includedParams['included_params']) : [];
+                            $includedParamsArr = [];
+                            foreach ($params as $param) {
+                                $includedParam = C4gReservationParamsModel::findByPk($param);
+                                if ($includedParam && $includedParam->caption) {
+                                    $includedParamsArr[$param] = $includedParam->caption;
+                                }
+                            }
+                            return serialize($includedParamsArr);
+                        case 'additional':
+                            $additionalParams = $this->db->prepare("SELECT additional_params FROM tl_c4g_reservation_type WHERE id = ?")
+                                ->execute($reservationEventObject->reservationType)->fetchAssoc();
+                            $params = $additionalParams ? unserialize($additionalParams['additional_params']) : [];
+                            $result = '';
+                            foreach ($params as $param) {
+                                $additionalParam = C4gReservationParamsModel::findByPk($param);
+                                if ($additionalParam && $additionalParam->caption) {
+                                    $result = $result ? $result.', '.$additionalParam->caption : $additionalParam->caption;
+                                }
+                            }
+
+                            return $result ? $this->getHtmlSkeleton('additionalParams', /*$GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParams']*/'', $result) : '';
+                        case 'additional_raw':
+                            $additionalParams = $this->db->prepare("SELECT additional_params FROM tl_c4g_reservation_type WHERE id = ?")
+                                ->execute($reservationEventObject->reservationType)->fetchAssoc();
+                            $params = unserialize($additionalParams);
+                            $additionalParamsArr = [];
+                            foreach ($params as $param) {
+                                $additionalParam = C4gReservationParamsModel::findByPk($param);
+                                if ($additionalParam && $additionalParam->caption) {
+                                    $additionalParamsArr[$param] = $additionalParam->caption;
+                                }
+                            }
+                            return serialize($additionalParamsArr);
                     }
                 }
             }
