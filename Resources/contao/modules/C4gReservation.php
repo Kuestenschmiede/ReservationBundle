@@ -174,6 +174,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
             $reservationTypeField->setHidden(count($typelist) == 1);
+            $reservationTypeField->setNotificationField(true);
             $fieldList[] = $reservationTypeField;
         }
 
@@ -553,7 +554,7 @@ class C4gReservation extends C4GBrickModuleParent
                 }
 
                 //save event id as reservation object
-                $reservationObjectDBField = new C4GNumberField();
+                $reservationObjectDBField = new C4GSelectField();
                 $reservationObjectDBField->setFieldName('reservation_object');
                 $reservationObjectDBField->setDatabaseField(true);
                 $reservationObjectDBField->setFormField(false);
@@ -562,7 +563,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $fieldList[] = $reservationObjectDBField;
 
                 //save beginDate
-                $reservationBeginDateDBField = new C4GNumberField();
+                $reservationBeginDateDBField = new C4GDateField();
                 $reservationBeginDateDBField->setFieldName('beginDate');
                 $reservationBeginDateDBField->setInitialValue(0);
                 $reservationBeginDateDBField->setDatabaseField(true);
@@ -572,7 +573,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $fieldList[] = $reservationBeginDateDBField;
 
                 //save beginTime
-                $reservationBeginTimeDBField = new C4GNumberField();
+                $reservationBeginTimeDBField = new C4GTimeField();
                 $reservationBeginTimeDBField->setFieldName('beginTime');
                 $reservationBeginTimeDBField->setInitialValue(0);
                 $reservationBeginTimeDBField->setDatabaseField(true);
@@ -583,7 +584,7 @@ class C4gReservation extends C4GBrickModuleParent
             }
 
             //save endDate
-            $reservationEndDateDBField = new C4GNumberField();
+            $reservationEndDateDBField = new C4GDateField();
             $reservationEndDateDBField->setFieldName('endDate');
             $reservationEndDateDBField->setInitialValue(0);
             $reservationEndDateDBField->setDatabaseField(true);
@@ -593,7 +594,7 @@ class C4gReservation extends C4GBrickModuleParent
             $fieldList[] = $reservationEndDateDBField;
 
             //save endTime
-            $reservationEndTimeDBField = new C4GNumberField();
+            $reservationEndTimeDBField = new C4GTimeField();
             $reservationEndTimeDBField->setFieldName('endTime');
             $reservationEndTimeDBField->setInitialValue(0);
             $reservationEndTimeDBField->setDatabaseField(true);
@@ -845,6 +846,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $includedParams->setAdditionalID($type['id'].'-00'.$reservationObject->getId());
                 $includedParams->setStyleClass('included-params');
                 $includedParams->setAllChecked(true);
+                $includedParams->setNotificationField(true);
                 $fieldList[] = $includedParams;
             }
 
@@ -878,6 +880,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $additionalParams->setRemoveWithEmptyCondition(true);
                 $additionalParams->setAdditionalID($type['id'].'-00'.$reservationObject->getId());
                 $additionalParams->setStyleClass('additional-params');
+                $additionalParams->setNotificationField(true);
                 $fieldList[] = $additionalParams;
             }
         }
@@ -1075,7 +1078,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $emailField2->setNotificationField(true);
                 $emailField2->setStyleClass('email');
                 $fieldList[] = $emailField2;
-            }if ($rowField == "organisation2") {
+            } else if ($rowField == "organisation2") {
                 $organisationField2 = new C4GTextField();
                 $organisationField2->setFieldName('organisation2');
                 $organisationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation2']);
@@ -1219,6 +1222,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationParticipants->setMandatory($rowMandatory);
                 $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
                 $reservationParticipants->setMax(intval($type->maxParticipantsPerBooking) > 0 ? $type->maxParticipantsPerBooking : -1); //ToDo Test
+                $reservationParticipants->setNotificationField(true);
                 $fieldList[] = $reservationParticipants;
             }
         }
@@ -1237,7 +1241,7 @@ class C4gReservation extends C4GBrickModuleParent
         $reservationIdField->setUnique(true);
         $reservationIdField->setNotificationField(true);
         $reservationIdField->setDbUnique(true);
-        $reservationIdField->setSimpleTextWithoutEditing(true);
+        $reservationIdField->setSimpleTextWithoutEditing(false); //!!!
         $reservationIdField->setDatabaseField(true);
         $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id_exists']);
         $reservationIdField->setDbUniqueAdditionalCondition("tl_c4g_reservation.cancellation <> '1' AND tl_c4g_reservation.beginDate > UNIX_TIMESTAMP(NOW())");
@@ -1293,7 +1297,7 @@ class C4gReservation extends C4GBrickModuleParent
         $buttonField->setWithoutLabel(true);
         $fieldList[] = $buttonField;
 
-        //ToDo load location table
+
         $contact_name = new C4GTextField();
         $contact_name->setFieldName('contact_name');
         $contact_name->setSortColumn(false);
@@ -1349,106 +1353,23 @@ class C4gReservation extends C4GBrickModuleParent
         $this->fieldList = $fieldList;
     }
 
-
-
-
-    public function createIcs($beginDate, $beginTime, $endDate, $endTime, $object, $type)
-    {
-        $locationId = ($object && $object->location) ? $object->location : $type->location;
-        if ($locationId) {
-            $location = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_location WHERE id=?")
-                ->execute($locationId);
-            if ($location && $location->ics && $location->icsPath) {
-                $contact_street = $location->contact_street;
-                $contact_postal = $location->contact_postal;
-                $contact_city = $location->contact_city;
-                $contact_name = $location->contact_name;
-                $contact_email = $location->contact_email;
-
-                $dateFormat = $GLOBALS['TL_CONFIG']['dateFormat'];
-                $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
-                $timezone   = $GLOBALS['TL_CONFIG']['timeZone'];
-
-                $icstimezone = 'TZID='.$timezone;
-                $icsdaylightsaving= date('I');
-                $icsprodid = $contact_name;
-                $icslocation = $contact_street ." ". $contact_postal." ". $contact_city;
-                $icsuid = $contact_email;
-
-                $local_tz = new \DateTimeZone($timezone);
-                $localTime = $beginTime+date("Z");//new \DateTime(intval($beginTime), $local_tz);
-//                $difference = $beginTime->diff($local);
-//
-//                if ($icsdaylightsaving == 1) {
-//                    $beginTime = $beginTime - $difference - 3600;
-//                }
-//                if ($icsdaylightsaving == 0) {
-//                    $beginTime = $beginTime - $difference;
-//                }
-
-                $b_date = date('Ymd', strtotime($beginDate));
-                $b_time = date('His', $localTime);
-                $icsdate = $b_date . 'T' . $b_time . 'Z';
-
-                $icsalert = $location->icsAlert;
-
-                $residence = $object->min_residence_time;
-                $time_int = $object->time_interval;
-
-                $icssummary = $object->caption;
-
-                $icsalert = $icsalert * 60;
-                $icsalert = '-PT'.$icsalert.'M';
-
-                if ($residence != 0) {
-                    $residence = $residence * 3600;
-                    $e_date = date('Ymd',strtotime($beginDate));
-                    $e_time = $beginTime + $residence;
-                    $e_time = date('His',$e_time);
-                    $icsenddate =$e_date . 'T' . $e_time. 'Z';
-                } else if ($time_int) {
-                    $time_int = $time_int * 3600;
-                    $e_date = date('Ymd',strtotime($beginDate));
-                    $e_time = $beginTime + $time_int;
-                    $e_time = date('His',$e_time);
-                    $icsenddate =$e_date . 'T' . $e_time. 'Z';
-                } else if ($type->reservationObjectType == '2') {  //event
-                    $e_date = date('Ymd', $beginDate);
-                    $e_time = date('His', $beginTime);
-                    $icsenddate =$e_date . 'T' . $e_time. 'Z';
-                }
-
-                $fileId = sprintf("%05d", $type->id).sprintf("%05d",$object->id);
-                $pathUuid = $location->icsPath;
-                if ($pathUuid) {
-                    $pathUuid = StringUtil::binToUuid($pathUuid);
-                    $path = Controller::replaceInsertTags("{{file::$pathUuid}}");
-
-                    $filename = $path.'/'.$fileId.'/'.'reservation.isc';
-                    try {
-                        mkdir($path.'/'.$fileId.'/');
-                        $ics = new File($filename);
-                    } catch (\Exception $exception) {
-                        $fs = new Filesystem();
-                        $fs->touch($filename);
-                        $ics = new File($filename);
-                    }
-                    $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nDESCRIPTION:$icssummary\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
-                }
-            }
-        }
-    }
-
+    /**
+     * @param $values
+     * @param $putVars
+     * @return array|false|mixed|string|string[]|void
+     *
+     */
     public function clickReservation($values, $putVars)
     {
         $type = $putVars['reservation_type'];
         $reservationType = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
             ->execute($type);
 
-        if ($type && $type['notification_type']) {
-            $this->dialogParams->setNotificationType($type['notification_type']);
-            $this->notification_type = $type['notification_type'];
+        if ($reservationType && $reservationType->notification_type) {
+            $this->getDialogParams()->setNotificationType($reservationType->notification_type);
+            $this->notification_type = $reservationType->notification_type;
         }
+
         $newFieldList = [];
         $removedFromList = [];
         foreach ($this->getFieldList() as $key=>$field) {
@@ -1474,30 +1395,16 @@ class C4gReservation extends C4GBrickModuleParent
                     ->execute($resObject);
             }
 
-            $contact_name = $reservationType->contact_name;
-            $contact_email = $reservationType->contact_email;
-            $vcard = $reservationObject->vcard_show;
-            if ($vcard) {
-                $contact_street = $reservationObject->contact_street;
-                $contact_phone = $reservationObject->contact_phone;
-                $contact_postal = $reservationObject->contact_postal;
-                $contact_city = $reservationObject->contact_city;
-            } else {
-                $contact_street = $reservationType->contact_street;
-                $contact_phone = $reservationType->contact_phone;
-                $contact_postal = $reservationType->contact_postal;
-                $contact_city = $reservationType->contact_city;
-            }
-
-            $putVars['contact_name'] = $contact_name;
-            $putVars['contact_phone'] = $contact_phone;
-            $putVars['contact_email'] = $contact_email;
-            $putVars['contact_street'] = $contact_street;
-            $putVars['contact_postal'] = $contact_postal;
-            $putVars['contact_city'] = $contact_city;
-
             if ($field->getFieldName() && (!$removedFromList[$field->getFieldName()] || ($removedFromList[$field->getFieldName()] == $field->getAdditionalId()))) {
                 $newFieldList[] = $field;
+            }
+
+            if (!$field->isEditable() && !$field->isDatabaseField() && $field->getInitialValue() && $field->isNotificationField()) {
+                if ($field->getAdditionalId()) {
+                    $putVars[$field->getFieldName().'_'.$field->getAdditionalId()] = $field->getInitialValue();
+                } else {
+                    $putVars[$field->getFieldName()] = $field->getInitialValue();
+                }
             }
         }
 
@@ -1520,16 +1427,16 @@ class C4gReservation extends C4GBrickModuleParent
 
             $putVars['reservation_object'] = $objectId;
 
-            //implement all event possibilities
-            $putVars['beginDate'] = $reservationObject->startDate ? intvaL($reservationObject->startDate) : 0;
-            $putVars['beginTime'] = $reservationObject->startTime ? intval($reservationObject->startTime) : 0;
-            $putVars['endDate'] = $reservationObject->endDate ? intval($reservationObject->endDate) : 0;
-            $putVars['endTime'] = $reservationObject->endTime ? intval($reservationObject->endTime) : 0;
+            //ToDo implement all event possibilities
+            $beginDate = $reservationObject->startDate ? intvaL($reservationObject->startDate) : 0;
+            $beginTime = $reservationObject->startTime ? intval($reservationObject->startTime) : 0;
+            $endDate   = $reservationObject->endDate ? intval($reservationObject->endDate) : 0;
+            $endTime   = $reservationObject->endTime ? intval($reservationObject->endTime) : 0;
 
-            $beginDate = $putVars['beginDate'];
-            $beginTime = $putVars['beginTime'];
-            $endDate   = $putVars['endDate'];
-            $endTime   = $putVars['endTime'];
+            $putVars['beginDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate);
+            $putVars['beginTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime);
+            $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate);
+            $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
        } else {
             $putVars['reservationObjectType'] = '1';
             $beginDate = $putVars['beginDate_'.$type];
@@ -1572,15 +1479,147 @@ class C4gReservation extends C4GBrickModuleParent
             $putVars['endTime'] = $endTime;
         }
 
-        $action = new C4GSaveAndRedirectDialogAction($this->dialogParams, $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
+        $locationId = 0;
+        if ($isEvent && $reservationEventObject->location) {
+            $locationId = $reservationEventObject->location;
+        } else If (!$isEvent && $reservationObject->location) {
+            $locationId = $reservationObject->location;
+        } else {
+            $locationId = $reservationType->location;
+        }
+
+        $location = null;
+        if ($locationId > 0) {
+            $location = C4gReservationLocationModel::findByPk($locationId);
+            if ($location) {
+                $contact_name = $location->contact_name;
+                $contact_email = $location->contact_email;
+                $vcard = $location->vcard_show;
+                if ($vcard) {
+                    $contact_street = $location->contact_street;
+                    $contact_phone = $location->contact_phone;
+                    $contact_postal = $location->contact_postal;
+                    $contact_city = $location->contact_city;
+                } else {
+                    $contact_street = $location->contact_street;
+                    $contact_phone = $location->contact_phone;
+                    $contact_postal = $location->contact_postal;
+                    $contact_city = $location->contact_city;
+                }
+
+                $putVars['contact_name'] = $contact_name;
+                $putVars['contact_phone'] = $contact_phone;
+                $putVars['contact_email'] = $contact_email;
+                $putVars['contact_street'] = $contact_street;
+                $putVars['contact_postal'] = $contact_postal;
+                $putVars['contact_city'] = $contact_city;
+            }
+        }
+
+        $rawData = '';
+        foreach ($putVars as $key => $value) {
+            $rawData .= (isset($putVars[$key]) ? $putVars[$key] : ucfirst($key)) . ': ' . (is_array($value) ? implode(', ', $value) : $value) . "\n";
+        }
+
+        $putVars['raw_data'] = $rawData;
+
+        $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
 
         $vcardObject = $reservationEventObject ? $reservationEventObject : $reservationObject;
-        $this->createIcs($beginDate, $beginTime, $endDate, $endTime, $vcardObject, $reservationType);
+        $this->createIcs($beginDate, $beginTime, $endDate, $endTime, $vcardObject, $reservationType, $location);
 
         return $result = $action->run();
     }
 
+    /**
+     * @param $beginDate
+     * @param $beginTime
+     * @param $endDate
+     * @param $endTime
+     * @param $object
+     * @param $type
+     * @param $location
+     */
+    public function createIcs($beginDate, $beginTime, $endDate, $endTime, $object, $type, $location)
+    {
+        if ($location && $location->ics && $location->icsPath) {
+            $contact_street = $location->contact_street;
+            $contact_postal = $location->contact_postal;
+            $contact_city = $location->contact_city;
+            $contact_name = $location->contact_name;
+            $contact_email = $location->contact_email;
+
+            $dateFormat = $GLOBALS['TL_CONFIG']['dateFormat'];
+            $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
+            $timezone   = $GLOBALS['TL_CONFIG']['timeZone'];
+
+            $icstimezone = 'TZID='.$timezone;
+            $icsdaylightsaving= date('I');
+            $icsprodid = $contact_name;
+            $icslocation = $contact_street ." ". $contact_postal." ". $contact_city;
+            $icsuid = $contact_email;
+
+            $local_tz = new \DateTimeZone($timezone);
+            $localTime = $beginTime+date("Z");
+
+            $b_date = date('Ymd', strtotime($beginDate));
+            $b_time = date('His', $localTime);
+            $icsdate = $b_date . 'T' . $b_time . 'Z';
+
+            $icsalert = $location->icsAlert;
+
+            $residence = $object->min_residence_time;
+            $time_int = $object->time_interval;
+
+            $icssummary = $object->caption;
+
+            $icsalert = $icsalert * 60;
+            $icsalert = '-PT'.$icsalert.'M';
+
+            if ($residence != 0) {
+                $residence = $residence * 3600;
+                $e_date = date('Ymd',strtotime($beginDate));
+                $e_time = $beginTime + $residence;
+                $e_time = date('His',$e_time);
+                $icsenddate =$e_date . 'T' . $e_time. 'Z';
+            } else if ($time_int) {
+                $time_int = $time_int * 3600;
+                $e_date = date('Ymd',strtotime($beginDate));
+                $e_time = $beginTime + $time_int;
+                $e_time = date('His',$e_time);
+                $icsenddate =$e_date . 'T' . $e_time. 'Z';
+            } else if ($type->reservationObjectType == '2') {  //event
+                $e_date = date('Ymd', $beginDate);
+                $e_time = date('His', $beginTime);
+                $icsenddate =$e_date . 'T' . $e_time. 'Z';
+            }
+
+            $fileId = sprintf("%05d", $type->id).sprintf("%05d",$object->id);
+            $pathUuid = $location->icsPath;
+            if ($pathUuid) {
+                $pathUuid = StringUtil::binToUuid($pathUuid);
+                $path = Controller::replaceInsertTags("{{file::$pathUuid}}");
+
+                $filename = $path.'/'.$fileId.'/'.'reservation.isc';
+                try {
+                    mkdir($path.'/'.$fileId.'/');
+                    $ics = new File($filename);
+                } catch (\Exception $exception) {
+                    $fs = new Filesystem();
+                    $fs->touch($filename);
+                    $ics = new File($filename);
+                }
+                $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nDESCRIPTION:$icssummary\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
+            }
+        }
+    }
+
+    /**
+     * @param $values
+     * @param $putVars
+     * @return array
+     */
     public function getCurrentTimeset($values, $putVars)
     {
         $date = $values[2];
