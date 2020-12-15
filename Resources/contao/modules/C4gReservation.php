@@ -1521,8 +1521,6 @@ class C4gReservation extends C4GBrickModuleParent
             $rawData .= (isset($putVars[$key]) ? $putVars[$key] : ucfirst($key)) . ': ' . (is_array($value) ? implode(', ', $value) : $value) . "\n";
         }
 
-        $putVars['raw_data'] = $rawData;
-
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
 
