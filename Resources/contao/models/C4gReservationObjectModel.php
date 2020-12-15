@@ -329,12 +329,17 @@ class C4gReservationObjectModel extends \Model
 
     private static function addTime($list, $time, $obj, $interval, $endTime = 0)
     {
+        $clock = '';
+        if (!strpos($GLOBALS['TL_CONFIG']['timeFormat'],'A')) {
+            $clock = ' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
+        }
 
         if ($obj && ($obj['id'] == -1)) {
             $key = $time;
-            $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
+            $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
+
             if ($interval) {
-                $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval);
+                $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
                 $list[$key] = array('id' => $time, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else {
                 $list[$key] = array('id' => $time, 'name' => $begin, 'objects' => [$obj]);
@@ -349,13 +354,13 @@ class C4gReservationObjectModel extends \Model
             }
 
             $key = $time;
-            $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
+            $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
 
             if ($interval) {
-                $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval);
+                $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
                 $list[$key] = array('id' => $time, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else if ($endTime && ($endTime != $time)) {
-                $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
+                $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
                 $list[$key] = array('id' => $time, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else {
                 $list[$key] = array('id' => $time, 'name' => $begin, 'objects' => [$obj]);

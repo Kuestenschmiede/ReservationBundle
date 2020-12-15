@@ -339,6 +339,11 @@ class C4gReservationInsertTags
                     $datimFormat = $GLOBALS['TL_CONFIG']['datimFormat'];
                     $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
 
+                    $clock = '';
+                    if (!strpos($timeFormat,'A')) {
+                        $clock = ' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
+                    }
+
                     switch($key) {
                         case 'check':
                             return true;
@@ -535,7 +540,7 @@ class C4gReservationInsertTags
                         case 'beginTime':
                             $value = $calendarEvent->startTime ? date($timeFormat, $calendarEvent->startTime) : false;
                             if ($value) {
-                                $value = $this->getHtmlSkeleton('beginTime',$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'],$value.' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']);
+                                $value = $this->getHtmlSkeleton('beginTime',$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'],$value.' '.$clock);
                             }
                             return $value;
                         case 'beginTime_raw':
@@ -543,7 +548,7 @@ class C4gReservationInsertTags
                         case 'endTime':
                             $value = $calendarEvent->startTime < $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : false;
                             if ($value) {
-                                $value = $this->getHtmlSkeleton('endTime',$GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'],$value.' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']);
+                                $value = $this->getHtmlSkeleton('endTime',$GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'],$value.$clock);
                             }
                             return $value;
                         case 'endTime_raw':
