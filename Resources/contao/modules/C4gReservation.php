@@ -1475,8 +1475,8 @@ class C4gReservation extends C4GBrickModuleParent
             $duration = $duration * $interval;
             $endTime = $beginTime + $duration;
 
-            $putVars['endDate'] = strtotime($putVars['beginDate_'.$type]); //ToDo multiple days
-            $putVars['endTime'] = $endTime;
+            $putVars['endDate'] = $putVars['beginDate_'.$type]; //ToDo multiple days
+            $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$endTime);
         }
 
         $locationId = 0;
