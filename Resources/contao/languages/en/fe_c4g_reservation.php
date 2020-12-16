@@ -42,6 +42,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'] = 'Reservation possible
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'] = 'Reservation possible. Only a few seats available.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'] = 'Fully booked. No reservation possible.';
 
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_data'] = 'Your data';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] = 'Overview';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'] = 'Location';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'] = 'Address';

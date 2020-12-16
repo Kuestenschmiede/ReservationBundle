@@ -197,10 +197,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationDesiredCapacity->setMin(1);
                 $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                 $reservationDesiredCapacity->setCallOnChange(true);
-                if ($isEvent) {
-                    //ToDo
-                    //$reservationDesiredCapacity->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_".$type['id']."')," . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
-                } else {
+                if (!$isEvent) {
                     $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(document.getElementById('c4g_beginDate_".$type['id']."')," . $this->id . "," . $type['id'] . ",'getCurrentTimeset');");
                 }
                 $reservationDesiredCapacity->setNotificationField(true);
@@ -615,8 +612,8 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationObjectField->setNotificationField(true);
             $reservationObjectField->setRangeField('desiredCapacity_' . $type['id']);
             $reservationObjectField->setStyleClass($isEvent ? 'reservation-event-object displayReservationObjects' : 'reservation-object displayReservationObjects');
-            $reservationObjectField->setWithEmptyOption(!$isEvent); //ToDo
-            $reservationObjectField->setShowIfEmpty(true); //ToDo
+            $reservationObjectField->setWithEmptyOption(!$isEvent);
+            $reservationObjectField->setShowIfEmpty(true);
             $reservationObjectField->setDatabaseField(!$isEvent);
             $reservationObjectField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
             $reservationObjectField->setCondition([$condition]);
@@ -894,7 +891,7 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         $bookerHeadline = new C4GHeadlineField();
-        $bookerHeadline->setTitle('Ihre Daten'); //ToDo
+        $bookerHeadline->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_data']);
         $fieldList[] = $bookerHeadline;
 
         $salutation = [
@@ -1221,7 +1218,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationParticipants->setForeignKeyField($participantsForeign);
                 $reservationParticipants->setMandatory($rowMandatory);
                 $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
-                $reservationParticipants->setMax(intval($type->maxParticipantsPerBooking) > 0 ? $type->maxParticipantsPerBooking : -1); //ToDo Test
+                $reservationParticipants->setMax(intval($type->maxParticipantsPerBooking) > 0 ? $type->maxParticipantsPerBooking : -1);
                 $reservationParticipants->setNotificationField(true);
                 $fieldList[] = $reservationParticipants;
             }
@@ -1433,10 +1430,10 @@ class C4gReservation extends C4GBrickModuleParent
             $endDate   = $reservationObject->endDate ? intval($reservationObject->endDate) : 0;
             $endTime   = $reservationObject->endTime ? intval($reservationObject->endTime) : 0;
 
-            $putVars['beginDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate);
-            $putVars['beginTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime);
-            $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate);
-            $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
+            $putVars['beginDate'] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
+            $putVars['beginTime'] = $beginTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime) : $beginTime;
+            $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate;
+            $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
        } else {
             $putVars['reservationObjectType'] = '1';
             $beginDate = $putVars['beginDate_'.$type];

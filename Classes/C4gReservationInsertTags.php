@@ -364,15 +364,18 @@ class C4gReservationInsertTags
                         case 'headline_raw':
                             return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'];
                         case 'button':
-                            $settings = $this->db->prepare("SELECT reservationForwarding FROM $tableSettings")
-                                ->limit(1)
-                                ->execute();
-                            if ($settings->numRows && $settings->reservationForwarding) {
-                                $url = Controller::replaceInsertTags("{{link_url::".$settings->reservationForwarding."}}");
-                                if ($url) {
-                                    return '<a href="'.$url.'?event='.$pid.'" title="Reservieren" itemprop="url">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'].'</a>';
+                            if ($calendarEvent->startDate > time()) {
+                                $settings = $this->db->prepare("SELECT reservationForwarding FROM $tableSettings")
+                                    ->limit(1)
+                                    ->execute();
+                                if ($settings->numRows && $settings->reservationForwarding) {
+                                    $url = Controller::replaceInsertTags("{{link_url::".$settings->reservationForwarding."}}");
+                                    if ($url) {
+                                        return '<a href="'.$url.'?event='.$pid.'" title="Reservieren" itemprop="url">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'].'</a>';
+                                    }
                                 }
                             }
+                            break;
                         case 'lon':
                             return $calendarEvent->loc_geox;
                         case 'lat':

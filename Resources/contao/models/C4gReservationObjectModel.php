@@ -646,7 +646,6 @@ class C4gReservationObjectModel extends \Model
 
                                             $timeObj = ['id'=>-1,'act'=>$actPersons, 'percent'=>$actPercent, 'max'=>$capacity,'showSeats'=>$showFreeSeats];
 
-                                            //ToDo nowDate isFrontendStuff
                                             if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $time)))) {
                                                 if ($actPersons && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
                                                     $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
@@ -752,10 +751,10 @@ class C4gReservationObjectModel extends \Model
                 $type = C4gReservationTypeModel::findByPk($moduleType);
                 if ($type && $type->reservationObjectType === '2') {
                     $objectlist = C4gReservationObjectModel::getReservationObjectEventList($moduleTypes, $objectId, $type->almostFullyBookedAt);
-                    break; //ToDo check
+                    break;
                 } else {
                     $objectlist = C4gReservationObjectModel::getReservationObjectDefaultList($moduleTypes, $type->almostFullyBookedAt);
-                    break; //ToDo check
+                    break;
                 }
             }
         }
@@ -776,7 +775,7 @@ class C4gReservationObjectModel extends \Model
         if ($objectId) {
             $event = C4gReservationEventModel::findOneBy('pid',$objectId);
             $eventObject = \CalendarEventsModel::findByPk($objectId);
-            if ($event && $eventObject && $eventObject->published) { //ToDo nur Events in der Zukunft zulassen
+            if ($event && $eventObject && $eventObject->published && ($eventObject->startDate && ($eventObject->startDate >= time()))) {
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject->id);
@@ -809,7 +808,7 @@ class C4gReservationObjectModel extends \Model
             if ($allEvents) {
                 foreach ($allEvents as $event) {
                     $eventObject = \CalendarEventsModel::findByPk($event['pid']);
-                    if ($eventObject && $eventObject->published) { //ToDo nur Events in der Zukunft zulassen
+                    if ($eventObject && $eventObject->published && ($eventObject->startDate && ($eventObject->startDate >= time()))) {
                         $frontendObject = new C4gReservationFrontendObject();
                         $frontendObject->setType(2);
                         $frontendObject->setId($eventObject->id);
@@ -896,7 +895,7 @@ class C4gReservationObjectModel extends \Model
                 $opening_hours['fr'] = unserialize($object->oh_friday);
                 $opening_hours['sa'] = unserialize($object->oh_saturday);
 
-               //ToDo array duchgehen falls nur der erste Datensatz leer ist.
+               //ToDo check if only the first record is empty.
                 if ($opening_hours['su'] != false) {
                     if ($opening_hours['su'][0]['time_begin'] && $opening_hours['su'][0]['time_end']) {
                         $weekdays['0'] = true;

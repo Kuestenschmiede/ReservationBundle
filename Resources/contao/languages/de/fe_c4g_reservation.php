@@ -38,6 +38,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'] = 'Reservierung möglic
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'] = 'Reservierung möglich. Nur noch wenige Plätze verfügbar.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'] = 'Ausgebucht. Keine Reservierung möglich.';
 
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_data'] = 'Ihre Daten';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] = 'Übersicht';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'] = 'Veranstaltungsort';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'] = 'Adresse';
