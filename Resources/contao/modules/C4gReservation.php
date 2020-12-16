@@ -1516,6 +1516,24 @@ class C4gReservation extends C4GBrickModuleParent
             }
         }
 
+        $participantsArr = [];
+        foreach ($putVars as $key => $value) {
+            if (strpos($key,"participants#") !== false) {
+                $keyArr = explode("#", $key);
+                if ($keyArr[1] && $keyArr[2]) {
+                    $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
+                }
+            }
+        }
+
+        $participants = '';
+        if ($participantsArr && count($participantsArr) > 0) {
+            foreach ($participantsArr as $key => $valueArray) {
+                $participants .= $participants ? ', #'.$key.':'.trim(implode(' ',$valueArray)) : '#'.$key.':'.trim(implode(' ',$valueArray));
+            }
+            $putVars['participants'] = $participants;
+        }
+
         $rawData = '';
         foreach ($putVars as $key => $value) {
             $rawData .= (isset($putVars[$key]) ? $putVars[$key] : ucfirst($key)) . ': ' . (is_array($value) ? implode(', ', $value) : $value) . "\n";
