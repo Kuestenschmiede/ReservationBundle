@@ -1415,7 +1415,15 @@ class C4gReservation extends C4GBrickModuleParent
             $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
 
             $reservationCount = count($reservations);
-            $reservationEventObject = C4gReservationEventModel::findOneBy('pid', $objectId);
+
+            $reservationEventObjects = C4gReservationEventModel::findBy('pid', $objectId);
+
+            if ($reservationEventObjects && (count($reservationEventObjects) > 1)) {
+                C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '.$objectId);
+            }
+
+            $reservationEventObject = $reservationEventObjects && is_array($reservationEventObjects) ? $reservationEventObjects[array_key_last($reservationEventObjects)] : false;
+
             $desiredCapacity =  $reservationEventObject && $reservationEventObject->maxParticipants ? $reservationEventObject->maxParticipants : 0;
 
             if ($desiredCapacity && ((($reservationCount / $desiredCapacity) * 100) >= 100)) {
