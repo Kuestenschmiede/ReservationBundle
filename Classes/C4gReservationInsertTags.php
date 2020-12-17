@@ -735,6 +735,16 @@ class C4gReservationInsertTags
                     case 'zipAndCity':
                         $cityStr = $this->getHtmlSkeleton($key,'', $speakerObject->postal.' '.$speakerObject->city, 'c4g_speaker_details');
                         return $cityStr;
+                    case 'website':
+                        $websiteStr = $speakerObject->website;
+                        if ($websiteStr && !strpos($websiteStr,'http')) {
+                            $websiteStr = 'https://'.$websiteStr;
+                        }
+                        $websiteStr = $this->getHtmlSkeleton($key,'', '<a rel="noopener" target="_blank" href="' . $websiteStr . '" title="' . $speakerObject->website . '" itemprop="url">' . $speakerObject->website . '</a>', 'c4g_speaker_details');
+                        return $websiteStr;
+                    case 'email':
+                        $emailStr = $this->getHtmlSkeleton($key,'', $speakerObject->email, 'c4g_speaker_details'); //ToDo link
+                        return $emailStr;
                     case 'photo':
                         $uuid = $speakerObject->photo;
                         if ($uuid) {
