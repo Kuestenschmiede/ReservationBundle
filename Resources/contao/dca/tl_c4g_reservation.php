@@ -121,7 +121,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     'palettes' => array
     (
         '__selector__' => ['reservationObjectType'],
-        'default'   =>  '{reservation_legend}, reservation_type, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id, confirmed, cancellation; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {comment_legend}, comment,internal_comment, agreed;',
+        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id, confirmed, cancellation; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {comment_legend}, comment,internal_comment, agreed;',
     ),
 
     // Subpalettes
@@ -166,12 +166,22 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
         ),
 
+        'included_params' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_included_option'],
+            'inputType'         => 'select',
+            'foreignKey'        => 'tl_c4g_reservation_params.caption',
+            'eval'              => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'disabled' => true, 'tl_class'=>'long clr','alwaysSave'=> true),
+            'sql'               => "blob NULL",
+
+        ),
+
         'additional_params' => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_additional_option'],
-            'inputType'         => 'checkbox',
+            'inputType'         => 'select',
             'foreignKey'        => 'tl_c4g_reservation_params.caption',
-            'eval'              => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
+            'eval'              => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'               => "blob NULL",
 
         ),

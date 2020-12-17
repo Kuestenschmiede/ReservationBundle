@@ -384,9 +384,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         (
             'label'                   => $GLOBALS['TL_LANG']['ts_c4g_reservation_type']['included_params'],
             'exclude'                 => true,
-            'inputType'               => 'checkbox',
+            'inputType'               => 'select',
             'foreignKey'              => 'tl_c4g_reservation_params.caption',
-            'eval'                    => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
+            'eval'                    => array('chosen'=>true, 'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'                     => "blob NULL"
         ),
 
@@ -394,9 +394,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         (
         'label'                   => $GLOBALS['TL_LANG']['ts_c4g_reservation_type']['additional_params'],
         'exclude'                 => true,
-        'inputType'               => 'checkbox',
+        'inputType'               => 'select',
         'foreignKey'              => 'tl_c4g_reservation_params.caption',
-        'eval'                    => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
+        'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
         'sql'                     => "blob NULL"
         ),
 
