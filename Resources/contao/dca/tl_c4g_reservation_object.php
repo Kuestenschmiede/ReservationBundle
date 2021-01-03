@@ -201,7 +201,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'],
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'maxval'=> 60, 'mandatory'=>false, 'tl_class'=>'long clr'),
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'long clr'),
             'sql'               => "smallint(5) unsigned NOT NULL default 0"
         ),
         'min_residence_time' => array
