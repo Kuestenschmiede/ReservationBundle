@@ -31,6 +31,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GHeadlineField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLabelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiSelectField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GNumberField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GRadioGroupField;
@@ -1221,6 +1222,14 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationParticipants->setMax(intval($type->maxParticipantsPerBooking) > 0 ? $type->maxParticipantsPerBooking : -1);
                 $reservationParticipants->setNotificationField(true);
                 $fieldList[] = $reservationParticipants;
+
+                $reservationParticipantList = new C4GMultiSelectField();
+                $reservationParticipantList->setFieldName('participantList');
+                $reservationParticipantList->setDatabaseField(false);
+                $reservationParticipantList->setNotificationField(true);
+                $reservationParticipantList->setFormField(false);
+                $fieldList[] = $reservationParticipantList;
+
             }
         }
 
