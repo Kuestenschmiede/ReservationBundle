@@ -533,29 +533,45 @@ class C4gReservationInsertTags
                         case 'beginDate_raw':
                             return date($dateFormat, $calendarEvent->startDate);
                         case 'endDate':
-                            $value = $calendarEvent->endDate ? date($dateFormat, $calendarEvent->endDate) : false;
-                            if ($value) {
-                                $value = $this->getHtmlSkeleton('endDate',$GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'],$value);
+                            $value = '';
+                            if ($calendarEvent->startDate != $calendarEvent->endDate) {
+                                $value = $calendarEvent->endDate ? date($dateFormat, $calendarEvent->endDate) : false;
+                                if ($value) {
+                                    $value = $this->getHtmlSkeleton('endDate',$GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'],$value);
+                                }
                             }
                             return $value;
                         case 'endDate_raw':
-                            return $calendarEvent->endDate ? date($dateFormat, $calendarEvent->endDate) : '';
+                            $value = '';
+                            if ($calendarEvent->startDate != $calendarEvent->endDate) {
+                                return $calendarEvent->endDate ? date($dateFormat, $calendarEvent->endDate) : '';
+                            }
                         case 'beginTime':
-                            $value = $calendarEvent->startTime ? date($timeFormat, $calendarEvent->startTime) : false;
+                            $value = $calendarEvent->startTime && date('H', $calendarEvent->startTime) != '00' ? date($timeFormat, $calendarEvent->startTime) : false;
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('beginTime',$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'],$value.' '.$clock);
+                            } else {
+                                $value = '';
                             }
                             return $value;
                         case 'beginTime_raw':
-                            return $calendarEvent->startTime ? date($timeFormat, $calendarEvent->startTime) : '';
+                            return $calendarEvent->startTime && date('H', $calendarEvent->startTime) != '00' ? date($timeFormat, $calendarEvent->startTime) : '';
                         case 'endTime':
-                            $value = $calendarEvent->startTime < $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : false;
-                            if ($value) {
-                                $value = $this->getHtmlSkeleton('endTime',$GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'],$value.$clock);
+                            $value = '';
+                            if (!$calendarEvent->endDate || ($calendarEvent->startDate == $calendarEvent->endDate)) {
+                                $value = $calendarEvent->startTime < $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : false;
+                                if ($value) {
+                                    $value = $this->getHtmlSkeleton('endTime', $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'], $value . $clock);
+                                }
                             }
                             return $value;
                         case 'endTime_raw':
-                            return $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : '';
+                            $value = '';
+                            if (!$calendarEvent->endDate || ($calendarEvent->startDate == $calendarEvent->endDate)) {
+                                return $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : '';
+                            } else {
+                                return $value;
+                            }
                         case 'title':
                             $value = $calendarEvent->title;
                             if ($value) {
