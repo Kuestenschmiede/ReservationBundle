@@ -677,23 +677,26 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationEndDateField->setStyleClass('enddate-event');
                     $fieldList[] = $reservationEndDateField;
 
-                    $reservationBeginTimeField = new C4GRadioGroupField();
-                    $reservationBeginTimeField->setFieldName('beginTimeEvent');
-                    $reservationBeginTimeField->setTitle($isEvent ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
-                    $reservationBeginTimeField->setFormField(true);
-                    $reservationBeginTimeField->setOptions(C4gReservationObjectModel::getReservationEventTime($reservationObject, $this->showEndTime, $this->showFreeSeats));
-                    $reservationBeginTimeField->setMandatory(false);
-                    $reservationBeginTimeField->setInitialValue($reservationObject->getBeginTime());
-                    $reservationBeginTimeField->setDatabaseField(false);
-                    $reservationBeginTimeField->setSort(false);
-                    $reservationBeginTimeField->setCondition($objConditionArr);
-                    $reservationBeginTimeField->setAdditionalID($type['id'].'-22'.$reservationObject->getId());
-                    $reservationBeginTimeField->setNotificationField(true);
-                    $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
-                    $reservationBeginTimeField->setTurnButton(true);
-                    $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
-                    $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_'.$type['id'].'-22'.$reservationObject->getId().C4gReservationObjectModel::getButtonStateClass($reservationObject));
-                    $fieldList[] = $reservationBeginTimeField;
+                    //ToDo find better solution for empty beginTime
+                    if ($reservationObject->getBeginTime() && date('H', $reservationObject->getBeginTime()) != '00') {
+                        $reservationBeginTimeField = new C4GRadioGroupField();
+                        $reservationBeginTimeField->setFieldName('beginTimeEvent');
+                        $reservationBeginTimeField->setTitle($isEvent ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                        $reservationBeginTimeField->setFormField(true);
+                        $reservationBeginTimeField->setOptions(C4gReservationObjectModel::getReservationEventTime($reservationObject, $this->showEndTime, $this->showFreeSeats));
+                        $reservationBeginTimeField->setMandatory(false);
+                        $reservationBeginTimeField->setInitialValue($reservationObject->getBeginTime());
+                        $reservationBeginTimeField->setDatabaseField(false);
+                        $reservationBeginTimeField->setSort(false);
+                        $reservationBeginTimeField->setCondition($objConditionArr);
+                        $reservationBeginTimeField->setAdditionalID($type['id'] . '-22' . $reservationObject->getId());
+                        $reservationBeginTimeField->setNotificationField(true);
+                        $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                        $reservationBeginTimeField->setTurnButton(true);
+                        $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
+                        $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_' . $type['id'] . '-22' . $reservationObject->getId() . C4gReservationObjectModel::getButtonStateClass($reservationObject));
+                        $fieldList[] = $reservationBeginTimeField;
+                    }
 
                     $locationId = $reservationObject->getLocation();
                     if ($locationId) {
