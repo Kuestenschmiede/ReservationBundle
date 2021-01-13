@@ -1224,6 +1224,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
                 $reservationParticipants->setMax(intval($type->maxParticipantsPerBooking) > 0 ? $type->maxParticipantsPerBooking : -1);
                 $reservationParticipants->setNotificationField(true);
+                $reservationParticipants->setShowFirstDataSet(true);
                 $fieldList[] = $reservationParticipants;
 
                 $reservationParticipantList = new C4GMultiSelectField();
