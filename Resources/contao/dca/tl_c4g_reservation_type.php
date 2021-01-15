@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,location,notification_type,published;{expert_legend:hide},auto_del;'
+        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,notification_type,published;{expert_legend:hide},auto_del;'
     ),
 
     //Subpalettes
@@ -398,6 +398,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'foreignKey'              => 'tl_c4g_reservation_params.caption',
         'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
         'sql'                     => "blob NULL"
+        ),
+
+        'participant_params' => array
+        (
+            'label'                   => $GLOBALS['TL_LANG']['ts_c4g_reservation_type']['participant_params'],
+            'exclude'                 => true,
+            'inputType'               => 'select',
+            'foreignKey'              => 'tl_c4g_reservation_params.caption',
+            'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
+            'sql'                     => "blob NULL"
         ),
 
         'description' => array

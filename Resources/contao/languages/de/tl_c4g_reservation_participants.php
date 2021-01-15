@@ -26,6 +26,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['address'] = array("Stra�
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['postal'] = array("Postleitzahl", "Postleitzahl");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['city'] = array("Ort", "Ort");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['comment'] = array("Anmerkung zum Teilnehmer", "Kommentarfeld zur Reservierung.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['reservation_participant_option'] = array("Teilnehmeroptionen", "Ausgewählte Teilnehmerleistungen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['cancellation'] = array("Storniert", "Wenn ein Teilnehmern den Termin storniert hat, ist dieses Feld anzuwählen");
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['yes'] = 'ja';

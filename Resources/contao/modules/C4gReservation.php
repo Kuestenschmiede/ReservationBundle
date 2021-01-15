@@ -144,6 +144,7 @@ class C4gReservation extends C4GBrickModuleParent
                                 'periodType' => $type->periodType,
                                 'includedParams' => unserialize($type->included_params),
                                 'additionalParams' => unserialize($type->additional_params),
+                                'participantParams' => unserialize($type->participant_params),
                                 'objects' => $objects,
                                 'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false
                             );
@@ -1178,7 +1179,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $titleField->setSortColumn(false);
                 $titleField->setTableColumn(false);
                 $titleField->setMandatory(false);
-                $titleField->setNotificationField(true);
+                $titleField->setNotificationField(false);
                 $participants[] = $titleField;
 
                 $firstnameField = new C4GTextField();
@@ -1188,7 +1189,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $firstnameField->setSortColumn(false);
                 $firstnameField->setTableColumn(true);
                 $firstnameField->setMandatory(true);
-                $firstnameField->setNotificationField(true);
+                $firstnameField->setNotificationField(false);
                 $participants[] = $firstnameField;
 
                 $lastnameField = new C4GTextField();
@@ -1198,7 +1199,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $lastnameField->setSortColumn(false);
                 $lastnameField->setTableColumn(true);
                 $lastnameField->setMandatory(true);
-                $lastnameField->setNotificationField(true);
+                $lastnameField->setNotificationField(false);
                 $participants[] = $lastnameField;
 
                 $emailField = new C4GEmailField();
@@ -1208,8 +1209,39 @@ class C4gReservation extends C4GBrickModuleParent
                 $emailField->setSortColumn(false);
                 $emailField->setTableColumn(false);
                 $emailField->setMandatory(false);
-                $emailField->setNotificationField(true);
+                $emailField->setNotificationField(false);
                 $participants[] = $emailField;
+
+                $params = $type['participantParams'];
+                $participantParamsArr = [];
+
+                if ($params) {
+                    foreach ($params as $paramId) {
+                        if ($paramId) {
+                            $participantParam = C4gReservationParamsModel::findByPk($paramId);
+                            if ($participantParam && $participantParam->caption && ($participantParam->price && $this->showPrices)) {
+                                $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption."<span class='price'>&nbsp;(+".number_format($participantParam->price,2)." €)</span>"];
+                            } else if ($participantParam && $participantParam->caption) {
+                                $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption];
+                            }
+                        }
+                    }
+                }
+
+                if (count($participantParamsArr) > 0) {
+                    $participantParams = new C4GMultiCheckboxField();
+                    $participantParams->setFieldName('participant_params');
+                    $participantParams->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params']);
+                    $participantParams->setFormField(true);
+                    $participantParams->setEditable(true);
+                    $participantParams->setOptions($participantParamsArr);
+                    $participantParams->setMandatory(false);
+                    $participantParams->setModernStyle(false);
+                    $participantParams->setStyleClass('participant-params');
+                    $participantParams->setNotificationField(false);
+
+                    $participants[] = $participantParams;
+                }
 
                 $reservationParticipants = new C4GSubDialogField();
                 $reservationParticipants->setFieldName('participants');
@@ -1223,8 +1255,9 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationParticipants->setMandatory($rowMandatory);
                 $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
                 $reservationParticipants->setMax(intval($type->maxParticipantsPerBooking) > 0 ? $type->maxParticipantsPerBooking : -1);
-                $reservationParticipants->setNotificationField(true);
+                $reservationParticipants->setNotificationField(false);
                 $reservationParticipants->setShowFirstDataSet(true);
+                $reservationParticipants->setDelimiter('~');
                 $fieldList[] = $reservationParticipants;
 
                 $reservationParticipantList = new C4GMultiSelectField();
@@ -1536,10 +1569,26 @@ class C4gReservation extends C4GBrickModuleParent
 
         $participantsArr = [];
         foreach ($putVars as $key => $value) {
-            if (strpos($key,"participants#") !== false) {
-                $keyArr = explode("#", $key);
-                if ($keyArr[1] && $keyArr[2]) {
-                    $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
+            if (strpos($key,"participants~") !== false) {
+                $keyArr = explode("~", $key);
+                if (trim($keyArr[1]) && trim($keyArr[2]) && trim($value)) {
+                    $pos = strpos($keyArr[2],'|');
+                    if ($pos) {
+                        $keyValue = $keyArr[2];
+                        $keyArr[2] = substr($keyValue,0, $pos);
+                        $paramId = substr($keyValue,$pos+1);
+                        $paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
+                        if ($value && $value !== 'false' && $participantsArr[$keyArr[2]][$keyArr[1]]) {
+                            $value = $participantsArr[$keyArr[2]][$keyArr[1]].', '.$paramCaption;
+                        } else if ($value && $value !== 'false') {
+                            $value = $paramCaption;
+                        }
+                    }
+
+                    if ($value && $value !== 'false') {
+                        $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
+                    }
+
                 } else {
                     unset($putVars[$key]);
                 }
@@ -1549,7 +1598,7 @@ class C4gReservation extends C4GBrickModuleParent
         $participants = '';
         if ($participantsArr && count($participantsArr) > 0) {
             foreach ($participantsArr as $key => $valueArray) {
-                $participants .= $participants ? ', #'.$key.':'.trim(implode(' ',$valueArray)) : '#'.$key.':'.trim(implode(' ',$valueArray));
+                $participants .= $participants ? '; '.$key.': '.trim(implode(', ',$valueArray)) : $key.': '.trim(implode(', ',$valueArray));
             }
             $putVars['participantList'] = $participants;
         }

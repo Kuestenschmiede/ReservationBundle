@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{participants_legend}, title, lastname, firstname, email, comment, cancellation;',
+        'default'   =>  '{participants_legend}, title, lastname, firstname, email, comment, participant_params, cancellation;',
     ),
 
 
@@ -143,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'sorting'                 => true,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
             'sql'                     => "varchar(50) NOT NULL default ''"
         ),
 
@@ -233,6 +233,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'default'                 => '',
             'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
             'sql'                     => "text NULL"
+        ),
+
+        'participant_params' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['reservation_participant_option'],
+            'inputType'         => 'select',
+            'foreignKey'        => 'tl_c4g_reservation_params.caption',
+            'eval'              => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
+            'sql'               => "blob NULL",
+
         ),
 
         'cancellation' => array(
