@@ -82,7 +82,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['hide_selection'] = array
                 'default'                 =>'',
                 'inputType'               => 'select',
                 'options_callback'        => array('tl_module_c4g_reservation','getOptional'),
-                'eval'                    => array('multiple' => false,'mandatory'=>false,'includeBlankOption'=>true),
+                'eval'                    => array('multiple' => false,'mandatory'=>false,'includeBlankOption'=>true,'chosen' => true, 'style'=>'width: 100%')
             ),
             'initialValue' => array
             (
@@ -90,15 +90,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['hide_selection'] = array
                 'exclude'                 => true,
                 'default'                 => '',
                 'inputType'               => 'text',
-                'eval'                    => array('multiple' => false,'mandatory'=>false),
+                'eval'                    => array('multiple' => false,'mandatory'=>false, 'style'=>'width: 100%')
             ),
             'binding' => array
             (
                 'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['binding'],
                 'exclude'                 => true,
                 'inputType'               => 'checkbox',
-                'eval'                    => array('multiple' => false,'mandatory'=>false,'alwaysSave'=>true),
-
+                'eval'                    => array('multiple' => false,'mandatory'=>false,'alwaysSave'=>true, 'style'=>'width: 33%')
             )
         ),
     ),
@@ -193,7 +192,11 @@ class tl_module_c4g_reservation extends Backend {
         System::loadLanguageFile('tl_c4g_reservation');
         $columnsFormatted=[];
         $columnsFormatted['organisation'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation'][0];
+        $columnsFormatted['salutation'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['salutation'][0];
         $columnsFormatted['title'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['title'][0];
+        $columnsFormatted['firstname'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['firstname'][0];
+        $columnsFormatted['lastname'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['lastname'][0];
+        $columnsFormatted['email'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['email'][0];
         $columnsFormatted['phone'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone'][0];
         $columnsFormatted['address'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['address'][0];
         $columnsFormatted['postal'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal'][0];

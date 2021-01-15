@@ -26,11 +26,11 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_si
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_text'] = array('Datenschutzkommentar', 'Dieser Datenschutzkommentar taucht vor der Checkbox zur Einwilligung auf.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type'] = array('Benachrichtigung', 'Wählen Sie die Benachrichtigung aus. Die Einstellung kann in der Reservierungsart überschrieben werden.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type_contact_request']  = array('Benachrichtigung der Kontaktanfrage', 'Wählen Sie die Benachrichtigung für das Versenden der Kontaktanfrage aus');
-$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas'] = array("Optionale Datenfelder.","Reihenfolge hier entspricht der Anzeige im Frontend. Bis auf die Überschrift, kann jedes Feld nur einmal verwendet werden.");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas'] = array("Datenfelder","Reihenfolge hier entspricht der Anzeige im Frontend. Bis auf die Überschrift, kann jedes Feld nur einmal verwendet werden.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['mandatory'] = array("Pflichtfeld?","");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['binding'] = array("Pflichtfeld?","Soll dieses Datenfeld als Pflichtfeld im Frontend angezeigt werden");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['initialValue'] = array("Initialer Wert", "Hier können Sie einen initialen Wert eingeben. Wichtig bei der Überschrift - ansonsten optional.");
-$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['hide_selection'] = array("Datenfelder Hinzufügen","");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['hide_selection'] = array("Datenfelder Hinzufügen","Achtung! Vorname, Nachname und E-Mail werden angehangen, falls diese fehlen. Die drei Felder sind immer erforderlich.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['additionalDuration'] = array("Kunde kann Verweildauer selber angeben (BETA)","Mit anhaken erscheint im Frontend ein neues Feld in welchem der Kunde seine verweildauer angibt");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withCapacity'] = array("Kunde kann Personenanzahl angeben","Der Kunde kann die Personenanzahl angeben. Dieses wird bspw. für eine Tischreservierung im Restaurant benötigt.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showFreeSeats'] = array("Freie Plätze anzeigen","Offene Plätze werden dargestellt.");
