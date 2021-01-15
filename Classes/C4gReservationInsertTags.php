@@ -753,7 +753,7 @@ class C4gReservationInsertTags
                         return $cityStr;
                     case 'website':
                         $websiteStr = $speakerObject->website;
-                        if ($websiteStr && !strpos($websiteStr,'http')) {
+                        if ($websiteStr && strpos($websiteStr,'http') === false) {
                             $websiteStr = 'https://'.$websiteStr;
                         }
                         $websiteStr = $this->getHtmlSkeleton($key,'', '<a rel="noopener" target="_blank" href="' . $websiteStr . '" title="' . $speakerObject->website . '" itemprop="url">' . $speakerObject->website . '</a>', 'c4g_speaker_details');
