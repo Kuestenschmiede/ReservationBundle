@@ -111,12 +111,22 @@ class C4gReservation extends C4GBrickModuleParent
 
         $eventId  = $this->Input->get('event') ? $this->Input->get('event') : 0;
         $event    = $eventId ? \CalendarEventsModel::findByPk($eventId) : false;
-        $eventObj = $event && $event->published ? C4gReservationEventModel::findOneBy('pid', $event->id) : false;
-        if ($eventObj) {
-            $typeId = $eventObj->reservationType;
-            $types[] = C4gReservationTypeModel::findByPk($typeId); //ToDo check published
-        } else {
-            $types = C4gReservationTypeModel::findBy('published', '1');
+        $eventObj = $event && $event->published ? C4gReservationEventModel::findBy('pid', $event->id) : false;
+        if ($eventObj && (count($eventObj) > 1)) {
+            C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '.$event->id);
+        }
+
+        $t = 'tl_c4g_reservation_type';
+        $arrValues = array();
+        $arrOptions = array();
+
+        if ($eventObj && count($eventObj) == 1) {
+            $typeId = $eventObj[0]->reservationType;
+            $arrColumns = array("$t.published='1' AND $t.id=$typeId");
+            $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
+        } else if (!$eventObj) {
+            $arrColumns = array("$t.published='1'");
+            $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
         }
 
         if ($types) {
@@ -1192,7 +1202,6 @@ class C4gReservation extends C4GBrickModuleParent
 
                 $participants = [];
 
-
                 $titleField = new C4GTextField();
                 $titleField->setFieldName('title');
                 $titleField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
@@ -1232,7 +1241,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $emailField->setNotificationField(false);
                 $participants[] = $emailField;
 
-                $params = $type['participantParams'];
+                $params = $typelist['participantParams'];
                 $participantParamsArr = [];
 
                 if ($params) {
@@ -1249,18 +1258,18 @@ class C4gReservation extends C4GBrickModuleParent
                 }
 
                 if (count($participantParamsArr) > 0) {
-                    $participantParams = new C4GMultiCheckboxField();
-                    $participantParams->setFieldName('participant_params');
-                    $participantParams->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params']);
-                    $participantParams->setFormField(true);
-                    $participantParams->setEditable(true);
-                    $participantParams->setOptions($participantParamsArr);
-                    $participantParams->setMandatory(false);
-                    $participantParams->setModernStyle(false);
-                    $participantParams->setStyleClass('participant-params');
-                    $participantParams->setNotificationField(false);
+                    $participantParamField = new C4GMultiCheckboxField();
+                    $participantParamField->setFieldName('participant_params');
+                    $participantParamField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params']);
+                    $participantParamField->setFormField(true);
+                    $participantParamField->setEditable(true);
+                    $participantParamField->setOptions($participantParamsArr);
+                    $participantParamField->setMandatory(false);
+                    $participantParamField->setModernStyle(false);
+                    $participantParamField->setStyleClass('participant-params');
+                    $participantParamField->setNotificationField(false);
 
-                    $participants[] = $participantParams;
+                    $participants[] = $participantParamField;
                 }
 
                 $reservationParticipants = new C4GSubDialogField();
@@ -1782,7 +1791,8 @@ class C4gReservation extends C4GBrickModuleParent
             }
         }
 
-        $objects = C4gReservationObjectModel::getReservationObjectList(array($additionalParam));
+        $eventId  = $this->Input->get('event') ? $this->Input->get('event') : 0;
+        $objects = C4gReservationObjectModel::getReservationObjectList(array($additionalParam), $eventId);
         $withEndTimes = $this->showEndTime;
         $withFreeSeats = $this->showFreeSeats;
 
