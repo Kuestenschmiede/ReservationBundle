@@ -1283,7 +1283,17 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationParticipants->setForeignKeyField($participantsForeign);
                 $reservationParticipants->setMandatory($rowMandatory);
                 $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
-                $reservationParticipants->setMax(intval($type->maxParticipantsPerBooking) > 0 ? $type->maxParticipantsPerBooking : -1);
+
+                //ToDo participants are still independent of types and objects
+                //$max = intval($type['maxParticipantsPerBooking']) > 0 ? intval($type['maxParticipantsPerBooking']) : $reservationParticipants->getMax();
+
+                //if ($isEvent) {
+                //    $max = $reservationObject && $reservationObject->maxParticipants ? $reservationObject->maxParticipants : $max;
+                //} else {
+                //    $max = $reservationObject && $reservationObject->getDesiredCapacity()[1] && $reservationObject->getDesiredCapacity()[1] > $maxParticipantsPerBooking  ? $reservationObject->getDesiredCapacity()[1] : $max;
+                //}
+                $reservationParticipants->setMax(42); //$max
+
                 $reservationParticipants->setNotificationField(false);
                 $reservationParticipants->setShowFirstDataSet(true);
                 $reservationParticipants->setDelimiter('~');

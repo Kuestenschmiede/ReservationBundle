@@ -6,7 +6,6 @@ use Contao\StringUtil;
 $str = 'tl_calendar_events';
 
 $GLOBALS['TL_DCA'][$str]['config']['ctable'][] = 'tl_c4g_reservation_event';
-//$GLOBALS['TL_DCA'][$str]['config']['ctable'][] = 'tl_c4g_reservation';
 $GLOBALS['TL_DCA'][$str]['config']['onload_callback'][] = ['tl_c4g_reservation_event_bridge', 'c4gLoadReservationData'];
 
 $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gEditEvent'] = [
@@ -104,6 +103,22 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
         $imgAttributes = 'style="width: 18px; height: 18px"';
 
         $href = "/contao?do=$do&table=tl_c4g_reservation&amp&id=".$row['id']."&pid=".$row['pid']."&rt=".$rt."&ref=".$ref;
+
+        $state = InsertTags::replaceInsertTags('{{c4gevent::' . $row['id'] . '::state_raw}}');
+        switch ($state) {
+            case '1':
+                $icon = 'bundles/con4gisreservation/images/circle_green.svg';
+                break;
+            case '2':
+                $icon = 'bundles/con4gisreservation/images/circle_orange.svg';
+                break;
+            case '3':
+                $icon = 'bundles/con4gisreservation/images/circle_red.svg';
+                break;
+            Default:
+                $icon = 'bundles/con4gisreservation/images/circle_green.svg';
+                break;
+        }
 
         return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a> ';
     }
