@@ -155,6 +155,7 @@ class C4gReservation extends C4GBrickModuleParent
                                 'includedParams' => unserialize($type->included_params),
                                 'additionalParams' => unserialize($type->additional_params),
                                 'participantParams' => unserialize($type->participant_params),
+                                'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                                 'objects' => $objects,
                                 'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false
                             );
@@ -1241,63 +1242,71 @@ class C4gReservation extends C4GBrickModuleParent
                 $emailField->setNotificationField(false);
                 $participants[] = $emailField;
 
-                $params = $typelist['participantParams'];
-                $participantParamsArr = [];
+                foreach ($typelist as $type) {
+                    $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $type['id']);
 
-                if ($params) {
-                    foreach ($params as $paramId) {
-                        if ($paramId) {
-                            $participantParam = C4gReservationParamsModel::findByPk($paramId);
-                            if ($participantParam && $participantParam->caption && ($participantParam->price && $this->showPrices)) {
-                                $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption."<span class='price'>&nbsp;(+".number_format($participantParam->price,2)." €)</span>"];
-                            } else if ($participantParam && $participantParam->caption) {
-                                $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption];
+                    $params = $type['participantParams'];
+                    $participantParamsArr = [];
+
+                    if ($params) {
+                        foreach ($params as $paramId) {
+                            if ($paramId) {
+                                $participantParam = C4gReservationParamsModel::findByPk($paramId);
+                                if ($participantParam && $participantParam->caption && ($participantParam->price && $this->showPrices)) {
+                                    $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption."<span class='price'>&nbsp;(+".number_format($participantParam->price,2)." €)</span>"];
+                                } else if ($participantParam && $participantParam->caption) {
+                                    $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption];
+                                }
                             }
                         }
                     }
+
+                    if (count($participantParamsArr) > 0) {
+                        $participantParamField = new C4GMultiCheckboxField();
+                        $participantParamField->setFieldName('participant_params');
+                        $participantParamField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params']);
+                        $participantParamField->setFormField(true);
+                        $participantParamField->setEditable(true);
+                        $participantParamField->setOptions($participantParamsArr);
+                        $participantParamField->setMandatory(false);
+                        $participantParamField->setModernStyle(false);
+                        $participantParamField->setStyleClass('participant-params');
+                        $participantParamField->setNotificationField(false);
+
+                        $participants[] = $participantParamField;
+                    }
+
+                    $reservationParticipants = new C4GSubDialogField();
+                    $reservationParticipants->setFieldName('participants');
+                    $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
+                    $reservationParticipants->setAddButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant']);
+                    $reservationParticipants->setRemoveButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant']);
+                    $reservationParticipants->setTable('tl_c4g_reservation_participants');
+                    $reservationParticipants->addFields($participants);
+                    $reservationParticipants->setKeyField($participantsKey);
+                    $reservationParticipants->setForeignKeyField($participantsForeign);
+                    $reservationParticipants->setMandatory($rowMandatory);
+                    $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
+
+                    //ToDo participants are still independent of types and objects
+                    $max = intval($type['maxParticipantsPerBooking']) > 0 ? intval($type['maxParticipantsPerBooking']) : $reservationParticipants->getMax();
+
+//                    if ($isEvent) {
+//                        $max = $reservationObject && $reservationObject->maxParticipants && $reservationObject->maxParticipants < intval($type['maxParticipantsPerBooking']) ? $reservationObject->maxParticipants : $max;
+//                    } else {
+//                        $max = $reservationObject && $reservationObject->getDesiredCapacity()[1] && $reservationObject->getDesiredCapacity()[1] < intval($type['maxParticipantsPerBooking'])  ? $reservationObject->getDesiredCapacity()[1] : $max;
+//                    }
+                    $reservationParticipants->setMax($max);
+
+                    $reservationParticipants->setNotificationField(false);
+                    $reservationParticipants->setShowFirstDataSet(true);
+                    $reservationParticipants->setDelimiter('~');
+                    $reservationParticipants->setCondition(array($condition));
+                    $reservationParticipants->setRemoveWithEmptyCondition(true);
+                    $reservationParticipants->setAdditionalID($type['id']);
+
+                    $fieldList[] = $reservationParticipants;
                 }
-
-                if (count($participantParamsArr) > 0) {
-                    $participantParamField = new C4GMultiCheckboxField();
-                    $participantParamField->setFieldName('participant_params');
-                    $participantParamField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params']);
-                    $participantParamField->setFormField(true);
-                    $participantParamField->setEditable(true);
-                    $participantParamField->setOptions($participantParamsArr);
-                    $participantParamField->setMandatory(false);
-                    $participantParamField->setModernStyle(false);
-                    $participantParamField->setStyleClass('participant-params');
-                    $participantParamField->setNotificationField(false);
-
-                    $participants[] = $participantParamField;
-                }
-
-                $reservationParticipants = new C4GSubDialogField();
-                $reservationParticipants->setFieldName('participants');
-                $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
-                $reservationParticipants->setAddButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant']);
-                $reservationParticipants->setRemoveButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant']);
-                $reservationParticipants->setTable('tl_c4g_reservation_participants');
-                $reservationParticipants->addFields($participants);
-                $reservationParticipants->setKeyField($participantsKey);
-                $reservationParticipants->setForeignKeyField($participantsForeign);
-                $reservationParticipants->setMandatory($rowMandatory);
-                $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
-
-                //ToDo participants are still independent of types and objects
-                //$max = intval($type['maxParticipantsPerBooking']) > 0 ? intval($type['maxParticipantsPerBooking']) : $reservationParticipants->getMax();
-
-                //if ($isEvent) {
-                //    $max = $reservationObject && $reservationObject->maxParticipants ? $reservationObject->maxParticipants : $max;
-                //} else {
-                //    $max = $reservationObject && $reservationObject->getDesiredCapacity()[1] && $reservationObject->getDesiredCapacity()[1] > $maxParticipantsPerBooking  ? $reservationObject->getDesiredCapacity()[1] : $max;
-                //}
-                $reservationParticipants->setMax(42); //$max
-
-                $reservationParticipants->setNotificationField(false);
-                $reservationParticipants->setShowFirstDataSet(true);
-                $reservationParticipants->setDelimiter('~');
-                $fieldList[] = $reservationParticipants;
 
                 $reservationParticipantList = new C4GMultiSelectField();
                 $reservationParticipantList->setFieldName('participantList');
@@ -1305,7 +1314,6 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationParticipantList->setNotificationField(true);
                 $reservationParticipantList->setFormField(false);
                 $fieldList[] = $reservationParticipantList;
-
             }
         }
 
@@ -1608,7 +1616,7 @@ class C4gReservation extends C4GBrickModuleParent
 
         $participantsArr = [];
         foreach ($putVars as $key => $value) {
-            if (strpos($key,"participants~") !== false) {
+            if (strpos($key,"participants_".$type."~") !== false) {
                 $keyArr = explode("~", $key);
                 if (trim($keyArr[1]) && trim($keyArr[2]) && trim($value)) {
                     $pos = strpos($keyArr[2],'|');
