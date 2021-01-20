@@ -364,7 +364,7 @@ class C4gReservationInsertTags
                         case 'headline_raw':
                             return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'];
                         case 'button':
-                            if ($calendarEvent->startDate > time()) {
+                            if (($calendarEvent->startTime && ($calendarEvent->startTime > time())) || ($calendarEvent->startDate && $calendarEvent->startDate >= time())) {
                                 $settings = $this->db->prepare("SELECT reservationForwarding FROM $tableSettings")
                                     ->limit(1)
                                     ->execute();

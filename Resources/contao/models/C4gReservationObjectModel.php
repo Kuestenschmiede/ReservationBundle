@@ -783,7 +783,7 @@ class C4gReservationObjectModel extends \Model
             }
 
             $eventObject = \CalendarEventsModel::findByPk($objectId);
-            if ($event && $eventObject && $eventObject->published && ($eventObject->startDate && ($eventObject->startDate >= time()))) {
+            if ($event && $eventObject && $eventObject->published && (($eventObject->startTime && ($eventObject->startTime > time())) || (!$eventObject->startTime && $eventObject->startDate && $eventObject->startDate >= time()))) {
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject->id);
@@ -816,7 +816,7 @@ class C4gReservationObjectModel extends \Model
             if ($allEvents) {
                 foreach ($allEvents as $event) {
                     $eventObject = \CalendarEventsModel::findByPk($event['pid']);
-                    if ($eventObject && $eventObject->published && ($eventObject->startDate && ($eventObject->startDate >= time()))) {
+                    if ($eventObject && $eventObject->published && (($eventObject->startTime && ($eventObject->startTime > time())) || (!$eventObject->startTime && $eventObject->startDate && $eventObject->startDate >= time()))) {
                         $frontendObject = new C4gReservationFrontendObject();
                         $frontendObject->setType(2);
                         $frontendObject->setId($eventObject->id);
