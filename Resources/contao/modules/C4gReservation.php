@@ -1650,6 +1650,10 @@ class C4gReservation extends C4GBrickModuleParent
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'].$possible];
             }
 
+            if ($reservationType->maxParticipantsPerBooking && (count($participantsArr) > $reservationType->maxParticipantsPerBooking)) {
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'].$reservationType->maxParticipantsPerBooking];
+            }
+
             foreach ($participantsArr as $key => $valueArray) {
                 $participants .= $participants ? '; '.$key.': '.trim(implode(', ',$valueArray)) : $key.': '.trim(implode(', ',$valueArray));
             }
