@@ -67,34 +67,39 @@ class C4gReservationInsertTags
      * @param $reservationEventObject
      * @param $calendarEvent
      */
-    private function getState($reservationEventObject)
+    private function getState($reservationEventObject, $calendarEvent)
     {
         $result = 0;
         $id = $reservationEventObject->pid;
         $max = $reservationEventObject->maxParticipants;
-        if ($id && $max > 0) {
+
+        if (!$reservationEventObject->reservationType || ($calendarEvent->startTime && ($calendarEvent->startTime < time())) || ($calendarEvent->startDate && $calendarEvent->startDate < time())) {
+            $result = 3;
+        } else if ($id && $max > 0) {
             $tableReservation = 'tl_c4g_reservation';
-            $reservationObject = $this->db->prepare("SELECT COUNT(id) AS reservationCount, reservation_type FROM $tableReservation WHERE reservation_object = $id AND reservationObjectType = '2' AND NOT cancellation = '1'")->execute()->fetchAllAssoc();
+            $reservationObject = $this->db->prepare("SELECT COUNT(id) AS reservationCount FROM $tableReservation WHERE reservation_object = $id AND reservationObjectType = '2' AND NOT cancellation = '1'")->execute()->fetchAllAssoc();
             if ($reservationObject) {
-                $reservationType = $reservationObject[0]['reservation_type'];
                 $reservationCount = $reservationObject[0]['reservationCount'];
+            }
 
-                if ($reservationType && $reservationCount > 0) {
-                    $tableReservationType = 'tl_c4g_reservation_type';
-                    $almostFullyBookedAt = $this->db->prepare("SELECT almostFullyBookedAt FROM $tableReservationType WHERE id=?")
-                        ->limit(1)
-                        ->execute($reservationType, 1);
+            $reservationType = $reservationEventObject->reservationType;
+            if ($reservationType) {
+                $tableReservationType = 'tl_c4g_reservation_type';
+                $almostFullyBookedAt = $this->db->prepare("SELECT almostFullyBookedAt FROM $tableReservationType WHERE id=?")
+                    ->limit(1)
+                    ->execute($reservationType, 1);
 
-                    $percent = ($reservationCount / $max) * 100;
-                    if ($percent >= 100) {
-                        $result = 3;
-                    } elseif ($percent >= $almostFullyBookedAt) {
-                        $result = 2;
-                    } else {
-                        $result = 1;
-                    }
+                $percent = $reservationCount ? ($reservationCount / $max) * 100 : 0;
+                if ($percent >= 100) {
+                    $result = 3;
+                } elseif ($percent >= $almostFullyBookedAt) {
+                    $result = 2;
+                } else {
+                    $result = 1;
                 }
             }
+        } else if ($id && !$max) {
+            $result = 1;
         }
 
         return $result;
@@ -353,7 +358,7 @@ class C4gReservationInsertTags
                         case 'check':
                             return true;
                         case 'state':
-                            $state = $this->getState($reservationEventObject);
+                            $state = $this->getState($reservationEventObject, $calendarEvent);
                             if ($state) {
                                 switch ($state) {
                                     case '1':
@@ -379,13 +384,13 @@ class C4gReservationInsertTags
 
                             return '';
                         case 'state_raw':
-                            return $this->getState($reservationEventObject);
+                            return $this->getState($reservationEventObject, $calendarEvent);
                         case 'headline':
                             return '<div class=" c4g_reservation_details_headline">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] . '</div>';
                         case 'headline_raw':
                             return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'];
                         case 'button':
-                            if (($calendarEvent->startTime && ($calendarEvent->startTime > time())) || ($calendarEvent->startDate && $calendarEvent->startDate >= time())) {
+                            if ($reservationEventObject->reservationType && (($calendarEvent->startTime && ($calendarEvent->startTime > time())) || ($calendarEvent->startDate && $calendarEvent->startDate >= time()))) {
                                 $settings = $this->db->prepare("SELECT reservationForwarding FROM $tableSettings")
                                     ->limit(1)
                                     ->execute();
