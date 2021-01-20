@@ -74,7 +74,7 @@ class C4gReservationInsertTags
         $max = $reservationEventObject->maxParticipants;
         if ($id && $max > 0) {
             $tableReservation = 'tl_c4g_reservation';
-            $reservationObject = $this->db->prepare("SELECT COUNT(id) AS reservationCount, reservation_type FROM $tableReservation WHERE reservation_object = $id AND reservationObjectType = '2'")->execute()->fetchAllAssoc();
+            $reservationObject = $this->db->prepare("SELECT COUNT(id) AS reservationCount, reservation_type FROM $tableReservation WHERE reservation_object = $id AND reservationObjectType = '2' AND NOT cancellation = '1'")->execute()->fetchAllAssoc();
             if ($reservationObject) {
                 $reservationType = $reservationObject[0]['reservation_type'];
                 $reservationCount = $reservationObject[0]['reservationCount'];
@@ -86,9 +86,9 @@ class C4gReservationInsertTags
                         ->execute($reservationType, 1);
 
                     $percent = ($reservationCount / $max) * 100;
-                    if ($percent > 100) {
+                    if ($percent >= 100) {
                         $result = 3;
-                    } elseif ($percent > $almostFullyBookedAt) {
+                    } elseif ($percent >= $almostFullyBookedAt) {
                         $result = 2;
                     } else {
                         $result = 1;

@@ -1513,13 +1513,14 @@ class C4gReservation extends C4GBrickModuleParent
 
             if ($reservationEventObjects && (count($reservationEventObjects) > 1)) {
                 C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '.$objectId);
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['error']];
             }
 
-            $reservationEventObject = $reservationEventObjects && is_array($reservationEventObjects) ? $reservationEventObjects[array_key_last($reservationEventObjects)] : false;
+            $reservationEventObject = count($reservationEventObjects) > 0 ? $reservationEventObjects[0] : false;
 
             $desiredCapacity =  $reservationEventObject && $reservationEventObject->maxParticipants ? $reservationEventObject->maxParticipants : 0;
 
-            if ($desiredCapacity && ((($reservationCount / $desiredCapacity) * 100) >= 100)) {
+            if ($desiredCapacity && ($reservationCount >= $desiredCapacity)) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked']];
             }
 
@@ -1644,6 +1645,11 @@ class C4gReservation extends C4GBrickModuleParent
 
         $participants = '';
         if ($participantsArr && count($participantsArr) > 0) {
+            $possible = $desiredCapacity - $reservationCount;
+            if ($desiredCapacity && $possible < count($participantsArr)) {
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'].$possible];
+            }
+
             foreach ($participantsArr as $key => $valueArray) {
                 $participants .= $participants ? '; '.$key.': '.trim(implode(', ',$valueArray)) : $key.': '.trim(implode(', ',$valueArray));
             }
