@@ -36,3 +36,6 @@ $GLOBALS['TL_LANG'][$str]['copy'] = array("Copy event", "Copy event ID %s");
 $GLOBALS['TL_LANG'][$str]['delete'] = array("Delete event", "Delete event ID %s");
 $GLOBALS['TL_LANG'][$str]['show'] = array("Display event", "Display event ID %s");
 $GLOBALS['TL_LANG'][$str]['TOGGLE'] = array("Activate event", "Activate event ID %s");
+
+/** INFO */
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['infoEvent'] = "";

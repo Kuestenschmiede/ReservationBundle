@@ -84,3 +84,6 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['copy'] = array("Copy reservation", "C
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['delete'] = array("delete reservation", "delete reservation ID %s");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['show'] = array("Show reservation", "Show reservation ID %s");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['TOGGLE'] = array("Activate reservation", "Activate reservation ID %s");
+
+/** INFOTEXT */
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['infoReservation'] = '';

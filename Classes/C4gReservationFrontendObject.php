@@ -37,9 +37,9 @@ class C4gReservationFrontendObject
     private $endTime = 0;
     private $almostFullyBookedAt = 0;
     private $number = '';
-    private $topic = array();
-    private $audience = array();
-    private $speaker = array();
+    private $topic = [];
+    private $audience = [];
+    private $speaker = [];
     private $location = 0;
     private $eventDuration = ''; //ToDo
 
@@ -433,5 +433,4 @@ class C4gReservationFrontendObject
     {
         $this->eventDuration = $eventDuration;
     }
-
 }
