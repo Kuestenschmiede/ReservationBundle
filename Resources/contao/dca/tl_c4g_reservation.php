@@ -173,7 +173,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'foreignKey'        => 'tl_c4g_reservation_params.caption',
             'eval'              => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'disabled' => true, 'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'               => "blob NULL",
-
         ),
 
         'additional_params' => array

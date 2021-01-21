@@ -15,15 +15,15 @@
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['price'] = array("Price", "Determine the price (e.g. 50.00)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['caption'] = array("caption", "Caption of the booking option");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['language'] = array("language", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['published'] = array("Publish.", "Should this object be displayed in the frontend ?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['published'] = array("Publish.", "Should this object be displayed in the frontend?");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['bookingparams_legend'] = "Supplement for reservations";
 
 /** OPERATIONS **/
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['new'] = array("add object", "add object");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['edit'] = array("Edit object", "Edit object ID %s");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['copy'] = array("Copy object", "Copy object ID %s");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['delete'] = array("Delete object", "Delete object ID %s");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['show'] = array("Show object", "Show object ID %s");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['TOGGLE'] = array("Activate object", "Display object ID %s");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['new'] = array("Add option", "Add option");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['edit'] = array("Edit option", "Edit option ID %s");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['copy'] = array("Copy option", "Copy option ID %s");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['delete'] = array("Delete option", "Delete option ID %s");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['show'] = array("Show option", "Show option ID %s");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['TOGGLE'] = array("Activate option", "Display option ID %s");

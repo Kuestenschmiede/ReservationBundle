@@ -139,7 +139,7 @@ class C4gReservation extends C4GBrickModuleParent
                     }
                 }
 
-                $objects = C4gReservationObjectModel::getReservationObjectList(array($type->id), $eventId);
+                $objects = C4gReservationObjectModel::getReservationObjectList(array($type->id), $eventId, $this->showPrices);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
@@ -837,7 +837,7 @@ class C4gReservation extends C4GBrickModuleParent
                 foreach ($includedParams as $paramId) {
                     $includedParam = C4gReservationParamsModel::findByPk($paramId);
                     if ($includedParam && $includedParam->caption && ($includedParam->price && $this->showPrices)) {
-                        $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption."<span class='price'>&nbsp;(+".number_format($includedParam->price,2)." €)</span>"];
+                        $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption."<span class='price'>&nbsp;(+".number_format($includedParam->price,2,',','.')." €)</span>"];
                     } else if ($includedParam && $includedParam->caption) {
                         $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption];
                     }
@@ -871,7 +871,7 @@ class C4gReservation extends C4GBrickModuleParent
                     if ($paramId) {
                         $additionalParam = C4gReservationParamsModel::findByPk($paramId);
                         if ($additionalParam && $additionalParam->caption && ($additionalParam->price && $this->showPrices)) {
-                            $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption."<span class='price'>&nbsp;(+".number_format($additionalParam->price,2)." €)</span>"];
+                            $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption."<span class='price'>&nbsp;(+".number_format($additionalParam->price,2,',','.')." €)</span>"];
                         } else if ($additionalParam && $additionalParam->caption) {
                             $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
                         }
@@ -1253,7 +1253,7 @@ class C4gReservation extends C4GBrickModuleParent
                             if ($paramId) {
                                 $participantParam = C4gReservationParamsModel::findByPk($paramId);
                                 if ($participantParam && $participantParam->caption && ($participantParam->price && $this->showPrices)) {
-                                    $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption."<span class='price'>&nbsp;(+".number_format($participantParam->price,2)." €)</span>"];
+                                    $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption."<span class='price'>&nbsp;(+".number_format($participantParam->price,2,',','.')." €)</span>"];
                                 } else if ($participantParam && $participantParam->caption) {
                                     $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption];
                                 }
@@ -1820,7 +1820,7 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         $eventId  = $this->Input->get('event') ? $this->Input->get('event') : 0;
-        $objects = C4gReservationObjectModel::getReservationObjectList(array($additionalParam), $eventId);
+        $objects = C4gReservationObjectModel::getReservationObjectList(array($additionalParam), $eventId, $this->showPrices);
         $withEndTimes = $this->showEndTime;
         $withFreeSeats = $this->showFreeSeats;
 

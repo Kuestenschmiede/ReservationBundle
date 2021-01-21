@@ -120,7 +120,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
             'inputType'               => 'text',
             'eval'                    => array('rpxp'=>'digit','mandatory'=>true, 'maxlength'=>6, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
             'sql'                     => "double(5,2) NOT NULL default '0.00'"
-
         ),
 
         'priceoption' => array
@@ -140,9 +139,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_object'],
             'exclude'                 => true,
             'filter'                  => true,
-            'inputType'               => 'checkbox',
+            'inputType'               => 'select',
             'foreignKey'              => 'tl_c4g_reservation_object.caption',
-            'eval'                    => array('mandatory'=>false, 'tl_class' => 'long clr', 'multiple'=>true),
+            'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'disabled' => false, 'tl_class'=>'long clr'),
             'sql'                     => "blob NULL'"
         ),
 
@@ -151,9 +150,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_event'],
             'exclude'                 => true,
             'filter'                  => true,
-            'inputType'               => 'checkbox',
+            'inputType'               => 'select',
             'foreignKey'              => 'tl_calendar_events.title',
-            'eval'                    => array('mandatory'=>false, 'tl_class' => 'long clr', 'multiple'=>true),
+            'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'false' => true, 'tl_class'=>'long clr'),
             'sql'                     => "blob NULL'"
         ),
 

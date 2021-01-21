@@ -743,17 +743,17 @@ class C4gReservationObjectModel extends \Model
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectList($moduleTypes = null, $objectId = 0)
+    public static function getReservationObjectList($moduleTypes = null, $objectId = 0, $showPrices = false)
     {
         $objectlist = array();
         foreach ($moduleTypes as $moduleType) {
             if ($moduleType) {
                 $type = C4gReservationTypeModel::findByPk($moduleType);
                 if ($type && $type->reservationObjectType === '2') {
-                    $objectlist = C4gReservationObjectModel::getReservationObjectEventList($moduleTypes, $objectId, $type->almostFullyBookedAt);
+                    $objectlist = C4gReservationObjectModel::getReservationObjectEventList($moduleTypes, $objectId, $type, $showPrices);
                     break;
                 } else {
-                    $objectlist = C4gReservationObjectModel::getReservationObjectDefaultList($moduleTypes, $type->almostFullyBookedAt);
+                    $objectlist = C4gReservationObjectModel::getReservationObjectDefaultList($moduleTypes, $type, $showPrices);
                     break;
                 }
             }
@@ -763,15 +763,100 @@ class C4gReservationObjectModel extends \Model
     }
 
     /**
+     * @param $object
+     */
+    private static function calcPrices($object, $type, $isEvent = false) {
+        $price = 0;
+        if ($object) {
+            $priceObjs = C4gReservationObjectPricesModel::findBy('published', '1');
+            if ($priceObjs) {
+                foreach ($priceObjs as $priceObj) {
+                    $days = 1;
+                    $minutes = 0;
+                    $hours = 0;
+                    if ($isEvent) {
+                        $objects = $priceObj->reservation_event;
+                    } else {
+                        $objects = $priceObj->reservation_object;
+                    }
+
+                    if ($objects) {
+                        $objects = unserialize($objects);
+                        foreach ($objects as $objectId) {
+                            if ($objectId == $object->id) {
+                                switch($priceObj->priceoption) {
+                                    case 'pMin':
+                                        if ($isEvent && $object->startTime && $object->endTime) {
+                                            $diff = $object->endTime - $object->startTime;
+                                            if ($diff > 0 ) {
+                                                $minutes = $diff / 60;
+                                            }
+                                        } else if (!$isEvent && $type->periodType && $object->time_interval) {
+                                            switch ($type->periodType) {
+                                                case 'minute':
+                                                    $minutes = $object->time_interval;
+                                                    break;
+                                                case 'hour':
+                                                    $minutes = $object->time_interval * 60;
+                                                    break;
+                                                default: '';
+                                            }
+                                        }
+                                        $price = $price + (intval($priceObj->price)*$minutes);
+                                        break;
+                                    case 'pHour':
+                                        if ($isEvent && $object->startTime && $object->endTime) {
+                                            $diff = $object->endTime - $object->startTime;
+                                            if ($diff > 0 ) {
+                                                $hours = $diff / 3600;
+                                            }
+                                        } else if (!$isEvent && $type->periodType && $object->time_interval) {
+                                            switch ($type->periodType) {
+                                                case 'minute':
+                                                    $hours = $object->time_interval / 60;
+                                                    break;
+                                                case 'hour':
+                                                    $hours = $object->time_interval;
+                                                    break;
+                                                default: '';
+                                            }
+                                        }
+                                        $price = $price + (intval($priceObj->price)*$hours);
+                                        break;
+                                    case 'pDay':
+                                        if ($isEvent && $object->startDate && $object->endDate) {
+                                            $days = round(abs($object->endDate - $object->startDate) / (60*60*24));
+                                        } else if (!$isEvent && $object->beginDate && $object->endDate) {
+                                            $days = round(abs($object->endDate - $object->beginDate) / (60*60*24));
+                                        }
+                                        $price = $price + (intval($priceObj->price)*$days);
+                                        break;
+                                    case 'pEvent':
+                                        $price = $price + intval($priceObj->price);
+                                        break;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $price;
+    }
+
+    /**
      * @param null $moduleTypes
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0, $almostFullyBookedAt = 0)
+    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0, $type, $showPrices = false)
     {
         $objectList = array();
         $db = Database::getInstance();
-
+        $almostFullyBookedAt = $type->almostFullyBookedAt;
         if ($objectId) {
             $events = C4gReservationEventModel::findBy('pid',$objectId);
             if ($events) {
@@ -787,7 +872,8 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject->id);
-                $frontendObject->setCaption($eventObject->title);
+                $price = $showPrices ? static::calcPrices($eventObject, $type, true) : 0;
+                $frontendObject->setCaption($showPrices && $price ? $eventObject->title."<span class='price'>&nbsp;(+".number_format($price,2,',','.')." €)</span>" : $eventObject->title);
                 $frontendObject->setDesiredCapacity([$event->minParticipants,$event->maxParticipants]);
                 $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
                 $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
@@ -820,7 +906,8 @@ class C4gReservationObjectModel extends \Model
                         $frontendObject = new C4gReservationFrontendObject();
                         $frontendObject->setType(2);
                         $frontendObject->setId($eventObject->id);
-                        $frontendObject->setCaption($eventObject->title);
+                        $price = $showPrices ? static::calcPrices($eventObject, $type, true) : 0;
+                        $frontendObject->setCaption($showPrices && $price ? $eventObject->title."<span class='price'>&nbsp;(".number_format($price,2,',','.')." €)</span>" : $eventObject->title);
                         $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
                         $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
                         $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
@@ -845,12 +932,13 @@ class C4gReservationObjectModel extends \Model
     /**
      * @return array
      */
-    public static function getReservationObjectDefaultList($moduleTypes = null, $almostFullyBookedAt = false)
+    public static function getReservationObjectDefaultList($moduleTypes = null, $type, $showPrices = false)
     {
         $objectList = array();
         $t = static::$strTable;
         $arrOptions = array();
         $allObjects = self::findBy('published','1');
+        $almostFullyBookedAt = $type->almostFullyBookedAt;
         if ($moduleTypes) {
             $types = $moduleTypes;
             $objects = [];
@@ -874,6 +962,7 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject->setId($object->id);
 
                 $frontendObject->setCaption($object->caption);
+
                 $captions = $object->options;
                 if ($captions) {
                     foreach ($captions as $caption) {
@@ -883,6 +972,9 @@ class C4gReservationObjectModel extends \Model
                         }
                     }
                 }
+
+                $price = $showPrices ? static::calcPrices($object, $type, false) : 0;
+                $frontendObject->setCaption($showPrices && $price ? $frontendObject->getCaption()."<span class='price'>&nbsp;(".number_format($price,2,',','.')." €)</span>" : $frontendObject->getCaption());
 
                 $frontendObject->setTimeinterval($object->time_interval);
                 $frontendObject->setMinReservationDay($object->min_reservation_day);

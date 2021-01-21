@@ -31,9 +31,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_event'] = a
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['objectprices_legend'] = "Addition for reservations";
 
 /** OPERATIONS **/
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['new'] = array("add object", "add object");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['edit'] = array("Edit object", "Edit object ID %s");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['copy'] = array("Copy object", "Copy object ID %s");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['delete'] = array("Delete object", "Delete object ID %s");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['show'] = array("Show object", "Show object ID %s");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['TOGGLE'] = array("Activate object", "Show object ID %s");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['new'] = array("add price", "add price");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['edit'] = array("Edit price", "Edit price ID %s");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['copy'] = array("Copy price", "Copy price ID %s");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['delete'] = array("Delete price", "Delete price ID %s");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['show'] = array("Show price", "Show price ID %s");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['TOGGLE'] = array("Activate price", "Show price ID %s");
