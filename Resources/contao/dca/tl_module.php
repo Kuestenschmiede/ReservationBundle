@@ -136,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservationButtonCaption'] = array
     'sorting'           => true,
     'search'            => true,
     'inputType'         => 'text',
-    'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 255),
+    'eval'              => array('mandatory' => false, 'tl_class' => 'long', 'maxlength' => 255),
     'sql'               => "varchar(255) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_redirect_site'] = array
