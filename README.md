@@ -1,10 +1,10 @@
 # con4gis-Reservation
 
 ## Overview
-Contao module for creating reservation forms. For example for tables, rooms or other objects.
+Contao module for creating reservation forms. For example for events, tables, rooms or other objects.
 
 __Features include:__
-* Define reservation types (for example: room reservation, table reservation, ...)
+* Define reservation types (for example: seminar reservation, room reservation, table reservation, ...)
 * Define reservation objects (for example: table 3, room 112, ...)
 * Set additional options that can be reserved
 * Determine reservation costs
