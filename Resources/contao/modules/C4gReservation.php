@@ -853,7 +853,6 @@ class C4gReservation extends C4GBrickModuleParent
                 $includedParams->setOptions($includedParamsArr);
                 $includedParams->setMandatory(false);
                 $includedParams->setModernStyle(false);
-                $includedParams->setNotificationField(true);
                 $includedParams->setCondition(array($condition));
                 $includedParams->setRemoveWithEmptyCondition(true);
                 $includedParams->setAdditionalID($type['id'].'-00'.$reservationObject->getId());
@@ -888,7 +887,6 @@ class C4gReservation extends C4GBrickModuleParent
                 $additionalParams->setOptions($additionalParamsArr);
                 $additionalParams->setMandatory(false);
                 $additionalParams->setModernStyle(false);
-                $additionalParams->setNotificationField(true);
                 $additionalParams->setCondition(array($condition));
                 $additionalParams->setRemoveWithEmptyCondition(true);
                 $additionalParams->setAdditionalID($type['id'].'-00'.$reservationObject->getId());
@@ -1478,6 +1476,21 @@ class C4gReservation extends C4GBrickModuleParent
                 $resObject = $putVars[$key];
                 $reservationObject = $this->Database->prepare("SELECT * FROM tl_calendar_events WHERE id=? AND published='1'")
                     ->execute($resObject);
+
+                foreach ($putVars as $key => $value) {
+                    if (strpos($key, strval($type.'-22'))) {
+                        if (!strpos($key, strval($type.'-22'.$resObject))) {
+                            unset($putVars[$key]);
+                        }
+                    }
+                }
+
+                if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-22')) !== 0))) {
+                    if (strpos($additionalId, strval($type.'-22'.$resObject)) === 0) {
+                        unset($putVars[$field->getFieldName()."_".$additionalId]);
+                        continue;
+                    }
+                }
             } else {
                 $key = "reservation_object_" . $type;
                 $resObject = $putVars[$key];
@@ -1500,7 +1513,7 @@ class C4gReservation extends C4GBrickModuleParent
 
         if ($isEvent) {
             $putVars['reservationObjectType'] = '2';
-            $objectId = $putVars['reservation_object_event_' . $type];
+            $objectId = $reservationObject->id; //$putVars['reservation_object_event_' . $type];
             $t = 'tl_c4g_reservation';
             $arrColumns = array("$t.reservation_object=$objectId AND $t.reservationObjectType='2' AND NOT $t.cancellation='1'");
             $arrValues = array();
