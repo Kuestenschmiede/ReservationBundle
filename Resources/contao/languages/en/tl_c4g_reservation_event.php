@@ -23,7 +23,7 @@ $GLOBALS['TL_LANG'][$str]['topic'] = array("Topics", "Here you can link your eve
 $GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Target audience", "Select your target audience.");
 $GLOBALS['TL_LANG'][$str]['minParticipants'] = array("Minimum number of participants", "Default: 1");
 $GLOBALS['TL_LANG'][$str]['maxParticipants'] = array("Maximum number of participants", "Default: 0 (unlimited)");
-$GLOBALS['TL_LANG'][$str]['state'] = array("Current status", "green, yellow, red");
+$GLOBALS['TL_LANG'][$str]['state'] = array("Current status", "green, orange, red");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['event_legend'] = "Event data";

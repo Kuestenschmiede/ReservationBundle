@@ -682,7 +682,7 @@ class C4gReservationObjectModel extends \Model
     public static function getButtonStateClass($object) {
         $result = '';
 
-        if ($object && $object->getAlmostFullyBookedAt() &&  $object->getDesiredCapacity() &&  $object->getDesiredCapacity()[1]) {  //yellow state
+        if ($object && $object->getAlmostFullyBookedAt() &&  $object->getDesiredCapacity() &&  $object->getDesiredCapacity()[1]) {  //orange state
             $t = 'tl_c4g_reservation';
             $id = $object->getId();
             $arrColumns = array("$t.reservation_object=$id AND $t.reservationObjectType='2' AND NOT $t.cancellation='1'");

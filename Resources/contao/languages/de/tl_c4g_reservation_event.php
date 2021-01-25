@@ -23,7 +23,7 @@ $GLOBALS['TL_LANG'][$str]['topic'] = array("Thema/Themen", "Hier können Sie Ver
 $GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Zielgruppe(n)", "Wählen Sie das Zielpublikum.");
 $GLOBALS['TL_LANG'][$str]['minParticipants'] = array("Minimale Teilnehmerzahl", "Standard: 1");
 $GLOBALS['TL_LANG'][$str]['maxParticipants'] = array("Maximale Teilnehmerzahl", "Standard: 0 (unbegrenzt)");
-$GLOBALS['TL_LANG'][$str]['state'] = array("Aktueller Status", "grün, gelb, rot");
+$GLOBALS['TL_LANG'][$str]['state'] = array("Aktueller Status", "grün, orange, rot");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['event_legend'] = "Daten zur Veranstaltung";
