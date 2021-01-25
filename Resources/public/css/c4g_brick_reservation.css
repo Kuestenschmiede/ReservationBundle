@@ -88,3 +88,6 @@
     margin-top: 2.5%!important;
     margin-bottom: 0!important;
 }
+#c4g_brick .ui-widget {
+    background: transparent;
+}
