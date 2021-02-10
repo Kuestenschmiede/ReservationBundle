@@ -75,7 +75,7 @@ class C4gReservationInsertTags
 
         if (!$reservationEventObject->reservationType || ($calendarEvent->startTime && ($calendarEvent->startTime < time())) || ($calendarEvent->startDate && $calendarEvent->startDate < time())) {
             $result = 3;
-        } else if ($id && $max > 0) {
+        } elseif ($id && $max > 0) {
             $tableReservation = 'tl_c4g_reservation';
             $reservationObject = $this->db->prepare("SELECT COUNT(id) AS reservationCount FROM $tableReservation WHERE reservation_object = $id AND reservationObjectType = '2' AND NOT cancellation = '1'")->execute()->fetchAllAssoc();
             if ($reservationObject) {
@@ -98,7 +98,7 @@ class C4gReservationInsertTags
                     $result = 1;
                 }
             }
-        } else if ($id && !$max) {
+        } elseif ($id && !$max) {
             $result = 1;
         }
 
@@ -371,13 +371,13 @@ class C4gReservationInsertTags
                                         return $this->getHtmlSkeleton(
                                             'state',
                                             $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
-                                            '<img class="c4g_reservation_state c4g_reservation_state_green img-fluid" loading="lazy" height="32px" width="32px" src="bundles/con4gisreservation/images/circle_orange.svg" alt="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'] . '" title="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'] . '">'
+                                            '<img class="c4g_reservation_state c4g_reservation_state_orange img-fluid" loading="lazy" height="32px" width="32px" src="bundles/con4gisreservation/images/circle_orange.svg" alt="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'] . '" title="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'] . '">'
                                         );
                                     case '3':
                                         return $this->getHtmlSkeleton(
                                             'state',
                                             $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
-                                            '<img class="c4g_reservation_state c4g_reservation_state_green img-fluid" loading="lazy" height="32px" width="32px" src="bundles/con4gisreservation/images/circle_red.svg" alt="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'] . '" title="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'] . '">'
+                                            '<img class="c4g_reservation_state c4g_reservation_state_red img-fluid" loading="lazy" height="32px" width="32px" src="bundles/con4gisreservation/images/circle_red.svg" alt="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'] . '" title="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'] . '">'
                                         );
                                 }
                             }
