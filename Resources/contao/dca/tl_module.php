@@ -110,7 +110,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['notification_type'] = array
     'inputType'               => 'checkbox',
     'foreignKey'              => 'tl_nc_notification.title',
     'eval'                    => array('multiple' => true),
-    'sql'                     => "varchar(255) NOT NULL default ''"
+    'sql'                     => "varchar(100) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['notification_type_contact_request'] = array
 (
@@ -119,7 +119,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['notification_type_contact_request'] =
     'inputType'               => 'checkbox',
     'foreignKey'              => 'tl_nc_notification.title',
     'eval'                    => array('multiple' => true),
-    'sql'                     => "varchar(255) NOT NULL default ''"
+    'sql'                     => "varchar(100) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['appearance_themeroller_css'] = array
@@ -137,7 +137,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservationButtonCaption'] = array
     'search'            => true,
     'inputType'         => 'text',
     'eval'              => array('mandatory' => false, 'tl_class' => 'long', 'maxlength' => 255),
-    'sql'               => "varchar(255) NOT NULL default ''"
+    'sql'               => "varchar(100) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_redirect_site'] = array
 (

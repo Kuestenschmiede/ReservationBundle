@@ -73,7 +73,10 @@ class C4gReservationInsertTags
         $id = $reservationEventObject->pid;
         $max = $reservationEventObject->maxParticipants;
 
-        if (!$reservationEventObject->reservationType || ($calendarEvent->startTime && ($calendarEvent->startTime < time())) || ($calendarEvent->startDate && $calendarEvent->startDate < time())) {
+        $today = date("Y.m.d", time());
+        $startdate = $calendarEvent->startDate ? date("Y.m.d", $calendarEvent->startDate) : false;
+        if (!$reservationEventObject->reservationType || ($startdate && $startdate < $today) || (($calendarEvent->startTime &&
+                    ($calendarEvent->startTime < time())) && ($startdate && $startdate == $today))) {
             $result = 3;
         } elseif ($id && $max > 0) {
             $tableReservation = 'tl_c4g_reservation';
@@ -390,7 +393,7 @@ class C4gReservationInsertTags
                         case 'headline_raw':
                             return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'];
                         case 'button':
-                            if ($reservationEventObject->reservationType && (($calendarEvent->startTime && ($calendarEvent->startTime > time())) || ($calendarEvent->startDate && $calendarEvent->startDate >= time()))) {
+                            if ($this->getState($reservationEventObject, $calendarEvent) !== 3) {
                                 $settings = $this->db->prepare("SELECT reservationForwarding FROM $tableSettings")
                                     ->limit(1)
                                     ->execute();
