@@ -73,8 +73,8 @@ class C4gReservationInsertTags
         $id = $reservationEventObject->pid;
         $max = $reservationEventObject->maxParticipants;
 
-        $today = date("Y.m.d", time());
-        $startdate = $calendarEvent->startDate ? date("Y.m.d", $calendarEvent->startDate) : false;
+        $today = date('Y.m.d', time());
+        $startdate = $calendarEvent->startDate ? date('Y.m.d', $calendarEvent->startDate) : false;
         if (!$reservationEventObject->reservationType || ($startdate && $startdate < $today) || (($calendarEvent->startTime &&
                     ($calendarEvent->startTime < time())) && ($startdate && $startdate == $today))) {
             $result = 3;
