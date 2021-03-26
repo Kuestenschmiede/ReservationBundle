@@ -39,6 +39,14 @@ class C4gReservationCancellation extends C4GBrickModuleParent
     protected $brickStyle   = 'bundles/con4gisreservation/css/c4g_brick_reservation.css';
     protected $withNotification = true;
 
+    protected $jQueryUseTable = false;
+    protected $jQueryUseScrollPane = false;
+    protected $jQueryUsePopups = false;
+    protected $loadChosenResources = false;
+    protected $loadCkEditor5Resources = false;
+    protected $loadCkEditorResources = false;
+    protected $loadMoreButtonResources = false;
+    protected $loadFontAwesomeResources = false;
 
     public function initBrickModule($id)
     {
