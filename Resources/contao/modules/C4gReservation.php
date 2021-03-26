@@ -78,6 +78,10 @@ class C4gReservation extends C4GBrickModuleParent
     protected $jQueryUseScrollPane = false;
     protected $jQueryUsePopups = false;
     protected $loadChosenResources = false;
+    protected $loadCkEditor5Resources = false;
+    protected $loadCkEditorResources = false;
+    protected $loadMoreButtonResources = false;
+    protected $loadFontAwesomeResources = false;
 
     public function initBrickModule($id)
     {
@@ -147,7 +151,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $captions = unserialize($type->options);
                 if ($captions) {
                     foreach ($captions as $caption) {
-                        if ($caption['language'] == $GLOBALS['TL_LANGUAGE']) {
+                        if (strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) {
                             $typelist[$type->id] = array(
                                 'id' => $type->id,
                                 'name' => $caption['caption'] ? $caption['caption'] : $type->caption,

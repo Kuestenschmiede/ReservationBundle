@@ -966,7 +966,7 @@ class C4gReservationObjectModel extends \Model
                 $captions = $object->options;
                 if ($captions) {
                     foreach ($captions as $caption) {
-                        if ($caption['language'] == $GLOBALS['TL_LANGUAGE']) {
+                        if (strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) {
                             $frontendObject->setCaption($caption['caption']);
                             break;
                         }
