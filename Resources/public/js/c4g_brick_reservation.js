@@ -246,6 +246,7 @@ function setTimeset(dateField, id, additionalId, callFunction) {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
                 var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group") : document.getElementsByClassName("c4g_brick_radio_group");
                 var timeList = [];
+                var intervalList = [];
                 var objectList = [];
                 var times = data['times'];
                 var size = times.length;
@@ -253,10 +254,15 @@ function setTimeset(dateField, id, additionalId, callFunction) {
                 jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)) ? jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)).show() : false;
                 var iterator = 0;
                 for (let key in times) {
-                    var dataTime = times[key]['id'];
+                    var dataTime = times[key]['time'];
+                    if (times[key]['interval'] > 0) {
+                        dataTime = times[key]['time']+'#'+times[key]['interval'];
+                    }
+                    var dataInterval = times[key]['interval'];
                     var dataObjects = times[key]['objects'];
 
                     timeList[iterator] = dataTime;
+                    intervalList[iterator] = dataInterval;
                     objectList[iterator] = dataObjects;
                     iterator++;
                 }
@@ -290,9 +296,9 @@ function setTimeset(dateField, id, additionalId, callFunction) {
 
                             for (k = 0; k < radioGroups[i].children[j].children.length; k++) {
                                 var value = jQuery(radioGroups[i].children[j].children[k]).val();
-                                if (value && parseInt(value)) {
+                                if (value) {
                                     namefield = radioGroups[i].children[j].children[k].getAttribute('name').substr(1);
-                                    var arrindex = jQuery.inArray(parseInt(value), timeList);
+                                    var arrindex = jQuery.inArray(value, timeList);
                                     var activateTimeButton = -1
                                     var percent = 0;
                                     if (arrindex !== -1) {
@@ -310,6 +316,9 @@ function setTimeset(dateField, id, additionalId, callFunction) {
                                         let objstr = '';
                                         for (l = 0; l < objectList[arrindex].length; l++) {
                                             let listObj = objectList[arrindex][l];
+                                            let interval = intervalList[arrindex];
+                                            let time = timeList[arrindex];
+
                                             if (l == 0) {
                                                 objstr = objstr + listObj['id'];
                                             } else {

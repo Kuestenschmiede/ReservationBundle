@@ -138,7 +138,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'sql'                   => "char(5) NOT NULL default ''"
         ),
 
-
         'price' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['price'],
             'exclude'                 => true,

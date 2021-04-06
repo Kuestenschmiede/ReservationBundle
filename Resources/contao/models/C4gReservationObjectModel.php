@@ -16,6 +16,7 @@ namespace con4gis\ReservationBundle\Resources\contao\models;
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ReservationBundle\Classes\C4gReservationFrontendObject;
+use con4gis\ReservationBundle\Classes\C4gReservationHelper;
 use Contao\Database;
 use Contao\Date;
 use Contao\StringUtil;
@@ -335,35 +336,38 @@ class C4gReservationObjectModel extends \Model
         }
 
         if ($obj && ($obj['id'] == -1)) {
-            $key = $time;
             $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
 
             if ($interval) {
+                $key = $time.'#'.$interval;
                 $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
-                $list[$key] = array('id' => $time, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
+                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else {
-                $list[$key] = array('id' => $time, 'name' => $begin, 'objects' => [$obj]);
+                $key = $time;
+                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj]);
             }
         } else {
             foreach ($list as $key => $item) {
                 //Ist der Termin schon in der Auflistung?
-                if ($item['id'] == $time) {
+                if ($key === $time || ($interval && ($key === ($time.'_'.$interval))) || ($endTime && ($key === ($time.'_'.($endTime-$time))))) {
                     $list[$key]['objects'][] = $obj;
                     return $list;
                 }
             }
 
-            $key = $time;
             $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
 
             if ($interval) {
+                $key = $time.'#'.$interval;
                 $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
-                $list[$key] = array('id' => $time, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
+                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else if ($endTime && ($endTime != $time)) {
+                $key = $time.'#'.($endTime-$time);
                 $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
-                $list[$key] = array('id' => $time, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
+                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else {
-                $list[$key] = array('id' => $time, 'name' => $begin, 'objects' => [$obj]);
+                $key = $time;
+                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj]);
             }
         }
 
@@ -649,7 +653,7 @@ class C4gReservationObjectModel extends \Model
                                             if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $time)))) {
                                                 if ($actPersons && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
                                                     $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
-                                                } else if ($maxCount && (!empty($count)) && ($count[$tsdate][$time] >= intval($maxCount * $capacity))) {  //n times for type
+                                                } else if ($maxCount && (C4gReservationHelper::getObjectCountPerTime($objectCount, $tsdate, $time, $interval) >= intval($maxCount * $capacity))) {  //n times for type
                                                     $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else if ($capacity && (!empty($objectCount)) && ($objectCount[$tsdate][$time] >= intval($capacity))) { //n times for object
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
