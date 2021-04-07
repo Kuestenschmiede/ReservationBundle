@@ -211,8 +211,20 @@ function checkTimelist(value, timeList) {
     if (value && timeList) {
         for (idx=0; idx < timeList.length; idx++) {
             if (timeList[idx]) {
-                let timeset = timeList[idx].split('#');
-                let valueset = value.split('#');
+                let timeset = [];
+                if (timeList[idx].indexOf('#')) {
+                    timeset = timeList[idx].split('#');
+                } else {
+                    timeset[0] = timeList[idx];
+                }
+
+                let valueset = [];
+                if (value.indexOf('#')) {
+                    valueset = value.split('#');
+                } else {
+                    valueset[0] = value;
+                }
+
                 let hits = 0;
 
                 if (parseInt(timeset[0]) === parseInt(valueset[0])) {
@@ -255,8 +267,21 @@ function checkMax(objectList, arrindex, idx, value, timeList) {
     if (objectList[arrindex][idx]['act'] < objectList[arrindex][idx]['max']) {
         for (y = 0; y < objectList.length; y++) {
             if (value && timeList && (y != arrindex)) {
-                let timeset = timeList[y].split('#');
-                let valueset = value.split('#');
+
+                let timeset = [];
+                if (timeList[y].indexOf('#')) {
+                    timeset = timeList[y].split('#');
+                } else {
+                    timeset[0] = timeList[y];
+                }
+
+                let valueset = [];
+                if (value.indexOf('#')) {
+                    valueset = value.split('#');
+                } else {
+                    valueset[0] = value;
+                }
+
                 let doCheck = false;
 
                 if (parseInt(timeset[0]) === parseInt(valueset[0])) {
