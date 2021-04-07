@@ -349,7 +349,7 @@ class C4gReservationObjectModel extends \Model
         } else {
             foreach ($list as $key => $item) {
                 //Ist der Termin schon in der Auflistung?
-                if ($key === $time || ($interval && ($key === ($time.'_'.$interval))) || ($endTime && ($key === ($time.'_'.($endTime-$time))))) {
+                if ($key === $time || ($interval && ($key === ($time.'#'.$interval))) || ($endTime && ($key === ($time.'#'.($endTime-$time))))) {
                     $list[$key]['objects'][] = $obj;
                     return $list;
                 }

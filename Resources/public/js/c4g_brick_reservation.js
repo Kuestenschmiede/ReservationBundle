@@ -205,6 +205,91 @@ function setReservationForm(object, id, additionalId, callFunction) {
     }
 }
 
+function checkTimelist(value, timeList) {
+    var arrIndex = -1
+
+    if (value && timeList) {
+        for (idx=0; idx < timeList.length; idx++) {
+            let timeset = timeList[idx].split('#');
+            let valueset = value.split('#');
+            let hits = 0;
+
+            if (parseInt(timeset[0]) === parseInt(valueset[0])) {
+                arrIndex = idx;
+                hits++;
+            }
+
+            if (timeset[1] && valueset[1]) {
+                let beginTime = parseInt(timeset[0]);
+                let endTime = beginTime+parseInt(timeset[1]);
+
+                let beginValue = parseInt(valueset[0]);
+                let endValue = beginValue+parseInt(valueset[1]);
+
+                if ((beginValue >= beginTime) && (beginValue < endTime)) {
+                    arrIndex = idx;
+                    hits++;
+                }
+
+                if ((endValue > beginTime) && (endValue <= endTime)) {
+                    arrIndex = idx;
+                    hits++;
+                }
+
+                if (hits == 3) {
+                    break;
+                }
+            } else if (hits == 1) {
+                break;
+            }
+        }
+    }
+
+    return arrIndex;
+}
+
+function checkMax(objectList, arrindex, idx, value, timeList) {
+    let result = false;
+    if (objectList[arrindex][idx]['act'] < objectList[arrindex][idx]['max']) {
+        for (y = 0; y < objectList.length; y++) {
+            if (value && timeList && (y != arrindex)) {
+                let timeset = timeList[y].split('#');
+                let valueset = value.split('#');
+                let doCheck = false;
+
+                if (parseInt(timeset[0]) === parseInt(valueset[0])) {
+                    doCheck = true;
+                } else if (timeset[1] && valueset[1]) {
+                    let beginTime = parseInt(timeset[0]);
+                    let endTime = beginTime+parseInt(timeset[1]);
+
+                    let beginValue = parseInt(valueset[0]);
+                    let endValue = beginValue+parseInt(valueset[1]);
+
+                    if ((beginValue >= beginTime) && (beginValue < endTime)) {
+                        doCheck = true;
+                    } else if ((endValue > beginTime) && (endValue <= endTime)) {
+                        doCheck = true;
+                    }
+                }
+
+                if (doCheck) {
+                    for (z = 0; z < objectList[y].length; z++) {
+                        if ((objectList[y][z]['act'] >= objectList[y][z]['max']) ||
+                            ((objectList[y][z]['act'] + objectList[arrindex][idx]['act']) >= objectList[arrindex][idx]['max'])) {
+                            return false;
+                        }
+                    }
+                }
+
+                result = true;
+            }
+        }
+    }
+
+    return result;
+}
+
 function setTimeset(dateField, id, additionalId, callFunction) {
     var brick_api = apiBaseUrl+"/c4g_brick_ajax";
     var elementId = 0;
@@ -255,7 +340,7 @@ function setTimeset(dateField, id, additionalId, callFunction) {
                 var iterator = 0;
                 for (let key in times) {
                     var dataTime = times[key]['time'];
-                    if (times[key]['interval'] > 0) {
+                    if (parseInt(times[key]['interval']) > 0) {
                         dataTime = times[key]['time']+'#'+times[key]['interval'];
                     }
                     var dataInterval = times[key]['interval'];
@@ -298,13 +383,13 @@ function setTimeset(dateField, id, additionalId, callFunction) {
                                 var value = jQuery(radioGroups[i].children[j].children[k]).val();
                                 if (value) {
                                     namefield = radioGroups[i].children[j].children[k].getAttribute('name').substr(1);
-                                    var arrindex = jQuery.inArray(value, timeList);
+                                    var arrindex = checkTimelist(value, timeList);
                                     var activateTimeButton = -1
                                     var percent = 0;
                                     if (arrindex !== -1) {
                                         for (l = 0; l < objectList[arrindex].length; l++) {
                                             if (objectList[arrindex][l]['id'] != -1) {
-                                                if ((objectList[arrindex][l]['act'] < objectList[arrindex][l]['max'] )) {
+                                                if (checkMax(objectList, arrindex, l, value, timeList)) {
                                                     activateTimeButton = (activateTimeButton < objectList[arrindex][l]['act']) ? objectList[arrindex][l]['act'] : activateTimeButton;
                                                     percent = objectList[arrindex][l]['percent'];
                                                 }
