@@ -1425,7 +1425,7 @@ class C4gReservation extends C4GBrickModuleParent
         $fieldList[] = $contact_street;
 
 
-        $contact_postal = new C4GPostalField();
+        $contact_postal = new C4GTextField();
         $contact_postal->setFieldName('contact_postal');
         $contact_postal->setFormField(false);
         $contact_postal->setTableColumn(false);
