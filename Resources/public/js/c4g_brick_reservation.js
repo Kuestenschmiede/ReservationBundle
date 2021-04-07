@@ -210,34 +210,36 @@ function checkTimelist(value, timeList) {
 
     if (value && timeList) {
         for (idx=0; idx < timeList.length; idx++) {
-            let timeset = timeList[idx].split('#');
-            let valueset = value.split('#');
-            let hits = 0;
+            if (timeList[idx]) {
+                let timeset = timeList[idx].split('#');
+                let valueset = value.split('#');
+                let hits = 0;
 
-            if (parseInt(timeset[0]) === parseInt(valueset[0])) {
-                arrIndex = idx;
-                hits++;
-            }
-
-            if (timeset[1] && valueset[1]) {
-                let beginTime = parseInt(timeset[0]);
-                let endTime = beginTime+parseInt(timeset[1]);
-
-                let beginValue = parseInt(valueset[0]);
-                let endValue = beginValue+parseInt(valueset[1]);
-
-                if ((beginValue >= beginTime) && (beginValue < endTime)) {
+                if (parseInt(timeset[0]) === parseInt(valueset[0])) {
                     arrIndex = idx;
                     hits++;
                 }
 
-                if ((endValue > beginTime) && (endValue <= endTime)) {
-                    arrIndex = idx;
-                    hits++;
-                }
+                if (timeset[1] && valueset[1]) {
+                    let beginTime = parseInt(timeset[0]);
+                    let endTime = beginTime + parseInt(timeset[1]);
 
-                if (hits == 3) {
-                    break;
+                    let beginValue = parseInt(valueset[0]);
+                    let endValue = beginValue + parseInt(valueset[1]);
+
+                    if ((beginValue >= beginTime) && (beginValue < endTime)) {
+                        arrIndex = idx;
+                        hits++;
+                    }
+
+                    if ((endValue > beginTime) && (endValue <= endTime)) {
+                        arrIndex = idx;
+                        hits++;
+                    }
+
+                    if (hits == 3) {
+                        break;
+                    }
                 }
             } else if (hits == 1) {
                 break;

@@ -99,7 +99,6 @@ class C4gReservation extends C4GBrickModuleParent
         $this->brickCaptionPlural = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural'];
     }
 
-
     public function addFields()
     {
         $fieldList = array();
