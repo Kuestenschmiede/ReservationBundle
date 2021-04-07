@@ -212,13 +212,15 @@ function checkTimelist(value, timeList) {
         for (idx=0; idx < timeList.length; idx++) {
             if (timeList[idx]) {
                 let timeset = [];
-                if (timeList[idx].indexOf('#')) {
-                    timeset = timeList[idx].split('#');
+                let timeidx = timeList[idx].toString();
+                if (timeidx && timeidx.indexOf('#')) {
+                    timeset = timeidx.split('#');
                 } else {
-                    timeset[0] = timeList[idx];
+                    timeset[0] = timeidx;
                 }
 
                 let valueset = [];
+                value = value.toString();
                 if (value.indexOf('#')) {
                     valueset = value.split('#');
                 } else {
@@ -269,13 +271,15 @@ function checkMax(objectList, arrindex, idx, value, timeList) {
             if (value && timeList && (y != arrindex)) {
 
                 let timeset = [];
-                if (timeList[y].indexOf('#')) {
-                    timeset = timeList[y].split('#');
+                let timeidx = timeList[y].toString();
+                if (timeidx && timeidx.indexOf('#')) {
+                    timeset = timeidx.split('#');
                 } else {
-                    timeset[0] = timeList[y];
+                    timeset[0] = timeidx;
                 }
 
                 let valueset = [];
+                value = value.toString();
                 if (value.indexOf('#')) {
                     valueset = value.split('#');
                 } else {
