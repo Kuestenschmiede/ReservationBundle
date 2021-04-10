@@ -65,6 +65,9 @@ class C4gReservationCancellation extends C4GBrickModuleParent
 
     public function addFields()
     {
+        $lastname  = $this->Input->get('lastname') ? $this->Input->get('lastname') : '';
+        $reservation_id  = $this->Input->get('reservation_id') ? $this->Input->get('reservation_id') : '';
+
         $fieldList = array();
 
         $idField = new C4GKeyField();
@@ -82,6 +85,7 @@ class C4gReservationCancellation extends C4GBrickModuleParent
         $lastnameField->setTableColumn(false);
         $lastnameField->setMandatory(true);
         $lastnameField->setNotificationField(true);
+        $lastnameField->setInitialValue($lastname);
         $fieldList[] = $lastnameField;
 
         $reservationIdField = new C4GTextField();
@@ -95,6 +99,7 @@ class C4gReservationCancellation extends C4GBrickModuleParent
         $reservationIdField->setMaxLength(13);
         $reservationIdField->setUnique(true);
         $reservationIdField->setNotificationField(true);
+        $reservationIdField->setInitialValue($reservation_id);
         $fieldList[] = $reservationIdField;
 
         $clickButton = new C4GBrickButton(C4GBrickConst::BUTTON_CLICK, $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['button_cancellation'], $visible=true, $enabled=true, $action = '', $accesskey = '', $defaultByEnter = true);
