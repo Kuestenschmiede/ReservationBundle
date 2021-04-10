@@ -22,6 +22,7 @@ use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickRegEx;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickCondition;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickConditionType;
+use con4gis\ProjectsBundle\Classes\Fieldlist\C4GBrickField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
@@ -1393,7 +1394,6 @@ class C4gReservation extends C4GBrickModuleParent
         $contact_name->setFormField(false);
         $contact_name->setTableColumn(true);
         $contact_name->setNotificationField(true);
-        $contact_name->setStyleClass('contact-name');
         $fieldList[] = $contact_name;
 
         $contact_phone = new C4GTelField();
@@ -1401,7 +1401,6 @@ class C4gReservation extends C4GBrickModuleParent
         $contact_phone->setFormField(false);
         $contact_phone->setTableColumn(false);
         $contact_phone->setNotificationField(true);
-        $contact_phone->setStyleClass('contact-phone');
         $fieldList[] = $contact_phone;
 
         $contact_email = new C4GEmailField();
@@ -1409,7 +1408,6 @@ class C4gReservation extends C4GBrickModuleParent
         $contact_email->setTableColumn(false);
         $contact_email->setFormField(false);
         $contact_email->setNotificationField(true);
-        $contact_email->setStyleClass('contact-email');
         $fieldList[] = $contact_email;
 
 
@@ -1418,7 +1416,6 @@ class C4gReservation extends C4GBrickModuleParent
         $contact_street->setTableColumn(false);
         $contact_street->setFormField(false);
         $contact_street->setNotificationField(true);
-        $contact_street->setStyleClass('contact-street');
         $fieldList[] = $contact_street;
 
 
@@ -1427,7 +1424,6 @@ class C4gReservation extends C4GBrickModuleParent
         $contact_postal->setFormField(false);
         $contact_postal->setTableColumn(false);
         $contact_postal->setNotificationField(true);
-        $contact_postal->setStyleClass('contact-postal');
         $fieldList[] = $contact_postal;
 
 
@@ -1436,7 +1432,13 @@ class C4gReservation extends C4GBrickModuleParent
         $contact_city->setTableColumn(false);
         $contact_city->setFormField(false);
         $contact_city->setNotificationField(true);
-        $contact_city->setStyleClass('contact-city');
+        $fieldList[] = $contact_city;
+
+        $contact_city = new C4GTextField();
+        $contact_city->setFieldName('icsFilename');
+        $contact_city->setTableColumn(false);
+        $contact_city->setFormField(false);
+        $contact_city->setNotificationField(true);
         $fieldList[] = $contact_city;
 
         $this->fieldList = $fieldList;
@@ -1674,6 +1676,9 @@ class C4gReservation extends C4GBrickModuleParent
             $putVars['participantList'] = $participants;
         }
 
+        $icsObject = $reservationEventObject ? $reservationEventObject : $reservationObject;
+        $putVars['icsFilename'] = $this->createIcs($beginDate, $beginTime, $endDate, $endTime, $icsObject, $reservationType, $location);
+
         $rawData = '';
         foreach ($putVars as $key => $value) {
             $rawData .= (isset($putVars[$key]) ? $putVars[$key] : ucfirst($key)) . ': ' . (is_array($value) ? implode(', ', $value) : $value) . "\n";
@@ -1681,9 +1686,6 @@ class C4gReservation extends C4GBrickModuleParent
 
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
-
-        $vcardObject = $reservationEventObject ? $reservationEventObject : $reservationObject;
-        $this->createIcs($beginDate, $beginTime, $endDate, $endTime, $vcardObject, $reservationType, $location);
 
         return $result = $action->run();
     }
@@ -1767,8 +1769,11 @@ class C4gReservation extends C4GBrickModuleParent
                     $ics = new File($filename);
                 }
                 $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nDESCRIPTION:$icssummary\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
+                return $filename;
             }
         }
+
+        return '';
     }
 
     /**

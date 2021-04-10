@@ -106,14 +106,14 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
             'salutation2', 'title2', 'organisation2', 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2',
             'comment', 'internal_comment','contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id',
             'location','speaker','topic','audience','agreed',
-            'raw_data'),
+            'icsFilename','raw_data'),
         'email_html' => array('reservation_type','desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime',
             'reservation_object', 'included_params', 'additional_params', 'admin_email', 'participantList',
             'salutation', 'title', 'organisation', 'firstname', 'lastname', 'email', 'phone', 'address', 'postal', 'city',
             'salutation2', 'title2', 'organisation2', 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2',
             'comment', 'internal_comment', 'contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id',
             'location','speaker','topic','audience','agreed',
-            'raw_data'),
+            'icsFilename','raw_data'),
         'email_sender_name' => array('admin_email','email','contact_email'),
         'email_sender_address' => array('admin_email','email','contact_email'),
         'email_recipient_cc' => array('admin_email','email','contact_email'),
@@ -125,7 +125,8 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
             'salutation2', 'title2', 'organisation2', 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2',
             'comment', 'internal_comment','contact_name','contact_email','contact_phone','contact_street','contact_postal','contact_city','reservation_id',
             'location','speaker','topic','audience','agreed',
-            'raw_data')
+            'icsFilename','raw_data'),
+        'attachment_tokens' => array('icsFilename')
     ),
     'con4gis_cancellation'   => array
     (
