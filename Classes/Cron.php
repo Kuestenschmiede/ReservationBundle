@@ -19,22 +19,21 @@ class Cron extends Backend
 {
     public function onDaily(): void
     {
-        $db = $this->Database->prepare('SELECT * FROM tl_c4g_reservation_type ')
+        $db = $this->Database->prepare('SELECT id, auto_del, del_time FROM tl_c4g_reservation_type ')
             ->execute()->fetchAllAssoc();
 
         foreach ($db as $entry) {
             $format = $entry['auto_del'];
             $value = $entry['del_time'];
 
-            if ($format === 'daily') {
+            if ($value && ($value >= 1) && ($format === 'daily')) {
                 $daytime = time();
-                $reservations = $this->Database->prepare('SELECT * FROM tl_c4g_reservation ')
-                    ->execute()->fetchAllAssoc();
+                $reservations = $this->Database->prepare('SELECT * FROM tl_c4g_reservation where reservation_type = ?')
+                    ->execute($entry['id'])->fetchAllAssoc();
 
                 foreach ($reservations as $reservation) {
                     $begindate = $reservation['beginDate'];
-                    $begintime = $reservation['beginTime'];
-                    $deletetime = $begintime + $begindate + ($value * 60 * 60 * 24) ;
+                    $deletetime = $begindate + ($value * 60 * 60 * 24) ;
                     if ($daytime > $deletetime) {
                         $db = $this->Database->prepare('DELETE FROM tl_c4g_reservation WHERE id=?')
                             ->execute($reservation['id']);
