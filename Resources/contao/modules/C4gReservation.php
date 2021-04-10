@@ -76,7 +76,7 @@ class C4gReservation extends C4GBrickModuleParent
 
     protected $jQueryUseTable = false;
     protected $jQueryUseScrollPane = false;
-    protected $jQueryUsePopups = false;
+    protected $jQueryUsePopups = true;
     protected $loadChosenResources = false;
     protected $loadCkEditor5Resources = false;
     protected $loadCkEditorResources = false;
@@ -88,11 +88,9 @@ class C4gReservation extends C4GBrickModuleParent
         parent::initBrickModule($id);
 
         $this->dialogParams->setWithoutGuiHeader(true);
-
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE);
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
-        $this->dialogParams->setWithoutGuiHeader(true);
         $this->dialogParams->setRedirectSite($this->reservation_redirect_site);
         $this->dialogParams->setSaveWithoutSavingMessage(true);
         $this->brickCaption = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption'];
@@ -1759,7 +1757,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $pathUuid = StringUtil::binToUuid($pathUuid);
                 $path = Controller::replaceInsertTags("{{file::$pathUuid}}");
 
-                $filename = $path.'/'.$fileId.'/'.'reservation.isc';
+                $filename = $path.'/'.$fileId.'/'.'reservation.ics';
                 try {
                     mkdir($path.'/'.$fileId.'/');
                     $ics = new File($filename);

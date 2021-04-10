@@ -17,12 +17,16 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural'] = 'Reservation
 
 /** FIELDS */ /**DKo 13.02.19*/
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type'] = 'What do you want to reserve?';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type_short'] = 'Reservation type';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_time'] = 'Time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity'] = 'How many people are you reserving for?';
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'] = 'Time span type';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['periodType'] = 'Time span type';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['tstamp'] = 'Last change';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'] = 'For which date would you like to make a reservation?';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateShort'] = 'Date';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'end date';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Please select a time';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeShort'] = 'Time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Ends at';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration'] = 'Duration';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'] = 'Begin date';
@@ -74,6 +78,8 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['city2'] = 'city';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none'] = 'No Bookings possible';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['comment'] = 'Your message to us';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'] = 'Privacy policy';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed'] = 'Confirmed';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['cancellation'] = 'Cancelled';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['periodType'] = 'Time span type';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['man'] = 'Mr.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman'] = 'Mrs.';

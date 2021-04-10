@@ -13,6 +13,7 @@
 namespace con4gis\ReservationBundle\Resources\contao\models;
 
 
+use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use Contao\Database;
 use Contao\Model;
 
@@ -29,4 +30,16 @@ class C4gReservationModel extends Model
      */
     protected static $strTable = 'tl_c4g_reservation';
 
+    /**
+     * @return mixed
+     */
+    public static function getListItems() {
+        $db = \Database::getInstance();
+        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE cancellation <> '1' AND beginDate > UNIX_TIMESTAMP(NOW())");
+        $dbResult = $stmt->execute();
+        $dbResult = $dbResult->fetchAllAssoc();
+        $result = $dbResult;
+
+        return ArrayHelper::arrayToObject($result);
+    }
 }

@@ -23,5 +23,6 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationEventAudience'] = array('Target audien
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Speaker', 'Here you can maintain the speakers.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Topics', 'Here you can, for example, store the seminar topics.');
 
-$GLOBALS['TL_LANG']['FMD']['C4gReservation'] = array('con4gis-Reservation: Reservation', 'Reservation');
+$GLOBALS['TL_LANG']['FMD']['C4gReservation']  = array('con4gis-Reservation: Form', 'Reservation form');
+$GLOBALS['TL_LANG']['FMD']['C4gReservationList']  = array('con4gis-Reservation: List', 'Reservation list');
 $GLOBALS['TL_LANG']['FMD']['C4gReservationCancellation'] = array('con4gis-Reservation: Cancellation', 'Reservation');

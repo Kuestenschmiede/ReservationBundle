@@ -747,23 +747,43 @@ class C4gReservationObjectModel extends \Model
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectList($moduleTypes = null, $objectId = 0, $showPrices = false)
+    public static function getReservationObjectList($moduleTypes = null, $objectId = 0, $showPrices = false, $getAllTypes = false)
     {
         $objectlist = array();
+        $allTypesList = array();
         foreach ($moduleTypes as $moduleType) {
             if ($moduleType) {
                 $type = C4gReservationTypeModel::findByPk($moduleType);
                 if ($type && $type->reservationObjectType === '2') {
                     $objectlist = C4gReservationObjectModel::getReservationObjectEventList($moduleTypes, $objectId, $type, $showPrices);
-                    break;
+
+                    if ($getAllTypes) {
+                        foreach($objectlist as $key=>$object) {
+                            $allTypesList['events'][$key] = $object;
+                        }
+                    } else {
+                        break;
+                    }
+
                 } else {
                     $objectlist = C4gReservationObjectModel::getReservationObjectDefaultList($moduleTypes, $type, $showPrices);
-                    break;
+
+                    if ($getAllTypes) {
+                        foreach($objectlist as $key=>$object) {
+                            $allTypesList['default'][$key] = $object;
+                        }
+                    } else {
+                        break;
+                    }
                 }
             }
         }
 
-        return $objectlist;
+        if ($getAllTypes) {
+            return $allTypesList;
+        } else {
+            return $objectlist;
+        }
     }
 
     /**

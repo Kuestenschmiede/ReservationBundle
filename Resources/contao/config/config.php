@@ -15,6 +15,7 @@
  * Frontend Modules
  */
 $GLOBALS['FE_MOD']['con4gis']['C4gReservation'] = \con4gis\ReservationBundle\Resources\contao\modules\C4gReservation::class;
+$GLOBALS['FE_MOD']['con4gis']['C4gReservationList'] = \con4gis\ReservationBundle\Resources\contao\modules\C4gReservationList::class;
 $GLOBALS['FE_MOD']['con4gis']['C4gReservationCancellation'] = \con4gis\ReservationBundle\Resources\contao\modules\C4gReservationCancellation::class;
 asort($GLOBALS['FE_MOD']['con4gis']);
 

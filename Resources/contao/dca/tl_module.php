@@ -15,7 +15,9 @@
  * Table tl_module
  */
 //ToDo showFreeSeats, additionalDuration
-$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,withCapacity,showEndTime,showPrices,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,withCapacity,showEndTime,showPrices,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site;';
+
+$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservationList']  = '{title_legend},name,headline,type;{reservation_legend},reservation_types, reservationView;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservationCancellation'] = '{title_legend},name,headline,type;{reservation_legend},reservation_types; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;'; //{caption_legend}, captionReservationType, captionBeginDate, captionReservationObject, captionAdditionalParams, captionComment, captionReservationId';
 
@@ -29,6 +31,17 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_types'] = array
     'options_callback'        => array('tl_module_c4g_reservation','getAllTypes'),
     'eval'                    => array('mandatory'=>false, 'multiple'=>true),
     'sql'                     => "blob NULL"
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['reservationView'] = array
+(
+    'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationView'],
+    'exclude'           => true,
+    'filter'            => true,
+    'inputType'         => 'select',
+    'default'           => 'publicview',
+    'options'           => ['publicview'],
+    'reference'          => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references'],
+    'sql'               => "varchar(25) NOT NULL default 'publicview'"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['withCapacity'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withCapacity'],

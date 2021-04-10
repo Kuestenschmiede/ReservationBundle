@@ -17,13 +17,17 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural'] = 'Reservierun
 
 /** FIELDS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type'] = 'Was möchten Sie reservieren?';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type_short'] = 'Reservierungsart';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_time'] = 'Uhrzeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity'] = 'Für wie viele Personen reservieren Sie?';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'] = "Zeitspannenart";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration'] = "Verweildauer in Stunden";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['tstamp'] = 'Letzte Änderung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'] = 'An welchem Tag möchten Sie reservieren?';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateShort'] = 'Datum';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'Endet am';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Bitte wählen Sie eine Uhrzeit aus';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeShort'] = 'Uhrzeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Endet um';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'] = 'Startet am';
@@ -78,6 +82,8 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['man'] = 'Herr';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman'] = 'Frau';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['various'] = ' - ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'] = 'Einwilligung Datenschutz: ';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed'] = 'Bestätigt';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['cancellation'] = 'Storniert';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['periodType'] = 'Zeitspannenart';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['minute'] = 'Minuten';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['hour'] = 'Stunden';

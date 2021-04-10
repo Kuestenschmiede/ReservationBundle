@@ -14,7 +14,7 @@
 /** Fields **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['caption'] = array("Backend Bezeichnung","Bezeichnung zur Auswahl im Backend.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['options'] = array("Frontend Bezeichnung","Werden je nach Sprache im Auswahlfeld im Frontend dargestellt.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("Option","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("Name","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'] = array("Objekttyp", "Es können Reserverierungsobjekte und Contao Events reserviert werden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][1] = 'Standard';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][2] = 'Events';
@@ -25,7 +25,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'] = array("Maximale 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'] = array("Objekte mehrfach buchbar","Alle Objekte des Typs können mehrfach gebucht werden. Nur sinnvoll mit Personenangabe. Eine bereits gebuchte Personenzahl wird subrahiert.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['language'] = array("Sprache","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_del'] = array("Intervall für Automatisches Löschen","In welchem Intervall sollen erledigte Termine gelöscht werden ");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['del_time'] = array("Wert für Intervall angeben","Anzahl der Tage nach denen ein erldigter Termin gelöscht wird");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['del_time'] = array("Wert für Intervall angeben","Anzahl der Tage nach denen ein erledigter Termin gelöscht wird");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minute'] = array("Minuten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['no_delete'] = array("Nur Manuelles löschen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['hour'] = array("Stunden");
