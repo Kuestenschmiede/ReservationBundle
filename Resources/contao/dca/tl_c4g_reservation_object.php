@@ -137,6 +137,17 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
         ),
 
+        'member_id' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'],
+            'default'           => 0,
+            'inputType'         => 'select',
+            'options_callback'  => array('tl_c4g_reservation_type', 'loadMemberOptions'),
+            'eval'              => array('mandatory'=>false, 'disabled' => true),
+            'filter'            => true,
+            'sql'               => "int(10) unsigned NOT NULL default 0"
+        ),
+
         'caption' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'],

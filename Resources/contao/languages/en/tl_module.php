@@ -39,3 +39,4 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showEndTime'] = a
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'] = array("Show prices","Prices are displayed");
 
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['publicview'] = 'Public';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['member'] = 'Member based';

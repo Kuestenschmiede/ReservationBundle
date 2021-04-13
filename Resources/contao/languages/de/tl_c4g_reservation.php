@@ -63,6 +63,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'] = array("Datenschutzerkläru
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Bestätigt", "Wurde der Termin bestätigt? (Optional)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Storniert", "Wenn der Termin storniert wird, ist dieses Feld auszuwählen");
 
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'] = array("Erstellendes Mitglied", "Die Reservierung wurde durch dieses Mitglied erstellt.");
+
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['billingAddress'] = array("Rechnungsadresse", "Rechnungsadresse");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additionalHeadline'] = "Überschrift";
 

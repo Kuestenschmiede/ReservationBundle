@@ -14,6 +14,6 @@ namespace con4gis\ReservationBundle\Classes;
 
 class C4gReservationBrickTypes
 {
-    const BRICK_RESERVATION = 'reservation';
+    const BRICK_RESERVATION = 'brick_reservation';
     const BRICK_RESERVATION_CANCELLATION = 'cancellation';
 }

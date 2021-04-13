@@ -38,7 +38,6 @@ class C4gReservationList extends C4GBrickModuleParent
 {
     protected $tableName    = 'tl_c4g_reservation';
     protected $modelClass   = C4gReservationModel::class;
-    protected $modelListFunction = 'getListItems';
     protected $languageFile = 'fe_c4g_reservation';
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICVIEW;
@@ -59,17 +58,23 @@ class C4gReservationList extends C4GBrickModuleParent
 
     public function initBrickModule($id)
     {
-        parent::initBrickModule($id);
-
         if ($this->reservationView) {
             $this->viewType = $this->reservationView;
+            if ($this->viewType === 'publicview') {
+                $this->modelListFunction = 'getListItems';
+            }
         }
 
+        parent::initBrickModule($id);
+
         $this->dialogParams->setWithoutGuiHeader(true);
+
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
         $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
-
-        $this->dialogParams->setSaveWithoutMessages(true);
+        
+        if ($this->viewType === 'publicview') {
+            $this->dialogParams->setSaveWithoutMessages(true);
+        }
 
         $this->brickCaption = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption'];
         $this->brickCaptionPlural = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural'];
@@ -114,7 +119,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $reservationBeginDateField->setFormField(true);
         $reservationBeginDateField->setColumnWidth(5);
         $reservationBeginDateField->setStyleClass('begin-date');
-        $reservationBeginDateField->setEditable(false);
+        //$reservationBeginDateField->setEditable(false);
         $fieldList[] = $reservationBeginDateField;
 
         $reservationBeginTimeField = new C4GTimeField();
@@ -125,7 +130,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $reservationBeginTimeField->setMandatory(true);
         $reservationBeginTimeField->setNotificationField(true);
         $reservationBeginTimeField->setStyleClass('begin-time');
-        $reservationBeginTimeField->setEditable(false);
+        //$reservationBeginTimeField->setEditable(false);
         $fieldList[] = $reservationBeginTimeField;
 
         $t = 'tl_c4g_reservation_type';
@@ -140,7 +145,7 @@ class C4gReservationList extends C4GBrickModuleParent
             foreach ($types as $type) {
                 $typeArr[] = $type->id;
                 $captions = unserialize($type->options);
-                if ($captions) {
+                if ($captions && count($captions) > 0) {
                     foreach ($captions as $caption) {
                         if (strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) {
                             $typelist[$type->id] = array(
@@ -149,6 +154,11 @@ class C4gReservationList extends C4GBrickModuleParent
                             );
                         }
                     }
+                } else {
+                    $typelist[$type->id] = array(
+                        'id' => $type->id,
+                        'name' => $type->caption
+                    );
                 }
             }
 
@@ -203,7 +213,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $lastnameField->setMandatory(true);
         $lastnameField->setNotificationField(true);
         $lastnameField->setStyleClass('lastname');
-        $lastnameField->setEditable(false);
+        //$lastnameField->setEditable(false);
         $fieldList[] = $lastnameField;
 
         $firstnameField = new C4GTextField();
@@ -215,7 +225,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $firstnameField->setMandatory(true);
         $firstnameField->setNotificationField(true);
         $firstnameField->setStyleClass('firsname');
-        $firstnameField->setEditable(false);
+        //$firstnameField->setEditable(false);
         $fieldList[] = $firstnameField;
 
         $emailField = new C4GEmailField();
@@ -227,7 +237,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $emailField->setMandatory(true);
         $emailField->setNotificationField(true);
         $emailField->setStyleClass('email');
-        $emailField->setEditable(false);
+        //$emailField->setEditable(false);
         $fieldList[] = $emailField;
 
         $reservationIdField = new C4GTextField();
@@ -251,7 +261,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $reservationIdField->setEditable(false);
         $fieldList[] = $reservationIdField;
 
-        if ($this->reservationView !== 'publicview') {
+        if ($this->viewType !== 'publicview') {
             $confirmedField = new C4GCheckboxField();
             $confirmedField->setFieldName('confirmed');
             $confirmedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed']);
@@ -288,7 +298,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $includedParams->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['included_params']);
             $includedParams->setFormField(true);
             $includedParams->setTableColumn(false);
-            $includedParams->setEditable(false);
+            //$includedParams->setEditable(false);
             $includedParams->setOptions($paramList);
             $includedParams->setMandatory(false);
             $includedParams->setModernStyle(false);
@@ -302,7 +312,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $additionalParams->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['additional_params']);
             $additionalParams->setFormField(true);
             $additionalParams->setTableColumn(false);
-            $additionalParams->setEditable(false);
+            //$additionalParams->setEditable(false);
             $additionalParams->setOptions($paramList);
             $additionalParams->setMandatory(false);
             $additionalParams->setModernStyle(false);
@@ -370,7 +380,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $participantParamField->setFieldName('participant_params');
             $participantParamField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params']);
             $participantParamField->setFormField(true);
-            $participantParamField->setEditable(true);
+            //$participantParamField->setEditable(true);
             $participantParamField->setOptions($paramList);
             $participantParamField->setMandatory(false);
             $participantParamField->setModernStyle(false);
@@ -383,18 +393,21 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationParticipants = new C4GSubDialogField();
             $reservationParticipants->setFieldName('participants');
             $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
+            $reservationParticipants->setAddButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant']);
+            $reservationParticipants->setRemoveButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant']);
+            $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
             $reservationParticipants->setTable('tl_c4g_reservation_participants');
             $reservationParticipants->addFields($participants);
             $reservationParticipants->setKeyField($participantsKey);
             $reservationParticipants->setForeignKeyField($participantsForeign);
             $reservationParticipants->setMandatory(false);
             $reservationParticipants->setNotificationField(false);
-            $reservationParticipants->setShowFirstDataSet(false);
-            $reservationParticipants->setShowIfEmpty(false);
+            //$reservationParticipants->setShowFirstDataSet(false);
+            //$reservationParticipants->setShowIfEmpty(false);
             $reservationParticipants->setDelimiter('~');
             $reservationParticipants->setTableColumn(false);
-            $reservationParticipants->setEditable(false);
-            $reservationParticipants->setShowButtons(false);
+            //$reservationParticipants->setEditable(false);
+            //$reservationParticipants->setShowButtons(false);
 
             $fieldList[] = $reservationParticipants;
         }
