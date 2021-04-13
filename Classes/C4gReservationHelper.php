@@ -20,7 +20,7 @@ class C4gReservationHelper
             foreach ($countArr[$date] as $beginTime => $count) {
                 if ($beginTime == $time) {
                     $actCount = $actCount + $count;
-                } else if (($time > $beginTime) && ($time <= ($beginTime+$interval))) {
+                } else if (($time > $beginTime) && ($time < ($beginTime+$interval))) {
                     $actCount = $actCount + $count;
                 }
             }

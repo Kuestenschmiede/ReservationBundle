@@ -292,7 +292,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'auto_del' => array
         (
             'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_del'],
-            'default'               => '',
             'exclude'               => true,
             'inputType'             => 'select',
             'reference'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
@@ -304,7 +303,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'del_time' => array
         (
             'label'                    =>&$GLOBALS['TL_LANG']['tl_c4g_reservations_type']['del_time'],
-            'default'                  => 0,
             'exclude'                  =>true,
             'inputType'                =>'text',
             'default'                  =>'30',
@@ -450,7 +448,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
 
 
 /**
- * Class tl_c4g_reservation
+ * Class tl_c4g_reservation_type
  */
 class tl_c4g_reservation_type extends Backend
 {

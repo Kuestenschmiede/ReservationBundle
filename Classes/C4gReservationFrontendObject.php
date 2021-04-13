@@ -23,7 +23,7 @@ class C4gReservationFrontendObject
     private $caption = '';
     private $quantity = 1;
     private $timeinterval = '30';
-    private $duration = '2';
+    private $duration = '30';
     private $reservationTypes = [];
     private $opening_hours = ['mo','tu','we','th','fr','sa','su'];
     private $dates_exclusion = [];

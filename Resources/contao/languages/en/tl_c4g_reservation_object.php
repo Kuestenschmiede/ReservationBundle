@@ -45,6 +45,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['minute'] = array("minutes");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['hour'] = array("hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['openingHours'] = array("booking hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'] = array("time interval", "Specify how many X minutes/ X hours the object can be booked (depends on which reservation type the object is assigned to");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['duration'] = array("Duration per booking (optional)", "Normally [0] the duration is according to the time interval. However, if the actual appointment should be longer than the offered interval. For example, if a conversion or cleaning break is to be scheduled, then a longer interval can be entered here.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_exclusion_end'] = array("Exclusion end", "Put the last Date of exlusion in");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_residence_time'] = array("Maximum residence time", "If the customer can choose the maximum length of stay in hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_residence_time'] = array("Minimum residence time", "If customer can choose length of stay at least how many hours");

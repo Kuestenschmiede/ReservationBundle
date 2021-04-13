@@ -11,18 +11,11 @@
  * @link       https://www.con4gis.org
  */
 
-use con4gis\CoreBundle\Classes\C4GVersionProvider;
-
-
 /**
  * Table tl_module
  */
 
-if (C4GVersionProvider::isInstalled('con4gis/maps')) {
-    $default = '{type_legend}, caption, quantity, options, description, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
-} else {
-    $default = '{type_legend}, caption, quantity, options, description, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
-}
+$default = '{type_legend}, caption, quantity, options, description, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -137,17 +130,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
         ),
 
-        'member_id' => array
-        (
-            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'],
-            'default'           => 0,
-            'inputType'         => 'select',
-            'options_callback'  => array('tl_c4g_reservation_type', 'loadMemberOptions'),
-            'eval'              => array('mandatory'=>false, 'disabled' => true),
-            'filter'            => true,
-            'sql'               => "int(10) unsigned NOT NULL default 0"
-        ),
-
         'caption' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'],
@@ -212,15 +194,24 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'],
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'long clr'),
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NOT NULL default 0"
         ),
+
+        'duration' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['duration'],
+            'inputType'         => 'text',
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'               => "smallint(5) unsigned NOT NULL default 0"
+        ),
+
         'min_residence_time' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_residence_time'],
             'inputType'         => 'text',
             'default'           => '0',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'long'),
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NOT NULL default 1"
         ),
         'max_residence_time' => array
@@ -228,7 +219,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_residence_time'],
             'inputType'         => 'text',
             'default'           => '0',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'long'),
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NOT NULL default 1"
         ),
 

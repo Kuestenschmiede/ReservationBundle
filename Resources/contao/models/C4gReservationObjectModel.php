@@ -588,9 +588,11 @@ class C4gReservationObjectModel extends \Model
                     switch ($periodType) {
                         case 'minute':
                             $interval = $object->getTimeinterval() * 60;
+                            $durationInterval = $object->getDuration() > $object->getTimeinterval() ? $object->getDuration() * 60 : $interval;
                             break;
                         case 'hour':
                             $interval = $object->getTimeinterval() * 3600;
+                            $durationInterval = $object->getDuration() > $object->getTimeinterval() ? $object->getDuration() * 3600 : $interval;
                             break;
                         default: '';
                     }
@@ -653,7 +655,7 @@ class C4gReservationObjectModel extends \Model
                                             if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $time)))) {
                                                 if ($actPersons && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
                                                     $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
-                                                } else if ($maxCount && (C4gReservationHelper::getObjectCountPerTime($objectCount, $tsdate, $time, $interval) >= intval($maxCount * $capacity))) {  //n times for type
+                                                } else if ($maxCount && (C4gReservationHelper::getObjectCountPerTime($objectCount, $tsdate, $time, $durationInterval) >= intval($maxCount * $capacity))) {  //n times for type
                                                     $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else if ($capacity && (!empty($objectCount)) && ($objectCount[$tsdate][$time] >= intval($capacity))) { //n times for object
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
@@ -663,7 +665,7 @@ class C4gReservationObjectModel extends \Model
                                                 }
                                             }
 
-                                            $time = $time + $interval;
+                                            $time = $time + ($duration > $interval ? $duration : $interval);
                                         }
                                     }
                                 }
@@ -1001,6 +1003,7 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject->setCaption($showPrices && $price ? $frontendObject->getCaption()."<span class='price'>&nbsp;(".number_format($price,2,',','.')." €)</span>" : $frontendObject->getCaption());
 
                 $frontendObject->setTimeinterval($object->time_interval);
+                $frontendObject->setDuration($object->duration);
                 $frontendObject->setMinReservationDay($object->min_reservation_day);
                 $frontendObject->setMaxReservationDay($object->max_reservation_day);
                 $frontendObject->setReservationTypes(unserialize($object->viewableTypes));
