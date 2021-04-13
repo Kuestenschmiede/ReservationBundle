@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,notification_type,published;{expert_legend:hide},auto_del;'
+        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,notification_type,published;{expert_legend:hide},member_id,auto_del;'
     ),
 
     //Subpalettes
@@ -137,6 +137,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'eval'              => array('doNotCopy'=>true, 'maxlength'=>128),
             'save_callback'     => array(array('tl_c4g_reservation_type','generateUuid')),
             'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
+        ),
+
+        'member_id' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['memberId'],
+            'default'           => 0,
+            'inputType'         => 'select',
+            'options_callback'  => array('tl_c4g_reservation_type', 'loadMemberOptions'),
+            'eval'              => array('mandatory'=>false,
+                'disabled' => false, 'includeBlankOption' => true, 'blankOptionLabel' => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId']),
+            'filter'            => true,
+            'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
 
         'caption' => array
@@ -517,32 +529,21 @@ class tl_c4g_reservation_type extends Backend
         $this->createNewVersion('tl_c4g_reservation_type', $intId);
     }
 
-//    public function listTypes($arrRow)
-//    {
-//        $period_ids = unserialize($arrRow['periodType']);
-//
-//        $reservationTypes = '';
-//        foreach ($type_ids as $type_id) {
-//            $reservation_type = \con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel::findByPk($type_id);
-//            if ($reservation_type) {
-//                if ($reservationTypes == '') {
-//                    $reservationTypes .= $reservation_type->caption;
-//                } else {
-//                    $reservationTypes .= ','.$reservation_type->caption;
-//                }
-//            }
-//        }
-//
-//        $arrRow['viewableTypes'] = $reservationTypes;
-//
-//        $result = [
-//            $arrRow['caption'],
-//            $arrRow['quantity'],
-//            $arrRow['desiredCapacityMin'],
-//            $arrRow['desiredCapacityMax'],
-//            $arrRow['viewableTypes']
-//        ];
-//        return $result;
-//    }
+    /**
+     * @param $dc
+     * @return array
+     */
+    public function loadMemberOptions($dc) {
+        $options = [];
+        //$options[$dc->activeRecord->id] = '';
+
+        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member");
+        $result = $stmt->execute()->fetchAllAssoc();
+
+        foreach ($result as $row) {
+            $options[$row['id']] = $row['lastname'] . ', ' . $row['firstname'];
+        }
+        return $options;
+    }
 
 }

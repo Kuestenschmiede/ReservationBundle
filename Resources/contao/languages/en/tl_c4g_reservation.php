@@ -64,7 +64,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'] = array("Privacy Policy", "S
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Confirmed", "Has the appointment been confirmed?If applicable, select this field.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Canceled", "If the appointment is cancelled, select this field");
 
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'] = array("Creating member", "The reservation was created by this member.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'] = array("Creating member", "The reservation was created for or by this member.");
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['billingAddress'] = array("Billing address", "Billing address");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additionalHeadline'] = array("Headline", "Headline");

@@ -53,6 +53,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['participant_params'] = array("Pa
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Description");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = array("Maximum number of participants per booking", "Here you can limit the number of participants in the entry per booking. 0 = unlimited.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['almostFullyBookedAt'] = array("Almost fully booked at how much %", "This can be used to set the organge warn status. 0 = no orange status");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['memberId'] = array("Link member", "All reservations of this type will be created for this member.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId'] = 'Default (no special member)';
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Details of the type of reservation";

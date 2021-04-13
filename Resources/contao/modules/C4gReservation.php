@@ -147,7 +147,7 @@ class C4gReservation extends C4GBrickModuleParent
                 }
 
                 $captions = unserialize($type->options);
-                if ($captions) {
+                if ($captions && (count($captions) > 0)) {
                     foreach ($captions as $caption) {
                         if (strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) {
                             $typelist[$type->id] = array(
@@ -159,10 +159,24 @@ class C4gReservation extends C4GBrickModuleParent
                                 'participantParams' => unserialize($type->participant_params),
                                 'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                                 'objects' => $objects,
-                                'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false
+                                'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
+                                'memberId' => $type->member_id
                             );
                         }
                     }
+                } else {
+                    $typelist[$type->id] = array(
+                        'id' => $type->id,
+                        'name' => $type->caption,
+                        'periodType' => $type->periodType,
+                        'includedParams' => unserialize($type->included_params),
+                        'additionalParams' => unserialize($type->additional_params),
+                        'participantParams' => unserialize($type->participant_params),
+                        'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
+                        'objects' => $objects,
+                        'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
+                        'memberId' => $type->member_id
+                    );
                 }
             }
         }
@@ -1441,6 +1455,13 @@ class C4gReservation extends C4GBrickModuleParent
         $contact_city->setNotificationField(true);
         $fieldList[] = $contact_city;
 
+        $memberId = new C4GTextField();
+        $memberId->setFieldName('member_id');
+        $memberId->setTableColumn(true);
+        $memberId->setFormField(false);
+        $memberId->setNotificationField(false);
+        $fieldList[] = $memberId;
+
         $this->fieldList = $fieldList;
     }
 
@@ -1630,6 +1651,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $putVars['contact_city'] = $contact_city;
             }
         }
+
+        $putVars['member_id'] = $reservationType->member_id;
 
         $participantsArr = [];
         foreach ($putVars as $key => $value) {

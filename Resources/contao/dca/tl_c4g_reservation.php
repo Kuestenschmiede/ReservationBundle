@@ -45,8 +45,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     (
         'sorting' => array
         (
-            'mode'              => 2,
-            'fields'            => ['id','beginDate','lastname'],
+            'mode'              => 11,
+            'fields'            => ['id DESC','beginDate DESC','lastname'],
             'filter'            => (Input::get('do') == "calendar") ? array(array('reservation_object=? AND reservationObjectType=2',Input::get('id'))) : null,
             'panelLayout'       => 'filter;sort,search,limit',
         ),
@@ -161,7 +161,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'],
             'default'           => 0,
             'inputType'         => 'select',
-            'options_callback'  => array('tl_c4g_reservation_type', 'loadMemberOptions'),
+            'options_callback'  => array('tl_c4g_reservation', 'loadMemberOptions'),
             'eval'              => array('mandatory'=>false, 'disabled' => true),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
