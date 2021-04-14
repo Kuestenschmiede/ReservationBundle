@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,notification_type,published;{expert_legend:hide},member_id,auto_del;'
+        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,notification_type,published;{expert_legend:hide},member_id,group_id,auto_del;'
     ),
 
     //Subpalettes
@@ -147,6 +147,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'options_callback'  => array('tl_c4g_reservation_type', 'loadMemberOptions'),
             'eval'              => array('mandatory'=>false,
                 'disabled' => false, 'includeBlankOption' => true, 'blankOptionLabel' => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId']),
+            'filter'            => true,
+            'sql'               => "int(10) unsigned NOT NULL default 0"
+        ),
+
+        'group_id' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['groupId'],
+            'default'           => 0,
+            'inputType'         => 'select',
+            'options_callback'  => array('tl_c4g_reservation_type', 'loadGroupOptions'),
+            'eval'              => array('mandatory'=>false,
+                'disabled' => false, 'includeBlankOption' => true, 'blankOptionLabel' => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyGroupId']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
@@ -533,9 +545,8 @@ class tl_c4g_reservation_type extends Backend
      */
     public function loadMemberOptions($dc) {
         $options = [];
-        //$options[$dc->activeRecord->id] = '';
 
-        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member");
+        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE disable != 1");
         $result = $stmt->execute()->fetchAllAssoc();
 
         foreach ($result as $row) {
@@ -544,4 +555,19 @@ class tl_c4g_reservation_type extends Backend
         return $options;
     }
 
+    /**
+     * @param $dc
+     * @return array
+     */
+    public function loadGroupOptions($dc) {
+        $options = [];
+
+        $stmt = $this->Database->prepare("SELECT id, name FROM tl_member_group WHERE disable != 1");
+        $result = $stmt->execute()->fetchAllAssoc();
+
+        foreach ($result as $row) {
+            $options[$row['id']] = $row['name'];
+        }
+        return $options;
+    }
 }

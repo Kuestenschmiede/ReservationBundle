@@ -1462,6 +1462,13 @@ class C4gReservation extends C4GBrickModuleParent
         $memberId->setNotificationField(false);
         $fieldList[] = $memberId;
 
+        $groupId = new C4GTextField();
+        $groupId->setFieldName('group_id');
+        $groupId->setTableColumn(true);
+        $groupId->setFormField(false);
+        $groupId->setNotificationField(false);
+        $fieldList[] = $groupId;
+
         $this->fieldList = $fieldList;
     }
 
@@ -1653,6 +1660,7 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         $putVars['member_id'] = $reservationType->member_id;
+        $putVars['group_id'] = $reservationType->group_id;
 
         $participantsArr = [];
         foreach ($putVars as $key => $value) {

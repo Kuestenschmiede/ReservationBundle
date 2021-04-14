@@ -39,7 +39,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservationView'] = array
     'filter'            => true,
     'inputType'         => 'select',
     'default'           => 'publicview',
-    'options'           => ['publicview','member'],
+    'options'           => ['publicview','member','group'],
     'reference'          => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references'],
     'sql'               => "varchar(25) NOT NULL default 'publicview'"
 );

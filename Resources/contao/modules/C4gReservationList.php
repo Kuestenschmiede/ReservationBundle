@@ -56,6 +56,8 @@ class C4gReservationList extends C4GBrickModuleParent
     protected $loadMoreButtonResources = false;
     protected $loadFontAwesomeResources = false;
 
+    protected $withPermissionCheck = false;
+    
     public function initBrickModule($id)
     {
         if ($this->reservationView) {
@@ -71,6 +73,8 @@ class C4gReservationList extends C4GBrickModuleParent
 
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
         $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
+
+        $this->dialogParams->setWithPrintButton(true);
 
         if ($this->viewType === 'publicview') {
             $this->dialogParams->setSaveWithoutMessages(true);

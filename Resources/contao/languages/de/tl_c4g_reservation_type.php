@@ -55,6 +55,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = ar
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['almostFullyBookedAt'] = array("Fast ausgebucht bei wieviel %", "Hiermit kann der Warnstatus (Organge) festgelegt werden. 0 = kein Orange-Status");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['memberId'] = array("Mitglied verknüpfen", "Alle Reservierungen dieser Art werden für dieses Mitglied erstellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId'] = 'Standard (kein spezielles Mitglied)';
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['groupId'] = array("Gruppe verknüpfen", "Alle Reservierungen dieser Art werden für diese Mitgliedergruppe erstellt.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyGroupId'] = 'Standard (keine spezielle Gruppe)';
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Angaben zur Reservierungsart";
