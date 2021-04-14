@@ -57,6 +57,7 @@ use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel;
 use Contao\Controller;
 use Contao\Date;
+use Contao\FrontendUser;
 use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\Filesystem\Filesystem;
@@ -160,7 +161,8 @@ class C4gReservation extends C4GBrickModuleParent
                                 'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                                 'objects' => $objects,
                                 'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
-                                'memberId' => $type->member_id
+                                'memberId' => $type->member_id,
+                                'groupId' => $type->group_id
                             );
                         }
                     }
@@ -175,7 +177,8 @@ class C4gReservation extends C4GBrickModuleParent
                         'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                         'objects' => $objects,
                         'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
-                        'memberId' => $type->member_id
+                        'memberId' => $type->member_id,
+                        'groupId' => $type->group_id
                     );
                 }
             }
@@ -951,6 +954,23 @@ class C4gReservation extends C4GBrickModuleParent
             }
         }
 
+        $memberArr = [];
+        if (FE_USER_LOGGED_IN === true) {
+            $member = FrontendUser::getInstance();
+            if ($member) {
+                $memberArr['id'] = $member->id ? $member->id : '';
+                $memberArr['company'] = $member->company ? $member->company : '';
+                $memberArr['firstname'] = $member->firstname ? $member->firstname : '';
+                $memberArr['lastname'] = $member->lastname ? $member->lastname : '';
+                $memberArr['email'] = $member->email ? $member->email : '';
+                $memberArr['street'] = $member->street ? $member->street : '';
+                $memberArr['postal'] = $member->postal ? $member->postal : '';
+                $memberArr['city'] = $member->city ? $member->city : '';
+                $memberArr['country'] = $member->country ? $member->country : '';
+                $memberArr['phone'] = $member->phone ? $member->phone : '';
+            }
+        }
+
         foreach ($additionaldatas as $rowdata) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
@@ -977,6 +997,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $titleField->setMandatory(false);
                 $titleField->setNotificationField(true);
                 $titleField->setStyleClass('title');
+                $titleField->setInitialValue($initialValue);
                 $fieldList[] = $titleField;
             } else if ($rowField == "salutation") {
                 $salutationField = new C4GSelectField();
@@ -985,9 +1006,10 @@ class C4gReservation extends C4GBrickModuleParent
                 $salutationField->setSortColumn(false);
                 $salutationField->setTableColumn(false);
                 $salutationField->setOptions($salutation);
-                $salutationField->setMandatory(false);
+                $salutationField->setMandatory($rowMandatory);
                 $salutationField->setNotificationField(true);
                 $salutationField->setStyleClass('salutation');
+                $salutationField->setInitialValue($initialValue);
                 $fieldList[] = $salutationField;
             } else if ($rowField == "firstname") {
                 $firstnameField = new C4GTextField();
@@ -998,7 +1020,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $firstnameField->setTableColumn(true);
                 $firstnameField->setMandatory(true);
                 $firstnameField->setNotificationField(true);
-                $firstnameField->setStyleClass('firsname');
+                $firstnameField->setStyleClass('firstname');
+                $firstnameField->setInitialValue($initialValue ? $initialValue : $memberArr['firstname']);
                 $fieldList[] = $firstnameField;
             } else if ($rowField == "lastname") {
                 $lastnameField = new C4GTextField();
@@ -1010,6 +1033,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $lastnameField->setMandatory(true);
                 $lastnameField->setNotificationField(true);
                 $lastnameField->setStyleClass('lastname');
+                $lastnameField->setInitialValue($initialValue ? $initialValue : $memberArr['lastname']);
                 $fieldList[] = $lastnameField;
             } else if ($rowField == "email") {
                 $emailField = new C4GEmailField();
@@ -1021,6 +1045,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $emailField->setMandatory(true);
                 $emailField->setNotificationField(true);
                 $emailField->setStyleClass('email');
+                $emailField->setInitialValue($initialValue ? $initialValue : $memberArr['email']);
                 $fieldList[] = $emailField;
             } else if ($rowField == "phone") {
                 $phoneField = new C4GTelField();
@@ -1032,7 +1057,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $phoneField->setTableColumn(false);
                 $phoneField->setNotificationField(true);
                 $phoneField->setStyleClass('phone');
-                $phoneField->setInitialValue($initialValue);
+                $phoneField->setInitialValue($initialValue ? $initialValue : $memberArr['phone']);
                 $fieldList[] = $phoneField;
             } else if ($rowField == "address") {
                 $addressField = new C4GTextField();
@@ -1044,7 +1069,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $addressField->setMandatory($rowMandatory);
                 $addressField->setNotificationField(true);
                 $addressField->setStyleClass('address');
-                $addressField->setInitialValue($initialValue);
+                $addressField->setInitialValue($initialValue ? $initialValue : $memberArr['street']);
                 $fieldList[] = $addressField;
             } else if ($rowField == "postal") {
                 $postalField = new C4GPostalField();
@@ -1057,7 +1082,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $postalField->setMandatory($rowMandatory);
                 $postalField->setNotificationField(true);
                 $postalField->setStyleClass('postal');
-                $postalField->setInitialValue($initialValue);
+                $postalField->setInitialValue($initialValue ? $initialValue : $memberArr['postal']);
                 $fieldList[] = $postalField;
             } else if ($rowField == "city") {
                 $cityField = new C4GTextField();
@@ -1069,7 +1094,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $cityField->setMandatory($rowMandatory);
                 $cityField->setNotificationField(true);
                 $cityField->setStyleClass('city');
-                $cityField->setInitialValue($initialValue);
+                $cityField->setInitialValue($initialValue ? $initialValue : $memberArr['city']);
                 $fieldList[] = $cityField;
             } else if ($rowField == "salutation2") {
                 $salutationField2 = new C4GSelectField();
