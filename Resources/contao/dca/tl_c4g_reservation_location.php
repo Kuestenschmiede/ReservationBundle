@@ -214,8 +214,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_location']['ics'],
             'inputType'         => 'checkbox',
-            'eval'              => array('mandatory'=>false,'tl_class'=>'long clr','alwaysSave'=> true,),
-            'sql'               => "blob NULL "
+            'eval'              => array('submitOnChange'=>true,'mandatory'=>false,'tl_class'=>'long clr','alwaysSave'=> true),
+            'sql'               => "char(1) NOT NULL default ''"
         ),
         'icsAlert' => array
         (
@@ -228,7 +228,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         'icsPath'  => array
         (
             'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['icsPath'],
-            'exclude'           => true,
             'exclude'           => true,
             'default'           => null,
             'inputType'         => 'fileTree',
