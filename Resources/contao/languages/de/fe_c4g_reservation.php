@@ -17,7 +17,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural'] = 'Reservierun
 
 /** FIELDS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type'] = 'Was möchten Sie reservieren?';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type_short'] = 'Reservierungsart';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type_short'] = 'Art';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_time'] = 'Uhrzeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity'] = 'Für wie viele Personen reservieren Sie?';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'] = "Zeitspannenart";
@@ -52,6 +52,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'] = 'Zielgruppe(n)';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'] = 'Thema/Themen';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object'] = 'Reservierungsmöglichkeit';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_short'] = 'Reservierung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] = 'Veranstaltung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none'] = 'Bitte Zeitpunkt wählen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['included_params'] = 'Enthaltende Leistungen';

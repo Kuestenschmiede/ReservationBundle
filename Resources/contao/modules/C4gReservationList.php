@@ -57,7 +57,7 @@ class C4gReservationList extends C4GBrickModuleParent
     protected $loadFontAwesomeResources = false;
 
     protected $withPermissionCheck = false;
-    
+
     public function initBrickModule($id)
     {
         if ($this->reservationView) {
@@ -74,10 +74,11 @@ class C4gReservationList extends C4GBrickModuleParent
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
         $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
 
-        $this->dialogParams->setWithPrintButton(true);
-
         if ($this->viewType === 'publicview') {
             $this->dialogParams->setSaveWithoutMessages(true);
+        } else {
+            $this->dialogParams->setCaptionField('reservation_id');
+            $this->dialogParams->addButton(C4GBrickConst::BUTTON_PRINT);
         }
 
         $this->brickCaption = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption'];
@@ -93,6 +94,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $idField->setEditable(false);
         $idField->setFormField(false);
         $idField->setSortColumn(false);
+        $idField->setPrintable(false);
         $fieldList[] = $idField;
 
 //        $tstampField = new C4GDateField();
@@ -124,6 +126,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $reservationBeginDateField->setColumnWidth(5);
         $reservationBeginDateField->setStyleClass('begin-date');
         //$reservationBeginDateField->setEditable(false);
+        $reservationBeginDateField->setPrintable(true);
         $fieldList[] = $reservationBeginDateField;
 
         $reservationBeginTimeField = new C4GTimeField();
@@ -134,6 +137,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $reservationBeginTimeField->setMandatory(true);
         $reservationBeginTimeField->setNotificationField(true);
         $reservationBeginTimeField->setStyleClass('begin-time');
+        $reservationBeginTimeField->setPrintable(true);
         //$reservationBeginTimeField->setEditable(false);
         $fieldList[] = $reservationBeginTimeField;
 
@@ -175,10 +179,11 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationTypeField->setColumnWidth(20);
             $reservationTypeField->setSize(1);
             $reservationTypeField->setOptions($typelist);
-            $reservationTypeField->setMandatory(true);
+            $reservationTypeField->setMandatory(false);
             $reservationTypeField->setStyleClass('reservation-type');
             $reservationTypeField->setNotificationField(true);
             $reservationTypeField->setEditable(false);
+            $reservationTypeField->setPrintable(true);
             $fieldList[] = $reservationTypeField;
 
             $reservationObjects = C4gReservationObjectModel::getReservationObjectList($typeArr,0, false, true);
@@ -196,15 +201,16 @@ class C4gReservationList extends C4GBrickModuleParent
 
             $reservationObjectField = new C4GSelectField();
             $reservationObjectField->setFieldName('reservation_object');
-            $reservationObjectField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object']);
+            $reservationObjectField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_short']);
             $reservationObjectField->setTableColumn(true);
             $reservationObjectField->setColumnWidth(20);
             $reservationObjectField->setOptions($objects);
-            $reservationObjectField->setMandatory(true);
+            $reservationObjectField->setMandatory(false);
             $reservationObjectField->setNotificationField(true);
             $reservationObjectField->setStyleClass('reservation-object');
             $reservationObjectField->setShowIfEmpty(false);
             $reservationObjectField->setEditable(false);
+            $reservationObjectField->setPrintable(true);
             $fieldList[] = $reservationObjectField;
         }
 
@@ -217,6 +223,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $lastnameField->setMandatory(true);
         $lastnameField->setNotificationField(true);
         $lastnameField->setStyleClass('lastname');
+        $lastnameField->setPrintable(true);
         //$lastnameField->setEditable(false);
         $fieldList[] = $lastnameField;
 
@@ -230,6 +237,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $firstnameField->setNotificationField(true);
         $firstnameField->setStyleClass('firsname');
         //$firstnameField->setEditable(false);
+        $firstnameField->setPrintable(false);
         $fieldList[] = $firstnameField;
 
         $emailField = new C4GEmailField();
@@ -242,6 +250,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $emailField->setNotificationField(true);
         $emailField->setStyleClass('email');
         //$emailField->setEditable(false);
+        $emailField->setPrintable(false);
         $fieldList[] = $emailField;
 
         $reservationIdField = new C4GTextField();
@@ -263,6 +272,7 @@ class C4gReservationList extends C4GBrickModuleParent
         $reservationIdField->setDbUniqueAdditionalCondition("tl_c4g_reservation.cancellation <> '1' AND tl_c4g_reservation.beginDate > UNIX_TIMESTAMP(NOW())");
         $reservationIdField->setStyleClass('reservation-id');
         $reservationIdField->setEditable(false);
+        $reservationIdField->setPrintable(false);
         $fieldList[] = $reservationIdField;
 
         if ($this->viewType !== 'publicview') {
@@ -276,6 +286,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $confirmedField->setNotificationField(true);
             $confirmedField->setStyleClass('confirmed');
             $confirmedField->setWithoutDescriptionLineBreak(true);
+            $confirmedField->setPrintable(false);
             $fieldList[] = $confirmedField;
 
             $cancellationField = new C4GCheckboxField();
@@ -288,6 +299,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $cancellationField->setNotificationField(true);
             $cancellationField->setStyleClass('cancellation');
             $cancellationField->setWithoutDescriptionLineBreak(true);
+            $cancellationField->setPrintable(false);
             $fieldList[] = $cancellationField;
 
 
@@ -309,6 +321,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $includedParams->setStyleClass('included-params');
             $includedParams->setNotificationField(true);
             $includedParams->setShowIfEmpty(false);
+            $includedParams->setPrintable(false);
             $fieldList[] = $includedParams;
 
             $additionalParams = new C4GMultiCheckboxField();
@@ -324,8 +337,8 @@ class C4gReservationList extends C4GBrickModuleParent
             $additionalParams->setNotificationField(true);
             $additionalParams->setAllChecked(true);
             $additionalParams->setShowIfEmpty(false);
+            $additionalParams->setPrintable(false);
             $fieldList[] = $additionalParams;
-
 
             $participants = [];
 
@@ -335,11 +348,13 @@ class C4gReservationList extends C4GBrickModuleParent
             $participantsKey->setEditable(false);
             $participantsKey->setHidden(true);
             $participantsKey->setFormField(true);
+            $participantsKey->setPrintable(false);
 
             $participantsForeign = new C4GForeignKeyField();
             $participantsForeign->setFieldName('pid');
             $participantsForeign->setHidden(true);
             $participantsForeign->setFormField(true);
+            $participantsForeign->setPrintable(false);
 
             $titleField = new C4GTextField();
             $titleField->setFieldName('title');
@@ -348,6 +363,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $titleField->setTableColumn(false);
             $titleField->setMandatory(false);
             $titleField->setNotificationField(false);
+            $titleField->setPrintable(false);
             $participants[] = $titleField;
 
             $firstnameField = new C4GTextField();
@@ -358,6 +374,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $firstnameField->setTableColumn(false);
             $firstnameField->setMandatory(true);
             $firstnameField->setNotificationField(false);
+            $firstnameField->setPrintable(false);
             $participants[] = $firstnameField;
 
             $lastnameField = new C4GTextField();
@@ -368,6 +385,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $lastnameField->setTableColumn(false);
             $lastnameField->setMandatory(true);
             $lastnameField->setNotificationField(false);
+            $lastnameField->setPrintable(false);
             $participants[] = $lastnameField;
 
             $emailField = new C4GEmailField();
@@ -378,6 +396,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $emailField->setTableColumn(false);
             $emailField->setMandatory(false);
             $emailField->setNotificationField(false);
+            $emailField->setPrintable(false);
             $participants[] = $emailField;
 
             $participantParamField = new C4GMultiCheckboxField();
@@ -391,7 +410,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $participantParamField->setStyleClass('participant-params');
             $participantParamField->setNotificationField(false);
             $participantParamField->setShowIfEmpty(false);
-
+            $participantParamField->setPrintable(false);
             $participants[] = $participantParamField;
 
             $reservationParticipants = new C4GSubDialogField();
@@ -412,7 +431,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationParticipants->setTableColumn(false);
             //$reservationParticipants->setEditable(false);
             //$reservationParticipants->setShowButtons(false);
-
+            $reservationParticipants->setPrintable(false);
             $fieldList[] = $reservationParticipants;
         }
 
