@@ -73,17 +73,38 @@ class C4gReservation extends C4GBrickModuleParent
     protected $sendEMails   = null;
     protected $brickScript  = 'bundles/con4gisreservation/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/css/c4g_brick_reservation.css';
-    protected $strTemplate  = 'mod_c4g_brick_simple';
     protected $withNotification = true;
 
-    protected $jQueryUseTable = false;
-    protected $jQueryUseScrollPane = false;
-    protected $jQueryUsePopups = true;
-    protected $loadChosenResources = false;
-    protected $loadCkEditor5Resources = false;
+    //Resource Params
+    protected $loadDefaultResources = true;
     protected $loadCkEditorResources = false;
+    protected $loadCkEditor5Resources = false;
+    protected $loadDateTimePickerResources = false;
+    protected $loadChosenResources = false;
+    protected $loadClearBrowserUrlResources = false;
+    protected $loadConditionalFieldDisplayResources = true;
     protected $loadMoreButtonResources = false;
     protected $loadFontAwesomeResources = false;
+    protected $loadTriggerSearchFromOtherModuleResources = false;
+    protected $loadFileUploadResources = false;
+    protected $loadMultiColumnResources = false;
+    protected $loadMiniSearchResources = false;
+    protected $loadHistoryPushResources = false;
+
+    //JQuery GUI Resource Params
+    protected $jQueryAddCore = true;
+    protected $jQueryAddJquery = true;
+    protected $jQueryAddJqueryUI = true;
+    protected $jQueryUseTree = false;
+    protected $jQueryUseTable = false;
+    protected $jQueryUseHistory = false;
+    protected $jQueryUseTooltip = false;
+    protected $jQueryUseMaps = false;
+    protected $jQueryUseGoogleMaps = false;
+    protected $jQueryUseMapsEditor = false;
+    protected $jQueryUseWswgEditor = false;
+    protected $jQueryUseScrollPane = false;
+    protected $jQueryUsePopups = false;
 
     public function initBrickModule($id)
     {
