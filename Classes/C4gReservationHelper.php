@@ -1,8 +1,6 @@
 <?php
 
-
 namespace con4gis\ReservationBundle\Classes;
-
 
 class C4gReservationHelper
 {
@@ -14,13 +12,14 @@ class C4gReservationHelper
      * @param $interval
      * @return int|mixed
      */
-    public static function getObjectCountPerTime($countArr, $date, $time, $interval) {
+    public static function getObjectCountPerTime($countArr, $date, $time, $interval)
+    {
         $actCount = 0;
         if (!empty($countArr)) {
             foreach ($countArr[$date] as $beginTime => $count) {
                 if ($beginTime == $time) {
                     $actCount = $actCount + $count;
-                } else if (($time > $beginTime) && ($time < ($beginTime+$interval))) {
+                } elseif (($time > $beginTime) && ($time < ($beginTime + $interval))) {
                     $actCount = $actCount + $count;
                 }
             }

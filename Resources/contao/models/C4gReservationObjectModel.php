@@ -76,7 +76,11 @@ class C4gReservationObjectModel extends \Model
             $weekday = date("w",$date);
             $quantity = $objectData['quantity'];
             $periodType = $type['periodType'];
-            $maxPerTime = $type['objectCount']; //ToDo check max count per interval
+            $maxPerTime = $type['objectCount'];
+            if ($maxPerTime < $quantity) {
+                $quantity = $maxPerTime; //ToDo check max count per interval for all objects
+            }
+
             $interval = $object->getTimeInterval();
 
             if($weekday == 0){
@@ -102,7 +106,7 @@ class C4gReservationObjectModel extends \Model
             }
 
             $possibleBookings = 0;
-            foreach($array as $timeset) {
+            foreach ($array as $timeset) {
                 $possibleSeconds = $timeset['time_end'] - $timeset['time_begin'];
 
                 switch ($periodType) {
@@ -116,7 +120,6 @@ class C4gReservationObjectModel extends \Model
                 }
 
                 if ($possibleSeconds) {
-
                     $possibleBookings = $possibleBookings + (($possibleSeconds / $toSecond / $interval) * $quantity);
                 }
             }
@@ -653,7 +656,7 @@ class C4gReservationObjectModel extends \Model
                                             $timeObj = ['id'=>-1,'act'=>$actPersons, 'percent'=>$actPercent, 'max'=>$capacity,'showSeats'=>$showFreeSeats];
 
                                             if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $time)))) {
-                                                if ($actPersons && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
+                                                if (($actPersons >= $capacity) && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
                                                     $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else if ($maxCount && (C4gReservationHelper::getObjectCountPerTime($objectCount, $tsdate, $time, $durationInterval) >= intval($maxCount * $capacity))) {  //n times for type
                                                     $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
