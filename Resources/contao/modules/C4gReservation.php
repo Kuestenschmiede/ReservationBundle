@@ -969,11 +969,14 @@ class C4gReservation extends C4GBrickModuleParent
             }
         }
 
+        $addMandatoryFields = [];
         foreach ($mandatoryFields as $mandatoryField=>$value) {
             if ($value) {
-                $additionaldatas[] = ['additionaldatas'=>$mandatoryField, 'initialValue' => '', 'mandatory' => true];
+                $addMandatoryFields[] = ['additionaldatas'=>$mandatoryField, 'initialValue' => '', 'mandatory' => true];
             }
         }
+
+        $additionaldatas = array_merge($addMandatoryFields, $additionaldatas);
 
         $memberArr = [];
         if (FE_USER_LOGGED_IN === true) {
