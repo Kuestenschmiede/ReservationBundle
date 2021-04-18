@@ -36,7 +36,7 @@
     background-color: darkorange;
 }
 .reservation_time_button input[type="radio"][disabled] + label, .reservation_time_event_button input[type="radio"][disabled] + label,
-.reservation_time_button .radio_object_hurry_up + label, .reservation_time_event_button .c4g_radio_object_fully_booked .radio_element input[type = "radio"] + label {
+.reservation_time_event_button .c4g_radio_object_fully_booked .radio_element input[type = "radio"] + label {
     background-color: red;
     cursor: no-drop;
     font-weight: normal;
