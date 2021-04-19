@@ -37,6 +37,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withCapacity'] = 
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showFreeSeats'] = array("Show free seats", "Open seats are displayed.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showEndTime'] = array("The end times are also output", "The end times are also displayed (depending on the configuration).");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'] = array("Show prices","Prices are displayed");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showMemberData'] = array("Apply member data", "Existing member data is automatically pre-populated in the form fields.");
 
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['publicview'] = 'Public (reservations will be visible)';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['member'] = 'Member based (Only reservations for logged in member)';

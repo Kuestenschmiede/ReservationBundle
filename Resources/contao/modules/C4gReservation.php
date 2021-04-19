@@ -979,7 +979,17 @@ class C4gReservation extends C4GBrickModuleParent
         $additionaldatas = array_merge($addMandatoryFields, $additionaldatas);
 
         $memberArr = [];
-        if (FE_USER_LOGGED_IN === true) {
+        $memberArr['company'] = '';
+        $memberArr['firstname'] = '';
+        $memberArr['lastname'] = '';
+        $memberArr['email'] = '';
+        $memberArr['street'] = '';
+        $memberArr['postal'] = '';
+        $memberArr['city'] = '';
+        $memberArr['country'] = '';
+        $memberArr['phone'] = '';
+
+        if ($this->showMemberData && FE_USER_LOGGED_IN === true) {
             $member = FrontendUser::getInstance();
             if ($member) {
                 $memberArr['id'] = $member->id ? $member->id : '';

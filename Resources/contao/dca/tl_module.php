@@ -15,7 +15,7 @@
  * Table tl_module
  */
 //ToDo showFreeSeats, additionalDuration
-$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,withCapacity,showEndTime,showPrices,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,withCapacity,showEndTime,showPrices,showMemberData,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservationList']  = '{title_legend},name,headline,type;{reservation_legend},reservation_types, reservationView;';
 
@@ -66,6 +66,13 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['showEndTime'] = array
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['showPrices'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'],
+    'exclude'           => true,
+    'filter'            => true,
+    'inputType'         => 'checkbox',
+    'sql'               => "int(1) unsigned NULL default 0"
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['showMemberData'] = array
+(   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showMemberData'],
     'exclude'           => true,
     'filter'            => true,
     'inputType'         => 'checkbox',
