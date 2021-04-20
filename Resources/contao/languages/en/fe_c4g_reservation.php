@@ -53,7 +53,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'] = 'Address';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventnumber'] = 'Number';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object'] = 'Reservation options';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none'] = 'Reservation request not available.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none'] = 'Please select or change time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id'] = 'Identification key: ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation'] = 'Company / Organization / School';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation'] = 'Salutation';
@@ -112,13 +112,13 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'] = 'Reservatio
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'] = 'The number of participants per booking is limited. Maximum number: ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'An error has occurred. The reservation cannot be made. Please contact us.';
 
-/** DESCRIPTIONS */ /**DKo 13.02.19*/
+/** DESCRIPTIONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Select the reservation type';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_beginDate'] = 'Select the date on which the event starts.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_endDate'] = 'Choose the date on which the event ends.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_beginTime'] = 'Select the time when the event starts(9:00-12:00 & 14:00-18:00)';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_endTime'] = 'Select the time when the event ends(9:00-12:00 & 14:00-18:00)';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object'] = 'Select what you want to reserve.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object'] = '';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_id'] = 'This key is mandatory for a cancellation You will receive a copy by e-mail.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_lastname'] = 'Enter your descendant.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_firstname'] = 'Enter your first name.';
