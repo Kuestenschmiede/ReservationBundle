@@ -268,6 +268,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $organisationField->setNotificationField(true);
             $organisationField->setStyleClass('organisation');
             $organisationField->setShowIfEmpty(false);
+            $organisationField->setPrintable(true);
             $fieldList[] = $organisationField;
 
             $titleField = new C4GTextField();
@@ -278,6 +279,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $titleField->setNotificationField(true);
             $titleField->setStyleClass('title');
             $titleField->setShowIfEmpty(false);
+            $titleField->setPrintable(true);
             $fieldList[] = $titleField;
 
 //            $salutation = [
@@ -307,6 +309,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $firstnameField->setNotificationField(true);
             $firstnameField->setStyleClass('firstname');
             $firstnameField->setShowIfEmpty(false);
+            $firstnameField->setPrintable(true);
             $fieldList[] = $firstnameField;
 
             $lastnameField = new C4GTextField();
@@ -315,10 +318,10 @@ class C4gReservationList extends C4GBrickModuleParent
             $lastnameField->setColumnWidth(10);
             $lastnameField->setSortColumn(false);
             $lastnameField->setTableColumn(false);
-
             $lastnameField->setNotificationField(true);
             $lastnameField->setStyleClass('lastname');
             $lastnameField->setShowIfEmpty(false);
+            $lastnameField->setPrintable(true);
             $fieldList[] = $lastnameField;
 
             $addressField = new C4GTextField();
@@ -330,6 +333,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $addressField->setNotificationField(true);
             $addressField->setStyleClass('address');
             $addressField->setShowIfEmpty(false);
+            $addressField->setPrintable(true);
             $fieldList[] = $addressField;
 
             $postalField = new C4GPostalField();
@@ -342,6 +346,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $postalField->setNotificationField(true);
             $postalField->setStyleClass('postal');
             $postalField->setShowIfEmpty(false);
+            $postalField->setPrintable(true);
             $fieldList[] = $postalField;
 
             $cityField = new C4GTextField();
@@ -353,6 +358,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $cityField->setNotificationField(true);
             $cityField->setStyleClass('city');
             $cityField->setShowIfEmpty(false);
+            $cityField->setPrintable(true);
             $fieldList[] = $cityField;
 
             $emailField = new C4GEmailField();
@@ -365,6 +371,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $emailField->setNotificationField(true);
             $emailField->setStyleClass('email');
             $emailField->setShowIfEmpty(false);
+            $emailField->setPrintable(true);
             $fieldList[] = $emailField;
 
             $phoneField = new C4GTelField();
@@ -376,6 +383,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $phoneField->setNotificationField(true);
             $phoneField->setStyleClass('phone');
             $phoneField->setShowIfEmpty(false);
+            $phoneField->setPrintable(true);
             $fieldList[] = $phoneField;
 
             $birthDateField = new C4GDateField();
@@ -391,6 +399,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $birthDateField->setNotificationField(true);
             $birthDateField->setStyleClass('dateOfBirth');
             $birthDateField->setShowIfEmpty(false);
+            $birthDateField->setPrintable(true);
             $fieldList[] = $birthDateField;
 
             $organisationField2 = new C4GTextField();
@@ -402,6 +411,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $organisationField2->setNotificationField(true);
             $organisationField2->setStyleClass('organisation');
             $organisationField2->setShowIfEmpty(false);
+            $organisationField2->setPrintable(true);
             $fieldList[] = $organisationField2;
 
 //            $salutationField2 = new C4GSelectField();
@@ -425,6 +435,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $titleField2->setNotificationField(true);
             $titleField2->setStyleClass('title');
             $titleField2->setShowIfEmpty(false);
+            $titleField2->setPrintable(true);
             $fieldList[] = $titleField2;
 
             $firstnameField2 = new C4GTextField();
@@ -436,6 +447,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $firstnameField2->setNotificationField(true);
             $firstnameField2->setStyleClass('firstname');
             $firstnameField2->setShowIfEmpty(false);
+            $firstnameField2->setPrintable(true);
             $fieldList[] = $firstnameField2;
 
             $lastnameField2 = new C4GTextField();
@@ -447,6 +459,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $lastnameField2->setNotificationField(true);
             $lastnameField2->setStyleClass('lastname');
             $lastnameField2->setShowIfEmpty(false);
+            $lastnameField2->setPrintable(true);
             $fieldList[] = $lastnameField2;
 
             $addressField2 = new C4GTextField();
@@ -458,6 +471,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $addressField2->setNotificationField(true);
             $addressField2->setStyleClass('address');
             $addressField2->setShowIfEmpty(false);
+            $addressField2->setPrintable(true);
             $fieldList[] = $addressField2;
 
             $postalField2 = new C4GPostalField();
@@ -470,6 +484,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $postalField2->setNotificationField(true);
             $postalField2->setStyleClass('postal');
             $postalField2->setShowIfEmpty(false);
+            $postalField2->setPrintable(true);
             $fieldList[] = $postalField2;
 
             $cityField2 = new C4GTextField();
@@ -481,6 +496,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $cityField2->setNotificationField(true);
             $cityField2->setStyleClass('city');
             $cityField2->setShowIfEmpty(false);
+            $cityField2->setPrintable(true);
             $fieldList[] = $cityField2;
 
             $emailField2 = new C4GEmailField();
@@ -492,6 +508,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $emailField2->setNotificationField(true);
             $emailField2->setStyleClass('email');
             $emailField2->setShowIfEmpty(false);
+            $emailField2->setPrintable(true);
             $fieldList[] = $emailField2;
 
             $phoneField2 = new C4GTelField();
@@ -503,6 +520,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $phoneField2->setNotificationField(true);
             $phoneField2->setStyleClass('phone');
             $phoneField2->setShowIfEmpty(false);
+            $phoneField2->setPrintable(true);
             $fieldList[] = $phoneField2;
 
             $commentField = new C4GTextareaField();
@@ -514,6 +532,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $commentField->setNotificationField(true);
             $commentField->setStyleClass('comment');
             $commentField->setShowIfEmpty(false);
+            $commentField->setPrintable(true);
             $fieldList[] = $commentField;
 
             $reservationIdField = new C4GTextField();
@@ -602,99 +621,99 @@ class C4gReservationList extends C4GBrickModuleParent
             $additionalParams->setPrintable(false);
             $fieldList[] = $additionalParams;
 
-            $participants = [];
-
-            $participantsKey = new C4GKeyField();
-            $participantsKey->setFieldName('id');
-            $participantsKey->setComparable(false);
-            $participantsKey->setEditable(false);
-            $participantsKey->setHidden(true);
-            $participantsKey->setFormField(true);
-            $participantsKey->setPrintable(false);
-
-            $participantsForeign = new C4GForeignKeyField();
-            $participantsForeign->setFieldName('pid');
-            $participantsForeign->setHidden(true);
-            $participantsForeign->setFormField(true);
-            $participantsForeign->setPrintable(false);
-
-            $titleField = new C4GTextField();
-            $titleField->setFieldName('title');
-            $titleField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
-            $titleField->setSortColumn(false);
-            $titleField->setTableColumn(false);
-            $titleField->setMandatory(false);
-            $titleField->setNotificationField(false);
-            $titleField->setPrintable(false);
-            $participants[] = $titleField;
-
-            $firstnameField = new C4GTextField();
-            $firstnameField->setFieldName('firstname');
-            $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
-            $firstnameField->setColumnWidth(10);
-            $firstnameField->setSortColumn(false);
-            $firstnameField->setTableColumn(false);
-            $firstnameField->setMandatory(true);
-            $firstnameField->setNotificationField(false);
-            $firstnameField->setPrintable(false);
-            $participants[] = $firstnameField;
-
-            $lastnameField = new C4GTextField();
-            $lastnameField->setFieldName('lastname');
-            $lastnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
-            $lastnameField->setColumnWidth(10);
-            $lastnameField->setSortColumn(false);
-            $lastnameField->setTableColumn(false);
-            $lastnameField->setMandatory(true);
-            $lastnameField->setNotificationField(false);
-            $lastnameField->setPrintable(false);
-            $participants[] = $lastnameField;
-
-            $emailField = new C4GEmailField();
-            $emailField->setFieldName('email');
-            $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
-            $emailField->setColumnWidth(10);
-            $emailField->setSortColumn(false);
-            $emailField->setTableColumn(false);
-            $emailField->setMandatory(false);
-            $emailField->setNotificationField(false);
-            $emailField->setPrintable(false);
-            $participants[] = $emailField;
-
-            $participantParamField = new C4GMultiCheckboxField();
-            $participantParamField->setFieldName('participant_params');
-            $participantParamField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params']);
-            $participantParamField->setFormField(true);
-            //$participantParamField->setEditable(true);
-            $participantParamField->setOptions($paramList);
-            $participantParamField->setMandatory(false);
-            $participantParamField->setModernStyle(false);
-            $participantParamField->setStyleClass('participant-params');
-            $participantParamField->setNotificationField(false);
-            $participantParamField->setShowIfEmpty(false);
-            $participantParamField->setPrintable(false);
-            $participants[] = $participantParamField;
-
-            $reservationParticipants = new C4GSubDialogField();
-            $reservationParticipants->setFieldName('participants');
-            $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
-            $reservationParticipants->setAddButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant']);
-            $reservationParticipants->setRemoveButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant']);
-            $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
-            $reservationParticipants->setTable('tl_c4g_reservation_participants');
-            $reservationParticipants->addFields($participants);
-            $reservationParticipants->setKeyField($participantsKey);
-            $reservationParticipants->setForeignKeyField($participantsForeign);
-            $reservationParticipants->setMandatory(false);
-            $reservationParticipants->setNotificationField(false);
-            //$reservationParticipants->setShowFirstDataSet(false);
-            //$reservationParticipants->setShowIfEmpty(false);
-            $reservationParticipants->setDelimiter('~');
-            $reservationParticipants->setTableColumn(false);
-            //$reservationParticipants->setEditable(false);
-            //$reservationParticipants->setShowButtons(false);
-            $reservationParticipants->setPrintable(false);
-            $fieldList[] = $reservationParticipants;
+//            $participants = [];
+//
+//            $participantsKey = new C4GKeyField();
+//            $participantsKey->setFieldName('id');
+//            $participantsKey->setComparable(false);
+//            $participantsKey->setEditable(false);
+//            $participantsKey->setHidden(true);
+//            $participantsKey->setFormField(true);
+//            $participantsKey->setPrintable(false);
+//
+//            $participantsForeign = new C4GForeignKeyField();
+//            $participantsForeign->setFieldName('pid');
+//            $participantsForeign->setHidden(true);
+//            $participantsForeign->setFormField(true);
+//            $participantsForeign->setPrintable(false);
+//
+//            $titleField = new C4GTextField();
+//            $titleField->setFieldName('title');
+//            $titleField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
+//            $titleField->setSortColumn(false);
+//            $titleField->setTableColumn(false);
+//            $titleField->setMandatory(false);
+//            $titleField->setNotificationField(false);
+//            $titleField->setPrintable(true);
+//            $participants[] = $titleField;
+//
+//            $firstnameField = new C4GTextField();
+//            $firstnameField->setFieldName('firstname');
+//            $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
+//            $firstnameField->setColumnWidth(10);
+//            $firstnameField->setSortColumn(false);
+//            $firstnameField->setTableColumn(false);
+//            $firstnameField->setMandatory(true);
+//            $firstnameField->setNotificationField(false);
+//            $firstnameField->setPrintable(true);
+//            $participants[] = $firstnameField;
+//
+//            $lastnameField = new C4GTextField();
+//            $lastnameField->setFieldName('lastname');
+//            $lastnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
+//            $lastnameField->setColumnWidth(10);
+//            $lastnameField->setSortColumn(false);
+//            $lastnameField->setTableColumn(false);
+//            $lastnameField->setMandatory(true);
+//            $lastnameField->setNotificationField(false);
+//            $lastnameField->setPrintable(true);
+//            $participants[] = $lastnameField;
+//
+//            $emailField = new C4GEmailField();
+//            $emailField->setFieldName('email');
+//            $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
+//            $emailField->setColumnWidth(10);
+//            $emailField->setSortColumn(false);
+//            $emailField->setTableColumn(false);
+//            $emailField->setMandatory(false);
+//            $emailField->setNotificationField(false);
+//            $emailField->setPrintable(true);
+//            $participants[] = $emailField;
+//
+//            $participantParamField = new C4GMultiCheckboxField();
+//            $participantParamField->setFieldName('participant_params');
+//            $participantParamField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params']);
+//            $participantParamField->setFormField(true);
+//            //$participantParamField->setEditable(true);
+//            $participantParamField->setOptions($paramList);
+//            $participantParamField->setMandatory(false);
+//            $participantParamField->setModernStyle(false);
+//            $participantParamField->setStyleClass('participant-params');
+//            $participantParamField->setNotificationField(false);
+//            $participantParamField->setShowIfEmpty(false);
+//            $participantParamField->setPrintable(false);
+//            $participants[] = $participantParamField;
+//
+//            $reservationParticipants = new C4GSubDialogField();
+//            $reservationParticipants->setFieldName('participants');
+//            $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
+//            $reservationParticipants->setAddButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant']);
+//            $reservationParticipants->setRemoveButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant']);
+//            $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
+//            $reservationParticipants->setTable('tl_c4g_reservation_participants');
+//            $reservationParticipants->addFields($participants);
+//            $reservationParticipants->setKeyField($participantsKey);
+//            $reservationParticipants->setForeignKeyField($participantsForeign);
+//            $reservationParticipants->setMandatory(false);
+//            $reservationParticipants->setNotificationField(false);
+//            //$reservationParticipants->setShowFirstDataSet(false);
+//            //$reservationParticipants->setShowIfEmpty(false);
+//            $reservationParticipants->setDelimiter('~');
+//            $reservationParticipants->setTableColumn(false);
+//            //$reservationParticipants->setEditable(false);
+//            //$reservationParticipants->setShowButtons(false);
+//            $reservationParticipants->setPrintable(false);
+//            $fieldList[] = $reservationParticipants;
         }
 
         $this->fieldList = $fieldList;
