@@ -47,6 +47,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone'] = array("Telefonnummer", "Tel
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['address'] = array("Straße", "Straße");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal'] = array("Postleitzahl", "Postleitzahl");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['city'] = array("Ort", "Ort");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['dateOfBirth'] = array("Geburtsdatum", "Geburtsdatum");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation2'] = ['Firma / Organisation / Schule (2)','Firmennamen, Organisation oder Namen der Schule angeben'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['salutation2'] = ['Anrede (2)','Bitte auswählen.'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['title2'] = ['Titel (2)', 'Titel der Person'];

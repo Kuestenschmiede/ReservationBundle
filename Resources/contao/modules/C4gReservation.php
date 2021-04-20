@@ -988,6 +988,7 @@ class C4gReservation extends C4GBrickModuleParent
         $memberArr['city'] = '';
         $memberArr['country'] = '';
         $memberArr['phone'] = '';
+        $memberArr['dateOfBirth'] = '';
 
         if ($this->showMemberData && FE_USER_LOGGED_IN === true) {
             $member = FrontendUser::getInstance();
@@ -1002,6 +1003,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $memberArr['city'] = $member->city ? $member->city : '';
                 $memberArr['country'] = $member->country ? $member->country : '';
                 $memberArr['phone'] = $member->phone ? $member->phone : '';
+                $memberArr['dateOfBirth'] = $member->dateOfBirth ? $member->dateOfBirth : '';
             }
         }
 
@@ -1130,7 +1132,22 @@ class C4gReservation extends C4GBrickModuleParent
                 $cityField->setStyleClass('city');
                 $cityField->setInitialValue($initialValue ? $initialValue : $memberArr['city']);
                 $fieldList[] = $cityField;
-            } else if ($rowField == "salutation2") {
+            } else if ($rowField == "dateOfBirth") {
+                $birthDateField = new C4GDateField();
+                $birthDateField->setFieldName('dateOfBirth');
+                $birthDateField->setMinDate(strtotime('-120 year'));
+                $birthDateField->setMaxDate(strtotime('-1 year'));
+                $birthDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['dateOfBirth']);
+                $birthDateField->setColumnWidth(60);
+                $birthDateField->setSortColumn(false);
+                $birthDateField->setTableColumn(false);
+                $birthDateField->setSortSequence('de_datetime');
+                $birthDateField->setMandatory($rowMandatory);
+                $birthDateField->setNotificationField(true);
+                $birthDateField->setStyleClass('dateOfBirth');
+                $birthDateField->setInitialValue($initialValue ? $initialValue : $memberArr['dateOfBirth']);
+                $fieldList[] = $birthDateField;
+            }else if ($rowField == "salutation2") {
                 $salutationField2 = new C4GSelectField();
                 $salutationField2->setFieldName('salutation2');
                 $salutationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation2']);

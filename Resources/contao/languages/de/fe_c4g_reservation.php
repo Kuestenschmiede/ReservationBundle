@@ -68,6 +68,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['phone'] = 'Telefonnummer';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['address'] = 'Straße';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['postal'] = 'Postleitzahl';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['city'] = 'Ort';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['dateOfBirth'] = 'Geburtsdatum';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation2'] = 'Firma / Organisation / Schule';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation2'] = 'Anrede';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['title2'] = 'Titel';
