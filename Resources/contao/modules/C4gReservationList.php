@@ -23,8 +23,11 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSelectField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSubDialogField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBrickModuleParent;
@@ -264,6 +267,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $organisationField->setTableColumn(false);
             $organisationField->setNotificationField(true);
             $organisationField->setStyleClass('organisation');
+            $organisationField->setShowIfEmpty(false);
             $fieldList[] = $organisationField;
 
             $titleField = new C4GTextField();
@@ -273,23 +277,26 @@ class C4gReservationList extends C4GBrickModuleParent
             $titleField->setTableColumn(false);
             $titleField->setNotificationField(true);
             $titleField->setStyleClass('title');
+            $titleField->setShowIfEmpty(false);
             $fieldList[] = $titleField;
 
-            $salutation = [
-                ['id' => 'man' ,'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
-                ['id' => 'woman','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
-                ['id' => 'various','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
-            ];
-
-            $salutationField = new C4GSelectField();
-            $salutationField->setFieldName('salutation');
-            $salutationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation']);
-            $salutationField->setSortColumn(false);
-            $salutationField->setTableColumn(false);
-            $salutationField->setOptions($salutation);
-            $salutationField->setNotificationField(true);
-            $salutationField->setStyleClass('salutation');
-            $fieldList[] = $salutationField;
+//            $salutation = [
+//                ['id' => 'man' ,'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
+//                ['id' => 'woman','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
+//                ['id' => 'various','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
+//            ];
+//
+//            $salutationField = new C4GSelectField();
+//            $salutationField->setFieldName('salutation');
+//            $salutationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation']);
+//            $salutationField->setSortColumn(false);
+//            $salutationField->setTableColumn(false);
+//            $salutationField->setOptions($salutation);
+//            $salutationField->setNotificationField(true);
+//            $salutationField->setStyleClass('salutation');
+//            $salutationField->setShowIfEmpty(false);
+//            $salutationField->setWithEmptyOption(false);
+//            $fieldList[] = $salutationField;
 
             $firstnameField = new C4GTextField();
             $firstnameField->setFieldName('firstname');
@@ -299,6 +306,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $firstnameField->setTableColumn(false);
             $firstnameField->setNotificationField(true);
             $firstnameField->setStyleClass('firstname');
+            $firstnameField->setShowIfEmpty(false);
             $fieldList[] = $firstnameField;
 
             $lastnameField = new C4GTextField();
@@ -310,6 +318,7 @@ class C4gReservationList extends C4GBrickModuleParent
 
             $lastnameField->setNotificationField(true);
             $lastnameField->setStyleClass('lastname');
+            $lastnameField->setShowIfEmpty(false);
             $fieldList[] = $lastnameField;
 
             $addressField = new C4GTextField();
@@ -320,6 +329,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $addressField->setTableColumn(false);
             $addressField->setNotificationField(true);
             $addressField->setStyleClass('address');
+            $addressField->setShowIfEmpty(false);
             $fieldList[] = $addressField;
 
             $postalField = new C4GPostalField();
@@ -331,6 +341,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $postalField->setTableColumn(false);
             $postalField->setNotificationField(true);
             $postalField->setStyleClass('postal');
+            $postalField->setShowIfEmpty(false);
             $fieldList[] = $postalField;
 
             $cityField = new C4GTextField();
@@ -341,6 +352,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $cityField->setTableColumn(false);
             $cityField->setNotificationField(true);
             $cityField->setStyleClass('city');
+            $cityField->setShowIfEmpty(false);
             $fieldList[] = $cityField;
 
             $emailField = new C4GEmailField();
@@ -352,6 +364,8 @@ class C4gReservationList extends C4GBrickModuleParent
             $emailField->setMandatory(false);
             $emailField->setNotificationField(true);
             $emailField->setStyleClass('email');
+            $emailField->setShowIfEmpty(false);
+            $fieldList[] = $emailField;
 
             $phoneField = new C4GTelField();
             $phoneField->setFieldName('phone');
@@ -361,6 +375,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $phoneField->setTableColumn(false);
             $phoneField->setNotificationField(true);
             $phoneField->setStyleClass('phone');
+            $phoneField->setShowIfEmpty(false);
             $fieldList[] = $phoneField;
 
             $birthDateField = new C4GDateField();
@@ -375,6 +390,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $birthDateField->setSortSequence('de_datetime');
             $birthDateField->setNotificationField(true);
             $birthDateField->setStyleClass('dateOfBirth');
+            $birthDateField->setShowIfEmpty(false);
             $fieldList[] = $birthDateField;
 
             $organisationField2 = new C4GTextField();
@@ -385,17 +401,20 @@ class C4gReservationList extends C4GBrickModuleParent
             $organisationField2->setTableColumn(true);
             $organisationField2->setNotificationField(true);
             $organisationField2->setStyleClass('organisation');
+            $organisationField2->setShowIfEmpty(false);
             $fieldList[] = $organisationField2;
 
-            $salutationField2 = new C4GSelectField();
-            $salutationField2->setFieldName('salutation2');
-            $salutationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation2']);
-            $salutationField2->setSortColumn(false);
-            $salutationField2->setTableColumn(false);
-            $salutationField2->setOptions($salutation);
-            $salutationField2->setNotificationField(true);
-            $salutationField2->setStyleClass('salutation');
-            $fieldList[] = $salutationField2;
+//            $salutationField2 = new C4GSelectField();
+//            $salutationField2->setFieldName('salutation2');
+//            $salutationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation2']);
+//            $salutationField2->setSortColumn(false);
+//            $salutationField2->setTableColumn(false);
+//            $salutationField2->setOptions($salutation);
+//            $salutationField2->setNotificationField(true);
+//            $salutationField2->setStyleClass('salutation');
+//            $salutationField2->setShowIfEmpty(false);
+//            $salutationField2->setWithEmptyOption(false);
+//            $fieldList[] = $salutationField2;
 
             $titleField2 = new C4GTextField();
             $titleField2->setFieldName('title2');
@@ -405,6 +424,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $titleField2->setMandatory(false);
             $titleField2->setNotificationField(true);
             $titleField2->setStyleClass('title');
+            $titleField2->setShowIfEmpty(false);
             $fieldList[] = $titleField2;
 
             $firstnameField2 = new C4GTextField();
@@ -415,6 +435,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $firstnameField2->setTableColumn(true);
             $firstnameField2->setNotificationField(true);
             $firstnameField2->setStyleClass('firstname');
+            $firstnameField2->setShowIfEmpty(false);
             $fieldList[] = $firstnameField2;
 
             $lastnameField2 = new C4GTextField();
@@ -425,6 +446,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $lastnameField2->setTableColumn(true);
             $lastnameField2->setNotificationField(true);
             $lastnameField2->setStyleClass('lastname');
+            $lastnameField2->setShowIfEmpty(false);
             $fieldList[] = $lastnameField2;
 
             $addressField2 = new C4GTextField();
@@ -435,6 +457,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $addressField2->setTableColumn(false);
             $addressField2->setNotificationField(true);
             $addressField2->setStyleClass('address');
+            $addressField2->setShowIfEmpty(false);
             $fieldList[] = $addressField2;
 
             $postalField2 = new C4GPostalField();
@@ -446,6 +469,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $postalField2->setTableColumn(false);
             $postalField2->setNotificationField(true);
             $postalField2->setStyleClass('postal');
+            $postalField2->setShowIfEmpty(false);
             $fieldList[] = $postalField2;
 
             $cityField2 = new C4GTextField();
@@ -456,6 +480,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $cityField2->setTableColumn(false);
             $cityField2->setNotificationField(true);
             $cityField2->setStyleClass('city');
+            $cityField2->setShowIfEmpty(false);
             $fieldList[] = $cityField2;
 
             $emailField2 = new C4GEmailField();
@@ -466,6 +491,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $emailField2->setTableColumn(false);
             $emailField2->setNotificationField(true);
             $emailField2->setStyleClass('email');
+            $emailField2->setShowIfEmpty(false);
             $fieldList[] = $emailField2;
 
             $phoneField2 = new C4GTelField();
@@ -476,6 +502,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $phoneField2->setTableColumn(false);
             $phoneField2->setNotificationField(true);
             $phoneField2->setStyleClass('phone');
+            $phoneField2->setShowIfEmpty(false);
             $fieldList[] = $phoneField2;
 
             $commentField = new C4GTextareaField();
@@ -486,6 +513,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $commentField->setTableColumn(false);
             $commentField->setNotificationField(true);
             $commentField->setStyleClass('comment');
+            $commentField->setShowIfEmpty(false);
             $fieldList[] = $commentField;
 
             $reservationIdField = new C4GTextField();
