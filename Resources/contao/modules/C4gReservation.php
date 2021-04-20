@@ -295,6 +295,7 @@ class C4gReservation extends C4GBrickModuleParent
                     //$conditionDate = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'beginDate_'.$type['id']);
 
                     $reservationBeginDateField = new C4GDateField();
+                    $reservationBeginDateField->setFlipButtonPosition(true);
                     $reservationBeginDateField->setMinDate(C4gReservationObjectModel::getMinDate($reservationObjects));
                     $reservationBeginDateField->setMaxDate(C4gReservationObjectModel::getMaxDate($reservationObjects));
                     $reservationBeginDateField->setExcludeWeekdays(C4gReservationObjectModel::getWeekdayExclusionString($reservationObjects));
@@ -685,6 +686,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $objConditionArr = [$obj_condition,$val_condition];
 
                     $reservationBeginDateField = new C4gDateField();
+                    $reservationBeginDateField->setFlipButtonPosition(true);
                     $reservationBeginDateField->setFieldName('beginDateEvent');
                     $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
                     $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
@@ -707,6 +709,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $fieldList[] = $reservationBeginDateField;
 
                     $reservationEndDateField = new C4GDateField();
+                    $reservationEndDateField->setFlipButtonPosition(true);
                     $reservationEndDateField->setFieldName('endDateEvent');
                     $reservationEndDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
                     $reservationEndDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
@@ -1134,6 +1137,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $fieldList[] = $cityField;
             } else if ($rowField == "dateOfBirth") {
                 $birthDateField = new C4GDateField();
+                $birthDateField->setFlipButtonPosition(true);
                 $birthDateField->setFieldName('dateOfBirth');
                 $birthDateField->setMinDate(strtotime('-120 year'));
                 $birthDateField->setMaxDate(strtotime('-1 year'));
@@ -1177,7 +1181,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $firstnameField2->setTableColumn(true);
                 $firstnameField2->setMandatory($rowMandatory);
                 $firstnameField2->setNotificationField(true);
-                $firstnameField2->setStyleClass('firsname');
+                $firstnameField2->setStyleClass('firstname');
                 $fieldList[] = $firstnameField2;
             } else if ($rowField == "lastname2") {
                 $lastnameField2 = new C4GTextField();

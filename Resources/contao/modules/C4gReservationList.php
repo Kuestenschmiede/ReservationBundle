@@ -16,6 +16,7 @@ namespace con4gis\ReservationBundle\Resources\contao\modules;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Fieldlist\C4GBrickField;
+use con4gis\ProjectsBundle\Classes\Fieldlist\C4GBrickFieldNumeric;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
@@ -113,6 +114,7 @@ class C4gReservationList extends C4GBrickModuleParent
 //        $fieldList[] = $tstampField;
 
         $reservationBeginDateField = new C4GDateField();
+        $reservationBeginDateField->setFlipButtonPosition(true);
         $reservationBeginDateField->setFieldName('beginDate');
         $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
         $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
@@ -214,46 +216,278 @@ class C4gReservationList extends C4GBrickModuleParent
             $fieldList[] = $reservationObjectField;
         }
 
-        $lastnameField = new C4GTextField();
-        $lastnameField->setFieldName('lastname');
-        $lastnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
-        $lastnameField->setColumnWidth(10);
-        $lastnameField->setSortColumn(false);
-        $lastnameField->setTableColumn(true);
-        $lastnameField->setMandatory(true);
-        $lastnameField->setNotificationField(true);
-        $lastnameField->setStyleClass('lastname');
-        $lastnameField->setPrintable(true);
-        //$lastnameField->setEditable(false);
-        $fieldList[] = $lastnameField;
+        if ($this->viewType === 'publicview') {
+            $lastnameField = new C4GTextField();
+            $lastnameField->setFieldName('lastname');
+            $lastnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
+            $lastnameField->setColumnWidth(10);
+            $lastnameField->setSortColumn(false);
+            $lastnameField->setTableColumn(true);
+            $lastnameField->setMandatory(true);
+            $lastnameField->setNotificationField(true);
+            $lastnameField->setStyleClass('lastname');
+            $lastnameField->setPrintable(true);
+            //$lastnameField->setEditable(false);
+            $fieldList[] = $lastnameField;
 
-        $firstnameField = new C4GTextField();
-        $firstnameField->setFieldName('firstname');
-        $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
-        $firstnameField->setColumnWidth(10);
-        $firstnameField->setSortColumn(false);
-        $firstnameField->setTableColumn(true);
-        $firstnameField->setMandatory(true);
-        $firstnameField->setNotificationField(true);
-        $firstnameField->setStyleClass('firsname');
-        //$firstnameField->setEditable(false);
-        $firstnameField->setPrintable(false);
-        $fieldList[] = $firstnameField;
+            $firstnameField = new C4GTextField();
+            $firstnameField->setFieldName('firstname');
+            $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
+            $firstnameField->setColumnWidth(10);
+            $firstnameField->setSortColumn(false);
+            $firstnameField->setTableColumn(true);
+            $firstnameField->setMandatory(true);
+            $firstnameField->setNotificationField(true);
+            $firstnameField->setStyleClass('firsname');
+            //$firstnameField->setEditable(false);
+            $firstnameField->setPrintable(false);
+            $fieldList[] = $firstnameField;
 
-        $emailField = new C4GEmailField();
-        $emailField->setFieldName('email');
-        $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
-        $emailField->setColumnWidth(10);
-        $emailField->setSortColumn(false);
-        $emailField->setTableColumn(false);
-        $emailField->setMandatory(true);
-        $emailField->setNotificationField(true);
-        $emailField->setStyleClass('email');
-        //$emailField->setEditable(false);
-        $emailField->setPrintable(false);
-        $fieldList[] = $emailField;
+            $emailField = new C4GEmailField();
+            $emailField->setFieldName('email');
+            $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
+            $emailField->setColumnWidth(10);
+            $emailField->setSortColumn(false);
+            $emailField->setTableColumn(false);
+            $emailField->setMandatory(true);
+            $emailField->setNotificationField(true);
+            $emailField->setStyleClass('email');
+            //$emailField->setEditable(false);
+            $emailField->setPrintable(false);
+            $fieldList[] = $emailField;
+        } else if ($this->viewType !== 'publicview') {
+            $organisationField = new C4GTextField();
+            $organisationField->setFieldName('organisation');
+            $organisationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation']);
+            $organisationField->setColumnWidth(10);
+            $organisationField->setSortColumn(false);
+            $organisationField->setTableColumn(false);
+            $organisationField->setNotificationField(true);
+            $organisationField->setStyleClass('organisation');
+            $fieldList[] = $organisationField;
 
-        if ($this->viewType !== 'publicview') {
+            $titleField = new C4GTextField();
+            $titleField->setFieldName('title');
+            $titleField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
+            $titleField->setSortColumn(false);
+            $titleField->setTableColumn(false);
+            $titleField->setNotificationField(true);
+            $titleField->setStyleClass('title');
+            $fieldList[] = $titleField;
+
+            $salutation = [
+                ['id' => 'man' ,'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
+                ['id' => 'woman','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
+                ['id' => 'various','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
+            ];
+
+            $salutationField = new C4GSelectField();
+            $salutationField->setFieldName('salutation');
+            $salutationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation']);
+            $salutationField->setSortColumn(false);
+            $salutationField->setTableColumn(false);
+            $salutationField->setOptions($salutation);
+            $salutationField->setNotificationField(true);
+            $salutationField->setStyleClass('salutation');
+            $fieldList[] = $salutationField;
+
+            $firstnameField = new C4GTextField();
+            $firstnameField->setFieldName('firstname');
+            $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
+            $firstnameField->setColumnWidth(10);
+            $firstnameField->setSortColumn(false);
+            $firstnameField->setTableColumn(false);
+            $firstnameField->setNotificationField(true);
+            $firstnameField->setStyleClass('firstname');
+            $fieldList[] = $firstnameField;
+
+            $lastnameField = new C4GTextField();
+            $lastnameField->setFieldName('lastname');
+            $lastnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
+            $lastnameField->setColumnWidth(10);
+            $lastnameField->setSortColumn(false);
+            $lastnameField->setTableColumn(false);
+
+            $lastnameField->setNotificationField(true);
+            $lastnameField->setStyleClass('lastname');
+            $fieldList[] = $lastnameField;
+
+            $addressField = new C4GTextField();
+            $addressField->setFieldName('address');
+            $addressField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['address']);
+            $addressField->setColumnWidth(60);
+            $addressField->setSortColumn(false);
+            $addressField->setTableColumn(false);
+            $addressField->setNotificationField(true);
+            $addressField->setStyleClass('address');
+            $fieldList[] = $addressField;
+
+            $postalField = new C4GPostalField();
+            $postalField->setFieldName('postal');
+            $postalField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['postal']);
+            $postalField->setColumnWidth(60);
+            $postalField->setSize(5); //international 32
+            $postalField->setSortColumn(false);
+            $postalField->setTableColumn(false);
+            $postalField->setNotificationField(true);
+            $postalField->setStyleClass('postal');
+            $fieldList[] = $postalField;
+
+            $cityField = new C4GTextField();
+            $cityField->setFieldName('city');
+            $cityField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['city']);
+            $cityField->setColumnWidth(60);
+            $cityField->setSortColumn(false);
+            $cityField->setTableColumn(false);
+            $cityField->setNotificationField(true);
+            $cityField->setStyleClass('city');
+            $fieldList[] = $cityField;
+
+            $emailField = new C4GEmailField();
+            $emailField->setFieldName('email');
+            $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
+            $emailField->setColumnWidth(10);
+            $emailField->setSortColumn(false);
+            $emailField->setTableColumn(false);
+            $emailField->setMandatory(false);
+            $emailField->setNotificationField(true);
+            $emailField->setStyleClass('email');
+
+            $phoneField = new C4GTelField();
+            $phoneField->setFieldName('phone');
+            $phoneField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['phone']);
+            $phoneField->setColumnWidth(10);
+            $phoneField->setSortColumn(false);
+            $phoneField->setTableColumn(false);
+            $phoneField->setNotificationField(true);
+            $phoneField->setStyleClass('phone');
+            $fieldList[] = $phoneField;
+
+            $birthDateField = new C4GDateField();
+            $birthDateField->setFlipButtonPosition(true);
+            $birthDateField->setFieldName('dateOfBirth');
+            $birthDateField->setMinDate(strtotime('-120 year'));
+            $birthDateField->setMaxDate(strtotime('-1 year'));
+            $birthDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['dateOfBirth']);
+            $birthDateField->setColumnWidth(60);
+            $birthDateField->setSortColumn(false);
+            $birthDateField->setTableColumn(false);
+            $birthDateField->setSortSequence('de_datetime');
+            $birthDateField->setNotificationField(true);
+            $birthDateField->setStyleClass('dateOfBirth');
+            $fieldList[] = $birthDateField;
+
+            $organisationField2 = new C4GTextField();
+            $organisationField2->setFieldName('organisation2');
+            $organisationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation2']);
+            $organisationField2->setColumnWidth(10);
+            $organisationField2->setSortColumn(false);
+            $organisationField2->setTableColumn(true);
+            $organisationField2->setNotificationField(true);
+            $organisationField2->setStyleClass('organisation');
+            $fieldList[] = $organisationField2;
+
+            $salutationField2 = new C4GSelectField();
+            $salutationField2->setFieldName('salutation2');
+            $salutationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation2']);
+            $salutationField2->setSortColumn(false);
+            $salutationField2->setTableColumn(false);
+            $salutationField2->setOptions($salutation);
+            $salutationField2->setNotificationField(true);
+            $salutationField2->setStyleClass('salutation');
+            $fieldList[] = $salutationField2;
+
+            $titleField2 = new C4GTextField();
+            $titleField2->setFieldName('title2');
+            $titleField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title2']);
+            $titleField2->setSortColumn(false);
+            $titleField2->setTableColumn(false);
+            $titleField2->setMandatory(false);
+            $titleField2->setNotificationField(true);
+            $titleField2->setStyleClass('title');
+            $fieldList[] = $titleField2;
+
+            $firstnameField2 = new C4GTextField();
+            $firstnameField2->setFieldName('firstname2');
+            $firstnameField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname2']);
+            $firstnameField2->setColumnWidth(10);
+            $firstnameField2->setSortColumn(false);
+            $firstnameField2->setTableColumn(true);
+            $firstnameField2->setNotificationField(true);
+            $firstnameField2->setStyleClass('firstname');
+            $fieldList[] = $firstnameField2;
+
+            $lastnameField2 = new C4GTextField();
+            $lastnameField2->setFieldName('lastname2');
+            $lastnameField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname2']);
+            $lastnameField2->setColumnWidth(10);
+            $lastnameField2->setSortColumn(false);
+            $lastnameField2->setTableColumn(true);
+            $lastnameField2->setNotificationField(true);
+            $lastnameField2->setStyleClass('lastname');
+            $fieldList[] = $lastnameField2;
+
+            $addressField2 = new C4GTextField();
+            $addressField2->setFieldName('address2');
+            $addressField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['address2']);
+            $addressField2->setColumnWidth(60);
+            $addressField2->setSortColumn(false);
+            $addressField2->setTableColumn(false);
+            $addressField2->setNotificationField(true);
+            $addressField2->setStyleClass('address');
+            $fieldList[] = $addressField2;
+
+            $postalField2 = new C4GPostalField();
+            $postalField2->setFieldName('postal2');
+            $postalField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['postal2']);
+            $postalField2->setColumnWidth(60);
+            $postalField2->setSize(5); //international 32
+            $postalField2->setSortColumn(false);
+            $postalField2->setTableColumn(false);
+            $postalField2->setNotificationField(true);
+            $postalField2->setStyleClass('postal');
+            $fieldList[] = $postalField2;
+
+            $cityField2 = new C4GTextField();
+            $cityField2->setFieldName('city2');
+            $cityField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['city2']);
+            $cityField2->setColumnWidth(60);
+            $cityField2->setSortColumn(false);
+            $cityField2->setTableColumn(false);
+            $cityField2->setNotificationField(true);
+            $cityField2->setStyleClass('city');
+            $fieldList[] = $cityField2;
+
+            $emailField2 = new C4GEmailField();
+            $emailField2->setFieldName('email2');
+            $emailField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email2']);
+            $emailField2->setColumnWidth(10);
+            $emailField2->setSortColumn(false);
+            $emailField2->setTableColumn(false);
+            $emailField2->setNotificationField(true);
+            $emailField2->setStyleClass('email');
+            $fieldList[] = $emailField2;
+
+            $phoneField2 = new C4GTelField();
+            $phoneField2->setFieldName('phone2');
+            $phoneField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['phone2']);
+            $phoneField2->setColumnWidth(10);
+            $phoneField2->setSortColumn(false);
+            $phoneField2->setTableColumn(false);
+            $phoneField2->setNotificationField(true);
+            $phoneField2->setStyleClass('phone');
+            $fieldList[] = $phoneField2;
+
+            $commentField = new C4GTextareaField();
+            $commentField->setFieldName('comment');
+            $commentField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['comment']);
+            $commentField->setColumnWidth(60);
+            $commentField->setSortColumn(false);
+            $commentField->setTableColumn(false);
+            $commentField->setNotificationField(true);
+            $commentField->setStyleClass('comment');
+            $fieldList[] = $commentField;
+
             $reservationIdField = new C4GTextField();
             $reservationIdField->setFieldName('reservation_id');
             $reservationIdField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id']);
