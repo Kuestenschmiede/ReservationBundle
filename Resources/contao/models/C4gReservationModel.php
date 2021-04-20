@@ -42,4 +42,28 @@ class C4gReservationModel extends Model
 
         return ArrayHelper::arrayToObject($result);
     }
+
+    public static function getListItemsByMember($memberId, $tableName, $database, $fieldList, $listParams) {
+        $db = \Database::getInstance();
+        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE member_id=? AND cancellation <> '1' AND beginDate > UNIX_TIMESTAMP(NOW())");
+        $dbResult = $stmt->execute(member_id);
+        $dbResult = $dbResult->fetchAllAssoc();
+        $result = $dbResult;
+
+        return ArrayHelper::arrayToObject($result);
+    }
+
+    public static function getListItemsByGroup($groupId, $database, $listParams, $brickDatabase) {
+        $db = \Database::getInstance();
+        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE group_id=? AND cancellation <> '1' AND beginDate > UNIX_TIMESTAMP(NOW())");
+        $dbResult = $stmt->execute($groupId);
+        $dbResult = $dbResult->fetchAllAssoc();
+
+        $result = [];
+        foreach ($dbResult as $dbResultItem) {
+            $result[$dbResultItem['id']] = $dbResultItem;
+        }
+
+        return ArrayHelper::arrayToObject($result);
+    }
 }

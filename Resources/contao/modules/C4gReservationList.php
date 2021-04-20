@@ -48,7 +48,6 @@ class C4gReservationList extends C4GBrickModuleParent
     protected $sendEMails   = null;
     protected $brickScript  = 'bundles/con4gisreservation/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/css/c4g_brick_reservation.css';
-    protected $strTemplate  = 'mod_c4g_brick_simple';
     protected $withNotification = false;
 
     protected $jQueryUseTable = true;
@@ -68,6 +67,10 @@ class C4gReservationList extends C4GBrickModuleParent
             $this->viewType = $this->reservationView;
             if ($this->viewType === 'publicview') {
                 $this->modelListFunction = 'getListItems';
+            } else if ($this->viewType === 'member') {
+                $this->modelListFunction = 'getListItemsByMember';
+            } else if ($this->viewType === 'group') {
+                $this->modelListFunction = 'getListItemsByGroup';
             }
         }
 
