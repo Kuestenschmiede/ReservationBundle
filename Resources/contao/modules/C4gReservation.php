@@ -1431,7 +1431,7 @@ class C4gReservation extends C4GBrickModuleParent
         $agreedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed']);
         if ($this->privacy_policy_site) {
             $href = \Contao\Controller::replaceInsertTags('{{link_url::' . $this->privacy_policy_site . '}}');
-            $agreedField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . '<a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>');
+            $agreedField->setDescription('<span class="c4g_field_description_text">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . '</span> <a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>');
         } else {
             $agreedField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link']);
         }

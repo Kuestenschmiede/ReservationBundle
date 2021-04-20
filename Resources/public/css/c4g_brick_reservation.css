@@ -88,6 +88,16 @@
     margin-top: 2.5%!important;
     margin-bottom: 0!important;
 }
+.c4g_field_description {
+    margin-left: 2.5%;
+}
+.c4g_field_description_text {
+    display: inline-block;
+}
+.c4g_field_description a {
+    display: inline-block;
+}
+
 #c4g_brick .ui-widget {
     background: transparent;
 }
