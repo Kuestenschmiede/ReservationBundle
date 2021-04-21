@@ -105,7 +105,9 @@ class C4gReservationList extends C4GBrickModuleParent
         $this->dialogParams->setWithoutGuiHeader(true);
 
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
+        $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
         $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
+
 
         $this->listParams->setScrollX(false);
         $this->listParams->setResponsive(true);
@@ -199,7 +201,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationTypeField->setFieldName('reservation_type');
             $reservationTypeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type_short']);
             $reservationTypeField->setSortColumn(false);
-            $reservationTypeField->setTableColumn(false);
+            $reservationTypeField->setTableColumn(true);
             //$reservationTypeField->setColumnWidth(20);
             $reservationTypeField->setSize(1);
             $reservationTypeField->setOptions($typelist);
@@ -208,7 +210,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationTypeField->setNotificationField(true);
             $reservationTypeField->setEditable(false);
             $reservationTypeField->setPrintable(true);
-            $reservationTypeField->setTableColumnPriority(1);
+            $reservationTypeField->setTableColumnPriority(3);
             $fieldList[] = $reservationTypeField;
 
             $reservationObjects = C4gReservationObjectModel::getReservationObjectList($typeArr,0, false, true);
@@ -565,7 +567,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationIdField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id']);
             //$reservationIdField->setColumnWidth(5);
             $reservationIdField->setSortColumn(false);
-            $reservationIdField->setTableColumn(false);
+            $reservationIdField->setTableColumn(true);
             $reservationIdField->setMandatory(false);
             $reservationIdField->setInitialValue(C4GBrickCommon::getUUID());
             $reservationIdField->setTableRow(false);
@@ -580,6 +582,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationIdField->setStyleClass('reservation-id');
             $reservationIdField->setEditable(false);
             $reservationIdField->setPrintable(false);
+            $reservationIdField->setTableColumnPriority(3);
             $fieldList[] = $reservationIdField;
 
             $confirmedField = new C4GCheckboxField();
