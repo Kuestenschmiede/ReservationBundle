@@ -13,6 +13,7 @@
 
 namespace con4gis\ReservationBundle\Resources\contao\modules;
 
+use con4gis\CoreBundle\Classes\C4GVersionProvider;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Fieldlist\C4GBrickField;
@@ -111,7 +112,7 @@ class C4gReservationList extends C4GBrickModuleParent
 
         if ($this->viewType === 'publicview') {
             $this->dialogParams->setSaveWithoutMessages(true);
-        } else {
+        } else if (C4GVersionProvider::isInstalled('con4gis/documents')) {
             $this->dialogParams->setCaptionField('reservation_id');
             $this->dialogParams->addButton(C4GBrickConst::BUTTON_PRINT);
         }
