@@ -108,7 +108,6 @@ class C4gReservationList extends C4GBrickModuleParent
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
         $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
 
-
         $this->listParams->setScrollX(false);
         $this->listParams->setResponsive(true);
 
