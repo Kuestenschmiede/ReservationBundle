@@ -83,7 +83,7 @@ function isSaturday(date, fieldName) {
     }
 }
 
-function setObjectId(object, typeid) {
+function setObjectId(object, typeid, showDateTime) {
     var className = object.className;
     className = className.split(" ")[0];
     var typeId = typeid;
@@ -101,11 +101,11 @@ function setObjectId(object, typeid) {
             jQuery(selectField).val(objects[0]).change();
         }
     }
-    hideOptions(reservationObjects,typeId, objects ? objects : val);
+    hideOptions(reservationObjects,typeId, objects ? objects : val, showDateTime);
     return true;
 }
 
-function hideOptions(reservationObjects,typeId,values) {
+function hideOptions(reservationObjects, typeId, values, showDateTime) {
     if (reservationObjects) {
         if (typeId == -1) {
             var typeField = document.getElementById("c4g_reservation_type");
@@ -159,6 +159,46 @@ function hideOptions(reservationObjects,typeId,values) {
                 jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
 
                 jQuery(selectField).removeAttr('disabled');
+
+                if (showDateTime) {
+                    var text = jQuery(selectField).children('option[value="'+first+'"]').text();
+                    var date = '';
+                    var time = '';
+
+                    var dateFields = document.getElementsByClassName('c4g_date_field_input');
+                    if (dateFields) {
+                        for (i = 0; i < dateFields.length; i++) {
+                            var dateField = dateFields[i];
+                            if (dateField && dateField.value && jQuery(dateField).is(":visible")) {
+                                date = dateField.value;
+                                break;
+                            }
+                        }
+                    }
+
+                    var radioButton = jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
+                    if (radioButton) {
+                        for (i = 0; i < radioButton.length; i++) {
+                            var button = radioButton[i];
+                            if (button /*&& jQuery(button).hasClass("radio_object_" + typeId)*/) {
+                                var label = jQuery('label[for="'+ jQuery(button).attr('id') +'"]');
+                                time = label ? label[0].firstChild.nodeValue : '';
+                            }
+                        }
+                    }
+
+                    if (text && (date != '') && (time != '')) {
+                        var pos = text.lastIndexOf(' (');
+                        if (pos != -1) {
+                            text = text.substr(0, pos);
+                        }
+
+                        jQuery(selectField).children('option[value="'+first+'"]').text(
+                            text + ' ('+ date + ' '+time+')'
+                        );
+                    }
+                }
+
             } else {
                 jQuery(selectField).children('option[value="-1"]').removeAttr('disabled');
                 jQuery(selectField).val("-1").change();
@@ -170,7 +210,7 @@ function hideOptions(reservationObjects,typeId,values) {
     checkEventFields(-1);
 }
 
-function setReservationForm(object, id, additionalId, callFunction) {
+function setReservationForm(object, id, additionalId, callFunction, showDateTime) {
     var typeField = document.getElementById("c4g_reservation_type");
     var typeId = typeField ? typeField.value : -1;
 
@@ -181,14 +221,14 @@ function setReservationForm(object, id, additionalId, callFunction) {
             var dateField = dateFields[i];
             if (dateField && dateField.value && jQuery(dateField).is(":visible")) {
                 dateFieldVisible = true;
-                setTimeset(dateField, id, additionalId, callFunction);
+                setTimeset(dateField, id, additionalId, callFunction, showDateTime);
                 break;
             }
         }
     }
 
     if (!dateFieldVisible) {
-        setTimeset(null, id, additionalId, callFunction);
+        setTimeset(null, id, additionalId, callFunction, showDateTime);
     }
 
     var radioButton = jQuery('.reservation_time_button input[type = "radio"]:checked');
@@ -198,7 +238,7 @@ function setReservationForm(object, id, additionalId, callFunction) {
             var button = radioButton[i];
 
             if (button && jQuery(button).hasClass("radio_object_"+typeId)) {
-                setObjectId(button, typeId);
+                setObjectId(button, typeId, showDateTime);
                 //radioButton.prop( "checked", true );
             }
         }
@@ -321,7 +361,7 @@ function checkMax(objectList, arrindex, idx, value, timeList) {
     return result;
 }
 
-function setTimeset(dateField, id, additionalId, callFunction) {
+function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
     var brick_api = apiBaseUrl+"/c4g_brick_ajax";
     var elementId = 0;
     var date = 0;
@@ -497,7 +537,7 @@ function setTimeset(dateField, id, additionalId, callFunction) {
     }
 
     var reservationObjects = document.getElementsByClassName("displayReservationObjects");
-    hideOptions(reservationObjects,additionalId, val);
+    hideOptions(reservationObjects,additionalId, val, showDateTime);
 }
 
 /**
