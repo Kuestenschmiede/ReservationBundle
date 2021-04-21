@@ -30,6 +30,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimepickerField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBrickModuleParent;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
 use con4gis\ReservationBundle\Classes\C4gReservationBrickTypes;
@@ -49,15 +50,39 @@ class C4gReservationList extends C4GBrickModuleParent
     protected $brickScript  = 'bundles/con4gisreservation/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/css/c4g_brick_reservation.css';
     protected $withNotification = false;
+    protected $permalink_field = 'reservation_id';
+    protected $permalink_name = 'token';
 
-    protected $jQueryUseTable = true;
-    protected $jQueryUseScrollPane = false;
-    protected $jQueryUsePopups = true;
-    protected $loadChosenResources = false;
-    protected $loadCkEditor5Resources = false;
+    //Resource Params
+    protected $loadDefaultResources = true;
     protected $loadCkEditorResources = false;
+    protected $loadCkEditor5Resources = false;
+    protected $loadDateTimePickerResources = false;
+    protected $loadChosenResources = false;
+    protected $loadClearBrowserUrlResources = false;
+    protected $loadConditionalFieldDisplayResources = false;
     protected $loadMoreButtonResources = false;
     protected $loadFontAwesomeResources = false;
+    protected $loadTriggerSearchFromOtherModuleResources = false;
+    protected $loadFileUploadResources = false;
+    protected $loadMultiColumnResources = false;
+    protected $loadMiniSearchResources = false;
+    protected $loadHistoryPushResources = false;
+
+    //JQuery GUI Resource Params
+    protected $jQueryAddCore = true;
+    protected $jQueryAddJquery = true;
+    protected $jQueryAddJqueryUI = true;
+    protected $jQueryUseTree = false;
+    protected $jQueryUseTable = true;
+    protected $jQueryUseHistory = false;
+    protected $jQueryUseTooltip = false;
+    protected $jQueryUseMaps = false;
+    protected $jQueryUseGoogleMaps = false;
+    protected $jQueryUseMapsEditor = false;
+    protected $jQueryUseWswgEditor = false;
+    protected $jQueryUseScrollPane = true;
+    protected $jQueryUsePopups = false;
 
     protected $withPermissionCheck = false;
 
@@ -80,6 +105,9 @@ class C4gReservationList extends C4GBrickModuleParent
 
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
         $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
+
+        $this->listParams->setScrollX(false);
+        $this->listParams->setResponsive(true);
 
         if ($this->viewType === 'publicview') {
             $this->dialogParams->setSaveWithoutMessages(true);
@@ -104,21 +132,6 @@ class C4gReservationList extends C4GBrickModuleParent
         $idField->setPrintable(false);
         $fieldList[] = $idField;
 
-//        $tstampField = new C4GDateField();
-//        $tstampField->setFieldName('tstamp');
-//        $tstampField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
-//        $tstampField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
-//        $tstampField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['tstamp']);
-//        $tstampField->setSortColumn(true);
-//        $tstampField->setSortType('de_date');
-//        $tstampField->setSortSequence(SORT_DESC);
-//        $tstampField->setTableColumn(true);
-//        $tstampField->setFormField(true);
-//        $tstampField->setColumnWidth(5);
-//        $tstampField->setStyleClass('begin-date');
-//        $tstampField->setEditable(false);
-//        $fieldList[] = $tstampField;
-
         $reservationBeginDateField = new C4GDateField();
         $reservationBeginDateField->setFlipButtonPosition(true);
         $reservationBeginDateField->setFieldName('beginDate');
@@ -131,22 +144,24 @@ class C4gReservationList extends C4GBrickModuleParent
         //$reservationBeginDateField->setSortSequence('de_datetime');
         $reservationBeginDateField->setTableColumn(true);
         $reservationBeginDateField->setFormField(true);
-        $reservationBeginDateField->setColumnWidth(5);
+        $reservationBeginDateField->setColumnWidth(10);
         $reservationBeginDateField->setStyleClass('begin-date');
         //$reservationBeginDateField->setEditable(false);
         $reservationBeginDateField->setPrintable(true);
+        $reservationBeginDateField->setTableColumnPriority(1);
         $fieldList[] = $reservationBeginDateField;
 
-        $reservationBeginTimeField = new C4GTimeField();
+        $reservationBeginTimeField = new C4GTimePickerField();
         $reservationBeginTimeField->setFieldName('beginTime');
         $reservationBeginTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeShort']);
         $reservationBeginTimeField->setTableColumn(true);
-        $reservationBeginTimeField->setColumnWidth(5);
+        $reservationBeginTimeField->setColumnWidth(10);
         $reservationBeginTimeField->setMandatory(true);
         $reservationBeginTimeField->setNotificationField(true);
         $reservationBeginTimeField->setStyleClass('begin-time');
         $reservationBeginTimeField->setPrintable(true);
         //$reservationBeginTimeField->setEditable(false);
+        $reservationBeginTimeField->setTableColumnPriority(1);
         $fieldList[] = $reservationBeginTimeField;
 
         $t = 'tl_c4g_reservation_type';
@@ -183,8 +198,8 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationTypeField->setFieldName('reservation_type');
             $reservationTypeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type_short']);
             $reservationTypeField->setSortColumn(false);
-            $reservationTypeField->setTableColumn(true);
-            $reservationTypeField->setColumnWidth(20);
+            $reservationTypeField->setTableColumn(false);
+            //$reservationTypeField->setColumnWidth(20);
             $reservationTypeField->setSize(1);
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(false);
@@ -192,6 +207,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationTypeField->setNotificationField(true);
             $reservationTypeField->setEditable(false);
             $reservationTypeField->setPrintable(true);
+            $reservationTypeField->setTableColumnPriority(1);
             $fieldList[] = $reservationTypeField;
 
             $reservationObjects = C4gReservationObjectModel::getReservationObjectList($typeArr,0, false, true);
@@ -211,7 +227,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationObjectField->setFieldName('reservation_object');
             $reservationObjectField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_short']);
             $reservationObjectField->setTableColumn(true);
-            $reservationObjectField->setColumnWidth(20);
+            //$reservationObjectField->setColumnWidth(20);
             $reservationObjectField->setOptions($objects);
             $reservationObjectField->setMandatory(false);
             $reservationObjectField->setNotificationField(true);
@@ -219,6 +235,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationObjectField->setShowIfEmpty(false);
             $reservationObjectField->setEditable(false);
             $reservationObjectField->setPrintable(true);
+            $reservationObjectField->setTableColumnPriority(1);
             $fieldList[] = $reservationObjectField;
         }
 
@@ -226,20 +243,21 @@ class C4gReservationList extends C4GBrickModuleParent
             $lastnameField = new C4GTextField();
             $lastnameField->setFieldName('lastname');
             $lastnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
-            $lastnameField->setColumnWidth(10);
+            //$lastnameField->setColumnWidth(10);
             $lastnameField->setSortColumn(false);
             $lastnameField->setTableColumn(true);
             $lastnameField->setMandatory(true);
             $lastnameField->setNotificationField(true);
             $lastnameField->setStyleClass('lastname');
             $lastnameField->setPrintable(true);
+            $lastnameField->setTableColumnPriority(2);
             //$lastnameField->setEditable(false);
             $fieldList[] = $lastnameField;
 
             $firstnameField = new C4GTextField();
             $firstnameField->setFieldName('firstname');
             $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
-            $firstnameField->setColumnWidth(10);
+            //$firstnameField->setColumnWidth(10);
             $firstnameField->setSortColumn(false);
             $firstnameField->setTableColumn(true);
             $firstnameField->setMandatory(true);
@@ -247,13 +265,14 @@ class C4gReservationList extends C4GBrickModuleParent
             $firstnameField->setStyleClass('firsname');
             //$firstnameField->setEditable(false);
             $firstnameField->setPrintable(false);
+            $firstnameField->setTableColumnPriority(2);
             $fieldList[] = $firstnameField;
 
             $emailField = new C4GEmailField();
             $emailField->setFieldName('email');
             $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
-            $emailField->setColumnWidth(10);
-            $emailField->setSortColumn(false);
+            //$emailField->setColumnWidth(20);
+            //$emailField->setSortColumn(false);
             $emailField->setTableColumn(false);
             $emailField->setMandatory(true);
             $emailField->setNotificationField(true);
@@ -265,7 +284,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $organisationField = new C4GTextField();
             $organisationField->setFieldName('organisation');
             $organisationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation']);
-            $organisationField->setColumnWidth(10);
+            //$organisationField->setColumnWidth(10);
             $organisationField->setSortColumn(false);
             $organisationField->setTableColumn(false);
             $organisationField->setNotificationField(true);
@@ -306,31 +325,33 @@ class C4gReservationList extends C4GBrickModuleParent
             $firstnameField = new C4GTextField();
             $firstnameField->setFieldName('firstname');
             $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
-            $firstnameField->setColumnWidth(10);
+            //$firstnameField->setColumnWidth(10);
             $firstnameField->setSortColumn(false);
-            $firstnameField->setTableColumn(false);
+            $firstnameField->setTableColumn(true);
             $firstnameField->setNotificationField(true);
             $firstnameField->setStyleClass('firstname');
             $firstnameField->setShowIfEmpty(false);
             $firstnameField->setPrintable(true);
+            $firstnameField->setTableColumnPriority(2);
             $fieldList[] = $firstnameField;
 
             $lastnameField = new C4GTextField();
             $lastnameField->setFieldName('lastname');
             $lastnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
-            $lastnameField->setColumnWidth(10);
+            //$lastnameField->setColumnWidth(10);
             $lastnameField->setSortColumn(false);
-            $lastnameField->setTableColumn(false);
+            $lastnameField->setTableColumn(true);
             $lastnameField->setNotificationField(true);
             $lastnameField->setStyleClass('lastname');
             $lastnameField->setShowIfEmpty(false);
             $lastnameField->setPrintable(true);
+            $lastnameField->setTableColumnPriority(2);
             $fieldList[] = $lastnameField;
 
             $addressField = new C4GTextField();
             $addressField->setFieldName('address');
             $addressField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['address']);
-            $addressField->setColumnWidth(60);
+            //$addressField->setColumnWidth(60);
             $addressField->setSortColumn(false);
             $addressField->setTableColumn(false);
             $addressField->setNotificationField(true);
@@ -342,7 +363,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $postalField = new C4GPostalField();
             $postalField->setFieldName('postal');
             $postalField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['postal']);
-            $postalField->setColumnWidth(60);
+            //$postalField->setColumnWidth(60);
             $postalField->setSize(5); //international 32
             $postalField->setSortColumn(false);
             $postalField->setTableColumn(false);
@@ -355,7 +376,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $cityField = new C4GTextField();
             $cityField->setFieldName('city');
             $cityField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['city']);
-            $cityField->setColumnWidth(60);
+            //$cityField->setColumnWidth(60);
             $cityField->setSortColumn(false);
             $cityField->setTableColumn(false);
             $cityField->setNotificationField(true);
@@ -367,7 +388,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $emailField = new C4GEmailField();
             $emailField->setFieldName('email');
             $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
-            $emailField->setColumnWidth(10);
+            //$emailField->setColumnWidth(20);
             $emailField->setSortColumn(false);
             $emailField->setTableColumn(false);
             $emailField->setMandatory(false);
@@ -380,7 +401,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $phoneField = new C4GTelField();
             $phoneField->setFieldName('phone');
             $phoneField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['phone']);
-            $phoneField->setColumnWidth(10);
+            //$phoneField->setColumnWidth(10);
             $phoneField->setSortColumn(false);
             $phoneField->setTableColumn(false);
             $phoneField->setNotificationField(true);
@@ -395,7 +416,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $birthDateField->setMinDate(strtotime('-120 year'));
             $birthDateField->setMaxDate(strtotime('-1 year'));
             $birthDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['dateOfBirth']);
-            $birthDateField->setColumnWidth(60);
+            //$birthDateField->setColumnWidth(60);
             $birthDateField->setSortColumn(false);
             $birthDateField->setTableColumn(false);
             $birthDateField->setSortSequence('de_datetime');
@@ -408,9 +429,9 @@ class C4gReservationList extends C4GBrickModuleParent
             $organisationField2 = new C4GTextField();
             $organisationField2->setFieldName('organisation2');
             $organisationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation2']);
-            $organisationField2->setColumnWidth(10);
+            //$organisationField2->setColumnWidth(10);
             $organisationField2->setSortColumn(false);
-            $organisationField2->setTableColumn(true);
+            $organisationField2->setTableColumn(false);
             $organisationField2->setNotificationField(true);
             $organisationField2->setStyleClass('organisation');
             $organisationField2->setShowIfEmpty(false);
@@ -444,9 +465,9 @@ class C4gReservationList extends C4GBrickModuleParent
             $firstnameField2 = new C4GTextField();
             $firstnameField2->setFieldName('firstname2');
             $firstnameField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname2']);
-            $firstnameField2->setColumnWidth(10);
+            //$firstnameField2->setColumnWidth(10);
             $firstnameField2->setSortColumn(false);
-            $firstnameField2->setTableColumn(true);
+            $firstnameField2->setTableColumn(false);
             $firstnameField2->setNotificationField(true);
             $firstnameField2->setStyleClass('firstname');
             $firstnameField2->setShowIfEmpty(false);
@@ -456,9 +477,9 @@ class C4gReservationList extends C4GBrickModuleParent
             $lastnameField2 = new C4GTextField();
             $lastnameField2->setFieldName('lastname2');
             $lastnameField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname2']);
-            $lastnameField2->setColumnWidth(10);
+            //$lastnameField2->setColumnWidth(10);
             $lastnameField2->setSortColumn(false);
-            $lastnameField2->setTableColumn(true);
+            $lastnameField2->setTableColumn(false);
             $lastnameField2->setNotificationField(true);
             $lastnameField2->setStyleClass('lastname');
             $lastnameField2->setShowIfEmpty(false);
@@ -468,7 +489,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $addressField2 = new C4GTextField();
             $addressField2->setFieldName('address2');
             $addressField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['address2']);
-            $addressField2->setColumnWidth(60);
+            //$addressField2->setColumnWidth(60);
             $addressField2->setSortColumn(false);
             $addressField2->setTableColumn(false);
             $addressField2->setNotificationField(true);
@@ -480,7 +501,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $postalField2 = new C4GPostalField();
             $postalField2->setFieldName('postal2');
             $postalField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['postal2']);
-            $postalField2->setColumnWidth(60);
+            //$postalField2->setColumnWidth(60);
             $postalField2->setSize(5); //international 32
             $postalField2->setSortColumn(false);
             $postalField2->setTableColumn(false);
@@ -493,7 +514,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $cityField2 = new C4GTextField();
             $cityField2->setFieldName('city2');
             $cityField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['city2']);
-            $cityField2->setColumnWidth(60);
+            //$cityField2->setColumnWidth(60);
             $cityField2->setSortColumn(false);
             $cityField2->setTableColumn(false);
             $cityField2->setNotificationField(true);
@@ -505,7 +526,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $emailField2 = new C4GEmailField();
             $emailField2->setFieldName('email2');
             $emailField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email2']);
-            $emailField2->setColumnWidth(10);
+            //$emailField2->setColumnWidth(10);
             $emailField2->setSortColumn(false);
             $emailField2->setTableColumn(false);
             $emailField2->setNotificationField(true);
@@ -517,7 +538,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $phoneField2 = new C4GTelField();
             $phoneField2->setFieldName('phone2');
             $phoneField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['phone2']);
-            $phoneField2->setColumnWidth(10);
+            //$phoneField2->setColumnWidth(10);
             $phoneField2->setSortColumn(false);
             $phoneField2->setTableColumn(false);
             $phoneField2->setNotificationField(true);
@@ -529,7 +550,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $commentField = new C4GTextareaField();
             $commentField->setFieldName('comment');
             $commentField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['comment']);
-            $commentField->setColumnWidth(60);
+            //$commentField->setColumnWidth(60);
             $commentField->setSortColumn(false);
             $commentField->setTableColumn(false);
             $commentField->setNotificationField(true);
@@ -541,7 +562,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationIdField = new C4GTextField();
             $reservationIdField->setFieldName('reservation_id');
             $reservationIdField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id']);
-            $reservationIdField->setColumnWidth(5);
+            //$reservationIdField->setColumnWidth(5);
             $reservationIdField->setSortColumn(false);
             $reservationIdField->setTableColumn(false);
             $reservationIdField->setMandatory(false);
@@ -563,27 +584,31 @@ class C4gReservationList extends C4GBrickModuleParent
             $confirmedField = new C4GCheckboxField();
             $confirmedField->setFieldName('confirmed');
             $confirmedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed']);
-            $confirmedField->setTableRow(false);
-            $confirmedField->setColumnWidth(5);
+            //$confirmedField->setColumnWidth(5);
             $confirmedField->setSortColumn(false);
-            $confirmedField->setTableColumn(true);
+            $confirmedField->setTableColumn(false);
             $confirmedField->setNotificationField(true);
             $confirmedField->setStyleClass('confirmed');
             $confirmedField->setWithoutDescriptionLineBreak(true);
             $confirmedField->setPrintable(false);
+            $confirmedField->setTableRow(true);
+            $confirmedField->setTableRowWidth('25%');
+            $confirmedField->setTableRowLabelWidth('10%');
             $fieldList[] = $confirmedField;
 
             $cancellationField = new C4GCheckboxField();
             $cancellationField->setFieldName('cancellation');
             $cancellationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['cancellation']);
-            $cancellationField->setTableRow(false);
-            $cancellationField->setColumnWidth(5);
+            //$cancellationField->setColumnWidth(5);
             $cancellationField->setSortColumn(false);
-            $cancellationField->setTableColumn(true);
+            $cancellationField->setTableColumn(false);
             $cancellationField->setNotificationField(true);
             $cancellationField->setStyleClass('cancellation');
             $cancellationField->setWithoutDescriptionLineBreak(true);
             $cancellationField->setPrintable(false);
+            $cancellationField->setTableRow(true);
+            $cancellationField->setTableRowWidth('25%');
+            $cancellationField->setTableRowLabelWidth('10%');
             $fieldList[] = $cancellationField;
 
 
