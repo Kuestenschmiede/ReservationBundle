@@ -107,6 +107,7 @@ class C4gReservation extends C4GBrickModuleParent
     protected $jQueryUsePopups = false;
 
     protected $withPermissionCheck = false;
+    protected $useUuidCookie = false;
 
     public function initBrickModule($id)
     {
@@ -1979,6 +1980,7 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         return array(
+            'reservationId' => C4GBrickCommon::getUUID(),
             'times' => $times
         );
     }

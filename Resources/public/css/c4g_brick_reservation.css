@@ -50,6 +50,9 @@
 .mod_C4gReservation div#c4g_reservation_id {
     display: inline;
 }
+.mod_C4gReservation .reservation-id {
+    display: none;
+}
 .mod_C4gReservation .displayReservationObjects {
     display: none;
 }

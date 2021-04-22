@@ -211,6 +211,8 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
 }
 
 function setReservationForm(object, id, additionalId, callFunction, showDateTime) {
+    jQuery(document.getElementsByClassName("reservation-id")).hide();
+
     var typeField = document.getElementById("c4g_reservation_type");
     var typeId = typeField ? typeField.value : -1;
 
@@ -406,7 +408,8 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                 var objectList = [];
                 var times = data['times'];
                 var size = times.length;
-
+                document.getElementById("c4g_reservation_id").value = data['reservationId']; //Force regeneration
+                jQuery(document.getElementsByClassName("reservation-id")).show();
                 jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)) ? jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)).show() : false;
                 var iterator = 0;
                 for (let key in times) {
@@ -552,6 +555,7 @@ function checkEventFields(object) {
     jQuery('.eventdata').hide();
 
     if (selectField && selectField.is(":visible")) {
+        jQuery(document.getElementsByClassName("reservation-id")).show();
         for (i = 0; i < selectField.length; i++) {
             if (selectField[i]) {
                 var additional = -1;
