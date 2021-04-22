@@ -25,6 +25,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration'] = "Verweildauer in Stunden
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['tstamp'] = 'Letzte Änderung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'] = 'An welchem Tag möchten Sie reservieren?';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateShort'] = 'Datum';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateTime'] = 'Zeitpunkt';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'Endet am';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Bitte wählen Sie eine Uhrzeit aus';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeShort'] = 'Uhrzeit';

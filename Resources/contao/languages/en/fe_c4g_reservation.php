@@ -24,6 +24,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['periodType'] = 'Time span type';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['tstamp'] = 'Last change';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'] = 'For which date would you like to make a reservation?';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateShort'] = 'Date';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateTime'] = 'Time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'end date';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Please select a time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeShort'] = 'Time';
