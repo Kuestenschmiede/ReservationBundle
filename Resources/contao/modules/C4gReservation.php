@@ -1143,7 +1143,9 @@ class C4gReservation extends C4GBrickModuleParent
                 $birthDateField->setFlipButtonPosition(true);
                 $birthDateField->setFieldName('dateOfBirth');
                 $birthDateField->setMinDate(strtotime('-120 year'));
-                $birthDateField->setMaxDate(strtotime('-1 year'));
+
+                $year = date('Y');
+                $birthDateField->setMaxDate(strtotime($year . '-12-31'));
                 $birthDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['dateOfBirth']);
                 $birthDateField->setColumnWidth(60);
                 $birthDateField->setSortColumn(false);
