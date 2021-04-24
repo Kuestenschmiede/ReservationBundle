@@ -24,10 +24,10 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['minute'] = array("Minuten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['hour'] = array("Stunden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['openingHours'] = array("Öffnungszeiten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['md'] = array("Mehrtägig");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['beginDate'] = array("Beginn");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['endDate'] = array("Ende");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['beginTime'] = array("Uhrzeit Beginn", "Wann startet die Veranstaltung");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['endTime'] = array("Ende", "Wann endet die Veranstaltung?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['beginDate'] = array("Beginndatum");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['endDate'] = array("Enddatum");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['beginTime'] = array("Beginnzeit", "Wann startet die Veranstaltung");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['endTime'] = array("Endzeit", "Wann endet die Veranstaltung?");
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservationObjectType'] = array("Objekttyp", "Es können Reserverierungsobjekte und Contao Events reserviert werden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][1] = 'Standard';
@@ -59,9 +59,12 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['address2'] = array("Straße (2)", "St
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'] = array("Postleitzahl (2)", "Postleitzahl");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'] = array("Ort (2)", "Ort");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'] = array("Anmerkung vom Kunden", "Kommentarfeld zur Reservierung.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['fileUpload'] = array("Datei Upload", "Hier kann eine Datei angehangen werden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['internal_comment'] = array("Nachricht an Kunden", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'] = array("Datenschutzerklärung", "Wird vom Nutzer im Frontend ausgewählt.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Bestätigt", "Wurde der Termin bestätigt? (Optional)");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Bestätigt (Standardinformation)", "Wurde der Termin bestätigt? (Optional)");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['specialNotification'] = array("Spezialnachricht senden", "Dieser Schalter kann für eine Zusatzinformation in der E-Mail aktiviert werden.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['emailConfirmationSend'] = array("Bestätigung wurde versendet", "Dieser Schalter wird automatisch gesetzt, sobald die E-Mail versendet wurde.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Storniert", "Wenn der Termin storniert wird, ist dieses Feld auszuwählen");
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'] = array("Für Mitglied", "Die Reservierung wurde durch oder für dieses Mitglied erstellt.");
@@ -73,12 +76,14 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['additionalHeadline'] = "Überschrift"
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes'] = 'ja';
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['participants'] = 'Teilnehmer';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmationEmail'] = 'Bestätigung versenden';
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend'] = "Reservierungsdaten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['person_legend']      = "Kontaktdaten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['person2_legend']     = "Rechnungsadresse / Sonstige Personendaten";
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['comment_legend']     = "Kommentare";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['comment_legend']     = "Anlagen";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['state_legend']       = "Status";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['new'] = array("Reservierung hinzufügen","Reservierung hinzufügen");

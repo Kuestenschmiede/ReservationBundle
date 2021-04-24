@@ -18,7 +18,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("Name","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'] = array("Object type", "Reservation objects and Contao events can be reserved.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][1] = 'Default';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][2] = 'Events';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('notification', 'Select notification');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('Automatic confirmation', 'Select the notification. This setting overrides the module settings.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location'] = array("Event location", "Where will the event take place?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("period type","Declare the type of time period");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'] = array("Maximum number of objects per time span","Maximum number of simultaneously bookable objects. This is useful, for example, to minimize simultaneous table reservations in the catering trade.");
@@ -60,6 +60,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyGroupId'] = 'Default (no sp
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Details of the type of reservation";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_legend'] = "Notification settings (optional)";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['object_legend'] = "Basic settings for the objects";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Expert settings";
 

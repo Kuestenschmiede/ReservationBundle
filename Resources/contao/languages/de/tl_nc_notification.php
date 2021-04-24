@@ -12,5 +12,6 @@
  */
 
 $GLOBALS['TL_LANG']['tl_nc_notification']['type']['con4gis_reservation_bundle'] = 'con4gis Reservation';
-$GLOBALS['TL_LANG']['tl_nc_notification']['type']['con4gis_reservation'] = array('Reservierungsbestätigung', 'Nachrichten nach dem Absenden des Reservierungsformulars.');
+$GLOBALS['TL_LANG']['tl_nc_notification']['type']['con4gis_reservation'] = array('Reservierungsbestätigung (Automatisch)', 'Nachrichten nach dem Absenden des Reservierungsformulars.');
 $GLOBALS['TL_LANG']['tl_nc_notification']['type']['con4gis_cancellation'] = array('Stornierungsbestätigung', 'Nachrichten nach dem Absenden des Stornierungsformulars.');
+$GLOBALS['TL_LANG']['tl_nc_notification']['type']['con4gis_reservation_confirmation'] = array('Reservierungsbestätigung (Backend)', 'Nachricht kann über die Reservierungsliste im Backend verschickt werden.');

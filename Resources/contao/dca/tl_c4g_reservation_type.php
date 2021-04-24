@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,notification_type,published;{expert_legend:hide},member_id,group_id,auto_del;'
+        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del;'
     ),
 
     //Subpalettes
@@ -301,6 +301,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'notification_type'  => array
         (
             'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'],
+            'exclude'                 => true,
+            'inputType'               => 'checkbox',
+            'foreignKey'              => 'tl_nc_notification.title',
+            'eval'                    => array('multiple' => true),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+
+        'notification_confirmation_type'  => array
+        (
+            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_confirmation_type'],
+            'exclude'                 => true,
+            'inputType'               => 'checkbox',
+            'foreignKey'              => 'tl_nc_notification.title',
+            'eval'                    => array('multiple' => true),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+
+        'notification_special_type'  => array
+        (
+            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_special_type'],
             'exclude'                 => true,
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',

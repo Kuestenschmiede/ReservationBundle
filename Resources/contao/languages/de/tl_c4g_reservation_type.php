@@ -18,7 +18,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("Name","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'] = array("Objekttyp", "Es können Reserverierungsobjekte und Contao Events reserviert werden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][1] = 'Standard';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][2] = 'Events';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('Benachrichtigung', 'Wählen Sie die Benachrichtigung aus. Diese Einstellung überschreibt die Moduleinstellungen.');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('Automatische Bestätigungsnachricht', 'Wählen Sie die Benachrichtigung aus. Diese Einstellung überschreibt die Moduleinstellungen.');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_confirmation_type'] = array('Bestätigungsnachricht (Backendversand)', 'Sie können aus der Reservierungsliste heraus eine Bestätigungsnachricht verschicken.');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_special_type'] = array('Spezialnachricht (Backendversand)', 'Diese Nachricht wird aus der Reservierungsliste heraus anstelle der Bestätigungsnachricht versenden, wenn die Checkbox "Spezialnachricht senden" ausgewählt wurde.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location'] = array("Veranstaltungsort", "Wo findet der Termin statt?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("Zeitspannenart","Art der Zeitspanne deklarieren");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'] = array("Maximale Anzahl Objekte pro Zeitspanne","Maximale Anzahl der Gleichzeitig buchbaren Objekte. Das ist sinnvoll um bspw. in der Gastronomie gleichzeitige Tischreservierungen zu minimieren.");
@@ -60,6 +62,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyGroupId'] = 'Standard (kein
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Angaben zur Reservierungsart";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_legend'] = "Benachrichtigungseinstellungen (optional)";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['object_legend'] = "Grundsätzliche Einstellungen zu den Objekten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Experteneinstellungen";
 
