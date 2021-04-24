@@ -211,6 +211,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
         'photo' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['photo'],
+            'exclude'           => true,
             'inputType'         => 'fileTree',
             'sorting'           => false,
             'search'            => false,

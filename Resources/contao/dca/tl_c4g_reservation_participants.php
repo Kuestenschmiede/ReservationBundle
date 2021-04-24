@@ -238,6 +238,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
         'participant_params' => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['reservation_participant_option'],
+            'exclude'           => true,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_c4g_reservation_params.caption',
             'eval'              => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),

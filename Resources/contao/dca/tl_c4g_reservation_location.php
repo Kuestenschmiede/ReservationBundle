@@ -205,7 +205,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'search'            => true,
             'sorting'           => true,
             'exclude'           => true,
-            'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => "varchar(255) NOT NULL default ''"
@@ -214,6 +213,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_location']['ics'],
             'inputType'         => 'checkbox',
+            'exclude'           => true,
             'eval'              => array('submitOnChange'=>true,'mandatory'=>false,'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'               => "char(1) NOT NULL default ''"
         ),
