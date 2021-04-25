@@ -18,6 +18,7 @@
 use con4gis\CoreBundle\Classes\Helper\InputHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Notifications\C4GNotification;
+use con4gis\ReservationBundle\Resources\contao\models\C4GReservationParamsModel;
 use Contao\Image;
 use Contao\StringUtil;
 
@@ -49,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     (
         'sorting' => array
         (
-            'mode'              => 11,
+            'mode'              => 2,
             'fields'            => ['id DESC','beginDate DESC','lastname'],
             'filter'            => (Input::get('do') == "calendar") ? array(array('reservation_object=? AND reservationObjectType=2',Input::get('id'))) : null,
             'panelLayout'       => 'filter;sort,search,limit',
@@ -131,8 +132,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     //Palettes
     'palettes' => array
     (
-        '__selector__' => ['reservationObjectType'],
-        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {comment_legend}, comment, fileUpload; {state_legend}, cancellation, agreed, confirmed, specialNotification, emailConfirmationSend, internal_comment,  member_id, group_id;',
+        '__selector__' => ['reservationObjectType'/*, 'confirmed'*/],
+        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {comment_legend}, comment, fileUpload; {notification_legend}, confirmed, internal_comment, specialNotification, emailConfirmationSend; {state_legend}, cancellation, agreed, member_id, group_id;',
     ),
 
     // Subpalettes
@@ -140,6 +141,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     [
         'reservationObjectType_1' => 'reservation_object, duration',
         'reservationObjectType_2' => 'reservation_object',
+        //'confirmed' => 'internal_comment, specialNotification, emailConfirmationSend'
     ],
 //Fields
     'fields' => array
@@ -148,6 +150,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['id'],
             'sql'               => "int(10) unsigned NOT NULL auto_increment",
+            'flag'              => 6,
             'sorting'           => true,
         ),
 
@@ -260,6 +263,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'default'                 => time(),
             'filter'                  => true,
             'sorting'                 => true,
+            'flag'                    => 6,
             'search'                  => false,
             'exclude'                 => true,
             'inputType'               => 'text',
@@ -356,7 +360,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['title'],
             'exclude'                 => true,
             'search'                  => true,
-            'sorting'                 => true,
+            'sorting'                 => false,
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
@@ -478,7 +482,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['title2'],
             'exclude'                 => true,
             'search'                  => true,
-            'sorting'                 => true,
+            'sorting'                 => false,
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
@@ -490,7 +494,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['lastname2'],
             'exclude'                 => true,
             'search'                  => true,
-            'sorting'                 => true,
+            'sorting'                 => false,
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
@@ -594,7 +598,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'inputType'               => 'fileTree',
             'default'                 => null,
             'eval'                    => array('files' => true,'filesOnly' => true,'fieldType' => 'radio','mandatory' => false),
-            'sql'                     => "text NULL"
+            'sql'                     => "binary(16)"
         ),
 
         'cancellation' => array(
@@ -621,7 +625,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
-            'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true,),
+            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true, 'submitOnChange'=>true),
             'sql'               => "char(1) NOT NULL default ''"
         ),
 
@@ -630,7 +634,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
-            'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true,),
+            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true,),
             'sql'               => "char(1) NOT NULL default ''"
         ),
 
@@ -639,7 +643,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
-            'eval'              => array('tl_class'=>'w50 clr', 'feEditable'=>true, 'feViewable'=>true,),
+            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true,),
             'sql'               => "char(1) NOT NULL default '0'"
         ),
 
@@ -865,6 +869,8 @@ class tl_c4g_reservation extends Backend
 
                     if ($reservationObjectType === '1') {
                         $reservationObject = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? LIMIT 1")->execute($reservation['reservation_object'])->fetchAssoc();
+                    } else {
+                        $reservationObject = Database::getInstance()->prepare("SELECT * FROM tl_calendar_events WHERE id=? LIMIT 1")->execute($reservation['reservation_object'])->fetchAssoc();
                     }
 
                     $notificationConifrmationType = StringUtil::deserialize($type['notification_confirmation_type']);
@@ -881,6 +887,13 @@ class tl_c4g_reservation extends Backend
                     }
 
                     if ($c4gNotify && is_array($arrNotificationIds) && (count($arrNotificationIds) > 0) && $reservationObject) {
+
+                        if ($reservationObjectType == '2') {
+                            $c4gNotify->setTokenValue('reservation_object', $reservationObject['title']);
+                        } else {
+                            $c4gNotify->setTokenValue('reservation_object', $reservationObject['caption']);
+                        }
+
                         $c4gNotify->setTokenValue('admin_email', $GLOBALS['TL_CONFIG']['adminEmail']);
                         $c4gNotify->setTokenValue('email', $reservation['email']);
                         $c4gNotify->setTokenValue('contact_email', $location && $location['contact_email'] ? $location['contact_email'] : false);
@@ -888,20 +901,59 @@ class tl_c4g_reservation extends Backend
 
                         $c4gNotify->setTokenValue('desiredCapacity', $reservation['desiredCapacity']);
 
-                        $c4gNotify->setTokenValue('beginDate', $reservation['beginDate']);
-                        $c4gNotify->setTokenValue('beginTime', $reservation['beginTime']);
-                        $c4gNotify->setTokenValue('endDate', $reservation['endDate']);
-                        $c4gNotify->setTokenValue('endTime', $reservation['endTime']);
-                        $c4gNotify->setTokenValue('reservation_object', $reservationObject['caption']);
+                        $dateFormat = $GLOBALS['TL_CONFIG']['dateFormat'];
+                        //$datimFormat = $GLOBALS['TL_CONFIG']['datimFormat'];
+                        $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
+                        $c4gNotify->setTokenValue('beginDate', date($dateFormat, $reservation['beginDate']));
+                        $c4gNotify->setTokenValue('beginTime', date($timeFormat, $reservation['beginTime']));
+                        $c4gNotify->setTokenValue('endDate', date($dateFormat, $reservation['endDate']));
+                        $c4gNotify->setTokenValue('endTime', date($timeFormat, $reservation['endTime']));
 
-                        $c4gNotify->setTokenValue('included_params', 'ToDo');
-                        $c4gNotify->setTokenValue('additional_params', 'ToDo');
-                        $c4gNotify->setTokenValue('participantList', 'ToDo');
+                        $params = $reservation['included_params'] ? unserialize($reservation['included_params']) : [];
+                        $includedParamsArr = [];
+                        foreach ($params as $param) {
+                            $includedParam = C4gReservationParamsModel::findByPk($param);
+                            if ($includedParam && $includedParam->caption) {
+                                $includedParamsArr[$param] = $includedParam->caption;
+                            }
+                        }
+                        $c4gNotify->setTokenValue('included_params', implode($includedParamsArr));
+
+                        $params = $reservation['additional_params'] ? unserialize($reservation['additional_params']) : [];
+                        $additionalParamsArr = [];
+                        foreach ($params as $param) {
+                            $additionalParam = C4gReservationParamsModel::findByPk($param);
+                            if ($additionalParam && $additionalParam->caption) {
+                                $additionalParamsArr[$param] = $additionalParam->caption;
+                            }
+                        }
+                        $c4gNotify->setTokenValue('additional_params', implode($additionalParamsArr));
+
+                        $participantsArr = [];
+                        $participants = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation_participants WHERE pid=?")->execute($reservation['id'])->fetchAllAssoc();
+                        if ($participants && (count($participants) > 0)) {
+                            foreach ($participants as $participant) {
+                                //$paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
+                                $participantsArr[] = [$participant['firstname'],$participant['lastname'],$participant['email']];
+                            }
+                        }
+
+                        $participants = '';
+                        foreach ($participantsArr as $key => $valueArray) {
+                            $participants .= $participants ? '; '.$key.': '.trim(implode(', ',$valueArray)) : $key.': '.trim(implode(', ',$valueArray));
+                        }
+
+                        $c4gNotify->setTokenValue('participantList', $participants);
                         $c4gNotify->setTokenValue('speaker', 'ToDo');
                         $c4gNotify->setTokenValue('topic', 'ToDo');
                         $c4gNotify->setTokenValue('audience', 'ToDo');
 
-                        $c4gNotify->setTokenValue('salutation', $reservation['salutation']);
+                        $salutation = array(
+                            'man'=>$GLOBALS['TL_LANG']['tl_c4g_reservation']['man'][0],
+                            'woman'=>$GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'][0],
+                            'various'=>$GLOBALS['TL_LANG']['tl_c4g_reservation']['various'][0]
+                        );
+                        $c4gNotify->setTokenValue('salutation', $salutation[$reservation['salutation']]);
                         $c4gNotify->setTokenValue('title', $reservation['title']);
                         $c4gNotify->setTokenValue('organisation', $reservation['organisation']);
                         $c4gNotify->setTokenValue('firstname', $reservation['firstname']);
@@ -910,8 +962,8 @@ class tl_c4g_reservation extends Backend
                         $c4gNotify->setTokenValue('address', $reservation['address']);
                         $c4gNotify->setTokenValue('postal', $reservation['postal']);
                         $c4gNotify->setTokenValue('city', $reservation['city']);
-                        $c4gNotify->setTokenValue('dateOfBirth', $reservation['dateOfBirth']);
-                        $c4gNotify->setTokenValue('salutation2', $reservation['salutation2']);
+                        $c4gNotify->setTokenValue('dateOfBirth', date($dateFormat, $reservation['dateOfBirth']));
+                        $c4gNotify->setTokenValue('salutation2', $salutation[$reservation['salutation2']]);
                         $c4gNotify->setTokenValue('title2', $reservation['title2']);
                         $c4gNotify->setTokenValue('organisation2', $reservation['organisation2']);
                         $c4gNotify->setTokenValue('firstname2', $reservation['firstname2']);
@@ -921,8 +973,8 @@ class tl_c4g_reservation extends Backend
                         $c4gNotify->setTokenValue('address2', $reservation['address2']);
                         $c4gNotify->setTokenValue('postal2', $reservation['postal2']);
                         $c4gNotify->setTokenValue('city2', $reservation['city2']);
-                        $c4gNotify->setTokenValue('comment', 'Todo'/*$reservation['comment']*/);
-                        $c4gNotify->setTokenValue('internal_comment', 'ToDo'/*$reservation['internal_comment']*/);
+                        $c4gNotify->setTokenValue('comment', unserialize($reservation['comment']));
+                        $c4gNotify->setTokenValue('internal_comment', unserialize($reservation['internal_comment']));
 
                         $c4gNotify->setTokenValue('location', $location ? $location['name'] : '');
                         $c4gNotify->setTokenValue('contact_name', $location ? $location['contact_name'] : '');
@@ -934,13 +986,22 @@ class tl_c4g_reservation extends Backend
                         $c4gNotify->setTokenValue('reservation_id', $reservation['reservation_id']);
                         $c4gNotify->setTokenValue('agreed', $reservation['agreed']);
 
-                        $c4gNotify->setTokenValue('uploadFile', '/files/ToDo');
+
+                        $binFileUuid = $reservation['uploadFile'];
+                        $filePath = '';
+                        if ($binFileUuid) {
+                            $file = \FilesModel::findByUuid(\Contao\StringUtil::binToUuid($binFileUuid));
+                            if ($file) {
+                                $filePath = $file->path;
+                            }
+                        }
+                        $c4gNotify->setTokenValue('uploadFile', $filePath);
 
                         $c4gNotify->setOptionalTokens(
                             ['contact_email','desiredCapacity', 'endDate', 'endTime', 'included_params', 'additional_params', 'participantList', 'speaker', 'topic',
                                 'audience', 'salutation', 'title', 'organisation', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
                                 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment', 'location', 'contact_name',
-                                'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFiled']
+                                'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile']
                         );
 
                         $sendingResult = $c4gNotify->send($arrNotificationIds);
@@ -999,7 +1060,30 @@ class tl_c4g_reservation extends Backend
         $showButton = false;
 
         if (($row['confirmed'] || $row['specialNotification']) && (!$row['emailConfirmationSend'])) {
-            $showButton = true;
+            $type = $row['reservation_type'];
+            if ($type) {
+                $reservationType = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? LIMIT 1")->execute($type)->fetchAssoc();
+
+                if ($reservationType) {
+                    if ($row['confirmed']) {
+                        $notificationConifrmationType = StringUtil::deserialize($reservationType['notification_confirmation_type']);
+
+                        if ($notificationConifrmationType && (count($notificationConifrmationType) > 0)) {
+                            $showButton = true;
+                        }
+                    }
+
+                    if ($row['specialNotification']) {
+                        $notificationSpecialType = StringUtil::deserialize($reservationType['notification_special_type']);
+
+                        if ($notificationSpecialType && (count($notificationSpecialType) > 0)) {
+                            $showButton = true;
+                        }
+                    }
+                }
+
+
+            }
         }
 
         if (!$showButton) {

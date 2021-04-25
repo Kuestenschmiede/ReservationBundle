@@ -302,7 +302,7 @@ class C4gReservationInsertTags
                         case 'included_raw':
                             $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE id = ?')
                                 ->execute($reservationEventObject->reservationType)->fetchAssoc();
-                            $params = $includedParams ? unserialize($includedParams['additional_params']) : [];
+                            $params = $includedParams ? unserialize($includedParams['included_params']) : [];
                             $includedParamsArr = [];
                             foreach ($params as $param) {
                                 $includedParam = C4gReservationParamsModel::findByPk($param);

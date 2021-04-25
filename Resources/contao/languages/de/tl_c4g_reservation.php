@@ -62,9 +62,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'] = array("Anmerkung vom Kund
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['fileUpload'] = array("Datei Upload", "Hier kann eine Datei angehangen werden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['internal_comment'] = array("Nachricht an Kunden", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'] = array("Datenschutzerklärung", "Wird vom Nutzer im Frontend ausgewählt.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Bestätigt (Standardinformation)", "Wurde der Termin bestätigt? (Optional)");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['specialNotification'] = array("Spezialnachricht senden", "Dieser Schalter kann für eine Zusatzinformation in der E-Mail aktiviert werden.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['emailConfirmationSend'] = array("Bestätigung wurde versendet", "Dieser Schalter wird automatisch gesetzt, sobald die E-Mail versendet wurde.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Bestätigen", "Der Termin wird bestätigt. Benachrichtigung können an der Reservierungsart verknüpft werden (optional).");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['specialNotification'] = array("Spezialnachricht senden", "Ist dieser Schalter gesetzt wird die an der Reservierungsart verknüpfte Spezialnachricht versendet.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['emailConfirmationSend'] = array("Bestätigung wurde versendet", "Dieser Schalter wird automatisch gesetzt, sobald die E-Mail versendet wurde. Sie können die Checkbox wieder deaktivieren um eine erneute Bestätigung zu versenden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Storniert", "Wenn der Termin storniert wird, ist dieses Feld auszuwählen");
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'] = array("Für Mitglied", "Die Reservierung wurde durch oder für dieses Mitglied erstellt.");
@@ -83,6 +83,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend'] = "Reservierungs
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['person_legend']      = "Kontaktdaten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['person2_legend']     = "Rechnungsadresse / Sonstige Personendaten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment_legend']     = "Anlagen";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['notification_legend'] = "Bestätigung an den Buchenden";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['state_legend']       = "Status";
 
 /** OPERATIONS **/

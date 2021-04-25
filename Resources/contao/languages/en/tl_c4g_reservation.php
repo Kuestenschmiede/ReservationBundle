@@ -63,8 +63,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'] = array("city (2)", "town");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'] = array("comment", "comment from creator");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['fileUpload'] = array("file Upload", "A file can be attached here.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'] = array("Privacy Policy", "Selected by user in frontend.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Confirmed (send default information)", "Has the appointment been confirmed?If applicable, select this field.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['specialNotification'] = array("Send special information", "This switch can be activated for an additional information in the e-mail.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Confirm", "The appointment is confirmed. Link notification to the reservation type (optional).");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['specialNotification'] = array("Send special information", "Ist dieser Schalter gesetzt wird die an der Reservierungsart verknüpfte Spezialnachricht versendet. You can uncheck the checkbox again to send a new confirmation.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['emailConfirmationSend'] = array("Confirmation has been sent", "This switch will be set automatically once the email has been sent.");
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Canceled", "If the appointment is cancelled, select this field");
@@ -85,6 +85,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend'] = "reservation d
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['person_legend']      = "personal data";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['person2_legend']     = "Billing addresse / Additional person data";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment_legend']     = "Attachments";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['notification_legend'] = "Confirmation to the booker";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['state_legend']       = "State";
 
 /** OPERATIONS **/
