@@ -855,7 +855,6 @@ class tl_c4g_reservation extends Backend
         $key = Contao\Input::get('key');
         $reservationType = 0;
         if ($id && $key && ($key == 'sendNotification')) {
-            Contao\Input::setUnusedGet('key','');
             $reservation = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation WHERE id=? LIMIT 1")->execute($id)->fetchAssoc();
             $reservationType = $reservation ? $reservation['reservation_type'] : false;
             $reservationObjectType = $reservation ? $reservation['reservationObjectType'] : false;
@@ -991,12 +990,6 @@ class tl_c4g_reservation extends Backend
                             $filePath = '';
                             if ($binFileUuid) {
                                 $filePath = Controller::replaceInsertTags("{{file::$binFileUuid}}");
-//                                $file = \FilesModel::findByUuid(\Contao\StringUtil::binToUuid($binFileUuid));
-//                                if ($file && $file->path) {
-//                                    $filePath = $file->path;
-//                                    $pathUuid = StringUtil::binToUuid($pathUuid);
-//
-//                                }
                             }
                             $c4gNotify->setTokenValue('uploadFile', $filePath);
 
