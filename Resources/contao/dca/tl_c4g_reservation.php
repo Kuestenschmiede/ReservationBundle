@@ -163,7 +163,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         'uuid' => array
         (
             'label'             => array('uuid','uuid'),
-            'exclude'           => true,
+            'exclude'           => false,
             'inputType'         => 'text',
             'search'            => false,
             'eval'              => array('doNotCopy'=>true, 'maxlength'=>128),
@@ -998,7 +998,7 @@ class tl_c4g_reservation extends Backend
                                 ['contact_email','desiredCapacity', 'endDate', 'endTime', 'included_params', 'additional_params', 'participantList', 'speaker', 'topic',
                                     'audience', 'salutation', 'title', 'organisation', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
                                     'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment', 'location', 'contact_name',
-                                    'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document']
+                                    'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id']
                             );
 
                             $sendingResult = $c4gNotify->send($arrNotificationIds);
