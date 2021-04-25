@@ -19,6 +19,7 @@ use con4gis\CoreBundle\Classes\Helper\InputHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Notifications\C4GNotification;
 use con4gis\ReservationBundle\Resources\contao\models\C4GReservationParamsModel;
+use Contao\Controller;
 use Contao\Image;
 use Contao\StringUtil;
 
@@ -876,7 +877,7 @@ class tl_c4g_reservation extends Backend
                         $notificationSpecialType = StringUtil::deserialize($type['notification_special_type']);
 
                         $configuration = $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle']['con4gis_reservation_confirmation'];
-                        $c4gNotify = $configuration ? new C4GNotification($configuration, false) : false;
+                        $c4gNotify = $configuration ? new C4GNotification($configuration) : false;
 
                         $arrNotificationIds = [];
                         if ($reservation['specialNotification'] && $notificationSpecialType && (count($notificationSpecialType) > 0)) {
@@ -986,15 +987,20 @@ class tl_c4g_reservation extends Backend
                             $c4gNotify->setTokenValue('agreed', $reservation['agreed']);
 
 
-                            $binFileUuid = $reservation['uploadFile'];
+                            $binFileUuid = $reservation['fileUpload'];
                             $filePath = '';
                             if ($binFileUuid) {
-                                $file = \FilesModel::findByUuid(\Contao\StringUtil::binToUuid($binFileUuid));
-                                if ($file) {
-                                    $filePath = $file->path;
-                                }
+                                $filePath = Controller::replaceInsertTags("{{file::$binFileUuid}}");
+//                                $file = \FilesModel::findByUuid(\Contao\StringUtil::binToUuid($binFileUuid));
+//                                if ($file && $file->path) {
+//                                    $filePath = $file->path;
+//                                    $pathUuid = StringUtil::binToUuid($pathUuid);
+//
+//                                }
                             }
                             $c4gNotify->setTokenValue('uploadFile', $filePath);
+
+
                             $c4gNotify->setOptionalTokens(
                                 ['contact_email','desiredCapacity', 'endDate', 'endTime', 'included_params', 'additional_params', 'participantList', 'speaker', 'topic',
                                     'audience', 'salutation', 'title', 'organisation', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
