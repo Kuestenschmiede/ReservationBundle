@@ -146,7 +146,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'options_callback'  => array('tl_c4g_reservation_type', 'loadMemberOptions'),
-            'eval'              => array('mandatory'=>false,
+            'eval'              => array('mandatory'=>false, 'chosen'=>true,
                 'disabled' => false, 'includeBlankOption' => true, 'blankOptionLabel' => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
@@ -159,7 +159,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'options_callback'  => array('tl_c4g_reservation_type', 'loadGroupOptions'),
-            'eval'              => array('mandatory'=>false,
+            'eval'              => array('mandatory'=>false, 'chosen'=>true,
                 'disabled' => false, 'includeBlankOption' => true, 'blankOptionLabel' => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyGroupId']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"

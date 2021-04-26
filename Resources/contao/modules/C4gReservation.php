@@ -1664,7 +1664,7 @@ class C4gReservation extends C4GBrickModuleParent
             $putVars['reservation_object'] = $objectId;
 
             //ToDo implement all event possibilities
-            $beginDate = $reservationObject->startDate ? intvaL($reservationObject->startDate) : 0;
+            $beginDate = $reservationObject->startDate ? intval($reservationObject->startDate) : 0;
             $beginTime = $reservationObject->startTime ? intval($reservationObject->startTime) : 0;
             $endDate   = $reservationObject->endDate ? intval($reservationObject->endDate) : 0;
             $endTime   = $reservationObject->endTime ? intval($reservationObject->endTime) : 0;
