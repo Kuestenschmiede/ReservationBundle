@@ -306,9 +306,10 @@ function checkTimelist(value, timeList) {
     return arrIndex;
 }
 
-function checkMax(objectList, arrindex, idx, value, timeList) {
-    let result = false;
-    if (objectList[arrindex][idx]['act'] < objectList[arrindex][idx]['max']) {
+function checkMax(objectList, arrindex, idx, value, timeList, capacity) {
+    let result = true;
+    let actCapacity = objectList[arrindex][idx]['act'] + parseInt(capacity);
+    if (actCapacity <= objectList[arrindex][idx]['max']) {
         for (y = 0; y < objectList.length; y++) {
             if (value && timeList && (y != arrindex)) {
 
@@ -358,6 +359,8 @@ function checkMax(objectList, arrindex, idx, value, timeList) {
                 result = true;
             }
         }
+    } else {
+        result = false;
     }
 
     return result;
@@ -463,7 +466,7 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                                     if (arrindex !== -1) {
                                         for (l = 0; l < objectList[arrindex].length; l++) {
                                             if (objectList[arrindex][l]['id'] != -1) {
-                                                if (checkMax(objectList, arrindex, l, value, timeList)) {
+                                                if (checkMax(objectList, arrindex, l, value, timeList, capacity)) {
                                                     activateTimeButton = (activateTimeButton < objectList[arrindex][l]['act']) ? objectList[arrindex][l]['act'] : activateTimeButton;
                                                     percent = objectList[arrindex][l]['percent'];
                                                 }
