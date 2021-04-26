@@ -1681,8 +1681,13 @@ class C4gReservation extends C4GBrickModuleParent
             foreach ($putVars as $key => $value) {
                 if (strpos($key, "beginTime_".$type) !== false) {
                     if ($value) {
+                        if (strpos($value, '#') !== false) {
+                            $value = substr($value,0, strpos($value, '#')); //remove frontend duration
+                            $putVars[$key] = $value;
+                        }
+
                         $beginTime = $value;
-                        break;
+                        //break;
                     }
                 }
             }
