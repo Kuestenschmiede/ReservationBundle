@@ -938,8 +938,8 @@ class tl_c4g_reservation extends Backend
                             }
 
                             $participants = '';
-                            foreach ($participantsArr as $key => $valueArray) {
-                                $participants .= $participants ? '; ' . $key . ': ' . trim(implode(', ', $valueArray)) : $key . ': ' . trim(implode(', ', $valueArray));
+                            foreach ($participantsArr as $participantkey => $valueArray) {
+                                $participants .= $participants ? '; ' . $participantkey . ': ' . trim(implode(', ', $valueArray)) : $participantkey . ': ' . trim(implode(', ', $valueArray));
                             }
 
                             $c4gNotify->setTokenValue('participantList', $participants);
@@ -1013,6 +1013,9 @@ class tl_c4g_reservation extends Backend
                     C4gLogModel::addLogEntry('reservation', $exception->getMessage());
                 }
             }
+
+            //delete key per redirect
+            Controller::redirect(str_replace('&key='.$key, '', \Environment::get('request')));
         }
     }
 
