@@ -17,5 +17,5 @@
 /**
  * RIGHTS
  */
-$GLOBALS['TL_LANG']['tl_member_group']['cg_rights']['brick_reservation'] = 'Reservierungen bearbeiten';
+$GLOBALS['TL_LANG']['tl_member_group']['cg_rights']['brick_reservation'] = 'Reservierungen';
 
