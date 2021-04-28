@@ -65,9 +65,17 @@ class C4gReservationObjectModel extends \Model
         return $result;
     }
 
+    /**
+     * @param $list
+     * @param $date
+     * @param $type
+     * @return int
+     */
     public static function getMaxObjectCountPerDate($list, $date, $type) {
         $result = 0;
         $database = Database::getInstance();
+        $periodType = $type['periodType'];
+        $maxPerTime = $type['objectCount'];
 
         foreach ($list as $object) {
             $id= $object->getId();
@@ -75,8 +83,7 @@ class C4gReservationObjectModel extends \Model
                 ->execute($id)->fetchAssoc();
             $weekday = date("w",$date);
             $quantity = $objectData['quantity'];
-            $periodType = $type['periodType'];
-            $maxPerTime = $type['objectCount'];
+
             if ($maxPerTime < $quantity) {
                 $quantity = $maxPerTime; //ToDo check max count per interval for all objects
             }
@@ -338,6 +345,13 @@ class C4gReservationObjectModel extends \Model
             $clock = ' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
         }
 
+        foreach ($list as $key => $item) {
+            if ($key === $time || ($interval && ($key === ($time.'#'.$interval))) || ($endTime && ($key === ($time.'#'.($endTime-$time))))) {
+                $list[$key]['objects'][] = $obj;
+                return $list;
+            }
+        }
+
         if ($obj && ($obj['id'] == -1)) {
             $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
 
@@ -345,19 +359,15 @@ class C4gReservationObjectModel extends \Model
                 $key = $time.'#'.$interval;
                 $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
                 $list[$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
+            } else if ($endTime && ($endTime != $time)) {
+                $key = $time.'#'.($endTime-$time);
+                $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
+                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else {
                 $key = $time;
                 $list[$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj]);
             }
         } else {
-            foreach ($list as $key => $item) {
-                //Ist der Termin schon in der Auflistung?
-                if ($key === $time || ($interval && ($key === ($time.'#'.$interval))) || ($endTime && ($key === ($time.'#'.($endTime-$time))))) {
-                    $list[$key]['objects'][] = $obj;
-                    return $list;
-                }
-            }
-
             $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
 
             if ($interval) {
@@ -629,6 +639,7 @@ class C4gReservationObjectModel extends \Model
                                                 $actPersons = 0;
                                                 $actPercent = 0;
                                                 if ($reservations) {
+                                                    $totalCount = [];
                                                     foreach ($reservations as $reservation) {
                                                         if ($reservation->reservation_object) {
                                                             if ($reservation->reservation_object == $id) {
@@ -636,6 +647,7 @@ class C4gReservationObjectModel extends \Model
                                                                 $objectCount[$tsdate][$time] = $objectCount[$tsdate][$time] ? $objectCount[$tsdate][$time] + 1 : 1;
                                                                 $actPersons = $actPersons + intval($reservation->desiredCapacity);
                                                             }
+                                                            $totalCount[$tsdate][$time] = $totalCount[$tsdate][$time] ? $totalCount[$tsdate][$time] + 1 : 1;
                                                         }
                                                     }
 
@@ -658,7 +670,7 @@ class C4gReservationObjectModel extends \Model
                                             if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $time)))) {
                                                 if (($actPersons >= $capacity) && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
                                                     $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
-                                                } else if ($maxCount && (C4gReservationHelper::getObjectCountPerTime($objectCount, $tsdate, $time, $durationInterval) >= intval($maxCount * $capacity))) {  //n times for type
+                                                } else if ($maxCount && (C4gReservationHelper::getObjectCountPerTime($totalCount, $tsdate, $time, $durationInterval) >= intval($maxCount * $capacity))) {  //n times for type
                                                     $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
                                                 } else if ($capacity && (!empty($objectCount)) && ($objectCount[$tsdate][$time] >= intval($capacity))) { //n times for object
                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
