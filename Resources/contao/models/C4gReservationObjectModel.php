@@ -631,7 +631,7 @@ class C4gReservationObjectModel extends \Model
                                             $id = $object->getId();
                                             if ($date && $tsdate) {
                                                 $t = 'tl_c4g_reservation';
-                                                $arrColumns = array("$t.beginDate=$tsdate AND $t.beginTime=$time AND $t.reservationObjectType=$objectType AND NOT $t.cancellation='1'");
+                                                $arrColumns = array("$t.beginDate=$tsdate AND $t.beginTime=$time AND $t.reservation_type=$type AND $t.reservationObjectType=$objectType AND NOT $t.cancellation='1'");
                                                 $arrValues = array();
                                                 $arrOptions = array();
 
