@@ -1683,11 +1683,11 @@ class C4gReservation extends C4GBrickModuleParent
                     if ($value) {
                         if (strpos($value, '#') !== false) {
                             $value = substr($value,0, strpos($value, '#')); //remove frontend duration
-                            $putVars[$key] = $value;
+                            //$putVars[$key] = is_int($value) ? date($GLOBALS['TL_CONFIG']['timeFormat'],$value) : $value;
                         }
 
                         $beginTime = $value;
-                        //break;
+                        break;
                     }
                 }
             }
