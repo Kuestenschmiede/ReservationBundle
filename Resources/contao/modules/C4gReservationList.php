@@ -222,7 +222,8 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationTypeField->setFieldName('reservation_type');
             $reservationTypeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type_short']);
             $reservationTypeField->setSortColumn(false);
-            $reservationTypeField->setTableColumn(true);
+            $reservationTypeField->setTableColumn($this->showReservationType);
+            $reservationTypeField->setFormField($this->showReservationType);
             //$reservationTypeField->setColumnWidth(20);
             $reservationTypeField->setSize(1);
             $reservationTypeField->setOptions($typelist);
