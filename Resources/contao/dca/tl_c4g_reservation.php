@@ -888,25 +888,25 @@ class tl_c4g_reservation extends Backend
                         if ($c4gNotify && is_array($arrNotificationIds) && (count($arrNotificationIds) > 0) && $reservationObject) {
 
                             if ($reservationObjectType == '2') {
-                                $c4gNotify->setTokenValue('reservation_object', $reservationObject['title']);
+                                $c4gNotify->setTokenValue('reservation_object', $reservationObject['title'] ? $reservationObject['title'] : '');
                             } else {
-                                $c4gNotify->setTokenValue('reservation_object', $reservationObject['caption']);
+                                $c4gNotify->setTokenValue('reservation_object', $reservationObject['caption'] ? $reservationObject['caption'] : '');
                             }
 
                             $c4gNotify->setTokenValue('admin_email', $GLOBALS['TL_CONFIG']['adminEmail']);
                             $c4gNotify->setTokenValue('email', $reservation['email']);
                             $c4gNotify->setTokenValue('contact_email', $location && $location['contact_email'] ? $location['contact_email'] : false);
-                            $c4gNotify->setTokenValue('reservation_type', $type['caption']);
+                            $c4gNotify->setTokenValue('reservation_type', $type['caption'] ? $type['caption'] : '');
 
-                            $c4gNotify->setTokenValue('desiredCapacity', $reservation['desiredCapacity']);
+                            $c4gNotify->setTokenValue('desiredCapacity', $reservation['desiredCapacity'] ? $reservation['desiredCapacity'] : '');
 
                             $dateFormat = $GLOBALS['TL_CONFIG']['dateFormat'];
                             //$datimFormat = $GLOBALS['TL_CONFIG']['datimFormat'];
                             $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
-                            $c4gNotify->setTokenValue('beginDate', date($dateFormat, $reservation['beginDate']));
-                            $c4gNotify->setTokenValue('beginTime', date($timeFormat, $reservation['beginTime']));
-                            $c4gNotify->setTokenValue('endDate', date($dateFormat, $reservation['endDate']));
-                            $c4gNotify->setTokenValue('endTime', date($timeFormat, $reservation['endTime']));
+                            $c4gNotify->setTokenValue('beginDate', $reservation['beginDate'] ? date($dateFormat, $reservation['beginDate']) : '');
+                            $c4gNotify->setTokenValue('beginTime', $reservation['beginTime'] ? date($timeFormat, $reservation['beginTime']) : '');
+                            $c4gNotify->setTokenValue('endDate', $reservation['endDate'] ? date($dateFormat, $reservation['endDate']) : '');
+                            $c4gNotify->setTokenValue('endTime', $reservation['endTime'] ? date($timeFormat, $reservation['endTime']) : '');
 
                             $params = $reservation['included_params'] ? unserialize($reservation['included_params']) : [];
                             $includedParamsArr = [];
@@ -952,28 +952,28 @@ class tl_c4g_reservation extends Backend
                                 'woman' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'][0],
                                 'various' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['various'][0]
                             );
-                            $c4gNotify->setTokenValue('salutation', $salutation[$reservation['salutation']]);
-                            $c4gNotify->setTokenValue('title', $reservation['title']);
-                            $c4gNotify->setTokenValue('organisation', $reservation['organisation']);
-                            $c4gNotify->setTokenValue('firstname', $reservation['firstname']);
-                            $c4gNotify->setTokenValue('lastname', $reservation['lastname']);
-                            $c4gNotify->setTokenValue('phone', $reservation['phone']);
-                            $c4gNotify->setTokenValue('address', $reservation['address']);
-                            $c4gNotify->setTokenValue('postal', $reservation['postal']);
-                            $c4gNotify->setTokenValue('city', $reservation['city']);
-                            $c4gNotify->setTokenValue('dateOfBirth', date($dateFormat, $reservation['dateOfBirth']));
-                            $c4gNotify->setTokenValue('salutation2', $salutation[$reservation['salutation2']]);
-                            $c4gNotify->setTokenValue('title2', $reservation['title2']);
-                            $c4gNotify->setTokenValue('organisation2', $reservation['organisation2']);
-                            $c4gNotify->setTokenValue('firstname2', $reservation['firstname2']);
-                            $c4gNotify->setTokenValue('lastname2', $reservation['lastname2']);
-                            $c4gNotify->setTokenValue('email2', $reservation['email2']);
-                            $c4gNotify->setTokenValue('phone2', $reservation['phone2']);
-                            $c4gNotify->setTokenValue('address2', $reservation['address2']);
-                            $c4gNotify->setTokenValue('postal2', $reservation['postal2']);
-                            $c4gNotify->setTokenValue('city2', $reservation['city2']);
-                            $c4gNotify->setTokenValue('comment', unserialize($reservation['comment']));
-                            $c4gNotify->setTokenValue('internal_comment', unserialize($reservation['internal_comment']));
+                            $c4gNotify->setTokenValue('salutation', $reservation['salutation'] ? $salutation[$reservation['salutation']] : '');
+                            $c4gNotify->setTokenValue('title', $reservation['title'] ? $reservation['title'] : '');
+                            $c4gNotify->setTokenValue('organisation', $reservation['organisation'] ? $reservation['organisation'] : '');
+                            $c4gNotify->setTokenValue('firstname', $reservation['firstname'] ? $reservation['firstname'] : '');
+                            $c4gNotify->setTokenValue('lastname', $reservation['lastname'] ? $reservation['lastname'] : '');
+                            $c4gNotify->setTokenValue('phone', $reservation['phone'] ? $reservation['phone'] : '');
+                            $c4gNotify->setTokenValue('address', $reservation['address'] ? $reservation['address'] : '');
+                            $c4gNotify->setTokenValue('postal', $reservation['postal'] ? $reservation['postal'] : '');
+                            $c4gNotify->setTokenValue('city', $reservation['city'] ? $reservation['city'] : '');
+                            $c4gNotify->setTokenValue('dateOfBirth', $reservation['dateOfBirth'] ? date($dateFormat, $reservation['dateOfBirth']) : '');
+                            $c4gNotify->setTokenValue('salutation2', $reservation['salutation2'] ? $salutation[$reservation['salutation2']] : '');
+                            $c4gNotify->setTokenValue('title2', $reservation['title2'] ? $reservation['title2'] : '');
+                            $c4gNotify->setTokenValue('organisation2', $reservation['organisation2'] ? $reservation['organisation2'] : '');
+                            $c4gNotify->setTokenValue('firstname2', $reservation['firstname2'] ? $reservation['firstname2'] : '');
+                            $c4gNotify->setTokenValue('lastname2', $reservation['lastname2'] ? $reservation['lastname2'] : '');
+                            $c4gNotify->setTokenValue('email2', $reservation['email2'] ? $reservation['email2'] : '');
+                            $c4gNotify->setTokenValue('phone2', $reservation['phone2'] ? $reservation['phone2'] : '');
+                            $c4gNotify->setTokenValue('address2', $reservation['address2'] ? $reservation['address2'] : '');
+                            $c4gNotify->setTokenValue('postal2', $reservation['postal2'] ? $reservation['postal2'] : '');
+                            $c4gNotify->setTokenValue('city2', $reservation['city2'] ? $reservation['city2'] : '');
+                            $c4gNotify->setTokenValue('comment', $reservation['comment'] ? unserialize($reservation['comment']) : '');
+                            $c4gNotify->setTokenValue('internal_comment', $reservation['internal_comment'] ? unserialize($reservation['internal_comment']) : '');
 
                             $c4gNotify->setTokenValue('location', $location ? $location['name'] : '');
                             $c4gNotify->setTokenValue('contact_name', $location ? $location['contact_name'] : '');
