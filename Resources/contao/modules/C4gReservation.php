@@ -135,12 +135,18 @@ class C4gReservation extends C4GBrickModuleParent
         $fieldList[] = $idField;
 
         $typelist = array();
-
+        
+        $initialDate = '';
         $eventId = $this->Input->get('event') ? $this->Input->get('event') : 0;
         $event = $eventId ? \CalendarEventsModel::findByPk($eventId) : false;
         $eventObj = $event && $event->published ? C4gReservationEventModel::findBy('pid', $event->id) : false;
         if ($eventObj && (count($eventObj) > 1)) {
             C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: ' . $event->id);
+        } else {
+            $date = $this->Input->get('date') ? $this->Input->get('date') : 0;
+            if ($date) {
+                $initialDate = $date;
+            }
         }
 
         $t = 'tl_c4g_reservation_type';
@@ -297,6 +303,11 @@ class C4gReservation extends C4GBrickModuleParent
                 if (($type['periodType'] === 'minute') || ($type['periodType'] === 'hour')) {
                     //$conditionDate = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'beginDate_'.$type['id']);
 
+                    if ($initialDate) {
+                        $script = "setTimeset(document.getElementById('c4g_beginDate_".$type['id']."'), " . $this->id . "," . $type['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");";
+                        $this->getDialogParams()->setOnloadScript($script);
+                    }
+
                     $reservationBeginDateField = new C4GDateField();
                     $reservationBeginDateField->setFlipButtonPosition(true);
                     $reservationBeginDateField->setMinDate(C4gReservationObjectModel::getMinDate($reservationObjects));
@@ -308,7 +319,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
                     $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate']);
                     $reservationBeginDateField->setEditable(true);
-                    //$reservationBeginDateField->setInitialValue(C4gReservationObjectModel::getMinDate($reservationObjects));
+                    $reservationBeginDateField->setInitialValue($initialDate ? strtotime($initialDate) : false);
                     $reservationBeginDateField->setComparable(false);
                     $reservationBeginDateField->setSortColumn(true);
                     $reservationBeginDateField->setSortSequence('de_datetime');
