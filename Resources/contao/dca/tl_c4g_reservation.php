@@ -350,7 +350,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'inputType'               => 'select',
             'default'                 => 'various',
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation'],
-            'options'                 => array('man','woman','various'),
+            'options'                 => array('various','man','woman'),
             'eval'                    => array('tl_class'=>'w50 clr','feViewable'=>true, 'mandatory'=>false),
             'sql'                     => "char(25) NOT NULL default ''"
 
@@ -472,7 +472,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'inputType'               => 'select',
             'default'                 => 'various',
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation'],
-            'options'                 => array('man','woman','various'),
+            'options'                 => array('various','man','woman'),
             'eval'                    => array('tl_class'=>'w50 clr','feViewable'=>true, 'mandatory'=>false),
             'sql'                     => "char(25) NOT NULL default ''"
 
