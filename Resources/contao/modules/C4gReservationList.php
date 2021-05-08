@@ -48,8 +48,8 @@ class C4gReservationList extends C4GBrickModuleParent
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICVIEW;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/js/c4g_brick_reservation.js';
-    protected $brickStyle   = 'bundles/con4gisreservation/css/c4g_brick_reservation.css';
+    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
+    protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = false;
     protected $permalink_field = 'reservation_id';
     protected $permalink_name = 'token';

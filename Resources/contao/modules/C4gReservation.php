@@ -69,8 +69,8 @@ class C4gReservation extends C4GBrickModuleParent
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/js/c4g_brick_reservation.js';
-    protected $brickStyle   = 'bundles/con4gisreservation/css/c4g_brick_reservation.css';
+    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
+    protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
 
     //Resource Params
@@ -82,7 +82,7 @@ class C4gReservation extends C4GBrickModuleParent
     protected $loadClearBrowserUrlResources = false;
     protected $loadConditionalFieldDisplayResources = true;
     protected $loadMoreButtonResources = false;
-    protected $loadFontAwesomeResources = false;
+    protected $loadFontAwesomeResources = true;
     protected $loadTriggerSearchFromOtherModuleResources = false;
     protected $loadFileUploadResources = false;
     protected $loadMultiColumnResources = false;
