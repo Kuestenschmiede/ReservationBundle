@@ -13,7 +13,7 @@
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption'] = 'reservation';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural'] = 'Reservations';
 
-/** FIELDS */ /**DKo 13.02.19*/
+/** FIELDS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type'] = 'What do you want to reserve?';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type_short'] = 'Reservation type';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_time'] = 'Time';
@@ -111,6 +111,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked'] = 'Reservations are no
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'] = 'Reservation is no longer possible. The number of free places is exceeded. Possible number: ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'] = 'The number of participants per booking is limited. Maximum number: ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'An error has occurred. The reservation cannot be made. Please contact us.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id'] = 'Sorry. An error has occurred. The reservation cannot be made.  Please reload the page and try again.';
 
 /** DESCRIPTIONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Select the reservation type';

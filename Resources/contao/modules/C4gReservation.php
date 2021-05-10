@@ -11,7 +11,6 @@
 
 namespace con4gis\ReservationBundle\Resources\contao\modules;
 
-use con4gis\CoreBundle\Classes\Helper\InputHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Actions\C4GSaveAndRedirectDialogAction;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
@@ -20,7 +19,6 @@ use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickRegEx;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickCondition;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickConditionType;
-use con4gis\ProjectsBundle\Classes\Fieldlist\C4GBrickField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
@@ -40,7 +38,6 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimepickerField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBrickModuleParent;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
 use con4gis\ReservationBundle\Classes\C4gReservationBrickTypes;
@@ -54,10 +51,8 @@ use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel;
 use Contao\Controller;
-use Contao\Date;
 use Contao\FrontendUser;
 use Contao\StringUtil;
-use Contao\System;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -1684,6 +1679,21 @@ class C4gReservation extends C4GBrickModuleParent
             $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
        } else {
             $putVars['reservationObjectType'] = '1';
+
+            $objectId = $reservationObject->id; //$putVars['reservation_object_event_' . $type];
+            $reservationId = $putVars['reservation_id'];
+            $t = 'tl_c4g_reservation';
+            $arrColumns = array("$t.reservation_id=$objectId");
+            $arrValues = array();
+            $arrOptions = array();
+            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
+
+            $reservationCount = count($reservations);
+            if ($reservationCount >= 0) {
+                C4gLogModel::addLogEntry('reservation', 'Duplicate reservation ID detected.');
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']];
+            }
+
             $beginDate = $putVars['beginDate_'.$type];
 
             $beginTime = 0;
