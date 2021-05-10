@@ -698,6 +698,58 @@ class C4gReservationObjectModel extends \Model
         }
     }
 
+    /**
+     * @param $reservationObject
+     * @param $putVars
+     */
+    public static function preventDublicateBookings($reservationType,$reservationObject,$putVars)
+    {
+        $result = false;
+        if ($reservationObject and $putVars) {
+            $objectId = $reservationObject->id;
+            $typeId   = $reservationType->id;
+            $beginDate = strtotime($putVars['beginDate_'.$typeId]);
+            $beginTime = 0;
+            foreach ($putVars as $key => $value) {
+                if (strpos($key, "beginTime_".$typeId) !== false) {
+                    if ($value) {
+                        if (strpos($value, '#') !== false) {
+                            $value = substr($value,0, strpos($value, '#')); //remove frontend duration
+                        }
+
+                        $beginTime = $value;
+                        break;
+                    }
+                }
+            }
+
+            $reservationId = $putVars['reservation_id'];
+            $t = 'tl_c4g_reservation';
+            $arrColumns = array("$t.reservation_type=$typeId AND $t.reservation_object=$objectId AND $t.reservationObjectType='1' AND NOT $t.cancellation='1' AND $t.beginDate=$beginDate AND $t.beginTime=$beginTime");
+            $arrValues = array();
+            $arrOptions = array();
+            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
+            $reservationCount = count($reservations);
+            $maxCount = $reservationType->objectCount && ($reservationType->objectCount < $reservationObject->quantity) ? $reservationType->objectCount : $reservationObject->quantity;
+            if ($maxCount && ($reservationCount >= $maxCount)) {
+                return true;
+
+                //maxCount überprüfen
+/*
+ * if (($actPersons >= $capacity) && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                } else if ($maxCount && (C4gReservationHelper::getObjectCountPerTime($totalCount, $tsdate, $time, $durationInterval) >= intval($maxCount * $capacity))) {  //n times for type
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                } else if ($capacity && (!empty($objectCount)) && ($objectCount[$tsdate][$time] >= intval($capacity))) { //n times for object
+                                                   $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+ */
+
+            }
+
+        }
+        return $result;
+    }
+
     public static function getButtonStateClass($object) {
         $result = '';
 

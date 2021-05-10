@@ -1680,18 +1680,19 @@ class C4gReservation extends C4GBrickModuleParent
        } else {
             $putVars['reservationObjectType'] = '1';
 
-            $objectId = $reservationObject->id; //$putVars['reservation_object_event_' . $type];
+            //check duplicate reservation id
             $reservationId = $putVars['reservation_id'];
-            $t = 'tl_c4g_reservation';
-            $arrColumns = array("$t.reservation_id=$objectId");
-            $arrValues = array();
-            $arrOptions = array();
-            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
-
+            $reservations = C4gReservationModel::findBy("reservation_id", $reservationId);
             $reservationCount = count($reservations);
-            if ($reservationCount >= 0) {
+            if ($reservationCount >= 1) {
                 C4gLogModel::addLogEntry('reservation', 'Duplicate reservation ID detected.');
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']];
+            }
+
+            //check duplicate bookings
+            if (C4gReservationObjectModel::preventDublicateBookings($reservationType,$reservationObject,$putVars)) {
+                C4gLogModel::addLogEntry('reservation', 'Duplicate booking detected.');
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking']];
             }
 
             $beginDate = $putVars['beginDate_'.$type];

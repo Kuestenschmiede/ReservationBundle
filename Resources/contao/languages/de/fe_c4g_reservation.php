@@ -113,6 +113,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'] = 'Eine Reser
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'] = 'Die Anzahl der Teilnehmer pro Buchung ist begrenzt. Maximale Anzahl: ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte nehmen Sie mit uns Kontakt auf.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte laden Sie die Seite neu und versuchen Sie es erneut.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte laden Sie die Seite neu und versuchen Sie es erneut.';
 
 /** DESCRIPTIONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Wählen Sie die Reservierungsart aus.';
