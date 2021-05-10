@@ -79,6 +79,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['address2'] = 'Straße';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['postal2'] = 'Postleitzahl';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['city2'] = 'Ort';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['comment'] = 'Ihre Nachricht an uns';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['comment_short'] = 'Bemerkung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['man'] = 'Herr';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman'] = 'Frau';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['various'] = ' - ';

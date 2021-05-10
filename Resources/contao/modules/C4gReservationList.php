@@ -303,6 +303,18 @@ class C4gReservationList extends C4GBrickModuleParent
             //$emailField->setEditable(false);
             $emailField->setPrintable(false);
             $fieldList[] = $emailField;
+
+            $commentField = new C4GTextareaField();
+            $commentField->setFieldName('comment');
+            $commentField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['comment_short']);
+            //$commentField->setColumnWidth();
+            $commentField->setSortColumn(false);
+            $commentField->setTableColumn(true);
+            $commentField->setNotificationField(true);
+            $commentField->setStyleClass('comment');
+            $commentField->setShowIfEmpty(false);
+            $commentField->setPrintable(true);
+            $fieldList[] = $commentField;
         } else if ($this->viewType !== 'publicview') {
             $organisationField = new C4GTextField();
             $organisationField->setFieldName('organisation');
@@ -573,9 +585,9 @@ class C4gReservationList extends C4GBrickModuleParent
             $commentField = new C4GTextareaField();
             $commentField->setFieldName('comment');
             $commentField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['comment']);
-            //$commentField->setColumnWidth(60);
+            //$commentField->setColumnWidth();
             $commentField->setSortColumn(false);
-            $commentField->setTableColumn(false);
+            $commentField->setTableColumn(true);
             $commentField->setNotificationField(true);
             $commentField->setStyleClass('comment');
             $commentField->setShowIfEmpty(false);

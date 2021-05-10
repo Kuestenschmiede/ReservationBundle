@@ -77,6 +77,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['postal2'] = 'Postal code';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['city2'] = 'City';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none'] = 'No Bookings possible';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['comment'] = 'Your message to us';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['comment_short'] = 'Comment';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'] = 'Privacy policy';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed'] = 'Confirmed';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['cancellation'] = 'Cancelled';
