@@ -63,7 +63,7 @@ class C4gReservationList extends C4GBrickModuleParent
     protected $loadClearBrowserUrlResources = false;
     protected $loadConditionalFieldDisplayResources = false;
     protected $loadMoreButtonResources = false;
-    protected $loadFontAwesomeResources = false;
+    protected $loadFontAwesomeResources = true;
     protected $loadTriggerSearchFromOtherModuleResources = false;
     protected $loadFileUploadResources = false;
     protected $loadMultiColumnResources = false;

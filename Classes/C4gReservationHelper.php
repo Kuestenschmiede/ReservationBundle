@@ -11,8 +11,6 @@
 
 namespace con4gis\ReservationBundle\Classes;
 
-use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
-
 class C4gReservationHelper
 {
     /**
