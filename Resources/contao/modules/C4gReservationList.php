@@ -14,24 +14,18 @@ namespace con4gis\ReservationBundle\Resources\contao\modules;
 use con4gis\CoreBundle\Classes\C4GVersionProvider;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
-use con4gis\ProjectsBundle\Classes\Fieldlist\C4GBrickField;
-use con4gis\ProjectsBundle\Classes\Fieldlist\C4GBrickFieldNumeric;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateTimePickerField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSelectField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSubDialogField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimepickerField;
-use con4gis\ProjectsBundle\Classes\Filter\C4GDateTimeListFilter;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBrickModuleParent;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
 use con4gis\ReservationBundle\Classes\C4gReservationBrickTypes;
@@ -56,8 +50,7 @@ class C4gReservationList extends C4GBrickModuleParent
 
     //Resource Params
     protected $loadDefaultResources = true;
-    protected $loadCkEditorResources = false;
-    protected $loadCkEditor5Resources = false;
+    protected $loadTrixEditorResources = false;
     protected $loadDateTimePickerResources = false;
     protected $loadChosenResources = false;
     protected $loadClearBrowserUrlResources = false;
@@ -65,7 +58,7 @@ class C4gReservationList extends C4GBrickModuleParent
     protected $loadMoreButtonResources = false;
     protected $loadFontAwesomeResources = true;
     protected $loadTriggerSearchFromOtherModuleResources = false;
-    protected $loadFileUploadResources = false;
+    protected $loadFileUploadResources = true;
     protected $loadMultiColumnResources = false;
     protected $loadMiniSearchResources = false;
     protected $loadHistoryPushResources = false;
@@ -584,13 +577,13 @@ class C4gReservationList extends C4GBrickModuleParent
 
             $commentField = new C4GTextareaField();
             $commentField->setFieldName('comment');
-            $commentField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['comment']);
+            $commentField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['comment_short']);
             //$commentField->setColumnWidth();
             $commentField->setSortColumn(false);
             $commentField->setTableColumn(true);
             $commentField->setNotificationField(true);
             $commentField->setStyleClass('comment');
-            $commentField->setShowIfEmpty(false);
+            $commentField->setShowIfEmpty(true);
             $commentField->setPrintable(true);
             $fieldList[] = $commentField;
 
