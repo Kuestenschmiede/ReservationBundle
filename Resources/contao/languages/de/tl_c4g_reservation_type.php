@@ -64,6 +64,11 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_legend'] = "Benachr
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['object_legend'] = "Grundsätzliche Einstellungen zu den Objekten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Experteneinstellungen";
 
+/** Info */
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['infotext'] = 'Die Reservierungsart beschreibt den Typ der Reservierungsobjekte. Beispielsweise: "Tischreservierung" für die Objekte "4er Tisch" oder "Tisch 23. "'.
+    'Mehr auf <a href="https://docs.con4gis.org/con4gis-reservation" title="con4gis Docs Reservation" target="_blank" rel="noopener"><b>docs.con4gis.org</b></a><br>. '.
+    '<b>Wichtig! Achten Sie darauf, dass die Formularfelder nicht gecached werden. So ersparen Sie Ihren Nutzern nervige Meldungen.</b>';
+
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['new'] = array("Reservierungsart hinzufügen","Reservierungsart hinzufügen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['edit'] = array("Reservierungsart bearbeiten","Bearbeiten der Reservierungsart ID %s");

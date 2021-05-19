@@ -20,6 +20,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     (
         'dataContainer'     => 'Table',
         'enableVersioning'  => 'true',
+        'onload_callback'   => [['tl_c4g_reservation_type', 'showInfoMessage']],
         'sql'               => array
         (
             'keys' => array
@@ -595,5 +596,13 @@ class tl_c4g_reservation_type extends Backend
             $options[$row['id']] = $row['name'];
         }
         return $options;
+    }
+
+    /**
+     * @param \Contao\DataContainer $dc
+     */
+    public function showInfoMessage(Contao\DataContainer $dc)
+    {
+        \Contao\Message::addInfo($GLOBALS['TL_LANG']['tl_c4g_reservation_type']['infotext']);
     }
 }

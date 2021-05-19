@@ -62,6 +62,11 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_legend'] = "Notific
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['object_legend'] = "Basic settings for the objects";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Expert settings";
 
+/** Info */
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['infotext'] = 'The reservation type describes the type of reservation objects. For example: "Table reservation" for the objects "Table of 4" or "Table 23. "'.
+    'More on <a href="https://docs.con4gis.org/con4gis-reservation" title="con4gis Docs Reservation" target="_blank" rel="noopener"><b>docs.con4gis.org</b></a><br>. '.
+    '<b>Important! Make sure that the form fields are not cached. This will save your users from annoying messages.</b>';
+
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['new'] = array("add reservation type", "add reservation type");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['edit'] = array("Edit reservation type", "Edit reservation type ID %s");
