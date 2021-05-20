@@ -150,7 +150,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['id'],
             'sql'               => "int(10) unsigned NOT NULL auto_increment",
-            'flag'              => 6,
             'sorting'           => true,
         ),
 
