@@ -51,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         'sorting' => array
         (
             'mode'              => 2,
-            'fields'            => ['id DESC','beginDate DESC','lastname'],
+            'fields'            => ['beginDate DESC','lastname'],
             'filter'            => (Input::get('do') == "calendar") ? array(array('reservation_object=? AND reservationObjectType=2',Input::get('id'))) : null,
             'panelLayout'       => 'filter;sort,search,limit',
         ),
@@ -150,7 +150,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['id'],
             'sql'               => "int(10) unsigned NOT NULL auto_increment",
-            'sorting'           => true,
+            'sorting'           => false,
         ),
 
         'tstamp' => array
@@ -772,7 +772,6 @@ class tl_c4g_reservation extends Backend
         }
 
         $result = [
-            $arrRow['id'],
             $arrRow['beginDate'],
             $arrRow['endDate'],
             $arrRow['desiredCapacity'],
@@ -839,7 +838,7 @@ class tl_c4g_reservation extends Backend
         $id = $this->Input->get('id');
 
         $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-            ['id','beginDate','endTime','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object'];
+            ['beginDate','endTime','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object'];
 
         if ($id && $do && ($do == 'calendar')) {
             $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['default'] = '2';
