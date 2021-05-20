@@ -15,6 +15,7 @@
 
 use con4gis\CoreBundle\Classes\Helper\InputHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
+use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
 use con4gis\ProjectsBundle\Classes\Notifications\C4GNotification;
 use con4gis\ReservationBundle\Resources\contao\models\C4GReservationParamsModel;
 use Contao\Controller;
@@ -566,12 +567,17 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         'reservation_id' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_id'],
+            'default'           => C4GBrickCommon::getUUID(),
             'flag'              => 1,
             'exclude'           => true,
             'sorting'           => false,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory' => false, 'maxlength'=>255, 'tl_class' => 'long'),
+            'eval'              => array('doNotCopy' => true, 'unique' => true, 'mandatory' => false, 'maxlength'=>255, 'tl_class' => 'long'),
+            'save_callback' => array
+            (
+                array('tl_c4g_reservation', 'generateKey')
+            ),
             'sql'               => "varchar(255) NOT NULL default ''"
         ),
 
@@ -1092,5 +1098,18 @@ class tl_c4g_reservation extends Backend
 
         $href = "/contao?do=$do&key=sendNotification&id=".$row['id'];
         return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>'.Image::getHtml($icon, $label, $imgAttributes).'</a> ';
+    }
+
+    /**
+     * @param $varValue
+     * @param DataContainer $dc
+     * @return string
+     */
+    public function generateKey($varValue, DataContainer $dc) {
+        $result = $varValue;
+        if (!$result) {
+            $result = C4GBrickCommon::getUUID();
+        }
+        return $result;
     }
 }
