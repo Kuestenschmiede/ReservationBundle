@@ -11,6 +11,9 @@
 namespace con4gis\ReservationBundle\Classes;
 
 use Contao\Backend;
+use Contao\File;
+use Contao\FilesModel;
+use Contao\StringUtil;
 
 class Cron extends Backend
 //Delete old data records by specifying the number of days
@@ -33,6 +36,14 @@ class Cron extends Backend
                     $begindate = $reservation['beginDate'];
                     $deletetime = $begindate + ($value * 60 * 60 * 24) ;
                     if ($daytime > $deletetime) {
+                        if ($reservation['fileUpload']) {
+                            $fileUuid = StringUtil::binToUuid($reservation['fileUpload']);
+                            $file = FilesModel::findById($fileUuid);
+                            if ($file) {
+                                $file = new File($file->path);
+                                $file->delete();
+                            }
+                        }
                         $db = $this->Database->prepare('DELETE FROM tl_c4g_reservation WHERE id=?')
                             ->execute($reservation['id']);
                     }
