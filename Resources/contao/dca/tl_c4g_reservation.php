@@ -246,16 +246,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sql'               => "smallint(5) unsigned NOT NULL default 1"
         ),
 
-        'periodType' => array(
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'],
-            'exclude'                 => true,
-            'search'                  => false,
-            'inputType'               => 'select',
-            'options'                 => array('minute','hour','openingHours','md'),
-            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation'],
-            'eval'                    => array('tl_class'=>'w50','unique' =>true,'feViewable'=>true, 'mandatory'=>true),
-            'sql'                     => "char(25) NOT NULL default ''"
-        ),
+//        'periodType' => array(
+//            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'],
+//            'exclude'                 => true,
+//            'search'                  => false,
+//            'inputType'               => 'select',
+//            'options'                 => array('minute','hour','openingHours','md'),
+//            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation'],
+//            'eval'                    => array('tl_class'=>'w50','unique' =>false,'feViewable'=>true, 'mandatory'=>true),
+//            'sql'                     => "char(25) NOT NULL default ''"
+//        ),
 
         'beginDate' => array
         (
@@ -396,7 +396,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
             'sql'                     => "varchar(255) NOT NULL default ''"
         ),
 
@@ -861,7 +861,7 @@ class tl_c4g_reservation extends Backend
             $reservation = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation WHERE id=? LIMIT 1")->execute($id)->fetchAssoc();
             $reservationType = $reservation ? $reservation['reservation_type'] : false;
             $reservationObjectType = $reservation ? $reservation['reservationObjectType'] : false;
-            if ($reservationType && !($reservation['emailConfirmationSend'])) {
+            if ($reservationType &&  $reservation['email'] && !($reservation['emailConfirmationSend'])) {
                 try {
                     $type = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? LIMIT 1")->execute($reservationType)->fetchAssoc();
                     if ($type) {
