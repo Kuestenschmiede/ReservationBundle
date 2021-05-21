@@ -234,7 +234,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
+            'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
             (
                 'time_begin' => array
                 (
@@ -243,8 +243,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 ),
                 'time_end' => array
                 (
@@ -253,8 +253,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_from' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_to' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 )
             )),
             'sql'                     => "blob NULL"
@@ -266,7 +284,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
+            'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
             (
                 'time_begin' => array
                 (
@@ -275,8 +293,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'default'                 => '',
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 ),
                 'time_end' => array
                 (
@@ -285,8 +303,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'default'                 => '',
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_from' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_to' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 )
             )),
             'sql'                     => "blob NULL"
@@ -298,7 +334,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
+            'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
             (
                 'time_begin' => array
                 (
@@ -307,8 +343,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 ),
                 'time_end' => array
                 (
@@ -317,8 +353,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_from' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_to' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 )
             )),
             'sql'                     => "blob NULL"
@@ -330,7 +384,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
+            'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
             (
                 'time_begin' => array
                 (
@@ -339,8 +393,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 ),
                 'time_end' => array
                 (
@@ -349,8 +403,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_from' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_to' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 )
             )),
             'sql'                     => "blob NULL"
@@ -362,7 +434,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
+            'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
             (
                 'time_begin' => array
                 (
@@ -371,8 +443,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 ),
                 'time_end' => array
                 (
@@ -381,8 +453,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_from' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_to' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 )
             )),
             'sql'                     => "blob NULL"
@@ -394,7 +484,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
+            'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
             (
                 'time_begin' => array
                 (
@@ -403,8 +493,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 ),
                 'time_end' => array
                 (
@@ -413,8 +503,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_from' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_to' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 )
             )),
             'sql'                     => "blob NULL"
@@ -426,7 +534,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
+            'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
             (
                 'time_begin' => array
                 (
@@ -435,8 +543,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 ),
                 'time_end' => array
                 (
@@ -445,8 +553,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'flag'                    => 8,
-                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_from' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
+                ),
+                'date_to' => array
+                (
+                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'default'                 => '',
+                    'exclude'                 => true,
+                    'inputType'               => 'text',
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 )
             )),
             'sql'                     => "blob NULL"
@@ -458,7 +584,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
-            'eval'                    => array('columnFields'	=> array
+            'eval'                    => array('style'=>'min-width: 320px', 'columnFields'	=> array
             (
                 'date_exclusion' => array
                 (
@@ -466,8 +592,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 120px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 ),
                 'date_exclusion_end' => array
                 (
@@ -475,8 +601,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-                    'sql'                     => "int(10) unsigned NULL"
+                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 120px;'),
+                    'sql'                     => "varchar(10) NOT NULL default ''"
                 )
 
             )),
