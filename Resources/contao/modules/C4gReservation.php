@@ -1877,29 +1877,38 @@ class C4gReservation extends C4GBrickModuleParent
 
             $icsalert = $location->icsAlert;
 
-            $residence = $object->min_residence_time;
-            $time_int = $object->time_interval;
+            switch ($type->periodType) {
+                case 'minute':
+                    $time_int = $object->time_interval * 60;
+                    $residence = $object->min_residence_time * 60;
+                    break;
+                case 'hour':
+                    $time_int = $object->time_interval * 3600;
+                    $residence = $object->min_residence_time * 3600;
+                    break;
+                default: '';
+            }
 
             $icssummary = $object->caption;
 
             $icsalert = $icsalert * 60;
             $icsalert = '-PT'.$icsalert.'M';
 
-            if ($residence != 0) {
-                $residence = $residence * 3600;
+            if ($residence && $residence > 0) {
+                $residence = $residence;
                 $e_date = date('Ymd',strtotime($beginDate));
                 $e_time = $beginTime + $residence;
                 $e_time = date('His',$e_time);
                 $icsenddate =$e_date . 'T' . $e_time. 'Z';
             } else if ($time_int) {
-                $time_int = $time_int * 3600;
+                $time_int = $time_int;
                 $e_date = date('Ymd',strtotime($beginDate));
                 $e_time = $beginTime + $time_int;
                 $e_time = date('His',$e_time);
                 $icsenddate =$e_date . 'T' . $e_time. 'Z';
             } else if ($type->reservationObjectType == '2') {  //event
                 $e_date = date('Ymd', $beginDate);
-                $e_time = date('His', $beginTime);
+                $e_time = date('His', $endTime);
                 $icsenddate =$e_date . 'T' . $e_time. 'Z';
             }
 
