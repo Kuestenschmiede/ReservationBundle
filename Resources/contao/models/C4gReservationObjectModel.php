@@ -112,7 +112,7 @@ class C4gReservationObjectModel extends \Model
 
             $possibleBookings = 0;
             foreach ($array as $timeset) {
-                $possibleSeconds = $timeset['time_end'] - $timeset['time_begin'];
+                $possibleSeconds = intval($timeset['time_end']) - intval($timeset['time_begin']);
 
                 switch ($periodType) {
                     case 'minute':
@@ -198,7 +198,7 @@ class C4gReservationObjectModel extends \Model
 
                     $possibleBookings = 0;
                     foreach($array as $timeset) {
-                        $possibleSeconds = $timeset['time_end'] - $timeset['time_begin'];
+                        $possibleSeconds = intval($timeset['time_end']) - intval($timeset['time_begin']);
 
                         switch ($periodType) {
                             case 'minute':
@@ -498,6 +498,31 @@ class C4gReservationObjectModel extends \Model
     }
 
     /**
+     * @param $tstamp
+     * @param $period
+     */
+    public static function checkValidPeriod($tstamp, $period) {
+        $date_from = intval($period['date_from']);
+        $date_to = intval($period['date_to']);
+
+        if ($date_from || $date_to) {
+
+            //hit the date
+            if ($date_from && $date_to && ($tstamp >= $date_from) && ($tstamp <= $date_to)) {
+                return true;
+            } else if (!$date_to && $date_from && ($tstamp >= $date_from)) {
+                return true;
+            } else if (!$date_from && $date_to && ($tstamp <= $date_to)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param $list
      * @param $type
      * @param int $weekday
@@ -616,11 +641,11 @@ class C4gReservationObjectModel extends \Model
                     if ($interval > 0) {
                         foreach ($oh as $key => $day) {
                             if (($day != -1) && ($key == $weekday)) {
-                                foreach ($day as $period) {
-                                    $time_begin = $period['time_begin'];
-                                    $time_end = $period['time_end'];
+                                foreach ($day as $key=>$period) {
+                                    $time_begin = intval($period['time_begin']);
+                                    $time_end = intval($period['time_end']);
 
-                                    if ($time_begin && $time_end) {
+                                    if ($time_begin && $time_end && (!$checkToday || C4gReservationObjectModel::checkValidPeriod($tsdate, $period))) {
                                         $time = $time_begin;
 
                                         $reservation = null;

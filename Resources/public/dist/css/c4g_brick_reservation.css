@@ -13,7 +13,7 @@
 }
 .reservation_time_button .c4g_brick_radio_group label,
 .reservation_time_event_button .c4g_brick_radio_group label {
-  min-width: 95px;
+  min-width: 120px;
   padding-right: 1em;
   padding-left: 1em;
   height: 30px;
@@ -32,7 +32,6 @@
 }
 .reservation_time_button input[type=radio]:checked + label,
 .reservation_time_event_button input[type=radio]:checked + label {
-  padding: 0;
   background-color: #006400;
   border-bottom: #ff0;
   font-weight: 700

@@ -13,16 +13,6 @@
     position:absolute;
     z-index: 999;
 }
-/*
-.ui-datepicker-calendar td.ui-state-disabled span.ui-state-default {
-    text-align:center;
-    background-color:rgba(204,0,0,1);
-    color:#fff;
-}
-.ui-datepicker-calendar td a.ui-state-default {
-    text-align:center;
-    background-color:#080;
-}*/
 .c4g_brick_radio_group {
     margin-left: 0px;
     padding-left: 0px;
@@ -30,7 +20,7 @@
     padding-right: 0px;
 }
 .reservation_time_button .c4g_brick_radio_group label, .reservation_time_event_button .c4g_brick_radio_group label {
-    min-width:95px;
+    min-width:120px;
     padding-right: 1em;
     padding-left: 1em;
     height:30px;
@@ -48,7 +38,6 @@
     margin: 2px;
 }
 .reservation_time_button input[type = "radio"]:checked + label, .reservation_time_event_button input[type = "radio"]:checked + label {
-    padding:0;
     background-color: darkgreen;
     border-bottom: yellow;
     font-weight: bold;
