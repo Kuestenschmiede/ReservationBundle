@@ -992,7 +992,18 @@ class tl_c4g_reservation extends Backend
                             $filePath = '';
                             if ($binFileUuid) {
                                 $filePath = Controller::replaceInsertTags("{{file::$binFileUuid}}");
+                                if (!$filePath) {
+                                    C4gLogModel::addLogEntry('reservation', 'File not found: '.$binFileUuid.'. Try again in 5 seconds ...');
+                                    sleep(5);
+                                    $filePath = Controller::replaceInsertTags("{{file::$binFileUuid}}");
+                                    if (!$filePath) {
+                                        C4gLogModel::addLogEntry('reservation', 'File not found again.: ' . $binFileUuid . '. Why?');
+                                    } else {
+                                        C4gLogModel::addLogEntry('reservation', 'This time the file was there: ' . $binFileUuid . '.');
+                                    }
+                                }
                             }
+
                             $c4gNotify->setTokenValue('uploadFile', $filePath);
 
 
