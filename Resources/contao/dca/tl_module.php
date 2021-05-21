@@ -15,7 +15,7 @@
 //ToDo showFreeSeats, additionalDuration
 $GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,withCapacity,showEndTime,showPrices,showDateTime,showMemberData,hide_selection; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservationList']  = '{title_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType;';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservationList']  = '{title_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservationCancellation'] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;';
 
@@ -43,10 +43,19 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservationView'] = array
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationType'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationType'],
+    'default'           => 1,
     'exclude'           => true,
     'filter'            => true,
     'inputType'         => 'checkbox',
     'sql'               => "int(1) unsigned NULL default 0"
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['showReservationObject'] = array
+(   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationObject'],
+    'default'           => 1,
+    'exclude'           => true,
+    'filter'            => true,
+    'inputType'         => 'checkbox',
+    'sql'               => "int(1) unsigned NULL default 1"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['withCapacity'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withCapacity'],
