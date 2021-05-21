@@ -33,7 +33,7 @@ class C4gReservationModel extends Model
      */
     public static function getListItems() {
         $db = \Database::getInstance();
-        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE cancellation <> '1' AND beginDate > UNIX_TIMESTAMP(NOW())");
+        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE cancellation <> '1' AND beginDate >= UNIX_TIMESTAMP(CURRENT_DATE())");
         $dbResult = $stmt->execute();
         $dbResult = $dbResult->fetchAllAssoc();
         $result = $dbResult;
@@ -43,7 +43,7 @@ class C4gReservationModel extends Model
 
     public static function getListItemsByMember($memberId, $tableName, $database, $fieldList, $listParams) {
         $db = \Database::getInstance();
-        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE member_id=? AND cancellation <> '1' AND beginDate > UNIX_TIMESTAMP(NOW())");
+        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE member_id=? AND cancellation <> '1' AND beginDate >= UNIX_TIMESTAMP(CURRENT_DATE())");
         $dbResult = $stmt->execute(member_id);
         $dbResult = $dbResult->fetchAllAssoc();
         $result = $dbResult;
@@ -53,7 +53,7 @@ class C4gReservationModel extends Model
 
     public static function getListItemsByGroup($groupId, $database, $listParams, $brickDatabase) {
         $db = \Database::getInstance();
-        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE group_id=? AND cancellation <> '1' AND beginDate > UNIX_TIMESTAMP(NOW())");
+        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE group_id=? AND cancellation <> '1' AND beginDate >= UNIX_TIMESTAMP(CURRENT_DATE())");
         $dbResult = $stmt->execute($groupId);
         $dbResult = $dbResult->fetchAllAssoc();
 

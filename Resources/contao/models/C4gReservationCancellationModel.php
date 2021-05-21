@@ -27,7 +27,7 @@ class C4gReservationCancellationModel extends \Model
     public static function cancellation($lastname, $key) {
         if ($lastname && $key) {
             $t = 'tl_c4g_reservation';
-            $arrColumns = array("$t.lastname='$lastname' AND $t.reservation_id='$key' AND $t.cancellation <> '1' AND $t.beginDate > UNIX_TIMESTAMP(NOW())");
+            $arrColumns = array("$t.lastname='$lastname' AND $t.reservation_id='$key' AND $t.cancellation <> '1' AND beginDate >= UNIX_TIMESTAMP(CURRENT_DATE())");
             $arrValues = array();
             $arrOptions = array();
 
