@@ -263,7 +263,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'default'                 => time(),
             'filter'                  => true,
             'sorting'                 => true,
-            'flag'                    => 6,
+            'flag'                    => 12,
             'search'                  => false,
             'exclude'                 => true,
             'inputType'               => 'text',
@@ -280,7 +280,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'exclude'                 => true,
             'inputType'               => 'text',
-            'flag'                    => 6,
+            'flag'                    => 12,
             'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
             'sql'                     => "int(10) unsigned unsigned NULL"
         ),
@@ -293,6 +293,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'filter'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
+            'flag'                    => 12,
             'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50 clr','datepicker'=>true),
             'sql'                     => "int(10) unsigned NOT NULL default 0"
         ),
@@ -305,6 +306,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'default'                 => 0,//time()+3600,
             'sorting'                 => false,
             'inputType'               => 'text',
+            'flag'                    => 12,
             'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50','date','datepicker'=>true),
             'sql'                     => "int(10) unsigned NULL"
         ),
@@ -838,7 +840,7 @@ class tl_c4g_reservation extends Backend
         $id = $this->Input->get('id');
 
         $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-            ['beginDate','endTime','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object'];
+            ['beginDate','endDate','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object'];
 
         if ($id && $do && ($do == 'calendar')) {
             $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['default'] = '2';

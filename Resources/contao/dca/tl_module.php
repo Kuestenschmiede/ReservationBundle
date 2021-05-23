@@ -250,6 +250,7 @@ class tl_module_c4g_reservation extends Backend {
         $columnsFormatted['title2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['title2'][0];
         $columnsFormatted['firstname2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['firstname2'][0];
         $columnsFormatted['lastname2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['lastname2'][0];
+        $columnsFormatted['email2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['email2'][0];
         $columnsFormatted['phone2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone2'][0];
         $columnsFormatted['address2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['address2'][0];
         $columnsFormatted['postal2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'][0];
