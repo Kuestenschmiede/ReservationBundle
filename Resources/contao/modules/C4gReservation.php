@@ -164,7 +164,6 @@ class C4gReservation extends C4GBrickModuleParent
                 }
             }
 
-
             $moduleTypes = unserialize($this->reservation_types);
             foreach ($types as $type) {
                 if ($moduleTypes && (count($moduleTypes) > 0)) {
