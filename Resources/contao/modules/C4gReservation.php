@@ -156,6 +156,15 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         if ($types) {
+            $memberId = -1;
+            if (FE_USER_LOGGED_IN === true) {
+                $member = FrontendUser::getInstance();
+                if ($member) {
+                    $memberId = $member->id;
+                }
+            }
+
+
             $moduleTypes = unserialize($this->reservation_types);
             foreach ($types as $type) {
                 if ($moduleTypes && (count($moduleTypes) > 0)) {
@@ -184,7 +193,7 @@ class C4gReservation extends C4GBrickModuleParent
                                 'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                                 'objects' => $objects,
                                 'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
-                                'memberId' => $type->member_id,
+                                'memberId' => $type->member_id ? $type->member_id : $memberId,
                                 'groupId' => $type->group_id
                             );
                         }
@@ -200,7 +209,7 @@ class C4gReservation extends C4GBrickModuleParent
                         'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                         'objects' => $objects,
                         'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
-                        'memberId' => $type->member_id,
+                        'memberId' => $type->member_id ? $type->member_id : $memberId,
                         'groupId' => $type->group_id
                     );
                 }
@@ -1782,7 +1791,15 @@ class C4gReservation extends C4GBrickModuleParent
             }
         }
 
-        $putVars['member_id'] = $reservationType->member_id;
+        $memberId = -1;
+        if (FE_USER_LOGGED_IN === true) {
+            $member = FrontendUser::getInstance();
+            if ($member) {
+                $memberId = $member->id;
+            }
+        }
+
+        $putVars['member_id'] = $reservationType->member_id ? $reservationType->member_id : $memberId;
         $putVars['group_id'] = $reservationType->group_id;
 
         $participantsArr = [];
