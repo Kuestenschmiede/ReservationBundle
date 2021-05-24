@@ -1170,6 +1170,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $salutationField2->setMandatory($rowMandatory);
                 $salutationField2->setNotificationField(true);
                 $salutationField2->setStyleClass('salutation');
+                $salutationField2->setInitialValue($initialValue);
                 $fieldList[] = $salutationField2;
             } else if ($rowField == "title2") {
                 $titleField2 = new C4GTextField();
@@ -1180,6 +1181,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $titleField2->setMandatory(false);
                 $titleField2->setNotificationField(true);
                 $titleField2->setStyleClass('title');
+                $titleField2->setInitialValue($initialValue);
                 $fieldList[] = $titleField2;
             } else if ($rowField == "firstname2") {
                 $firstnameField2 = new C4GTextField();
@@ -1191,6 +1193,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $firstnameField2->setMandatory($rowMandatory);
                 $firstnameField2->setNotificationField(true);
                 $firstnameField2->setStyleClass('firstname');
+                $firstnameField2->setInitialValue($initialValue);
                 $fieldList[] = $firstnameField2;
             } else if ($rowField == "lastname2") {
                 $lastnameField2 = new C4GTextField();
@@ -1202,6 +1205,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $lastnameField2->setMandatory($rowMandatory);
                 $lastnameField2->setNotificationField(true);
                 $lastnameField2->setStyleClass('lastname');
+                $lastnameField2->setInitialValue($initialValue);
                 $fieldList[] = $lastnameField2;
             } else if ($rowField == "email2") {
                 $emailField2 = new C4GEmailField();
@@ -1213,6 +1217,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $emailField2->setMandatory($rowMandatory);
                 $emailField2->setNotificationField(true);
                 $emailField2->setStyleClass('email');
+                $emailField2->setInitialValue($initialValue);
                 $fieldList[] = $emailField2;
             } else if ($rowField == "organisation2") {
                 $organisationField2 = new C4GTextField();
