@@ -142,7 +142,7 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
     ),
     'con4gis_reservation_confirmation' => array
     (
-        'recipients' => array('admin_email','email','contact_email'),
+        'recipients' => array('admin_email','email','email2','contact_email'),
         'email_subject' => array('admin_email','reservation_type','desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime',
             'reservation_object', 'included_params', 'additional_params', 'admin_email', 'participantList',
             'salutation', 'title', 'organisation', 'firstname', 'lastname', 'email', 'phone', 'address', 'postal', 'city', 'dateOfBirth',
@@ -163,7 +163,7 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
             'location','speaker','topic','audience','agreed'),
         'email_sender_name' => array('admin_email','email','contact_email','location','contact_name'),
         'email_sender_address' => array('admin_email','email','contact_email'),
-        'email_recipient_cc' => array('admin_email','email','contact_email'),
+        'email_recipient_cc' => array('admin_email','email','email2','contact_email'),
         'email_recipient_bcc' => array('admin_email','email','contact_email'),
         'email_replyTo' => array('admin_email','email','contact_email'),
         'file_content' => array('reservation_type','desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime',
