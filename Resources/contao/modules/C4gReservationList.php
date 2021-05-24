@@ -87,7 +87,9 @@ class C4gReservationList extends C4GBrickModuleParent
             $this->viewType = $this->reservationView;
             if ($this->viewType === 'publicview') {
                 $this->modelListFunction = 'getListItems';
-            } else if ($this->viewType === 'group') {
+            } /*else if ($this->viewType === 'member') {
+                $this->modelListFunction = 'getListItemsByMember';
+            } */else if ($this->viewType === 'group') {
                 $this->modelListFunction = 'getListItemsByGroup';
             }
         }
@@ -105,10 +107,11 @@ class C4gReservationList extends C4GBrickModuleParent
 
         if ($this->viewType === 'publicview') {
             $this->dialogParams->setSaveWithoutMessages(true);
+        } else if ($this->viewType === 'member') {
+            $this->dialogParams->setSaveWithoutMessages(true);
         } else if (C4GVersionProvider::isInstalled('con4gis/documents')) {
             $this->dialogParams->setCaptionField('reservation_id');
             $this->dialogParams->addButton(C4GBrickConst::BUTTON_PRINT);
-
         }
 
         $this->brickCaption = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption'];
@@ -224,6 +227,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationTypeField->setEditable(false);
             $reservationTypeField->setPrintable(true);
             $reservationTypeField->setTableColumnPriority(3);
+            $reservationTypeField->setComparable(false);
             $fieldList[] = $reservationTypeField;
 
             $reservationObjects = C4gReservationObjectModel::getReservationObjectList($typeArr,0, false, true);
