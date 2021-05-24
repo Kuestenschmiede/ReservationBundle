@@ -21,7 +21,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
     'config' => array
     (   //'onsubmit_callback' => [['tl_c4g_reservation_object', 'multi_booking']],
         'dataContainer'     => 'Table',
-        'enableVersioning'  => 'true',
+        'enableVersioning'  => true,
         'sql'               => array
         (
             'keys' => array

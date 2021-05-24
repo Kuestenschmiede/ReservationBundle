@@ -19,7 +19,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'config' => array
     (
         'dataContainer'     => 'Table',
-        'enableVersioning'  => 'true',
+        'enableVersioning'  => true,
         'onload_callback'   => [['tl_c4g_reservation_type', 'showInfoMessage']],
         'sql'               => array
         (

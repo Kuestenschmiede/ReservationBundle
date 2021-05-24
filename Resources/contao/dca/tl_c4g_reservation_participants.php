@@ -19,7 +19,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
     'config' => array
     (
         'dataContainer'     => 'Table',
-        'enableVersioning'  => 'true',
+        'enableVersioning'  => true,
         'ptable'            => 'tl_c4g_reservation',
         'sql'               => array
         (

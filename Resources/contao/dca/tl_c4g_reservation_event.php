@@ -23,7 +23,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     'config' => array
     (
         'dataContainer'     => 'Table',
-        'enableVersioning'  => 'true',
+        'enableVersioning'  => true,
         'ptable'            => 'tl_calendar_events',
         'onload_callback'   => [['tl_c4g_reservation_event', 'setParent']],
         'doNotCopyRecords'  => true,

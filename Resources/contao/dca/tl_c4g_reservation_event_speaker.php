@@ -15,7 +15,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
     'config' => array
     (
         'dataContainer'     => 'Table',
-        'enableVersioning'  => 'true',
+        'enableVersioning'  => true,
         'sql'               => array
         (
             'keys' => array

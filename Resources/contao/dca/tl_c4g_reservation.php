@@ -28,7 +28,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     'config' => array
     (
         'dataContainer'      => 'Table',
-        'enableVersioning'   => 'true',
+        'enableVersioning'   => true,
         'ctable'             => ['tl_c4g_reservation_participants'],
         'onload_callback'    => [['tl_c4g_reservation', 'setParent']],
         'doNotDeleteRecords' => true,
