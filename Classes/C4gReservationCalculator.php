@@ -11,7 +11,6 @@
 
 namespace con4gis\ReservationBundle\Classes;
 
-use con4gis\ReservationBundle\Resources\contao\models\C4gReservationModel;
 use Contao\Database;
 
 class C4gReservationCalculator
@@ -36,7 +35,7 @@ class C4gReservationCalculator
 
         $set = [$date, $typeId, $objectType];
         $database = Database::getInstance();
-        $reservations = $database->prepare("SELECT * FROM `tl_c4g_reservation` WHERE ".
+        $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
             "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
                         ->execute($set)->fetchAllAssoc();
 
@@ -49,10 +48,10 @@ class C4gReservationCalculator
                 $timeBegin = strtotime($tb);
                 $timeEnd = strtotime($te);
                 $timeBeginDb = strtotime($tbdb);
-                $timeEndDb   = strtotime($tedb);
+                $timeEndDb = strtotime($tedb);
                 if (
                     (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
-                    (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb))){
+                    (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb))) {
                     $reservationList[] = $reservation;
                 }
             }
@@ -70,7 +69,8 @@ class C4gReservationCalculator
     /**
      * @return int
      */
-    private function calculateDbBookingsPerType($reservations) {
+    private function calculateDbBookingsPerType($reservations)
+    {
         return $reservations ? count($reservations) : 0;
     }
 
@@ -78,7 +78,8 @@ class C4gReservationCalculator
      * @param $objectId
      * @return int|mixed
      */
-    private function calculateDbPersons($reservations, $objectId) {
+    private function calculateDbPersons($reservations, $objectId)
+    {
         $actPersons = 0;
         if ($reservations) {
             foreach ($reservations as $reservation) {
@@ -99,7 +100,8 @@ class C4gReservationCalculator
      * @param $capacity
      * @return float|int
      */
-    private function calculateDbPercent($object, $actPersons, $capacity) {
+    private function calculateDbPercent($object, $actPersons, $capacity)
+    {
         $actPercent = 0;
         if ($object && $object->getAlmostFullyBookedAt()) {
             $percent = ($actPersons / $capacity) * 100;
@@ -117,7 +119,8 @@ class C4gReservationCalculator
      * @param $objectId
      * @return array
      */
-    private function calculateTimeArray($reservations, $timeArray, $tsdate, $time, $objectId) {
+    private function calculateTimeArray($reservations, $timeArray, $tsdate, $time, $objectId)
+    {
         if ($reservations) {
             foreach ($reservations as $reservation) {
                 if ($reservation['reservation_object']) {
@@ -127,6 +130,7 @@ class C4gReservationCalculator
                 }
             }
         }
+
         return $timeArray;
     }
 

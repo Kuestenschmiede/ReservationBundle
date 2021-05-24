@@ -11,7 +11,6 @@
 
 namespace con4gis\ReservationBundle\Classes;
 
-
 class C4gReservationCalculatorResult
 {
     private $dbBookings = 0;
