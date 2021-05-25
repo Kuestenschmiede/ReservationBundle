@@ -70,8 +70,6 @@ class C4gReservation extends C4GBrickModuleParent
 
     //Resource Params
     protected $loadDefaultResources = true;
-    protected $loadCkEditorResources = false;
-    protected $loadCkEditor5Resources = false;
     protected $loadDateTimePickerResources = false;
     protected $loadChosenResources = false;
     protected $loadClearBrowserUrlResources = false;
