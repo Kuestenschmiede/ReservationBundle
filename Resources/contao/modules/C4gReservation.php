@@ -1764,6 +1764,7 @@ class C4gReservation extends C4GBrickModuleParent
         if ($locationId > 0) {
             $location = C4gReservationLocationModel::findByPk($locationId);
             if ($location) {
+                $locationName = $location->name;
                 $contact_name = $location->contact_name;
                 $contact_email = $location->contact_email;
                 $vcard = $location->vcard_show;
@@ -1779,6 +1780,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $contact_city = $location->contact_city;
                 }
 
+                $putVars['location'] = $locationName;
                 $putVars['contact_name'] = $contact_name;
                 $putVars['contact_phone'] = $contact_phone;
                 $putVars['contact_email'] = $contact_email;
