@@ -743,7 +743,7 @@ class C4gReservationObjectModel extends \Model
 
             $reservationId = $putVars['reservation_id'];
             $t = 'tl_c4g_reservation';
-            $arrColumns = array("$t.reservation_type=$typeId AND $t.reservation_object=$objectId AND $t.reservationObjectType='1' AND NOT $t.cancellation='1' AND $t.beginDate=$beginDate AND $t.beginTime=$beginTime");
+            $arrColumns = array("$t.reservation_type=$typeId AND $t.reservation_object=$objectId AND $t.reservationObjectType='1' AND $t.beginDate=$beginDate AND $t.beginTime=$beginTime AND NOT $t.cancellation='1'");
             $arrValues = array();
             $arrOptions = array();
             $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);

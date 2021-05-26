@@ -1701,7 +1701,7 @@ class C4gReservation extends C4GBrickModuleParent
             }
 
             //check duplicate bookings
-            if (C4gReservationObjectModel::preventDublicateBookings($reservationType,$reservationObject,$putVars)) {
+            if ($reservationObject && $reservationObject->id && C4gReservationObjectModel::preventDublicateBookings($reservationType,$reservationObject,$putVars)) {
                 C4gLogModel::addLogEntry('reservation', 'Duplicate booking detected.');
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking']];
             }
