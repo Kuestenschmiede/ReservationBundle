@@ -569,7 +569,6 @@ function checkEventFields(object) {
     var typeField = document.getElementById("c4g_reservation_type");
     var typeId = typeField ? typeField.value : -1;
     var selectField = jQuery('.reservation-event-object select');
-
     jQuery('.eventdata').hide();
 
     if (selectField && selectField.is(":visible")) {
@@ -588,10 +587,14 @@ function checkEventFields(object) {
                     for (j = 0; j < dateFields.length; j++) {
                         if ((additional != -1) && jQuery(dateFields[j]).children().children('input').hasClass('c4g_beginDateEvent_' + additional)) {
                             jQuery(dateFields[j]).show();
-                            jQuery(dateFields[j]).children().show();
+                            jQuery(dateFields[j]).children('label').show();
+                            jQuery(dateFields[j]).children('.c4g_date_field_container').show();
+                            jQuery(dateFields[j]).children('.c4g_date_field_container').children('input').show();
                         } else {
                             jQuery(dateFields[j]).hide();
-                            jQuery(dateFields[j]).children().hide();
+                            jQuery(dateFields[j]).children('label').hide();
+                            jQuery(dateFields[j]).children('.c4g_date_field_container').hide();
+                            jQuery(dateFields[j]).children('.c4g_date_field_container').children('input').hide();
                         }
                     }
                 }

@@ -190,7 +190,7 @@ class C4gReservation extends C4GBrickModuleParent
                                 'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                                 'objects' => $objects,
                                 'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
-                                'memberId' => $type->member_id ? $type->member_id : $memberId,
+                                'memberId' => $type->member_id ?: $memberId,
                                 'groupId' => $type->group_id
                             );
                         }
@@ -206,7 +206,7 @@ class C4gReservation extends C4GBrickModuleParent
                         'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                         'objects' => $objects,
                         'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
-                        'memberId' => $type->member_id ? $type->member_id : $memberId,
+                        'memberId' => $type->member_id ?: $memberId,
                         'groupId' => $type->group_id
                     );
                 }
