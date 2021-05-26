@@ -586,7 +586,7 @@ class C4gReservationObjectModel extends \Model
             }
             $periodType = $typeObject->periodType;
 
-            $maxCount = $typeObject->objectCount;
+            $maxCount = intval($typeObject->objectCount);
 
             $objectType = $typeObject->reservationObjectType;
 
@@ -639,9 +639,9 @@ class C4gReservationObjectModel extends \Model
                 }
 
                 $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
-                $capacity = $objectQuantity * $desiredCapacity;
+                $capacity = intval($objectQuantity) * intval($desiredCapacity);
 
-                if ($maxCount < $capacity) {
+                if ($maxCount && ($maxCount < $capacity)) {
                     $capacity = $maxCount;
                 }
 
@@ -658,7 +658,7 @@ class C4gReservationObjectModel extends \Model
 
                                     while ($time <= $periodEnd) {
                                         $id = $object->getId();
-                                        if ($date && $tsdate && $time) {
+                                        if ($date && $tsdate && $time && $typeObject && $capacity) {
                                             $endTime = $time + $durationInterval;
                                             $calculator = new C4gReservationCalculator(
                                                 $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray

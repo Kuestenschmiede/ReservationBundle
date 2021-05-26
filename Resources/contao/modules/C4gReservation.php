@@ -1962,7 +1962,7 @@ class C4gReservation extends C4GBrickModuleParent
     public function getCurrentTimeset($values, $putVars)
     {
         $date = $values[2];
-        $additionalParam = $values[3];
+        $type = $values[3];
         $duration = $values[4];
         $weekday = -1;
         $wd = -1;
@@ -2017,16 +2017,16 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         $eventId  = $this->Input->get('event') ? $this->Input->get('event') : 0;
-        $objects = C4gReservationObjectModel::getReservationObjectList(array($additionalParam), $eventId, $this->showPrices);
+        $objects = C4gReservationObjectModel::getReservationObjectList(array($type), $eventId, $this->showPrices);
         $withEndTimes = $this->showEndTime;
         $withFreeSeats = $this->showFreeSeats;
 
-        $times = C4gReservationObjectModel::getReservationTimes($objects, $additionalParam, $weekday, $date, $duration, $withEndTimes, $withFreeSeats, true);
+        $times = C4gReservationObjectModel::getReservationTimes($objects, $type, $weekday, $date, $duration, $withEndTimes, $withFreeSeats, true);
 
-        if ($additionalParam) {
+        if ($type) {
             if ($this->fieldList) {
                 foreach ($this->fieldList as $key => $field) {
-                    if (($field->getFieldName() == 'beginTime') && ($field->getAdditionalId() == $additionalParam . '00' . $wd)) {
+                    if (($field->getFieldName() == 'beginTime') && ($field->getAdditionalId() == $type . '00' . $wd)) {
                         $this->fieldList[$key]->setOptions($times);
                         break;
                     }
