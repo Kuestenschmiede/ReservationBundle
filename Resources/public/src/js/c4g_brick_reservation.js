@@ -237,16 +237,18 @@ function setReservationForm(object, id, additionalId, callFunction, showDateTime
             var dateField = dateFields[i];
             if (dateField && dateField.value && jQuery(dateField).is(":visible")) {
                 dateFieldVisible = true;
-                setTimeset(dateField, id, additionalId, callFunction, showDateTime);
+                setTimeset(dateField, id, typeId, callFunction, showDateTime);
                 break;
             }
         }
     }
 
     if (!dateFieldVisible) {
-        setTimeset(null, id, additionalId, callFunction, showDateTime);
+        var dateId = 'c4g_beginDate_'+typeId;
+        if (document.getElementById(dateId)) {
+            setTimeset(document.getElementById(dateId), id, typeId, callFunction, showDateTime);
+        }
     }
-
     var radioButton = jQuery('.reservation_time_button input[type = "radio"]:checked');
     radioButton.prop( "checked", false );
     if (radioButton) {
@@ -255,7 +257,6 @@ function setReservationForm(object, id, additionalId, callFunction, showDateTime
 
             if (button && jQuery(button).hasClass("radio_object_"+typeId)) {
                 setObjectId(button, typeId, showDateTime);
-                //radioButton.prop( "checked", true );
             }
         }
     }
