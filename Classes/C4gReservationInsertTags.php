@@ -387,7 +387,7 @@ class C4gReservationInsertTags
                         case 'state_raw':
                             return $this->getState($reservationEventObject, $calendarEvent);
                         case 'headline':
-                            return '<div class=" c4g_reservation_details_headline">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] . '</div>';
+                            return '<div class="c4g_reservation_details_headline">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] . '</div>';
                         case 'headline_raw':
                             return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'];
                         case 'button':
@@ -398,7 +398,7 @@ class C4gReservationInsertTags
                                 if ($settings->numRows && $settings->reservationForwarding) {
                                     $url = Controller::replaceInsertTags('{{link_url::' . $settings->reservationForwarding . '}}');
                                     if ($url) {
-                                        return '<a href="' . $url . '?event=' . $pid . '" title="Reservieren" itemprop="url">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'] . '</a>';
+                                        return '<a class="c4g_reservation_details_book-button" href="' . $url . '?event=' . $pid . '" title="Reservieren" itemprop="url">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'] . '</a>';
                                     }
                                 }
                             }
