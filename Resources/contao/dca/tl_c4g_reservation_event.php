@@ -114,8 +114,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         (
             'inputType'         => 'select',
             'exclude'           => true,
+            'default'           => 0,
             'options_callback'  => ['tl_c4g_reservation_event', 'getActEvent'],
-            'eval'              => array('mandatory' => false, 'disabled' => true, 'tl_class' => 'long clr'),
+            'eval'              => array('mandatory' => false, 'disabled' => true, 'tl_class' => 'long clr', 'unique' => true, 'doNotCopy' => true, 'includeBlankOption' => true, 'blankOptionLabel' => 'OOPS! ERROR?', 'doNotSaveEmpty' => true),
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
         'tstamp' => array
@@ -129,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'search'            => false,
-            'eval'              => array('doNotCopy'=>true, 'maxlength'=>128),
+            'eval'              => array('doNotCopy'=>true, 'maxlength'=>128, 'doNotCopy' => true),
             'save_callback'     => array(array('tl_c4g_reservation_event','generateUuid')),
             'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
         ),
@@ -142,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'flag'              => 1,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'eval'              => array('mandatory'=>false, 'tl_class'=>'w50 clr', 'doNotCopy' => true),
             'sql'               => "varchar(128) NOT NULL default ''"
         ),
 
@@ -153,9 +154,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_c4g_reservation_location.name',
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr','includeBlankOption'=>true),
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr','includeBlankOption'=>true, 'doNotCopy' => true),
             'sql'               => "int(10) unsigned NOT NULL default 0",
-            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+            'relation'          => array('type' => 'hasOne', 'load' => 'eager'),
         ),
 
         'reservationType' => array
@@ -164,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'exclude'           => true,
             'inputType'         => 'select',
             'options_callback'  => ['tl_c4g_reservation_event', 'getReservationTypes'],
-            'eval'              => ['mandatory' => true, 'tl_class' => 'long clr'],
+            'eval'              => ['mandatory' => true, 'tl_class' => 'long clr', 'doNotCopy' => true],
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
 
@@ -175,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'flag'              => 1,
             'search'            => false,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50'),
+            'eval'              => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50', 'doNotCopy' => true),
             'sql'               => "smallint(3) NOT NULL default 1"
         ),
 
@@ -186,7 +187,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'flag'              => 1,
             'search'            => false,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50'),
+            'eval'              => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50', 'doNotCopy' => true),
             'sql'               => "smallint(3) NOT NULL default 0"
         ),
 
@@ -196,7 +197,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'exclude'           => true,
             'inputType'         => 'checkbox',
             'options_callback'  => ['tl_c4g_reservation_event', 'getSpeakerName'],
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true),
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
             'sql'               => "blob NULL"
         ),
 
@@ -206,7 +207,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'exclude'           => true,
             'inputType'         => 'checkbox',
             'foreignKey'        => 'tl_c4g_reservation_event_topic.topic',
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true),
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
             'sql'               => "blob NULL"
         ),
@@ -217,7 +218,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'exclude'           => true,
             'inputType'         => 'checkbox',
             'foreignKey'        => 'tl_c4g_reservation_event_audience.targetAudience',
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true),
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
             'sql'               => "blob NULL"
         ),
@@ -228,7 +229,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'filter'            => true,
             'options'           => [0,1,2,3], //none, green, orange, red
             'inputType'         => 'select',
-            'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true),
+            'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'doNotCopy' => true),
             'sql'               => "char(1) NOT NULL default '0'"
         )
     )
@@ -266,14 +267,18 @@ class tl_c4g_reservation_event extends Backend
     {
         \Contao\Message::addInfo($GLOBALS['TL_LANG']['tl_c4g_reservation_event']['infoEvent']);
 
-        $pid = Input::get('pid');
+        $pid = intval(Input::get('pid'));
 
         if (!$pid) {
-            return;
+            $pid = $dc->activeRecord->pid;
+            if (!$pid) {
+              return $dc;
+            }
         }
 
         $dc->pid = $pid;
         $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $pid;
+        $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['sql'] = "int(10) unsigned NOT NULL default ".$pid;
 
         return $dc;
     }
@@ -285,11 +290,10 @@ class tl_c4g_reservation_event extends Backend
     public function getActEvent(DataContainer $dc)
     {
         $return = [];
-
         $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events ORDER BY title")->execute();
 
         while ($events->next()) {
-            $return[$events->id] = $events->title;
+            $return[intval($events->id)] = $events->title;
         }
 
         return $return;
