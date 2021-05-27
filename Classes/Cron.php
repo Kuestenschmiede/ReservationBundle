@@ -10,14 +10,39 @@
  */
 namespace con4gis\ReservationBundle\Classes;
 
+use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use Contao\Backend;
+use Contao\Database;
 use Contao\File;
 use Contao\FilesModel;
 use Contao\StringUtil;
 
+//ToDo replace for Contao 5
 class Cron extends Backend
-//Delete old data records by specifying the number of days
 {
+    //send confirmation emails if defined
+    public function onMinutely(): void
+    {
+        $db = $this->Database->prepare('SELECT id, auto_send FROM tl_c4g_reservation_type ')
+            ->execute()->fetchAllAssoc();
+
+        foreach ($db as $entry) {
+            $auto_send = $entry['auto_send'];
+
+            if ($auto_send === 'minutely') {
+                $database = Database::getInstance();
+                $reservations = $database->prepare("SELECT * FROM tl_c4g_reservation where reservation_type = ? AND confirmed = '1' AND NOT emailConfirmationSend = '1'")
+                    ->execute($entry['id'])->fetchAllAssoc();
+
+                foreach ($reservations as $reservation) {
+                    C4gReservationConfirmation::sendNotification($reservation['id']);
+                    //C4gLogModel::addLogEntry('reservation', 'Test: E-Mail versendet');
+                }
+            }
+        }
+    }
+
+    //Delete old data records by specifying the number of days
     public function onDaily(): void
     {
         $db = $this->Database->prepare('SELECT id, auto_del, del_time FROM tl_c4g_reservation_type ')

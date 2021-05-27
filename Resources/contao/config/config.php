@@ -189,6 +189,8 @@ $GLOBALS['TL_MODELS']['tl_c4g_reservation_event_topic'] = \con4gis\ReservationBu
 
 $GLOBALS['TL_CRON']['daily'][] = [\con4gis\ReservationBundle\Classes\Cron::class, 'onDaily'];
 
+$GLOBALS['TL_CRON']['minutely'][] = [\con4gis\ReservationBundle\Classes\Cron::class, 'onMinutely'];
+
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_event';
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation';
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_participants';

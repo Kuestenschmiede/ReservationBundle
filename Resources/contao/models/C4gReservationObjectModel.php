@@ -972,7 +972,7 @@ class C4gReservationObjectModel extends \Model
                 if (count($events) > 1) {
                     C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '.$objectId);
                 } else if (count($events) > 0) {
-                    $event = $events[0];
+                    $event = $events;
                 }
             }
 

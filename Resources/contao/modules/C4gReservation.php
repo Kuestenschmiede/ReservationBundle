@@ -145,7 +145,7 @@ class C4gReservation extends C4GBrickModuleParent
         $arrOptions = array();
 
         if ($eventObj && count($eventObj) == 1) {
-            $typeId = $eventObj[0]->reservationType;
+            $typeId = $eventObj->reservationType;
             $arrColumns = array("$t.published='1' AND $t.id=$typeId");
             $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
         } else if (!$eventObj) {

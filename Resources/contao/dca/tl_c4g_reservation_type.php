@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del;'
+        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
     ),
 
     //Subpalettes
@@ -326,7 +326,17 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'eval'                    => array('multiple' => true),
             'sql'                     => "varchar(255) NOT NULL default ''"
         ),
-
+        'auto_send' => array
+        (
+            'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_send'],
+            'exclude'               => true,
+            'inputType'             => 'select',
+            'reference'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
+            'default'               =>'no_sending',
+            'options'               => array('minutely','no_sending'),
+            'eval'                  => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'submitOnChange' => true),
+            'sql'                   => "char(25) default 'no_sending'"
+        ),
         'auto_del' => array
         (
             'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_del'],
@@ -336,7 +346,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'               =>'no_delete',
             'options'               => array('daily','no_delete'),
             'eval'                  => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'submitOnChange' => true),
-            'sql'                   => "char(25) default ''"
+            'sql'                   => "char(25) default 'no_delete'"
         ),
         'del_time' => array
         (
