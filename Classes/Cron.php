@@ -36,7 +36,7 @@ class Cron extends Backend
 
                 foreach ($reservations as $reservation) {
                     C4gReservationConfirmation::sendNotification($reservation['id']);
-                    //C4gLogModel::addLogEntry('reservation', 'Test: E-Mail versendet');
+                    sleep(2); // buffer
                 }
             }
         }

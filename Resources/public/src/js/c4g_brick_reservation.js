@@ -247,6 +247,14 @@ function setReservationForm(object, id, additionalId, callFunction, showDateTime
         var dateId = 'c4g_beginDate_'+typeId;
         if (document.getElementById(dateId)) {
             setTimeset(document.getElementById(dateId), id, typeId, callFunction, showDateTime);
+        } else {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const event = urlParams.get('event')
+            var dateId = 'c4g_beginDateEvent_'+typeId+'-22'+event;
+            if (event && document.getElementById(dateId)) {
+                setTimeset(document.getElementById(dateId), id, typeId, callFunction, showDateTime);
+            }
         }
     }
     var radioButton = jQuery('.reservation_time_button input[type = "radio"]:checked');
