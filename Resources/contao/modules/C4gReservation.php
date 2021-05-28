@@ -1502,6 +1502,15 @@ class C4gReservation extends C4GBrickModuleParent
         $buttonField->setWithoutLabel(true);
         $fieldList[] = $buttonField;
 
+        if (!$isEvent) {
+            $location_name = new C4GTextField();
+            $location_name->setFieldName('location');
+            $location_name->setSortColumn(false);
+            $location_name->setFormField(false);
+            $location_name->setTableColumn(true);
+            $location_name->setNotificationField(true);
+            $fieldList[] = $location_name;
+        }
 
         $contact_name = new C4GTextField();
         $contact_name->setFieldName('contact_name');
@@ -1668,7 +1677,7 @@ class C4gReservation extends C4GBrickModuleParent
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['error']];
             }
 
-            $reservationEventObject = count($reservationEventObjects) > 0 ? $reservationEventObjects[0] : false;
+            $reservationEventObject = is_array($reservationEventObjects) && count($reservationEventObjects) > 0 ? $reservationEventObjects[0] : $reservationEventObjects;
 
             $desiredCapacity =  $reservationEventObject && $reservationEventObject->maxParticipants ? $reservationEventObject->maxParticipants : 0;
 
@@ -1780,7 +1789,10 @@ class C4gReservation extends C4GBrickModuleParent
                     $contact_city = $location->contact_city;
                 }
 
-                $putVars['location'] = $locationName;
+                if (!$isEvent) {
+                    $putVars['location'] = $locationName;
+                }
+
                 $putVars['contact_name'] = $contact_name;
                 $putVars['contact_phone'] = $contact_phone;
                 $putVars['contact_email'] = $contact_email;
