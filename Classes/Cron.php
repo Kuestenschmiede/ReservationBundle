@@ -10,7 +10,6 @@
  */
 namespace con4gis\ReservationBundle\Classes;
 
-use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use Contao\Backend;
 use Contao\Database;
 use Contao\File;
