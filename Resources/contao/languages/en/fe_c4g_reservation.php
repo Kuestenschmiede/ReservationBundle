@@ -92,6 +92,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['included_params'] = 'Included service
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional_params'] = 'Bookable services';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['md'] = 'several days';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['event'] = 'Event';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['signature'] = 'Signature';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect'] = 'Please select';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText'] = 'No times available';

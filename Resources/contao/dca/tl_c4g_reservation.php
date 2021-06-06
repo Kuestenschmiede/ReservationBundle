@@ -609,6 +609,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sql'                     => "binary(16)"
         ),
 
+        'signature' => array (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['signature'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'textarea',
+            'default'                 => null,
+            'eval'                    => ['preserve_tags'=>true, 'style'=>'width: calc(100% - 50px); max-height: 480px'],
+            'sql'                     => "text NULL"
+        ),
+
         'cancellation' => array(
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'],
             'exclude'           => true,

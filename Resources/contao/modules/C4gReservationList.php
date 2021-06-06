@@ -23,6 +23,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSelectField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSignaturePadField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
@@ -63,6 +64,8 @@ class C4gReservationList extends C4GBrickModuleParent
     protected $loadMultiColumnResources = false;
     protected $loadMiniSearchResources = false;
     protected $loadHistoryPushResources = false;
+
+    protected $loadSignaturePadResources = true;
 
     //JQuery GUI Resource Params
     protected $jQueryAddCore = true;
@@ -616,36 +619,44 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationIdField->setTableColumnPriority(3);
             $fieldList[] = $reservationIdField;
 
-            $confirmedField = new C4GCheckboxField();
-            $confirmedField->setFieldName('confirmed');
-            $confirmedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed']);
-            //$confirmedField->setColumnWidth(5);
-            $confirmedField->setSortColumn(false);
-            $confirmedField->setTableColumn(false);
-            $confirmedField->setNotificationField(true);
-            $confirmedField->setStyleClass('confirmed');
-            $confirmedField->setWithoutDescriptionLineBreak(true);
-            $confirmedField->setPrintable(false);
-            $confirmedField->setTableRow(true);
-            $confirmedField->setTableRowWidth('25%');
-            $confirmedField->setTableRowLabelWidth('10%');
-            $fieldList[] = $confirmedField;
+            if ($this->viewType === 'group') {
+                $signatureField = new C4GSignaturePadField();
+                $signatureField->setFieldName('signature');
+                $signatureField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['signature']);
+                $signatureField->setEditable(true);
+                $signatureField->setPrintable(true);
+                $fieldList[] = $signatureField;
 
-            $cancellationField = new C4GCheckboxField();
-            $cancellationField->setFieldName('cancellation');
-            $cancellationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['cancellation']);
-            //$cancellationField->setColumnWidth(5);
-            $cancellationField->setSortColumn(false);
-            $cancellationField->setTableColumn(false);
-            $cancellationField->setNotificationField(true);
-            $cancellationField->setStyleClass('cancellation');
-            $cancellationField->setWithoutDescriptionLineBreak(true);
-            $cancellationField->setPrintable(false);
-            $cancellationField->setTableRow(true);
-            $cancellationField->setTableRowWidth('25%');
-            $cancellationField->setTableRowLabelWidth('10%');
-            $fieldList[] = $cancellationField;
+                $confirmedField = new C4GCheckboxField();
+                $confirmedField->setFieldName('confirmed');
+                $confirmedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed']);
+                //$confirmedField->setColumnWidth(5);
+                $confirmedField->setSortColumn(false);
+                $confirmedField->setTableColumn(false);
+                $confirmedField->setNotificationField(true);
+                $confirmedField->setStyleClass('confirmed');
+                $confirmedField->setWithoutDescriptionLineBreak(true);
+                $confirmedField->setPrintable(false);
+                $confirmedField->setTableRow(true);
+                $confirmedField->setTableRowWidth('25%');
+                $confirmedField->setTableRowLabelWidth('10%');
+                $fieldList[] = $confirmedField;
 
+                $cancellationField = new C4GCheckboxField();
+                $cancellationField->setFieldName('cancellation');
+                $cancellationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['cancellation']);
+                //$cancellationField->setColumnWidth(5);
+                $cancellationField->setSortColumn(false);
+                $cancellationField->setTableColumn(false);
+                $cancellationField->setNotificationField(true);
+                $cancellationField->setStyleClass('cancellation');
+                $cancellationField->setWithoutDescriptionLineBreak(true);
+                $cancellationField->setPrintable(false);
+                $cancellationField->setTableRow(true);
+                $cancellationField->setTableRowWidth('25%');
+                $cancellationField->setTableRowLabelWidth('10%');
+                $fieldList[] = $cancellationField;
+            }
 
             $params = C4gReservationParamsModel::findBy('published', 1);
             $paramList = [];
