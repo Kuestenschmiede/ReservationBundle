@@ -620,12 +620,16 @@ class C4gReservationList extends C4GBrickModuleParent
             $fieldList[] = $reservationIdField;
 
             if ($this->viewType === 'group') {
-                $signatureField = new C4GSignaturePadField();
-                $signatureField->setFieldName('signature');
-                $signatureField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['signature']);
-                $signatureField->setEditable(true);
-                $signatureField->setPrintable(true);
-                $fieldList[] = $signatureField;
+
+                if ($this->showSignatureField) {
+                    $signatureField = new C4GSignaturePadField();
+                    $signatureField->setFieldName('signature');
+                    $signatureField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['signature']);
+                    $signatureField->setEditable(true);
+                    $signatureField->setPrintable(true);
+                    $signatureField->setMandatory(true);
+                    $fieldList[] = $signatureField;
+                }
 
                 $confirmedField = new C4GCheckboxField();
                 $confirmedField->setFieldName('confirmed');
