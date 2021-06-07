@@ -158,15 +158,16 @@ class C4gReservationConfirmation
                         $binFileUuid = $reservation['fileUpload'];
                         $filePath = '';
                         if ($binFileUuid) {
-                            $filePath = Controller::replaceInsertTags("{{file::$binFileUuid}}");
+                            $pathUuid = StringUtil::binToUuid($binFileUuid);
+                            $filePath = Controller::replaceInsertTags("{{file::$pathUuid}}");
                             if (!$filePath) {
-                                C4gLogModel::addLogEntry('reservation', 'File not found: ' . $binFileUuid . '. Try again in 5 seconds ...');
+                                C4gLogModel::addLogEntry('reservation', 'File not found: ' . $pathUuid . '. Try again in 5 seconds ...');
                                 sleep(5);
-                                $filePath = Controller::replaceInsertTags("{{file::$binFileUuid}}");
+                                $filePath = Controller::replaceInsertTags("{{file::$pathUuid}}");
                                 if (!$filePath) {
-                                    C4gLogModel::addLogEntry('reservation', 'File not found again.: ' . $binFileUuid . '. Why?');
+                                    C4gLogModel::addLogEntry('reservation', 'File not found again.: ' . $pathUuid . '. Why?');
                                 } else {
-                                    C4gLogModel::addLogEntry('reservation', 'This time the file was there: ' . $binFileUuid . '.');
+                                    C4gLogModel::addLogEntry('reservation', 'This time the file was there: ' . $pathUuid . '.');
                                 }
                             }
                         }
