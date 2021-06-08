@@ -126,10 +126,6 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
         if (selectField) {
             for (i = 0; i < selectField.options.length; i++) {
                 var option = selectField.options[i];
-
-                //ToDo set title
-                //option.title = "Test";
-
                 var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 1;
                 var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 1;
                 var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);

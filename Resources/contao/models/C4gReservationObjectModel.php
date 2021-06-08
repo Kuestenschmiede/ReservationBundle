@@ -679,7 +679,12 @@ class C4gReservationObjectModel extends \Model
                                                 'showSeats'=>$showFreeSeats
                                             ];
 
-                                            if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $time)))) {
+                                            $checkTime = $time;
+                                            if ($typeObject->bookRunning) {
+                                                $checkTime = $endTime;
+                                            }
+
+                                            if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
                                                 if (($calculatorResult->getDbPersons() >= $capacity) && $typeObject && !$typeObject->severalBookings) {
                                                    //Each object can only be booked once
                                                    //C4gLogModel::addLogEntry('reservation', 'Persons ('.$calculatorResult->getDbPersons().') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));

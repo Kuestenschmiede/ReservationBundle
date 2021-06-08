@@ -56,6 +56,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['participant_params'] = array("Te
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Beschreibung");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = array("Maximale Teilnehmerzahl pro Buchung", "Hierüber können Sie die Teilnehmerzahl in der Eingabe pro Buchung begrenzen. 0 = unbegrenzt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['almostFullyBookedAt'] = array("Fast ausgebucht bei wieviel %", "Hiermit kann der Warnstatus (Organge) festgelegt werden. 0 = kein Orange-Status");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['bookRunning'] = array("Laufende Termine buchbar", "Auch laufende Termine sind noch buchtbar.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['memberId'] = array("Mitglied verknüpfen", "Alle Reservierungen dieser Art werden für dieses Mitglied erstellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId'] = 'Standard (kein spezielles Mitglied)';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['groupId'] = array("Gruppe verknüpfen", "Alle Reservierungen dieser Art werden für diese Mitgliedergruppe erstellt.");
