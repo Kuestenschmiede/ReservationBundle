@@ -90,9 +90,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $this->viewType = $this->reservationView;
             if ($this->viewType === 'publicview') {
                 $this->modelListFunction = 'getListItems';
-            } /*else if ($this->viewType === 'member') {
-                $this->modelListFunction = 'getListItemsByMember';
-            } */else if ($this->viewType === 'group') {
+            } else if ($this->viewType === 'group') {
                 $this->modelListFunction = 'getListItemsByGroup';
             }
         }
@@ -112,7 +110,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $this->dialogParams->setSaveWithoutMessages(true);
         } else if ($this->viewType === 'member') {
             $this->dialogParams->setSaveWithoutMessages(true);
-        } else if (C4GVersionProvider::isInstalled('con4gis/documents')) {
+        } else if (($this->viewType === 'group') && (C4GVersionProvider::isInstalled('con4gis/documents'))) {
             $this->dialogParams->setCaptionField('reservation_id');
             $this->dialogParams->addButton(C4GBrickConst::BUTTON_PRINT);
             $this->dialogParams->setSavePrintoutToField('fileUpload');

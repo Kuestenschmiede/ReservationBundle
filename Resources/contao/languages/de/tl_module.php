@@ -42,5 +42,6 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showDateTime'] = 
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showMemberData'] = array("Mitgliederdaten übernehmen","Vorhandene Mitgliederdaten werden automatisch in den Formularfeldern vorbelegt.");
 
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['publicview'] = 'Öffentlich (Reservierungen werden sichtbar)';
-$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['member'] = 'Mitgliederbasiert (Nur Reservierungen für angemeldetes Mitglied) [erfordert con4gis/groups]';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['memberview'] = 'Mitgliedeansicht (Nur Reservierungen für angemeldetes Mitglied, nicht editierbar) [erfordert con4gis/groups]';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['member'] = 'Mitgliederbasiert (Nur Reservierungen für angemeldetes Mitglied, editierbar) [erfordert con4gis/groups]';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['group'] = 'Gruppenbasiert (Nur Reservierungen für Gruppen des angemeldeten Mitglieds) [erfordert con4gis/groups]';
