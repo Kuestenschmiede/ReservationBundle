@@ -115,6 +115,7 @@ class C4gReservationList extends C4GBrickModuleParent
         } else if (C4GVersionProvider::isInstalled('con4gis/documents')) {
             $this->dialogParams->setCaptionField('reservation_id');
             $this->dialogParams->addButton(C4GBrickConst::BUTTON_PRINT);
+            $this->dialogParams->setSavePrintoutToField('fileUpload');
         }
 
         $this->brickCaption = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption'];

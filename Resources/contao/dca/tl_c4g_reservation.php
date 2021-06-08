@@ -605,7 +605,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'inputType'               => 'fileTree',
             'default'                 => null,
-            'eval'                    => array('files' => true,'filesOnly' => true,'fieldType' => 'radio','mandatory' => false),
+            'eval'                    => array('files' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false),
             'sql'                     => "binary(16)"
         ),
 
