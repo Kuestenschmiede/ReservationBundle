@@ -80,6 +80,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['comment'] = 'Your message to us';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['comment_short'] = 'Comment';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'] = 'Privacy policy';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed'] = 'Confirmed';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['internalComment'] = 'Internal notification';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['cancellation'] = 'Cancelled';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['periodType'] = 'Time span type';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['man'] = 'Mr.';

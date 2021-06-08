@@ -622,6 +622,45 @@ class C4gReservationList extends C4GBrickModuleParent
 
             if ($this->viewType === 'group') {
 
+                $internalCommentField = new C4GTextareaField();
+                $internalCommentField->setFieldName('internalComment');
+                $internalCommentField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['internalComment']);
+                $internalCommentField->setSortColumn(false);
+                $internalCommentField->setTableColumn(false);
+                $internalCommentField->setNotificationField(true);
+                $internalCommentField->setStyleClass('comment');
+                $internalCommentField->setShowIfEmpty(true);
+                $internalCommentField->setPrintable(true);
+                $fieldList[] = $internalCommentField;
+
+                $confirmedField = new C4GCheckboxField();
+                $confirmedField->setFieldName('confirmed');
+                $confirmedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed']);
+                $confirmedField->setSortColumn(false);
+                $confirmedField->setTableColumn(false);
+                $confirmedField->setNotificationField(true);
+                $confirmedField->setStyleClass('confirmed');
+                $confirmedField->setWithoutDescriptionLineBreak(true);
+                $confirmedField->setPrintable(false);
+                $confirmedField->setTableRow(true);
+                $confirmedField->setTableRowWidth('100%');
+                $confirmedField->setTableRowLabelWidth('25%');
+                $fieldList[] = $confirmedField;
+
+                $specialNotificationField = new C4GCheckboxField();
+                $specialNotificationField->setFieldName('specialNotification');
+                $specialNotificationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['specialNotification']);
+                $specialNotificationField->setSortColumn(false);
+                $specialNotificationField->setTableColumn(false);
+                $specialNotificationField->setNotificationField(true);
+                $specialNotificationField->setStyleClass('confirmed');
+                $specialNotificationField->setWithoutDescriptionLineBreak(true);
+                $specialNotificationField->setPrintable(false);
+                $specialNotificationField->setTableRow(true);
+                $specialNotificationField->setTableRowWidth('100%');
+                $specialNotificationField->setTableRowLabelWidth('25%');
+                $fieldList[] = $specialNotificationField;
+
                 if ($this->showSignatureField) {
                     $signatureField = new C4GSignaturePadField();
                     $signatureField->setFieldName('signature');
@@ -632,35 +671,20 @@ class C4gReservationList extends C4GBrickModuleParent
                     $fieldList[] = $signatureField;
                 }
 
-                $confirmedField = new C4GCheckboxField();
-                $confirmedField->setFieldName('confirmed');
-                $confirmedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed']);
-                //$confirmedField->setColumnWidth(5);
-                $confirmedField->setSortColumn(false);
-                $confirmedField->setTableColumn(false);
-                $confirmedField->setNotificationField(true);
-                $confirmedField->setStyleClass('confirmed');
-                $confirmedField->setWithoutDescriptionLineBreak(true);
-                $confirmedField->setPrintable(false);
-                $confirmedField->setTableRow(true);
-                $confirmedField->setTableRowWidth('25%');
-                $confirmedField->setTableRowLabelWidth('10%');
-                $fieldList[] = $confirmedField;
-
-                $cancellationField = new C4GCheckboxField();
-                $cancellationField->setFieldName('cancellation');
-                $cancellationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['cancellation']);
-                //$cancellationField->setColumnWidth(5);
-                $cancellationField->setSortColumn(false);
-                $cancellationField->setTableColumn(false);
-                $cancellationField->setNotificationField(true);
-                $cancellationField->setStyleClass('cancellation');
-                $cancellationField->setWithoutDescriptionLineBreak(true);
-                $cancellationField->setPrintable(false);
-                $cancellationField->setTableRow(true);
-                $cancellationField->setTableRowWidth('25%');
-                $cancellationField->setTableRowLabelWidth('10%');
-                $fieldList[] = $cancellationField;
+//                $cancellationField = new C4GCheckboxField();
+//                $cancellationField->setFieldName('cancellation');
+//                $cancellationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['cancellation']);
+//                //$cancellationField->setColumnWidth(5);
+//                $cancellationField->setSortColumn(false);
+//                $cancellationField->setTableColumn(false);
+//                $cancellationField->setNotificationField(true);
+//                $cancellationField->setStyleClass('cancellation');
+//                $cancellationField->setWithoutDescriptionLineBreak(true);
+//                $cancellationField->setPrintable(false);
+//                $cancellationField->setTableRow(true);
+//                $cancellationField->setTableRowWidth('100%');
+//                $cancellationField->setTableRowLabelWidth('25%');
+//                $fieldList[] = $cancellationField;
             }
 
             $params = C4gReservationParamsModel::findBy('published', 1);
