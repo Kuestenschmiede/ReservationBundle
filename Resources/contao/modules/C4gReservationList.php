@@ -639,7 +639,7 @@ class C4gReservationList extends C4GBrickModuleParent
                 $confirmedField->setNotificationField(true);
                 $confirmedField->setStyleClass('confirmed');
                 $confirmedField->setWithoutDescriptionLineBreak(true);
-                $confirmedField->setPrintable(false);
+                $confirmedField->setPrintable(true);
                 $confirmedField->setTableRow(true);
                 $confirmedField->setTableRowWidth('100%');
                 $confirmedField->setTableRowLabelWidth('25%');
@@ -653,7 +653,7 @@ class C4gReservationList extends C4GBrickModuleParent
                 $specialNotificationField->setNotificationField(true);
                 $specialNotificationField->setStyleClass('confirmed');
                 $specialNotificationField->setWithoutDescriptionLineBreak(true);
-                $specialNotificationField->setPrintable(false);
+                $specialNotificationField->setPrintable(true);
                 $specialNotificationField->setTableRow(true);
                 $specialNotificationField->setTableRowWidth('100%');
                 $specialNotificationField->setTableRowLabelWidth('25%');
