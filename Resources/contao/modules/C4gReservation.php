@@ -102,6 +102,9 @@ class C4gReservation extends C4GBrickModuleParent
 
     public function initBrickModule($id)
     {
+        self::loadLanguageFile('fe_c4g_reservation');
+        $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']);
+        $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural']);
         parent::initBrickModule($id);
 
         $this->dialogParams->setWithoutGuiHeader(true);
@@ -110,8 +113,6 @@ class C4gReservation extends C4GBrickModuleParent
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
         $this->dialogParams->setRedirectSite($this->reservation_redirect_site);
         $this->dialogParams->setSaveWithoutSavingMessage(false);
-        $this->brickCaption = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption'];
-        $this->brickCaptionPlural = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural'];
     }
 
     public function addFields()

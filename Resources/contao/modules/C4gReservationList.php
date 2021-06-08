@@ -94,7 +94,9 @@ class C4gReservationList extends C4GBrickModuleParent
                 $this->modelListFunction = 'getListItemsByGroup';
             }
         }
-
+        self::loadLanguageFile('fe_c4g_reservation');
+        $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']);
+        $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural']);
         parent::initBrickModule($id);
 
         $this->dialogParams->setWithoutGuiHeader(true);
@@ -116,8 +118,6 @@ class C4gReservationList extends C4GBrickModuleParent
             $this->dialogParams->setSavePrintoutToField('fileUpload');
         }
 
-        $this->brickCaption = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption'];
-        $this->brickCaptionPlural = $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural'];
     }
 
     public function addFields()
