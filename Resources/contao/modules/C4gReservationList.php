@@ -317,6 +317,29 @@ class C4gReservationList extends C4GBrickModuleParent
             $commentField->setPrintable(true);
             $fieldList[] = $commentField;
         } else if ($this->viewType !== 'publicview') {
+            $reservationIdField = new C4GTextField();
+            $reservationIdField->setFieldName('reservation_id');
+            $reservationIdField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id']);
+            //$reservationIdField->setColumnWidth(5);
+            $reservationIdField->setSortColumn(false);
+            $reservationIdField->setTableColumn(true);
+            $reservationIdField->setMandatory(false);
+            $reservationIdField->setInitialValue(C4GBrickCommon::getUUID());
+            $reservationIdField->setTableRow(false);
+            $reservationIdField->setEditable(false);
+            $reservationIdField->setUnique(true);
+            $reservationIdField->setNotificationField(true);
+            $reservationIdField->setDbUnique(true);
+            $reservationIdField->setSimpleTextWithoutEditing(false); //!!!
+            $reservationIdField->setDatabaseField(true);
+            $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id_exists']);
+            //$reservationIdField->setDbUniqueAdditionalCondition("tl_c4g_reservation.cancellation <> '1' AND tl_c4g_reservation.beginDate > UNIX_TIMESTAMP(NOW())");
+            $reservationIdField->setStyleClass('reservation-id');
+            $reservationIdField->setEditable(false);
+            $reservationIdField->setPrintable(false);
+            $reservationIdField->setTableColumnPriority(3);
+            $fieldList[] = $reservationIdField;
+
             $organisationField = new C4GTextField();
             $organisationField->setFieldName('organisation');
             $organisationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation']);
@@ -594,29 +617,6 @@ class C4gReservationList extends C4GBrickModuleParent
             $commentField->setShowIfEmpty(true);
             $commentField->setPrintable(true);
             $fieldList[] = $commentField;
-
-            $reservationIdField = new C4GTextField();
-            $reservationIdField->setFieldName('reservation_id');
-            $reservationIdField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id']);
-            //$reservationIdField->setColumnWidth(5);
-            $reservationIdField->setSortColumn(false);
-            $reservationIdField->setTableColumn(true);
-            $reservationIdField->setMandatory(false);
-            $reservationIdField->setInitialValue(C4GBrickCommon::getUUID());
-            $reservationIdField->setTableRow(false);
-            $reservationIdField->setEditable(false);
-            $reservationIdField->setUnique(true);
-            $reservationIdField->setNotificationField(true);
-            $reservationIdField->setDbUnique(true);
-            $reservationIdField->setSimpleTextWithoutEditing(false); //!!!
-            $reservationIdField->setDatabaseField(true);
-            $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id_exists']);
-            //$reservationIdField->setDbUniqueAdditionalCondition("tl_c4g_reservation.cancellation <> '1' AND tl_c4g_reservation.beginDate > UNIX_TIMESTAMP(NOW())");
-            $reservationIdField->setStyleClass('reservation-id');
-            $reservationIdField->setEditable(false);
-            $reservationIdField->setPrintable(false);
-            $reservationIdField->setTableColumnPriority(3);
-            $fieldList[] = $reservationIdField;
 
             if ($this->viewType === 'group') {
 
