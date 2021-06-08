@@ -30,7 +30,7 @@ class Cron extends Backend
 
             if ($auto_send === 'minutely') {
                 $database = Database::getInstance();
-                $reservations = $database->prepare("SELECT * FROM tl_c4g_reservation where reservation_type = ? AND confirmed = '1' AND NOT emailConfirmationSend = '1'")
+                $reservations = $database->prepare("SELECT * FROM tl_c4g_reservation where reservation_type = ? AND (confirmed = '1' OR specialNotification = '1') AND NOT emailConfirmationSend = '1'")
                     ->execute($entry['id'])->fetchAllAssoc();
 
                 foreach ($reservations as $reservation) {
