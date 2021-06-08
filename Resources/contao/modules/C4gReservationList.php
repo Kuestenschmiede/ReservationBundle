@@ -621,7 +621,7 @@ class C4gReservationList extends C4GBrickModuleParent
             if ($this->viewType === 'group') {
 
                 $internalCommentField = new C4GTextareaField();
-                $internalCommentField->setFieldName('internalComment');
+                $internalCommentField->setFieldName('internal_comment');
                 $internalCommentField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['internalComment']);
                 $internalCommentField->setSortColumn(false);
                 $internalCommentField->setTableColumn(false);
