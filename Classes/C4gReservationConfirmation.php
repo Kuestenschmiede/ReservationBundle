@@ -122,7 +122,7 @@ class C4gReservationConfirmation
                             'woman' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'][0],
                             'various' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['various'][0],
                         ];
-                        $c4gNotify->setTokenValue('salutation', $reservation['salutation'] ? $salutation[$reservation['salutation']] : '');
+                        $c4gNotify->setTokenValue('salutation', $reservation['salutation'] && $salutation[$reservation['salutation']] ? $salutation[$reservation['salutation']] : '');
                         $c4gNotify->setTokenValue('title', $reservation['title'] ? $reservation['title'] : '');
                         $c4gNotify->setTokenValue('organisation', $reservation['organisation'] ? $reservation['organisation'] : '');
                         $c4gNotify->setTokenValue('firstname', $reservation['firstname'] ? $reservation['firstname'] : '');
@@ -132,7 +132,7 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('postal', $reservation['postal'] ? $reservation['postal'] : '');
                         $c4gNotify->setTokenValue('city', $reservation['city'] ? $reservation['city'] : '');
                         $c4gNotify->setTokenValue('dateOfBirth', $reservation['dateOfBirth'] ? date($dateFormat, $reservation['dateOfBirth']) : '');
-                        $c4gNotify->setTokenValue('salutation2', $reservation['salutation2'] ? $salutation[$reservation['salutation2']] : '');
+                        $c4gNotify->setTokenValue('salutation2', $reservation['salutation2'] && $salutation[$reservation['salutation2']] ? $salutation[$reservation['salutation2']] : '');
                         $c4gNotify->setTokenValue('title2', $reservation['title2'] ? $reservation['title2'] : '');
                         $c4gNotify->setTokenValue('organisation2', $reservation['organisation2'] ? $reservation['organisation2'] : '');
                         $c4gNotify->setTokenValue('firstname2', $reservation['firstname2'] ? $reservation['firstname2'] : '');
