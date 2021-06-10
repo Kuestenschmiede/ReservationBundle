@@ -261,6 +261,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationObjectField->setTableColumnPriority(1);
             $reservationObjectField->setTableColumn($this->showReservationObject);
             $reservationObjectField->setFormField($this->showReservationObject);
+            $reservationObjectField->setComparable(false);
             $fieldList[] = $reservationObjectField;
         }
 
