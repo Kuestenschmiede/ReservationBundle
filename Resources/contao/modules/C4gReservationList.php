@@ -116,6 +116,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $this->dialogParams->setCaptionField('reservation_id');
             $this->dialogParams->addButton(C4GBrickConst::BUTTON_PRINT);
             $this->dialogParams->setSavePrintoutToField('fileUpload');
+            $this->dialogParams->setGeneratePrintoutWithSaving(true);
         }
 
     }
