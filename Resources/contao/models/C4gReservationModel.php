@@ -43,7 +43,7 @@ class C4gReservationModel extends Model
 
     public static function getListItemsByMember($memberId, $tableName, $database, $fieldList, $listParams) {
         $db = \Database::getInstance();
-        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE member_id=? AND beginDate >= UNIX_TIMESTAMP(CURRENT_DATE())");
+        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE member_id=? AND cancellation <> '1' AND beginDate >= UNIX_TIMESTAMP(CURRENT_DATE())");
         $dbResult = $stmt->execute($memberId);
         $dbResult = $dbResult->fetchAllAssoc();
 

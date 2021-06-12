@@ -90,6 +90,8 @@ class C4gReservationList extends C4GBrickModuleParent
             $this->viewType = $this->reservationView;
             if ($this->viewType === 'publicview') {
                 $this->modelListFunction = 'getListItems';
+            } else if (($this->viewType === 'member') || ($this->viewType === 'memberview')) {
+                $this->modelListFunction = 'getListItemsByMember';
             } else if ($this->viewType === 'group') {
                 $this->modelListFunction = 'getListItemsByGroup';
             }
