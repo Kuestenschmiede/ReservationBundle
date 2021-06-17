@@ -139,3 +139,4 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'] = 'Detaile
 
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'] = 'Reserve appointment';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['button_cancellation'] = 'Cancellation';

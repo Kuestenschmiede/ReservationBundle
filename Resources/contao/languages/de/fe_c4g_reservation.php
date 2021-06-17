@@ -141,3 +141,4 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'] = 'Detaill
 
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'] = 'Jetzt reservieren';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['button_cancellation'] = 'Stornieren';

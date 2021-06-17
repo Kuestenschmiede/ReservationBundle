@@ -11,15 +11,24 @@
 
 namespace con4gis\ReservationBundle\Resources\contao\modules;
 
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\CoreBundle\Classes\C4GVersionProvider;
+use con4gis\ProjectsBundle\Classes\Actions\C4GBrickAction;
+use con4gis\ProjectsBundle\Classes\Actions\C4GBrickActionType;
+use con4gis\ProjectsBundle\Classes\Actions\C4GRedirectAction;
+use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
+use con4gis\ProjectsBundle\Classes\Buttons\C4GMoreButton;
+use con4gis\ProjectsBundle\Classes\Buttons\C4GMoreButtonEntry;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Fieldlist\C4GBrickField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateTimePickerField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMoreButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSelectField;
@@ -35,6 +44,7 @@ use con4gis\ReservationBundle\Resources\contao\models\C4gReservationModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4GReservationParamsModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel;
+use Contao\Controller;
 
 class C4gReservationList extends C4GBrickModuleParent
 {
@@ -112,8 +122,19 @@ class C4gReservationList extends C4GBrickModuleParent
 
         if ($this->viewType === 'publicview') {
             $this->dialogParams->setSaveWithoutMessages(true);
-        } else if ($this->viewType === 'member') {
+        } else if (($this->viewType === 'member') || ($this->viewType === 'memberview')) {
             $this->dialogParams->setSaveWithoutMessages(true);
+
+            if ($this->cancellation_redirect_site) {
+                $button = new C4GBrickButton(C4GBrickConst::BUTTON_CLICK,
+                    $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_cancellation'],
+                    true,
+                    true,
+                    C4GBrickActionType::ACTION_BUTTONCLICK . ':clickCancellation');
+                $buttons = $this->dialogParams->getButtons();
+                $buttons[] = $button;
+                $this->dialogParams->setButtons($buttons);
+            }
         } else if (($this->viewType === 'group') && (C4GVersionProvider::isInstalled('con4gis/documents'))) {
             $this->dialogParams->setCaptionField('reservation_id');
             $this->dialogParams->addButton(C4GBrickConst::BUTTON_PRINT);
@@ -823,6 +844,17 @@ class C4gReservationList extends C4GBrickModuleParent
 
         $this->fieldList = $fieldList;
     }
+
+    public function clickCancellation($values, $putVars) {
+        $return = [];
+        if ($this->cancellation_redirect_site) {
+            $redirectPage = Controller::replaceInsertTags("{{link_url::".$this->cancellation_redirect_site."}}")."?lastname=".$putVars['lastname']."&reservation_id=".$putVars['reservation_id'];
+            $return['jump_to_url'] = $redirectPage;
+        }
+
+        return $return;
+    }
+
 
 }
 
