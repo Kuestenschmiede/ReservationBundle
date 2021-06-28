@@ -220,11 +220,13 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
     checkEventFields(-1);
 }
 
-function setReservationForm(object, id, additionalId, callFunction, showDateTime) {
+function setReservationForm(id, typeId, callFunction, showDateTime) {
     jQuery(document.getElementsByClassName("reservation-id")).hide();
 
-    var typeField = document.getElementById("c4g_reservation_type");
-    var typeId = typeField ? typeField.value : -1;
+    if (typeId == -1) {
+        var typeField = document.getElementById("c4g_reservation_type");
+        typeId = typeField ? typeField.value : -1;
+    }
 
     var dateFieldVisible = false;
     var dateFields = document.getElementsByClassName('c4g_date_field_input');
@@ -253,15 +255,35 @@ function setReservationForm(object, id, additionalId, callFunction, showDateTime
             }
         }
     }
-    var radioButton = jQuery('.reservation_time_button input[type = "radio"]:checked');
-    radioButton.prop( "checked", false );
-    if (radioButton) {
-        for (i = 0; i < radioButton.length; i++) {
-            var button = radioButton[i];
 
-            if (button && jQuery(button).hasClass("radio_object_"+typeId)) {
-                setObjectId(button, typeId, showDateTime);
+    if (typeId != -1) {
+        var timeGroups = jQuery('.reservation_time_button_'+typeId+'.formdata input[type = "hidden"]');
+        var timeValue = false;
+        if (timeGroups) {
+            for (i = 0; i < timeGroups.length; i++) {
+                if (timeGroups[i].style.display != "none") {
+                    timeValue = timeGroups[i].value;
+                    break;
+                }
             }
+        }
+
+        var targetButton = false;
+        if (timeValue) {
+            var radioButton = jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]');
+            if (radioButton) {
+                for (i = 0; i < radioButton.length; i++) {
+                    var button = radioButton[i];
+                    if (button && jQuery(button).is(":visible") && (button.value === timeValue)) {
+                        targetButton = button;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (targetButton) {
+            setObjectId(targetButton, typeId, showDateTime);
         }
     }
 }
@@ -513,19 +535,6 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                                                     break;
                                                 }
                                             }
-
-                                            //ToDo wrong position move to setObjectId
-                                            // if (optionidx !== -1) {
-                                            //     if (listObj['showSeats']) {
-                                            //         var optionText = selectField[optionidx].text;
-                                            //         var pos = optionText.lastIndexOf('[');
-                                            //         if (pos != -1) {
-                                            //             optionText = optionText.substr(0, pos-1);
-                                            //         }
-                                            //         selectField[optionidx].text = optionText + ' ['+listObj['act']+'/'+listObj['max']+']';
-                                            //     }
-                                            // }
-
                                         }
 
                                         if (objstr != 'undefined') {

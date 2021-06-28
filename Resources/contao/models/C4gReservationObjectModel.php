@@ -638,12 +638,17 @@ class C4gReservationObjectModel extends \Model
                     }
                 }
 
+                //max persons
                 $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
-                $capacity = intval($objectQuantity) * intval($desiredCapacity);
 
-                if ($maxCount && ($maxCount < $capacity)) {
-                    $capacity = $maxCount;
+                if (!$objectType->severalBookings) {
+                    $maxObjects = $maxCount && ($maxCount < $objectQuantity) ? $maxCount : $objectQuantity;
+                } else {
+                    $maxObjects = $maxCount ?: 0;
                 }
+
+                //object count * max persons
+                $capacity = $maxObjects ? (intval($maxObjects) * intval($desiredCapacity)) : (intval($objectQuantity) * intval($desiredCapacity));
 
                 if ($durationInterval && ($durationInterval > 0)) {
                     foreach ($oh as $key => $day) {
@@ -685,14 +690,17 @@ class C4gReservationObjectModel extends \Model
                                             }
 
                                             if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
-                                                if (($calculatorResult->getDbPersons() >= $capacity) && $typeObject && !$typeObject->severalBookings) {
+                                                if ($calculatorResult->getDbPersons() >= $capacity) {
                                                    //Each object can only be booked once
                                                    //C4gLogModel::addLogEntry('reservation', 'Persons ('.$calculatorResult->getDbPersons().') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
                                                    //C4gLogModel::addLogEntry('reservation', 'Interval '.$durationInterval);
-                                                } else if ($maxCount && ($calculatorResult->getDbBookings() >= intval($maxCount * $capacity))) {
+                                                } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && !$typeObject->severalBookings) {
                                                     //n times for type
                                                     //C4gLogModel::addLogEntry('reservation', 'Buchungen ('.$calculatorResult->getDbBookings().') > capacity ('.intval($maxCount * $capacity).'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
-                                                } else if ($capacity && (!empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($capacity))) {
+                                                } /*else if ($maxObjects && ($calculatorResult->getDbBookedObjects() >= intval($maxObjects)) && $typeObject->severalBookings) {
+                                                    //n times for type
+                                                    //C4gLogModel::addLogEntry('reservation', 'Buchungen ('.$calculatorResult->getDbBookings().') > capacity ('.intval($maxCount * $capacity).'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
+                                                } */else if ($capacity && (!empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($capacity))) {
                                                     //n times for object
                                                     //C4gLogModel::addLogEntry('reservation', 'Array-Eintrag ('.$timeArray[$tsdate][$time].') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
                                                 } else {
@@ -753,22 +761,25 @@ class C4gReservationObjectModel extends \Model
             $arrOptions = array();
             $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
             $reservationCount = count($reservations);
-            $maxCount = $reservationType->objectCount && ($reservationType->objectCount < $reservationObject->quantity) ? $reservationType->objectCount : $reservationObject->quantity;
-            if ($maxCount && ($reservationCount >= $maxCount)) {
-                return true;
 
-                //maxCount überprüfen
-/*
- * if (($actPersons >= $capacity) && $typeObject && !$typeObject->severalBookings) { //Each object can only be booked once
-                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
-                                                } else if ($maxCount && (C4gReservationHelper::getObjectCountPerTime($totalCount, $tsdate, $time, $durationInterval) >= intval($maxCount * $capacity))) {  //n times for type
-                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
-                                                } else if ($capacity && (!empty($objectCount)) && ($objectCount[$tsdate][$time] >= intval($capacity))) { //n times for object
-                                                   $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
- */
+            if ($reservationType->severalBookings) {
+                $factor = $reservationType->objectCount && ($reservationType->objectCount < $reservationObject->quantity) ? $reservationType->objectCount : $reservationObject->quantity;
+                if ($reservations && $factor) {
+                    $counter = 0;
+                    foreach ($reservations as $reservation) {
+                        $counter = $counter + $reservation->desiredCapacity;
+                    }
 
+                    if ($reservationObject>desiredCapacityMax && (($factor * $reservationObject->desiredCapacityMax) <= $counter)) {
+                        return true;
+                    }
+                }
+            } else {
+                $maxCount = $reservationType->objectCount && ($reservationType->objectCount < $reservationObject->quantity) ? $reservationType->objectCount : $reservationObject->quantity;
+                if ($maxCount && ($reservationCount >= $maxCount)) {
+                    return true;
+                }
             }
-
         }
         return $result;
     }
@@ -786,6 +797,7 @@ class C4gReservationObjectModel extends \Model
 
             $percent = $object->getAlmostFullyBookedAt();
             $reservationCount = count($reservations);
+
             $desiredCapacity = $object->getDesiredCapacity()[1];
 
             if ((($reservationCount / $desiredCapacity) * 100) >= 100) {

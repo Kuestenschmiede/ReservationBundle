@@ -14,6 +14,7 @@ namespace con4gis\ReservationBundle\Classes;
 class C4gReservationCalculatorResult
 {
     private $dbBookings = 0;
+    private $dbBookedObjects = 0;
     private $dbPersons = 0;
     private $dbPercent = 0;
     private $timeArray = [];
@@ -40,6 +41,22 @@ class C4gReservationCalculatorResult
     public function getDbPersons(): int
     {
         return $this->dbPersons;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDbBookedObjects(): int
+    {
+        return $this->dbBookedObjects;
+    }
+
+    /**
+     * @param int $dbBookedObjects
+     */
+    public function setDbBookedObjects(int $dbBookedObjects): void
+    {
+        $this->dbBookedObjects = $dbBookedObjects;
     }
 
     /**

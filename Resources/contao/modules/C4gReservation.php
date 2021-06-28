@@ -232,7 +232,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
             $reservationTypeField->setCallOnChange(true);
-            $reservationTypeField->setCallOnChangeFunction("setReservationForm(this, " . $this->id . ", -1 ,'getCurrentTimeset'," . $this->showDateTime . ")");
+            $reservationTypeField->setCallOnChangeFunction("setReservationForm(" . $this->id . ", -1 ,'getCurrentTimeset'," . $this->showDateTime . ")");
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
             $reservationTypeField->setHidden(count($typelist) == 1);
@@ -260,7 +260,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                 $reservationDesiredCapacity->setCallOnChange(true);
                 if (!$isEvent) {
-                    $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(document.getElementById('c4g_beginDate_" . $listType['id'] . "')," . $this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");");
+                    $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");");
                 }
                 $reservationDesiredCapacity->setNotificationField(true);
                 $reservationDesiredCapacity->setAdditionalID($listType['id']);
@@ -1318,6 +1318,7 @@ class C4gReservation extends C4GBrickModuleParent
 
                 $participants = [];
 
+                /* ToDo dynamic field list for participants
                 $titleField = new C4GTextField();
                 $titleField->setFieldName('title');
                 $titleField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
@@ -1326,7 +1327,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $titleField->setMandatory(false);
                 $titleField->setNotificationField(false);
                 $participants[] = $titleField;
-
+                */
                 $firstnameField = new C4GTextField();
                 $firstnameField->setFieldName('firstname');
                 $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
@@ -1680,7 +1681,8 @@ class C4gReservation extends C4GBrickModuleParent
 
             $reservationEventObject = is_array($reservationEventObjects) && count($reservationEventObjects) > 0 ? $reservationEventObjects[0] : $reservationEventObjects;
 
-            $desiredCapacity =  $reservationEventObject && $reservationEventObject->maxParticipants ? $reservationEventObject->maxParticipants : 0;
+            $factor = 1;
+            $desiredCapacity =  $reservationEventObject && $reservationEventObject->maxParticipants ? ($reservationEventObject->maxParticipants * $factor) : 0;
 
             if ($desiredCapacity && ($reservationCount >= $desiredCapacity)) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked']];
@@ -1714,6 +1716,10 @@ class C4gReservation extends C4GBrickModuleParent
             if ($reservationObject && $reservationObject->id && C4gReservationObjectModel::preventDublicateBookings($reservationType,$reservationObject,$putVars)) {
                 C4gLogModel::addLogEntry('reservation', 'Duplicate booking detected.');
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking']];
+            }
+
+            if (!$reservationObject || !$reservationObject->id) {
+                return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']];
             }
 
             $beginDate = $putVars['beginDate_'.$type];
@@ -1841,6 +1847,14 @@ class C4gReservation extends C4GBrickModuleParent
                 }
             }
         }
+
+        $factor = 1;
+
+        if ($reservationType && $reservationType->severalBookings) {
+            $factor = $reservationType->objectCount && ($reservationType->objectCount < $reservationObject->quantity) ? $reservationType->objectCount : $reservationObject->quantity;
+        }
+
+        $desiredCapacity =  $reservationObject && $reservationObject->maxParticipants ? ($reservationObject->maxParticipants * $factor) : 0;
 
         $participants = '';
         if ($participantsArr && count($participantsArr) > 0) {

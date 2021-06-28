@@ -59,6 +59,7 @@ class C4gReservationCalculator
 
         $calculatorResult = new C4gReservationCalculatorResult();
         $calculatorResult->setDbBookings($this->calculateDbBookingsPerType($reservationList));
+        $calculatorResult->setDbBookedObjects($this->calculateDbObjectsPerType($reservationList));
         $calculatorResult->setDbPersons($this->calculateDbPersons($reservationList, $objectId));
         $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $capacity));
         $calculatorResult->setTimeArray($this->calculateTimeArray($reservationList, $timeArray, $date, $time, $objectId));
@@ -72,6 +73,20 @@ class C4gReservationCalculator
     private function calculateDbBookingsPerType($reservations)
     {
         return $reservations ? count($reservations) : 0;
+    }
+
+    /**
+     * @return int
+     */
+    private function calculateDbObjectsPerType($reservations)
+    {
+        $result = [];
+        foreach ($reservations as $reservation) {
+            if ($reservation['reservation_object']) {
+                $result[intval($reservation['reservation_object'])] = $reservation;
+            }
+        }
+        return $result ? count($result) : 0;
     }
 
     /**
