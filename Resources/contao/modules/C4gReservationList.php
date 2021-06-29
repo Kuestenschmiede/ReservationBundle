@@ -42,7 +42,7 @@ use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
 use con4gis\ReservationBundle\Classes\C4gReservationBrickTypes;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
-use con4gis\ReservationBundle\Resources\contao\models\C4GReservationParamsModel;
+use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel;
 use Contao\Controller;
 

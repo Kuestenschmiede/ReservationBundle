@@ -13,7 +13,7 @@ namespace con4gis\ReservationBundle\Classes;
 
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Notifications\C4GNotification;
-use con4gis\ReservationBundle\Resources\contao\models\C4GReservationParamsModel;
+use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
 use Contao\Controller;
 use Contao\Database;
 use Contao\StringUtil;

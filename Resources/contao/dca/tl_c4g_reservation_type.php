@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,bookRunning,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
+        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
     ),
 
     //Subpalettes
@@ -265,13 +265,23 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'sql'                     => "int(1) unsigned NULL default 0"
         ),
 
+        'minParticipantsPerBooking' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minParticipantsPerBooking'],
+            'exclude'           => true,
+            'default'           => 1,
+            'inputType'         => 'text',
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'sql'               => "smallint(5) unsigned NULL default 1"
+        ),
+
         'maxParticipantsPerBooking' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'],
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NULL default 0"
         ),
 

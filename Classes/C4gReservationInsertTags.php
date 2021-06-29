@@ -11,7 +11,7 @@
 namespace con4gis\ReservationBundle\Classes;
 
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
-use con4gis\ReservationBundle\Resources\contao\models\C4GReservationParamsModel;
+use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
 use Contao\Controller;
 use Contao\Database;
 use Contao\StringUtil;

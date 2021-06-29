@@ -98,6 +98,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none'] = 'Derzeit sind ke
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['signature'] = 'Unterschrift';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'] = 'Teilnehmer';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipants'] = 'Weitere Teilnehmer';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant'] = 'Teilnehmer hinzufügen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant'] = 'Teilnehmer entfernen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage'] = 'Teilnehmer wirklich entfernen';

@@ -51,6 +51,7 @@ use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationTypeModel;
 use Contao\Controller;
+use Contao\Date;
 use Contao\FrontendUser;
 use Contao\StringUtil;
 use Symfony\Component\Filesystem\Filesystem;
@@ -129,6 +130,7 @@ class C4gReservation extends C4GBrickModuleParent
         $typelist = array();
         
         $initialDate = '';
+        $initialTime = '';
         $eventId = $this->Input->get('event') ? $this->Input->get('event') : 0;
         $event = $eventId ? \CalendarEventsModel::findByPk($eventId) : false;
         $eventObj = $event && $event->published ? C4gReservationEventModel::findBy('pid', $event->id) : false;
@@ -138,6 +140,13 @@ class C4gReservation extends C4GBrickModuleParent
             $date = $this->Input->get('date') ? $this->Input->get('date') : 0;
             if ($date) {
                 $initialDate = $date;
+            }
+
+            $time = $this->Input->get('time') ? $this->Input->get('time') : 0;
+            if ($time) {
+                $initialTime = strtotime($time);
+                $objDate = new Date(date("H:i",$initialTime), Date::getFormatFromRgxp('time'));
+                $initialTime = $objDate->tstamp;
             }
         }
 
@@ -153,6 +162,8 @@ class C4gReservation extends C4GBrickModuleParent
             $arrColumns = array("$t.published='1'");
             $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
         }
+
+        $specialParticipantMechanism = $this->specialParticipantMechanism;
 
         if ($types) {
             $memberId = -1;
@@ -188,6 +199,7 @@ class C4gReservation extends C4GBrickModuleParent
                                 'includedParams' => unserialize($type->included_params),
                                 'additionalParams' => unserialize($type->additional_params),
                                 'participantParams' => unserialize($type->participant_params),
+                                'minParticipantsPerBooking' => $type->minParticipantsPerBooking,
                                 'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                                 'objects' => $objects,
                                 'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
@@ -204,6 +216,7 @@ class C4gReservation extends C4GBrickModuleParent
                         'includedParams' => unserialize($type->included_params),
                         'additionalParams' => unserialize($type->additional_params),
                         'participantParams' => unserialize($type->participant_params),
+                        'minParticipantsPerBooking' => $type->minParticipantsPerBooking,
                         'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                         'objects' => $objects,
                         'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
@@ -248,15 +261,28 @@ class C4gReservation extends C4GBrickModuleParent
 
             if ($this->withCapacity) {
                 $conditionCapacity = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id']);
+
+
+                $minCapacity = $listType['minParticipantsPerBooking'] ? $listType['minParticipantsPerBooking'] : 1;
+                $maxCapacity = $listType['maxParticipantsPerBooking'] ? $listType['maxParticipantsPerBooking'] : 0;
+
                 $reservationDesiredCapacity = new C4GNumberField();
                 $reservationDesiredCapacity->setFieldName('desiredCapacity');
-                $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
+
+                if ($minCapacity && $maxCapacity) {
+                    $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);/*. ' ('.$minCapacity.'-'.$maxCapacity.')')*/; //ToDo default solution
+                } else {
+                    $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
+                }
                 $reservationDesiredCapacity->setFormField(true);
                 $reservationDesiredCapacity->setEditable(true);
                 $reservationDesiredCapacity->setCondition(array($condition));
-                $reservationDesiredCapacity->setInitialValue(1);
+                $reservationDesiredCapacity->setInitialValue($minCapacity);
                 $reservationDesiredCapacity->setMandatory(true);
-                $reservationDesiredCapacity->setMin(1);
+                $reservationDesiredCapacity->setMin($minCapacity);
+                if ($maxCapacity) {
+                    $reservationDesiredCapacity->setMax($maxCapacity);
+                }
                 $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                 $reservationDesiredCapacity->setCallOnChange(true);
                 if (!$isEvent) {
@@ -265,7 +291,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationDesiredCapacity->setNotificationField(true);
                 $reservationDesiredCapacity->setAdditionalID($listType['id']);
                 $reservationDesiredCapacity->setStyleClass('desired-capacity');
-                //$reservationDesiredCapacity->setHidden(!$this->withCapacity);
+
                 $fieldList[] = $reservationDesiredCapacity;
             }
 
@@ -383,6 +409,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $suReservationTimeField->setTurnButton(true);
                     $suReservationTimeField->setRemoveWithEmptyCondition(true);
                     $suReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
+                    $suReservationTimeField->setInitialValue($initialTime);
                     $fieldList[] = $suReservationTimeField;
 
                     $mo_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -416,6 +443,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $moReservationTimeField->setTurnButton(true);
                     $moReservationTimeField->setRemoveWithEmptyCondition(true);
                     $moReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
+                    $moReservationTimeField->setInitialValue($initialTime);
                     $fieldList[] = $moReservationTimeField;
 
                     $tu_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -449,6 +477,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $tuReservationTimeField->setTurnButton(true);
                     $tuReservationTimeField->setRemoveWithEmptyCondition(true);
                     $tuReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
+                    $tuReservationTimeField->setInitialValue($initialTime);
                     $fieldList[] = $tuReservationTimeField;
 
                     $we_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -482,6 +511,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $weReservationTimeField->setTurnButton(true);
                     $weReservationTimeField->setRemoveWithEmptyCondition(true);
                     $weReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
+                    $weReservationTimeField->setInitialValue($initialTime);
                     $fieldList[] = $weReservationTimeField;
 
                     $th_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -515,6 +545,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $thReservationTimeField->setTurnButton(true);
                     $thReservationTimeField->setRemoveWithEmptyCondition(true);
                     $thReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
+                    $thReservationTimeField->setInitialValue($initialTime);
                     $fieldList[] = $thReservationTimeField;
 
                     $fr_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -548,6 +579,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $frReservationTimeField->setTurnButton(true);
                     $frReservationTimeField->setRemoveWithEmptyCondition(true);
                     $frReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
+                    $frReservationTimeField->setInitialValue($initialTime);
                     $fieldList[] = $frReservationTimeField;
 
                     $sa_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -582,6 +614,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $saReservationTimeField->setTurnButton(true);
                     $saReservationTimeField->setRemoveWithEmptyCondition(true);
                     $saReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
+                    $saReservationTimeField->setInitialValue($initialTime);
                     $fieldList[] = $saReservationTimeField;
 
                 }
@@ -1334,7 +1367,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $firstnameField->setColumnWidth(10);
                 $firstnameField->setSortColumn(false);
                 $firstnameField->setTableColumn(true);
-                $firstnameField->setMandatory(true);
+                $firstnameField->setMandatory($specialParticipantMechanism ? $rowMandatory : true);
                 $firstnameField->setNotificationField(false);
                 $participants[] = $firstnameField;
 
@@ -1344,7 +1377,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $lastnameField->setColumnWidth(10);
                 $lastnameField->setSortColumn(false);
                 $lastnameField->setTableColumn(true);
-                $lastnameField->setMandatory(true);
+                $lastnameField->setMandatory($specialParticipantMechanism ? $rowMandatory : true);
                 $lastnameField->setNotificationField(false);
                 $participants[] = $lastnameField;
 
@@ -1354,7 +1387,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $emailField->setColumnWidth(10);
                 $emailField->setSortColumn(false);
                 $emailField->setTableColumn(false);
-                $emailField->setMandatory(false);
+                $emailField->setMandatory($rowMandatory);
                 $emailField->setNotificationField(false);
                 $participants[] = $emailField;
 
@@ -1392,36 +1425,67 @@ class C4gReservation extends C4GBrickModuleParent
                         $participants[] = $participantParamField;
                     }
 
-                    $reservationParticipants = new C4GSubDialogField();
-                    $reservationParticipants->setFieldName('participants');
-                    $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
-                    $reservationParticipants->setAddButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant']);
-                    $reservationParticipants->setRemoveButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant']);
-                    $reservationParticipants->setTable('tl_c4g_reservation_participants');
-                    $reservationParticipants->addFields($participants);
-                    $reservationParticipants->setKeyField($participantsKey);
-                    $reservationParticipants->setForeignKeyField($participantsForeign);
-                    $reservationParticipants->setMandatory($rowMandatory);
-                    $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
+                    if (!$specialParticipantMechanism) {
+                        $reservationParticipants = new C4GSubDialogField();
+                        $reservationParticipants->setFieldName('participants');
+                        $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
+                        $reservationParticipants->setAddButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant']);
+                        $reservationParticipants->setRemoveButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant']);
+                        $reservationParticipants->setTable('tl_c4g_reservation_participants');
+                        $reservationParticipants->addFields($participants);
+                        $reservationParticipants->setKeyField($participantsKey);
+                        $reservationParticipants->setForeignKeyField($participantsForeign);
+                        $reservationParticipants->setMandatory($rowMandatory);
+                        $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
 
-                    //ToDo participants are still independent of types and objects
-                    $max = intval($listType['maxParticipantsPerBooking']) > 0 ? intval($listType['maxParticipantsPerBooking']) : $reservationParticipants->getMax();
+                        $reservationParticipants->setMin($minCapacity);
+                        if ($maxCapacity) {
+                            $reservationParticipants->setMax($maxCapacity);
+                        }
 
-//                    if ($isEvent) {
-//                        $max = $reservationObject && $reservationObject->maxParticipants && $reservationObject->maxParticipants < intval($listType['maxParticipantsPerBooking']) ? $reservationObject->maxParticipants : $max;
-//                    } else {
-//                        $max = $reservationObject && $reservationObject->getDesiredCapacity()[1] && $reservationObject->getDesiredCapacity()[1] < intval($listType['maxParticipantsPerBooking'])  ? $reservationObject->getDesiredCapacity()[1] : $max;
-//                    }
-                    $reservationParticipants->setMax($max);
+                        $reservationParticipants->setNotificationField(false);
+                        $reservationParticipants->setShowFirstDataSet(true);
+                        $reservationParticipants->setParentFieldList($fieldList);
+                        $reservationParticipants->setDelimiter('~');
+                        $reservationParticipants->setCondition(array($condition));
+                        $reservationParticipants->setRemoveWithEmptyCondition(true);
+                        $reservationParticipants->setAdditionalID($listType['id']);
 
-                    $reservationParticipants->setNotificationField(false);
-                    $reservationParticipants->setShowFirstDataSet(true);
-                    $reservationParticipants->setDelimiter('~');
-                    $reservationParticipants->setCondition(array($condition));
-                    $reservationParticipants->setRemoveWithEmptyCondition(true);
-                    $reservationParticipants->setAdditionalID($listType['id']);
+                        $fieldList[] = $reservationParticipants;
+                    } else {
+                        for ($i = $minCapacity; $i <= $maxCapacity; $i++) {
+                            $newCondition = [];
 
-                    $fieldList[] = $reservationParticipants;
+                            //$newCondition[] = $condition;
+                            $newCondition[] = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_'.$listType['id'], $i);
+
+                            $reservationParticipants = new C4GSubDialogField();
+                            $reservationParticipants->setFieldName('participants');
+                            $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipants']);
+                            $reservationParticipants->setShowButtons(false);
+                            $reservationParticipants->setTable('tl_c4g_reservation_participants');
+                            $reservationParticipants->addFields($participants);
+                            $reservationParticipants->setKeyField($participantsKey);
+                            $reservationParticipants->setForeignKeyField($participantsForeign);
+                            $reservationParticipants->setMandatory($rowMandatory);
+
+                            $reservationParticipants->setMin($minCapacity);
+                            if ($maxCapacity) {
+                                $reservationParticipants->setMax($maxCapacity);
+                            }
+
+                            $reservationParticipants->setNotificationField(false);
+
+                            $reservationParticipants->setShowDataSetsByCount($i-1);
+                            $reservationParticipants->setParentFieldList($fieldList);
+                            $reservationParticipants->setDelimiter('~');
+                            $reservationParticipants->setCondition($newCondition);
+                            $reservationParticipants->setRemoveWithEmptyCondition(true);
+                            $reservationParticipants->setAdditionalID($listType['id'] . '#' . $i);
+
+                            $fieldList[] = $reservationParticipants;
+                        }
+                    }
                 }
 
                 $reservationParticipantList = new C4GMultiSelectField();
@@ -1822,28 +1886,61 @@ class C4gReservation extends C4GBrickModuleParent
 
         $participantsArr = [];
         foreach ($putVars as $key => $value) {
-            if (strpos($key,"participants_".$type."~") !== false) {
-                $keyArr = explode("~", $key);
-                if (trim($keyArr[1]) && trim($keyArr[2]) && trim($value)) {
-                    $pos = strpos($keyArr[2],'|');
-                    if ($pos) {
-                        $keyValue = $keyArr[2];
-                        $keyArr[2] = substr($keyValue,0, $pos);
-                        $paramId = substr($keyValue,$pos+1);
-                        $paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
-                        if ($value && $value !== 'false' && $participantsArr[$keyArr[2]][$keyArr[1]]) {
-                            $value = $participantsArr[$keyArr[2]][$keyArr[1]].', '.$paramCaption;
-                        } else if ($value && $value !== 'false') {
-                            $value = $paramCaption;
+            $special = '';
+            if ($this->specialParticipantMechanism) {
+
+                //ToDo
+                $desiredCapacity = $putVars['desiredCapacity_'.$reservationType->id];
+                if ($desiredCapacity) {
+                    if (strpos($key,"participants_".$type."#".$desiredCapacity."~") !== false) {
+                        $keyArr = explode("~", $key);
+                        if (trim($keyArr[1]) && trim($keyArr[2]) && trim($value)) {
+                            $pos = strpos($keyArr[2],'|');
+                            if ($pos) {
+                                $keyValue = $keyArr[2];
+                                $keyArr[2] = substr($keyValue,0, $pos);
+                                $paramId = substr($keyValue,$pos+1);
+                                $paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
+                                if ($value && $value !== 'false' && $participantsArr[$keyArr[2]][$keyArr[1]]) {
+                                    $value = $participantsArr[$keyArr[2]][$keyArr[1]].', '.$paramCaption;
+                                } else if ($value && $value !== 'false') {
+                                    $value = $paramCaption;
+                                }
+                            }
+
+                            if ($value && $value !== 'false') {
+                                $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
+                            }
+
+                        } else {
+                            unset($putVars[$key]);
                         }
                     }
+                }
+            } else {
+                if (strpos($key,"participants_".$type."~") !== false) {
+                    $keyArr = explode("~", $key);
+                    if (trim($keyArr[1]) && trim($keyArr[2]) && trim($value)) {
+                        $pos = strpos($keyArr[2],'|');
+                        if ($pos) {
+                            $keyValue = $keyArr[2];
+                            $keyArr[2] = substr($keyValue,0, $pos);
+                            $paramId = substr($keyValue,$pos+1);
+                            $paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
+                            if ($value && $value !== 'false' && $participantsArr[$keyArr[2]][$keyArr[1]]) {
+                                $value = $participantsArr[$keyArr[2]][$keyArr[1]].', '.$paramCaption;
+                            } else if ($value && $value !== 'false') {
+                                $value = $paramCaption;
+                            }
+                        }
 
-                    if ($value && $value !== 'false') {
-                        $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
+                        if ($value && $value !== 'false') {
+                            $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
+                        }
+
+                    } else {
+                        unset($putVars[$key]);
                     }
-
-                } else {
-                    unset($putVars[$key]);
                 }
             }
         }

@@ -648,7 +648,7 @@ class C4gReservationObjectModel extends \Model
                 }
 
                 //object count * max persons
-                $capacity = $maxObjects ? (intval($maxObjects) * intval($desiredCapacity)) : (intval($objectQuantity) * intval($desiredCapacity));
+                $capacity = $maxObjects ? ($maxObjects * intval($desiredCapacity)) : ($objectQuantity * intval($desiredCapacity));
 
                 if ($durationInterval && ($durationInterval > 0)) {
                     foreach ($oh as $key => $day) {

@@ -93,7 +93,7 @@ function isSaturday(date, fieldName) {
     }
 }
 
-function setObjectId(object, typeid, showDateTime) {
+function setObjectId(object, typeid, showDateTime = 0) {
     var className = object.className;
     className = className.split(" ")[0];
     var typeId = typeid;
@@ -105,13 +105,13 @@ function setObjectId(object, typeid, showDateTime) {
     if (selectField) {
         jQuery(selectField).show();
         reservationObjects ? reservationObjects.show() : false;
-        if (className) {
+        if (className && !jQuery(object).is(":disabled")) {
             val = className.split("_")[2];
             var objects = val.split('-');
             jQuery(selectField).val(objects[0]).change();
         }
     }
-    hideOptions(reservationObjects,typeId, objects ? objects : val, showDateTime);
+    hideOptions(reservationObjects, typeId, objects ? objects : val, showDateTime);
     return true;
 }
 
@@ -253,37 +253,6 @@ function setReservationForm(id, typeId, callFunction, showDateTime) {
             if (event && document.getElementById(dateId)) {
                 setTimeset(document.getElementById(dateId), id, typeId, callFunction, showDateTime);
             }
-        }
-    }
-
-    if (typeId != -1) {
-        var timeGroups = jQuery('.reservation_time_button_'+typeId+'.formdata input[type = "hidden"]');
-        var timeValue = false;
-        if (timeGroups) {
-            for (i = 0; i < timeGroups.length; i++) {
-                if (timeGroups[i].style.display != "none") {
-                    timeValue = timeGroups[i].value;
-                    break;
-                }
-            }
-        }
-
-        var targetButton = false;
-        if (timeValue) {
-            var radioButton = jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]');
-            if (radioButton) {
-                for (i = 0; i < radioButton.length; i++) {
-                    var button = radioButton[i];
-                    if (button && jQuery(button).is(":visible") && (button.value === timeValue)) {
-                        targetButton = button;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (targetButton) {
-            setObjectId(targetButton, typeId, showDateTime);
         }
     }
 }
@@ -566,12 +535,44 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                     var reservation_time_button = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
                     reservation_time_button.prop( "checked", false );
                 }
+
+                var reservationObjects = document.getElementsByClassName("displayReservationObjects");
+                hideOptions(reservationObjects,additionalId, val, showDateTime);
+
+                if (additionalId != -1) {
+                    var timeGroups = jQuery('.reservation_time_button_'+additionalId+'.formdata input[type = "hidden"]');
+                    var timeValue = false;
+                    if (timeGroups) {
+                        for (i = 0; i < timeGroups.length; i++) {
+                            if (timeGroups[i].style.display != "none") {
+                                timeValue = timeGroups[i].value;
+                                break;
+                            }
+                        }
+                    }
+
+                    var targetButton = false;
+                    if (timeValue) {
+                        var radioButton = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
+                        if (radioButton) {
+                            for (i = 0; i < radioButton.length; i++) {
+                                var button = radioButton[i];
+                                if (button && jQuery(button).is(":visible") && (button.value === timeValue)) {
+                                    targetButton = button;
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (targetButton && !jQuery(targetButton).is(":disabled") && !(jQuery(targetButton).hasClass("radio_object_disabled"))) {
+                        setObjectId(targetButton, additionalId, showDateTime);
+                    }
+                }
             }
         })
     }
-
-    var reservationObjects = document.getElementsByClassName("displayReservationObjects");
-    hideOptions(reservationObjects,additionalId, val, showDateTime);
 }
 
 /**
