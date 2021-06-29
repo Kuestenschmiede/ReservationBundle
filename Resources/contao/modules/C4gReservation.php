@@ -1343,24 +1343,12 @@ class C4gReservation extends C4GBrickModuleParent
                 $participantsKey->setEditable(false);
                 $participantsKey->setHidden(true);
                 $participantsKey->setFormField(true);
-
                 $participantsForeign = new C4GForeignKeyField();
                 $participantsForeign->setFieldName('pid');
                 $participantsForeign->setHidden(true);
                 $participantsForeign->setFormField(true);
-
                 $participants = [];
 
-                /* ToDo dynamic field list for participants
-                $titleField = new C4GTextField();
-                $titleField->setFieldName('title');
-                $titleField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
-                $titleField->setSortColumn(false);
-                $titleField->setTableColumn(false);
-                $titleField->setMandatory(false);
-                $titleField->setNotificationField(false);
-                $participants[] = $titleField;
-                */
                 $firstnameField = new C4GTextField();
                 $firstnameField->setFieldName('firstname');
                 $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
@@ -1481,7 +1469,7 @@ class C4gReservation extends C4GBrickModuleParent
                             $reservationParticipants->setDelimiter('~');
                             $reservationParticipants->setCondition($newCondition);
                             $reservationParticipants->setRemoveWithEmptyCondition(true);
-                            $reservationParticipants->setAdditionalID($listType['id'] . '#' . $i);
+                            $reservationParticipants->setAdditionalID($listType['id'] . '-' . $i);
 
                             $fieldList[] = $reservationParticipants;
                         }
@@ -1886,30 +1874,32 @@ class C4gReservation extends C4GBrickModuleParent
 
         $participantsArr = [];
         foreach ($putVars as $key => $value) {
-            $special = '';
             if ($this->specialParticipantMechanism) {
-
-                //ToDo
                 $desiredCapacity = $putVars['desiredCapacity_'.$reservationType->id];
                 if ($desiredCapacity) {
-                    if (strpos($key,"participants_".$type."#".$desiredCapacity."~") !== false) {
+                    if (strpos($key,"participants_".$type."-".$desiredCapacity."~") !== false) {
                         $keyArr = explode("~", $key);
-                        if (trim($keyArr[1]) && trim($keyArr[2]) && trim($value)) {
-                            $pos = strpos($keyArr[2],'|');
+                        if (trim($keyArr[0]) && trim($keyArr[1]) && trim($value)) {
+                            $keyPos = strpos(trim($keyArr[0]), "-".$desiredCapacity);
+                            if ($keyPos) {
+                                $keyArr[0] = substr(trim($keyArr[0]),0, $keyPos);
+                                //$putVars[$keyArr[0].'~'.$keyArr[1].'~'.$keyArr[2]] = $value;
+                            }
+                            $pos = strpos($keyArr[1],'|');
                             if ($pos) {
-                                $keyValue = $keyArr[2];
-                                $keyArr[2] = substr($keyValue,0, $pos);
+                                $keyValue = $keyArr[1];
+                                $keyArr[1] = substr($keyValue,0, $pos);
                                 $paramId = substr($keyValue,$pos+1);
                                 $paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
-                                if ($value && $value !== 'false' && $participantsArr[$keyArr[2]][$keyArr[1]]) {
-                                    $value = $participantsArr[$keyArr[2]][$keyArr[1]].', '.$paramCaption;
+                                if ($value && $value !== 'false' && $participantsArr[$keyArr[1]][$keyArr[0]]) {
+                                    $value = $participantsArr[$keyArr[1]][$keyArr[0]].', '.$paramCaption;
                                 } else if ($value && $value !== 'false') {
                                     $value = $paramCaption;
                                 }
                             }
 
                             if ($value && $value !== 'false') {
-                                $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
+                                $participantsArr[$keyArr[1]][$keyArr[0]] = $value;
                             }
 
                         } else {
@@ -1920,22 +1910,22 @@ class C4gReservation extends C4GBrickModuleParent
             } else {
                 if (strpos($key,"participants_".$type."~") !== false) {
                     $keyArr = explode("~", $key);
-                    if (trim($keyArr[1]) && trim($keyArr[2]) && trim($value)) {
-                        $pos = strpos($keyArr[2],'|');
+                    if (trim($keyArr[0]) && trim($keyArr[1]) && trim($value)) {
+                        $pos = strpos($keyArr[1],'|');
                         if ($pos) {
-                            $keyValue = $keyArr[2];
-                            $keyArr[2] = substr($keyValue,0, $pos);
+                            $keyValue = $keyArr[1];
+                            $keyArr[1] = substr($keyValue,0, $pos);
                             $paramId = substr($keyValue,$pos+1);
                             $paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
-                            if ($value && $value !== 'false' && $participantsArr[$keyArr[2]][$keyArr[1]]) {
-                                $value = $participantsArr[$keyArr[2]][$keyArr[1]].', '.$paramCaption;
+                            if ($value && $value !== 'false' && $participantsArr[$keyArr[1]][$keyArr[0]]) {
+                                $value = $participantsArr[$keyArr[1]][$keyArr[0]].', '.$paramCaption;
                             } else if ($value && $value !== 'false') {
                                 $value = $paramCaption;
                             }
                         }
 
                         if ($value && $value !== 'false') {
-                            $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
+                            $participantsArr[$keyArr[1]][$keyArr[0]] = $value;
                         }
 
                     } else {
