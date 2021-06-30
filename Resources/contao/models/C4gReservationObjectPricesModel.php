@@ -12,7 +12,7 @@ namespace con4gis\ReservationBundle\Resources\contao\models;
 
 
 /**
- * Class C4GReservationParamsModel
+ * Class C4gReservationParamsModel
  * @package c4g\projects
  */
 class C4gReservationObjectPricesModel extends \Model

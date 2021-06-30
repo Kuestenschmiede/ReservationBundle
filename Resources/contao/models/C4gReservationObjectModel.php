@@ -641,14 +641,14 @@ class C4gReservationObjectModel extends \Model
                 //max persons
                 $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
 
-                if (!$objectType->severalBookings) {
-                    $maxObjects = $maxCount && ($maxCount < $objectQuantity) ? $maxCount : $objectQuantity;
-                } else {
+//                if (!$objectType->severalBookings) {
+//                    $maxObjects = $maxCount && ($maxCount < $objectQuantity) ? $maxCount : $objectQuantity;
+//                } else {
                     $maxObjects = $maxCount ?: 0;
-                }
+//                }
 
                 //object count * max persons
-                $capacity = $maxObjects ? ($maxObjects * intval($desiredCapacity)) : ($objectQuantity * intval($desiredCapacity));
+                $capacity = $objectQuantity * intval($desiredCapacity);
 
                 if ($durationInterval && ($durationInterval > 0)) {
                     foreach ($oh as $key => $day) {
@@ -676,11 +676,17 @@ class C4gReservationObjectModel extends \Model
                                                 $endTimeInterval = 0;
                                             }
 
+                                            $max = $capacity;
+                                            if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
+                                                $time = $time + $durationInterval;
+                                                continue;
+                                            }
+
                                             $timeObj = [
                                                 'id'=>-1,
                                                 'act'=>$calculatorResult->getDbPersons(),
                                                 'percent'=>$calculatorResult->getDbPercent(),
-                                                'max'=>$capacity,
+                                                'max'=>$max,
                                                 'showSeats'=>$showFreeSeats
                                             ];
 
@@ -1110,6 +1116,7 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject->setDesiredCapacity([$object->desiredCapacityMin, $object->desiredCapacityMax]);
                 $frontendObject->setQuantity($object->quantity);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
+
 
                 $opening_hours = array();
                 $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);

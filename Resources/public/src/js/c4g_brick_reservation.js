@@ -105,10 +105,13 @@ function setObjectId(object, typeid, showDateTime = 0) {
     if (selectField) {
         jQuery(selectField).show();
         reservationObjects ? reservationObjects.show() : false;
-        if (className && !jQuery(object).is(":disabled")) {
+        if (className) {
             val = className.split("_")[2];
             var objects = val.split('-');
-            jQuery(selectField).val(objects[0]).change();
+
+            if (!jQuery(object).is(":disabled")) {
+                jQuery(selectField).val(objects[0]).change();
+            }
         }
     }
     hideOptions(reservationObjects, typeId, objects ? objects : val, showDateTime);

@@ -12,10 +12,10 @@ namespace con4gis\ReservationBundle\Resources\contao\models;
 
 
 /**
- * Class C4GReservationParamsModel
+ * Class C4geservationParamsModel
  * @package c4g\projects
  */
-class C4GReservationParamsModel extends \Model
+class C4gReservationParamsModel extends \Model
 {
 
     /**

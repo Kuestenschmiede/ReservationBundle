@@ -1758,7 +1758,7 @@ class C4gReservation extends C4GBrickModuleParent
             //check duplicate reservation id
             $reservationId = $putVars['reservation_id'];
             $reservations = C4gReservationModel::findBy("reservation_id", $reservationId);
-            $reservationCount = count($reservations);
+            $reservationCount = is_array($reservations) ? count($reservations) : 0;
             if ($reservationCount >= 1) {
                 C4gLogModel::addLogEntry('reservation', 'Duplicate reservation ID detected.');
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']];
