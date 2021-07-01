@@ -1899,7 +1899,7 @@ class C4gReservation extends C4GBrickModuleParent
                             }
 
                             if ($value && $value !== 'false') {
-                                $participantsArr[$keyArr[1]][$keyArr[0]] = $value;
+                                $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
                             }
 
                         } else {
@@ -1925,7 +1925,7 @@ class C4gReservation extends C4GBrickModuleParent
                         }
 
                         if ($value && $value !== 'false') {
-                            $participantsArr[$keyArr[1]][$keyArr[0]] = $value;
+                            $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
                         }
 
                     } else {
@@ -1954,8 +1954,10 @@ class C4gReservation extends C4GBrickModuleParent
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'].$reservationType->maxParticipantsPerBooking];
             }
 
+            $number = 0;
             foreach ($participantsArr as $key => $valueArray) {
-                $participants .= $participants ? '; '.$key.': '.trim(implode(', ',$valueArray)) : $key.': '.trim(implode(', ',$valueArray));
+                $number++;
+                $participants .= $participants ? '; '.$number.': '.trim(implode(', ',$valueArray)) : $number.': '.trim(implode(', ',$valueArray));
             }
             $putVars['participantList'] = $participants;
         }
