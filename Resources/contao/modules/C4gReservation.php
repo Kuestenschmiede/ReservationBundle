@@ -1434,7 +1434,7 @@ class C4gReservation extends C4GBrickModuleParent
                         $reservationParticipants->setNotificationField(false);
                         $reservationParticipants->setShowFirstDataSet(true);
                         $reservationParticipants->setParentFieldList($fieldList);
-                        $reservationParticipants->setDelimiter('~');
+                        $reservationParticipants->setDelimiter('§');
                         $reservationParticipants->setCondition(array($condition));
                         $reservationParticipants->setRemoveWithEmptyCondition(true);
                         $reservationParticipants->setAdditionalID($listType['id']);
@@ -1466,10 +1466,10 @@ class C4gReservation extends C4GBrickModuleParent
 
                             $reservationParticipants->setShowDataSetsByCount($i-1);
                             $reservationParticipants->setParentFieldList($fieldList);
-                            $reservationParticipants->setDelimiter('~');
+                            $reservationParticipants->setDelimiter('§');
                             $reservationParticipants->setCondition($newCondition);
                             $reservationParticipants->setRemoveWithEmptyCondition(true);
-                            $reservationParticipants->setAdditionalID($listType['id'] . '-' . $i);
+                            $reservationParticipants->setAdditionalID($listType['id'] . '-' . ($i-1));
 
                             $fieldList[] = $reservationParticipants;
                         }
@@ -1877,10 +1877,11 @@ class C4gReservation extends C4GBrickModuleParent
             if ($this->specialParticipantMechanism) {
                 $desiredCapacity = $putVars['desiredCapacity_'.$reservationType->id];
                 if ($desiredCapacity) {
-                    if (strpos($key,"participants_".$type."-".$desiredCapacity."~") !== false) {
-                        $keyArr = explode("~", $key);
+                    $extId = $desiredCapacity-1;
+                    if (strpos($key,"participants_".$type."-".$extId."§") !== false) {
+                        $keyArr = explode("§", $key);
                         if (trim($keyArr[0]) && trim($keyArr[1]) && trim($value)) {
-                            $keyPos = strpos(trim($keyArr[0]), "-".$desiredCapacity);
+                            $keyPos = strpos(trim($keyArr[0]), "-".$extId);
                             if ($keyPos) {
                                 $keyArr[0] = substr(trim($keyArr[0]),0, $keyPos);
                                 //$putVars[$keyArr[0].'~'.$keyArr[1].'~'.$keyArr[2]] = $value;
@@ -1902,14 +1903,26 @@ class C4gReservation extends C4GBrickModuleParent
                                 $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
                             }
 
-                        } else {
-                            unset($putVars[$key]);
                         }
                     }
                 }
+
+                foreach ($putVars as $key => $value) {
+                    $desiredCapacity = $putVars['desiredCapacity_'.$reservationType->id];
+                    if ($desiredCapacity) {
+                        $extId = ($desiredCapacity - 1);
+                        for ($i = 0; $i <= 100; $i++) {
+                            if ((strpos($key, "participants_" . $type . "-" . $i . "§") !== false) && ($i !== $extId)) {
+                                unset($putVars[$key]);
+                            }
+                        }
+                    }
+                }
+
+
             } else {
-                if (strpos($key,"participants_".$type."~") !== false) {
-                    $keyArr = explode("~", $key);
+                if (strpos($key,"participants_".$type."§") !== false) {
+                    $keyArr = explode("§", $key);
                     if (trim($keyArr[0]) && trim($keyArr[1]) && trim($value)) {
                         $pos = strpos($keyArr[1],'|');
                         if ($pos) {
@@ -1928,8 +1941,6 @@ class C4gReservation extends C4GBrickModuleParent
                             $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
                         }
 
-                    } else {
-                        unset($putVars[$key]);
                     }
                 }
             }
