@@ -284,6 +284,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationDesiredCapacity->setCallOnChange(true);
                 if (!$isEvent) {
                     $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");");
+                } else {
+                    $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");");
                 }
                 $reservationDesiredCapacity->setNotificationField(true);
                 $reservationDesiredCapacity->setAdditionalID($listType['id']);
