@@ -555,8 +555,8 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                     }
 
                     var targetButton = false;
+                    var radioButton = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
                     if (timeValue) {
-                        var radioButton = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
                         if (radioButton) {
                             for (i = 0; i < radioButton.length; i++) {
                                 var button = radioButton[i];
@@ -568,8 +568,6 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                             }
                         }
                     } else {
-                        var radioButton = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
-
                         //if there are just one time button then select automaticly.
                         if (radioButton && radioButton.length === 1) {
                             targetButton = radioButton[0];
@@ -577,6 +575,13 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                     }
 
                     if (targetButton && !jQuery(targetButton).is(":disabled") && !(jQuery(targetButton).hasClass("radio_object_disabled"))) {
+                        radioButton.prop( "checked", true );
+
+                        var elementId = targetButton.getAttribute('name').substr(1);
+                        var hiddenField = document.getElementById(elementId);
+                        if (hiddenField) {
+                            hiddenField.value = targetButton.value;
+                        }
                         setObjectId(targetButton, additionalId, showDateTime);
                     }
                 }
