@@ -9,5 +9,5 @@
  * @link https://www.con4gis.org
  */
 
-$GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwarding'] = ["Weiterung zum Modul", "Wählen Sie die Seite aus, auf der sich das Reservierungsmodul befindet."];
+$GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwarding'] = ["Weiterleitung zum Modul", "Wählen Sie die Seite aus, auf der sich das Reservierungsmodul befindet."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['c4g_reservation_legend'] = "Einstellungen zu den Reservierungen";
