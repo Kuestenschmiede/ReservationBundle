@@ -194,7 +194,7 @@ class C4gReservation extends C4GBrickModuleParent
                         if (strpos($GLOBALS['TL_LANGUAGE'], $caption['language']) >= 0) {
                             $typelist[$type->id] = array(
                                 'id' => $type->id,
-                                'name' => $caption['caption'] ? $caption['caption'] : $type->caption,
+                                'name' => $caption['caption'] ?: $type->caption,
                                 'periodType' => $type->periodType,
                                 'includedParams' => unserialize($type->included_params),
                                 'additionalParams' => unserialize($type->additional_params),
@@ -258,13 +258,10 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationObjects = $listType['objects'];
 
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
-
+            $minCapacity = $listType['minParticipantsPerBooking'] ? $listType['minParticipantsPerBooking'] : 1;
+            $maxCapacity = $listType['maxParticipantsPerBooking'] ? $listType['maxParticipantsPerBooking'] : 0;
             if ($this->withCapacity) {
                 $conditionCapacity = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id']);
-
-
-                $minCapacity = $listType['minParticipantsPerBooking'] ? $listType['minParticipantsPerBooking'] : 1;
-                $maxCapacity = $listType['maxParticipantsPerBooking'] ? $listType['maxParticipantsPerBooking'] : 0;
 
                 $reservationDesiredCapacity = new C4GNumberField();
                 $reservationDesiredCapacity->setFieldName('desiredCapacity');
@@ -1668,8 +1665,19 @@ class C4gReservation extends C4GBrickModuleParent
                 unset($putVars[$field->getFieldName()."_".$additionalId]);
                 continue;
             } else if ($additionalId) {
-                $removedFromList[$field->getFieldName()] = $field->getAdditionalID();
+                $removedFromList[$field->getFieldName()] = $additionalId;
                 unset($putVars[$field->getFieldName()]);
+            }
+
+            if ($field->getFieldName() == "beginTime") {
+                foreach ($putVars as $key => $value) {
+                    if (strpos($key, "beginTime_".$type) !== false) {
+                        $additionalIdPostParam = substr($key, (strlen("beginTime_".$type)));
+                    }
+                }
+                if ($additionalId != $type.$additionalIdPostParam) {
+                    continue;
+                }
             }
 
             $isEvent = $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
@@ -1777,15 +1785,19 @@ class C4gReservation extends C4GBrickModuleParent
             $beginDate = $putVars['beginDate_'.$type];
 
             $beginTime = 0;
+            $timeKey = false;
+            $rightStr = '';
             foreach ($putVars as $key => $value) {
                 if (strpos($key, "beginTime_".$type) !== false) {
                     if ($value) {
                         if (strpos($value, '#') !== false) {
-                            $value = substr($value,0, strpos($value, '#')); //remove frontend duration
+                            $newValue = substr($value,0, strpos($value, '#')); //remove frontend duration
                             //$putVars[$key] = is_int($value) ? date($GLOBALS['TL_CONFIG']['timeFormat'],$value) : $value;
+                            $rightStr = substr($value,strpos($value, '#'));
                         }
 
-                        $beginTime = $value;
+                        $beginTime = $newValue;
+                        $timeKey = $key;
                         break;
                     }
                 }
@@ -1817,6 +1829,19 @@ class C4gReservation extends C4GBrickModuleParent
 
             $putVars['endDate'] = $putVars['beginDate_'.$type]; //ToDo multiple days
             $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$endTime);
+
+            //check nxt day times
+            $bday = $putVars['beginDate_'.$type];
+            $nextDay = strtotime("+1 day", strtotime($bday));
+            if ($beginTime >= 86400) {
+                $putVars['beginDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                $putVars[$timeKey] = ($beginTime-86400).$rightStr;
+            }
+
+            if ($endTime >= 86400) {
+                $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], ($endTime-86400));
+            }
         }
 
         $locationId = 0;

@@ -33,26 +33,60 @@ class C4gReservationCalculator
         $objectType = $type->reservationObjectType;
         $reservationList = [];
 
-        $set = [$date, $typeId, $objectType];
         $database = Database::getInstance();
-        $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-            "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                        ->execute($set)->fetchAllAssoc();
 
-        if ($reservations) {
-            foreach ($reservations as $reservation) {
-                $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
-                $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);
-                $tb = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
-                $te = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
-                $timeBegin = strtotime($tb);
-                $timeEnd = strtotime($te);
-                $timeBeginDb = strtotime($tbdb);
-                $timeEndDb = strtotime($tedb);
-                if (
-                    (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
-                    (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb))) {
-                    $reservationList[] = $reservation;
+        if ($endTime >= 86400) { //nxt day
+
+            if ($time >= 86400) {
+                $set = [strtotime("+1 day", $date), $typeId, $objectType];
+            } else {
+                $set = [$date, $typeId, $objectType];
+            }
+            $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                ->execute($set)->fetchAllAssoc();
+            if ($reservations) {
+                foreach ($reservations as $reservation) {
+                    $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
+                    $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);
+
+                    $tb = $time ? $time >= 86400 : ($time - 86400);
+                    $tb = date($GLOBALS['TL_CONFIG']['timeFormat'], $tb);
+
+                    $te = $endTime ? $endTime >= 86400 : ($endTime - 86400);
+                    $te = date($GLOBALS['TL_CONFIG']['timeFormat'], $te);
+                    $timeBegin = strtotime($tb);
+                    $timeEnd = strtotime($te);
+                    $timeBeginDb = strtotime($tbdb);
+                    $timeEndDb = strtotime($tedb);
+                    if (
+                        (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
+                        (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb))) {
+                        $reservationList[] = $reservation;
+                    }
+                }
+            }
+        } else {
+            $set = [$date, $typeId, $objectType];
+            $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                ->execute($set)->fetchAllAssoc();
+
+            if ($reservations) {
+                foreach ($reservations as $reservation) {
+                    $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
+                    $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);
+                    $tb = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
+                    $te = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
+                    $timeBegin = strtotime($tb);
+                    $timeEnd = strtotime($te);
+                    $timeBeginDb = strtotime($tbdb);
+                    $timeEndDb = strtotime($tedb);
+                    if (
+                        (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
+                        (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb))) {
+                        $reservationList[] = $reservation;
+                    }
                 }
             }
         }

@@ -114,7 +114,12 @@ class C4gReservationObjectModel extends \Model
 
             $possibleBookings = 0;
             foreach ($array as $timeset) {
-                $possibleSeconds = intval($timeset['time_end']) - intval($timeset['time_begin']);
+
+                if (intval($timeset['time_end']) < intval($timeset['time_begin'])) { //nxtday
+                    $possibleSeconds = intval(86400+$timeset['time_end']) + intval($timeset['time_begin']);
+                } else {
+                    $possibleSeconds = intval($timeset['time_end']) - intval($timeset['time_begin']);
+                }
 
                 switch ($periodType) {
                     case 'minute':
@@ -200,7 +205,11 @@ class C4gReservationObjectModel extends \Model
 
                     $possibleBookings = 0;
                     foreach($array as $timeset) {
-                        $possibleSeconds = intval($timeset['time_end']) - intval($timeset['time_begin']);
+                        if (intval($timeset['time_end']) < intval($timeset['time_begin'])) { //nxtday
+                            $possibleSeconds = intval(86400+$timeset['time_end']) + intval($timeset['time_begin']);
+                        } else {
+                            $possibleSeconds = intval($timeset['time_end']) - intval($timeset['time_begin']);
+                        }
 
                         switch ($periodType) {
                             case 'minute':
@@ -657,67 +666,134 @@ class C4gReservationObjectModel extends \Model
                                 $time_begin = intval($period['time_begin']);
                                 $time_end = intval($period['time_end']);
 
-                                if ($time_begin && $time_end && (!$checkToday || C4gReservationObjectModel::checkValidPeriod($tsdate, $period))) {
-                                    $time = $time_begin;
-                                    $periodEnd = $time_end - $durationInterval;
+                                if ($time_end < $time_begin) { //nxt day
+                                    if ($time_begin && $time_end && (!$checkToday || C4gReservationObjectModel::checkValidPeriod($tsdate, $period))) {
+                                        $time = $time_begin;
+                                        $endOfDate = 86400 + $time_end; //24h + nxt day time
+                                        $periodEnd = $endOfDate - $durationInterval;
 
-                                    while ($time <= $periodEnd) {
-                                        $id = $object->getId();
-                                        if ($date && $tsdate && $time && $typeObject && $capacity) {
-                                            $endTime = $time + $durationInterval;
-                                            $calculator = new C4gReservationCalculator(
-                                                $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
-                                            );
-                                            $calculatorResult = $calculator->getCalculatorResult();
-                                            $timeArray = $calculatorResult->getTimeArray();
+                                        while ($time <= $periodEnd) {
+                                            $id = $object->getId();
+                                            if ($date && $tsdate && $time && $typeObject && $capacity) {
+                                                $endTime = $time + $durationInterval;
+                                                $calculator = new C4gReservationCalculator(
+                                                    $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
+                                                );
+                                                $calculatorResult = $calculator->getCalculatorResult();
+                                                $timeArray = $calculatorResult->getTimeArray();
 
-                                            $endTimeInterval = $durationInterval;
-                                            if (!$withEndTimes) {
-                                                $endTimeInterval = 0;
-                                            }
+                                                $endTimeInterval = $durationInterval;
+                                                if (!$withEndTimes) {
+                                                    $endTimeInterval = 0;
+                                                }
 
-                                            $max = $capacity;
-                                            if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
-                                                $time = $time + $durationInterval;
-                                                continue;
-                                            }
+                                                $max = $capacity;
+                                                if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
+                                                    $time = $time + $durationInterval;
+                                                    continue;
+                                                }
 
-                                            $timeObj = [
-                                                'id'=>-1,
-                                                'act'=>$calculatorResult->getDbPersons(),
-                                                'percent'=>$calculatorResult->getDbPercent(),
-                                                'max'=>$max,
-                                                'showSeats'=>$showFreeSeats
-                                            ];
+                                                $timeObj = [
+                                                    'id'=>-1,
+                                                    'act'=>$calculatorResult->getDbPersons(),
+                                                    'percent'=>$calculatorResult->getDbPercent(),
+                                                    'max'=>$max,
+                                                    'showSeats'=>$showFreeSeats
+                                                ];
 
-                                            $checkTime = $time;
-                                            if ($typeObject->bookRunning) {
-                                                $checkTime = $endTime;
-                                            }
+                                                $checkTime = $time;
+                                                if ($typeObject->bookRunning) {
+                                                    $checkTime = $endTime;
+                                                }
 
-                                            if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
-                                                if ($calculatorResult->getDbPersons() >= $capacity) {
-                                                   //Each object can only be booked once
-                                                   //C4gLogModel::addLogEntry('reservation', 'Persons ('.$calculatorResult->getDbPersons().') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
-                                                   //C4gLogModel::addLogEntry('reservation', 'Interval '.$durationInterval);
-                                                } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && !$typeObject->severalBookings) {
-                                                    //n times for type
-                                                    //C4gLogModel::addLogEntry('reservation', 'Buchungen ('.$calculatorResult->getDbBookings().') > capacity ('.intval($maxCount * $capacity).'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
-                                                } /*else if ($maxObjects && ($calculatorResult->getDbBookedObjects() >= intval($maxObjects)) && $typeObject->severalBookings) {
+                                                if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
+                                                    if ($calculatorResult->getDbPersons() >= $capacity) {
+                                                        //Each object can only be booked once
+                                                        //C4gLogModel::addLogEntry('reservation', 'Persons ('.$calculatorResult->getDbPersons().') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
+                                                        //C4gLogModel::addLogEntry('reservation', 'Interval '.$durationInterval);
+                                                    } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && !$typeObject->severalBookings) {
+                                                        //n times for type
+                                                        //C4gLogModel::addLogEntry('reservation', 'Buchungen ('.$calculatorResult->getDbBookings().') > capacity ('.intval($maxCount * $capacity).'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
+                                                    } /*else if ($maxObjects && ($calculatorResult->getDbBookedObjects() >= intval($maxObjects)) && $typeObject->severalBookings) {
                                                     //n times for type
                                                     //C4gLogModel::addLogEntry('reservation', 'Buchungen ('.$calculatorResult->getDbBookings().') > capacity ('.intval($maxCount * $capacity).'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
                                                 } */else if ($capacity && (!empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($capacity))) {
-                                                    //n times for object
-                                                    //C4gLogModel::addLogEntry('reservation', 'Array-Eintrag ('.$timeArray[$tsdate][$time].') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
-                                                } else {
-                                                    $timeObj['id'] = $id;
+                                                        //n times for object
+                                                        //C4gLogModel::addLogEntry('reservation', 'Array-Eintrag ('.$timeArray[$tsdate][$time].') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
+                                                    } else {
+                                                        $timeObj['id'] = $id;
+                                                    }
+
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                }
+                                            }
+
+                                            $time = $time + $durationInterval;
+                                        }
+                                    }
+                                } else {
+                                    if ($time_begin && $time_end && (!$checkToday || C4gReservationObjectModel::checkValidPeriod($tsdate, $period))) {
+                                        $time = $time_begin;
+                                        $periodEnd = $time_end - $durationInterval;
+
+                                        while ($time <= $periodEnd) {
+                                            $id = $object->getId();
+                                            if ($date && $tsdate && $time && $typeObject && $capacity) {
+                                                $endTime = $time + $durationInterval;
+                                                $calculator = new C4gReservationCalculator(
+                                                    $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
+                                                );
+                                                $calculatorResult = $calculator->getCalculatorResult();
+                                                $timeArray = $calculatorResult->getTimeArray();
+
+                                                $endTimeInterval = $durationInterval;
+                                                if (!$withEndTimes) {
+                                                    $endTimeInterval = 0;
                                                 }
 
-                                                $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
-                                            }
-                                        }
+                                                $max = $capacity;
+                                                if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
+                                                    $time = $time + $durationInterval;
+                                                    continue;
+                                                }
 
-                                        $time = $time + $durationInterval;
+                                                $timeObj = [
+                                                    'id'=>-1,
+                                                    'act'=>$calculatorResult->getDbPersons(),
+                                                    'percent'=>$calculatorResult->getDbPercent(),
+                                                    'max'=>$max,
+                                                    'showSeats'=>$showFreeSeats
+                                                ];
+
+                                                $checkTime = $time;
+                                                if ($typeObject->bookRunning) {
+                                                    $checkTime = $endTime;
+                                                }
+
+                                                if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
+                                                    if ($calculatorResult->getDbPersons() >= $capacity) {
+                                                        //Each object can only be booked once
+                                                        //C4gLogModel::addLogEntry('reservation', 'Persons ('.$calculatorResult->getDbPersons().') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
+                                                        //C4gLogModel::addLogEntry('reservation', 'Interval '.$durationInterval);
+                                                    } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && !$typeObject->severalBookings) {
+                                                        //n times for type
+                                                        //C4gLogModel::addLogEntry('reservation', 'Buchungen ('.$calculatorResult->getDbBookings().') > capacity ('.intval($maxCount * $capacity).'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
+                                                    } /*else if ($maxObjects && ($calculatorResult->getDbBookedObjects() >= intval($maxObjects)) && $typeObject->severalBookings) {
+                                                    //n times for type
+                                                    //C4gLogModel::addLogEntry('reservation', 'Buchungen ('.$calculatorResult->getDbBookings().') > capacity ('.intval($maxCount * $capacity).'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
+                                                } */else if ($capacity && (!empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($capacity))) {
+                                                        //n times for object
+                                                        //C4gLogModel::addLogEntry('reservation', 'Array-Eintrag ('.$timeArray[$tsdate][$time].') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
+                                                    } else {
+                                                        $timeObj['id'] = $id;
+                                                    }
+
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                }
+                                            }
+
+                                            $time = $time + $durationInterval;
+                                        }
                                     }
                                 }
                             }
@@ -727,7 +803,7 @@ class C4gReservationObjectModel extends \Model
             }
 
             if ($result && is_array($result) && (count($result) > 0)) {
-                return ArrayHelper::sortArrayByFields($result,['name' => SORT_ASC]);
+                return ArrayHelper::sortArrayByFields($result,['id' => SORT_ASC]);
             } else {
                 return [];
             }
