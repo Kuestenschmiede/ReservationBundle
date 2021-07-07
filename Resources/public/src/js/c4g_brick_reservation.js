@@ -567,6 +567,13 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                                 }
                             }
                         }
+                    } else {
+                        var radioButton = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
+
+                        //if there are just one time button then select automaticly.
+                        if (radioButton && radioButton.length === 1) {
+                            targetButton = radioButton[0];
+                        }
                     }
 
                     if (targetButton && !jQuery(targetButton).is(":disabled") && !(jQuery(targetButton).hasClass("radio_object_disabled"))) {
