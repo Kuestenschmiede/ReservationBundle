@@ -1837,7 +1837,9 @@ class C4gReservation extends C4GBrickModuleParent
             $nextDay = strtotime("+1 day", strtotime($bday));
             if ($beginTime >= 86400) {
                 $putVars['beginDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
-                $putVars[$timeKey] = ($beginTime-86400).$rightStr;
+                $putVars[$timeKey] = ($beginTime-86400);
+            } else {
+                $putVars[$timeKey] = $beginTime;
             }
 
             if ($endTime >= 86400) {
