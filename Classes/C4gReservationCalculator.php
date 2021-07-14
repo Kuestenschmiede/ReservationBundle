@@ -38,7 +38,7 @@ class C4gReservationCalculator
         if ($endTime >= 86400) { //nxt day
 
             if ($time >= 86400) {
-                $set = [strtotime("+1 day", $date), $typeId, $objectType];
+                $set = [strtotime('+1 day', $date), $typeId, $objectType];
             } else {
                 $set = [$date, $typeId, $objectType];
             }
@@ -120,6 +120,7 @@ class C4gReservationCalculator
                 $result[intval($reservation['reservation_object'])] = $reservation;
             }
         }
+
         return $result ? count($result) : 0;
     }
 

@@ -1798,7 +1798,7 @@ class C4gReservation extends C4GBrickModuleParent
                             $rightStr = substr($value,strpos($value, '#'));
                         }
 
-                        $beginTime = $newValue;
+                        $beginTime = $newValue ?: $value;
                         $timeKey = $key;
                         break;
                     }

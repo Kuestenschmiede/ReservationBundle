@@ -12,9 +12,9 @@
         }
     ],
     "require": {
-        "contao/core-bundle": "^4.9",
+        "contao/core-bundle": "^4.4",
         "contao/calendar-bundle": "^4.9",
-        "con4gis/projects": "^3.0",
+        "con4gis/projects": "^3.0.11",
         "con4gis/documents": "^1.4"
     },
     "conflict": {
