@@ -166,7 +166,7 @@ class C4gReservation extends C4GBrickModuleParent
         $specialParticipantMechanism = $this->specialParticipantMechanism;
 
         if ($types) {
-            $memberId = -1;
+            $memberId = 0;
             if (FE_USER_LOGGED_IN === true) {
                 $member = FrontendUser::getInstance();
                 if ($member) {
@@ -1890,7 +1890,7 @@ class C4gReservation extends C4GBrickModuleParent
             }
         }
 
-        $memberId = -1;
+        $memberId = 0;
         if (FE_USER_LOGGED_IN === true) {
             $member = FrontendUser::getInstance();
             if ($member) {
