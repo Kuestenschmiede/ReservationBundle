@@ -14,8 +14,9 @@
     "require": {
         "contao/core-bundle": "^4.4",
         "contao/calendar-bundle": "^4.9",
-        "con4gis/projects": "^3.0.11",
-        "con4gis/documents": "^1.4"
+        "con4gis/projects": "^3.0.15",
+        "con4gis/documents": "^1.4.1",
+        "con4gis/groups": "^2.7"
     },
     "conflict": {
         "contao/core": "*",

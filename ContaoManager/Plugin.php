@@ -11,6 +11,7 @@
  */
 namespace con4gis\ReservationBundle\ContaoManager;
 
+use con4gis\GroupsBundle\con4gisGroupsBundle;
 use con4gis\ProjectsBundle\con4gisProjectsBundle;
 use con4gis\ReservationBundle\con4gisReservationBundle;
 use Contao\CalendarBundle\ContaoCalendarBundle;
@@ -36,7 +37,8 @@ class Plugin implements BundlePluginInterface
             BundleConfig::create(con4gisReservationBundle::class)
                 ->setLoadAfter([
                     ContaoCalendarBundle::class,
-                    con4gisProjectsBundle::class
+                    con4gisProjectsBundle::class,
+                    con4gisGroupsBundle::class
                 ])
         ];
     }
