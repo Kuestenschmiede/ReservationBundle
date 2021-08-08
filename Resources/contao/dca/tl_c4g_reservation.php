@@ -455,7 +455,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'inputType'               => 'text',
             'flag'                    => 6,
             'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard clr'),
-            'sql'                     => "int(10) unsigned NULL"
+            'sql'                     => "int(10) signed NULL"
         ),
 
         'organisation2' => array
