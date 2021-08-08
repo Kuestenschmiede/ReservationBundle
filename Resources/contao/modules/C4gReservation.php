@@ -409,6 +409,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $suReservationTimeField->setRemoveWithEmptyCondition(true);
                     $suReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $suReservationTimeField->setInitialValue($initialTime);
+                    $suReservationTimeField->setTimeButtonSpecial(true);
                     $fieldList[] = $suReservationTimeField;
 
                     $mo_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -443,6 +444,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $moReservationTimeField->setRemoveWithEmptyCondition(true);
                     $moReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $moReservationTimeField->setInitialValue($initialTime);
+                    $moReservationTimeField->setTimeButtonSpecial(true);
                     $fieldList[] = $moReservationTimeField;
 
                     $tu_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -477,6 +479,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $tuReservationTimeField->setRemoveWithEmptyCondition(true);
                     $tuReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $tuReservationTimeField->setInitialValue($initialTime);
+                    $tuReservationTimeField->setTimeButtonSpecial(true);
                     $fieldList[] = $tuReservationTimeField;
 
                     $we_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -511,6 +514,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $weReservationTimeField->setRemoveWithEmptyCondition(true);
                     $weReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $weReservationTimeField->setInitialValue($initialTime);
+                    $weReservationTimeField->setTimeButtonSpecial(true);
                     $fieldList[] = $weReservationTimeField;
 
                     $th_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -545,6 +549,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $thReservationTimeField->setRemoveWithEmptyCondition(true);
                     $thReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $thReservationTimeField->setInitialValue($initialTime);
+                    $thReservationTimeField->setTimeButtonSpecial(true);
                     $fieldList[] = $thReservationTimeField;
 
                     $fr_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -579,6 +584,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $frReservationTimeField->setRemoveWithEmptyCondition(true);
                     $frReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $frReservationTimeField->setInitialValue($initialTime);
+                    $frReservationTimeField->setTimeButtonSpecial(true);
                     $fieldList[] = $frReservationTimeField;
 
                     $sa_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
@@ -614,6 +620,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $saReservationTimeField->setRemoveWithEmptyCondition(true);
                     $saReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $saReservationTimeField->setInitialValue($initialTime);
+                    $saReservationTimeField->setTimeButtonSpecial(true);
                     $fieldList[] = $saReservationTimeField;
 
                 }
