@@ -752,10 +752,12 @@ class C4gReservationObjectModel extends \Model
                                                 }
 
                                                 $max = $capacity;
-                                                if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
+
+                                                //Todo check
+                                                /*if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
                                                     $time = $time + $durationInterval;
                                                     continue;
-                                                }
+                                                }*/
 
                                                 $timeObj = [
                                                     'id'=>-1,
