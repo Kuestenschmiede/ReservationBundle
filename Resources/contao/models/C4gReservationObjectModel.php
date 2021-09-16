@@ -753,7 +753,7 @@ class C4gReservationObjectModel extends \Model
 
                                                 $max = $capacity;
 
-                                                //Todo check
+                                                //Todo check "hotfix with several bookings 2.4.14"
                                                 /*if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
                                                     $time = $time + $durationInterval;
                                                     continue;
