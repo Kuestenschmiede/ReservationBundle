@@ -1146,7 +1146,7 @@ class C4gReservationObjectModel extends \Model
         $t = static::$strTable;
         $arrOptions = array();
         $allObjects = self::findBy('published','1');
-        $almostFullyBookedAt = $type->almostFullyBookedAt;
+        $almostFullyBookedAt = $type->almostFullyBookedAt ?: 0;
         if ($moduleTypes) {
             $types = $moduleTypes;
             $objects = [];
