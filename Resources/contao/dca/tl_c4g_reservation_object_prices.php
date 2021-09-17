@@ -125,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['priceoption'],
             'exclude'                 => true,
             'inputType'               => 'radio',
-            'options'                 => array('pMin','pHour','pDay','pEvent'),
+            'options'                 => array('pMin','pHour','pDay','pEvent','pPerson'),
             'default'                 => '',
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices'],
             'eval'                    => array('mandatory'=>true, 'tl_class' => 'long clr'),

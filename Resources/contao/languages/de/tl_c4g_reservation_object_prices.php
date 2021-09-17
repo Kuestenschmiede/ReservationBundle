@@ -21,6 +21,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pMin'] = array("Preis p
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pHour'] = array("Preis pro Stunde");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pDay'] = array("Preis pro Tag");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pEvent'] = array("Preis pro Veranstaltung");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['pPerson'] = array("Preis pro Person");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['published'] = array("Veröffentlichen.","Soll dieses Objekt im Frontend angezeigt werden ?") ;
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_object'] = array("Gilt für diese Objekte","Für welche Objekte gilt diese Preiseinstellung?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['reservation_event'] = array("Gilt für diese Events","Für welche Veranstaltungen gilt diese Preiseinstellung");

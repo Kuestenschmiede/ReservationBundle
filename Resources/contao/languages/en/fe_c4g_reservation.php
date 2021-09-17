@@ -118,6 +118,12 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'An error has occurred. The
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id'] = 'Sorry. An error has occurred. The reservation cannot be made.  Please reload the page and try again.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking'] = 'Sorry. An error has occurred. The reservation cannot be made.  Please reload the page and try again.';
 
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'] = array(" per minute");
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pHour'] = array(" per hour");
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'] = array(" per day");
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pEvent'] = array(" per event");
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'] = array(" per person");
+
 /** DESCRIPTIONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Select the reservation type';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_beginDate'] = 'Select the date on which the event starts.';

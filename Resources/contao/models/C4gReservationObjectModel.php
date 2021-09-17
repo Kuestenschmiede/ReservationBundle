@@ -975,7 +975,7 @@ class C4gReservationObjectModel extends \Model
     /**
      * @param $object
      */
-    private static function calcPrices($object, $type, $isEvent = false) {
+    private static function calcPrices($object, $type, $isEvent = false, $countPersons = 1) {
         $price = 0;
         if ($object) {
             $priceObjs = C4gReservationObjectPricesModel::findBy('published', '1');
@@ -1044,6 +1044,9 @@ class C4gReservationObjectModel extends \Model
                                     case 'pEvent':
                                         $price = $price + intval($priceObj->price);
                                         break;
+                                    case 'pPerson':
+                                        $price = ($price + intval($priceObj->price)).$GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'];
+                                        break;
                                 }
 
                                 break;
@@ -1082,7 +1085,7 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject->id);
-                $price = $showPrices ? static::calcPrices($eventObject, $type, true) : 0;
+                $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                 $frontendObject->setCaption($showPrices && $price ? $eventObject->title."<span class='price'>&nbsp;(+".number_format($price,2,',','.')." €)</span>" : $eventObject->title);
                 $frontendObject->setDesiredCapacity([$event->minParticipants,$event->maxParticipants]);
                 $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
@@ -1116,7 +1119,7 @@ class C4gReservationObjectModel extends \Model
                         $frontendObject = new C4gReservationFrontendObject();
                         $frontendObject->setType(2);
                         $frontendObject->setId($eventObject->id);
-                        $price = $showPrices ? static::calcPrices($eventObject, $type, true) : 0;
+                        $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                         $frontendObject->setCaption($showPrices && $price ? $eventObject->title."<span class='price'>&nbsp;(".number_format($price,2,',','.')." €)</span>" : $eventObject->title);
                         $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
                         $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
@@ -1183,7 +1186,7 @@ class C4gReservationObjectModel extends \Model
                     }
                 }
 
-                $price = $showPrices ? static::calcPrices($object, $type, false) : 0;
+                $price = $showPrices ? static::calcPrices($object, $type, false, 1) : 0;
                 $frontendObject->setCaption($showPrices && $price ? $frontendObject->getCaption()."<span class='price'>&nbsp;(".number_format($price,2,',','.')." €)</span>" : $frontendObject->getCaption());
 
                 $frontendObject->setTimeinterval($object->time_interval);
