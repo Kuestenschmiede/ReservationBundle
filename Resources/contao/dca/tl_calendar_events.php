@@ -75,26 +75,29 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
      */
     public function c4gEditEvent($row, $href, $label, $title, $icon)
     {
-        $rt = Input::get('rt');
-        $ref = Input::get('ref');
-        $do = Input::get('do');
+        $calendar = Database::getInstance()->prepare("SELECT activateEventReservation FROM tl_calendar WHERE id=?")->execute($row['pid'])->fetchAssoc();
+        if ($calendar['activateEventReservation']) {
+            $rt = Input::get('rt');
+            $ref = Input::get('ref');
+            $do = Input::get('do');
 
-        $attributes = 'style="margin-right:3px"';
-        $imgAttributes = 'style="width: 18px; height: 18px"';
+            $attributes = 'style="margin-right:3px"';
+            $imgAttributes = 'style="width: 18px; height: 18px"';
 
-        $result = Database::getInstance()->prepare("SELECT id FROM tl_c4g_reservation_event WHERE pid=?")->execute($row['id'])->fetchAllAssoc();
+            $result = Database::getInstance()->prepare("SELECT id FROM tl_c4g_reservation_event WHERE pid=?")->execute($row['id'])->fetchAllAssoc();
 
-        if ($result && count($result) > 1) {
-            C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '. $row['id']);
-        } else if ($result && count($result) == 1) {
-            $href = "/contao?do=$do&table=tl_c4g_reservation_event&amp;act=edit&amp;id=".$result[0]['id']."&amp;pid=".$row['id']."&amp;rt=".$rt;
-        } else {
-            $href = "/contao?do=$do&table=tl_c4g_reservation_event&amp;act=create&amp;mode=2&amp;pid=".$row['id']."&amp;rt=".$rt;
+            if ($result && count($result) > 1) {
+                C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '. $row['id']);
+            } else if ($result && count($result) == 1) {
+                $href = "/contao?do=$do&table=tl_c4g_reservation_event&amp;act=edit&amp;id=".$result[0]['id']."&amp;pid=".$row['id']."&amp;rt=".$rt;
+            } else {
+                $href = "/contao?do=$do&table=tl_c4g_reservation_event&amp;act=create&amp;mode=2&amp;pid=".$row['id']."&amp;rt=".$rt;
+            }
+
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $row['id'];
+
+            return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a> ';
         }
-
-        $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $row['id'];
-
-        return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a> ';
     }
 
     /**
@@ -107,31 +110,34 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
      */
     public function c4gShowReservations($row, $href, $label, $title, $icon)
     {
-        $rt = Input::get('rt');
-        $ref = Input::get('ref');
-        $do = Input::get('do');
+        $calendar = Database::getInstance()->prepare("SELECT activateEventReservation FROM tl_calendar WHERE id=?")->execute($row['pid'])->fetchAssoc();
+        if ($calendar['activateEventReservation']) {
+            $rt = Input::get('rt');
+            $ref = Input::get('ref');
+            $do = Input::get('do');
 
-        $attributes = 'style="margin-right:3px"';
-        $imgAttributes = 'style="width: 18px; height: 18px"';
+            $attributes = 'style="margin-right:3px"';
+            $imgAttributes = 'style="width: 18px; height: 18px"';
 
-        $href = "/contao?do=$do&table=tl_c4g_reservation&amp&id=".$row['id']."&pid=".$row['pid']."&rt=".$rt."&ref=".$ref;
+            $href = "/contao?do=$do&table=tl_c4g_reservation&amp&id=" . $row['id'] . "&pid=" . $row['pid'] . "&rt=" . $rt . "&ref=" . $ref;
 
-        $state = InsertTags::replaceInsertTags('{{c4gevent::' . $row['id'] . '::state_raw}}');
-        switch ($state) {
-            case '1':
-                $icon = 'bundles/con4gisreservation/images/circle_green.svg';
-                break;
-            case '2':
-                $icon = 'bundles/con4gisreservation/images/circle_orange.svg';
-                break;
-            case '3':
-                $icon = 'bundles/con4gisreservation/images/circle_red.svg';
-                break;
-            Default:
-                $icon = 'bundles/con4gisreservation/images/circle_red.svg';
-                break;
+            $state = InsertTags::replaceInsertTags('{{c4gevent::' . $row['id'] . '::state_raw}}');
+            switch ($state) {
+                case '1':
+                    $icon = 'bundles/con4gisreservation/images/circle_green.svg';
+                    break;
+                case '2':
+                    $icon = 'bundles/con4gisreservation/images/circle_orange.svg';
+                    break;
+                case '3':
+                    $icon = 'bundles/con4gisreservation/images/circle_red.svg';
+                    break;
+                default:
+                    $icon = 'bundles/con4gisreservation/images/circle_red.svg';
+                    break;
+            }
+
+            return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a> ';
         }
-
-        return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a> ';
     }
 }
