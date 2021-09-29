@@ -131,7 +131,17 @@ class C4gReservation extends C4GBrickModuleParent
         
         $initialDate = '';
         $initialTime = '';
+
         $eventId = $this->Input->get('event') ? $this->Input->get('event') : 0;
+
+        //ToDo hotfix
+        //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
+        if (!$eventId && $_COOKIE['reservationEventCookie']) {
+            $eventId = $_COOKIE['reservationEventCookie'];
+        } else if ($eventId) {
+            setcookie('reservationEventCookie', $eventId, time()+60, '/');
+        }
+
         $event = $eventId ? \CalendarEventsModel::findByPk($eventId) : false;
         $eventObj = $event && $event->published ? C4gReservationEventModel::findBy('pid', $event->id) : false;
         if ($eventObj && (count($eventObj) > 1)) {
@@ -142,10 +152,27 @@ class C4gReservation extends C4GBrickModuleParent
                 $initialDate = $date;
             }
 
+            //ToDo hotfix
+            //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
+            if (!$initialDate && $_COOKIE['reservationInitialDateCookie']) {
+                $initialDate = $_COOKIE['reservationInitialDateCookie'];
+            } else if ($initialDate) {
+                setcookie('reservationInitialDateCookie', $initialDate, time()+60, '/');
+            }
+
             $time = $this->Input->get('time') ? $this->Input->get('time') : 0;
+
+            //ToDo hotfix
+            //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
+            if (!$time && $_COOKIE['reservationTimeCookie']) {
+                $time = $_COOKIE['reservationTimeCookie'];
+            } else if ($time) {
+                setcookie('reservationTimeCookie', $time, time()+60, '/');
+            }
+
             if ($time) {
                 $initialTime = strtotime($time);
-                $objDate = new Date(date("H:i",$initialTime), Date::getFormatFromRgxp('time'));
+                $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],$initialTime), Date::getFormatFromRgxp('time'));
                 $initialTime = $objDate->tstamp;
             }
         }
@@ -183,7 +210,7 @@ class C4gReservation extends C4GBrickModuleParent
                     }
                 }
 
-                $objects = C4gReservationObjectModel::getReservationObjectList(array($type->id), $eventId, $this->showPrices);
+                $objects = C4gReservationObjectModel::getReservationObjectList(array($type->id), intval($eventId), $this->showPrices);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
@@ -250,6 +277,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationTypeField->setStyleClass('reservation-type');
             $reservationTypeField->setHidden(count($typelist) == 1);
             $reservationTypeField->setNotificationField(true);
+            //$reservationTypeField->setInitialCallOnChange($typelist[$firstType]['isEvent']);
             $fieldList[] = $reservationTypeField;
         }
 
@@ -286,6 +314,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");");
                 } else {
                     $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");");
+                    //$reservationDesiredCapacity->setInitialCallOnChange(true);
                 }
                 $reservationDesiredCapacity->setNotificationField(true);
                 $reservationDesiredCapacity->setAdditionalID($listType['id']);
@@ -1678,7 +1707,9 @@ class C4gReservation extends C4GBrickModuleParent
                 unset($putVars[$field->getFieldName()]);
             }
 
-            if ($field->getFieldName() == "beginTime") {
+            $isEvent = $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
+
+            if (!$isEvent && ($field->getFieldName() == "beginTime")) {
                 foreach ($putVars as $key => $value) {
                     if (strpos($key, "beginTime_".$type) !== false) {
                         $additionalIdPostParam = substr($key, (strlen("beginTime_".$type)));
@@ -1689,7 +1720,6 @@ class C4gReservation extends C4GBrickModuleParent
                 }
             }
 
-            $isEvent = $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
             if ($isEvent) {
                 $key = "reservation_object_event_" . $type;
                 $resObject = $putVars[$key];
@@ -1795,14 +1825,11 @@ class C4gReservation extends C4GBrickModuleParent
 
             $beginTime = 0;
             $timeKey = false;
-            $rightStr = '';
             foreach ($putVars as $key => $value) {
                 if (strpos($key, "beginTime_".$type) !== false) {
                     if ($value) {
                         if (strpos($value, '#') !== false) {
                             $newValue = substr($value,0, strpos($value, '#')); //remove frontend duration
-                            //$putVars[$key] = is_int($value) ? date($GLOBALS['TL_CONFIG']['timeFormat'],$value) : $value;
-                            $rightStr = substr($value,strpos($value, '#'));
                         }
 
                         $beginTime = $newValue ?: $value;
@@ -2009,7 +2036,7 @@ class C4gReservation extends C4GBrickModuleParent
             $putVars['participantList'] = $participants;
         }
 
-        $icsObject = $reservationEventObject ? $reservationEventObject : $reservationObject;
+        $icsObject = $reservationEventObject ?: $reservationObject;
         $putVars['icsFilename'] = $this->createIcs($beginDate, $beginTime, $endDate, $endTime, $icsObject, $reservationType, $location);
 
         $rawData = '';
@@ -2182,7 +2209,16 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         $eventId  = $this->Input->get('event') ? $this->Input->get('event') : 0;
-        $objects = C4gReservationObjectModel::getReservationObjectList(array($type), $eventId, $this->showPrices);
+
+        //ToDo hotfix
+        //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
+        if (!$eventId && $_COOKIE['reservationEventCookie']) {
+            $eventId = $_COOKIE['reservationEventCookie'];
+        } else if ($eventId) {
+            setcookie('reservationEventCookie', $eventId, time()+60, '/');
+        }
+
+        $objects = C4gReservationObjectModel::getReservationObjectList(array($type), intval($eventId), $this->showPrices);
         $withEndTimes = $this->showEndTime;
         $withFreeSeats = $this->showFreeSeats;
 

@@ -581,7 +581,7 @@ class C4gReservationObjectModel extends \Model
                     $nowDate = $nowDate->getTimestamp();
                 }
 
-                $objDate = new Date(date("H:i",time()), Date::getFormatFromRgxp('time'));
+                $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], time()), Date::getFormatFromRgxp('time'));
                 $nowTime = $objDate->tstamp;
             }
 
@@ -1088,17 +1088,17 @@ class C4gReservationObjectModel extends \Model
                 $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                 $frontendObject->setCaption($showPrices && $price ? $eventObject->title."<span class='price'>&nbsp;(+".number_format($price,2,',','.')." €)</span>" : $eventObject->title);
                 $frontendObject->setDesiredCapacity([$event->minParticipants,$event->maxParticipants]);
-                $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
-                $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
-                $frontendObject->setEndDate($eventObject->endDate ? $eventObject->endDate : 0);
-                $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
+                $frontendObject->setBeginDate($eventObject->startDate ?: 0);
+                $frontendObject->setBeginTime($eventObject->startTime ?: 0);
+                $frontendObject->setEndDate($eventObject->endDate ?: 0);
+                $frontendObject->setEndTime($eventObject->endTime ?: 0);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
-                $frontendObject->setNumber($event->number ? $event->number : '');
+                $frontendObject->setNumber($event->number ?: '');
                 $frontendObject->setAudience($event->targetAudience ? unserialize($event->targetAudience) : []);
                 $frontendObject->setEventDuration('');
                 $frontendObject->setSpeaker($event->speaker ? unserialize($event->speaker) : []);
                 $frontendObject->setTopic($event->topic ? unserialize($event->topic) : []);
-                $frontendObject->setLocation($event->location ? $event->location : 0);
+                $frontendObject->setLocation($event->location ?: 0);
                 $objectList[] = $frontendObject;
             }
         } else {
@@ -1122,10 +1122,10 @@ class C4gReservationObjectModel extends \Model
                         $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                         $frontendObject->setCaption($showPrices && $price ? $eventObject->title."<span class='price'>&nbsp;(".number_format($price,2,',','.')." €)</span>" : $eventObject->title);
                         $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
-                        $frontendObject->setBeginDate($eventObject->startDate ? $eventObject->startDate : 0);
-                        $frontendObject->setBeginTime($eventObject->startTime ? $eventObject->startTime : 0);
-                        $frontendObject->setEndDate($eventObject->endDate ? $eventObject->endDate : 0);
-                        $frontendObject->setEndTime($eventObject->endTime ? $eventObject->endTime : 0);
+                        $frontendObject->setBeginDate($eventObject->startDate ?: 0);
+                        $frontendObject->setBeginTime($eventObject->startTime ?: 0);
+                        $frontendObject->setEndDate($eventObject->endDate ?: 0);
+                        $frontendObject->setEndTime($eventObject->endTime ?: 0);
                         $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                         $frontendObject->setNumber($event['number']);
                         $frontendObject->setAudience($event['targetAudience'] ? unserialize($event['targetAudience']) : []);

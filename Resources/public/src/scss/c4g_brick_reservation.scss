@@ -45,11 +45,15 @@
 .reservation_time_button .radio_object_hurry_up + label, .reservation_time_event_button .c4g_radio_object_hurry_up .radio_element input[type = "radio"] + label {
     background-color: darkorange;
 }
-.reservation_time_button input[type="radio"][disabled] + label, .reservation_time_event_button input[type="radio"][disabled] + label,
+.reservation_time_button input[type="radio"][disabled] + label,
 .reservation_time_event_button .c4g_radio_object_fully_booked .radio_element input[type = "radio"] + label {
     background-color: red;
     cursor: no-drop;
     font-weight: normal;
+}
+
+.reservation_time_event_button input[type="radio"][disabled] + label {
+
 }
 
 .mod_C4gReservation .c4g_brick_dialog input[type='checkbox'], .mod_C4gReservation label.agreed.c4g_agreed, .mod_C4gReservation label.reservation_id.c4g_reservation_id {

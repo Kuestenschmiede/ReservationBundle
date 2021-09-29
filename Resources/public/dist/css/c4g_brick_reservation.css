@@ -41,8 +41,7 @@
   background-color: #ff8c00
 }
 .reservation_time_button input[type=radio][disabled] + label,
-.reservation_time_event_button .c4g_radio_object_fully_booked .radio_element input[type=radio] + label,
-.reservation_time_event_button input[type=radio][disabled] + label {
+.reservation_time_event_button .c4g_radio_object_fully_booked .radio_element input[type=radio] + label {
   background-color: red;
   cursor: no-drop;
   font-weight: 400
