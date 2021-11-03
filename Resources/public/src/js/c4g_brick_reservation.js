@@ -220,41 +220,62 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
         }
     }
 
-    checkEventFields(-1);
+    checkEventFields();
 }
 
-function setReservationForm(id, typeId, callFunction, showDateTime) {
+function checkType(dateField, event) {
+    if (event) {
+        return jQuery(dateField).parent().parent().hasClass('begindate-event') ? true : false;
+    } else {
+        return jQuery(dateField).parent().parent().hasClass('begin-date') ? true : false
+    }
+}
+
+function setReservationForm(id, typeId, callFunction, showDateTime, event) {
     jQuery(document.getElementsByClassName("reservation-id")).hide();
 
     if (typeId == -1) {
         var typeField = document.getElementById("c4g_reservation_type");
         typeId = typeField ? typeField.value : -1;
-    }
 
-    var dateFieldVisible = false;
-    var dateFields = document.getElementsByClassName('c4g_date_field_input');
-    if (dateFields) {
-        for (i = 0; i < dateFields.length; i++) {
-            var dateField = dateFields[i];
-            if (dateField && dateField.value && jQuery(dateField).is(":visible")) {
-                dateFieldVisible = true;
-                setTimeset(dateField, id, typeId, callFunction, showDateTime);
-                break;
+        if (!event) {
+            var selectedIndex = typeField.selectedIndex;
+            var selectedOption = typeField.options[selectedIndex];
+            if (selectedOption) {
+                event = selectedOption.getAttribute('type') == 2 ? true : false;
             }
+
         }
     }
 
-    if (!dateFieldVisible) {
-        var dateId = 'c4g_beginDate_'+typeId;
-        if (document.getElementById(dateId)) {
-            setTimeset(document.getElementById(dateId), id, typeId, callFunction, showDateTime);
+    var dateId = 'c4g_beginDate_'+typeId;
+    if (document.getElementById(dateId)) {
+        setTimeset(document.getElementById(dateId), id, typeId, callFunction, showDateTime);
+    } else if (event) {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const eventId = urlParams.get('event')
+
+        if (eventId) {
+            var dateId = 'c4g_beginDateEvent_' + typeId + '-22' + eventId;
+            if (document.getElementById(dateId)) {
+                //setTimeset(document.getElementById(dateId), id, typeId, callFunction, showDateTime);
+                checkEventFields();
+            }
         } else {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            const event = urlParams.get('event')
-            var dateId = 'c4g_beginDateEvent_'+typeId+'-22'+event;
-            if (event && document.getElementById(dateId)) {
-                setTimeset(document.getElementById(dateId), id, typeId, callFunction, showDateTime);
+            var dateFields = document.getElementsByClassName('c4g_date_field_input');
+            if (dateFields) {
+                for (i = 0; i < dateFields.length; i++) {
+                    var dateField = dateFields[i];
+                    if (dateField && checkType(dateField, event) && dateField.value) {
+                        var fieldId = dateField.id;
+                        if (fieldId && fieldId.indexOf('c4g_beginDateEvent_' + typeId + '-22')) {
+                            //setTimeset(dateField, id, typeId, callFunction, showDateTime);
+                            checkEventFields();
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
@@ -413,6 +434,8 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
     }
 
     if (id && callFunction && date && additionalId) {
+        duration = duration ? duration : -1;
+
         jQuery.ajax({
             dataType: "json",
             url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
@@ -592,7 +615,7 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
     if (additionalId) {
         //if there are just one time button then select automaticly.
         var radioButton = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
-        if (radioButton && radioButton.length === 1) {
+        if (radioButton && radioButton.length === 1 && radioButton.is(":visible")) {
             radioButton.click();
         }
     }
@@ -602,7 +625,7 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
  *
  * @param object
  */
-function checkEventFields(object) {
+function checkEventFields() {
     var typeField = document.getElementById("c4g_reservation_type");
     var typeId = typeField ? typeField.value : -1;
     var selectField = jQuery('.reservation-event-object select');

@@ -231,7 +231,8 @@ class C4gReservation extends C4GBrickModuleParent
                                 'objects' => $objects,
                                 'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
                                 'memberId' => $type->member_id ?: $memberId,
-                                'groupId' => $type->group_id
+                                'groupId' => $type->group_id,
+                                'type' => $type->reservationObjectType
                             );
                         }
                     }
@@ -248,17 +249,20 @@ class C4gReservation extends C4GBrickModuleParent
                         'objects' => $objects,
                         'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
                         'memberId' => $type->member_id ?: $memberId,
-                        'groupId' => $type->group_id
+                        'groupId' => $type->group_id,
+                        'type' => $type->reservationObjectType
                     );
                 }
             }
         }
 
+        $showDateTime = $this->showDateTime ? "1" : "0";
+
         if (count($typelist) > 0) {
             $firstType = array_key_first($typelist);
 
             $onLoadScript = $this->getDialogParams()->getOnloadScript();
-            $onLoadScript .= ' jQuery("#c4g_reservation_type").trigger("change");';
+            $onLoadScript .= " jQuery('#c4g_reservation_type').trigger('change');";
             $this->getDialogParams()->setOnloadScript(trim($onLoadScript));
 
             $reservationTypeField = new C4GSelectField();
@@ -272,11 +276,12 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
             $reservationTypeField->setCallOnChange(true);
-            $reservationTypeField->setCallOnChangeFunction("setReservationForm(" . $this->id . ", -1 ,'getCurrentTimeset'," . $this->showDateTime . ")");
+            $reservationTypeField->setCallOnChangeFunction("setReservationForm(" . $this->id . ", -1 ,'getCurrentTimeset'," . $showDateTime . ",false)");
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
             $reservationTypeField->setHidden(count($typelist) == 1);
             $reservationTypeField->setNotificationField(true);
+            $reservationTypeField->setWithOptionType(true);
             //$reservationTypeField->setInitialCallOnChange($typelist[$firstType]['isEvent']);
             $fieldList[] = $reservationTypeField;
         }
@@ -311,9 +316,9 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                 $reservationDesiredCapacity->setCallOnChange(true);
                 if (!$isEvent) {
-                    $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");");
+                    $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $showDateTime . ",false);");
                 } else {
-                    $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");");
+                    $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $showDateTime . ",true);");
                     //$reservationDesiredCapacity->setInitialCallOnChange(true);
                 }
                 $reservationDesiredCapacity->setNotificationField(true);
@@ -761,11 +766,12 @@ class C4gReservation extends C4GBrickModuleParent
 
             if ($isEvent) {
                 foreach ($reservationObjects as $reservationObject) {
-                    $val_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $listType['id'], $reservationObject->getId());
-                    $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'reservation_object_event_' . $listType['id']);
+                    //$type_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
+                    $val_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $listType['id']. '-22' . $reservationObject->getId(), $reservationObject->getId());
+                    $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'reservation_object_event_' . $listType['id']. '-22' . $reservationObject->getId());
                     $obj_condition->setModel(C4gReservationObjectModel::class);
                     $obj_condition->setFunction('isEventObject');
-                    $objConditionArr = [$obj_condition, $val_condition];
+                    $objConditionArr = [$obj_condition,$val_condition];
 
                     $reservationBeginDateField = new C4gDateField();
                     $reservationBeginDateField->setFlipButtonPosition(true);
