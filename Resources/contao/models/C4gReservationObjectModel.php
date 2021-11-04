@@ -259,6 +259,8 @@ class C4gReservationObjectModel extends \Model
                 }
             }
 
+            //ToDo days without possible times
+
             foreach ($alldates as $date) {
                 if ($date) {
                     $result = self::check($result) . $date;
@@ -518,7 +520,7 @@ class C4gReservationObjectModel extends \Model
         $date_from = intval($period['date_from']);
         $date_to = intval($period['date_to']);
 
-        if ($date_from || $date_to) {
+        if ($tstamp && ($date_from || $date_to)) {
 
             //hit the date
             if ($date_from && $date_to && ($tstamp >= $date_from) && ($tstamp <= $date_to)) {
@@ -597,7 +599,7 @@ class C4gReservationObjectModel extends \Model
 
             $maxCount = intval($typeObject->objectCount);
 
-            $objectType = $typeObject->reservationObjectType;
+            //$objectType = $typeObject->reservationObjectType;
 
             //$count = []; //count over all objects
 
@@ -663,11 +665,15 @@ class C4gReservationObjectModel extends \Model
                     foreach ($oh as $key => $day) {
                         if (($day != -1) && ($key == $weekday)) {
                             foreach ($day as $period) {
+                                if (!C4gReservationObjectModel::checkValidPeriod($tsdate, $period)) {
+                                    continue;
+                                }
+
                                 $time_begin = intval($period['time_begin']);
                                 $time_end = intval($period['time_end']);
 
                                 if ($time_end < $time_begin) { //nxt day
-                                    if ($time_begin && $time_end && (!$checkToday || C4gReservationObjectModel::checkValidPeriod($tsdate, $period))) {
+                                    if ($time_begin && $time_end) {
                                         $time = $time_begin;
                                         $endOfDate = 86400 + $time_end; //24h + nxt day time
                                         $periodEnd = $endOfDate - $durationInterval;
@@ -732,7 +738,7 @@ class C4gReservationObjectModel extends \Model
                                         }
                                     }
                                 } else {
-                                    if ($time_begin && $time_end && (!$checkToday || C4gReservationObjectModel::checkValidPeriod($tsdate, $period))) {
+                                    if ($time_begin && $time_end) {
                                         $time = $time_begin;
                                         $periodEnd = $time_end - $durationInterval;
 
