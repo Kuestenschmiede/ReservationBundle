@@ -2087,7 +2087,7 @@ class C4gReservation extends C4GBrickModuleParent
             $icstimezone = 'TZID='.$timezone;
             $icsdaylightsaving= date('I');
             $icsprodid = $contact_name;
-            $icslocation = $contact_street ." ". $contact_postal." ". $contact_city;
+            $icslocation = $contact_name .": ". $contact_street .", ". $contact_postal." ". $contact_city;
             $icsuid = $contact_email;
 
             $local_tz = new \DateTimeZone($timezone);
@@ -2149,7 +2149,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $fs->touch($filename);
                     $ics = new File($filename);
                 }
-                $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nDESCRIPTION:$icssummary\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
+                $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nDTSTAMP:$icsdate\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nDESCRIPTION:$icssummary\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
                 return $filename;
             }
         }
