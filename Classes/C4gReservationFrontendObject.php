@@ -20,6 +20,7 @@ class C4gReservationFrontendObject
     private $type = 1; //1=default, 2=event
     private $caption = '';
     private $quantity = 1;
+    private $allTypesQuantity = 1;
     private $timeinterval = '30';
     private $duration = '30';
     private $reservationTypes = [];
@@ -94,6 +95,22 @@ class C4gReservationFrontendObject
     public function setQuantity(int $quantity): void
     {
         $this->quantity = $quantity;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAllTypesQuantity(): int
+    {
+        return $this->allTypesQuantity;
+    }
+
+    /**
+     * @param int $allTypesQuantity
+     */
+    public function setAllTypesQuantity(int $allTypesQuantity): void
+    {
+        $this->allTypesQuantity = $allTypesQuantity;
     }
 
     /**

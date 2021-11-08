@@ -608,6 +608,11 @@ class C4gReservationObjectModel extends \Model
                 $found = false;
                 $timeArray = []; //count for one object
                 $objectQuantity = $object->getQuantity() ?  $object->getQuantity() : 1;
+
+                if ($object->getAllTypesQuantity()) {
+                    $maxCount = $objectQuantity;
+                }
+
                 $reservationTypes = $object->getReservationTypes();
                 
                 if ($reservationTypes) {
@@ -788,7 +793,7 @@ class C4gReservationObjectModel extends \Model
                                                         //Each object can only be booked once
                                                         //C4gLogModel::addLogEntry('reservation', 'Persons ('.$calculatorResult->getDbPersons().') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
                                                         //C4gLogModel::addLogEntry('reservation', 'Interval '.$durationInterval);
-                                                    } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && !$typeObject->severalBookings) {
+                                                    } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject->severalBookings || $object->getAllTypesQuantity())) {
                                                         //n times for type
                                                         //C4gLogModel::addLogEntry('reservation', 'Buchungen ('.$calculatorResult->getDbBookings().') > capacity ('.intval($maxCount * $capacity).'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
                                                     } /*else if ($maxObjects && ($calculatorResult->getDbBookedObjects() >= intval($maxObjects)) && $typeObject->severalBookings) {
@@ -1207,6 +1212,7 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject->setReservationTypes(unserialize($object->viewableTypes));
                 $frontendObject->setDesiredCapacity([$object->desiredCapacityMin, $object->desiredCapacityMax]);
                 $frontendObject->setQuantity($object->quantity);
+                $frontendObject->setAllTypesQuantity($object->allTypesQuantity ?: 0);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
 
 
