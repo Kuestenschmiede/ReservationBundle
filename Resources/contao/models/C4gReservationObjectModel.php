@@ -623,19 +623,23 @@ class C4gReservationObjectModel extends \Model
                     continue;
                 }
 
+                //im Formulat können zurzeit nur Minuten gesetzt werden
                 if ($duration >= 1)
                 {
-                    $oh = $object->getOpeningHours();
+
+                    //$oh = $object->getOpeningHours();
                     switch ($periodType) {
                         case 'minute':
-                            $interval = 60;
+                            $object->setDuration($duration);
                             break;
                         case 'hour':
-                            $interval = 3600;
+                            $object->setDuration($duration/60);
                             break;
                         default: '';
                     }
-                } else {
+                }
+
+                //else {
                     $oh = $object->getOpeningHours();
                     switch ($periodType) {
                         case 'minute':
@@ -648,7 +652,7 @@ class C4gReservationObjectModel extends \Model
                             break;
                         default: '';
                     }
-                }
+                //}
 
                 //max persons
                 $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
@@ -682,21 +686,21 @@ class C4gReservationObjectModel extends \Model
                                         while ($time <= $periodEnd) {
                                             $id = $object->getId();
                                             if ($date && $tsdate && $time && $typeObject && $capacity) {
-                                                $endTime = $time + $durationInterval;
+                                                $endTime = $time + $interval;
                                                 $calculator = new C4gReservationCalculator(
                                                     $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
                                                 );
                                                 $calculatorResult = $calculator->getCalculatorResult();
                                                 $timeArray = $calculatorResult->getTimeArray();
 
-                                                $endTimeInterval = $durationInterval;
+                                                $endTimeInterval = $interval;
                                                 if (!$withEndTimes) {
                                                     $endTimeInterval = 0;
                                                 }
 
                                                 $max = $capacity;
                                                 if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
-                                                    $time = $time + $durationInterval;
+                                                    $time = $time + $interval;
                                                     continue;
                                                 }
 
@@ -735,7 +739,7 @@ class C4gReservationObjectModel extends \Model
                                                 }
                                             }
 
-                                            $time = $time + $durationInterval;
+                                            $time = $time + $interval;
                                         }
                                     }
                                 } else {
@@ -746,14 +750,14 @@ class C4gReservationObjectModel extends \Model
                                         while ($time <= $periodEnd) {
                                             $id = $object->getId();
                                             if ($date && $tsdate && $time && $typeObject && $capacity) {
-                                                $endTime = $time + $durationInterval;
+                                                $endTime = $time + $interval;
                                                 $calculator = new C4gReservationCalculator(
                                                     $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
                                                 );
                                                 $calculatorResult = $calculator->getCalculatorResult();
                                                 $timeArray = $calculatorResult->getTimeArray();
 
-                                                $endTimeInterval = $durationInterval;
+                                                $endTimeInterval = $interval;
                                                 if (!$withEndTimes) {
                                                     $endTimeInterval = 0;
                                                 }
@@ -801,7 +805,7 @@ class C4gReservationObjectModel extends \Model
                                                 }
                                             }
 
-                                            $time = $time + $durationInterval;
+                                            $time = $time + $interval;
                                         }
                                     }
                                 }

@@ -339,8 +339,8 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationObjectTypeField->setFormField(false);
                 $fieldList[] = $reservationObjectTypeField;
 
-                $additionalDuration = StringUtil::deserialize($this->additionalDuration);
-                if ($additionalDuration == "1") {
+                $additionalDuration = $this->additionalDuration;
+                if (intval($additionalDuration) >= 1) {
                     $durationField = new C4GNumberField();
                     $durationField->setFieldName('duration');
                     $durationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['duration']);
@@ -354,6 +354,11 @@ class C4gReservation extends C4GBrickModuleParent
                     $durationField->setCondition(array($condition));
                     $durationField->setNotificationField(true);
                     $durationField->setStyleClass('duration');
+                    $durationField->setMin(1);
+                    $durationField->setMax($additionalDuration);
+                    $durationField->setMaxLength(3);
+                    $durationField->setStep(5);
+
                     $fieldList[] = $durationField;
                 } else {
                     $additionalDuration = 0;
@@ -426,7 +431,7 @@ class C4gReservation extends C4GBrickModuleParent
                             $listType['id'],
                             'su',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 0)),
-                            $additionalDuration,
+                            0,
                             $this->showEndTime,
                             $this->showFreeSeats
                         ));
@@ -461,7 +466,7 @@ class C4gReservation extends C4GBrickModuleParent
                             $listType['id'],
                             'mo',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 1)),
-                            $additionalDuration,
+                            0,
                             $this->showEndTime,
                             $this->showFreeSeats
                         ));
@@ -496,7 +501,7 @@ class C4gReservation extends C4GBrickModuleParent
                             $listType['id'],
                             'tu',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 2)),
-                            $additionalDuration,
+                            0,
                             $this->showEndTime,
                             $this->showFreeSeats
                         ));
@@ -531,7 +536,7 @@ class C4gReservation extends C4GBrickModuleParent
                             $listType['id'],
                             'we',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 3)),
-                            $additionalDuration,
+                            0,
                             $this->showEndTime,
                             $this->showFreeSeats
                         ));
@@ -566,7 +571,7 @@ class C4gReservation extends C4GBrickModuleParent
                             $listType['id'],
                             'th',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 4)),
-                            $additionalDuration,
+                            0,
                             $this->showEndTime,
                             $this->showFreeSeats
                         ));
@@ -601,7 +606,7 @@ class C4gReservation extends C4GBrickModuleParent
                             $listType['id'],
                             'fr',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 5)),
-                            $additionalDuration,
+                            0,
                             $this->showEndTime,
                             $this->showFreeSeats
                         ));
@@ -637,7 +642,7 @@ class C4gReservation extends C4GBrickModuleParent
                             $listType['id'],
                             'sa',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 6)),
-                            $additionalDuration,
+                            0,
                             $this->showEndTime,
                             $this->showFreeSeats
                         ));
