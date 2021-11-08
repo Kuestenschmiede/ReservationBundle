@@ -161,8 +161,7 @@ class C4gReservationObjectModel extends \Model
                 $id = $object->getId();
                 $dates = $database->prepare("SELECT DISTINCT beginDate FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType='1' AND NOT cancellation='1'")
                     ->execute($id)->fetchAllAssoc();
-//                $times = $database->prepare("SELECT  * FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType='1' AND NOT cancellation='1'")
-//                    ->execute($id)->fetchAllAssoc();
+
                 $objectData = $database->prepare("SELECT * FROM `tl_c4g_reservation_object` WHERE id=? AND published='1'")
                     ->execute($id)->fetchAssoc();
 
@@ -226,15 +225,11 @@ class C4gReservationObjectModel extends \Model
                         }
                     }
 
-//Removed because it does not have to be unique through the backend input
-//                    $resultArr = $database->prepare("SELECT SUM(desiredCapacity) AS count FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType='1' AND beginDate=? AND NOT cancellation='1'")
-//                        ->execute($id,$date['beginDate'])->fetchAssoc();
-//
-//
-//                    if ($resultArr && $possibleBookings && ($resultArr['count'] >= ($possibleBookings * 1.1))) //10 percent for backend manipulations
-//                    {
-//                        $exclusionObjects[$date['beginDate']] = $exclusionObjects[$date['beginDate']] ? $exclusionObjects[$date['beginDate']] + 1 : 1;
-//                    }
+                    //add dates without possible times
+                    $timeArr = self::getReservationTimes($list,$type,$weekday,date('d.m.Y',$beginDate));
+                    if (!$timeArr || (count($timeArr) == 0)) {
+                        $alldates[] = $beginDate;
+                    }
                 }
 
                 foreach ($exclusionPeriods as $period) {
@@ -258,8 +253,6 @@ class C4gReservationObjectModel extends \Model
                     $alldates[] = $date;
                 }
             }
-
-            //ToDo days without possible times
 
             foreach ($alldates as $date) {
                 if ($date) {
