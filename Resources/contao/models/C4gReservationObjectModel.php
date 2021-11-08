@@ -517,6 +517,7 @@ class C4gReservationObjectModel extends \Model
      * @param $period
      */
     public static function checkValidPeriod($tstamp, $period) {
+        $tstamp = intval($tstamp);
         $date_from = intval($period['date_from']);
         $date_to = intval($period['date_to']);
 

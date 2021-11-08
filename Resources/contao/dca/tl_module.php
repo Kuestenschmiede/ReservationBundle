@@ -189,6 +189,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['appearance_themeroller_css'] = array
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservationButtonCaption'] = array
 (
     'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationButtonCaption'],
+    'exclude'           => true,
     'sorting'           => true,
     'search'            => true,
     'inputType'         => 'text',
