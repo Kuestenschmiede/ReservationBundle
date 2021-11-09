@@ -147,90 +147,15 @@ class C4gReservationObjectModel extends \Model
      public static function getDateExclusionString($list, $type)
     {
         $result = '';
-
         if ($list) {
             $alldates = array();
-            $exclusionObjects = array();
-            $database = Database::getInstance();
 
+            //remove configured date exclusion
             foreach ($list as $object) {
                 if(!$object instanceof C4gReservationFrontendObject){
                     break;
                 }
                 $exclusionPeriods = $object->getDatesExclusion();
-                $id = $object->getId();
-                $dates = $database->prepare("SELECT DISTINCT beginDate FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType='1' AND NOT cancellation='1'")
-                    ->execute($id)->fetchAllAssoc();
-
-                $objectData = $database->prepare("SELECT * FROM `tl_c4g_reservation_object` WHERE id=? AND published='1'")
-                    ->execute($id)->fetchAssoc();
-
-
-                $desiredCapacity = $objectData['desiredCapacityMax'] ? $objectData['desiredCapacityMax'] : 1;
-                $quantity = $objectData['quantity'] * $desiredCapacity;
-
-                $periodType = $type['periodType'];
-
-                foreach ($dates as $date) {
-                    $beginDate = $date['beginDate'];
-                    if (!$beginDate) {
-                        continue;
-                    }
-                    $weekday = date('w',$beginDate);
-
-                    $interval = $objectData['time_interval'];
-
-                    if($weekday == 0){
-                        $array = StringUtil::deserialize($objectData['oh_sunday']);
-                    }
-                    if($weekday == 1){
-                        $array = StringUtil::deserialize($objectData['oh_monday']);
-                    }
-                    if($weekday == 2){
-                        $array = StringUtil::deserialize($objectData['oh_tuesday']);
-                    }
-                    if($weekday == 3){
-                        $array = StringUtil::deserialize($objectData['oh_wednesday']);
-                    }
-                    if($weekday == 4){
-                        $array = StringUtil::deserialize($objectData['oh_thursday']);
-                    }
-                    if($weekday == 5){
-                        $array = StringUtil::deserialize($objectData['oh_friday']);
-                    }
-                    if($weekday == 6){
-                        $array = StringUtil::deserialize($objectData['oh_saturday']);
-                    }
-
-                    $possibleBookings = 0;
-                    foreach($array as $timeset) {
-                        if (intval($timeset['time_end']) < intval($timeset['time_begin'])) { //nxtday
-                            $possibleSeconds = intval(86400+$timeset['time_end']) + intval($timeset['time_begin']);
-                        } else {
-                            $possibleSeconds = intval($timeset['time_end']) - intval($timeset['time_begin']);
-                        }
-
-                        switch ($periodType) {
-                            case 'minute':
-                                $toSecond = 60;
-                                break;
-                            case 'hour':
-                                $toSecond = 3600;
-                                break;
-                            default: '';
-                        }
-
-                        if ($possibleSeconds) {
-                            $possibleBookings = $possibleBookings + (($possibleSeconds / ($toSecond * $interval)) * $quantity);
-                        }
-                    }
-
-                    //add dates without possible times
-                    $timeArr = self::getReservationTimes($list,$type,$weekday,date('d.m.Y',$beginDate));
-                    if (!$timeArr || (count($timeArr) == 0)) {
-                        $alldates[] = $beginDate;
-                    }
-                }
 
                 foreach ($exclusionPeriods as $period) {
                     if ($period) {
@@ -246,11 +171,34 @@ class C4gReservationObjectModel extends \Model
                 }
             }
 
-            //add dates without free rooms
-            foreach ($exclusionObjects as $date=>$count) {
-                $maxCount = C4gReservationObjectModel::getMaxObjectCountPerDate($list, $date, $type);
-                if ($date && $count && ($count >= $maxCount)) {
-                    $alldates[] = $date;
+            //remove dates without possible times
+            $begin = new \DateTime(date('d.m.Y', time()));
+            $end   = new \DateTime(date('d.m.Y',time()+(365*86400))); //nxt year
+
+            for ($i = $begin; $i <= $end; $i->modify('+1 day')) {
+                $beginDate = $i->format('d.m.Y');
+                if (!$beginDate) {
+                    continue;
+                }
+                $weekday = date('w', strtotime($beginDate));
+                $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $beginDate);
+                if (!$timeArr || (count($timeArr) == 0)) {
+                    $alldates[] = strtotime($beginDate);
+                } else {
+                    $excludeTime = true;
+                    foreach ($timeArr as $timeElement) {
+                        if ($timeElement && $timeElement['objects']) {
+                            foreach ($timeElement['objects'] as $timeElementObj) {
+                                if (intval($timeElementObj['id']) && intval($timeElementObj['id']) !== -1) {
+                                    $excludeTime = false;
+                                    break 2;
+                                }
+                            }
+                        }
+                    }
+                    if ($excludeTime) {
+                        $alldates[] = strtotime($beginDate);
+                    }
                 }
             }
 
@@ -263,12 +211,7 @@ class C4gReservationObjectModel extends \Model
 
         return $result;
     }
-
-    public static function isTimePicked($date)
-    {
-
-    }
-
+    
     public static function isEventObject($object) {
         return ($object && (intval($object) > 0)) ? true : false;
     }
@@ -664,6 +607,32 @@ class C4gReservationObjectModel extends \Model
                 //object count * max persons
                 $capacity = $objectQuantity * intval($desiredCapacity);
 
+                if (is_numeric($weekday)) {
+                    switch (intval($weekday)) {
+                        case 0:
+                            $weekday = 'su';
+                            break;
+                        case 1:
+                            $weekday = 'mo';
+                            break;
+                        case 2:
+                            $weekday = 'tu';
+                            break;
+                        case 3:
+                            $weekday = 'we';
+                            break;
+                        case 4:
+                            $weekday = 'th';
+                            break;
+                        case 5:
+                            $weekday = 'fr';
+                            break;
+                        case 6:
+                            $weekday = 'sa';
+                            break;
+                    }
+                }
+
                 if ($durationInterval && ($durationInterval > 0)) {
                     foreach ($oh as $key => $day) {
                         if (($day != -1) && ($key == $weekday)) {
@@ -782,7 +751,7 @@ class C4gReservationObjectModel extends \Model
                                                 }
 
                                                 if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
-                                                    if ($calculatorResult->getDbPersons() >= $capacity) {
+                                                    if ($calculatorResult->getDbPersons() >= $max) {
                                                         //Each object can only be booked once
                                                         //C4gLogModel::addLogEntry('reservation', 'Persons ('.$calculatorResult->getDbPersons().') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
                                                         //C4gLogModel::addLogEntry('reservation', 'Interval '.$durationInterval);
@@ -792,7 +761,7 @@ class C4gReservationObjectModel extends \Model
                                                     } /*else if ($maxObjects && ($calculatorResult->getDbBookedObjects() >= intval($maxObjects)) && $typeObject->severalBookings) {
                                                     //n times for type
                                                     //C4gLogModel::addLogEntry('reservation', 'Buchungen ('.$calculatorResult->getDbBookings().') > capacity ('.intval($maxCount * $capacity).'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
-                                                } */else if ($capacity && (!empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($capacity))) {
+                                                } */else if ($max && (!empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($max))) {
                                                         //n times for object
                                                         //C4gLogModel::addLogEntry('reservation', 'Array-Eintrag ('.$timeArray[$tsdate][$time].') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
                                                     } else {

@@ -429,7 +429,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
-                            'su',
+                            '0',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 0)),
                             0,
                             $this->showEndTime,
@@ -464,7 +464,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
-                            'mo',
+                            '1',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 1)),
                             0,
                             $this->showEndTime,
@@ -499,7 +499,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
-                            'tu',
+                            '2',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 2)),
                             0,
                             $this->showEndTime,
@@ -534,7 +534,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
-                            'we',
+                            '3',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 3)),
                             0,
                             $this->showEndTime,
@@ -569,7 +569,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
-                            'th',
+                            '4',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 4)),
                             0,
                             $this->showEndTime,
@@ -604,7 +604,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
-                            'fr',
+                            '5',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 5)),
                             0,
                             $this->showEndTime,
@@ -640,7 +640,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
-                            'sa',
+                            '6',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 6)),
                             0,
                             $this->showEndTime,
@@ -2167,7 +2167,6 @@ class C4gReservation extends C4GBrickModuleParent
         $date = $values[2];
         $type = $values[3];
         $duration = $values[4];
-        $weekday = -1;
         $wd = -1;
 
         //hotfix dates with slashes
@@ -2194,29 +2193,6 @@ class C4gReservation extends C4GBrickModuleParent
 
             $datetime = $tsdate;//strtotime($date);
             $wd = date("w", $datetime);
-            switch ($wd) {
-                case 0:
-                    $weekday = 'su';
-                    break;
-                case 1:
-                    $weekday = 'mo';
-                    break;
-                case 2:
-                    $weekday = 'tu';
-                    break;
-                case 3:
-                    $weekday = 'we';
-                    break;
-                case 4:
-                    $weekday = 'th';
-                    break;
-                case 5:
-                    $weekday = 'fr';
-                    break;
-                case 6:
-                    $weekday = 'sa';
-                    break;
-            }
         }
 
         $eventId  = $this->Input->get('event') ? $this->Input->get('event') : 0;
@@ -2233,7 +2209,7 @@ class C4gReservation extends C4GBrickModuleParent
         $withEndTimes = $this->showEndTime;
         $withFreeSeats = $this->showFreeSeats;
 
-        $times = C4gReservationObjectModel::getReservationTimes($objects, $type, $weekday, $date, $duration, $withEndTimes, $withFreeSeats, true);
+        $times = C4gReservationObjectModel::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true);
 
         if ($type) {
             if ($this->fieldList) {
