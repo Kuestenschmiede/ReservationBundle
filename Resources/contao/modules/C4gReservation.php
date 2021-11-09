@@ -1865,13 +1865,13 @@ class C4gReservation extends C4GBrickModuleParent
             }
 
             $duration = $putVars['duration'];
-            if ($duration && (($duration >= $min_residence_time) && ($duration <= $max_residence_time))) {
+            if ($duration && ((!$min_residence_time || ($duration >= $min_residence_time) && (!$max_residence_time || ($duration <= $max_residence_time))))) {
                 //$duration = $duration;
             } else {
                 $duration = $time_interval;
             }
 
-            $duration = $duration * $interval;
+            $duration = $duration * 60; //check hourly period
             $endTime = $beginTime + $duration;
 
             $putVars['endDate'] = $putVars['beginDate_'.$type]; //ToDo multiple days
