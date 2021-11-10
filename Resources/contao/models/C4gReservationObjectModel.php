@@ -211,7 +211,7 @@ class C4gReservationObjectModel extends \Model
 
         return $result;
     }
-    
+
     public static function isEventObject($object) {
         return ($object && (intval($object) > 0)) ? true : false;
     }

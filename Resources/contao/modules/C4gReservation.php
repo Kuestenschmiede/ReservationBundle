@@ -1771,6 +1771,8 @@ class C4gReservation extends C4GBrickModuleParent
             }
         }
 
+        $reservationId = $putVars['reservation_id'];
+
         if ($isEvent) {
             $putVars['reservationObjectType'] = '2';
             $objectId = $reservationObject->id; //$putVars['reservation_object_event_' . $type];
@@ -1814,7 +1816,6 @@ class C4gReservation extends C4GBrickModuleParent
             $putVars['reservationObjectType'] = '1';
 
             //check duplicate reservation id
-            $reservationId = $putVars['reservation_id'];
             $reservations = C4gReservationModel::findBy("reservation_id", $reservationId);
             $reservationCount = is_array($reservations) ? count($reservations) : 0;
             if ($reservationCount >= 1) {
@@ -2048,7 +2049,7 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         $icsObject = $reservationEventObject ?: $reservationObject;
-        $putVars['icsFilename'] = $this->createIcs($beginDate, $beginTime, $endDate, $endTime, $icsObject, $reservationType, $location);
+        $putVars['icsFilename'] = $this->createIcs($beginDate, $beginTime, $endDate, $endTime, $icsObject, $reservationType, $location, $reservationId);
 
         $rawData = '';
         foreach ($putVars as $key => $value) {
@@ -2071,7 +2072,7 @@ class C4gReservation extends C4GBrickModuleParent
      * @param $type
      * @param $location
      */
-    public function createIcs($beginDate, $beginTime, $endDate, $endTime, $object, $type, $location)
+    public function createIcs($beginDate, $beginTime, $endDate, $endTime, $object, $type, $location, $reservationId)
     {
         if ($location && $location->ics && $location->icsPath) {
             $contact_street = $location->contact_street;
@@ -2085,8 +2086,8 @@ class C4gReservation extends C4GBrickModuleParent
             $timezone   = $GLOBALS['TL_CONFIG']['timeZone'];
 
             $icstimezone = 'TZID='.$timezone;
-            $icsdaylightsaving= date('I');
-            $icsprodid = $contact_name;
+            $icsdaylightsaving = date('I');
+            $icsprodid = $reservationId;
             $icslocation = $contact_name .": ". $contact_street .", ". $contact_postal." ". $contact_city;
             $icsuid = $contact_email;
 
