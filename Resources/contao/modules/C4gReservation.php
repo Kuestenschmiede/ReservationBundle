@@ -41,6 +41,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBrickModuleParent;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
 use con4gis\ReservationBundle\Classes\C4gReservationBrickTypes;
+use con4gis\ReservationBundle\Classes\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventAudienceModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventSpeakerModel;
@@ -2049,7 +2050,10 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         $icsObject = $reservationEventObject ?: $reservationObject;
-        $putVars['icsFilename'] = $this->createIcs($beginDate, $beginTime, $endDate, $endTime, $icsObject, $reservationType, $location, $reservationId);
+
+        $beginDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(strtotime($beginDate), $beginTime);
+        $endDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs($endDate ?: strtotime($beginDate), $endTime);
+        $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $reservationId);
 
         $rawData = '';
         foreach ($putVars as $key => $value) {
@@ -2064,78 +2068,37 @@ class C4gReservation extends C4GBrickModuleParent
     }
 
     /**
-     * @param $beginDate
-     * @param $beginTime
-     * @param $endDate
-     * @param $endTime
+     * @param $beginDateTime
+     * @param $endDateTime
      * @param $object
      * @param $type
      * @param $location
+     * @param $reservationId
+     * @return string
      */
-    public function createIcs($beginDate, $beginTime, $endDate, $endTime, $object, $type, $location, $reservationId)
+    public function createIcs($beginDateTime, $endDateTime, $object, $type, $location, $reservationId)
     {
-        if ($location && $location->ics && $location->icsPath) {
+
+        if ($beginDateTime && $endDateTime && $object && $type && $location && $location->ics && $location->icsPath && $reservationId) {
+            $icsprodid = $reservationId;
+            $icsuid = $reservationId;
             $contact_street = $location->contact_street;
             $contact_postal = $location->contact_postal;
             $contact_city = $location->contact_city;
             $contact_name = $location->contact_name;
-            $contact_email = $location->contact_email;
-
-            $dateFormat = $GLOBALS['TL_CONFIG']['dateFormat'];
-            $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
-            $timezone   = $GLOBALS['TL_CONFIG']['timeZone'];
-
-            $icstimezone = 'TZID='.$timezone;
-            $icsdaylightsaving = date('I');
-            $icsprodid = $reservationId;
-            $icslocation = $contact_name .": ". $contact_street .", ". $contact_postal." ". $contact_city;
-            $icsuid = $contact_email;
-
-            $local_tz = new \DateTimeZone($timezone);
-            $localTime = $beginTime+date("Z");
-
-            $b_date = date('Ymd', strtotime($beginDate));
-            $b_time = date('His', $localTime);
-            $icsdate = $b_date . 'T' . $b_time . 'Z';
-
-            $icsalert = $location->icsAlert;
-
-            switch ($type->periodType) {
-                case 'minute':
-                    $time_int = $object->time_interval * 60;
-                    $residence = $object->min_residence_time * 60;
-                    break;
-                case 'hour':
-                    $time_int = $object->time_interval * 3600;
-                    $residence = $object->min_residence_time * 3600;
-                    break;
-                default: '';
-            }
-
+            $icslocation = $contact_name ." (". $contact_street .", ". $contact_postal." ". $contact_city . ")";
             $icssummary = $object->caption;
-
+            $icsdescription = strip_tags($object->description);
+            $timezone   = $GLOBALS['TL_CONFIG']['timeZone'];
+            $icstimezone = 'TZID='.$timezone;
+            $dstart = $icstimezone.':'.$beginDateTime;
+            $dend = $icstimezone.':'.$endDateTime;
+            $dstamp = C4gReservationDateChecker::mergeDateWithTimeForIcs(time(),time()).'Z';
+            $icsalert = $location->icsAlert;
             $icsalert = $icsalert * 60;
             $icsalert = '-PT'.$icsalert.'M';
 
-            if ($residence && $residence > 0) {
-                $residence = $residence;
-                $e_date = date('Ymd',strtotime($beginDate));
-                $e_time = $beginTime + $residence;
-                $e_time = date('His',$e_time);
-                $icsenddate =$e_date . 'T' . $e_time. 'Z';
-            } else if ($time_int) {
-                $time_int = $time_int;
-                $e_date = date('Ymd',strtotime($beginDate));
-                $e_time = $beginTime + $time_int;
-                $e_time = date('His',$e_time);
-                $icsenddate =$e_date . 'T' . $e_time. 'Z';
-            } else if ($type->reservationObjectType == '2') {  //event
-                $e_date = date('Ymd', $beginDate);
-                $e_time = date('His', $endTime);
-                $icsenddate =$e_date . 'T' . $e_time. 'Z';
-            }
-
-            $fileId = sprintf("%05d", $type->id).sprintf("%05d",$object->id);
+            $fileId = $reservationId;//sprintf("%05d", $type->id).sprintf("%05d",$object->id);
             $pathUuid = $location->icsPath;
             if ($pathUuid) {
                 $pathUuid = StringUtil::binToUuid($pathUuid);
@@ -2150,7 +2113,11 @@ class C4gReservation extends C4GBrickModuleParent
                     $fs->touch($filename);
                     $ics = new File($filename);
                 }
-                $ics->openFile("w")->fwrite("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:$icsprodid\nMETHOD:PUBLISH\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icssummary\nDTSTART:$icsdate\nDTEND:$icsenddate\nDTSTAMP:$icsdate\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nDESCRIPTION:$icssummary\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
+
+                $ics->openFile("w")->fwrite(
+                    "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nPRODID:$icsprodid\n".
+                    "X-WR-TIMEZONE:$icstimezone\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icsdescription\n".
+                    "DTSTART;$dstart\nDTEND;$dend\nDTSTAMP:$dstamp\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
                 return $filename;
             }
         }
