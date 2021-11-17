@@ -1246,6 +1246,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $birthDateField->setNotificationField(true);
                 $birthDateField->setStyleClass('dateOfBirth');
                 $birthDateField->setInitialValue($initialValue ? $initialValue : $memberArr['dateOfBirth']);
+                $birthDateField->setDatePickerByBrowser(true);
                 $fieldList[] = $birthDateField;
             } else if ($rowField == "salutation2") {
                 $salutationField2 = new C4GSelectField();

@@ -508,6 +508,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $birthDateField->setStyleClass('dateOfBirth');
             $birthDateField->setShowIfEmpty(false);
             $birthDateField->setPrintable(true);
+            $birthDateField->setDatePickerByBrowser(true);
             $fieldList[] = $birthDateField;
 
             $organisationField2 = new C4GTextField();

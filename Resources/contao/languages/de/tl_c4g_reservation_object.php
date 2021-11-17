@@ -14,6 +14,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'] = array("Bezeichnung
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['options'] = array("Frontendbezeichnung","Werden je nach Sprache im Frontend dargestellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['quantity'] = array("Verfügbare Anzahl","Wie viele Objekte dieses Typs stehen zur Verfügung? (Standard 1)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesQuantity'] = array("Gilt über alle Reservierungsarten","Die verfügbare Anzahl der Objekte wird über alle Reservierungsarten berücksichtigt.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priority'] = array("Soll vorrangig angeboten werden","Ist dieser Schalter aktiv, dann wir das Objekt vorausgewählt, wenn mehrere Objekte in den Zeitpunkt passen.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location'] = array("Veranstaltungsort", "Wo findet der Termin statt?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'] = array("Reservierungsarten","Ordnen Sie das Reservierungsobjekt zu den Reservierungsarten zu.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['option'] = array("Name","");
