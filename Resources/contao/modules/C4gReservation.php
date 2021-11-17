@@ -1873,7 +1873,7 @@ class C4gReservation extends C4GBrickModuleParent
                 $duration = $time_interval;
             }
 
-            $duration = $duration * 60; //check hourly period
+            $duration = $duration * $interval;
             $endTime = $beginTime + $duration;
 
             $putVars['endDate'] = $putVars['beginDate_'.$type]; //ToDo multiple days
