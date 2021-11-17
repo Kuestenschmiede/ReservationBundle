@@ -760,6 +760,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationObjectField->setRangeField('desiredCapacity_' . $listType['id']);
             $reservationObjectField->setStyleClass($isEvent ? 'reservation-event-object displayReservationObjects' : 'reservation-object displayReservationObjects');
             $reservationObjectField->setWithEmptyOption(!$isEvent);
+            $reservationObjectField->setInitialValue(-1);
             $reservationObjectField->setShowIfEmpty(true);
             $reservationObjectField->setDatabaseField(!$isEvent);
             $reservationObjectField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);

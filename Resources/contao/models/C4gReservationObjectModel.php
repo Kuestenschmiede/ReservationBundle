@@ -676,7 +676,8 @@ class C4gReservationObjectModel extends \Model
                                                     'act'=>$calculatorResult->getDbPersons(),
                                                     'percent'=>$calculatorResult->getDbPercent(),
                                                     'max'=>$max,
-                                                    'showSeats'=>$showFreeSeats
+                                                    'showSeats'=>$showFreeSeats,
+                                                    'priority'=>intval($object->getPriority())
                                                 ];
 
                                                 $checkTime = $time;
@@ -742,7 +743,8 @@ class C4gReservationObjectModel extends \Model
                                                     'act'=>$calculatorResult->getDbPersons(),
                                                     'percent'=>$calculatorResult->getDbPercent(),
                                                     'max'=>$max,
-                                                    'showSeats'=>$showFreeSeats
+                                                    'showSeats'=>$showFreeSeats,
+                                                    'priority'=>intval($object->getPriority())
                                                 ];
 
                                                 $checkTime = $time;
@@ -1176,6 +1178,7 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject->setQuantity($object->quantity);
                 $frontendObject->setAllTypesQuantity($object->allTypesQuantity ?: 0);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
+                $frontendObject->setPriority($object->priority ?: 0);
 
 
                 $opening_hours = array();

@@ -41,6 +41,7 @@ class C4gReservationFrontendObject
     private $speaker = [];
     private $location = 0;
     private $eventDuration = ''; //ToDo
+    private $priority = 0;
 
     /**
      * C4gReservationFrontendObject constructor.
@@ -447,5 +448,21 @@ class C4gReservationFrontendObject
     public function setEventDuration(string $eventDuration): void
     {
         $this->eventDuration = $eventDuration;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority(int $priority): void
+    {
+        $this->priority = $priority;
     }
 }

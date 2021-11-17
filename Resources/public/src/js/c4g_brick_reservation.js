@@ -100,21 +100,24 @@ function setObjectId(object, typeid, showDateTime = 0) {
     var selectField = document.getElementById("c4g_reservation_object_"+typeId);
     var reservationObjects = jQuery(document.getElementsByClassName("displayReservationObjects"));
     var emptyOption = null;
-    var val = -1;
+    var objects = null;
+    var values = '';
 
     if (selectField) {
         jQuery(selectField).show();
         reservationObjects ? reservationObjects.show() : false;
         if (className) {
-            val = className.split("_")[2];
-            var objects = val.split('-');
+            values = className.split("_")[2];
+            objects = values.split('-');
 
             if (!jQuery(object).is(":disabled")) {
                 jQuery(selectField).val(objects[0]).change();
             }
+
+            values = objects ? objects : values
         }
     }
-    hideOptions(reservationObjects, typeId, objects ? objects : val, showDateTime);
+    hideOptions(reservationObjects, typeId, values, showDateTime);
     return true;
 }
 
@@ -125,7 +128,8 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
             typeId = typeField ? typeField.value : -1;
         }
         var selectField = document.getElementById("c4g_reservation_object_"+typeId);
-        var first = -1;//jQuery.isArray(values) ? values[0] : -1;//values;
+        var first = -1;
+        var firstValueParam = 0;
         if (selectField) {
             for (i = 0; i < selectField.options.length; i++) {
                 var option = selectField.options[i];
@@ -139,8 +143,17 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                 if (jQuery.isArray(values)) {
                     for (j = 0; j < values.length; j++) {
                         if (values[j] == option.value) {
+                            if (j == 0) {
+                                firstValueParam = values[j];
+                            }
                             foundValue = true;
+                            break;
                         }
+                    }
+                } else if (parseInt(values) >= 0) {
+                    if (values == option.value) {
+                        firstValueParam = values;
+                        foundValue = true;
                     }
                 }
 
@@ -153,14 +166,23 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                             jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
                         } else {
                             jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
-                            if ((first == -1) && (option.value != -1)) {
-                                first = option.value;
+
+                            if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
+                                first = firstValueParam;
+                            } else {
+                                if ((first == -1) && (option.value != -1)) {
+                                    first = option.value;
+                                }
                             }
                         }
                     } else {
                         jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
-                        if ((first == -1) && (option.value != -1)) {
-                            first = option.value;
+                        if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
+                            first = firstValueParam;
+                        } else {
+                            if ((first == -1) && (option.value != -1)) {
+                                first = option.value;
+                            }
                         }
                     }
                 }
@@ -400,6 +422,26 @@ function checkMax(objectList, arrindex, idx, value, timeList, capacity) {
     return result;
 }
 
+function shuffle(array) {
+    let counter = array.length;
+
+    // While there are elements in the array
+    while (counter > 0) {
+        // Pick a random index
+        let index = Math.floor(Math.random() * counter);
+
+        // Decrease counter by 1
+        counter--;
+
+        // And swap the last element with it
+        let temp = array[counter];
+        array[counter] = array[index];
+        array[index] = temp;
+    }
+
+    return array;
+}
+
 function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
     var brick_api = apiBaseUrl+"/c4g_brick_ajax";
     var elementId = 0;
@@ -512,36 +554,63 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
 
                                     if ((activateTimeButton >= 0) && (activateTimeButton < capMax) && (capacity >= capMin) && (capacity <= capMax)) {
                                         let objstr = '';
+                                        let withPriority = false;
+                                        let objArr = [];
+                                        for (l = 0; l < objectList[arrindex].length; l++) {
+                                            let listObj = objectList[arrindex][l];
+                                            if (listObj['priority'] && (listObj['priority'] == 1)) {
+                                                withPriority = true;
+                                                break;
+                                            }
+                                        }
+
+                                        objectList[arrindex] = shuffle(objectList[arrindex]); //random object selection
                                         for (l = 0; l < objectList[arrindex].length; l++) {
                                             let listObj = objectList[arrindex][l];
                                             let interval = intervalList[arrindex];
                                             let time = timeList[arrindex];
 
-                                            if (l == 0) {
-                                                objstr = objstr + listObj['id'];
+                                            if (withPriority && listObj['priority'] && (listObj['priority'] == 1)) {
+                                                objArr.splice( 0, 0, listObj['id'] );
                                             } else {
-                                                objstr = objstr + '-' + listObj['id'];
+                                                objArr.push(listObj['id']);
                                             }
 
                                             var optionidx = -1;
                                             for (var m = 0; m < jQuery(selectField).length; m++) {
                                                 if (selectField[m].value == listObj['id']) {
-                                                    optionidx = m;
-                                                    break;
+                                                    if (withPriority && listObj['priority'] && (listObj['priority'] == 1)) {
+                                                        optionidx = m;
+                                                        val = listObj['id'];
+                                                        break;
+                                                    } else if (!withPriority) {
+                                                        optionidx = m;
+                                                        val = listObj['id'];
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
 
-                                        if (objstr != 'undefined') {
-                                            jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objstr);
-                                            jQuery(radioGroups[i].children[j].children[k]).attr('disabled', false);
+                                        for (l = 0; l < objArr.length; l++) {
+                                            if (l == 0) {
+                                                objstr = objstr + objArr[l];
+                                            } else {
+                                                objstr = objstr + '-' + objArr[l];
+                                            }
                                         }
+                                        jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objstr);
+                                        jQuery(radioGroups[i].children[j].children[k]).attr('disabled', false);
 
                                         if (percent > 0) {
                                             jQuery(radioGroups[i].children[j].children[k]).addClass("radio_object_hurry_up");
                                         }
 
-                                        val = objectList[arrindex][0]['id']; //first valid option
+                                        if (!val || (val == -1)) {
+                                            val = objArr[0]; //first valid option
+                                        }
+                                        
+                                        hideOptions(reservationObjects,additionalId, objstr, showDateTime);
                                     } else {
                                         jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
                                         jQuery(radioGroups[i].children[j].children[k]).attr('disabled', true);
@@ -563,7 +632,6 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                 }
 
                 var reservationObjects = document.getElementsByClassName("displayReservationObjects");
-                hideOptions(reservationObjects,additionalId, val, showDateTime);
 
                 if (additionalId != -1) {
                     var timeGroups = jQuery('.reservation_time_button_'+additionalId+'.formdata input[type = "hidden"]');
