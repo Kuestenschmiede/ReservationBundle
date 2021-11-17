@@ -129,15 +129,15 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
     'con4gis_cancellation'   => array
     (
         'recipients'           => array('admin_email','email','contact_email'),
-        'email_subject'        => array('lastname','reservation_id'),
-        'email_text'           => array('lastname','reservation_id'),
-        'email_html'           => array('lastname','reservation_id'),
+        'email_subject'        => array('lastname','reservation_id','beginDate', 'beginTime', 'endDate', 'endTime'),
+        'email_text'           => array('lastname','reservation_id','beginDate', 'beginTime', 'endDate', 'endTime'),
+        'email_html'           => array('lastname','reservation_id','beginDate', 'beginTime', 'endDate', 'endTime'),
         'email_sender_name'    => array('admin_email','email','contact_email'),
         'email_sender_address' => array('admin_email','email','contact_email'),
         'email_recipient_cc'   => array('admin_email','email','contact_email'),
         'email_recipient_bcc'  => array('admin_email','email','contact_email'),
         'email_replyTo'        => array('admin_email','email','contact_email'),
-        'file_content'         => array('lastname','reservation_id')
+        'file_content'         => array('lastname','reservation_id','beginDate', 'beginTime', 'endDate', 'endTime')
 
     ),
     'con4gis_reservation_confirmation' => array
