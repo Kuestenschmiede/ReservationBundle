@@ -46,6 +46,11 @@
   cursor: no-drop;
   font-weight: 400
 }
+.reservation_time_button_direct input[type=radio][disabled] + label {
+  background-color: #006400;
+  border-bottom: #ff0;
+  font-weight: 700
+}
 .mod_C4gReservation .c4g_brick_dialog input[type=checkbox],
 .mod_C4gReservation label.agreed.c4g_agreed,
 .mod_C4gReservation label.reservation_id.c4g_reservation_id {

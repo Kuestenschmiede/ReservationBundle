@@ -110,7 +110,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'periodType_event'              => '{event_legend},event_dayBegin, event_timeBegin, event_dayEnd, event_timeEnd;',
         'periodType_contao_event'       => '{event_legend},event_id;',
         'auto_del_daily'                => 'del_time;',
-        'reservationObjectType_1'       => 'periodType,objectCount,severalBookings',
+        'reservationObjectType_1'       => 'periodType,objectCount,severalBookings,directBooking',
         'reservationObjectType_2'       => '',
     ),
 
@@ -255,11 +255,23 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'sql'               => "smallint(5) unsigned NULL default 0"
         ),
 
-        'severalBookings' => array(
+        'severalBookings' => array
+        (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'],
             'default'                 => 0,
             'exclude'                 => true,
             'filter'                  => true,
+            'inputType'               => 'checkbox',
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50 clr'),
+            'sql'                     => "int(1) unsigned NULL default 0"
+        ),
+
+        'directBooking' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['directBooking'],
+            'default'                 => 0,
+            'exclude'                 => true,
+            'filter'                  => false,
             'inputType'               => 'checkbox',
             'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50 clr'),
             'sql'                     => "int(1) unsigned NULL default 0"

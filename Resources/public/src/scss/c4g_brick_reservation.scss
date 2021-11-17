@@ -52,8 +52,10 @@
     font-weight: normal;
 }
 
-.reservation_time_event_button input[type="radio"][disabled] + label {
-
+.reservation_time_button_direct input[type="radio"][disabled] + label {
+    background-color: darkgreen;
+    border-bottom: yellow;
+    font-weight: bold;
 }
 
 .mod_C4gReservation .c4g_brick_dialog input[type='checkbox'], .mod_C4gReservation label.agreed.c4g_agreed, .mod_C4gReservation label.reservation_id.c4g_reservation_id {

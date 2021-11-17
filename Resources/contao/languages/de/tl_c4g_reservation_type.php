@@ -23,6 +23,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location'] = array("Veranstaltun
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("Zeitspannenart","Art der Zeitspanne deklarieren");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'] = array("Maximale Anzahl Objekte pro Zeitspanne","Maximale Anzahl der Gleichzeitig buchbaren Objekte. Das ist sinnvoll um bspw. in der Gastronomie gleichzeitige Tischreservierungen zu minimieren.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'] = array("Objekte mehrfach buchbar","Alle Objekte des Typs können mehrfach gebucht werden. Nur sinnvoll mit Personenangabe. Eine bereits gebuchte Personenzahl wird subrahiert.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['directBooking'] = array("Datum und Uhrzeit werden automatisch gesetzt","Diese Funktion wird benötigt wenn man ein Formular zum direkten Einbuchen nutzen möchte. Da wo es schnell gehen muss (z.B. Drive Through).");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['language'] = array("Sprache","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_send'] = array("Zusätzliche Bestätigung automatisch versenden","Die E-Mails werden versendet, sobald die Reservierung bestätigt ist.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_del'] = array("Intervall für Automatisches Löschen","In welchem Intervall sollen erledigte Termine gelöscht werden ");

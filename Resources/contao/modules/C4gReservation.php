@@ -233,7 +233,8 @@ class C4gReservation extends C4GBrickModuleParent
                                 'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
                                 'memberId' => $type->member_id ?: $memberId,
                                 'groupId' => $type->group_id,
-                                'type' => $type->reservationObjectType
+                                'type' => $type->reservationObjectType,
+                                'directBooking' => $type->directBooking
                             );
                         }
                     }
@@ -251,7 +252,8 @@ class C4gReservation extends C4GBrickModuleParent
                         'isEvent' => $type->reservationObjectType && $type->reservationObjectType === '2' ? true : false,
                         'memberId' => $type->member_id ?: $memberId,
                         'groupId' => $type->group_id,
-                        'type' => $type->reservationObjectType
+                        'type' => $type->reservationObjectType,
+                        'directBooking' => $type->directBooking
                     );
                 }
             }
@@ -368,6 +370,10 @@ class C4gReservation extends C4GBrickModuleParent
                 if (($listType['periodType'] === 'minute') || ($listType['periodType'] === 'hour')) {
                     //$conditionDate = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'beginDate_'.$listType['id']);
 
+                    if (!$initialDate && $listType['directBooking']) {
+                        $initialDate = date($GLOBALS['TL_CONFIG']['dateFormat'], time());
+                    }
+
                     if ($initialDate) {
                         $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."'), " . $this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");";
                         $this->getDialogParams()->setOnloadScript($script);
@@ -416,7 +422,45 @@ class C4gReservation extends C4GBrickModuleParent
                 $reservationendTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                 $fieldList[] = $reservationendTimeField;
 
-                if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute')) {
+                if (!$initialTime && $listType['directBooking']) {
+                    $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
+                    $initialTime = $objDate->tstamp;
+                }
+
+                $objects = [];
+                foreach ($reservationObjects as $reservationObject) {
+
+                    //ToDo Check Capacity
+                    $objects[] = array(
+                        'id' => $reservationObject->getId(),
+                        'name' => $reservationObject->getCaption(),
+                        'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
+                        'max' => $reservationObject->getDesiredCapacity()[1] ? ($reservationObject->getDesiredCapacity()[1] * $reservationObject->getQuantity()) : $reservationObject->getQuantity()
+                    );
+                }
+
+                if ($initialDate && $initialTime && $objects) {
+                    $reservationBeginTimeField = new C4GRadioGroupField();
+                    $reservationBeginTimeField->setFieldName('beginTime');
+                    $reservationBeginTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                    $reservationBeginTimeField->setFormField(true);
+                    $reservationBeginTimeField->setDatabaseField(true);
+                    $reservationBeginTimeField->setOptions(C4gReservationObjectModel::getReservationNowTime($objects[0]['id'], $this->showEndTime, $this->showFreeSeats));
+                    $reservationBeginTimeField->setCallOnChange(true);
+                    $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
+                    $reservationBeginTimeField->setMandatory(false);
+                    $reservationBeginTimeField->setInitialValue($initialTime);
+                    $reservationBeginTimeField->setSort(false);
+                    $reservationBeginTimeField->setCondition(array($condition));
+                    $reservationBeginTimeField->setAdditionalID($listType['id'].'-00'.date('w', strtotime($initialDate)));
+                    $reservationBeginTimeField->setNotificationField(true);
+                    $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
+                    $reservationBeginTimeField->setTurnButton(true);
+                    $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
+                    $reservationBeginTimeField->setStyleClass('reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id']);
+                    $reservationBeginTimeField->setTimeButtonSpecial(true);
+                    $fieldList[] = $reservationBeginTimeField;
+                } else if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute')) {
                     $su_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id']);
                     $su_condition->setModel(C4gReservationObjectModel::class);
                     $su_condition->setFunction('isSunday');
@@ -663,18 +707,6 @@ class C4gReservation extends C4GBrickModuleParent
                     $saReservationTimeField->setTimeButtonSpecial(true);
                     $fieldList[] = $saReservationTimeField;
 
-                }
-
-                $objects = [];
-                foreach ($reservationObjects as $reservationObject) {
-
-                    //ToDo Check Capacity
-                    $objects[] = array(
-                        'id' => $reservationObject->getId(),
-                        'name' => $reservationObject->getCaption(),
-                        'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
-                        'max' => $reservationObject->getDesiredCapacity()[1] ? ($reservationObject->getDesiredCapacity()[1] * $reservationObject->getQuantity()) : $reservationObject->getQuantity()
-                    );
                 }
             } else { //event
                 //set reservationObjectType to event
@@ -1884,16 +1916,23 @@ class C4gReservation extends C4GBrickModuleParent
             //check nxt day times
             $bday = $putVars['beginDate_'.$type];
             $nextDay = strtotime("+1 day", strtotime($bday));
-            if ($beginTime >= 86400) {
+            if (!$reservationType->directBooking && $beginTime >= 86400) {
                 $putVars['beginDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                 $putVars[$timeKey] = ($beginTime-86400);
             } else {
                 $putVars[$timeKey] = $beginTime;
             }
 
-            if ($endTime >= 86400) {
+            if (!$reservationType->directBooking && ($endTime >= 86400)) {
                 $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                 $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], ($endTime-86400));
+            }
+
+            if ($reservationType->directBooking) {
+                $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],$beginTime), Date::getFormatFromRgxp('time'));
+                $directTime = $objDate->tstamp;
+                $putVars[$timeKey] = $directTime;
+                //$putVars['beginDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
             }
         }
 

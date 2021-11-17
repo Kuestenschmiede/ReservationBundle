@@ -685,7 +685,7 @@ class C4gReservationObjectModel extends \Model
                                                     $checkTime = $endTime;
                                                 }
 
-                                                if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
+                                                if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)) || ($typeObject->directBooking))) {
                                                     if ($calculatorResult->getDbPersons() >= $capacity) {
                                                         //Each object can only be booked once
                                                         //C4gLogModel::addLogEntry('reservation', 'Persons ('.$calculatorResult->getDbPersons().') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
@@ -906,6 +906,13 @@ class C4gReservationObjectModel extends \Model
             $endTime = $object->getEndTime();
         }
         return self::addTime([], $object->getBeginTime(), $timeObj, false, $endTime);
+    }
+
+    public static function getReservationNowTime($objectId, $withEndTimes=false, $showFreeSeats=false) {
+        $timeObj = ['id'=>$objectId,'act'=>0,'percent'=>0,'max'=>1,'showSeats'=>$showFreeSeats];
+
+        $endTime = 0;
+        return self::addTime([], time(), $timeObj, false, $endTime);
     }
 
     /**

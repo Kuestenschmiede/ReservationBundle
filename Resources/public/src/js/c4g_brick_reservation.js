@@ -609,7 +609,7 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                                         if (!val || (val == -1)) {
                                             val = objArr[0]; //first valid option
                                         }
-                                        
+
                                         hideOptions(reservationObjects,additionalId, objstr, showDateTime);
                                     } else {
                                         jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
