@@ -143,10 +143,10 @@ class C4gReservationCancellation extends C4GBrickModuleParent
         $reservation = C4gReservationModel::findOneBy('reservation_id',$key);
         if ($reservation) {
             $putVars['email'] = $reservation->email;
-            $putVars['beginDate'] = $reservation->beginDate;
-            $putVars['beginTime'] = $reservation->beginTime;
-            $putVars['endDate'] = $reservation->endDate;
-            $putVars['endTime'] = $reservation->endTIme;
+            $putVars['beginDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$reservation->beginDate);
+            $putVars['beginTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$reservation->beginTime);
+            $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$reservation->endDate);
+            $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$reservation->endTime);
         }
 
         if (C4gReservationCancellationModel::cancellation($lastname, $key)) {
