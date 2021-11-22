@@ -12,23 +12,27 @@ namespace con4gis\ReservationBundle\Classes;
 
 class C4gReservationDateChecker
 {
-    public static function mergeDateWithTime($date, $time) {
+    public static function mergeDateWithTime($date, $time)
+    {
         $result = $date;
         $date = date('d.m.Y', $date);
         $time = date('H:i:s', $time);
         if ($date && $time) {
-            $result = strtotime($date)+strtotime($time);
+            $result = strtotime($date) + strtotime($time);
         }
+
         return $result;
     }
 
-    public static function mergeDateWithTimeForIcs($date, $time) {
+    public static function mergeDateWithTimeForIcs($date, $time)
+    {
         $result = $date;
         $date = date('Ymd', $date);
         $time = date('His', $time);
         if ($date && $time) {
-            $result = $date.'T'.$time;
+            $result = $date . 'T' . $time;
         }
+
         return $result;
     }
 
