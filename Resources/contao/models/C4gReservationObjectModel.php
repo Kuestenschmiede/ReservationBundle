@@ -685,7 +685,7 @@ class C4gReservationObjectModel extends \Model
                                                     $checkTime = $endTime;
                                                 }
 
-                                                if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)) || ($typeObject->directBooking))) {
+                                                if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime))/* || ($typeObject->directBooking)*/)) {
                                                     if ($calculatorResult->getDbPersons() >= $capacity) {
                                                         //Each object can only be booked once
                                                         //C4gLogModel::addLogEntry('reservation', 'Persons ('.$calculatorResult->getDbPersons().') > capacity ('.$capacity.'): '.$date.' '. date($GLOBALS['TL_CONFIG']['timeFormat'], $time));
@@ -908,8 +908,38 @@ class C4gReservationObjectModel extends \Model
         return self::addTime([], $object->getBeginTime(), $timeObj, false, $endTime);
     }
 
-    public static function getReservationNowTime($objectId, $withEndTimes=false, $showFreeSeats=false) {
-        $timeObj = ['id'=>$objectId,'act'=>0,'percent'=>0,'max'=>1,'showSeats'=>$showFreeSeats];
+    public static function getReservationNowTime($object, $withEndTimes=false, $showFreeSeats=false) {
+        $t = 'tl_c4g_reservation';
+        $id = intval($object['id']);
+
+        $time = time();
+
+        $arrColumns = array("$t.reservation_object=$id AND $t.reservationObjectType='1' AND $t.beginDate<=$time AND $t.endTime>=$time AND NOT $t.cancellation='1'");
+        $arrValues = array();
+        $arrOptions = array();
+        $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
+        $actPersons = 0;
+        $min = $object['min'] ?: 1;
+        $max = $object['max'] ?: 1;
+
+        if ($reservations) {
+            foreach ($reservations as $reservation) {
+                $actPersons = $actPersons + intval($reservation->desiredCapacity);
+            }
+
+            if ($object['almostFullyBookedAt']) {
+                $percent = ($actPersons / intval($max)) * 100;
+                if ($percent >= $object['almostFullyBookedAt']) {
+                    $actPercent = $percent;
+                }
+            }
+        }
+
+        if ($actPersons >= $max) {
+            $id = -1;
+        }
+
+        $timeObj = ['id'=>$id,'act'=>$actPersons,'percent'=>$actPercent,'min'=>$min,'max'=>$max,'showSeats'=>$showFreeSeats];
 
         $endTime = 0;
         return self::addTime([], time(), $timeObj, false, $endTime);

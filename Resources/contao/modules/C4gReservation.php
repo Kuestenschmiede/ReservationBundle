@@ -424,6 +424,9 @@ class C4gReservation extends C4GBrickModuleParent
 
                 if (!$initialTime && $listType['directBooking']) {
                     $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
+
+                    //ToDo check valid initial time ???
+
                     $initialTime = $objDate->tstamp;
                 }
 
@@ -435,7 +438,8 @@ class C4gReservation extends C4GBrickModuleParent
                         'id' => $reservationObject->getId(),
                         'name' => $reservationObject->getCaption(),
                         'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
-                        'max' => $reservationObject->getDesiredCapacity()[1] ? ($reservationObject->getDesiredCapacity()[1] * $reservationObject->getQuantity()) : $reservationObject->getQuantity()
+                        'max' => $reservationObject->getDesiredCapacity()[1] ? ($reservationObject->getDesiredCapacity()[1] * $reservationObject->getQuantity()) : $reservationObject->getQuantity(),
+                        'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt()
                     );
                 }
 
@@ -450,7 +454,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationBeginTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
                     $reservationBeginTimeField->setFormField(true);
                     $reservationBeginTimeField->setDatabaseField(true);
-                    $reservationBeginTimeField->setOptions(C4gReservationObjectModel::getReservationNowTime($objects[0]['id'], $this->showEndTime, $this->showFreeSeats));
+                    $reservationBeginTimeField->setOptions(C4gReservationObjectModel::getReservationNowTime($objects[0], $this->showEndTime, $this->showFreeSeats));
                     $reservationBeginTimeField->setCallOnChange(true);
                     $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
                     $reservationBeginTimeField->setMandatory(false);
