@@ -155,9 +155,9 @@ class C4gReservation extends C4GBrickModuleParent
 
             //ToDo hotfix
             //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
-            if (!$initialDate && $_COOKIE['reservationInitialDateCookie']) {
+            if ($eventObj && !$initialDate && $_COOKIE['reservationInitialDateCookie']) {
                 $initialDate = $_COOKIE['reservationInitialDateCookie'];
-            } else if ($initialDate) {
+            } else if ($eventObj && $initialDate) {
                 setcookie('reservationInitialDateCookie', $initialDate, time()+60, '/');
             }
 
@@ -165,9 +165,9 @@ class C4gReservation extends C4GBrickModuleParent
 
             //ToDo hotfix
             //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
-            if (!$time && $_COOKIE['reservationTimeCookie']) {
+            if ($eventObj && !$time && $_COOKIE['reservationTimeCookie']) {
                 $time = $_COOKIE['reservationTimeCookie'];
-            } else if ($time) {
+            } else if ($eventObj && $time) {
                 setcookie('reservationTimeCookie', $time, time()+60, '/');
             }
 
@@ -440,6 +440,11 @@ class C4gReservation extends C4GBrickModuleParent
                 }
 
                 if ($initialDate && $initialTime && $objects) {
+//                    if ($initialDate) {
+//                        $script = "setObjectId(this," . $listType['id'] . ",' . $this->showDateTime . ');";
+//                        $this->getDialogParams()->setOnloadScript($script);
+//                    }
+
                     $reservationBeginTimeField = new C4GRadioGroupField();
                     $reservationBeginTimeField->setFieldName('beginTime');
                     $reservationBeginTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
