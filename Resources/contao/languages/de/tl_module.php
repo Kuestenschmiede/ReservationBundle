@@ -40,6 +40,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showEndTime'] = a
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'] = array("Preise anzeigen","Preise werden dargestellt.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showDateTime'] = array("Termin am Objekt anzeigen","Zeigt den ausgewählten Termin direkt am Objekt an.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showMemberData'] = array("Mitgliederdaten übernehmen","Vorhandene Mitgliederdaten werden automatisch in den Formularfeldern vorbelegt.");
+//$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['overAllTypesReservation'] = array("Übergreifende Reservierungen","Diese Einstellung ist wichtig, wenn es um Verfügbarkeit von Personal geht, um parallele Buchungen über mehrere Reservierungsarten hinweg zu vermeiden.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['specialParticipantMechanism'] = array("Teilnehmermechanismus (optional)","Ist dieser Mechanismus aktiviert, werden die Teilnehmerfelder anhand der Personenzahl generiert.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['publicview'] = 'Öffentlich (Reservierungen werden sichtbar)';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['memberview'] = 'Mitgliedeansicht (Nur Reservierungen für angemeldetes Mitglied, nicht editierbar) [erfordert con4gis/groups]';

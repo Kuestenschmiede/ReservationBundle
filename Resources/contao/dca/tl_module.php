@@ -49,6 +49,13 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationType'] = array
     'inputType'         => 'checkbox',
     'sql'               => "int(1) unsigned NULL default 0"
 );
+//$GLOBALS['TL_DCA']['tl_module']['fields']['overAllTypesReservation'] = array
+//(   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['overAllTypesReservation'],
+//    'exclude'           => true,
+//    'filter'            => true,
+//    'inputType'         => 'checkbox',
+//    'sql'               => "int(1) unsigned NULL default 0"
+//);
 $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationObject'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationObject'],
     'default'           => 1,

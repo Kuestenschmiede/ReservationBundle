@@ -13,7 +13,8 @@
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'] = array("Name", "Name your reservation object. Examples: Room1, table7, specialist3");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['options'] = array("Frontend name", "Are displayed in the frontend depending on the language.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['quantity'] = array("Available number", "How many objects of this type are available? (default 1)");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesQuantity'] = array("Applies across all reservation types", "The available number of objects is considered across all reservation types.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesQuantity'] = array("Applies across all reservation types (same object)", "The available number of objects is considered across all reservation types.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesValidity'] = array("Applies across all reservation types (all objects)", "If more than one reservation type is active, then the booking will also block other objects.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priority'] = array("Should be offered with priority", "If this switch is active, then the object will be preselected if several objects fit into the time.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'] = array("Reservation types", "Assign the reservation object to the reservation types.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['option'] = array("Name","");

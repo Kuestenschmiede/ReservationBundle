@@ -13,7 +13,7 @@
  * Table tl_module
  */
 
-$default = '{type_legend}, caption, quantity, allTypesQuantity, priority, options, description, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
+$default = '{type_legend}, caption, quantity, allTypesQuantity, allTypesValidity, priority, options, description, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -157,6 +157,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'           => '1',
             'inputType'         => 'checkbox',
             'sql'               => "int(1) unsigned NULL default 1"
+        ),
+
+        'allTypesValidity' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesValidity'],
+            'exclude'           => true,
+            'filter'            => true,
+            'default'           => '0',
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
         ),
 
         'priority' => array
