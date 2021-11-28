@@ -16,18 +16,50 @@ use Contao\Database;
 class C4gReservationCalculator
 {
     private $calculatorResult = null;
+    private $reservations = [];
 
     /**
-     * C4gReservationCalculator constructor.
+     * @param int $date
+     * @param $object
+     * @param $type
+     */
+    public function __construct(int $date, $object, $type)
+    {
+        $objectId = $object->getId();
+        $typeId = $type->id;
+        $objectType = $type->reservationObjectType;
+        $reservationList = [];
+
+        $database = Database::getInstance();
+
+        if ($object && $object->getAllTypesValidity()) {
+            $set = [$date, $objectType];
+            $this->reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                ->execute($set)->fetchAllAssoc();
+        } else if ($object && $object->getAllTypesQuantity()) {
+            $set = [$date, $objectId, $objectType];
+            $this->reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                "`beginDate`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                ->execute($set)->fetchAllAssoc();
+        } else {
+            $set = [$date, $typeId, $objectType];
+            $this->reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                ->execute($set)->fetchAllAssoc();
+        }
+    }
+
+    /**
      * @param int $date
      * @param int $time
-     * @param int $interval
-     * @param $type
+     * @param int $endTime
      * @param $object
+     * @param $type
      * @param int $capacity
+     * @param $timeArray
      */
-    public function __construct(int $date, int $time, int $endTime, $object, $type, int $capacity, $timeArray)
-    {
+    public function calculateAll(int $date, int $time, int $endTime, $object, $type, int $capacity, $timeArray) {
         $objectId = $object->getId();
         $typeId = $type->id;
         $objectType = $type->reservationObjectType;
@@ -87,39 +119,21 @@ class C4gReservationCalculator
                     }
                 }
             }
-        } else {
-            if ($object && $object->getAllTypesValidity()) {
-                $set = [$date, $objectType];
-                $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc();
-            } else if ($object && $object->getAllTypesQuantity()) {
-                $set = [$date, $objectId, $objectType];
-                $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "`beginDate`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc();
-            } else {
-                $set = [$date, $typeId, $objectType];
-                $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc();
-            }
-
-            if ($reservations) {
-                foreach ($reservations as $reservation) {
-                    $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
-                    $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);
-                    $tb = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
-                    $te = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
-                    $timeBegin = strtotime($tb);
-                    $timeEnd = strtotime($te);
-                    $timeBeginDb = strtotime($tbdb);
-                    $timeEndDb = strtotime($tedb);
-                    if (
-                        (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
-                        (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb))) {
-                        $reservationList[] = $reservation;
-                    }
+        } else if ($this->reservations) {
+            $reservations = $this->reservations;
+            foreach ($reservations as $reservation) {
+                $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
+                $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);
+                $tb = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
+                $te = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
+                $timeBegin = strtotime($tb);
+                $timeEnd = strtotime($te);
+                $timeBeginDb = strtotime($tbdb);
+                $timeEndDb = strtotime($tedb);
+                if (
+                    (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
+                    (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb))) {
+                    $reservationList[] = $reservation;
                 }
             }
         }

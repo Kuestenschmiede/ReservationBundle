@@ -564,6 +564,10 @@ class C4gReservationObjectModel extends \Model
                     continue;
                 }
 
+                $calculator = new C4gReservationCalculator(
+                    $tsdate, $object, $typeObject
+                );
+
                 //im Formulat können zurzeit nur Minuten gesetzt werden
                 if ($duration >= 1)
                 {
@@ -654,7 +658,7 @@ class C4gReservationObjectModel extends \Model
                                             $id = $object->getId();
                                             if ($date && $tsdate && $time && $typeObject && $capacity) {
                                                 $endTime = $time + $interval;
-                                                $calculator = new C4gReservationCalculator(
+                                                $calculator->calculateAll(
                                                     $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
                                                 );
                                                 $calculatorResult = $calculator->getCalculatorResult();
@@ -719,7 +723,7 @@ class C4gReservationObjectModel extends \Model
                                             $id = $object->getId();
                                             if ($date && $tsdate && $time && $typeObject && $capacity) {
                                                 $endTime = $time + $interval;
-                                                $calculator = new C4gReservationCalculator(
+                                                $calculator->calculateAll(
                                                     $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
                                                 );
                                                 $calculatorResult = $calculator->getCalculatorResult();
