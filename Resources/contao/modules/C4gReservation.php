@@ -452,7 +452,7 @@ class C4gReservation extends C4GBrickModuleParent
                     );
                 }
 
-                if ($initialDate && $initialTime && $objects) {
+                if ($initialBookingDate && $initialBookingTime && $objects) {
 //                    if ($initialDate) {
 //                        $script = "setObjectId(this," . $listType['id'] . ",' . $this->showDateTime . ');";
 //                        $this->getDialogParams()->setOnloadScript($script);
