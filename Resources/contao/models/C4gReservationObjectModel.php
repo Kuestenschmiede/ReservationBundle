@@ -920,36 +920,87 @@ class C4gReservationObjectModel extends \Model
 
         $time = time();
 
-        $arrColumns = array("$t.reservation_object=$id AND $t.reservationObjectType='1' AND $t.beginDate<=$time AND $t.endTime>=$time AND NOT $t.cancellation='1'");
-        $arrValues = array();
-        $arrOptions = array();
-        $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
-        $actPersons = 0;
-        $min = $object['min'] ?: 1;
-        $max = $object['max'] ?: 1;
-
-        if ($reservations) {
-            foreach ($reservations as $reservation) {
-                $actPersons = $actPersons + intval($reservation->desiredCapacity);
+        $oh = $object['openingHours'];
+        $weekday = date("w", $time);
+        if (is_numeric($weekday)) {
+            switch (intval($weekday)) {
+                case 0:
+                    $weekday = 'su';
+                    break;
+                case 1:
+                    $weekday = 'mo';
+                    break;
+                case 2:
+                    $weekday = 'tu';
+                    break;
+                case 3:
+                    $weekday = 'we';
+                    break;
+                case 4:
+                    $weekday = 'th';
+                    break;
+                case 5:
+                    $weekday = 'fr';
+                    break;
+                case 6:
+                    $weekday = 'sa';
+                    break;
             }
+        }
 
-            if ($object['almostFullyBookedAt']) {
-                $percent = ($actPersons / intval($max)) * 100;
-                if ($percent >= $object['almostFullyBookedAt']) {
-                    $actPercent = $percent;
+        $validDate = false;
+        foreach ($oh as $key => $day) {
+            if (($day != -1) && ($key == $weekday)) {
+                foreach ($day as $period) {
+                    if (!C4gReservationObjectModel::checkValidPeriod($time, $period)) {
+                        continue;
+                    } else {
+                        $time_begin = strtotime($period['time_begin']);
+                        $time_end = strtotime($period['time_end']);
+
+                        if (($time_begin <= strtotime(date("H:i",$time))) && ($time_end >= strtotime(date("H:i",$time)))) {
+                            $validDate = true;
+                        }
+                    }
                 }
             }
         }
 
-        if ($actPersons >= $max) {
-            $id = -1;
+        if ($validDate) {
+            $arrColumns = array("$t.reservation_object=$id AND $t.reservationObjectType='1' AND $t.beginDate<=$time AND $t.endTime>=$time AND NOT $t.cancellation='1'");
+            $arrValues = array();
+            $arrOptions = array();
+            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
+            $actPersons = 0;
+            $min = $object['min'] ?: 1;
+            $max = $object['max'] ?: 1;
+
+            if ($reservations) {
+                foreach ($reservations as $reservation) {
+                    $actPersons = $actPersons + intval($reservation->desiredCapacity);
+                }
+
+                if ($object['almostFullyBookedAt']) {
+                    $percent = ($actPersons / intval($max)) * 100;
+                    if ($percent >= $object['almostFullyBookedAt']) {
+                        $actPercent = $percent;
+                    }
+                }
+            }
+
+            if ($actPersons >= $max) {
+                $id = -1;
+            }
+
+            $timeObj = ['id'=>$id,'act'=>$actPersons,'percent'=>$actPercent,'min'=>$min,'max'=>$max,'showSeats'=>$showFreeSeats];
+
+            $endTime = 0;
+            return self::addTime([], time(), $timeObj, false, $endTime);
+        } else {
+            return [];
         }
-
-        $timeObj = ['id'=>$id,'act'=>$actPersons,'percent'=>$actPercent,'min'=>$min,'max'=>$max,'showSeats'=>$showFreeSeats];
-
-        $endTime = 0;
-        return self::addTime([], time(), $timeObj, false, $endTime);
     }
+
 
     /**
      * @param null $moduleTypes

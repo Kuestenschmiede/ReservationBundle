@@ -448,7 +448,8 @@ class C4gReservation extends C4GBrickModuleParent
                         'name' => $reservationObject->getCaption(),
                         'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
                         'max' => $reservationObject->getDesiredCapacity()[1] ? ($reservationObject->getDesiredCapacity()[1] * $reservationObject->getQuantity()) : $reservationObject->getQuantity(),
-                        'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt()
+                        'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
+                        'openingHours' => $reservationObject->getOpeningHours()
                     );
                 }
 
