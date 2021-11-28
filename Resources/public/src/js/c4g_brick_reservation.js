@@ -683,7 +683,7 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
     if (additionalId) {
         //if there are just one time button then select automaticly.
         var radioButton = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
-        if (radioButton && radioButton.length === 1 && radioButton.is(":visible")) {
+        if (radioButton && radioButton.length === 1 && radioButton[0].is(":visible")) {
             radioButton.click();
         }
     }

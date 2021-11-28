@@ -23,30 +23,36 @@ class C4gReservationCalculator
      * @param $object
      * @param $type
      */
-    public function __construct(int $date, $object, $type)
+    public function __construct()
     {
-        $objectId = $object->getId();
-        $typeId = $type->id;
-        $objectType = $type->reservationObjectType;
-        $reservationList = [];
+    }
 
-        $database = Database::getInstance();
+    public function loadReservations(int $date, $object, $type)
+    {
+        if (!$this->reservations || !$this->reservations[$type->id] || !$this->reservations[$type->id][$object->getId()] || !$this->reservations[$type->id][$object->getId()][$date]) {
+            $objectId = $object->getId();
+            $typeId = $type->id;
+            $objectType = $type->reservationObjectType;
 
-        if ($object && $object->getAllTypesValidity()) {
-            $set = [$date, $objectType];
-            $this->reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                ->execute($set)->fetchAllAssoc();
-        } else if ($object && $object->getAllTypesQuantity()) {
-            $set = [$date, $objectId, $objectType];
-            $this->reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                "`beginDate`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                ->execute($set)->fetchAllAssoc();
-        } else {
-            $set = [$date, $typeId, $objectType];
-            $this->reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                ->execute($set)->fetchAllAssoc();
+            $database = Database::getInstance();
+
+            if ($object && $object->getAllTypesValidity()) {
+                $set = [$date, $objectType];
+                $this->reservations[$typeId][$objectId][$date] = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                    "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                    ->execute($set)->fetchAllAssoc();
+            } else if ($object && $object->getAllTypesQuantity()) {
+                $set = [$date, $objectId, $objectType];
+                $this->reservations[$typeId][$objectId][$date] = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                    "`beginDate`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                    ->execute($set)->fetchAllAssoc();
+            } else {
+                $set = [$date, $typeId, $objectType];
+                $this->reservations[$typeId][$objectId][$date] = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                    "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                    ->execute($set)->fetchAllAssoc();
+            }
+
         }
     }
 
@@ -119,8 +125,8 @@ class C4gReservationCalculator
                     }
                 }
             }
-        } else if ($this->reservations) {
-            $reservations = $this->reservations;
+        } else if ($this->reservations && $this->reservations[$typeId] && $this->reservations[$typeId][$objectId] && $this->reservations[$typeId][$objectId][$date]) {
+            $reservations = $this->reservations[$typeId][$objectId][$date];
             foreach ($reservations as $reservation) {
                 $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
                 $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);

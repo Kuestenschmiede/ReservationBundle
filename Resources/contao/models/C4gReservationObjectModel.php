@@ -144,7 +144,7 @@ class C4gReservationObjectModel extends \Model
         return $result;
     }
 
-     public static function getDateExclusionString($list, $type)
+     public static function getDateExclusionString($list, $type, $calculator)
     {
         $result = '';
         if ($list) {
@@ -181,7 +181,7 @@ class C4gReservationObjectModel extends \Model
                     continue;
                 }
                 $weekday = date('w', strtotime($beginDate));
-                $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $beginDate);
+                $timeArr = self::getReservationTimes($list, $type['id'], $calculator, $weekday, $beginDate);
                 if (!$timeArr || (count($timeArr) == 0)) {
                     $alldates[] = strtotime($beginDate);
                 } else {
@@ -484,9 +484,13 @@ class C4gReservationObjectModel extends \Model
      * @param false $showFreeSeats
      * @return array|mixed
      */
-    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false)
+    public static function getReservationTimes($list, $type, $calculator, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false)
     {
         $result = array();
+
+        if (!$calculator) {
+            $calculator = new C4gReservationCalculator();
+        }
 
         if ($list) {
             shuffle($list);
@@ -564,9 +568,7 @@ class C4gReservationObjectModel extends \Model
                     continue;
                 }
 
-                $calculator = new C4gReservationCalculator(
-                    $tsdate, $object, $typeObject
-                );
+                $calculator->loadReservations($tsdate, $object, $typeObject);
 
                 //im Formulat können zurzeit nur Minuten gesetzt werden
                 if ($duration >= 1)
@@ -1280,5 +1282,21 @@ class C4gReservationObjectModel extends \Model
         }
 
         return $objectList;
+    }
+
+    /**
+     * @return C4gReservationCalculator|null
+     */
+    public function getCalculator(): ?C4gReservationCalculator
+    {
+        return $this->calculator;
+    }
+
+    /**
+     * @param C4gReservationCalculator|null $calculator
+     */
+    public function setCalculator(?C4gReservationCalculator $calculator): void
+    {
+        $this->calculator = $calculator;
     }
 }

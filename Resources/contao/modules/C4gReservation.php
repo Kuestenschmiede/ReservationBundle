@@ -41,6 +41,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBrickModuleParent;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
 use con4gis\ReservationBundle\Classes\C4gReservationBrickTypes;
+use con4gis\ReservationBundle\Classes\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventAudienceModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationEventModel;
@@ -102,6 +103,8 @@ class C4gReservation extends C4GBrickModuleParent
     protected $withPermissionCheck = false;
     protected $useUuidCookie = false;
 
+    protected $calculator = null;
+
     public function initBrickModule($id)
     {
         self::loadLanguageFile('fe_c4g_reservation');
@@ -115,6 +118,8 @@ class C4gReservation extends C4GBrickModuleParent
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
         $this->dialogParams->setRedirectSite($this->reservation_redirect_site);
         $this->dialogParams->setSaveWithoutSavingMessage(false);
+
+        $this->calculator = new C4gReservationCalculator();
     }
 
     public function addFields()
@@ -371,10 +376,12 @@ class C4gReservation extends C4GBrickModuleParent
                     //$conditionDate = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'beginDate_'.$listType['id']);
 
                     if (!$initialDate && $listType['directBooking']) {
-                        $initialDate = date($GLOBALS['TL_CONFIG']['dateFormat'], time());
+                        $initialBookingDate = time();
+                    } else {
+                        $initialBookingDate = false;
                     }
 
-                    if ($initialDate) {
+                    if ($initialDate || $initialBookingDate) {
                         $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."'), " . $this->id . "," . $listType['id'] . ",'getCurrentTimeset'," . $this->showDateTime . ");";
                         $this->getDialogParams()->setOnloadScript($script);
                     }
@@ -384,13 +391,13 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationBeginDateField->setMinDate(C4gReservationObjectModel::getMinDate($reservationObjects));
                     $reservationBeginDateField->setMaxDate(C4gReservationObjectModel::getMaxDate($reservationObjects));
                     $reservationBeginDateField->setExcludeWeekdays(C4gReservationObjectModel::getWeekdayExclusionString($reservationObjects));
-                    $reservationBeginDateField->setExcludeDates(C4gReservationObjectModel::getDateExclusionString($reservationObjects, $listType));
+                    $reservationBeginDateField->setExcludeDates(C4gReservationObjectModel::getDateExclusionString($reservationObjects, $listType, $this->calculator));
                     $reservationBeginDateField->setFieldName('beginDate');
                     $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
                     $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
                     $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate']);
                     $reservationBeginDateField->setEditable(true);
-                    $reservationBeginDateField->setInitialValue($initialDate ? strtotime($initialDate) : false);
+                    $reservationBeginDateField->setInitialValue($initialBookingDate ?: strtotime($initialDate));
                     $reservationBeginDateField->setComparable(false);
                     $reservationBeginDateField->setSortColumn(true);
                     $reservationBeginDateField->setSortSequence('de_datetime');
@@ -427,7 +434,9 @@ class C4gReservation extends C4GBrickModuleParent
 
                     //ToDo check valid initial time ???
 
-                    $initialTime = $objDate->tstamp;
+                    $initialBookingTime = $objDate->tstamp;
+                } else {
+                    $initialBookingTime = false;
                 }
 
                 $objects = [];
@@ -458,7 +467,7 @@ class C4gReservation extends C4GBrickModuleParent
                     $reservationBeginTimeField->setCallOnChange(true);
                     $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
                     $reservationBeginTimeField->setMandatory(false);
-                    $reservationBeginTimeField->setInitialValue($initialTime);
+                    $reservationBeginTimeField->setInitialValue($initialBookingTime ?: $initialTime);
                     $reservationBeginTimeField->setSort(false);
                     $reservationBeginTimeField->setCondition(array($condition));
                     $reservationBeginTimeField->setAdditionalID($listType['id'].'-00'.date('w', strtotime($initialDate)));
@@ -483,6 +492,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
+                            $this->calculator,
                             '0',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 0)),
                             0,
@@ -518,6 +528,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
+                            $this->calculator,
                             '1',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 1)),
                             0,
@@ -553,6 +564,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
+                            $this->calculator,
                             '2',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 2)),
                             0,
@@ -588,6 +600,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
+                            $this->calculator,
                             '3',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 3)),
                             0,
@@ -623,6 +636,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
+                            $this->calculator,
                             '4',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 4)),
                             0,
@@ -658,6 +672,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
+                            $this->calculator,
                             '5',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 5)),
                             0,
@@ -694,6 +709,7 @@ class C4gReservation extends C4GBrickModuleParent
                         C4gReservationObjectModel::getReservationTimes(
                             $reservationObjects,
                             $listType['id'],
+                            $this->calculator,
                             '6',
                             date($GLOBALS['TL_CONFIG']['dateFormat'], C4gReservationObjectModel::getNextWeekday($reservationObjects, 6)),
                             0,
@@ -2186,6 +2202,7 @@ class C4gReservation extends C4GBrickModuleParent
         $type = $values[3];
         $duration = $values[4];
         $wd = -1;
+        $times = [];
 
         //hotfix dates with slashes
         $date = str_replace("~", "/", $date);
@@ -2223,22 +2240,25 @@ class C4gReservation extends C4GBrickModuleParent
             setcookie('reservationEventCookie', $eventId, time()+60, '/');
         }
 
-        $objects = C4gReservationObjectModel::getReservationObjectList(array($type), intval($eventId), $this->showPrices);
-        $withEndTimes = $this->showEndTime;
-        $withFreeSeats = $this->showFreeSeats;
+        if ($date) {
+            $objects = C4gReservationObjectModel::getReservationObjectList(array($type), intval($eventId), $this->showPrices);
+            $withEndTimes = $this->showEndTime;
+            $withFreeSeats = $this->showFreeSeats;
 
-        $times = C4gReservationObjectModel::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true);
+            $times = C4gReservationObjectModel::getReservationTimes($objects, $type, $this->calculator, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true);
 
-        if ($type) {
-            if ($this->fieldList) {
-                foreach ($this->fieldList as $key => $field) {
-                    if (($field->getFieldName() == 'beginTime') && ($field->getAdditionalId() == $type . '00' . $wd)) {
-                        $this->fieldList[$key]->setOptions($times);
-                        break;
+            if ($type) {
+                if ($this->fieldList) {
+                    foreach ($this->fieldList as $key => $field) {
+                        if (($field->getFieldName() == 'beginTime') && ($field->getAdditionalId() == $type . '00' . $wd)) {
+                            $this->fieldList[$key]->setOptions($times);
+                            break;
+                        }
                     }
                 }
             }
         }
+
 
         return array(
             'reservationId' => C4GBrickCommon::getUUID(),
