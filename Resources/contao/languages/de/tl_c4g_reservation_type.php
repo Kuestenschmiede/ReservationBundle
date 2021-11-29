@@ -22,7 +22,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_special_type'] = ar
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location'] = array("Veranstaltungsort", "Wo findet der Termin statt?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("Zeitspannenart","Art der Zeitspanne deklarieren");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'] = array("Maximale Anzahl Objekte pro Zeitspanne","Maximale Anzahl der Gleichzeitig buchbaren Objekte. Das ist sinnvoll um bspw. in der Gastronomie gleichzeitige Tischreservierungen zu minimieren.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'] = array("Objekte mehrfach buchbar","Alle Objekte des Typs können mehrfach gebucht werden. Nur sinnvoll mit Personenangabe. Eine bereits gebuchte Personenzahl wird subrahiert.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'] = array("Objekte mehrfach buchbar","Alle Objekte des Typs können mehrfach gebucht werden. Nur sinnvoll mit Personenangabe. Eine bereits gebuchte Personenzahl wird subtrahiert.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['directBooking'] = array("Datum und Uhrzeit werden automatisch gesetzt","Diese Funktion wird benötigt wenn man ein Formular zum direkten Einbuchen nutzen möchte. Da wo es schnell gehen muss (z.B. Drive Through). Achtung! Funktioniert nur mit einer einzelnen Reservierungsart.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['language'] = array("Sprache","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_send'] = array("Zusätzliche Bestätigung automatisch versenden","Die E-Mails werden versendet, sobald die Reservierung bestätigt ist.");
@@ -58,7 +58,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Beschreib
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minParticipantsPerBooking'] = array("Minimale Teilnehmerzahl pro Buchung", "Hierüber können Sie die Mindestteilnehmerzahl in der Eingabe pro Buchung erhöhen. 1 = Standard.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = array("Maximale Teilnehmerzahl pro Buchung", "Hierüber können Sie die Teilnehmerzahl in der Eingabe pro Buchung begrenzen. 0 = unbegrenzt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['almostFullyBookedAt'] = array("Fast ausgebucht bei wieviel %", "Hiermit kann der Warnstatus (Orange) festgelegt werden. 0 = kein Orange-Status");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['bookRunning'] = array("Laufende Termine buchbar", "Auch laufende Termine sind noch buchtbar.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['bookRunning'] = array("Laufende Termine buchbar", "Auch laufende Termine sind noch buchbar.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['memberId'] = array("Mitglied verknüpfen", "Alle Reservierungen dieser Art werden für dieses Mitglied erstellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId'] = 'Standard (kein spezielles Mitglied)';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['groupId'] = array("Gruppe verknüpfen", "Alle Reservierungen dieser Art werden für diese Mitgliedergruppe erstellt.");
@@ -72,7 +72,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['expert_legend'] = "Experteneinst
 
 /** Info */
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['infotext'] = 'Die Reservierungsart beschreibt den Typ der Reservierungsobjekte. Beispielsweise: "Tischreservierung" für die Objekte "4er Tisch" oder "Tisch 23. "'.
-    'Mehr auf <a href="https://docs.con4gis.org/con4gis-reservation" title="con4gis Docs Reservation" target="_blank" rel="noopener"><b>docs.con4gis.org</b></a><br>. '.
+    'Mehr auf <a href="https://docs.con4gis.org/con4gis-reservation" title="con4gis Docs Reservation" target="_blank" rel="noopener"><b>docs.con4gis.org</b></a>.<br>'.
     '<b>Wichtig! Achten Sie darauf, dass die Formularfelder nicht gecached werden. So ersparen Sie Ihren Nutzern nervige Meldungen.</b>';
 
 /** OPERATIONS **/
