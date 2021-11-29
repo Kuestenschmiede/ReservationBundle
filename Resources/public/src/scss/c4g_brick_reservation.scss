@@ -74,6 +74,10 @@
 .mod_C4gReservation .displayReservationObjects select {
     font-weight: bold;
     color: black;
+    cursor: pointer;
+}
+.mod_C4gReservation .displayReservationObjects select:disabled {
+    cursor: not-allowed;
 }
 
 .mod_C4gReservation .displayReservationObjects select option:disabled {

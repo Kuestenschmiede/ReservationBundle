@@ -67,7 +67,11 @@
 }
 .mod_C4gReservation .displayReservationObjects select {
   font-weight: 700;
-  color: #000
+  color: #000;
+  cursor: pointer
+}
+.mod_C4gReservation .displayReservationObjects select:disabled {
+  cursor: not-allowed
 }
 .mod_C4gReservation .displayReservationObjects select option:disabled {
   display: none
