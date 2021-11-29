@@ -955,11 +955,15 @@ class C4gReservationObjectModel extends \Model
                     if (!C4gReservationObjectModel::checkValidPeriod($time, $period)) {
                         continue;
                     } else {
-                        $time_begin = strtotime($period['time_begin']);
-                        $time_end = strtotime($period['time_end']);
+                        $time_begin = $period['time_begin'];
+                        $time_end = $period['time_end'];
 
-                        if (($time_begin <= strtotime(date("H:i",$time))) && ($time_end >= strtotime(date("H:i",$time)))) {
+                        $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],$time), Date::getFormatFromRgxp('time'));
+                        $nowTime = $objDate->tstamp;
+
+                        if (($time_begin <= $nowTime) && ($time_end >= $nowTime)) {
                             $validDate = true;
+                            break;
                         }
                     }
                 }
