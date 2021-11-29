@@ -1011,7 +1011,7 @@ class C4gReservationObjectModel extends \Model
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectList($moduleTypes = null, &$calculator, $date = 0, $objectId = 0, $showPrices = false, $getAllTypes = false)
+    public static function getReservationObjectList($moduleTypes = null, $calculator, $date = 0, $objectId = 0, $showPrices = false, $getAllTypes = false)
     {
         $objectlist = array();
         $allTypesList = array();
@@ -1228,7 +1228,7 @@ class C4gReservationObjectModel extends \Model
      * @param false $showPrices
      * @return array
      */
-    public static function getReservationObjectDefaultList($moduleTypes = null, $type, &$calculator, $date, $showPrices = false)
+    public static function getReservationObjectDefaultList($moduleTypes = null, $type, $calculator, $date, $showPrices = false)
     {
         $objectList = array();
         $t = static::$strTable;
