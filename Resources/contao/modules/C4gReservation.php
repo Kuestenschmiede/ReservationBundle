@@ -119,7 +119,7 @@ class C4gReservation extends C4GBrickModuleParent
         $this->dialogParams->setRedirectSite($this->reservation_redirect_site);
         $this->dialogParams->setSaveWithoutSavingMessage(false);
 
-        $this->calculator = new C4gReservationCalculator();
+        $this->calculator = $this->calculator ?: new C4gReservationCalculator();
     }
 
     public function addFields()
@@ -216,7 +216,7 @@ class C4gReservation extends C4GBrickModuleParent
                     }
                 }
 
-                $objects = C4gReservationObjectModel::getReservationObjectList(array($type->id), intval($eventId), $this->showPrices);
+                $objects = C4gReservationObjectModel::getReservationObjectList(array($type->id), $this->calculator, 0, intval($eventId), $this->showPrices);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
@@ -821,7 +821,7 @@ class C4gReservation extends C4GBrickModuleParent
             $reservationObjectField->setInitialValue(-1);
             $reservationObjectField->setShowIfEmpty(true);
             $reservationObjectField->setDatabaseField(!$isEvent);
-            $reservationObjectField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
+            $reservationObjectField->setEmptyOptionLabel($this->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
             $reservationObjectField->setCondition([$condition]);
             $reservationObjectField->setRemoveWithEmptyCondition(true);
             $reservationObjectField->setCallOnChange($isEvent);
@@ -2242,7 +2242,11 @@ class C4gReservation extends C4GBrickModuleParent
         }
 
         if ($date) {
-            $objects = C4gReservationObjectModel::getReservationObjectList(array($type), intval($eventId), $this->showPrices);
+            if (!$this->calculator) {
+                $this->calculator = new C4gReservationCalculator();
+            }
+
+            $objects = C4gReservationObjectModel::getReservationObjectList(array($type), $this->calculator, $tsdate, intval($eventId), $this->showPrices);
             $withEndTimes = $this->showEndTime;
             $withFreeSeats = $this->showFreeSeats;
 

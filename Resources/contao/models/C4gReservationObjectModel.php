@@ -144,7 +144,7 @@ class C4gReservationObjectModel extends \Model
         return $result;
     }
 
-     public static function getDateExclusionString($list, $type, $calculator)
+     public static function getDateExclusionString($list, $type, &$calculator)
     {
         $result = '';
         if ($list) {
@@ -484,7 +484,7 @@ class C4gReservationObjectModel extends \Model
      * @param false $showFreeSeats
      * @return array|mixed
      */
-    public static function getReservationTimes($list, $type, $calculator, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false)
+    public static function getReservationTimes($list, $type, &$calculator, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false)
     {
         $result = array();
 
@@ -1011,7 +1011,7 @@ class C4gReservationObjectModel extends \Model
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectList($moduleTypes = null, $objectId = 0, $showPrices = false, $getAllTypes = false)
+    public static function getReservationObjectList($moduleTypes = null, &$calculator, $date = 0, $objectId = 0, $showPrices = false, $getAllTypes = false)
     {
         $objectlist = array();
         $allTypesList = array();
@@ -1030,7 +1030,7 @@ class C4gReservationObjectModel extends \Model
                     }
 
                 } else {
-                    $objectlist = C4gReservationObjectModel::getReservationObjectDefaultList($moduleTypes, $type, $showPrices);
+                    $objectlist = C4gReservationObjectModel::getReservationObjectDefaultList($moduleTypes, $type, $calculator, $date, $showPrices);
 
                     if ($getAllTypes) {
                         foreach($objectlist as $key=>$object) {
@@ -1221,9 +1221,14 @@ class C4gReservationObjectModel extends \Model
     }
 
     /**
+     * @param null $moduleTypes
+     * @param $type
+     * @param $calculator
+     * @param $date
+     * @param false $showPrices
      * @return array
      */
-    public static function getReservationObjectDefaultList($moduleTypes = null, $type, $showPrices = false)
+    public static function getReservationObjectDefaultList($moduleTypes = null, $type, &$calculator, $date, $showPrices = false)
     {
         $objectList = array();
         $t = static::$strTable;
@@ -1248,6 +1253,10 @@ class C4gReservationObjectModel extends \Model
 
         if ($objects) {
             foreach ($objects as $object) {
+                if ($calculator && $date) {
+                    $calculator->loadReservations($date, $object, $type);
+                }
+
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(1);
                 $frontendObject->setId($object->id);
@@ -1291,7 +1300,7 @@ class C4gReservationObjectModel extends \Model
                 $opening_hours['fr'] = unserialize($object->oh_friday);
                 $opening_hours['sa'] = unserialize($object->oh_saturday);
 
-               //ToDo check if only the first record is empty.
+                //ToDo check if only the first record is empty.
                 if ($opening_hours['su'] != false) {
                     if ($opening_hours['su'][0]['time_begin'] && $opening_hours['su'][0]['time_end']) {
                         $weekdays['0'] = true;
@@ -1337,21 +1346,5 @@ class C4gReservationObjectModel extends \Model
         }
 
         return $objectList;
-    }
-
-    /**
-     * @return C4gReservationCalculator|null
-     */
-    public function getCalculator(): ?C4gReservationCalculator
-    {
-        return $this->calculator;
-    }
-
-    /**
-     * @param C4gReservationCalculator|null $calculator
-     */
-    public function setCalculator(?C4gReservationCalculator $calculator): void
-    {
-        $this->calculator = $calculator;
     }
 }

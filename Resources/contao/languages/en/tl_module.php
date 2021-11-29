@@ -40,6 +40,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showEndTime'] = a
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'] = array("Show prices","Prices are displayed");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showDateTime'] = array("Display appointment at object", "Displays the selected appointment directly at the object.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showMemberData'] = array("Apply member data", "Existing member data is automatically pre-populated in the form fields.");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['emptyOptionLabel'] = array("Text empty object list (optional)", "The text of the selectbox can optionally be overwritten.");
 //$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['overAllTypesReservation'] = array("Overlapping reservations", "This setting is important when dealing with staff availability to avoid parallel bookings across multiple reservation types.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['specialParticipantMechanism'] = array("Participant mechanism (optional)", "If this mechanism is activated, the participant fields are generated based on the number of persons.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['publicview'] = 'Public (reservations will be visible)';

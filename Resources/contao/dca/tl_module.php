@@ -13,7 +13,7 @@
  * Table tl_module
  */
 //ToDo showFreeSeats, additionalDuration
-$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,withCapacity,additionalDuration,showEndTime,showPrices,showDateTime,showMemberData,hide_selection, specialParticipantMechanism; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservation']   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,emptyOptionLabel,withCapacity,additionalDuration,showEndTime,showPrices,showDateTime,showMemberData,hide_selection, specialParticipantMechanism; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['C4gReservationList']  = '{title_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject, showSignatureField, cancellation_redirect_site;';
 
@@ -114,6 +114,18 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['showMemberData'] = array
     'inputType'         => 'checkbox',
     'sql'               => "int(1) unsigned NULL default 0"
 );
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['emptyOptionLabel'] = array (
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['emptyOptionLabel'],
+    'exclude'                 => true,
+    'filter'                  => false,
+    'search'                  => false,
+    'sorting'                 => false,
+    'inputType'               => 'text',
+    'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
+    'sql'                     => "varchar(255) NOT NULL default ''"
+);
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['additionalDuration'] = array
 (
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['additionalDuration'],

@@ -29,19 +29,32 @@ class C4gReservationCalculator
 
     public function loadReservations(int $date, $object, $type)
     {
-        if (!$this->reservations || !$this->reservations[$type->id] || !$this->reservations[$type->id][$object->getId()] || !$this->reservations[$type->id][$object->getId()][$date]) {
+        if (is_array($object)) {
+            $objectId = $object['id'];
+            $allTypesValidity = $object['allTypesValidity'];
+            $allTypesQuantity = $object['allTypesQuantity'];
+        } else if (method_exists($object, 'getId')) {
             $objectId = $object->getId();
-            $typeId = $type->id;
-            $objectType = $type->reservationObjectType;
+            $allTypesValidity = $object->getAllTypesValidity();
+            $allTypesQuantity = $object->getAllTypesQuantity();
+        } else {
+            $objectId = $object->id;
+            $allTypesValidity = $object->allTypesValidity;
+            $allTypesQuantity = $object->allTypesQuantity;
+        }
 
+        $typeId = $type->id;
+        $objectType = $type->reservationObjectType;
+
+        if (!$this->reservations || !$this->reservations[$typeId] || !$this->reservations[$typeId][$objectId] || !$this->reservations[$typeId][$objectId][$date]) {
             $database = Database::getInstance();
 
-            if ($object && $object->getAllTypesValidity()) {
+            if ($allTypesValidity) {
                 $set = [$date, $objectType];
                 $this->reservations[$typeId][$objectId][$date] = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
                     "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
                     ->execute($set)->fetchAllAssoc();
-            } else if ($object && $object->getAllTypesQuantity()) {
+            } else if ($allTypesQuantity) {
                 $set = [$date, $objectId, $objectType];
                 $this->reservations[$typeId][$objectId][$date] = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
                     "`beginDate`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
