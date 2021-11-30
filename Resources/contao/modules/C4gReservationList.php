@@ -40,6 +40,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimepickerField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBrickModuleParent;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
 use con4gis\ReservationBundle\Classes\C4gReservationBrickTypes;
+use con4gis\ReservationBundle\Classes\C4gReservationCalculator;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Resources\contao\models\C4gReservationParamsModel;
@@ -256,7 +257,8 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationTypeField->setComparable(false);
             $fieldList[] = $reservationTypeField;
 
-            $reservationObjects = C4gReservationObjectModel::getReservationObjectList($typeArr,0, false, true);
+            $calculator = new C4gReservationCalculator();
+            $reservationObjects = C4gReservationObjectModel::getReservationObjectList($typeArr, $calculator, 0, 0,false, true);
             $objects = [];
 
             foreach ($reservationObjects as $type=>$objList) {

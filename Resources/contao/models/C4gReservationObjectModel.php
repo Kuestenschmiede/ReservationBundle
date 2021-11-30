@@ -1287,6 +1287,7 @@ class C4gReservationObjectModel extends \Model
                 $frontendObject->setAllTypesValidity($object->allTypesValidity ?: 0);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                 $frontendObject->setPriority($object->priority ?: 0);
+                $frontendObject->setSwitchAllTypes($object->switchAllTypes);
 
 
                 $opening_hours = array();

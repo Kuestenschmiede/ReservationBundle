@@ -24,6 +24,16 @@ class C4gReservationDateChecker
         return $result;
     }
 
+    public static function getDayBeginStamp($time) {
+        $result = $time;
+        if ($time) {
+            $date = date('d.m.Y', $time);
+            $result = strtotime($date);
+        }
+
+        return $result;
+    }
+
     public static function mergeDateWithTimeForIcs($date, $time)
     {
         $result = $date;

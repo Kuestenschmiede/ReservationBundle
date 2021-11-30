@@ -43,6 +43,7 @@ class C4gReservationFrontendObject
     private $location = 0;
     private $eventDuration = ''; //ToDo
     private $priority = 0;
+    private $switchAllTypes = null;
 
     /**
      * C4gReservationFrontendObject constructor.
@@ -481,5 +482,21 @@ class C4gReservationFrontendObject
     public function setPriority(int $priority): void
     {
         $this->priority = $priority;
+    }
+
+    /**
+     * @return null
+     */
+    public function getSwitchAllTypes()
+    {
+        return $this->switchAllTypes;
+    }
+
+    /**
+     * @param null $switchAllTypes
+     */
+    public function setSwitchAllTypes($switchAllTypes): void
+    {
+        $this->switchAllTypes = $switchAllTypes;
     }
 }

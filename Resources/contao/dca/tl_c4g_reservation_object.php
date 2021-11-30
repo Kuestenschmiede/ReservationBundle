@@ -13,7 +13,7 @@
  * Table tl_module
  */
 
-$default = '{type_legend}, caption, quantity, allTypesQuantity, allTypesValidity, priority, options, description, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{publish_legend}, published';
+$default = '{type_legend}, caption, quantity, priority, options, description, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes;{publish_legend}, published';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -169,6 +169,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'               => "int(1) unsigned NULL default 0"
         ),
 
+        'switchAllTypes' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['switchAllTypes'],
+            'exclude'           => true,
+            'inputType'         => 'checkbox',
+            'foreignKey'        => 'tl_c4g_reservation_type.caption',
+            'eval'              => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr'),
+            'sql'               => "blob NULL"
+        ),
+
         'priority' => array
         (
             'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priority'],
@@ -217,7 +227,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'exclude'           => true,
             'inputType'         => 'checkbox',
             'foreignKey'        => 'tl_c4g_reservation_type.caption',
-            'eval'              => array('mandatory'=>'true','multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true,),
+            'eval'              => array('mandatory'=>true,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'               => "blob NULL "
         ),
 

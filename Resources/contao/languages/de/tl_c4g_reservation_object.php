@@ -15,6 +15,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['options'] = array("Frontendbez
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['quantity'] = array("Verfügbare Anzahl","Wie viele Objekte dieses Typs stehen zur Verfügung? (Standard 1)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesQuantity'] = array("Gilt über alle Reservierungsarten (selbes Objekt)","Die verfügbare Anzahl der Objekte wird über alle Reservierungsarten berücksichtigt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesValidity'] = array("Gilt über alle Reservierungsarten (alle Objekte)","Sollten mehrere Reservierungsarten aktiv sein, dann blockiert die Buchung auch andere Objekte.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['switchAllTypes'] = array("Gilt nur für folgende Reservierungsarten","Hiermit kann die Gültigkeit der vorherigen Checkboxen auf bestimmte Reservierungsarten reduziert werden (optional).");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priority'] = array("Soll vorrangig angeboten werden","Ist dieser Schalter aktiv, dann wir das Objekt vorausgewählt, wenn mehrere Objekte in den Zeitpunkt passen.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location'] = array("Veranstaltungsort", "Wo findet der Termin statt?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'] = array("Reservierungsarten","Ordnen Sie das Reservierungsobjekt zu den Reservierungsarten zu.");
@@ -82,6 +83,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['opening_hours_sunday_legend'] 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['exclusion_legend'] = "Ausschlusszeiten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['booking_wd_legend'] = "Buchungszeiträume";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location_legend'] = 'Einstellungen zum Ort';
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['expert_legend'] = 'Experteneinstellungen';
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['new'] = array("Objekt hinzufügen","Objekt hinzufügen");
