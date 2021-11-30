@@ -257,8 +257,7 @@ class C4gReservationList extends C4GBrickModuleParent
             $reservationTypeField->setComparable(false);
             $fieldList[] = $reservationTypeField;
 
-            $calculator = new C4gReservationCalculator();
-            $reservationObjects = C4gReservationObjectModel::getReservationObjectList($typeArr, $calculator, 0, 0,false, true);
+            $reservationObjects = C4gReservationObjectModel::getReservationObjectList($typeArr, 0,false, true);
             $objects = [];
 
             foreach ($reservationObjects as $type=>$objList) {

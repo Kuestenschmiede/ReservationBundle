@@ -17,83 +17,78 @@ class C4gReservationCalculator
 {
     private $calculatorResult = null;
     private $reservations = [];
+    private $resultList = [];
+    private $date = 0;
+    private $objectTypeId = 1;
 
     /**
-     * @param int $date
-     * @param $object
+     * @param $date
      * @param $type
+     * @param int $objectTypeId
      */
-    public function __construct()
+    public function __construct($date, $objectTypeId)
     {
+        $this->date = $date;
+        $this->objectTypeId = $objectTypeId;
+
+        $database = Database::getInstance();
+        $set = [$date, $objectTypeId];
+        $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+            "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+            ->execute($set)->fetchAllAssoc();
+        if ($result) {
+            $this->reservations[$date][$objectTypeId] = $result;
+        }
     }
 
-    public function loadReservations(int $date, $object, $type)
+    public function loadReservations($type, $object)
     {
-        if (is_array($object)) {
-            $objectId = $object['id'];
-            $allTypesValidity = $object['allTypesValidity'];
-            $allTypesQuantity = $object['allTypesQuantity'];
-            $switchAllTypes   = $object['switchAllTypes'];
-        } else if (method_exists($object, 'getId')) {
-            $objectId = $object->getId();
-            $allTypesValidity = $object->getAllTypesValidity();
-            $allTypesQuantity = $object->getAllTypesQuantity();
-            $switchAllTypes   = $object->getSwitchAllTypes();
-        } else {
-            $objectId = $object->id;
-            $allTypesValidity = $object->allTypesValidity;
-            $allTypesQuantity = $object->allTypesQuantity;
-            $switchAllTypes   = $object->switchAllTypes;
+        if (!$type || !$object || !$this->date || !count($this->reservations)) {
+            return;
         }
 
+        $date = $this->date;
         $typeId = $type->id;
-        $objectType = $type->reservationObjectType;
-        //$date = C4gReservationDateChecker::getDayBeginStamp($date);
+        $objectTypeId = $this->objectTypeId;
+        $reservations = $this->reservations[$date][$objectTypeId];
+        $objectId = $object->getId();
+        $allTypesValidity = $object->getAllTypesValidity();
+        $allTypesQuantity = $object->getAllTypesQuantity();
+        $switchAllTypes   = $object->getSwitchAllTypes();
 
-        if (!$this->reservations || !$this->reservations[$typeId] || !$this->reservations[$typeId][$objectId] || !$this->reservations[$typeId][$objectId][$date]) {
-            $database = Database::getInstance();
+        $this->resultList = [];
 
-            $switchAllTypes = unserialize($switchAllTypes);
-
+        $switchAllTypes = unserialize($switchAllTypes);
+        foreach ($reservations as $reservation) {
             if ($allTypesValidity) {
-                $set = [$date, $objectType];
-
                 if ($switchAllTypes && count($switchAllTypes) > 0) {
-                    if (!in_array($type,$switchAllTypes)) {
+                    if (!in_array($typeId,$switchAllTypes)) {
                         $switchAllTypes[] = $typeId;
                     }
-                    $allTypes = implode(',', $switchAllTypes);
-                    $this->reservations[$typeId][$objectId][$date] = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                        "`beginDate`=? AND `reservation_type` IN (".$allTypes.") AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                        ->execute($set)->fetchAllAssoc();
+                    if (in_array($reservation['reservation_type'], $switchAllTypes)){
+                        $this->resultList[] = $reservation;
+                    }
                 } else {
-                    $this->reservations[$typeId][$objectId][$date] = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                        "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                        ->execute($set)->fetchAllAssoc();
+                    //if ($typeId == $reservation['reservation_type']) {
+                    $this->resultList[] = $reservation;
+                    //}
                 }
             } else if ($allTypesQuantity) {
-                $set = [$date, $objectId, $objectType];
-
                 if ($switchAllTypes && count($switchAllTypes) > 0) {
-                    if (!in_array($type,$switchAllTypes)) {
+                    if (!in_array($typeId,$switchAllTypes)) {
                         $switchAllTypes[] = $typeId;
                     }
-                    $allTypes = implode(',', $switchAllTypes);
-                    $this->reservations[$typeId][$objectId][$date] = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                        "`beginDate`=? AND `reservation_type` IN (".$allTypes.") AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                        ->execute($set)->fetchAllAssoc();
+                    if ((in_array($reservation['reservation_type'], $switchAllTypes) && ($reservation['reservation_object'] == $objectId))){
+                        $this->resultList[] = $reservation;
+                    }
                 } else {
-                    $this->reservations[$typeId][$objectId][$date] = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                        "`beginDate`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                        ->execute($set)->fetchAllAssoc();
+                    if ($reservation['reservation_object'] == $objectId) {
+                        $this->resultList[] = $reservation;
+                    }
                 }
             } else {
-                $set = [$date, $typeId, $objectType];
-                $this->reservations[$typeId][$objectId][$date] = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc();
+                $this->resultList[] = $reservation;
             }
-
         }
     }
 
@@ -112,44 +107,39 @@ class C4gReservationCalculator
         $objectType = $type->reservationObjectType;
         $reservationList = [];
 
-        $database = Database::getInstance();
-
-        //$date = C4gReservationDateChecker::getDayBeginStamp($date);
-
         if ($endTime >= 86400) { //nxt day
-
-            if ($object && $object->getAllTypesValidity()) {
-                $switchAllTypes = unserialize($switchAllTypes);
-
-                if ($allTypesValidity) {
-                    $set = [$date, $objectType];
-
-                    if ($switchAllTypes && count($switchAllTypes) > 0) {
-                        if (!in_array($type,$switchAllTypes)) {
-                            $switchAllTypes[] = $typeId;
-                        }
-                        $allTypes = implode(',', $switchAllTypes);
-
-                        if ($time >= 86400) {
-                            $set = [strtotime('+1 day', $date), $objectType];
-                        } else {
-                            $set = [$date, $objectType];
-                        }
-                        $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                            "`beginDate`=? AND `reservation_type` IN (".$allTypes.") AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                            ->execute($set)->fetchAllAssoc();
-                    } else {
-                        if ($time >= 86400) {
-                            $set = [strtotime('+1 day', $date), $objectType];
-                        } else {
-                            $set = [$date, $objectType];
-                        }
-                        $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                            "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
-                            ->execute($set)->fetchAllAssoc();
+            $database = Database::getInstance();
+            $objectId = $object->getId();
+            $allTypesValidity = $object->getAllTypesValidity();
+            $allTypesQuantity = $object->getAllTypesQuantity();
+            $switchAllTypes   = $object->getSwitchAllTypes();
+            $switchAllTypes = unserialize($switchAllTypes);
+            if ($object && $allTypesValidity) {
+                if ($switchAllTypes && count($switchAllTypes) > 0) {
+                    if (!in_array($type,$switchAllTypes)) {
+                        $switchAllTypes[] = $typeId;
                     }
+                    $allTypes = implode(',', $switchAllTypes);
+
+                    if ($time >= 86400) {
+                        $set = [strtotime('+1 day', $date), $objectType];
+                    } else {
+                        $set = [$date, $objectType];
+                    }
+                    $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                        "`beginDate`=? AND `reservation_type` IN (".$allTypes.") AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                        ->execute($set)->fetchAllAssoc();
+                } else {
+                    if ($time >= 86400) {
+                        $set = [strtotime('+1 day', $date), $objectType];
+                    } else {
+                        $set = [$date, $objectType];
+                    }
+                    $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                        "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                        ->execute($set)->fetchAllAssoc();
                 }
-            } else if ($object && $object->getAllTypesQuantity()) {
+            } else if ($object && $allTypesQuantity) {
                 if ($switchAllTypes && count($switchAllTypes) > 0) {
                     if (!in_array($type, $switchAllTypes)) {
                         $switchAllTypes[] = $typeId;
@@ -205,9 +195,8 @@ class C4gReservationCalculator
                     }
                 }
             }
-        } else if ($this->reservations && $this->reservations[$typeId] && $this->reservations[$typeId][$objectId] && $this->reservations[$typeId][$objectId][$date]) {
-            $reservations = $this->reservations[$typeId][$objectId][$date];
-            foreach ($reservations as $reservation) {
+        } else if ($this->resultList) {
+            foreach ($this->resultList as $reservation) {
                 $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
                 $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);
                 $tb = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
