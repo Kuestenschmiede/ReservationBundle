@@ -106,6 +106,7 @@ class C4gReservationCalculator
         $typeId = $type->id;
         $objectType = $type->reservationObjectType;
         $reservationList = [];
+        $date = C4gReservationDateChecker::getBeginOfDate($date);
 
         if ($endTime >= 86400) { //nxt day
             $database = Database::getInstance();

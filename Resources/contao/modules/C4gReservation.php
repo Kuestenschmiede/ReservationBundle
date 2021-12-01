@@ -2215,7 +2215,7 @@ class C4gReservation extends C4GBrickModuleParent
                 }
             }
 
-            $datetime = $tsdate;//strtotime($date);
+            $datetime = C4gReservationDateChecker::getBeginOfDate($tsdate);
             $wd = date("w", $datetime);
         }
 

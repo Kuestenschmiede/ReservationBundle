@@ -24,14 +24,33 @@ class C4gReservationDateChecker
         return $result;
     }
 
-    public static function getDayBeginStamp($time) {
-        $result = $time;
+    public static function getBeginOfDate($time) {
         if ($time) {
-            $date = date('d.m.Y', $time);
-            $result = strtotime($date);
+            $dateTimeObject = new \DateTime();
+            $dateTimeObject->setTimezone($GLOBALS['TL_CONFIG']['timeZone']);
+            $dateTimeObject->setTimestamp($time);
+            $beginOfDayString = $dateTimeObject->format('Y-m-d 00:00:00');
+            $beginOfDayObject = \DateTime::createFromFormat('Y-m-d H:i:s', $beginOfDayString);
+            $beginOfDay = $beginOfDayObject->getTimestamp();
+            return $beginOfDay;
+        } else {
+            return $time;
         }
 
-        return $result;
+    }
+
+    public static function getEndOfDate($time) {
+        if ($time) {
+            $dateTimeObject = new \DateTime();
+            $dateTimeObject->setTimezone($GLOBALS['TL_CONFIG']['timeZone']);
+            $dateTimeObject->setTimestamp($time);
+            $endOfDayString = $dateTimeObject->format('Y-m-d 23:59:59');
+            $endOfDayObject = \DateTime::createFromFormat('Y-m-d H:i:s', $endOfDayString);
+            $endOfDay = $endOfDayObject->getTimestamp();
+            return $endOfDay;
+        } else {
+            return $time;
+        }
     }
 
     public static function mergeDateWithTimeForIcs($date, $time)
@@ -44,6 +63,66 @@ class C4gReservationDateChecker
         }
 
         return $result;
+    }
+
+    public static function getWeekdayStr($weekday) {
+        if (is_numeric($weekday)) {
+            switch (intval($weekday)) {
+                case 0:
+                    $weekday = 'su';
+                    break;
+                case 1:
+                    $weekday = 'mo';
+                    break;
+                case 2:
+                    $weekday = 'tu';
+                    break;
+                case 3:
+                    $weekday = 'we';
+                    break;
+                case 4:
+                    $weekday = 'th';
+                    break;
+                case 5:
+                    $weekday = 'fr';
+                    break;
+                case 6:
+                    $weekday = 'sa';
+                    break;
+            }
+        }
+
+        return $weekday;
+    }
+
+    public static function getWeekdayNumber($weekday) {
+        if (is_string($weekday)) {
+            switch ($weekday) {
+                case 'su':
+                    $weekday = 0;
+                    break;
+                case 'mo':
+                    $weekday = 1;
+                    break;
+                case 'tu':
+                    $weekday = 2;
+                    break;
+                case 'we':
+                    $weekday = 3;
+                    break;
+                case 'th':
+                    $weekday = 4;
+                    break;
+                case 'fr':
+                    $weekday = 5;
+                    break;
+                case 'sa':
+                    $weekday = 6;
+                    break;
+            }
+        }
+
+        return $weekday;
     }
 
     public static function isSunday($date)

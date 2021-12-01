@@ -15,6 +15,7 @@ use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ReservationBundle\Classes\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\C4gReservationCalculatorResult;
+use con4gis\ReservationBundle\Classes\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Classes\C4gReservationFrontendObject;
 use con4gis\ReservationBundle\Classes\C4gReservationHelper;
 use Contao\Database;
@@ -463,23 +464,27 @@ class C4gReservationObjectModel extends \Model
     /**
      * @param $tstamp
      * @param $period
+     * @param $weekday
+     * @return bool
      */
-    public static function checkValidPeriod($tstamp, $period) {
+    public static function checkValidPeriod($tstamp, $period, $weekday) {
         $tstamp = intval($tstamp);
-        $date_from = intval($period['date_from']);
-        $date_to = intval($period['date_to']);
+        $wd = date("w", $tstamp);
+        if ($wd == $weekday) {
+            $date_from = C4gReservationDateChecker::getBeginOfDate(intval($period['date_from']));
+            $date_to = C4gReservationDateChecker::getEndOfDate(intval($period['date_to']));
 
-        if ($tstamp && ($date_from || $date_to)) {
-
-            //hit the date
-            if ($date_from && $date_to && ($tstamp >= $date_from) && ($tstamp <= $date_to)) {
-                return true;
-            } else if (!$date_to && $date_from && ($tstamp >= $date_from)) {
-                return true;
-            } else if (!$date_from && $date_to && ($tstamp <= $date_to)) {
-                return true;
-            } else {
-                return false;
+            if ($tstamp && ($date_from || $date_to)) {
+                //hit the date
+                if ($date_from && $date_to && ($tstamp >= $date_from) && ($tstamp <= $date_to)) {
+                    return true;
+                } else if (!$date_to && $date_from && ($tstamp >= $date_from)) {
+                    return true;
+                } else if (!$date_from && $date_to && ($tstamp <= $date_to)) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
 
@@ -549,6 +554,11 @@ class C4gReservationObjectModel extends \Model
             $maxCount = intval($typeObject->objectCount);
 
             $objectType = $typeObject->reservationObjectType;
+
+            if ($tsdate) {
+                $tsdate = C4gReservationDateChecker::getBeginOfDate($tsdate);
+            }
+
             $calculator = new C4gReservationCalculator($tsdate, $objectType);
 
             //$count = []; //count over all objects
@@ -621,40 +631,13 @@ class C4gReservationObjectModel extends \Model
 
                 //object count * max persons
                 $capacity = $objectQuantity * intval($desiredCapacity);
-
-                if (is_numeric($weekday)) {
-                    switch (intval($weekday)) {
-                        case 0:
-                            $weekday = 'su';
-                            break;
-                        case 1:
-                            $weekday = 'mo';
-                            break;
-                        case 2:
-                            $weekday = 'tu';
-                            break;
-                        case 3:
-                            $weekday = 'we';
-                            break;
-                        case 4:
-                            $weekday = 'th';
-                            break;
-                        case 5:
-                            $weekday = 'fr';
-                            break;
-                        case 6:
-                            $weekday = 'sa';
-                            break;
-                    }
-                }
+                $weekdayStr = C4gReservationDateChecker::getWeekdayStr($weekday);
 
                 if ($durationInterval && ($durationInterval > 0)) {
                     foreach ($oh as $key => $day) {
-                        if (($day != -1) && ($key == $weekday)) {
+                        if (($day != -1) && ($key == $weekdayStr)) {
                             foreach ($day as $period) {
-                                if (!C4gReservationObjectModel::checkValidPeriod($tsdate, $period)) {
-                                    continue;
-                                }
+                                $periodValid = C4gReservationObjectModel::checkValidPeriod($tsdate, $period, $weekday);
 
                                 $time_begin = intval($period['time_begin']);
                                 $time_end = intval($period['time_end']);
@@ -681,7 +664,7 @@ class C4gReservationObjectModel extends \Model
                                                 }
 
                                                 $max = $capacity;
-                                                if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
+                                                if (!$periodValid || ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1))) {
                                                     $time = $time + $interval;
                                                     continue;
                                                 }
@@ -923,6 +906,12 @@ class C4gReservationObjectModel extends \Model
         return self::addTime([], $object->getBeginTime(), $timeObj, false, $endTime);
     }
 
+    /**
+     * @param $object
+     * @param false $withEndTimes
+     * @param false $showFreeSeats
+     * @return array
+     */
     public static function getReservationNowTime($object, $withEndTimes=false, $showFreeSeats=false) {
         $t = 'tl_c4g_reservation';
         $id = intval($object['id']);
@@ -931,37 +920,14 @@ class C4gReservationObjectModel extends \Model
 
         $oh = $object['openingHours'];
         $weekday = date("w", $time);
-        if (is_numeric($weekday)) {
-            switch (intval($weekday)) {
-                case 0:
-                    $weekday = 'su';
-                    break;
-                case 1:
-                    $weekday = 'mo';
-                    break;
-                case 2:
-                    $weekday = 'tu';
-                    break;
-                case 3:
-                    $weekday = 'we';
-                    break;
-                case 4:
-                    $weekday = 'th';
-                    break;
-                case 5:
-                    $weekday = 'fr';
-                    break;
-                case 6:
-                    $weekday = 'sa';
-                    break;
-            }
-        }
+
+        $weekdayStr = C4gReservationDateChecker::getWeekdayStr($weekday);
 
         $validDate = false;
         foreach ($oh as $key => $day) {
-            if (($day != -1) && ($key == $weekday)) {
+            if (($day != -1) && ($key == $weekdayStr)) {
                 foreach ($day as $period) {
-                    if (!C4gReservationObjectModel::checkValidPeriod($time, $period)) {
+                    if (!C4gReservationObjectModel::checkValidPeriod($time, $period, $weekday)) {
                         continue;
                     } else {
                         $time_begin = $period['time_begin'];
