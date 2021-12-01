@@ -483,7 +483,7 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
             url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
             success: function (data) {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
-                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group") : document.getElementsByClassName("c4g_brick_radio_group");
+                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group") : document.querySelectorAll(".reservation_time_button c4g_brick_radio_group");
                 var timeList = [];
                 var intervalList = [];
                 var objectList = [];
