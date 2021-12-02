@@ -161,12 +161,12 @@ class C4gReservationObjectModel extends \Model
 
                 foreach ($exclusionPeriods as $period) {
                     if ($period) {
-                        $exclusionBegin = $period['date_exclusion'];
-                        $exclusionEnd =  $period['date_exclusion_end'];
+                        $exclusionBegin = C4gReservationDateChecker::getBeginOfDate($period['date_exclusion']);
+                        $exclusionEnd = C4gReservationDateChecker::getEndOfDate($period['date_exclusion_end']);
 
                         $current = $exclusionBegin;
                         while($current <= $exclusionEnd) {
-                            $alldates[] = $current;
+                            $alldates[] = C4gReservationDateChecker::getBeginOfDate($current);
                             $current = intval($current) + 86400;
                         }
                     }
@@ -183,10 +183,10 @@ class C4gReservationObjectModel extends \Model
             }
 
             //remove dates without possible times
-            $begin = new \DateTime(date('d.m.Y', time()+($minDate*86400)));
-            $end   = new \DateTime(date('d.m.Y',time()+($maxDate*86400)));
-
             if ($removeBookedDays) {
+                $begin = new \DateTime(date('d.m.Y', time()+($minDate*86400)));
+                $end   = new \DateTime(date('d.m.Y',time()+($maxDate*86400)));
+
                 for ($i = $begin; $i <= $end; $i->modify('+1 day')) {
                     $beginDate = $i->format('d.m.Y');
                     if (!$beginDate) {
@@ -399,7 +399,6 @@ class C4gReservationObjectModel extends \Model
     public static function getMaxDate($objects)
     {
         $result = '';
-        $lastmax = 365;
         $today = time();
         if ($objects) {
             foreach ($objects as $object) {
@@ -407,11 +406,8 @@ class C4gReservationObjectModel extends \Model
 
                 if ($max === 0) {
                     $result = $today + (365 * 3600 * 24);
-                } elseif ($max < $lastmax) {
-                    $result = $today + ($max * 3600 * 24);
                 } else{
-                    $lastmax = $max;
-                    $result = $today + ($lastmax * 3600 * 24);
+                    $result = $today + ($max * 3600 * 24);
                 }
             }
         }
