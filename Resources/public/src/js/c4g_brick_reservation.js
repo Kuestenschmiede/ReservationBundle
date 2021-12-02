@@ -186,25 +186,17 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                         }
                     }
                 }
-            }
 
-            if (parseInt(first) >= 0) {
-                jQuery(selectField).val(first).change();
-                jQuery(selectField).children('option[value="'+first+'"]').removeAttr('disabled');
-                jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
-
-                jQuery(selectField).removeAttr('disabled');
-
-                if (showDateTime) {
-                    var text = jQuery(selectField).children('option[value="'+first+'"]').text();
+                if (showDateTime && (option.value != -1) && foundValue) {
+                    var text = jQuery(selectField).children('option[value="'+option.value+'"]').text();
                     var date = '';
                     var time = '';
 
-                    var dateFields = document.getElementsByClassName('c4g_date_field_input');
+                    var dateFields = document.querySelectorAll('.c4g_date_field_container .c4g_beginDate_'+typeId);
                     if (dateFields) {
-                        for (i = 0; i < dateFields.length; i++) {
-                            var dateField = dateFields[i];
-                            if (dateField && dateField.value && jQuery(dateField).is(":visible")) {
+                        for (k = 0; k < dateFields.length; k++) {
+                            var dateField = dateFields[k];
+                            if (dateField && dateField.value) {
                                 date = dateField.value;
                                 break;
                             }
@@ -213,11 +205,12 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
 
                     var radioButton = jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
                     if (radioButton) {
-                        for (i = 0; i < radioButton.length; i++) {
-                            var button = radioButton[i];
-                            if (button /*&& jQuery(button).hasClass("radio_object_" + typeId)*/) {
+                        for (k = 0; k < radioButton.length; k++) {
+                            var button = radioButton[k];
+                            if (button) {
                                 var label = jQuery('label[for="'+ jQuery(button).attr('id') +'"]');
                                 time = label ? label[0].firstChild.nodeValue : '';
+                                break;
                             }
                         }
                     }
@@ -228,12 +221,19 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                             text = text.substr(0, pos);
                         }
 
-                        jQuery(selectField).children('option[value="'+first+'"]').text(
+                        jQuery(selectField).children('option[value="'+option.value+'"]').text(
                             text + ' ('+ date + ' '+time+')'
                         );
                     }
                 }
+            }
 
+            if (parseInt(first) >= 0) {
+                jQuery(selectField).val(first).change();
+                jQuery(selectField).children('option[value="'+first+'"]').removeAttr('disabled');
+                jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
+
+                jQuery(selectField).removeAttr('disabled');
             } else {
                 jQuery(selectField).children('option[value="-1"]').removeAttr('disabled');
                 jQuery(selectField).val("-1").change();
@@ -483,7 +483,7 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
             url: brick_api + "/"+id+"/" + "buttonclick:" + callFunction + ":"+ date +":"+additionalId+ ":"+ duration +  "?id=0",
             success: function (data) {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
-                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group") : document.querySelectorAll(".reservation_time_button c4g_brick_radio_group");
+                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group") : document.querySelectorAll(".reservation_time_button .c4g_brick_radio_group");
                 var timeList = [];
                 var intervalList = [];
                 var objectList = [];
