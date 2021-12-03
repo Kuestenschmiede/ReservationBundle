@@ -304,10 +304,11 @@ function setReservationForm(id, typeId, callFunction, showDateTime, event) {
 }
 
 function checkTimelist(value, timeList) {
-    var arrIndex = -1
+    var arrIndex = -1;
 
     if (value && timeList) {
         for (idx=0; idx < timeList.length; idx++) {
+            let hits = 0;
             if (timeList[idx]) {
                 let timeset = [];
                 let timeidx = timeList[idx].toString();
@@ -324,8 +325,6 @@ function checkTimelist(value, timeList) {
                 } else {
                     valueset[0] = value;
                 }
-
-                let hits = 0;
 
                 if (parseInt(timeset[0]) === parseInt(valueset[0])) {
                     arrIndex = idx;
@@ -536,12 +535,22 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
 
                             for (k = 0; k < radioGroups[i].children[j].children.length; k++) {
                                 var value = jQuery(radioGroups[i].children[j].children[k]).val();
+
                                 if (value) {
                                     namefield = radioGroups[i].children[j].children[k].getAttribute('name').substr(1);
                                     var arrindex = checkTimelist(value, timeList);
+
+                                    // if (arrindex === -2) {
+                                    //   jQuery(radioGroups[i].children[j].children[k]).hide();
+                                    //   continue;
+                                    // } else {
+                                    //     jQuery(radioGroups[i].children[j].children[k]).show();
+                                    // }
+
                                     var activateTimeButton = -1
                                     var percent = 0;
                                     if (arrindex !== -1) {
+                                        //jQuery(radioGroups[i].children[j].children[k]).show();
                                         for (l = 0; l < objectList[arrindex].length; l++) {
                                             if (objectList[arrindex][l]['id'] != -1) {
                                                 if (checkMax(objectList, arrindex, l, value, timeList, capacity)) {
@@ -550,6 +559,9 @@ function setTimeset(dateField, id, additionalId, callFunction, showDateTime) {
                                                 }
                                             }
                                         }
+                                    } else {
+                                        //jQuery(radioGroups[i].children[j].children[k]).hide();
+                                        //continue;
                                     }
 
                                     if ((activateTimeButton >= 0) && (activateTimeButton < capMax) && (capacity >= capMin) && (capacity <= capMax)) {

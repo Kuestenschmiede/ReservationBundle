@@ -639,9 +639,6 @@ class C4gReservationObjectModel extends \Model
                                 if ($date !== -1) {
                                     $periodValid = C4gReservationObjectModel::checkValidPeriod($tsdate, $period);
                                     if (!$periodValid) {
-                                        $datum = date('d.m.Y', $tsdate);
-                                        $von = date('d.m.Y', $period['date_from']);
-                                        $bis = date('d.m.Y', $period['date_to']);
                                         continue;
                                     }
                                 }
@@ -666,24 +663,25 @@ class C4gReservationObjectModel extends \Model
                                                     );
                                                     $calculatorResult = $calculator->getCalculatorResult();
                                                     $timeArray = $calculatorResult->getTimeArray();
-
-                                                    $endTimeInterval = $interval;
-                                                    if (!$withEndTimes) {
-                                                        $endTimeInterval = 0;
-                                                    }
-
-                                                    $max = $capacity;
-                                                    if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
-                                                        $time = $time + $interval;
-                                                        continue;
-                                                    }
                                                 }
+
+
+                                                $endTimeInterval = $interval;
+                                                if (!$withEndTimes) {
+                                                    $endTimeInterval = 0;
+                                                }
+
+                                                $max = $capacity;
+//                                                if ($calculatorResult->getDbPersons() && !$typeObject->severalBookings && ($objectQuantity == 1)) {
+//                                                    $time = $time + $interval;
+//                                                    continue;
+//                                                }
 
                                                 $timeObj = [
                                                     'id'=>-1,
                                                     'act'=>$calculatorResult ? $calculatorResult->getDbPersons() : 0,
                                                     'percent'=>$calculatorResult ? $calculatorResult->getDbPercent() : 0,
-                                                    'max'=>$max,
+                                                    'max'=> $max,
                                                     'showSeats'=>$showFreeSeats,
                                                     'priority'=>intval($object->getPriority())
                                                 ];
@@ -699,7 +697,7 @@ class C4gReservationObjectModel extends \Model
                                                         $reasonLog = 'too many persons';
                                                     } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject->severalBookings || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
                                                         $reasonLog = 'too many bookings';
-                                                    } else if ($capacity && (!empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($capacity))) {
+                                                    } else if ($capacity && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($capacity))) {
                                                         $reasionLog = 'too many bookings per object';
                                                 } else {
                                                         $timeObj['id'] = $id;
@@ -765,7 +763,7 @@ class C4gReservationObjectModel extends \Model
                                                         $reasonLog = 'too many persons';
                                                     } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject->severalBookings || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
                                                         $reasonLog = 'too many bookings';
-                                                    } else if ($max && (!empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($max))) {
+                                                    } else if ($max && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($max))) {
                                                         $reasionLog = 'too many bookings per object';
                                                     } else {
                                                         $timeObj['id'] = $id;
