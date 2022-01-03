@@ -12,8 +12,8 @@
         }
     ],
     "require": {
-        "contao/core-bundle": "^4.4",
-        "contao/calendar-bundle": "^4.4",
+        "contao/core-bundle": "^4.9",
+        "contao/calendar-bundle": "^4.9",
         "con4gis/projects": "^v3.0.29",
         "con4gis/documents": "^1.4.1",
         "con4gis/groups": "^v2.7.3"
@@ -27,16 +27,17 @@
     },
     "autoload": {
         "psr-4": {
-            "con4gis\\ReservationBundle\\": ""
+            "con4gis\\ReservationBundle\\": "src/"
         },
         "classmap": [
-            "Resources/contao/"
+            "src/Classes/",
+            "src/Resources/contao/"
         ],
         "exclude-from-classmap": [
-            "Resources/contao/config/",
-            "Resources/contao/dca /",
-            "Resources/contao/languages/",
-            "Resources/contao/templates/"
+            "src/Resources/contao/config/",
+            "src/Resources/contao/dca/",
+            "src/Resources/contao/languages/",
+            "src/Resources/contao/templates/"
         ]
     },
     "config": {
