@@ -32,8 +32,8 @@ class Plugin implements RoutingPluginInterface, BundlePluginInterface
     public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel)
     {
         return $resolver
-            ->resolve(__DIR__.'/../../config/routing.yml')
-            ->load(__DIR__.'/../../config/routing.yml')
+            ->resolve(__DIR__.'/../Resources/config/routing.yml')
+            ->load(__DIR__.'/../Resources/config/routing.yml')
             ;
     }
 
