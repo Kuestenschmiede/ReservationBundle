@@ -1753,7 +1753,8 @@ class C4gReservationController extends C4GBaseController
     public function clickReservation($values, $putVars)
     {
         $type = $putVars['reservation_type'];
-        $reservationType = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
+        $database = \Database::getInstance();
+        $reservationType = $database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
             ->execute($type);
 
         if ($reservationType && $reservationType->notification_type) {
@@ -1794,7 +1795,7 @@ class C4gReservationController extends C4GBaseController
             if ($isEvent) {
                 $key = "reservation_object_event_" . $type;
                 $resObject = $putVars[$key];
-                $reservationObject = $this->Database->prepare("SELECT * FROM tl_calendar_events WHERE id=? AND published='1'")
+                $reservationObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE id=? AND published='1'")
                     ->execute($resObject);
 
                 foreach ($putVars as $key => $value) {
@@ -1814,7 +1815,7 @@ class C4gReservationController extends C4GBaseController
             } else {
                 $key = "reservation_object_" . $type;
                 $resObject = $putVars[$key];
-                $reservationObject = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
+                $reservationObject = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
                     ->execute($resObject);
             }
 
