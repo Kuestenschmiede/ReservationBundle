@@ -73,7 +73,9 @@ class C4gReservationHandler
 
         foreach ($list as $object) {
             $id= $object->getId();
-            $objectData = $database->prepare("SELECT * FROM `tl_c4g_reservation_object` WHERE id=? AND published='1'")
+            $objectData = $database->prepare(
+                "SELECT quantity,oh_sunday,oh_monday,oh_tuesday,oh_wednesday,oh_thursday,oh_friday,oh_saturday".
+                         "FROM `tl_c4g_reservation_object` WHERE id=? AND published='1'")
                 ->execute($id)->fetchAssoc();
             $weekday = date("w",$date);
             $quantity = $objectData['quantity'];
@@ -875,7 +877,7 @@ class C4gReservationHandler
 //            $arrOptions = array();
 //            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT * FROM `tl_c4g_reservation` WHERE reservation_type=? AND reservation_object=? AND reservationObjectType=? AND beginDate=? AND beginTime=? AND cancellation=?")
+            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE reservation_type=? AND reservation_object=? AND reservationObjectType=? AND beginDate=? AND beginTime=? AND cancellation=?")
                 ->execute($typeId,$objectId,'1',$beginDate,$beginTime,'1')->fetchAllAssoc();
 
             $reservationCount = count($reservations);
@@ -918,7 +920,7 @@ class C4gReservationHandler
 //            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
 
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT * FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType=? AND NOT cancellation=?")
+            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType=? AND NOT cancellation=?")
                 ->execute($id,'2','1')->fetchAllAssoc();
 
             $percent = $object->getAlmostFullyBookedAt();
@@ -951,7 +953,7 @@ class C4gReservationHandler
 //        $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
 
         $database = Database::getInstance();
-        $reservations = $database->prepare("SELECT * FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType=? AND NOT cancellation=?")
+        $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType=? AND NOT cancellation=?")
             ->execute($id,'2','1')->fetchAllAssoc();
 
         $actPersons = 0;
@@ -1027,7 +1029,7 @@ class C4gReservationHandler
 //            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
 
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT * FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType=? AND beginDate<=? AND endTime>=? AND NOT cancellation=?")
+            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType=? AND beginDate<=? AND endTime>=? AND NOT cancellation=?")
                 ->execute($id,'1',$time,$time,'1')->fetchAllAssoc();
 
             $actPersons = 0;
@@ -1117,7 +1119,7 @@ class C4gReservationHandler
         if ($object) {
             //$priceObjs = C4gReservationObjectPricesModel::findBy('published', '1');
             $database = Database::getInstance();
-            $priceObjs = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE published=?")
+            $priceObjs = $database->prepare("SELECT * FROM `tl_c4g_reservation_object_prices` WHERE published=?")
                 ->execute('1')->fetchAllAssoc();
             if ($priceObjs) {
                 foreach ($priceObjs as $priceObj) {
