@@ -540,17 +540,9 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
                                     namefield = radioGroups[i].children[j].children[k].getAttribute('name').substr(1);
                                     var arrindex = checkTimelist(value, timeList);
 
-                                    // if (arrindex === -2) {
-                                    //   jQuery(radioGroups[i].children[j].children[k]).hide();
-                                    //   continue;
-                                    // } else {
-                                    //     jQuery(radioGroups[i].children[j].children[k]).show();
-                                    // }
-
                                     var activateTimeButton = -1
                                     var percent = 0;
                                     if (arrindex !== -1) {
-                                        //jQuery(radioGroups[i].children[j].children[k]).show();
                                         for (l = 0; l < objectList[arrindex].length; l++) {
                                             if (objectList[arrindex][l]['id'] != -1) {
                                                 if (checkMax(objectList, arrindex, l, value, timeList, capacity)) {
@@ -559,9 +551,6 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
                                                 }
                                             }
                                         }
-                                    } else {
-                                        //jQuery(radioGroups[i].children[j].children[k]).hide();
-                                        //continue;
                                     }
 
                                     if ((activateTimeButton >= 0) && (activateTimeButton < capMax) && (capacity >= capMin) && (capacity <= capMax)) {

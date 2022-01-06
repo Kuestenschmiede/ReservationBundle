@@ -39,7 +39,13 @@ use con4gis\ReservationBundle\Classes\Projects\C4gReservationBrickTypes;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Controller;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\ModuleModel;
 use Contao\System;
+use Contao\Template;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class C4gReservationListController extends C4GBaseController
 {
@@ -49,7 +55,7 @@ class C4gReservationListController extends C4GBaseController
     protected $modelClass   = C4gReservationModel::class;
     protected $languageFile = 'fe_c4g_reservation';
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
-    protected $viewType     = C4GBrickViewType::PUBLICVIEW;
+    protected $viewType     = C4GBrickViewType::GROUPBASED;
     protected $sendEMails   = null;
     protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
@@ -91,10 +97,17 @@ class C4gReservationListController extends C4GBaseController
 
     protected $withPermissionCheck = false;
 
-    public function initBrickModule($id)
+    /**
+     * @param string $rootDir
+     * @param Session $session
+     * @param ContaoFramework $framework
+     */
+    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, ModuleModel $model = null)
     {
-        if ($this->reservationView) {
-            $this->viewType = $this->reservationView;
+        parent::__construct($rootDir, $session, $framework, $model);
+
+        if ($model && $model->reservationView) {
+            $this->viewType = $model->reservationView;
             if ($this->viewType === 'publicview') {
                 $this->modelListFunction = 'getListItems';
             } else if (($this->viewType === 'member') || ($this->viewType === 'memberview')) {
@@ -103,9 +116,40 @@ class C4gReservationListController extends C4GBaseController
                 $this->modelListFunction = 'getListItemsByGroup';
             }
         }
+    }
+
+    /**
+     * @param Template $template
+     * @param ModuleModel $model
+     * @param Request $request
+     * @return Response|null
+     */
+    public function getResponse(Template $template, ModuleModel $model, Request $request): ?Response {
+        if ($model && $model->reservationView) {
+            $this->viewType = $model->reservationView;
+            if ($this->viewType === 'publicview') {
+                $this->modelListFunction = 'getListItems';
+            } else if (($this->viewType === 'member') || ($this->viewType === 'memberview')) {
+                $this->modelListFunction = 'getListItemsByMember';
+            } else if ($this->viewType === 'group') {
+                $this->modelListFunction = 'getListItemsByGroup';
+            }
+        }
+
+        $result = parent::getResponse($template, $model, $request);
         System::loadLanguageFile('fe_c4g_reservation');
         $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']);
         $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural']);
+
+        return $result;
+    }
+
+    /**
+     * @param $id
+     * @return void
+     */
+    public function initBrickModule($id)
+    {
         parent::initBrickModule($id);
 
         $this->dialogParams->setWithoutGuiHeader(true);
@@ -164,7 +208,7 @@ class C4gReservationListController extends C4GBaseController
         $reservationBeginDateTimeField->setSortSequence(SORT_ASC);
         $reservationBeginDateTimeField->setTableColumn(true);
         $reservationBeginDateTimeField->setFormField(false);
-        $reservationBeginDateTimeField->setColumnWidth(5);
+        //$reservationBeginDateTimeField->setColumnWidth(5);
         $reservationBeginDateTimeField->setStyleClass('begin-date');
         //$reservationBeginDateTimeField->setEditable(false);
         $reservationBeginDateTimeField->setPrintable(true);

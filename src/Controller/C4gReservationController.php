@@ -148,6 +148,8 @@ class C4gReservationController extends C4GBaseController
 
         //ToDo hotfix
         //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
+
+        //ToDo use session instead
         if (!$eventId && $_COOKIE['reservationEventCookie']) {
             $eventId = $_COOKIE['reservationEventCookie'];
         } else if ($eventId) {
@@ -166,6 +168,7 @@ class C4gReservationController extends C4GBaseController
 
             //ToDo hotfix
             //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
+            //ToDo use session instead
             if ($eventObj && !$initialDate && $_COOKIE['reservationInitialDateCookie']) {
                 $initialDate = $_COOKIE['reservationInitialDateCookie'];
             } else if ($eventObj && $initialDate) {
@@ -176,6 +179,7 @@ class C4gReservationController extends C4GBaseController
 
             //ToDo hotfix
             //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
+            //ToDo use session instead
             if ($eventObj && !$time && $_COOKIE['reservationTimeCookie']) {
                 $time = $_COOKIE['reservationTimeCookie'];
             } else if ($eventObj && $time) {
@@ -2200,9 +2204,6 @@ class C4gReservationController extends C4GBaseController
      */
     public function getCurrentTimesetAction(Request $request, $date, $type, $duration)
     {
-//        $date = $values[2];
-//        $type = $values[3];
-//        $duration = $values[4];
         $wd = -1;
         $times = [];
 
@@ -2236,6 +2237,7 @@ class C4gReservationController extends C4GBaseController
 
         //ToDo hotfix
         //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
+        //ToDo use session instead
         if (!$eventId && $_COOKIE['reservationEventCookie']) {
             $eventId = $_COOKIE['reservationEventCookie'];
         } else if ($eventId) {
@@ -2243,8 +2245,6 @@ class C4gReservationController extends C4GBaseController
         }
 
         if ($date) {
-            $this->framework->initialize(true);
-
             $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($eventId), $this->showPrices);
             $withEndTimes = $this->showEndTime;
             $withFreeSeats = $this->showFreeSeats;
@@ -2262,7 +2262,6 @@ class C4gReservationController extends C4GBaseController
                 }
             }
         }
-
 
         return new JsonResponse(array(
             'reservationId' => C4GBrickCommon::getUUID(),
