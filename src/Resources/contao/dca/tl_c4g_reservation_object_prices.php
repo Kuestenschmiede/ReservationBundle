@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object_prices'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object_prices']['TOGGLE'],
                 'icon'                => 'visible.gif',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array('tl_c4g_reservation', 'toggleIcon')
+                'button_callback'     => array('tl_c4g_reservation_object_prices', 'toggleIcon')
             )
         )
     ),
@@ -224,7 +224,7 @@ class tl_c4g_reservation_object_prices extends Backend
         }
 
         // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation_type SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE id=?")
+        $this->Database->prepare("UPDATE tl_c4g_reservation_object_prices SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE id=?")
             ->execute($intId);
         $this->createNewVersion('tl_c4g_reservation_object_prices', $intId);
     }
