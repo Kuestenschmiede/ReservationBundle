@@ -281,7 +281,7 @@ function setReservationForm(id, typeId, showDateTime, event) {
         if (eventId) {
             var dateId = 'c4g_beginDateEvent_' + typeId + '-22' + eventId;
             if (document.getElementById(dateId)) {
-                //setTimeset(document.getElementById(dateId), id, typeId, showDateTime);
+                setTimeset(document.getElementById(dateId), id, typeId, showDateTime);
                 checkEventFields();
             }
         } else {
@@ -292,7 +292,7 @@ function setReservationForm(id, typeId, showDateTime, event) {
                     if (dateField && checkType(dateField, event) && dateField.value) {
                         var fieldId = dateField.id;
                         if (fieldId && fieldId.indexOf('c4g_beginDateEvent_' + typeId + '-22')) {
-                            //setTimeset(dateField, id, typeId, showDateTime);
+                            setTimeset(dateField, id, typeId, showDateTime);
                             checkEventFields();
                             break;
                         }

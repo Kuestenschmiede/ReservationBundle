@@ -773,7 +773,7 @@ class tl_c4g_reservation_object extends Backend
         }
 
         // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation_object SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE id=?")
+        $this->Database->prepare("UPDATE tl_c4g_reservation_object SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE `id`=?")
             ->execute($intId);
         $this->createNewVersion('tl_c4g_reservation_object', $intId);
     }
@@ -820,7 +820,7 @@ class tl_c4g_reservation_object extends Backend
 //            if($entry['multiple_booking'] === '1')
 //            {
 //
-//                $this->Database->prepare("UPDATE tl_c4g_reservation_object SET quantity = $value  WHERE id=$id")
+//                $this->Database->prepare("UPDATE tl_c4g_reservation_object SET quantity = $value  WHERE `id`=$id")
 //                    ->execute($entry['id']);
 //
 //

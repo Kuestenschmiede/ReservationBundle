@@ -75,7 +75,7 @@ class C4gReservationHandler
             $id= $object->getId();
             $objectData = $database->prepare(
                 "SELECT quantity,oh_sunday,oh_monday,oh_tuesday,oh_wednesday,oh_thursday,oh_friday,oh_saturday".
-                         "FROM `tl_c4g_reservation_object` WHERE id=? AND published='1'")
+                         "FROM `tl_c4g_reservation_object` WHERE `id`=? AND `published`='1'")
                 ->execute($id)->fetchAssoc();
             $weekday = date("w",$date);
             $quantity = $objectData['quantity'];
@@ -593,7 +593,7 @@ class C4gReservationHandler
                 return [];
             }
             $database = Database::getInstance();
-            $typeObject = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE id=?")
+            $typeObject = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=?")
                 ->execute($type)->fetchAssoc();
             //$typeObject = C4gReservationTypeModel::findByPk($type);
             if (!$typeObject) {
@@ -877,7 +877,7 @@ class C4gReservationHandler
 //            $arrOptions = array();
 //            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE reservation_type=? AND reservation_object=? AND reservationObjectType=? AND beginDate=? AND beginTime=? AND cancellation=?")
+            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND `beginDate`=? AND `beginTime`=? AND `cancellation`=?")
                 ->execute($typeId,$objectId,'1',$beginDate,$beginTime,'1')->fetchAllAssoc();
 
             $reservationCount = count($reservations);
@@ -920,7 +920,7 @@ class C4gReservationHandler
 //            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
 
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType=? AND NOT cancellation=?")
+            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
                 ->execute($id,'2','1')->fetchAllAssoc();
 
             $percent = $object->getAlmostFullyBookedAt();
@@ -953,7 +953,7 @@ class C4gReservationHandler
 //        $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
 
         $database = Database::getInstance();
-        $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType=? AND NOT cancellation=?")
+        $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
             ->execute($id,'2','1')->fetchAllAssoc();
 
         $actPersons = 0;
@@ -1029,7 +1029,7 @@ class C4gReservationHandler
 //            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
 
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE reservation_object=? AND reservationObjectType=? AND beginDate<=? AND endTime>=? AND NOT cancellation=?")
+            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object`=? AND `reservationObjectType`=? AND `beginDate`<=? AND `endTime`>=? AND NOT `cancellation`=?")
                 ->execute($id,'1',$time,$time,'1')->fetchAllAssoc();
 
             $actPersons = 0;
@@ -1076,7 +1076,7 @@ class C4gReservationHandler
             if ($moduleType) {
                 //$type = C4gReservationTypeModel::findByPk($moduleType);
                 $database = Database::getInstance();
-                $type = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE id=?")
+                $type = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=?")
                     ->execute($moduleType)->fetchAssoc();
 
                 if ($type && $type['reservationObjectType'] === '2') {
@@ -1119,7 +1119,7 @@ class C4gReservationHandler
         if ($object) {
             //$priceObjs = C4gReservationObjectPricesModel::findBy('published', '1');
             $database = Database::getInstance();
-            $priceObjs = $database->prepare("SELECT * FROM `tl_c4g_reservation_object_prices` WHERE published=?")
+            $priceObjs = $database->prepare("SELECT * FROM `tl_c4g_reservation_object_prices` WHERE `published`=?")
                 ->execute('1')->fetchAllAssoc();
             if ($priceObjs) {
                 foreach ($priceObjs as $priceObj) {
@@ -1213,7 +1213,7 @@ class C4gReservationHandler
         $database = Database::getInstance();
         $almostFullyBookedAt = $type['almostFullyBookedAt'];
         if ($objectId) {
-            $events = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE 'pid' = ?")->execute($objectId)->fetchAllAssoc();
+            $events = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `pid` = ?")->execute($objectId)->fetchAllAssoc();
             //$events = C4gReservationEventModel::findBy('pid',$objectId);
             if ($events) {
                 if (count($events) > 1) {
@@ -1223,7 +1223,7 @@ class C4gReservationHandler
                 }
             }
 
-            $eventObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE 'id' = ?")->execute($objectId)->fetchAssoc();
+            $eventObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($objectId)->fetchAssoc();
             //$eventObject = \CalendarEventsModel::findByPk($objectId);
             if ($event && $eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > time())) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= time()))) {
                 $frontendObject = new C4gReservationFrontendObject();
@@ -1255,12 +1255,12 @@ class C4gReservationHandler
             }
             $idString .= ")";
 
-            $allEvents = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE reservationType IN $idString")->execute()->fetchAllAssoc();
+            $allEvents = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `reservationType` IN $idString")->execute()->fetchAllAssoc();
 
             if ($allEvents) {
                 foreach ($allEvents as $event) {
                     //$eventObject = \CalendarEventsModel::findByPk($event['pid']);
-                    $eventObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE 'id' = ?")->execute($event['pid'])->fetchAssoc();
+                    $eventObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($event['pid'])->fetchAssoc();
                     if ($eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > time())) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= time()))) {
                         $frontendObject = new C4gReservationFrontendObject();
                         $frontendObject->setType(2);
@@ -1303,7 +1303,7 @@ class C4gReservationHandler
 //        $arrOptions = array();
 //        $allObjects = C4gReservationObjectModel::findBy('published','1');
         $database = Database::getInstance();
-        $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ?")->execute('1')->fetchAllAssoc();
+        $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE `published` = ?")->execute('1')->fetchAllAssoc();
 
         $almostFullyBookedAt = $type['almostFullyBookedAt'] ?: 0;
         if ($moduleTypes) {

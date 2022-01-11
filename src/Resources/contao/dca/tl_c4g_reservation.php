@@ -747,7 +747,7 @@ class tl_c4g_reservation extends Backend
         }
 
         // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation SET tstamp=". time() .", cancellation='" . ($blnCancellation ? '0' : '1') . "' WHERE id=?")
+        $this->Database->prepare("UPDATE tl_c4g_reservation SET tstamp=". time() .", cancellation='" . ($blnCancellation ? '0' : '1') . "' WHERE `id`=?")
             ->execute($intId);
         $this->createNewVersion('tl_c4g_reservation', $intId);
     }
@@ -890,7 +890,7 @@ class tl_c4g_reservation extends Backend
         $options = [];
         $options[$dc->activeRecord->id] = '';
 
-        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE disable != 1");
+        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
         $result = $stmt->execute()->fetchAllAssoc();
 
         foreach ($result as $row) {
@@ -907,7 +907,7 @@ class tl_c4g_reservation extends Backend
         $options = [];
         $options[$dc->activeRecord->id] = '';
 
-        $stmt = $this->Database->prepare("SELECT id, name FROM tl_member_group WHERE disable != 1");
+        $stmt = $this->Database->prepare("SELECT id, name FROM tl_member_group WHERE `disable` != 1");
         $result = $stmt->execute()->fetchAllAssoc();
 
         foreach ($result as $row) {
@@ -928,7 +928,7 @@ class tl_c4g_reservation extends Backend
         if (($row['confirmed'] || $row['specialNotification']) && (!$row['emailConfirmationSend'])) {
             $type = $row['reservation_type'];
             if ($type) {
-                $reservationType = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? LIMIT 1")->execute($type)->fetchAssoc();
+                $reservationType = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation_type WHERE `id`=? LIMIT 1")->execute($type)->fetchAssoc();
 
                 if ($reservationType) {
                     if ($row['confirmed']) {
@@ -969,7 +969,7 @@ class tl_c4g_reservation extends Backend
         if (!$value) {
             $value = C4GBrickCommon::getUUID();
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT * FROM tl_c4g_reservation where reservation_id=?")
+            $reservations = $database->prepare("SELECT * FROM tl_c4g_reservation where `reservation_id`=?")
                 ->execute($value)->fetchAllAssoc();
             if ($reservations && count($reservations) > 0) {
                 $value = C4GBrickCommon::getUUID();

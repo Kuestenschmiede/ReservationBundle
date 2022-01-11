@@ -31,7 +31,7 @@ class Cron extends Backend
 
             if ($auto_send === 'minutely') {
                 $database = Database::getInstance();
-                $reservations = $database->prepare("SELECT * FROM tl_c4g_reservation where reservation_type = ? AND (confirmed = '1' OR specialNotification = '1') AND NOT emailConfirmationSend = '1'")
+                $reservations = $database->prepare("SELECT * FROM tl_c4g_reservation where `reservation_type` = ? AND (`confirmed` = '1' OR `specialNotification` = '1') AND NOT `emailConfirmationSend` = '1'")
                     ->execute($entry['id'])->fetchAllAssoc();
 
                 foreach ($reservations as $reservation) {
@@ -54,7 +54,7 @@ class Cron extends Backend
 
             if ($value && ($value >= 1) && ($format === 'daily')) {
                 $daytime = time();
-                $reservations = $this->Database->prepare('SELECT * FROM tl_c4g_reservation where reservation_type = ?')
+                $reservations = $this->Database->prepare('SELECT * FROM tl_c4g_reservation where `reservation_type` = ?')
                     ->execute($entry['id'])->fetchAllAssoc();
 
                 foreach ($reservations as $reservation) {
@@ -69,7 +69,7 @@ class Cron extends Backend
                                 $file->delete();
                             }
                         }
-                        $db = $this->Database->prepare('DELETE FROM tl_c4g_reservation WHERE id=?')
+                        $db = $this->Database->prepare('DELETE FROM tl_c4g_reservation WHERE `id`=?')
                             ->execute($reservation['id']);
                     }
                 }

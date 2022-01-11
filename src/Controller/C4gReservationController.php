@@ -158,7 +158,7 @@ class C4gReservationController extends C4GBaseController
 
         $event = $eventId ? \CalendarEventsModel::findByPk($eventId) : false;
         $eventObj = $event && $event->published ? C4gReservationEventModel::findBy('pid', $event->id) : false;
-        if ($eventObj && (count($eventObj) > 1)) {
+        if ($eventObj && is_countable($eventObj) && (count($eventObj) > 1)) {
             C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: ' . $event->id);
         } else {
             $date = Input::get('date') ? Input::get('date') : 0;
@@ -197,7 +197,7 @@ class C4gReservationController extends C4GBaseController
         $arrValues = array();
         $arrOptions = array();
 
-        if ($eventObj && count($eventObj) == 1) {
+        if ($eventObj) {
             $typeId = $eventObj->reservationType;
             $arrColumns = array("$t.published='1' AND $t.id=$typeId");
             $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
@@ -835,7 +835,7 @@ class C4gReservationController extends C4GBaseController
             if ($isEvent) {
                 foreach ($reservationObjects as $reservationObject) {
                     //$type_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
-                    $val_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $listType['id']. '-22' . $reservationObject->getId(), $reservationObject->getId());
+                    $val_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $listType['id'], $reservationObject->getId());
                     $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'reservation_object_event_' . $listType['id']. '-22' . $reservationObject->getId());
                     $obj_condition->setModel(C4gReservationHandler::class);
                     $obj_condition->setFunction('isEventObject');

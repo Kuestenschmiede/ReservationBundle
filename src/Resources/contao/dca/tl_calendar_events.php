@@ -52,10 +52,10 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
     public function c4gLoadReservationData()
     {
         $noReservationEvents = true;
-        $reservationEvents = $this->Database->prepare("SELECT pid, number FROM tl_c4g_reservation_event WHERE pid!=0 AND number!=''")->execute()->fetchAllAssoc();
+        $reservationEvents = $this->Database->prepare("SELECT pid, number FROM tl_c4g_reservation_event WHERE `pid`<>0 AND `number`<>''")->execute()->fetchAllAssoc();
         if ($reservationEvents) {
             foreach ($reservationEvents as $reservationEvent) {
-                $this->Database->prepare("UPDATE tl_calendar_events SET c4g_reservation_number=? WHERE id=?")->execute($reservationEvent['number'], $reservationEvent['pid']);
+                $this->Database->prepare("UPDATE tl_calendar_events SET c4g_reservation_number=? WHERE `id`=?")->execute($reservationEvent['number'], $reservationEvent['pid']);
                 $noReservationEvents = false;
             }
         }
@@ -75,7 +75,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
      */
     public function c4gEditEvent($row, $href, $label, $title, $icon)
     {
-        $calendar = Database::getInstance()->prepare("SELECT activateEventReservation FROM tl_calendar WHERE id=?")->execute($row['pid'])->fetchAssoc();
+        $calendar = Database::getInstance()->prepare("SELECT activateEventReservation FROM tl_calendar WHERE `id`=?")->execute($row['pid'])->fetchAssoc();
         if ($calendar['activateEventReservation']) {
             $rt = Input::get('rt');
             $ref = Input::get('ref');
@@ -84,7 +84,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             $attributes = 'style="margin-right:3px"';
             $imgAttributes = 'style="width: 18px; height: 18px"';
 
-            $result = Database::getInstance()->prepare("SELECT id FROM tl_c4g_reservation_event WHERE pid=?")->execute($row['id'])->fetchAllAssoc();
+            $result = Database::getInstance()->prepare("SELECT id FROM tl_c4g_reservation_event WHERE `pid`=?")->execute($row['id'])->fetchAllAssoc();
 
             if ($result && count($result) > 1) {
                 C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '. $row['id']);
@@ -110,7 +110,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
      */
     public function c4gShowReservations($row, $href, $label, $title, $icon)
     {
-        $calendar = Database::getInstance()->prepare("SELECT activateEventReservation FROM tl_calendar WHERE id=?")->execute($row['pid'])->fetchAssoc();
+        $calendar = Database::getInstance()->prepare("SELECT activateEventReservation FROM tl_calendar WHERE `id`=?")->execute($row['pid'])->fetchAssoc();
         if ($calendar['activateEventReservation']) {
             $rt = Input::get('rt');
             $ref = Input::get('ref');

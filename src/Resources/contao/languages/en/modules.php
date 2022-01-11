@@ -12,6 +12,7 @@
 use con4gis\ReservationBundle\Controller\C4gReservationCancellationController;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
 use con4gis\ReservationBundle\Controller\C4gReservationListController;
+use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
 
 $GLOBALS['TL_LANG']['MOD']['Reservation'] = array('con4gis Reservation', 'www.con4gis.org');
 $GLOBALS['TL_LANG']['MOD']['C4gReservation'] = array('Reservations', 'What times have already been reserved?');
@@ -28,3 +29,4 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Topics', 'Here y
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Form', 'Reservation form');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE]  = array('con4gis-Reservation: List', 'Reservation list');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationCancellationController::TYPE] = array('con4gis-Reservation: Cancellation', 'Reservation');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE]  = array('con4gis-Reservation: Speaker', 'Speaker');

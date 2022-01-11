@@ -10,15 +10,6 @@
  */
 
 /**
- * Frontend Modules
- */
-//$GLOBALS['FE_MOD']['con4gis']['C4gReservation'] = \con4gis\ReservationBundle\Controller\C4gReservationController::class;
-//$GLOBALS['FE_MOD']['con4gis']['C4gReservationList'] = \con4gis\ReservationBundle\Controller\C4gReservationListController::class;
-//$GLOBALS['FE_MOD']['con4gis']['C4gReservationCancellation'] = \con4gis\ReservationBundle\Controller\C4gReservationCancellationController::class;
-//asort($GLOBALS['FE_MOD']['con4gis']);
-
-
-/**
  * Backend Modules
  */
 $GLOBALS['BE_MOD']['con4gis'] = array_merge($GLOBALS['BE_MOD']['con4gis'], [

@@ -26,21 +26,21 @@ class C4gReservationConfirmation
     public static function sendNotification(int $reservationId)
     {
         $database = Database::getInstance();
-        $reservation = $database->prepare('SELECT * FROM tl_c4g_reservation WHERE id=? LIMIT 1')->execute($reservationId)->fetchAssoc();
+        $reservation = $database->prepare('SELECT * FROM tl_c4g_reservation WHERE `id`=? LIMIT 1')->execute($reservationId)->fetchAssoc();
         $reservationType = $reservation ? $reservation['reservation_type'] : false;
         $reservationObjectType = $reservation ? $reservation['reservationObjectType'] : false;
         if ($reservationType && $reservation['email'] && !($reservation['emailConfirmationSend'])) {
             try {
-                $type = $database->prepare('SELECT * FROM tl_c4g_reservation_type WHERE id=? LIMIT 1')->execute($reservationType)->fetchAssoc();
+                $type = $database->prepare('SELECT * FROM tl_c4g_reservation_type WHERE `id`=? LIMIT 1')->execute($reservationType)->fetchAssoc();
                 if ($type) {
                     if ($type['location']) {
-                        $location = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE id=? LIMIT 1')->execute($type['location'])->fetchAssoc();
+                        $location = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($type['location'])->fetchAssoc();
                     }
 
                     if ($reservationObjectType === '1') {
-                        $reservationObject = $database->prepare('SELECT * FROM tl_c4g_reservation_object WHERE id=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
+                        $reservationObject = $database->prepare('SELECT * FROM tl_c4g_reservation_object WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
                     } else {
-                        $reservationObject = $database->prepare('SELECT * FROM tl_calendar_events WHERE id=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
+                        $reservationObject = $database->prepare('SELECT * FROM tl_calendar_events WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
                     }
 
                     $notificationConifrmationType = StringUtil::deserialize($type['notification_confirmation_type']);
@@ -99,7 +99,7 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('additional_params', implode($additionalParamsArr));
 
                         $participantsArr = [];
-                        $participants = $database->prepare('SELECT * FROM tl_c4g_reservation_participants WHERE pid=?')->execute($reservation['id'])->fetchAllAssoc();
+                        $participants = $database->prepare('SELECT * FROM tl_c4g_reservation_participants WHERE `pid`=?')->execute($reservation['id'])->fetchAllAssoc();
                         if ($participants && (count($participants) > 0)) {
                             foreach ($participants as $participant) {
                                 //$paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
@@ -185,7 +185,7 @@ class C4gReservationConfirmation
 
                         $sendingResult = $c4gNotify->send($arrNotificationIds);
                         if ($sendingResult) {
-                            $database->prepare("UPDATE tl_c4g_reservation SET emailConfirmationSend='1' WHERE id=?")->execute($reservationId);
+                            $database->prepare("UPDATE tl_c4g_reservation SET emailConfirmationSend='1' WHERE `id`=?")->execute($reservationId);
                         }
                     }
                 }

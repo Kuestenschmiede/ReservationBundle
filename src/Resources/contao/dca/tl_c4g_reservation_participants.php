@@ -317,7 +317,7 @@ class tl_c4g_reservation_participants extends Backend
         }
 
         // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation_participants SET tstamp=". time() .", cancellation='" . ($blnCancellation ? '0' : '1') . "' WHERE id=?")
+        $this->Database->prepare("UPDATE tl_c4g_reservation_participants SET tstamp=". time() .", cancellation='" . ($blnCancellation ? '0' : '1') . "' WHERE `id`=?")
             ->execute($intId);
         $this->createNewVersion('tl_c4g_reservation_participants', $intId);
     }

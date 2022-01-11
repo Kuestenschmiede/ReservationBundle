@@ -603,7 +603,7 @@ class tl_c4g_reservation_type extends Backend
         }
 
         // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation_type SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE id=?")
+        $this->Database->prepare("UPDATE tl_c4g_reservation_type SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE `id`=?")
             ->execute($intId);
         $this->createNewVersion('tl_c4g_reservation_type', $intId);
     }
@@ -615,7 +615,7 @@ class tl_c4g_reservation_type extends Backend
     public function loadMemberOptions($dc) {
         $options = [];
 
-        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE disable != 1");
+        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
         $result = $stmt->execute()->fetchAllAssoc();
 
         foreach ($result as $row) {
@@ -631,7 +631,7 @@ class tl_c4g_reservation_type extends Backend
     public function loadGroupOptions($dc) {
         $options = [];
 
-        $stmt = $this->Database->prepare("SELECT id, name FROM tl_member_group WHERE disable != 1");
+        $stmt = $this->Database->prepare("SELECT id, name FROM tl_member_group WHERE `disable` != 1");
         $result = $stmt->execute()->fetchAllAssoc();
 
         foreach ($result as $row) {

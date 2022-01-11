@@ -307,7 +307,7 @@ class tl_c4g_reservation_event extends Backend
     {
         $return = [];
 
-        $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_type WHERE reservationObjectType = 2 ORDER BY caption")
+        $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_type WHERE `reservationObjectType` = 2 ORDER BY caption")
             ->execute();
 
         while ($objects->next()) {

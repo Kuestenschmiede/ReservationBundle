@@ -78,7 +78,7 @@ class C4gReservationInsertTags
             $result = 3;
         } elseif ($id && $max > 0) {
             $tableReservation = 'tl_c4g_reservation';
-            $reservationObject = $this->db->prepare("SELECT COUNT(id) AS reservationCount FROM $tableReservation WHERE reservation_object = $id AND reservationObjectType = '2' AND NOT cancellation = '1'")->execute()->fetchAllAssoc();
+            $reservationObject = $this->db->prepare("SELECT COUNT(id) AS reservationCount FROM $tableReservation WHERE `reservation_object` = $id AND `reservationObjectType` = '2' AND NOT `cancellation` = '1'")->execute()->fetchAllAssoc();
             if ($reservationObject) {
                 $reservationCount = $reservationObject[0]['reservationCount'];
             }
@@ -86,7 +86,7 @@ class C4gReservationInsertTags
             $reservationType = $reservationEventObject->reservationType;
             if ($reservationType) {
                 $tableReservationType = 'tl_c4g_reservation_type';
-                $almostFullyBookedAt = $this->db->prepare("SELECT almostFullyBookedAt FROM $tableReservationType WHERE id=?")
+                $almostFullyBookedAt = $this->db->prepare("SELECT almostFullyBookedAt FROM $tableReservationType WHERE `id`=?")
                     ->limit(1)
                     ->execute($reservationType, 1);
 
@@ -160,7 +160,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $audiences .= ')';
-                                $audienceElements = $this->db->prepare("SELECT targetAudience FROM $tableAudience WHERE id IN $audiences")
+                                $audienceElements = $this->db->prepare("SELECT targetAudience FROM $tableAudience WHERE `id` IN $audiences")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($audienceElements as $audience) {
@@ -191,7 +191,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $speakers .= ')';
-                                $speakerElements = $this->db->prepare("SELECT id,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE id IN $speakers")
+                                $speakerElements = $this->db->prepare("SELECT id,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE `id` IN $speakers")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($speakerElements as $speaker) {
@@ -224,7 +224,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $topics .= ')';
-                                $topicElements = $this->db->prepare("SELECT topic FROM $tableTopic WHERE id IN $topics")
+                                $topicElements = $this->db->prepare("SELECT topic FROM $tableTopic WHERE `id` IN $topics")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($topicElements as $topic) {
@@ -255,7 +255,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $locations .= ')';
-                                $locationElements = $this->db->prepare("SELECT name FROM $tableLocation WHERE id IN $locations")
+                                $locationElements = $this->db->prepare("SELECT name FROM $tableLocation WHERE `id` IN $locations")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($locationElements as $location) {
@@ -286,7 +286,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $locations .= ')';
-                                $locationElements = $this->db->prepare("SELECT contact_city FROM $tableLocation WHERE id IN $locations")
+                                $locationElements = $this->db->prepare("SELECT contact_city FROM $tableLocation WHERE `id` IN $locations")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($locationElements as $location) {
@@ -298,7 +298,7 @@ class C4gReservationInsertTags
 
                             break;
                         case 'included_raw':
-                            $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE id = ?')
+                            $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE `id` = ?')
                                 ->execute($reservationEventObject->reservationType)->fetchAssoc();
                             $params = $includedParams ? unserialize($includedParams['included_params']) : [];
                             $includedParamsArr = [];
@@ -311,7 +311,7 @@ class C4gReservationInsertTags
 
                             return serialize($includedParamsArr);
                         case 'additional_raw':
-                            $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE id = ?')
+                            $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE `id` = ?')
                                 ->execute($reservationEventObject->reservationType)->fetchAssoc();
                             $params = $additionalParams ? unserialize($additionalParams['additional_params']) : [];
                             $additionalParamsArr = [];
@@ -336,11 +336,11 @@ class C4gReservationInsertTags
                 $tableTopic = 'tl_c4g_reservation_event_topic';
                 $tableLocation = 'tl_c4g_reservation_location';
 
-                $reservationEventObject = $this->db->prepare("SELECT * FROM $tableEventObject WHERE pid=?")
+                $reservationEventObject = $this->db->prepare("SELECT * FROM $tableEventObject WHERE `pid`=?")
                     ->limit(1)
                     ->execute($pid, 1);
 
-                $calendarEvent = $this->db->prepare("SELECT * FROM $tableCalendarEvent WHERE id=?")
+                $calendarEvent = $this->db->prepare("SELECT * FROM $tableCalendarEvent WHERE `id`=?")
                     ->limit(1)
                     ->execute($pid, 1);
 
@@ -428,7 +428,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $audiences .= ')';
-                                $audienceElements = $this->db->prepare("SELECT targetAudience FROM $tableAudience WHERE id IN $audiences")
+                                $audienceElements = $this->db->prepare("SELECT targetAudience FROM $tableAudience WHERE `id` IN $audiences")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($audienceElements as $audience) {
@@ -450,7 +450,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $audiences .= ')';
-                                $audienceElements = $this->db->prepare("SELECT targetAudience FROM $tableAudience WHERE id IN $audiences")
+                                $audienceElements = $this->db->prepare("SELECT targetAudience FROM $tableAudience WHERE `id` IN $audiences")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($audienceElements as $audience) {
@@ -472,7 +472,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $speakers .= ')';
-                                $speakerElements = $this->db->prepare("SELECT id,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE id IN $speakers")
+                                $speakerElements = $this->db->prepare("SELECT id,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE `id` IN $speakers")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($speakerElements as $speaker) {
@@ -502,7 +502,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $speakers .= ')';
-                                $speakerElements = $this->db->prepare("SELECT id,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE id IN $speakers")
+                                $speakerElements = $this->db->prepare("SELECT id,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE `id` IN $speakers")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($speakerElements as $speaker) {
@@ -526,7 +526,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $topics .= ')';
-                                $topicElements = $this->db->prepare("SELECT topic FROM $tableTopic WHERE id IN $topics")
+                                $topicElements = $this->db->prepare("SELECT topic FROM $tableTopic WHERE `id` IN $topics")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($topicElements as $topic) {
@@ -548,7 +548,7 @@ class C4gReservationInsertTags
                                     }
                                 }
                                 $topics .= ')';
-                                $topicElements = $this->db->prepare("SELECT topic FROM $tableTopic WHERE id IN $topics")
+                                $topicElements = $this->db->prepare("SELECT topic FROM $tableTopic WHERE `id` IN $topics")
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($topicElements as $topic) {
@@ -634,7 +634,7 @@ class C4gReservationInsertTags
                         case 'eventlocation':
                             $locationId = $reservationEventObject->location;
                             if ($locationId) {
-                                $locationElement = $this->db->prepare("SELECT name FROM $tableLocation WHERE id=$locationId")
+                                $locationElement = $this->db->prepare("SELECT name FROM $tableLocation WHERE `id`=$locationId")
                                     ->execute()->fetchAssoc();
 
                                 if ($locationElement) {
@@ -662,7 +662,7 @@ class C4gReservationInsertTags
                         case 'city':
                             $locationId = $reservationEventObject->location;
                             if ($locationId) {
-                                $locationElement = $this->db->prepare("SELECT contact_city FROM $tableLocation WHERE id=$locationId")
+                                $locationElement = $this->db->prepare("SELECT contact_city FROM $tableLocation WHERE `id`=$locationId")
                                     ->execute()->fetchAssoc();
 
                                 if ($locationElement) {
@@ -676,7 +676,7 @@ class C4gReservationInsertTags
                         case 'city_raw':
                             $locationId = $reservationEventObject->location;
                             if ($locationId) {
-                                $locationElement = $this->db->prepare("SELECT contact_city FROM $tableLocation WHERE id=$locationId")
+                                $locationElement = $this->db->prepare("SELECT contact_city FROM $tableLocation WHERE `id`=$locationId")
                                     ->execute()->fetchAssoc();
 
                                 if ($locationElement) {
@@ -699,7 +699,7 @@ class C4gReservationInsertTags
                         case 'eventaddress':
                             $locationId = $reservationEventObject->location;
                             if ($locationId) {
-                                $locationElement = $this->db->prepare("SELECT contact_street,contact_postal,contact_city FROM $tableLocation WHERE id=$locationId")
+                                $locationElement = $this->db->prepare("SELECT contact_street,contact_postal,contact_city FROM $tableLocation WHERE `id`=$locationId")
                                     ->execute()->fetchAssoc();
 
                                 if ($locationElement && $locationElement['contact_street'] && $locationElement['contact_postal'] && $locationElement['contact_city']) {
@@ -713,7 +713,7 @@ class C4gReservationInsertTags
                         case 'eventaddress_raw':
                             $locationId = $reservationEventObject->location;
                             if ($locationId) {
-                                $locationElement = $this->db->prepare("SELECT contact_street,contact_postal,contact_city FROM $tableLocation WHERE id=$locationId")
+                                $locationElement = $this->db->prepare("SELECT contact_street,contact_postal,contact_city FROM $tableLocation WHERE `id`=$locationId")
                                     ->execute()->fetchAssoc();
 
                                 if ($locationElement && $locationElement['contact_street'] && $locationElement['contact_postal'] && $locationElement['contact_city']) {
@@ -725,7 +725,7 @@ class C4gReservationInsertTags
 
                             break;
                         case 'included':
-                            $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE id = ?')
+                            $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE `id` = ?')
                                 ->execute($reservationEventObject->reservationType)->fetchAssoc();
                             $params = $includedParams ? unserialize($includedParams['included_params']) : [];
                             $result = '';
