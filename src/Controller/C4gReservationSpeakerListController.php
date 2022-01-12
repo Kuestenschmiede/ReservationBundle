@@ -64,7 +64,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
     protected $loadFileUploadResources = false;
     protected $loadMultiColumnResources = false;
     protected $loadMiniSearchResources = false;
-    protected $loadHistoryPushResources = true;
+    protected $loadHistoryPushResources = false;
 
     protected $loadSignaturePadResources = false;
 
@@ -93,6 +93,14 @@ class C4gReservationSpeakerListController extends C4GBaseController
     public function __construct(string $rootDir, Session $session, ContaoFramework $framework, ModuleModel $model = null)
     {
         parent::__construct($rootDir, $session, $framework, $model);
+
+        if ($model && $model->renderMode) {
+            $this->renderMode = $model->renderMode;
+            if ($this->renderMode == C4GBrickRenderMode::TABLEBASED) {
+                $this->jQueryAddJqueryUI = true;
+                $this->jQueryUseTable = true;
+            }
+        }
     }
 
     /**
@@ -103,9 +111,15 @@ class C4gReservationSpeakerListController extends C4GBaseController
      */
     public function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
+        if ($model && $model->renderMode) {
+            $this->renderMode = $model->renderMode;
+            if ($this->renderMode == C4GBrickRenderMode::TABLEBASED) {
+                $this->jQueryAddJqueryUI = true;
+                $this->jQueryUseTable = true;
+            }
+        }
+
         $result = parent::getResponse($template, $model, $request);
-
-
 
         return $result;
     }
@@ -123,7 +137,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
             $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['brick_caption_plural']
         );
         
-        $this->listParams->setRenderMode(C4GBrickRenderMode::TILEBASED);
+        $this->listParams->setRenderMode($this->renderMode ?: C4GBrickRenderMode::TILEBASED);
     }
 
     public function addFields()

@@ -13,11 +13,13 @@
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_module']['reservation_legend'] = 'reservation objects';
+$GLOBALS['TL_LANG']['tl_module']['list_legend'] = 'list settings';
 $GLOBALS['TL_LANG']['tl_module']['reservation_notification_center_legend'] = 'Notification Center';
 $GLOBALS['TL_LANG']['tl_module']['reservation_jquery_theme_legend'] = 'jQuery UI-Theme';
 $GLOBALS['TL_LANG']['tl_module']['reservation_redirect_legend'] = 'forwarding';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_types'] = array('reservation types', 'Select the reservation types (rooms, tables, ...) to be considered in the reservation in the frontend. If no selection is made, all reservation objects are loaded.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationView'] = array('List view', 'Default: public');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['renderMode'] = array('List display', 'Different displays of the list are possible. Default: Tiles');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationType'] = array("Show reservation type", "The reservation type is not shown in list and detail by default. You can change that here.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationObject'] = array("Show reservation object", "The reservation object is shown by default. There are scenarios in which hiding it makes sense.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showSignatureField'] = array("Signature field (group view only)", "Possibility to request a signature. Currently only possible in the group list.");
@@ -48,3 +50,6 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['publicview'] 
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['memberview'] = 'Member view (Only reservations for logged in member, without editing)';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['member'] = 'Member based (Only reservations for logged in member, with editing)';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['group'] = 'Group based (Only reservations for groups of the logged in member)';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['tiles'] = 'Tiles';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['table'] = 'Data table';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['list'] = 'List elements';

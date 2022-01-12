@@ -13,6 +13,7 @@
  * Table tl_module
  */
 //ToDo showFreeSeats, additionalDuration
+use con4gis\ProjectsBundle\Classes\Lists\C4GBrickRenderMode;
 use con4gis\ReservationBundle\Controller\C4gReservationCancellationController;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
 use con4gis\ReservationBundle\Controller\C4gReservationListController;
@@ -20,11 +21,11 @@ use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,emptyOptionLabel,withCapacity,additionalDuration,showEndTime,showPrices,showDateTime,showMemberData, removeBookedDays, hide_selection, specialParticipantMechanism; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{title_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject, showSignatureField, cancellation_redirect_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject, showSignatureField, cancellation_redirect_site;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode;';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_addition_booking_params'] = array();
 
@@ -47,6 +48,17 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservationView'] = array
     'options'           => ['publicview','memberview','member','group'],
     'reference'          => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references'],
     'sql'               => "varchar(25) NOT NULL default 'publicview'"
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['renderMode'] = array
+(
+    'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['renderMode'],
+    'exclude'           => true,
+    'filter'            => true,
+    'inputType'         => 'select',
+    'default'           => C4GBrickRenderMode::TILEBASED,
+    'options'           => [C4GBrickRenderMode::TILEBASED,C4GBrickRenderMode::TABLEBASED,C4GBrickRenderMode::LISTBASED],
+    'reference'          => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references'],
+    'sql'               => "varchar(25) NOT NULL default 'tiles'"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationType'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationType'],

@@ -13,11 +13,13 @@
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_module']['reservation_legend'] = 'Reservierungsobjekte';
+$GLOBALS['TL_LANG']['tl_module']['list_legend'] = 'Listeneinstellungen';
 $GLOBALS['TL_LANG']['tl_module']['reservation_notification_center_legend'] = 'Notification Center';
 $GLOBALS['TL_LANG']['tl_module']['reservation_jquery_theme_legend'] = 'jQuery UI-Theme';
 $GLOBALS['TL_LANG']['tl_module']['reservation_redirect_legend'] = 'Weiterleitung';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_types'] = array('Reservierungsarten', 'Wählen Sie die bei der Reservierung im Frontend zu berücksichigenden Reservierungsarten (Räume, Tische, ...). Bei keiner Auswahl werden alle Reservierungsobjekte geladen.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationView'] = array('Listenansicht', 'Verschiedene Ansichten der Liste sind möglich. Standard: Öffentlich');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['renderMode'] = array('Listendarstellung', 'Verschiedene Darstellungen der Liste sind möglich. Standard: Kacheln');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationType'] = array("Reservierungsart darstellen","Die Reservierungsart wird standardmäßig in Liste und Detail nicht dargestellt. Das können Sie hier ändern.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationObject'] = array("Reservierungsobjekt darstellen","Das Reservierungsobjekt wird standardmäßig dargestellt. Es gibt Szenarien in denen das Ausblenden sinnvoll ist.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showSignatureField'] = array("Unterschriftenfeld (nur Gruppenansicht)","Möglichkeit eine Unterschrift abzufragen. Zurzeit nur in der Gruppenliste möglich.");
@@ -48,3 +50,6 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['publicview'] 
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['memberview'] = 'Mitgliedeansicht (Nur Reservierungen für angemeldetes Mitglied, nicht editierbar) [erfordert con4gis/groups]';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['member'] = 'Mitgliederbasiert (Nur Reservierungen für angemeldetes Mitglied, editierbar) [erfordert con4gis/groups]';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['group'] = 'Gruppenbasiert (Nur Reservierungen für Gruppen des angemeldeten Mitglieds) [erfordert con4gis/groups]';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['tiles'] = 'Kachelliste';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['table'] = 'Tabelle (Data table)';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['list'] = 'Listenelemente';
