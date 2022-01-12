@@ -68,26 +68,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         (
             'edit' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['edit'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['edit'],
                 'href'          => 'act=edit',
                 'icon'          => 'edit.gif',
             ),
             'copy' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['copy'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['copy'],
                 'href'          => 'act=copy',
                 'icon'          => 'copy.gif',
             ),
             'delete' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['delete'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['delete'],
                 'href'          => 'act=delete',
                 'icon'          => 'delete.gif',
                 'attributes'    => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false;Backend.getScrollOffset()"',
             ),
             'show' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['show'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['show'],
                 'href'          => 'act=show',
                 'icon'          => 'show.gif',
             )
@@ -136,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         ),
 
         'number' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['number'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['number'],
             'exclude'           => true,
             'default'           => '',
             'sorting'           => true,
@@ -149,7 +149,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
 
         'location'  => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['location'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['location'],
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'select',
@@ -170,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         ),
 
         'minParticipants' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['minParticipants'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['minParticipants'],
             'exclude'           => true,
             'sorting'           => false,
             'flag'              => 1,
@@ -181,7 +181,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         ),
 
         'maxParticipants' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['maxParticipants'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['maxParticipants'],
             'exclude'           => true,
             'sorting'           => false,
             'flag'              => 1,
@@ -224,7 +224,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         ),
 
         'state' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['state'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['state'],
             'exclude'           => true,
             'filter'            => true,
             'options'           => [0,1,2,3], //none, green, orange, red

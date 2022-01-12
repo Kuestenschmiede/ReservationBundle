@@ -55,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         (
             'all' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['MSC']['all'],
+                'label'         => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'          => 'act=select',
                 'class'         => 'header_edit_all',
                 'attributes'    => 'onclick="Backend.getScrollOffSet()" accesskey="e"'
@@ -66,26 +66,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         (
             'edit' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['edit'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['edit'],
                 'href'          => 'act=edit',
                 'icon'          => 'edit.gif',
             ),
             'copy' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['copy'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['copy'],
                 'href'          => 'act=copy',
                 'icon'          => 'copy.gif',
             ),
             'delete' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['delete'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['delete'],
                 'href'          => 'act=delete',
                 'icon'          => 'delete.gif',
                 'attributes'    => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false;Backend.getScrollOffset()"',
             ),
             'show' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['show'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['show'],
                 'href'          => 'act=show',
                 'icon'          => 'show.gif',
 
@@ -132,7 +132,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'caption' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['caption'],
             'exclude'           => true,
             'sorting'           => true,
             'search'            => true,
@@ -143,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'quantity' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['quantity'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['quantity'],
             'exclude'           => true,
             'inputType'         => 'text',
             'default'           => '1',
@@ -153,7 +153,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'allTypesQuantity' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesQuantity'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesQuantity'],
             'exclude'           => true,
             'filter'            => true,
             'default'           => '1',
@@ -163,7 +163,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'allTypesValidity' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesValidity'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesValidity'],
             'exclude'           => true,
             'filter'            => true,
             'default'           => '0',
@@ -173,7 +173,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'switchAllTypes' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['switchAllTypes'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['switchAllTypes'],
             'exclude'           => true,
             'inputType'         => 'checkbox',
             'foreignKey'        => 'tl_c4g_reservation_type.caption',
@@ -183,7 +183,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'priority' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priority'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priority'],
             'exclude'           => true,
             'filter'            => true,
             'default'           => '0',
@@ -193,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'location'  => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location'],
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'select',
@@ -225,7 +225,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'viewableTypes' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'],
             'exclude'           => true,
             'inputType'         => 'checkbox',
             'foreignKey'        => 'tl_c4g_reservation_type.caption',
@@ -235,7 +235,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'time_interval' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'],
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
@@ -244,7 +244,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'duration' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['duration'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['duration'],
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
@@ -253,7 +253,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'min_residence_time' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_residence_time'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_residence_time'],
             'exclude'           => true,
             'inputType'         => 'text',
             'default'           => '0',
@@ -262,7 +262,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         ),
         'max_residence_time' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_residence_time'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_residence_time'],
             'exclude'           => true,
             'inputType'         => 'text',
             'default'           => '0',
@@ -272,7 +272,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'oh_monday' => array
         (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_monday'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_monday'],
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
@@ -280,7 +280,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             (
                 'time_begin' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -290,7 +290,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'time_end' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -300,7 +300,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_from' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -309,7 +309,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_to' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -322,7 +322,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'oh_tuesday' => array
         (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_tuesday'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_tuesday'],
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
@@ -330,7 +330,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             (
                 'time_begin' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
                     'exclude'                 => true,
                     'default'                 => '',
                     'inputType'               => 'text',
@@ -340,7 +340,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'time_end' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
                     'exclude'                 => true,
                     'default'                 => '',
                     'inputType'               => 'text',
@@ -350,7 +350,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_from' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -359,7 +359,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_to' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -372,7 +372,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'oh_wednesday' => array
         (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_wednesday'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_wednesday'],
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
@@ -380,7 +380,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             (
                 'time_begin' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -390,7 +390,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'time_end' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -400,7 +400,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_from' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -409,7 +409,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_to' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -422,7 +422,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'oh_thursday' => array
         (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_thursday'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_thursday'],
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
@@ -430,7 +430,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             (
                 'time_begin' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -440,7 +440,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'time_end' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -450,7 +450,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_from' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -459,7 +459,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_to' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -472,7 +472,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'oh_friday' => array
         (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_friday'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_friday'],
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
@@ -480,7 +480,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             (
                 'time_begin' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -490,7 +490,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'time_end' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -500,7 +500,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_from' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -509,7 +509,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_to' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -522,7 +522,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'oh_saturday' => array
         (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_saturday'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_saturday'],
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
@@ -530,7 +530,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             (
                 'time_begin' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -540,7 +540,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'time_end' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -550,7 +550,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_from' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -559,7 +559,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_to' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -572,7 +572,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'oh_sunday' => array
         (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_sunday'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_sunday'],
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
@@ -580,7 +580,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             (
                 'time_begin' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_begin'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -590,7 +590,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'time_end' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_end'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -600,7 +600,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_from' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_from'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -609,7 +609,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_to' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_to'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -622,7 +622,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'days_exclusion' => array
         (
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['days_exclusion'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['days_exclusion'],
             'default'                 => time(),
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
@@ -630,7 +630,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             (
                 'date_exclusion' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_exclusion'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_exclusion'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -639,7 +639,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 ),
                 'date_exclusion_end' => array
                 (
-                    'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_exclusion_end'],
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_exclusion_end'],
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
@@ -652,7 +652,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         ),
 
         'min_reservation_day' => array(
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_reservation_day'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_reservation_day'],
             'exclude'                 => true,
             'sorting'                 => false,
             'flag'                    => 1,
@@ -663,7 +663,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         ),
 
         'max_reservation_day' => array(
-            'label'                   => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_reservation_day'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_reservation_day'],
             'exclude'                 => true,
             'sorting'                 => false,
             'flag'                    => 1,

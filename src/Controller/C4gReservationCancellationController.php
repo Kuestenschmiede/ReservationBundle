@@ -139,7 +139,7 @@ class C4gReservationCancellationController extends C4GBaseController
         $key  = $putVars['reservation_id'];
 
         if (!C4GBrickDialog::checkMandatoryFields($this->fieldList, $putVars)) {
-            return array('usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']);
+            return array('usermessage' => &$GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']);
         }
 
         $reservation = C4gReservationModel::findOneBy('reservation_id',$key);
@@ -162,7 +162,7 @@ class C4gReservationCancellationController extends C4GBaseController
                 return $result;
             }
         } else {
-            return array('usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['cancellation_failed']);
+            return array('usermessage' => &$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['cancellation_failed']);
         }
     }
 }

@@ -118,9 +118,9 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('audience', 'ToDo');
 
                         $salutation = [
-                            'man' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['man'][0],
-                            'woman' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'][0],
-                            'various' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['various'][0],
+                            'man' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['man'][0],
+                            'woman' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'][0],
+                            'various' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['various'][0],
                         ];
                         $c4gNotify->setTokenValue('salutation', $reservation['salutation'] && $salutation[$reservation['salutation']] ? $salutation[$reservation['salutation']] : '');
                         $c4gNotify->setTokenValue('title', $reservation['title'] ? $reservation['title'] : '');

@@ -48,7 +48,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         (
             'all' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['MSC']['all'],
+                'label'         => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'          => 'act=select',
                 'class'         => 'header_edit_all',
                 'attributes'    => 'onclick="Backend.getScrollOffSet()" accesskey="e"'
@@ -59,26 +59,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         (
             'edit' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_location']['edit'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['edit'],
                 'href'          => 'act=edit',
                 'icon'          => 'edit.gif',
             ),
             'copy' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_location']['copy'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['copy'],
                 'href'          => 'act=copy',
                 'icon'          => 'copy.gif',
             ),
             'delete' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_location']['delete'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['delete'],
                 'href'          => 'act=delete',
                 'icon'          => 'delete.gif',
                 'attributes'    => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false;Backend.getScrollOffset()"',
             ),
             'show' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_location']['show'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['show'],
                 'href'          => 'act=show',
                 'icon'          => 'show.gif',
             )
@@ -148,7 +148,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
 
         'contact_name' => array
         (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_name'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_name'],
             'default'           => '',
             'filter'            => true,
             'search'            => true,
@@ -161,7 +161,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
 
         'contact_phone' => array
         (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_phone'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_phone'],
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
@@ -170,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         ),
         'contact_email' => array
         (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_email'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_email'],
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
@@ -179,7 +179,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         ),
         'contact_street' => array
         (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_street'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_street'],
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
@@ -188,7 +188,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         ),
         'contact_postal' => array
         (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_postal'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_postal'],
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
@@ -197,7 +197,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         ),
         'contact_city' => array
         (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_city'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_city'],
             'default'           => '',
             'filter'            => true,
             'search'            => true,
@@ -209,7 +209,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         ),
         'ics' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_location']['ics'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['ics'],
             'inputType'         => 'checkbox',
             'exclude'           => true,
             'eval'              => array('submitOnChange'=>true,'mandatory'=>false,'tl_class'=>'long clr','alwaysSave'=> true),
@@ -217,7 +217,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         ),
         'icsAlert' => array
         (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['icsAlert'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['icsAlert'],
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'digit', 'maxval'=> '480', 'mandatory'=>false, 'tl_class'=>'w50 clr'),
@@ -225,7 +225,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
         ),
         'icsPath'  => array
         (
-            'label'             =>$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['icsPath'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['icsPath'],
             'exclude'           => true,
             'default'           => null,
             'inputType'         => 'fileTree',

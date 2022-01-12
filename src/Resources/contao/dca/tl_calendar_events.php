@@ -33,7 +33,7 @@ $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gEditReservations'] = [
 ];
 
 $GLOBALS['TL_DCA'][$str]['fields']['c4g_reservation_number'] = [
-    'label'                   => $GLOBALS['TL_LANG'][$str]['c4g_reservation_number'],
+    'label'                   => &$GLOBALS['TL_LANG'][$str]['c4g_reservation_number'],
     'default'                 => '',
     'sorting'                 => true,
     'search'                  => true,

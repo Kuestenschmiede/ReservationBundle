@@ -430,9 +430,9 @@ class C4gReservationListController extends C4GBaseController
             $fieldList[] = $titleField;
 
 //            $salutation = [
-//                ['id' => 'man' ,'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
-//                ['id' => 'woman','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
-//                ['id' => 'various','name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
+//                ['id' => 'man' ,'name' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
+//                ['id' => 'woman','name' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
+//                ['id' => 'various','name' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
 //            ];
 //
 //            $salutationField = new C4GSelectField();

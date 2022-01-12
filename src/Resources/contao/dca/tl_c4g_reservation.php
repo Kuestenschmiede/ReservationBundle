@@ -69,7 +69,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         (
             'all' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['MSC']['all'],
+                'label'         => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'          => 'act=select',
                 'class'         => 'header_edit_all',
                 'attributes'    => 'onclick="Backend.getScrollOffSet()" accesskey="e"'
@@ -86,26 +86,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         (
             'edit' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation']['edit'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['edit'],
                 'href'          => 'act=edit',
                 'icon'          => 'edit.gif',
             ),
             'copy' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation']['copy'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['copy'],
                 'href'          => 'act=copy',
                 'icon'          => 'copy.gif',
             ),
             'delete' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation']['delete'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['delete'],
                 'href'          => 'act=delete',
                 'icon'          => 'delete.gif',
                 'attributes'    => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false;Backend.getScrollOffset()"',
             ),
             'show' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation']['show'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['show'],
                 'href'          => 'act=show',
                 'icon'          => 'show.gif',
             ),
@@ -243,7 +243,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
 
         'duration' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['duration'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['duration'],
             'exclude'           => true,
             'inputType'         => 'text',
             'default'           => '1',
@@ -573,7 +573,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
 
         'reservation_id' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_id'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_id'],
             'default'           => C4GBrickCommon::getUUID(),
             'flag'              => 1,
             'exclude'           => true,
@@ -625,7 +625,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         ),
 
         'cancellation' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
@@ -634,7 +634,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         ),
 
         'agreed' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
@@ -644,7 +644,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         ),
 
         'confirmed' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
@@ -653,7 +653,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         ),
 
         'specialNotification' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['specialNotification'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['specialNotification'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
@@ -662,7 +662,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         ),
 
         'emailConfirmationSend' => array(
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation']['emailConfirmationSend'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['emailConfirmationSend'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',

@@ -943,7 +943,9 @@ class C4gReservationController extends C4GBaseController
                     $speakerIds = $reservationObject->getSpeaker();
                     $speakerStr = '';
                     if ($speakerIds && count($speakerIds) > 0) {
+                        $speakerNr = 0;
                         foreach ($speakerIds as $speakerId) {
+                            $speakerNr++;
                             $speaker = C4gReservationEventSpeakerModel::findByPk($speakerId);
                             if ($speaker) {
                                 $speakerName = $speaker->title ? $speaker->title . '&nbsp;' . $speaker->firstname . '&nbsp;' . $speaker->lastname : $speaker->firstname . '&nbsp;' . $speaker->lastname;
@@ -952,7 +954,7 @@ class C4gReservationController extends C4GBaseController
                                     $speakerField = new C4GUrlField();
                                     $jumpTo = \PageModel::findByPk($this->speaker_redirect_site);
                                     if ($jumpTo) {
-                                        $speakerField->setUrl($jumpTo->getFrontendUrl().'?id='.$speakerId);
+                                        $speakerField->setUrl(Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?id='.$speakerId);
                                     }
                                 }
 
@@ -962,7 +964,12 @@ class C4gReservationController extends C4GBaseController
                                 }
 
                                 $speakerField->setFieldName('speaker');
-                                $speakerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker']);
+                                if ($speakerNr == 1) {
+                                    $speakerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker']);
+                                } else {
+                                    $speakerField->setTitle('');
+                                }
+
                                 $speakerField->setFormField(true);
                                 $speakerField->setEditable(false);
                                 $speakerField->setDatabaseField(false);
@@ -1119,9 +1126,9 @@ class C4gReservationController extends C4GBaseController
         $fieldList[] = $bookerHeadline;
 
         $salutation = [
-            ['id' => 'man', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
-            ['id' => 'woman', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
-            ['id' => 'various', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
+            ['id' => 'man', 'name' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
+            ['id' => 'woman', 'name' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
+            ['id' => 'various', 'name' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
         ];
 
         $additionaldatas = StringUtil::deserialize($this->hide_selection);
@@ -1862,7 +1869,7 @@ class C4gReservationController extends C4GBaseController
 
             if ($reservationEventObjects && (count($reservationEventObjects) > 1)) {
                 C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '.$objectId);
-                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['error']];
+                return ['usermessage' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['error']];
             }
 
             $reservationEventObject = is_array($reservationEventObjects) && count($reservationEventObjects) > 0 ? $reservationEventObjects[0] : $reservationEventObjects;
@@ -1871,7 +1878,7 @@ class C4gReservationController extends C4GBaseController
             $desiredCapacity =  $reservationEventObject && $reservationEventObject->maxParticipants ? ($reservationEventObject->maxParticipants * $factor) : 0;
 
             if ($desiredCapacity && ($reservationCount >= $desiredCapacity)) {
-                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked']];
+                return ['usermessage' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked']];
             }
 
             $putVars['reservation_object'] = $objectId;
@@ -1894,17 +1901,17 @@ class C4gReservationController extends C4GBaseController
             $reservationCount = is_array($reservations) ? count($reservations) : 0;
             if ($reservationCount >= 1) {
                 C4gLogModel::addLogEntry('reservation', 'Duplicate reservation ID detected.');
-                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']];
+                return ['usermessage' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']];
             }
 
             //check duplicate bookings
             if ($reservationObject && $reservationObject->id && C4gReservationHandler::preventDublicateBookings($reservationType,$reservationObject,$putVars)) {
                 C4gLogModel::addLogEntry('reservation', 'Duplicate booking detected.');
-                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking']];
+                return ['usermessage' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking']];
             }
 
             if (!$reservationObject || !$reservationObject->id) {
-                return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']];
+                return ['usermessage' => &$GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']];
             }
 
             $beginDate = $putVars['beginDate_'.$type];

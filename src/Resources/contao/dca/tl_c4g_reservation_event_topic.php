@@ -46,7 +46,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_topic'] = array
         (
             'all' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['MSC']['all'],
+                'label'         => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'          => 'act=select',
                 'class'         => 'header_edit_all',
                 'attributes'    => 'onclick="Backend.getScrollOffSet()" accesskey="e"'
@@ -57,26 +57,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_topic'] = array
         (
             'edit' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_topic']['edit'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_topic']['edit'],
                 'href'          => 'act=edit',
                 'icon'          => 'edit.gif',
             ),
             'copy' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_topic']['copy'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_topic']['copy'],
                 'href'          => 'act=copy',
                 'icon'          => 'copy.gif',
             ),
             'delete' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_topic']['delete'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_topic']['delete'],
                 'href'          => 'act=delete',
                 'icon'          => 'delete.gif',
                 'attributes'    => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false;Backend.getScrollOffset()"',
             ),
             'show' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_topic']['show'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_topic']['show'],
                 'href'          => 'act=show',
                 'icon'          => 'show.gif',
             )

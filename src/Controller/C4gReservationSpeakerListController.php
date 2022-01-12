@@ -11,6 +11,10 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
+use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
+use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
+use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickGrid;
+use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickGridElement;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GGridField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GImageField;
@@ -138,6 +142,8 @@ class C4gReservationSpeakerListController extends C4GBaseController
         );
         
         $this->listParams->setRenderMode($this->renderMode ?: C4GBrickRenderMode::TILEBASED);
+
+        $this->dialogParams->changeButtonCaption(C4GBrickConst::BUTTON_CANCEL, $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['button_cancel']);
     }
 
     public function addFields() : array
@@ -160,7 +166,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $titleField->setFormField(true);
         $titleField->setTableColumn(false);
         $titleField->setShowIfEmpty(false);
-        $fieldList[] = $titleField;
+        //$fieldList[] = $titleField;
 
         $firstname = new C4GTextField();
         $firstname->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['firstname']);
@@ -169,7 +175,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $firstname->setFormField(true);
         $firstname->setTableColumn(true);
         $firstname->setShowIfEmpty(false);
-        $fieldList[] = $firstname;
+        //$fieldList[] = $firstname;
 
         $lastname = new C4GTextField();
         $lastname->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['lastname']);
@@ -178,7 +184,21 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $lastname->setFormField(true);
         $lastname->setTableColumn(true);
         $lastname->setShowIfEmpty(false);
-        $fieldList[] = $lastname;
+        //$fieldList[] = $lastname;
+
+        $titleGridElement = new C4GBrickGridElement($titleField,0,0,'left','top','20%',1,1);
+        $firstnameGridElement = new C4GBrickGridElement($firstname,1,0,'left','top','40%',2,1);
+        $lastnameGridElement = new C4GBrickGridElement($lastname,2,0,'left','top','40%', 3, 1);
+        $grid = new C4GBrickGrid([
+            $titleGridElement,
+            $firstnameGridElement,
+            $lastnameGridElement
+        ]);
+
+        $nameField = new C4GGridField($grid);
+        $nameField->setTableColumn(true);
+        $nameField->setFormField(true);
+        $fieldList[] = $nameField;
 
         $email = new C4GEmailField();
         $email->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['email']);
@@ -214,7 +234,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $postal->setFormField(true);
         $postal->setTableColumn(false);
         $postal->setShowIfEmpty(false);
-        $fieldList[] = $postal;
+        //$fieldList[] = $postal;
 
         $city = new C4GTextField();
         $city->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['city']);
@@ -223,7 +243,19 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $city->setFormField(true);
         $city->setTableColumn(false);
         $city->setShowIfEmpty(false);
-        $fieldList[] = $city;
+        //$fieldList[] = $city;
+
+        $postalGridElement = new C4GBrickGridElement($postal,0,0,'left','top','50%',1,1);
+        $cityGridElement = new C4GBrickGridElement($city,1,0,'left','top','50%',2,1);
+        $grid = new C4GBrickGrid([
+            $postalGridElement,
+            $cityGridElement
+        ]);
+
+        $postalCityField = new C4GGridField($grid);
+        $postalCityField->setTableColumn(true);
+        $postalCityField->setFormField(true);
+        $fieldList[] = $postalCityField;
 
         $website = new C4GUrlField();
         $website->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['website']);

@@ -46,7 +46,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_audience'] = array
         (
             'all' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['MSC']['all'],
+                'label'         => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'          => 'act=select',
                 'class'         => 'header_edit_all',
                 'attributes'    => 'onclick="Backend.getScrollOffSet()" accesskey="e"'
@@ -57,26 +57,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_audience'] = array
         (
             'edit' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_audience']['edit'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_audience']['edit'],
                 'href'          => 'act=edit',
                 'icon'          => 'edit.gif',
             ),
             'copy' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_audience']['copy'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_audience']['copy'],
                 'href'          => 'act=copy',
                 'icon'          => 'copy.gif',
             ),
             'delete' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_audience']['delete'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_audience']['delete'],
                 'href'          => 'act=delete',
                 'icon'          => 'delete.gif',
                 'attributes'    => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false;Backend.getScrollOffset()"',
             ),
             'show' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_audience']['show'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_audience']['show'],
                 'href'          => 'act=show',
                 'icon'          => 'show.gif',
             )

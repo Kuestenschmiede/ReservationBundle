@@ -36,4 +36,4 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['photo'] = 'Photo';
 //$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Wählen Sie die Reservierungsart aus.';
 
 /** BUTTONS */
-//$GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'] = 'Jetzt reservieren';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['button_cancel'] = 'Zur Liste';

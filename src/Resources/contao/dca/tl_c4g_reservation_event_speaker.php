@@ -46,7 +46,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
         (
             'all' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['MSC']['all'],
+                'label'         => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'          => 'act=select',
                 'class'         => 'header_edit_all',
                 'attributes'    => 'onclick="Backend.getScrollOffSet()" accesskey="e"'
@@ -57,26 +57,26 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
         (
             'edit' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['edit'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['edit'],
                 'href'          => 'act=edit',
                 'icon'          => 'edit.gif',
             ),
             'copy' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['copy'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['copy'],
                 'href'          => 'act=copy',
                 'icon'          => 'copy.gif',
             ),
             'delete' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['delete'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['delete'],
                 'href'          => 'act=delete',
                 'icon'          => 'delete.gif',
                 'attributes'    => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false;Backend.getScrollOffset()"',
             ),
             'show' => array
             (
-                'label'         => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['show'],
+                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['show'],
                 'href'          => 'act=show',
                 'icon'          => 'show.gif',
             )
@@ -208,7 +208,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
 
         'photo' => array
         (
-            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['photo'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['photo'],
             'exclude'           => true,
             'inputType'         => 'fileTree',
             'sorting'           => false,
