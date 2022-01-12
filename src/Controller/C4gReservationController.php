@@ -38,6 +38,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GUrlField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBaseController;
 use con4gis\ProjectsBundle\Classes\Framework\C4GController;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
@@ -946,26 +947,36 @@ class C4gReservationController extends C4GBaseController
                             $speaker = C4gReservationEventSpeakerModel::findByPk($speakerId);
                             if ($speaker) {
                                 $speakerName = $speaker->title ? $speaker->title . '&nbsp;' . $speaker->firstname . '&nbsp;' . $speaker->lastname : $speaker->firstname . '&nbsp;' . $speaker->lastname;
-                                $speakerStr = $speakerStr ? $speakerStr . ',&nbsp;' . $speakerName : $speakerName;
+
+                                if ($this->speaker_redirect_site) {
+                                    $speakerField = new C4GUrlField();
+                                    $jumpTo = \PageModel::findByPk($this->speaker_redirect_site);
+                                    if ($jumpTo) {
+                                        $speakerField->setUrl($jumpTo->getFrontendUrl().'?id='.$speakerId);
+                                    }
+                                }
+
+                                if (!$speakerField || !$speakerField->getUrl()) {
+                                    $speakerField = new C4GTextField();
+                                    $speakerField->setSimpleTextWithoutEditing(true);
+                                }
+
+                                $speakerField->setFieldName('speaker');
+                                $speakerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker']);
+                                $speakerField->setFormField(true);
+                                $speakerField->setEditable(false);
+                                $speakerField->setDatabaseField(false);
+                                $speakerField->setCondition($objConditionArr);
+                                $speakerField->setInitialValue($speakerName);
+                                $speakerField->setMandatory(false);
+                                $speakerField->setShowIfEmpty(false);
+                                $speakerField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                                $speakerField->setRemoveWithEmptyCondition(true);
+                                $speakerField->setNotificationField(true);
+                                $speakerField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-speaker');
+                                $fieldList[] = $speakerField;
                             }
                         }
-
-                        $speakerField = new C4GTextField();
-                        $speakerField->setFieldName('speaker');
-                        $speakerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker']);
-                        $speakerField->setFormField(true);
-                        $speakerField->setEditable(false);
-                        $speakerField->setDatabaseField(false);
-                        $speakerField->setCondition($objConditionArr);
-                        $speakerField->setInitialValue($speakerStr);
-                        $speakerField->setMandatory(false);
-                        $speakerField->setShowIfEmpty(false);
-                        $speakerField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
-                        $speakerField->setRemoveWithEmptyCondition(true);
-                        $speakerField->setNotificationField(true);
-                        $speakerField->setSimpleTextWithoutEditing(true);
-                        $speakerField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-speaker');
-                        $fieldList[] = $speakerField;
                     }
 
                     $topicIds = $reservationObject->getTopic();

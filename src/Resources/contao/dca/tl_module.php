@@ -19,7 +19,7 @@ use con4gis\ReservationBundle\Controller\C4gReservationController;
 use con4gis\ReservationBundle\Controller\C4gReservationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,emptyOptionLabel,withCapacity,additionalDuration,showEndTime,showPrices,showDateTime,showMemberData, removeBookedDays, hide_selection, specialParticipantMechanism; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, privacy_policy_text, privacy_policy_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,emptyOptionLabel,withCapacity,additionalDuration,showEndTime,showPrices,showDateTime,showMemberData, removeBookedDays, hide_selection, specialParticipantMechanism; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, speaker_redirect_site, privacy_policy_text, privacy_policy_site;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject, showSignatureField, cancellation_redirect_site;';
 
@@ -254,6 +254,16 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_redirect_site'] = array
 $GLOBALS['TL_DCA']['tl_module']['fields']['cancellation_redirect_site'] = array
 (
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site'],
+    'exclude'                 => true,
+    'inputType'               => 'pageTree',
+    'foreignKey'              => 'tl_page.title',
+    'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+    'sql'                     => "int(10) unsigned NOT NULL default '0'",
+    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['speaker_redirect_site'] = array
+(
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['speaker_redirect_site'],
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',

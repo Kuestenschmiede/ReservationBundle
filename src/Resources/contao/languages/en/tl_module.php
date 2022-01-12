@@ -26,6 +26,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showSignatureFiel
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['appearance_themeroller_css'] = array('jQuery UI ThemeRoller CSS file', 'Optional: select a CSS file created with the jQuery UI ThemeRoller to customize the style of the module accordingly');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationButtonCaption'] = array('Button label', 'This allows you to change the button text.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site'] = array('Forwarding page', 'After booking, you will be forwarded here.');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['speaker_redirect_site'] = array('Speaker forwarding', 'If you want to link the speakers, you can set the forwarding here.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type'] = array('notification', 'Select notification');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_site']  = array('Link to privacy policy', 'This page is linked for the confirmation of the privacy policy.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_text']  = array('Privacy Comment', 'This privacy comment appears before the consent checkbox.');

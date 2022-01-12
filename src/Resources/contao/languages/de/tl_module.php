@@ -26,6 +26,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showSignatureFiel
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['appearance_themeroller_css'] = array('jQuery UI ThemeRoller CSS Datei', 'Optional: wählen Sie eine, mit dem jQuery UI ThemeRoller erstellte, CSS-Datei aus, um den Stil des Moduls entsprechend anzupassen.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationButtonCaption'] = array('Buttonbeschriftung','Hiermit können Sie den Button Text ändern. Bspw. "Zahlungspflichtig reservieren".');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site'] = array('Weiterleitungsseite', 'Nach der Buchung wird hierhin weitergeleitet.');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['speaker_redirect_site'] = array('Referentenweiterleitung', 'Falls Sie die Referenten verknüpfen wollen, können Sie hier die Weiterleitung einstellen.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_site'] = array('Link zur Datenschutzerklärung', 'Diese Seite wird für die Bestätigung der Datenschutzerklärung verlinkt.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['privacy_policy_text'] = array('Datenschutzkommentar', 'Dieser Datenschutzkommentar taucht vor der Checkbox zur Einwilligung auf.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type'] = array('Benachrichtigung', 'Wählen Sie die Benachrichtigung aus. Die Einstellung kann in der Reservierungsart überschrieben werden.');
