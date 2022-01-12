@@ -29,6 +29,7 @@ use con4gis\ReservationBundle\Classes\Projects\C4gReservationBrickTypes;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationCalculator;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\ModuleModel;
+use Contao\System;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -103,9 +104,8 @@ class C4gReservationSpeakerListController extends C4GBaseController
     public function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         $result = parent::getResponse($template, $model, $request);
-        //System::loadLanguageFile('fe_c4g_reservation_speaker');
-        $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['brick_caption']);
-        $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['brick_caption_plural']);
+
+
 
         return $result;
     }
@@ -117,39 +117,13 @@ class C4gReservationSpeakerListController extends C4GBaseController
     public function initBrickModule($id)
     {
         parent::initBrickModule($id);
-        $this->listParams->setRenderMode(C4GBrickRenderMode::TILEBASED);
-//
-//        $this->dialogParams->setWithoutGuiHeader(true);
-//
-//        $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
-//        $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
-//        $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
-//
-//        $this->listParams->setScrollX(false);
-//        $this->listParams->setResponsive(true);
-//
-//        if ($this->viewType === 'publicview') {
-//            $this->dialogParams->setSaveWithoutMessages(true);
-//        } else if (($this->viewType === 'member') || ($this->viewType === 'memberview')) {
-//            $this->dialogParams->setSaveWithoutMessages(true);
-//
-//            if ($this->cancellation_redirect_site) {
-//                $button = new C4GBrickButton(C4GBrickConst::BUTTON_CLICK,
-//                    $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_cancellation'],
-//                    true,
-//                    true,
-//                    C4GBrickActionType::ACTION_BUTTONCLICK . ':clickCancellation');
-//                $buttons = $this->dialogParams->getButtons();
-//                $buttons[] = $button;
-//                $this->dialogParams->setButtons($buttons);
-//            }
-//        } else if (($this->viewType === 'group') && (C4GVersionProvider::isInstalled('con4gis/documents'))) {
-//            $this->dialogParams->setCaptionField('reservation_id');
-//            $this->dialogParams->addButton(C4GBrickConst::BUTTON_PRINT);
-//            $this->dialogParams->setSavePrintoutToField('fileUpload');
-//            $this->dialogParams->setGeneratePrintoutWithSaving(true);
-//        }
 
+        $this->setBrickCaptions(
+            $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['brick_caption'],
+            $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['brick_caption_plural']
+        );
+        
+        $this->listParams->setRenderMode(C4GBrickRenderMode::TILEBASED);
     }
 
     public function addFields()
