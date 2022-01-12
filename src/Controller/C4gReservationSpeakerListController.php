@@ -140,7 +140,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $this->listParams->setRenderMode($this->renderMode ?: C4GBrickRenderMode::TILEBASED);
     }
 
-    public function addFields()
+    public function addFields() : array
     {
         $fieldList = array();
 
@@ -253,7 +253,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $photo->setShowIfEmpty(false);
         $fieldList[] = $photo;
 
-        $this->fieldList = $fieldList;
+        return $fieldList;
     }
 }
 

@@ -84,7 +84,7 @@ class C4gReservationCancellationController extends C4GBaseController
         $this->brickCaptionPlural = $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['brick_caption_plural'];
     }
 
-    public function addFields()
+    public function addFields() : array
     {
         $lastname  = Input::get('lastname') ? Input::get('lastname') : '';
         $reservation_id  = Input::get('reservation_id') ? Input::get('reservation_id') : '';
@@ -130,7 +130,7 @@ class C4gReservationCancellationController extends C4GBaseController
         $buttonField->setWithoutLabel(true);
         $fieldList[] = $buttonField;
 
-        $this->fieldList = $fieldList;
+        return $fieldList;
     }
 
 

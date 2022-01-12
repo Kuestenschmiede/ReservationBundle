@@ -129,7 +129,7 @@ class C4gReservationController extends C4GBaseController
         $this->dialogParams->setSaveWithoutSavingMessage(false);
     }
 
-    public function addFields()
+    public function addFields() : array
     {
         $fieldList = array();
 
@@ -1754,9 +1754,7 @@ class C4gReservationController extends C4GBaseController
         $groupId->setNotificationField(false);
         $fieldList[] = $groupId;
 
-        $this->fieldList = $fieldList;
-
-        //return $fieldList;
+        return $fieldList;
     }
 
     /**

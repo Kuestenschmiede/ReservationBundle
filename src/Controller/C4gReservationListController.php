@@ -185,7 +185,7 @@ class C4gReservationListController extends C4GBaseController
 
     }
 
-    public function addFields()
+    public function addFields() : array
     {
         $fieldList = array();
 
@@ -884,7 +884,7 @@ class C4gReservationListController extends C4GBaseController
 //            $fieldList[] = $reservationParticipants;
         }
 
-        $this->fieldList = $fieldList;
+        return $fieldList;
     }
 
     public function clickCancellation($values, $putVars) {
