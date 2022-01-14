@@ -192,7 +192,7 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                     var date = '';
                     var time = '';
 
-                    var dateFields = document.querySelectorAll('.c4g_date_field_container .c4g_beginDate_'+typeId);
+                    var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+typeId);
                     if (dateFields) {
                         for (k = 0; k < dateFields.length; k++) {
                             var dateField = dateFields[k];
@@ -285,7 +285,7 @@ function setReservationForm(id, typeId, showDateTime, event) {
                 checkEventFields();
             }
         } else {
-            var dateFields = document.getElementsByClassName('c4g_date_field_input');
+            var dateFields = document.getElementsByClassName('c4g__form-date-input');
             if (dateFields) {
                 for (i = 0; i < dateFields.length; i++) {
                     var dateField = dateFields[i];
@@ -716,13 +716,13 @@ function checkEventFields() {
                         if ((additional != -1) && jQuery(dateFields[j]).children().children('input').hasClass('c4g_beginDateEvent_' + additional)) {
                             jQuery(dateFields[j]).show();
                             jQuery(dateFields[j]).children('label').show();
-                            jQuery(dateFields[j]).children('.c4g_date_field_container').show();
-                            jQuery(dateFields[j]).children('.c4g_date_field_container').children('input').show();
+                            jQuery(dateFields[j]).children('.c4g_form-date-container').show();
+                            jQuery(dateFields[j]).children('.c4g_form-date-container').children('input').show();
                         } else {
                             jQuery(dateFields[j]).hide();
                             jQuery(dateFields[j]).children('label').hide();
-                            jQuery(dateFields[j]).children('.c4g_date_field_container').hide();
-                            jQuery(dateFields[j]).children('.c4g_date_field_container').children('input').hide();
+                            jQuery(dateFields[j]).children('.c4g_form-date-container').hide();
+                            jQuery(dateFields[j]).children('.c4g_form-date-container').children('input').hide();
                         }
                     }
                 }
