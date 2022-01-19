@@ -5,7 +5,7 @@
  * @version 8
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2021, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -19,11 +19,14 @@ use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickRegEx;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickCondition;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickConditionType;
+use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickGrid;
+use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickGridElement;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GGridField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GHeadlineField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLabelField;
@@ -78,7 +81,7 @@ class C4gReservationController extends C4GBaseController
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
+    protected $brickScript  = 'bundles/con4gisreservation/src/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
 
@@ -398,7 +401,7 @@ class C4gReservationController extends C4GBaseController
                     }
 
                     $reservationBeginDateField = new C4GDateField();
-                    $reservationBeginDateField->setFlipButtonPosition(true);
+                    $reservationBeginDateField->setFlipButtonPosition(false);
                     $reservationBeginDateField->setMinDate(C4gReservationHandler::getMinDate($reservationObjects));
                     $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
                     $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
@@ -835,12 +838,12 @@ class C4gReservationController extends C4GBaseController
 
             if ($isEvent) {
                 foreach ($reservationObjects as $reservationObject) {
-                    //$type_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
+                    $type_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
                     $val_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $listType['id'], $reservationObject->getId());
                     $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'reservation_object_event_' . $listType['id']. '-22' . $reservationObject->getId());
                     $obj_condition->setModel(C4gReservationHandler::class);
                     $obj_condition->setFunction('isEventObject');
-                    $objConditionArr = [$obj_condition,$val_condition];
+                    $objConditionArr = $type_condition;//[$obj_condition,$val_condition];
 
                     $reservationBeginDateField = new C4gDateField();
                     $reservationBeginDateField->setFlipButtonPosition(true);
@@ -944,6 +947,7 @@ class C4gReservationController extends C4GBaseController
                     $speakerStr = '';
                     if ($speakerIds && count($speakerIds) > 0) {
                         $speakerNr = 0;
+                        $speakerList = [];
                         foreach ($speakerIds as $speakerId) {
                             $speakerNr++;
                             $speaker = C4gReservationEventSpeakerModel::findByPk($speakerId);
@@ -964,26 +968,40 @@ class C4gReservationController extends C4GBaseController
                                 }
 
                                 $speakerField->setFieldName('speaker');
-                                if ($speakerNr == 1) {
-                                    $speakerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker']);
-                                } else {
-                                    $speakerField->setTitle('');
-                                }
+//                                if ($speakerNr == 1) {
+//                                    $speakerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker']);
+//                                } else {
+                                $speakerField->setTitle('');
+//                                }
 
                                 $speakerField->setFormField(true);
                                 $speakerField->setEditable(false);
                                 $speakerField->setDatabaseField(false);
-                                $speakerField->setCondition($objConditionArr);
                                 $speakerField->setInitialValue($speakerName);
                                 $speakerField->setMandatory(false);
+                                $speakerField->setCondition($objConditionArr);
                                 $speakerField->setShowIfEmpty(false);
                                 $speakerField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
-                                $speakerField->setRemoveWithEmptyCondition(true);
                                 $speakerField->setNotificationField(true);
                                 $speakerField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-speaker');
-                                $fieldList[] = $speakerField;
+                                $speakerList[] = new C4GBrickGridElement($speakerField);
                             }
                         }
+
+                        $grid = new C4GBrickGrid($speakerList, 1);
+
+                        $speakerGrid = new C4GGridField($grid);
+                        $speakerGrid->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker']);
+                        $speakerGrid->setFieldName('speakerGrid');
+                        $speakerGrid->setTableColumn(false);
+                        $speakerGrid->setFormField(true);
+                        $speakerGrid->setDatabaseField(false);
+                        $speakerGrid->setCondition($objConditionArr);
+                        $speakerGrid->setShowIfEmpty(false);
+                        $speakerGrid->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                        $speakerGrid->setRemoveWithEmptyCondition(true);
+                        //$speakerGrid->setNotificationField(true); //ToDo with Notification
+                        $fieldList[] = $speakerGrid;
                     }
 
                     $topicIds = $reservationObject->getTopic();
@@ -1569,6 +1587,7 @@ class C4gReservationController extends C4GBaseController
 
                         $fieldList[] = $reservationParticipants;
                     } else {
+                        $maxParticipants = $maxCapacity ? $maxCapacity : 1; //ToDo check
                         for ($i = $minCapacity; $i <= $maxCapacity; $i++) {
                             $newCondition = [];
 
@@ -1650,15 +1669,16 @@ class C4gReservationController extends C4GBaseController
             $fieldList[] = $privacyPolicyText;
         }
 
-        $agreedField = new C4GCheckboxField();
-        $agreedField->setFieldName('agreed');
-        $agreedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed']);
         if ($this->privacy_policy_site) {
             $href = \Contao\Controller::replaceInsertTags('{{link_url::' . $this->privacy_policy_site . '}}');
-            $agreedField->setDescription('<span class="c4g_field_description_text">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . '</span> <a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>');
+            $desc = '<span class="c4g_field_description_text">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . '</span> <a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>';
         } else {
-            $agreedField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link']);
+            $desc = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'];
         }
+
+        $agreedField = new C4GCheckboxField();
+        $agreedField->setFieldName('agreed');
+        $agreedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'].' '.$desc);
         $agreedField->setTableRow(false);
         $agreedField->setColumnWidth(5);
         $agreedField->setSortColumn(false);
@@ -1872,11 +1892,11 @@ class C4gReservationController extends C4GBaseController
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['error']];
             }
 
-            $reservationCount = count($reservations);
+            $reservationCount = $reservations && is_countable($reservations) ? count($reservations) : 0; //ToDo check
 
             $reservationEventObjects = C4gReservationEventModel::findBy('pid', $objectId);
 
-            if ($reservationEventObjects && (count($reservationEventObjects) > 1)) {
+            if ($reservationEventObjects && is_countable($reservationEventObject) && count($reservationEventObjects) > 1) {
                 C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '.$objectId);
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['error']];
             }

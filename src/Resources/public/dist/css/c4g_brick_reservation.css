@@ -51,7 +51,6 @@
   border-bottom: #ff0;
   font-weight: 700
 }
-.mod_C4gReservation .c4g_brick_dialog input[type=checkbox],
 .mod_C4gReservation label.agreed.c4g_agreed,
 .mod_C4gReservation label.reservation_id.c4g_reservation_id {
   display: inline-block
@@ -76,35 +75,9 @@
 .mod_C4gReservation .displayReservationObjects select option:disabled {
   display: none
 }
-.mod_C4gReservation .c4g_multicheckbox label.additional_params,
-.mod_C4gReservation .c4g_multicheckbox label.included_params {
-  display: inline-block!important
-}
 .ui-datepicker-calendar .ui-state-default {
   color: green!important
 }
 .ui-datepicker-calendar .ui-state-disabled .ui-state-default {
   color: red!important
-}
-.mod_C4gReservation table.c4g_brick_table_rows td {
-  padding-right: 1.5%
-}
-.mod_C4gReservation table.c4g_brick_table_rows td {
-  width: auto
-}
-.mod_C4gReservation table.c4g_brick_table_rows {
-  margin-top: 2.5%!important;
-  margin-bottom: 0!important
-}
-.c4g__form-description {
-  margin-left: 2.5%
-}
-.c4g__form-description-text {
-  display: inline-block
-}
-.c4g__form-description a {
-  display: inline-block
-}
-#c4g_brick .ui-widget {
-  background: 0 0
 }

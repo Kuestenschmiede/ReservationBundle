@@ -4,7 +4,7 @@
  * @version 8
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2021, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -713,21 +713,21 @@ function checkEventFields() {
                 var dateFields = document.getElementsByClassName('begindate-event');
                 if (dateFields) {
                     for (j = 0; j < dateFields.length; j++) {
-                        if ((additional != -1) && jQuery(dateFields[j]).children().children('input').hasClass('c4g_beginDateEvent_' + additional)) {
+                        if ((additional != -1) && jQuery(dateFields[j]).children('.c4g__form-date-container').children('input').hasClass('c4g_beginDateEvent_' + additional)) {
                             jQuery(dateFields[j]).show();
                             jQuery(dateFields[j]).children('label').show();
-                            jQuery(dateFields[j]).children('.c4g_form-date-container').show();
-                            jQuery(dateFields[j]).children('.c4g_form-date-container').children('input').show();
+                            jQuery(dateFields[j]).children('.c4g__form-date-container').show();
+                            jQuery(dateFields[j]).children('.c4g__form-date-container').children('input').show();
                         } else {
                             jQuery(dateFields[j]).hide();
                             jQuery(dateFields[j]).children('label').hide();
-                            jQuery(dateFields[j]).children('.c4g_form-date-container').hide();
-                            jQuery(dateFields[j]).children('.c4g_form-date-container').children('input').hide();
+                            jQuery(dateFields[j]).children('.c4g__form-date-container').hide();
+                            jQuery(dateFields[j]).children('.c4g__form-date-container').children('input').hide();
                         }
                     }
                 }
 
-                var timeFields = jQuery('.c4g_brick_radio_group_wrapper .reservation_time_event_button');
+                var timeFields = jQuery('.reservation_time_event_button');
                 if (timeFields) {
                     for (j = 0; j < timeFields.length; j++) {
                         if ((additional != -1) && jQuery(timeFields[j]).hasClass('reservation_time_event_button_' + additional)) {

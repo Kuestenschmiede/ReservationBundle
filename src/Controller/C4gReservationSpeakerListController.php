@@ -5,7 +5,7 @@
  * @version 8
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2021, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -195,14 +195,12 @@ class C4gReservationSpeakerListController extends C4GBaseController
         ], 3);
 
         $nameField = new C4GGridField($grid);
+        $nameField->setTitle("Name"); //ToDO Language
         $nameField->setFieldName('nameGrid');
         $nameField->setTableColumn(true); //ToDO
         $nameField->setFormField(true);
         $nameField->setDatabaseField(false);
         $fieldList[] = $nameField;
-
-        //ToDo Table Row per CSS (also zusätzliche Klasse)
-
 
         $email = new C4GEmailField();
         $email->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['email']);
@@ -256,7 +254,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
 
         $postalCityField = new C4GGridField($grid);
         $postalCityField->setFieldName('postalCityGrid');
-        $postalCityField->setTableColumn(true);
+        $postalCityField->setTableColumn(false);
         $postalCityField->setFormField(true);
         $postalCityField->setDatabaseField(false);
         $fieldList[] = $postalCityField;

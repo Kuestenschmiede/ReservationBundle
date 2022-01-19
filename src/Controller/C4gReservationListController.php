@@ -5,7 +5,7 @@
  * @version 8
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2021, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -707,7 +707,7 @@ class C4gReservationListController extends C4GBaseController
                 $confirmedField->setStyleClass('confirmed');
                 $confirmedField->setWithoutDescriptionLineBreak(true);
                 $confirmedField->setPrintable(true);
-                $confirmedField->setTableRow(true);
+                $confirmedField->setTableRow(false);
                 $confirmedField->setTableRowWidth('100%');
                 $confirmedField->setTableRowLabelWidth('25%');
                 $fieldList[] = $confirmedField;
@@ -721,7 +721,7 @@ class C4gReservationListController extends C4GBaseController
                 $specialNotificationField->setStyleClass('confirmed');
                 $specialNotificationField->setWithoutDescriptionLineBreak(true);
                 $specialNotificationField->setPrintable(true);
-                $specialNotificationField->setTableRow(true);
+                $specialNotificationField->setTableRow(false);
                 $specialNotificationField->setTableRowWidth('100%');
                 $specialNotificationField->setTableRowLabelWidth('25%');
                 $fieldList[] = $specialNotificationField;
