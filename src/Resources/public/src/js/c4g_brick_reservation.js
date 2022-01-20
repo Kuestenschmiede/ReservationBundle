@@ -443,7 +443,6 @@ function shuffle(array) {
 }
 
 function setTimeset(dateField, id, additionalId, showDateTime) {
-    //var brick_api = apiBaseUrl+"/c4g_brick_ajax";
     var elementId = 0;
     var date = 0;
     var val = -1;
@@ -457,7 +456,6 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
             dateField = document.getElementById('c4g_beginDate_'+additionalId);
         }
 
-        //elementId = "c4g_beginDate_"+additionalId;
         date = dateField ? dateField.value : 0;
     }
 
