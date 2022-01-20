@@ -85,7 +85,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
     protected $jQueryUseGoogleMaps = false;
     protected $jQueryUseMapsEditor = false;
     protected $jQueryUseWswgEditor = false;
-    protected $jQueryUseScrollPane = true;
+    protected $jQueryUseScrollPane = false;
     protected $jQueryUsePopups = false;
 
     protected $withPermissionCheck = false;
@@ -138,7 +138,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         parent::initBrickModule($id);
 
         $this->setBrickCaptions(
-            $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['brick_caption'],
+            /*$GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['brick_caption']*/'',
             $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['brick_caption_plural']
         );
         
@@ -159,6 +159,16 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $idField->setPrintable(false);
         $idField->setShowIfEmpty(false);
         $fieldList[] = $idField;
+
+        $photo = new C4GImageField();
+        //$photo->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['photo']);
+        $photo->setFieldName('photo');
+        $photo->setEditable(false);
+        $photo->setFormField(true);
+        $photo->setTableColumn(true);
+        $photo->setWithoutLabel(true);
+        $photo->setShowIfEmpty(false);
+        //$fieldList[] = $photo;
 
         $titleField = new C4GTextField();
         $titleField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['title']);
@@ -195,30 +205,12 @@ class C4gReservationSpeakerListController extends C4GBaseController
         ], 3);
 
         $nameField = new C4GGridField($grid);
-        $nameField->setTitle("Name"); //ToDO Language
+        $nameField->setTitle("");
         $nameField->setFieldName('nameGrid');
         $nameField->setTableColumn(true); //ToDO
         $nameField->setFormField(true);
         $nameField->setDatabaseField(false);
-        $fieldList[] = $nameField;
-
-        $email = new C4GEmailField();
-        $email->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['email']);
-        $email->setFieldName('email');
-        $email->setEditable(false);
-        $email->setFormField(true);
-        $email->setTableColumn(false);
-        $email->setShowIfEmpty(false);
-        $fieldList[] = $email;
-
-        $phone = new C4GTelField();
-        $phone->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['phone']);
-        $phone->setFieldName('phone');
-        $phone->setEditable(false);
-        $phone->setFormField(true);
-        $phone->setTableColumn(false);
-        $phone->setShowIfEmpty(false);
-        $fieldList[] = $phone;
+        //$fieldList[] = $nameField;
 
         $address = new C4GTextField();
         $address->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['address']);
@@ -227,7 +219,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $address->setFormField(true);
         $address->setTableColumn(false);
         $address->setShowIfEmpty(false);
-        $fieldList[] = $address;
+        //$fieldList[] = $address;
 
         $postal = new C4GPostalField();
         $postal->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['postal']);
@@ -257,7 +249,25 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $postalCityField->setTableColumn(false);
         $postalCityField->setFormField(true);
         $postalCityField->setDatabaseField(false);
-        $fieldList[] = $postalCityField;
+        //$fieldList[] = $postalCityField;
+
+        $phone = new C4GTelField();
+        $phone->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['phone']);
+        $phone->setFieldName('phone');
+        $phone->setEditable(false);
+        $phone->setFormField(true);
+        $phone->setTableColumn(true);
+        $phone->setShowIfEmpty(false);
+        //$fieldList[] = $phone;
+
+        $email = new C4GEmailField();
+        $email->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['email']);
+        $email->setFieldName('email');
+        $email->setEditable(false);
+        $email->setFormField(true);
+        $email->setTableColumn(true);
+        $email->setShowIfEmpty(false);
+        //$fieldList[] = $email;
 
         $website = new C4GUrlField();
         $website->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['website']);
@@ -266,7 +276,37 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $website->setFormField(true);
         $website->setTableColumn(true);
         $website->setShowIfEmpty(false);
-        $fieldList[] = $website;
+        //$fieldList[] = $website;
+
+        $grid = new C4GBrickGrid([
+            new C4GBrickGridElement($nameField),
+            new C4GBrickGridElement($address),
+            new C4GBrickGridElement($postalCityField),
+            new C4GBrickGridElement($phone),
+            new C4GBrickGridElement($email),
+            new C4GBrickGridElement($website)
+        ], 1);
+
+        $personalDataField = new C4GGridField($grid);
+        $personalDataField->setTitle(""); //ToDO Language
+        $personalDataField->setFieldName('header-content');
+        $personalDataField->setTableColumn(true); //ToDO
+        $personalDataField->setFormField(true);
+        $personalDataField->setDatabaseField(false);
+        //$fieldList[] = $personalDataField;
+
+        $grid = new C4GBrickGrid([
+            new C4GBrickGridElement($photo),
+            new C4GBrickGridElement($personalDataField),
+        ], 2);
+
+        $headerField = new C4GGridField($grid);
+        $headerField->setTitle(""); //ToDO Language
+        $headerField->setFieldName('header-content');
+        $headerField->setTableColumn(false); //ToDO
+        $headerField->setFormField(true);
+        $headerField->setDatabaseField(false);
+        $fieldList[] = $headerField;
 
         $vita = new C4GTrixEditorField();
         $vita->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['vita']);
@@ -277,15 +317,21 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $vita->setShowIfEmpty(false);
         $fieldList[] = $vita;
 
-        $photo = new C4GImageField();
-        //$photo->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['photo']);
-        $photo->setFieldName('photo');
-        $photo->setEditable(false);
-        $photo->setFormField(true);
-        $photo->setTableColumn(true);
-        $photo->setWithoutLabel(true);
-        $photo->setShowIfEmpty(false);
-        $fieldList[] = $photo;
+        $grid = new C4GBrickGrid([
+            new C4GBrickGridElement($photo),
+            new C4GBrickGridElement($nameField),
+            new C4GBrickGridElement($phone),
+            new C4GBrickGridElement($email),
+            new C4GBrickGridElement($website)
+        ], 1);
+
+        $tileContent = new C4GGridField($grid);
+        $tileContent->setTitle(""); //ToDO Language
+        $tileContent->setFieldName('tile-content');
+        $tileContent->setTableColumn(true); //ToDO
+        $tileContent->setFormField(false);
+        $tileContent->setDatabaseField(false);
+        $fieldList[] = $tileContent;
 
 //        if ($this->dialogId) {
 //
