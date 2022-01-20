@@ -94,8 +94,7 @@ function isSaturday(date, fieldName) {
 }
 
 function setObjectId(object, typeid, showDateTime = 0) {
-    var className = object.className;
-    className = className.split(" ")[0];
+    var objectParam = jQuery(object).attr('data-object');
     var typeId = typeid;
     var selectField = document.getElementById("c4g_reservation_object_"+typeId);
     var reservationObjects = jQuery(document.getElementsByClassName("displayReservationObjects"));
@@ -106,9 +105,9 @@ function setObjectId(object, typeid, showDateTime = 0) {
     if (selectField) {
         jQuery(selectField).show();
         reservationObjects ? reservationObjects.show() : false;
-        if (className) {
-            values = className.split("_")[2];
-            objects = values.split('-');
+        if (objectParam) {
+            //values = objectParam.split("_")[2];
+            objects = objectParam.split('-');
 
             if (!jQuery(object).is(":disabled")) {
                 jQuery(selectField).val(objects[0]).change();
@@ -301,6 +300,8 @@ function setReservationForm(id, typeId, showDateTime, event) {
             }
         }
     }
+
+    document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
 }
 
 function checkTimelist(value, timeList) {
@@ -476,7 +477,7 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
 
     if (id && date && additionalId) {
         duration = duration ? duration : -1;
-
+        document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "flex";
         let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration;
         fetch(url)
             .then(response => response.json())
@@ -601,9 +602,8 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
                                             }
                                         }
 
-                                        //ToDo remove classes
-
                                         //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objstr);
+                                        jQuery(radioGroups[i].children[j].children[k]).attr('data-object', objstr);
                                         jQuery(radioGroups[i].children[j].children[k]).attr('disabled', false);
 
                                         if (percent > 0) {
@@ -680,6 +680,10 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
                         setObjectId(targetButton, additionalId, showDateTime);
                     }
                 }
+            }).catch(function() {
+                //document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
+            }).finally(function() {
+                document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
             });
     }
 

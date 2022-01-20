@@ -1,4 +1,58 @@
 @charset "UTF-8";
+.reservation_time_button .c4g__form-radio-group input[type=radio],
+.reservation_time_event_button .c4g__form-radio-group input[type=radio] {
+  left: -9999px;
+  position: absolute;
+  z-index: 999
+}
+.c4g__form-radio-group {
+  margin-left: 0;
+  padding-left: 0;
+  margin-right: 0;
+  padding-right: 0
+}
+.reservation_time_button .c4g__form-radio-group label,
+.reservation_time_event_button .c4g__form-radio-group label {
+  min-width: 120px;
+  padding-right: 1em;
+  padding-left: 1em;
+  height: 30px;
+  display: inline-block;
+  margin-right: 2px;
+  margin-bottom: 2px;
+  text-align: center;
+  background-color: green;
+  line-height: 30px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 400
+}
+.c4g_brick_dialog .c4g__form-radio-group .lbl_turned {
+  margin: 2px
+}
+.reservation_time_button input[type=radio]:checked + label,
+.reservation_time_event_button input[type=radio]:checked + label {
+  background-color: #006400;
+  border-bottom: #ff0;
+  font-weight: 700
+}
+.reservation_time_button .radio_object_hurry_up + label,
+.reservation_time_event_button .c4g_radio_object_hurry_up .c4g__form-check input[type=radio] + label {
+  background-color: #ff8c00
+}
+.reservation_time_button input[type=radio][disabled] + label,
+.reservation_time_event_button .c4g_radio_object_fully_booked .c4g__form-check input[type=radio] + label {
+  background-color: red;
+  opacity: 1;
+  cursor: no-drop;
+  font-weight: 400
+}
+.reservation_time_button_direct input[type=radio][disabled] + label {
+  background-color: #006400;
+  opacity: 1;
+  border-bottom: #ff0;
+  font-weight: 700
+}
 .mod_C4gReservation label.agreed.c4g_agreed,
 .mod_C4gReservation label.reservation_id.c4g_reservation_id {
   display: inline-block
@@ -22,13 +76,4 @@
 }
 .mod_C4gReservation .displayReservationObjects select option:disabled {
   display: none
-}
-.mod_C4gReservation .datepicker-cell {
-  color: green!important
-}
-.mod_C4gReservation .datepicker-cell.disabled {
-  color: red!important
-}
-.mod_C4gReservation .datepicker-cell.today {
-  background-color: #ff0!important
 }
