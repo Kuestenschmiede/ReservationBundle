@@ -102,7 +102,7 @@ class C4gReservationController extends C4GBaseController
     //JQuery GUI Resource Params
     protected $jQueryAddCore = true;
     protected $jQueryAddJquery = true;
-    protected $jQueryAddJqueryUI = true;
+    protected $jQueryAddJqueryUI = false;
     protected $jQueryUseTree = false;
     protected $jQueryUseTable = false;
     protected $jQueryUseHistory = false;
@@ -489,6 +489,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationBeginTimeField->setNotificationField(true);
                     $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $reservationBeginTimeField->setTurnButton(true);
+                    $reservationBeginTimeField->setShowButtons(true);
                     $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
                     $reservationBeginTimeField->setStyleClass('reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id']);
                     $reservationBeginTimeField->setTimeButtonSpecial(true);
@@ -523,6 +524,7 @@ class C4gReservationController extends C4GBaseController
                     $suReservationTimeField->setNotificationField(true);
                     $suReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $suReservationTimeField->setTurnButton(true);
+                    $suReservationTimeField->setShowButtons(true);
                     $suReservationTimeField->setRemoveWithEmptyCondition(true);
                     $suReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $suReservationTimeField->setInitialValue($initialTime);
@@ -558,6 +560,7 @@ class C4gReservationController extends C4GBaseController
                     $moReservationTimeField->setNotificationField(true);
                     $moReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $moReservationTimeField->setTurnButton(true);
+                    $moReservationTimeField->setShowButtons(true);
                     $moReservationTimeField->setRemoveWithEmptyCondition(true);
                     $moReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $moReservationTimeField->setInitialValue($initialTime);
@@ -593,6 +596,7 @@ class C4gReservationController extends C4GBaseController
                     $tuReservationTimeField->setNotificationField(true);
                     $tuReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $tuReservationTimeField->setTurnButton(true);
+                    $tuReservationTimeField->setShowButtons(true);
                     $tuReservationTimeField->setRemoveWithEmptyCondition(true);
                     $tuReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $tuReservationTimeField->setInitialValue($initialTime);
@@ -628,6 +632,7 @@ class C4gReservationController extends C4GBaseController
                     $weReservationTimeField->setNotificationField(true);
                     $weReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $weReservationTimeField->setTurnButton(true);
+                    $weReservationTimeField->setShowButtons(true);
                     $weReservationTimeField->setRemoveWithEmptyCondition(true);
                     $weReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $weReservationTimeField->setInitialValue($initialTime);
@@ -663,6 +668,7 @@ class C4gReservationController extends C4GBaseController
                     $thReservationTimeField->setNotificationField(true);
                     $thReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $thReservationTimeField->setTurnButton(true);
+                    $thReservationTimeField->setShowButtons(true);
                     $thReservationTimeField->setRemoveWithEmptyCondition(true);
                     $thReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $thReservationTimeField->setInitialValue($initialTime);
@@ -698,6 +704,7 @@ class C4gReservationController extends C4GBaseController
                     $frReservationTimeField->setNotificationField(true);
                     $frReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $frReservationTimeField->setTurnButton(true);
+                    $frReservationTimeField->setShowButtons(true);
                     $frReservationTimeField->setRemoveWithEmptyCondition(true);
                     $frReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $frReservationTimeField->setInitialValue($initialTime);
@@ -734,6 +741,7 @@ class C4gReservationController extends C4GBaseController
                     $saReservationTimeField->setNotificationField(true);
                     $saReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $saReservationTimeField->setTurnButton(true);
+                    $saReservationTimeField->setShowButtons(true);
                     $saReservationTimeField->setRemoveWithEmptyCondition(true);
                     $saReservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                     $saReservationTimeField->setInitialValue($initialTime);
@@ -843,7 +851,7 @@ class C4gReservationController extends C4GBaseController
                     $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'reservation_object_event_' . $listType['id']. '-22' . $reservationObject->getId());
                     $obj_condition->setModel(C4gReservationHandler::class);
                     $obj_condition->setFunction('isEventObject');
-                    $objConditionArr = $type_condition;//[$obj_condition,$val_condition];
+                    $objConditionArr = $type_condition;//[$obj_condition,$val_condition]; //ToDo check
 
                     $reservationBeginDateField = new C4gDateField();
                     $reservationBeginDateField->setFlipButtonPosition(true);
@@ -908,6 +916,7 @@ class C4gReservationController extends C4GBaseController
                         $reservationBeginTimeField->setNotificationField(true);
                         $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                         $reservationBeginTimeField->setTurnButton(true);
+                        $reservationBeginTimeField->setShowButtons(true);
                         $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
                         $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_' . $listType['id'] . '-22' . $reservationObject->getId() . C4gReservationHandler::getButtonStateClass($reservationObject));
                         $fieldList[] = $reservationBeginTimeField;

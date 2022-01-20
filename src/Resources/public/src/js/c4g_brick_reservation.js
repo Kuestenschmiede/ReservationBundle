@@ -482,7 +482,7 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
             .then(response => response.json())
             .then((data) => {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
-                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g_brick_radio_group") : document.querySelectorAll(".reservation_time_button .c4g_brick_radio_group");
+                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g__form-radio-group") : document.querySelectorAll(".reservation_time_button .c4g__form-radio-group");
                 var timeList = [];
                 var intervalList = [];
                 var objectList = [];
@@ -600,7 +600,10 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
                                                 objstr = objstr + '-' + objArr[l];
                                             }
                                         }
-                                        jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objstr);
+
+                                        //ToDo remove classes
+
+                                        //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objstr);
                                         jQuery(radioGroups[i].children[j].children[k]).attr('disabled', false);
 
                                         if (percent > 0) {
@@ -613,7 +616,7 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
 
                                         hideOptions(reservationObjects,additionalId, objstr, showDateTime);
                                     } else {
-                                        jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
+                                        //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
                                         jQuery(radioGroups[i].children[j].children[k]).attr('disabled', true);
                                     }
                                 }
