@@ -38,6 +38,7 @@ use con4gis\ReservationBundle\Classes\Utils\C4gReservationCalculator;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Input;
 use Contao\ModuleModel;
 use Contao\System;
 use Contao\Template;
@@ -58,7 +59,6 @@ class C4gReservationSpeakerListController extends C4GBaseController
     //protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
     //protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = false;
-    protected $permalink_field = 'id';
     protected $permalink_name = 'speaker';
 
     //Resource Params
@@ -74,7 +74,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
     protected $loadFileUploadResources = false;
     protected $loadMultiColumnResources = false;
     protected $loadMiniSearchResources = false;
-    protected $loadHistoryPushResources = false;
+    protected $loadHistoryPushResources = true;
 
     protected $loadSignaturePadResources = false;
 
@@ -311,9 +311,11 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $vita->setShowIfEmpty(false);
         $fieldList[] = $vita;
 
-        if ($this->event_redirect_site && $this->dialogParams && $this->dialogParams->getId() && ($this->dialogParams->getId() != -1) && $this->brickDatabase) {
-            $dialogId = $this->dialogParams->getId();
-            $database = $this->brickDatabase->getParams()->getDatabase();
+
+        $speakerId = Input::get('speaker') ?: $this->dialogParams->getId();
+        if ($this->event_redirect_site && $speakerId && ($speakerId != -1)) {
+            $dialogId = $speakerId;
+            $database = \Database::getInstance();
             $reservationEvents = $database->prepare("SELECT pid, speaker FROM tl_c4g_reservation_event WHERE speaker LIKE '%" . $dialogId . "%'")
                 ->execute()->fetchAllAssoc();
 
@@ -323,7 +325,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
                 foreach ($reservationEvents as $reservationEvent) {
                     $speakers = unserialize($reservationEvent['speaker']);
                     foreach ($speakers as $speaker) {
-                        if ($speaker == $this->dialogParams->getId()) {
+                        if ($speaker == $speakerId) {
                             $speakerEvents[] = $reservationEvent['pid'];
                             break;
                         }

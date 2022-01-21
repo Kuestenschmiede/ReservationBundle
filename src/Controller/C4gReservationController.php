@@ -31,6 +31,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GHeadlineField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLabelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiLinkField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiSelectField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GNumberField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
@@ -954,6 +955,7 @@ class C4gReservationController extends C4GBaseController
 
                     $speakerIds = $reservationObject->getSpeaker();
                     $speakerStr = '';
+                    $speakerLinkArr = [];
                     if ($speakerIds && count($speakerIds) > 0) {
                         $speakerNr = 0;
                         $speakerList = [];
@@ -964,53 +966,32 @@ class C4gReservationController extends C4GBaseController
                                 $speakerName = $speaker->title ? $speaker->title . '&nbsp;' . $speaker->firstname . '&nbsp;' . $speaker->lastname : $speaker->firstname . '&nbsp;' . $speaker->lastname;
 
                                 if ($this->speaker_redirect_site) {
-                                    $speakerField = new C4GUrlField();
                                     $jumpTo = \PageModel::findByPk($this->speaker_redirect_site);
                                     if ($jumpTo) {
-                                        $speakerField->setUrl(Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?id='.$speakerId);
+                                       $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?id='.$speakerId;
                                     }
                                 }
 
-                                if (!$speakerField || !$speakerField->getUrl()) {
-                                    $speakerField = new C4GTextField();
-                                    $speakerField->setSimpleTextWithoutEditing(true);
-                                }
-
-                                $speakerField->setFieldName('speaker');
-//                                if ($speakerNr == 1) {
-//                                    $speakerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker']);
-//                                } else {
-                                $speakerField->setTitle('');
-//                                }
-
-                                $speakerField->setFormField(true);
-                                $speakerField->setEditable(false);
-                                $speakerField->setDatabaseField(false);
-                                $speakerField->setInitialValue($speakerName);
-                                $speakerField->setMandatory(false);
-                                $speakerField->setCondition($objConditionArr);
-                                $speakerField->setShowIfEmpty(false);
-                                $speakerField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
-                                $speakerField->setNotificationField(true);
-                                $speakerField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-speaker');
-                                $speakerList[] = new C4GBrickGridElement($speakerField);
+                                $speakerLinkArr[] = ['linkHref'=>$href, 'linkTitle'=>$speakerName, 'linkNewTag'=>0];
                             }
                         }
 
-                        $grid = new C4GBrickGrid($speakerList, 1);
+                        if ($speakerLinkArr && (count($speakerLinkArr) > 0)) {
+                            $speakerLinks = new C4GMultiLinkField();
+                            $speakerLinks->setWrapper(true);
+                            $speakerLinks->setFieldName('speaker-links');
+                            $speakerLinks->setInitialValue(serialize($speakerLinkArr));
+                            $speakerLinks->setFormField(true);
+                            $speakerLinks->setDatabaseField(false);
+                            $speakerLinks->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker']);
+                            $speakerLinks->setCondition($objConditionArr);
+                            $speakerLinks->setShowIfEmpty(false);
+                            $speakerLinks->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                            $speakerLinks->setRemoveWithEmptyCondition(true);
+                            $speakerLinks->setNotificationField(true);
+                            $fieldList[] = $speakerLinks;
+                        }
 
-                        $speakerGrid = new C4GGridField($grid);
-                        $speakerGrid->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker']);
-                        $speakerGrid->setFieldName('speakerGrid');
-                        $speakerGrid->setTableColumn(false);
-                        $speakerGrid->setFormField(true);
-                        $speakerGrid->setDatabaseField(false);
-                        $speakerGrid->setCondition($objConditionArr);
-                        $speakerGrid->setShowIfEmpty(false);
-                        $speakerGrid->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
-                        $speakerGrid->setRemoveWithEmptyCondition(true);
-                        //$speakerGrid->setNotificationField(true); //ToDo with Notification
-                        $fieldList[] = $speakerGrid;
                     }
 
                     $topicIds = $reservationObject->getTopic();
