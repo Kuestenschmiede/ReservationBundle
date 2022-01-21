@@ -480,7 +480,7 @@ class C4gReservationInsertTags
                                     if ($speakerStr && $speaker['speakerForwarding']) {
                                         $url = Controller::replaceInsertTags('{{link_url::' . $speaker['speakerForwarding'] . '}}');
                                         if ($url) {
-                                            $speakerStr = '<a href="' . $url . '?#speaker' . $speaker['id'] . '" title="' . $speakerStr . '" itemprop="url">' . $speakerStr . '</a>';
+                                            $speakerStr = '<a href="' . $url . '?speaker=' . $speaker['id'] . '" title="' . $speakerStr . '" itemprop="url">' . $speakerStr . '</a>';
                                         }
                                     }
 
