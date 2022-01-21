@@ -968,7 +968,7 @@ class C4gReservationController extends C4GBaseController
                                 if ($this->speaker_redirect_site) {
                                     $jumpTo = \PageModel::findByPk($this->speaker_redirect_site);
                                     if ($jumpTo) {
-                                       $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?id='.$speakerId;
+                                       $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerId;
                                     }
                                 }
 
