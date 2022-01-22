@@ -442,6 +442,15 @@ function shuffle(array) {
     return array;
 }
 
+function isElementReallyShowed (el) {
+    var elementReallyShowed = !jQuery(el).is(":disabled") && !jQuery(el).is(":hidden") && !(jQuery(el).css("visibility") == "hidden");
+    jQuery(el).parents().each(function () {
+        elementReallyShowed = elementReallyShowed && !jQuery(el).is(":disabled") && !jQuery(this).is(":hidden") && !(jQuery(this).css("visibility") == "hidden");
+    });
+
+    return elementReallyShowed;
+}
+
 function setTimeset(dateField, id, additionalId, showDateTime) {
     var elementId = 0;
     var date = 0;
@@ -477,6 +486,7 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
         duration = duration ? duration : -1;
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "flex";
         let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration;
+        var targetButton = false;
         fetch(url)
             .then(response => response.json())
             .then((data) => {
@@ -647,50 +657,39 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
                         }
                     }
 
-                    var targetButton = false;
                     var radioButton = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
-                    if (timeValue) {
-                        if (radioButton) {
-                            for (i = 0; i < radioButton.length; i++) {
-                                var button = radioButton[i];
-                                if (button && jQuery(button).is(":visible") && (button.value === timeValue)) {
-                                    targetButton = button;
+                    var visibleButtons = [];
+                    if (radioButton) {
+                        for (i = 0; i < radioButton.length; i++) {
+                            var button = radioButton[i];
+                            if (button && isElementReallyShowed(button)) {
 
-                                    break;
+                                if (timeValue && button.value === timeValue) {
+                                    targetButton = button;
+                                } else if (button.value) {
+                                    visibleButtons.push(button);
                                 }
                             }
                         }
-                    } else {
-                        //if there are just one time button then select automaticly.
-                        if (radioButton && radioButton.length === 1) {
-                            targetButton = radioButton[0];
+                    }
+
+                    //if there are just one time button then select automaticly.
+                    if (!targetButton && visibleButtons && visibleButtons.length === 1) {
+                        for (i = 0; i < visibleButtons.length; i++) {
+                                targetButton = visibleButtons[i];
+                                break;
                         }
                     }
 
                     if (targetButton && !jQuery(targetButton).is(":disabled") && !(jQuery(targetButton).hasClass("radio_object_disabled"))) {
-                        radioButton.prop( "checked", true );
-
-                        var elementId = targetButton.getAttribute('name').substr(1);
-                        var hiddenField = document.getElementById(elementId);
-                        if (hiddenField) {
-                            hiddenField.value = targetButton.value;
-                        }
-                        setObjectId(targetButton, additionalId, showDateTime);
+                        jQuery(targetButton).click();
+                        console.log("Test3: "+jQuery(targetButton).value);
                     }
+
                 }
-            }).catch(function() {
-                //document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
             }).finally(function() {
                 document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
             });
-    }
-
-    if (additionalId) {
-        //if there are just one time button then select automaticly.
-        var radioButton = jQuery('.reservation_time_button_'+additionalId+' input[type = "radio"]');
-        if (radioButton && radioButton.length === 1/* && radioButton[0].is(":visible")*/) {
-            radioButton.click();
-        }
     }
 }
 

@@ -28,6 +28,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GGridField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GHeadlineField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GInfoTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLabelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
@@ -82,7 +83,7 @@ class C4gReservationController extends C4GBaseController
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
+    protected $brickScript  = 'bundles/con4gisreservation/src/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
 
@@ -155,10 +156,13 @@ class C4gReservationController extends C4GBaseController
         //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
 
         //ToDo use session instead
-        if (!$eventId && $_COOKIE['reservationEventCookie']) {
-            $eventId = $_COOKIE['reservationEventCookie'];
-        } else if ($eventId) {
-            setcookie('reservationEventCookie', $eventId, time()+60, '/');
+//        if (!$eventId && $_COOKIE['reservationEventCookie']) {
+//            $eventId = $_COOKIE['reservationEventCookie'];
+//        } else if ($eventId) {
+//            setcookie('reservationEventCookie', $eventId, time()+60, '/');
+//        }
+        if ($eventId) {
+            $this->permalink_name = 'event';
         }
 
         $event = $eventId ? \CalendarEventsModel::findByPk($eventId) : false;
@@ -174,22 +178,22 @@ class C4gReservationController extends C4GBaseController
             //ToDo hotfix
             //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
             //ToDo use session instead
-            if ($eventObj && !$initialDate && $_COOKIE['reservationInitialDateCookie']) {
+            /*if ($eventObj && !$initialDate && $_COOKIE['reservationInitialDateCookie']) {
                 $initialDate = $_COOKIE['reservationInitialDateCookie'];
-            } else if ($eventObj && $initialDate) {
+            }*//* else if ($eventObj && $initialDate) {
                 setcookie('reservationInitialDateCookie', $initialDate, time()+60, '/');
-            }
+            }*/
 
             $time = Input::get('time') ? Input::get('time') : 0;
 
             //ToDo hotfix
             //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
             //ToDo use session instead
-            if ($eventObj && !$time && $_COOKIE['reservationTimeCookie']) {
+            /*if ($eventObj && !$time && $_COOKIE['reservationTimeCookie']) {
                 $time = $_COOKIE['reservationTimeCookie'];
-            } else if ($eventObj && $time) {
+            }*//* else if ($eventObj && $time) {
                 setcookie('reservationTimeCookie', $time, time()+60, '/');
-            }
+            }*/
 
             if ($time) {
                 $initialTime = strtotime($time);
@@ -307,6 +311,12 @@ class C4gReservationController extends C4GBaseController
             $reservationTypeField->setWithOptionType(true);
             //$reservationTypeField->setInitialCallOnChange($typelist[$firstType]['isEvent']);
             $fieldList[] = $reservationTypeField;
+        } else {
+            $info = new C4GInfoTextField();
+            $info->setFieldName('info');
+            $info->setEditable(false);
+            $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
+            return [$info];
         }
 
         foreach ($typelist as $listType) {
@@ -2273,11 +2283,11 @@ class C4gReservationController extends C4GBaseController
         //ToDo hotfix
         //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
         //ToDo use session instead
-        if (!$eventId && $_COOKIE['reservationEventCookie']) {
-            $eventId = $_COOKIE['reservationEventCookie'];
-        } else if ($eventId) {
-            setcookie('reservationEventCookie', $eventId, time()+60, '/');
-        }
+//        if (!$eventId && $_COOKIE['reservationEventCookie']) {
+//            $eventId = $_COOKIE['reservationEventCookie'];
+//        } else if ($eventId) {
+//            setcookie('reservationEventCookie', $eventId, time()+60, '/');
+//        }
 
         if ($date) {
             $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($eventId), $this->showPrices);

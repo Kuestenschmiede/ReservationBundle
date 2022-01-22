@@ -112,6 +112,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'Reservierungsfo
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['person_data'] = 'Ihre Daten';
 
 /** MESSAGES */
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none'] = 'Derzeit sind keine Reservierungen möglich.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['min_max_failed'] = 'Wir können Ihre Reservierung nicht durchführen. Der Termin ist außerhalb des buchbaren Bereichs.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked'] = 'Eine Reservierung ist nicht mehr möglich. Der Termin ist bereits ausgebucht.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'] = 'Eine Reservierung ist nicht mehr möglich. Die Anzahl der freien Plätze wird überschritten. Mögliche Anzahl: ';
