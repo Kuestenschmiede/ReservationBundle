@@ -210,7 +210,7 @@ class C4gReservationController extends C4GBaseController
             $typeId = $eventObj->reservationType;
             $arrColumns = array("$t.published='1' AND $t.id=$typeId");
             $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
-        } else if (!$eventObj) {
+        } else if (!$eventObj && !$eventId) {
             $arrColumns = array("$t.published='1' AND NOT $t.reservationObjectType='2'"); //no event type selection - use get params
             $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
         }
