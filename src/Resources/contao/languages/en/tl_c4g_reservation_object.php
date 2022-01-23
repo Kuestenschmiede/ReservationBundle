@@ -45,6 +45,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_dayEnd'] = array("Event 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_timeBegin'] = array("Event start", "At what time does the event start.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_timeEnd'] = array("Event end", "At what time does the event end");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['description'] = array("Description", "Description of the reservation object.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['image'] = array("Image", "Matching image to reservation option.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['minute'] = array("minutes");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['hour'] = array("hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['openingHours'] = array("booking hours");

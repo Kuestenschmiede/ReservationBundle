@@ -15,7 +15,7 @@
 
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 
-$default = '{type_legend}, caption, quantity, priority, options, description, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes;{publish_legend}, published';
+$default = '{type_legend}, caption, quantity, priority, options, description, image, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes;{publish_legend}, published';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -682,6 +682,19 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'inputType'               => 'textarea',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'rte'=>'tinyMCE', 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
             'sql'                     => "text NULL"
+        ),
+
+        'image' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['image'],
+            'exclude'           => true,
+            'inputType'         => 'fileTree',
+            'sorting'           => false,
+            'search'            => false,
+            'extensions'        => 'jpg, jpeg, png, tif',
+            'exclude'           => true,
+            'eval'              => array('filesOnly'=>true, 'files'=>true, 'fieldType'=>'radio', 'tl_class'=>'long clr', 'extensions'=>Config::get('validImageTypes')),
+            'sql'               => "blob NULL"
         ),
 
         'published' => array(

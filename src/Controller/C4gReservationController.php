@@ -28,6 +28,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GGridField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GHeadlineField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GImageField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GInfoTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLabelField;
@@ -43,6 +44,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTrixEditorField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GUrlField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBaseController;
 use con4gis\ProjectsBundle\Classes\Framework\C4GController;
@@ -850,15 +852,16 @@ class C4gReservationController extends C4GBaseController
             $reservationObjectField->setEmptyOptionLabel($this->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
             $reservationObjectField->setCondition([$condition]);
             $reservationObjectField->setRemoveWithEmptyCondition(true);
-            $reservationObjectField->setCallOnChange($isEvent);
-            $reservationObjectField->setCallOnChangeFunction("checkEventFields(this)");
+            $reservationObjectField->setCallOnChange(true);
+            if ($isEvent) {
+                $reservationObjectField->setCallOnChangeFunction("checkEventFields(this)");
+            }
             $reservationObjectField->setAdditionalID($listType["id"]);
             $fieldList[] = $reservationObjectField;
 
             if ($isEvent) {
                 foreach ($reservationObjects as $reservationObject) {
                     $type_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
-                    $val_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $listType['id'], $reservationObject->getId());
                     $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'reservation_object_event_' . $listType['id']. '-22' . $reservationObject->getId());
                     $obj_condition->setModel(C4gReservationHandler::class);
                     $obj_condition->setFunction('isEventObject');
@@ -1061,6 +1064,39 @@ class C4gReservationController extends C4GBaseController
                         $audienceField->setSimpleTextWithoutEditing(true);
                         $audienceField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-audience');
                         $fieldList[] = $audienceField;
+                    }
+                }
+            } else {
+                //Additional Object Info
+                foreach ($reservationObjects as $reservationObject) {
+                    $object_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId());
+
+                    if ($reservationObject->getDescription()) {
+                        $descriptionField = new C4GTrixEditorField();
+                        $descriptionField->setFieldName('description');
+                        $descriptionField->setInitialValue($reservationObject->getDescription());
+                        $descriptionField->setCondition($object_condition);
+                        $descriptionField->setFormField(true);
+                        $descriptionField->setShowIfEmpty(false);
+                        $descriptionField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
+                        $descriptionField->setRemoveWithEmptyCondition(true);
+                        $descriptionField->setDatabaseField(false);
+                        $descriptionField->setEditable(false);
+                        $fieldList[] = $descriptionField;
+                    }
+
+                    if ($reservationObject->getImage()) {
+                        $imageField = new C4GImageField();
+                        $imageField->setFieldName('image');
+                        $imageField->setInitialValue($reservationObject->getImage());
+                        $imageField->setCondition($object_condition);
+                        $imageField->setFormField(true);
+                        $imageField->setShowIfEmpty(false);
+                        $imageField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
+                        $imageField->setRemoveWithEmptyCondition(true);
+                        $imageField->setDatabaseField(false);
+                        $imageField->setLightBoxField(true);
+                        $fieldList[] = $imageField;
                     }
                 }
             }
@@ -1926,7 +1962,7 @@ class C4gReservationController extends C4GBaseController
 
             $reservationEventObjects = C4gReservationEventModel::findBy('pid', $objectId);
 
-            if ($reservationEventObjects && is_countable($reservationEventObject) && count($reservationEventObjects) > 1) {
+            if ($reservationEventObjects && is_countable($reservationEventObjects) && count($reservationEventObjects) > 1) {
                 C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '.$objectId);
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['error']];
             }

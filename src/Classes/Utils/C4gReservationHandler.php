@@ -1355,7 +1355,8 @@ class C4gReservationHandler
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                 $frontendObject->setPriority($object['priority'] ?: 0);
                 $frontendObject->setSwitchAllTypes($object['switchAllTypes']);
-
+                $frontendObject->setDescription($object['description']);
+                $frontendObject->setImage($object['image']);
 
                 $opening_hours = array();
                 $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);

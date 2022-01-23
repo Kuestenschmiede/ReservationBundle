@@ -44,6 +44,8 @@ class C4gReservationFrontendObject
     private $eventDuration = ''; //ToDo
     private $priority = 0;
     private $switchAllTypes = null;
+    private $description = '';
+    private $image = null;
 
     /**
      * C4gReservationFrontendObject constructor.
@@ -498,5 +500,37 @@ class C4gReservationFrontendObject
     public function setSwitchAllTypes($switchAllTypes): void
     {
         $this->switchAllTypes = $switchAllTypes;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return null
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param null $image
+     */
+    public function setImage($image): void
+    {
+        $this->image = $image;
     }
 }

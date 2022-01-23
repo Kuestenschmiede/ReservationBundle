@@ -110,7 +110,9 @@ function setObjectId(object, typeid, showDateTime = 0) {
             objects = objectParam.split('-');
 
             if (!jQuery(object).is(":disabled")) {
-                jQuery(selectField).val(objects[0]).change();
+                jQuery(selectField).val(objects[0]);
+                jQuery(selectField).attr('value',objects[0]);
+                jQuery(selectField).change();
             }
 
             values = objects ? objects : values
@@ -683,7 +685,6 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
 
                     if (targetButton && !jQuery(targetButton).is(":disabled") && !(jQuery(targetButton).hasClass("radio_object_disabled"))) {
                         jQuery(targetButton).click();
-                        console.log("Test3: "+jQuery(targetButton).value);
                     }
 
                 }
