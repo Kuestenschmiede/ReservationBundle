@@ -323,7 +323,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
             $speakerEvents = [];
             if ($reservationEvents) {
                 foreach ($reservationEvents as $reservationEvent) {
-                    $speakers = unserialize($reservationEvent['speaker']);
+                    $speakers = \Contao\StringUtil::deserialize($reservationEvent['speaker']);
                     foreach ($speakers as $speaker) {
                         if ($speaker == $speakerId) {
                             $speakerEvents[] = $reservationEvent['pid'];

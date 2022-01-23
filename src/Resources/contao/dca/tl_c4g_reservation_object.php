@@ -793,7 +793,7 @@ class tl_c4g_reservation_object extends Backend
 
     public function listFields($arrRow)
     {
-        $type_ids = unserialize($arrRow['viewableTypes']);
+        $type_ids = \Contao\StringUtil::deserialize($arrRow['viewableTypes']);
 
         $reservationTypes = '';
         foreach ($type_ids as $type_id) {

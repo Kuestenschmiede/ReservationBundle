@@ -228,7 +228,7 @@ class C4gReservationController extends C4GBaseController
                 }
             }
 
-            $moduleTypes = unserialize($this->reservation_types);
+            $moduleTypes = \Contao\StringUtil::deserialize($this->reservation_types);
             foreach ($types as $type) {
                 if ($moduleTypes && (count($moduleTypes) > 0)) {
                     $arrModuleTypes = $moduleTypes;
@@ -242,7 +242,7 @@ class C4gReservationController extends C4GBaseController
                     continue;
                 }
 
-                $captions = unserialize($type->options);
+                $captions = \Contao\StringUtil::deserialize($type->options);
                 if ($captions && (count($captions) > 0)) {
                     foreach ($captions as $caption) {
                         if (strpos($GLOBALS['TL_LANGUAGE'], $caption['language']) >= 0) {
@@ -250,9 +250,9 @@ class C4gReservationController extends C4GBaseController
                                 'id' => $type->id,
                                 'name' => $caption['caption'] ?: $type->caption,
                                 'periodType' => $type->periodType,
-                                'includedParams' => unserialize($type->included_params),
-                                'additionalParams' => unserialize($type->additional_params),
-                                'participantParams' => unserialize($type->participant_params),
+                                'includedParams' => \Contao\StringUtil::deserialize($type->included_params),
+                                'additionalParams' => \Contao\StringUtil::deserialize($type->additional_params),
+                                'participantParams' => \Contao\StringUtil::deserialize($type->participant_params),
                                 'minParticipantsPerBooking' => $type->minParticipantsPerBooking,
                                 'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                                 'objects' => $objects,
@@ -269,9 +269,9 @@ class C4gReservationController extends C4GBaseController
                         'id' => $type->id,
                         'name' => $type->caption,
                         'periodType' => $type->periodType,
-                        'includedParams' => unserialize($type->included_params),
-                        'additionalParams' => unserialize($type->additional_params),
-                        'participantParams' => unserialize($type->participant_params),
+                        'includedParams' => \Contao\StringUtil::deserialize($type->included_params),
+                        'additionalParams' => \Contao\StringUtil::deserialize($type->additional_params),
+                        'participantParams' => \Contao\StringUtil::deserialize($type->participant_params),
                         'minParticipantsPerBooking' => $type->minParticipantsPerBooking,
                         'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
                         'objects' => $objects,
@@ -1073,6 +1073,7 @@ class C4gReservationController extends C4GBaseController
 
                     if ($reservationObject->getDescription()) {
                         $descriptionField = new C4GTrixEditorField();
+                        $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
                         $descriptionField->setFieldName('description');
                         $descriptionField->setInitialValue($reservationObject->getDescription());
                         $descriptionField->setCondition($object_condition);
@@ -1180,9 +1181,9 @@ class C4gReservationController extends C4GBaseController
         $fieldList[] = $bookerHeadline;
 
         $salutation = [
-            ['id' => 'man', 'name' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
-            ['id' => 'woman', 'name' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
-            ['id' => 'various', 'name' => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
+            ['id' => 'man', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
+            ['id' => 'woman', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
+            ['id' => 'various', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
         ];
 
         $additionaldatas = StringUtil::deserialize($this->hide_selection);

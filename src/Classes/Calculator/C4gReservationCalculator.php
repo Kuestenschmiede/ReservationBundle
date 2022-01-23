@@ -64,7 +64,7 @@ class C4gReservationCalculator
 
         $this->resultList = [];
 
-        $switchAllTypes = unserialize($switchAllTypes);
+        $switchAllTypes = \Contao\StringUtil::deserialize($switchAllTypes);
         foreach ($reservations as $reservation) {
             if ($allTypesValidity) {
                 if ($switchAllTypes && count($switchAllTypes) > 0) {
@@ -121,7 +121,7 @@ class C4gReservationCalculator
             $allTypesValidity = $object->getAllTypesValidity();
             $allTypesQuantity = $object->getAllTypesQuantity();
             $switchAllTypes = $object->getSwitchAllTypes();
-            $switchAllTypes = unserialize($switchAllTypes);
+            $switchAllTypes = \Contao\StringUtil::deserialize($switchAllTypes);
             if ($object && $allTypesValidity) {
                 if ($switchAllTypes && count($switchAllTypes) > 0) {
                     if (!in_array($typeId, $switchAllTypes)) {

@@ -260,7 +260,7 @@ class C4gReservationListController extends C4GBaseController
             $typeList = [];
             foreach ($types as $type) {
                 $typeArr[] = $type->id;
-                $captions = unserialize($type->options);
+                $captions = \Contao\StringUtil::deserialize($type->options);
                 if ($captions && count($captions) > 0) {
                     foreach ($captions as $caption) {
                         if (strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) {

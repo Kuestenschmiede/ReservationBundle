@@ -78,7 +78,7 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('endDate', $reservation['endDate'] ? date($dateFormat, $reservation['endDate']) : '');
                         $c4gNotify->setTokenValue('endTime', $reservation['endTime'] ? date($timeFormat, $reservation['endTime']) : '');
 
-                        $params = $reservation['included_params'] ? unserialize($reservation['included_params']) : [];
+                        $params = $reservation['included_params'] ? \Contao\StringUtil::deserialize($reservation['included_params']) : [];
                         $includedParamsArr = [];
                         foreach ($params as $param) {
                             $includedParam = C4gReservationParamsModel::findByPk($param);
@@ -88,7 +88,7 @@ class C4gReservationConfirmation
                         }
                         $c4gNotify->setTokenValue('included_params', implode($includedParamsArr));
 
-                        $params = $reservation['additional_params'] ? unserialize($reservation['additional_params']) : [];
+                        $params = $reservation['additional_params'] ? \Contao\StringUtil::deserialize($reservation['additional_params']) : [];
                         $additionalParamsArr = [];
                         foreach ($params as $param) {
                             $additionalParam = C4gReservationParamsModel::findByPk($param);
@@ -118,9 +118,9 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('audience', 'ToDo');
 
                         $salutation = [
-                            'man' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['man'][0],
-                            'woman' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'][0],
-                            'various' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['various'][0],
+                            'man' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['man'][0],
+                            'woman' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'][0],
+                            'various' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['various'][0],
                         ];
                         $c4gNotify->setTokenValue('salutation', $reservation['salutation'] && $salutation[$reservation['salutation']] ? $salutation[$reservation['salutation']] : '');
                         $c4gNotify->setTokenValue('title', $reservation['title'] ? $reservation['title'] : '');
@@ -142,8 +142,8 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('address2', $reservation['address2'] ? $reservation['address2'] : '');
                         $c4gNotify->setTokenValue('postal2', $reservation['postal2'] ? $reservation['postal2'] : '');
                         $c4gNotify->setTokenValue('city2', $reservation['city2'] ? $reservation['city2'] : '');
-                        $c4gNotify->setTokenValue('comment', $reservation['comment'] ? unserialize($reservation['comment']) : '');
-                        $c4gNotify->setTokenValue('internal_comment', $reservation['internal_comment'] ? unserialize($reservation['internal_comment']) : '');
+                        $c4gNotify->setTokenValue('comment', $reservation['comment'] ? \Contao\StringUtil::deserialize($reservation['comment']) : '');
+                        $c4gNotify->setTokenValue('internal_comment', $reservation['internal_comment'] ? \Contao\StringUtil::deserialize($reservation['internal_comment']) : '');
 
                         $c4gNotify->setTokenValue('location', $location ? $location['name'] : '');
                         $c4gNotify->setTokenValue('contact_name', $location ? $location['contact_name'] : '');

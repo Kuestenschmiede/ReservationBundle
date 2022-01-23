@@ -144,7 +144,7 @@ class C4gReservationInsertTags
                             if ($reservationEventObject) {
                                 $audienceIds = [];
                                 foreach ($reservationEventObject as $eventObject) {
-                                    $eventAudiences = unserialize($eventObject['targetAudience']);
+                                    $eventAudiences = \Contao\StringUtil::deserialize($eventObject['targetAudience']);
                                     foreach ($eventAudiences as $audienceId) {
                                         $audienceIds[$audienceId] = $audienceId;
                                     }
@@ -175,7 +175,7 @@ class C4gReservationInsertTags
                             if ($reservationEventObject) {
                                 $speakerIds = [];
                                 foreach ($reservationEventObject as $eventObject) {
-                                    $eventSpeakers = unserialize($eventObject['speaker']);
+                                    $eventSpeakers = \Contao\StringUtil::deserialize($eventObject['speaker']);
                                     foreach ($eventSpeakers as $speakerId) {
                                         $speakerIds[$speakerId] = $speakerId;
                                     }
@@ -208,7 +208,7 @@ class C4gReservationInsertTags
                             if ($reservationEventObject) {
                                 $topicIds = [];
                                 foreach ($reservationEventObject as $eventObject) {
-                                    $eventTopics = unserialize($eventObject['topic']);
+                                    $eventTopics = \Contao\StringUtil::deserialize($eventObject['topic']);
                                     foreach ($eventTopics as $topicId) {
                                         $topicIds[$topicId] = $topicId;
                                     }
@@ -300,7 +300,7 @@ class C4gReservationInsertTags
                         case 'included_raw':
                             $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE `id` = ?')
                                 ->execute($reservationEventObject->reservationType)->fetchAssoc();
-                            $params = $includedParams ? unserialize($includedParams['included_params']) : [];
+                            $params = $includedParams ? \Contao\StringUtil::deserialize($includedParams['included_params']) : [];
                             $includedParamsArr = [];
                             foreach ($params as $param) {
                                 $includedParam = C4gReservationParamsModel::findByPk($param);
@@ -313,7 +313,7 @@ class C4gReservationInsertTags
                         case 'additional_raw':
                             $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE `id` = ?')
                                 ->execute($reservationEventObject->reservationType)->fetchAssoc();
-                            $params = $additionalParams ? unserialize($additionalParams['additional_params']) : [];
+                            $params = $additionalParams ? \Contao\StringUtil::deserialize($additionalParams['additional_params']) : [];
                             $additionalParamsArr = [];
                             foreach ($params as $param) {
                                 $additionalParam = C4gReservationParamsModel::findByPk($param);
@@ -418,7 +418,7 @@ class C4gReservationInsertTags
                         case 'number_raw':
                             return $reservationEventObject->number;
                         case 'audience':
-                            $audienceIds = unserialize($reservationEventObject->targetAudience);
+                            $audienceIds = \Contao\StringUtil::deserialize($reservationEventObject->targetAudience);
                             if ($audienceIds && count($audienceIds) > 0) {
                                 $audiences = '(' ;
                                 foreach ($audienceIds as $key => $audienceId) {
@@ -440,7 +440,7 @@ class C4gReservationInsertTags
 
                             break;
                         case 'audience_raw':
-                            $audienceIds = unserialize($reservationEventObject->targetAudience);
+                            $audienceIds = \Contao\StringUtil::deserialize($reservationEventObject->targetAudience);
                             if ($audienceIds && count($audienceIds) > 0) {
                                 $audiences = '(' ;
                                 foreach ($audienceIds as $key => $audienceId) {
@@ -462,7 +462,7 @@ class C4gReservationInsertTags
 
                             break;
                         case 'speaker':
-                            $speakerIds = unserialize($reservationEventObject->speaker);
+                            $speakerIds = \Contao\StringUtil::deserialize($reservationEventObject->speaker);
                             if ($speakerIds && count($speakerIds) > 0) {
                                 $speakers = '(' ;
                                 foreach ($speakerIds as $key => $speakerId) {
@@ -492,7 +492,7 @@ class C4gReservationInsertTags
 
                             break;
                         case 'speaker_raw':
-                            $speakerIds = unserialize($reservationEventObject->speaker);
+                            $speakerIds = \Contao\StringUtil::deserialize($reservationEventObject->speaker);
                             if ($speakerIds && count($speakerIds) > 0) {
                                 $speakers = '(' ;
                                 foreach ($speakerIds as $key => $speakerId) {
@@ -516,7 +516,7 @@ class C4gReservationInsertTags
 
                             break;
                         case 'topic':
-                            $topicIds = unserialize($reservationEventObject->topic);
+                            $topicIds = \Contao\StringUtil::deserialize($reservationEventObject->topic);
                             if ($topicIds && count($topicIds) > 0) {
                                 $topics = '(' ;
                                 foreach ($topicIds as $key => $topicId) {
@@ -538,7 +538,7 @@ class C4gReservationInsertTags
 
                             break;
                         case 'topic_raw':
-                            $topicIds = unserialize($reservationEventObject->topic);
+                            $topicIds = \Contao\StringUtil::deserialize($reservationEventObject->topic);
                             if ($topicIds && count($topicIds) > 0) {
                                 $topics = '(' ;
                                 foreach ($topicIds as $key => $topicId) {
@@ -727,7 +727,7 @@ class C4gReservationInsertTags
                         case 'included':
                             $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE `id` = ?')
                                 ->execute($reservationEventObject->reservationType)->fetchAssoc();
-                            $params = $includedParams ? unserialize($includedParams['included_params']) : [];
+                            $params = $includedParams ? \Contao\StringUtil::deserialize($includedParams['included_params']) : [];
                             $result = '';
                             foreach ($params as $param) {
                                 $includedParam = C4gReservationParamsModel::findByPk($param);
@@ -740,7 +740,7 @@ class C4gReservationInsertTags
                         case 'included_raw':
                             $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE id = ?')
                                 ->execute($reservationEventObject->reservationType)->fetchAssoc();
-                            $params = $includedParams ? unserialize($includedParams['included_params']) : [];
+                            $params = $includedParams ? \Contao\StringUtil::deserialize($includedParams['included_params']) : [];
                             $includedParamsArr = [];
                             foreach ($params as $param) {
                                 $includedParam = C4gReservationParamsModel::findByPk($param);
@@ -753,7 +753,7 @@ class C4gReservationInsertTags
                         case 'additional':
                             $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE id = ?')
                                 ->execute($reservationEventObject->reservationType)->fetchAssoc();
-                            $params = $additionalParams ? unserialize($additionalParams['additional_params']) : [];
+                            $params = $additionalParams ? \Contao\StringUtil::deserialize($additionalParams['additional_params']) : [];
                             $result = '';
                             foreach ($params as $param) {
                                 $additionalParam = C4gReservationParamsModel::findByPk($param);
@@ -766,7 +766,7 @@ class C4gReservationInsertTags
                         case 'additional_raw':
                             $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE id = ?')
                                 ->execute($reservationEventObject->reservationType)->fetchAssoc();
-                            $params = unserialize($additionalParams);
+                            $params = \Contao\StringUtil::deserialize($additionalParams);
                             $additionalParamsArr = [];
                             foreach ($params as $param) {
                                 $additionalParam = C4gReservationParamsModel::findByPk($param);

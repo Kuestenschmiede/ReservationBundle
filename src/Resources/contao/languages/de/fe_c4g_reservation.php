@@ -96,6 +96,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['md'] = 'Mehrtägig';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['event'] = 'Event';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none'] = 'Derzeit sind keine Reservierungen möglich. Bitte nehmen Sie mit uns Kontakt auf.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['signature'] = 'Unterschrift';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['description'] = 'Beschreibung';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'] = 'Teilnehmer';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipants'] = 'Weitere Teilnehmer';

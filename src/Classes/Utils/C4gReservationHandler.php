@@ -87,25 +87,25 @@ class C4gReservationHandler
             $interval = $object->getTimeInterval();
 
             if($weekday == 0){
-                $array = unserialize($objectData['oh_sunday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_sunday']);
             }
             if($weekday == 1){
-                $array = unserialize($objectData['oh_monday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_monday']);
             }
             if($weekday == 2){
-                $array = unserialize($objectData['oh_tuesday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_tuesday']);
             }
             if($weekday == 3){
-                $array = unserialize($objectData['oh_wednesday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_wednesday']);
             }
             if($weekday == 4){
-                $array = unserialize($objectData['oh_thursday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_thursday']);
             }
             if($weekday == 5){
-                $array = unserialize($objectData['oh_friday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_friday']);
             }
             if($weekday == 6){
-                $array = unserialize($objectData['oh_saturday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_saturday']);
             }
 
             $possibleBookings = 0;
@@ -1133,7 +1133,7 @@ class C4gReservationHandler
                     }
 
                     if ($objects) {
-                        $objects = unserialize($objects);
+                        $objects = \Contao\StringUtil::deserialize($objects);
                         foreach ($objects as $objectId) {
                             if ($objectId == $object['id']) {
                                 switch($priceObj->priceoption) {
@@ -1238,10 +1238,10 @@ class C4gReservationHandler
                 $frontendObject->setEndTime($eventObject['endTime'] ?: 0);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                 $frontendObject->setNumber($event['number'] ?: '');
-                $frontendObject->setAudience($event['targetAudience'] ? unserialize($event['targetAudience']) : []);
+                $frontendObject->setAudience($event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : []);
                 $frontendObject->setEventDuration('');
-                $frontendObject->setSpeaker($event['speaker'] ? unserialize($event['speaker']) : []);
-                $frontendObject->setTopic($event['topic'] ? unserialize($event['topic']) : []);
+                $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : []);
+                $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : []);
                 $frontendObject->setLocation($event['location'] ?: 0);
                 $objectList[] = $frontendObject;
             }
@@ -1274,10 +1274,10 @@ class C4gReservationHandler
                         $frontendObject->setEndTime($eventObject['endTime'] ?: 0);
                         $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                         $frontendObject->setNumber($event['number']);
-                        $frontendObject->setAudience($event['targetAudience'] ? unserialize($event['targetAudience']) : []);
+                        $frontendObject->setAudience($event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : []);
                         $frontendObject->setEventDuration('');
-                        $frontendObject->setSpeaker($event['speaker'] ? unserialize($event['speaker']) : []);
-                        $frontendObject->setTopic($event['topic'] ? unserialize($event['topic']) : []);
+                        $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : []);
+                        $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : []);
                         $frontendObject->setLocation($event['location']);
                         $objectList[] = $frontendObject;
                     }
@@ -1310,7 +1310,7 @@ class C4gReservationHandler
             $types = $moduleTypes;
             $objects = [];
             foreach ($allObjects as $object) {
-                $objectTypes = unserialize($object['viewableTypes']);
+                $objectTypes = \Contao\StringUtil::deserialize($object['viewableTypes']);
                 foreach($objectTypes as $objectType) {
                     if (in_array($objectType, $types)) {
                         $objects[] = $object;
@@ -1347,7 +1347,7 @@ class C4gReservationHandler
                 $frontendObject->setDuration($object['duration']);
                 $frontendObject->setMinReservationDay($object['min_reservation_day']);
                 $frontendObject->setMaxReservationDay($object['max_reservation_day']);
-                $frontendObject->setReservationTypes(unserialize($object['viewableTypes']));
+                $frontendObject->setReservationTypes(\Contao\StringUtil::deserialize($object['viewableTypes']));
                 $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'], $object['desiredCapacityMax']]);
                 $frontendObject->setQuantity($object['quantity']);
                 $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: 0);
@@ -1361,13 +1361,13 @@ class C4gReservationHandler
                 $opening_hours = array();
                 $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);
 
-                $opening_hours['su'] = unserialize($object['oh_sunday']);
-                $opening_hours['mo'] = unserialize($object['oh_monday']);
-                $opening_hours['tu'] = unserialize($object['oh_tuesday']);
-                $opening_hours['we'] = unserialize($object['oh_wednesday']);
-                $opening_hours['th'] = unserialize($object['oh_thursday']);
-                $opening_hours['fr'] = unserialize($object['oh_friday']);
-                $opening_hours['sa'] = unserialize($object['oh_saturday']);
+                $opening_hours['su'] = \Contao\StringUtil::deserialize($object['oh_sunday']);
+                $opening_hours['mo'] = \Contao\StringUtil::deserialize($object['oh_monday']);
+                $opening_hours['tu'] = \Contao\StringUtil::deserialize($object['oh_tuesday']);
+                $opening_hours['we'] = \Contao\StringUtil::deserialize($object['oh_wednesday']);
+                $opening_hours['th'] = \Contao\StringUtil::deserialize($object['oh_thursday']);
+                $opening_hours['fr'] = \Contao\StringUtil::deserialize($object['oh_friday']);
+                $opening_hours['sa'] = \Contao\StringUtil::deserialize($object['oh_saturday']);
 
                 //ToDo check if only the first record is empty.
                 if ($opening_hours['su'] != false) {
@@ -1408,7 +1408,7 @@ class C4gReservationHandler
 
                 $frontendObject->setWeekdayExclusion($weekdays);
                 $frontendObject->setOpeningHours($opening_hours);
-                $frontendObject->setDatesExclusion(unserialize($object['days_exclusion']));
+                $frontendObject->setDatesExclusion(\Contao\StringUtil::deserialize($object['days_exclusion']));
 
                 $objectList[] = $frontendObject;
             }
