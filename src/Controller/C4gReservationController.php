@@ -1080,6 +1080,7 @@ class C4gReservationController extends C4GBaseController
                         $descriptionField->setRemoveWithEmptyCondition(true);
                         $descriptionField->setDatabaseField(false);
                         $descriptionField->setEditable(false);
+                        $descriptionField->setNotificationField(true);
                         $fieldList[] = $descriptionField;
                     }
 
