@@ -158,11 +158,12 @@ class C4gReservationController extends C4GBaseController
         //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
 
         //ToDo use session instead
-//        if (!$eventId && $_COOKIE['reservationEventCookie']) {
-//            $eventId = $_COOKIE['reservationEventCookie'];
-//        } else if ($eventId) {
-//            setcookie('reservationEventCookie', $eventId, time()+60, '/');
-//        }
+        if (!$eventId && $this->session->getSessionValue('reservationEventCookie')) {
+            $eventId = $this->session->getSessionValue('reservationEventCookie');
+        } else if ($eventId) {
+            $this->session->setSessionValue('reservationEventCookie', $eventId);
+        }
+
         if ($eventId) {
             $this->permalink_name = 'event';
         }
@@ -177,25 +178,19 @@ class C4gReservationController extends C4GBaseController
                 $initialDate = $date;
             }
 
-            //ToDo hotfix
-            //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
-            //ToDo use session instead
-            /*if ($eventObj && !$initialDate && $_COOKIE['reservationInitialDateCookie']) {
-                $initialDate = $_COOKIE['reservationInitialDateCookie'];
-            }*//* else if ($eventObj && $initialDate) {
-                setcookie('reservationInitialDateCookie', $initialDate, time()+60, '/');
-            }*/
+            if ($eventObj && !$initialDate &&  $this->session->getSessionValue('reservationInitialDateCookie_'.$eventId)) {
+                $initialDate = $this->session->getSessionValue('reservationInitialDateCookie_'.$eventId);
+            } else if ($eventObj && $initialDate) {
+                $this->session->setSessionValue('reservationInitialDateCookie_'.$eventId, $initialDate);
+            }
 
             $time = Input::get('time') ? Input::get('time') : 0;
 
-            //ToDo hotfix
-            //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
-            //ToDo use session instead
-            /*if ($eventObj && !$time && $_COOKIE['reservationTimeCookie']) {
-                $time = $_COOKIE['reservationTimeCookie'];
-            }*//* else if ($eventObj && $time) {
-                setcookie('reservationTimeCookie', $time, time()+60, '/');
-            }*/
+            if ($eventObj && !$time &&  $this->session->getSessionValue('reservationTimeCookie_'.$eventId)) {
+                $time = $this->session->getSessionValue('reservationTimeCookie_'.$eventId);
+            } else if ($eventObj && $time) {
+                $this->session->setSessionValue('reservationTimeCookie_'.$eventId, $time);
+            }
 
             if ($time) {
                 $initialTime = strtotime($time);
@@ -875,6 +870,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent']);
                     $reservationBeginDateField->setEditable(false);
                     $reservationBeginDateField->setComparable(false);
+                    $reservationBeginDateField->setWithoutValidation(true);
                     $reservationBeginDateField->setDatabaseField(false);
                     $reservationBeginDateField->setSortColumn(true);
                     $reservationBeginDateField->setSortSequence('de_datetime');
@@ -898,6 +894,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationEndDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent']);
                     $reservationEndDateField->setEditable(false);
                     $reservationEndDateField->setComparable(false);
+                    $reservationEndDateField->setWithoutValidation(true);
                     $reservationEndDateField->setSortColumn(true);
                     $reservationEndDateField->setSortSequence('de_datetime');
                     $reservationEndDateField->setDatabaseField(false);
@@ -1864,19 +1861,45 @@ class C4gReservationController extends C4GBaseController
         $reservationType = $database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
             ->execute($type);
 
-        if ($reservationType && $reservationType->notification_type) {
+        if ($reservationType->notification_type) {
             $this->getDialogParams()->setNotificationType($reservationType->notification_type);
             $this->notification_type = $reservationType->notification_type;
         }
 
+        $isEvent = $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
+
+        if ($isEvent) {
+            $key = "reservation_object_event_" . $type;
+            $resObject = $putVars[$key];
+
+            if ($resObject) {
+                $reservationObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE id=? AND published='1'")
+                    ->execute($resObject);
+
+                foreach ($putVars as $key => $value) {
+                    if (strpos($key, strval($type.'-22'))) {
+                        if (!strpos($key, strval($type.'-22'.$resObject))) {
+                            unset($putVars[$key]);
+                        }
+                    }
+                }
+            }
+        } else {
+            $key = "reservation_object_" . $type;
+            $resObject = $putVars[$key];
+            $reservationObject = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
+                ->execute($resObject);
+        }
+
+
         $newFieldList = [];
         $removedFromList = [];
 
-        $reservationIdKey = 0;
+        //$reservationIdKey = 0;
         foreach ($this->getFieldList() as $key=>$field) {
-            if ($field->getFieldName() === 'reservation_id') {
+            /*if ($field->getFieldName() === 'reservation_id') {
                 $reservationIdKey = $key;
-            }
+            }*/
             $additionalId = $field->getAdditionalID();
             if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-')) !== 0))) {
                 unset($putVars[$field->getFieldName()."_".$additionalId]);
@@ -1885,8 +1908,6 @@ class C4gReservationController extends C4GBaseController
                 $removedFromList[$field->getFieldName()] = $additionalId;
                 unset($putVars[$field->getFieldName()]);
             }
-
-            $isEvent = $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
 
             if (!$isEvent && ($field->getFieldName() == "beginTime")) {
                 foreach ($putVars as $key => $value) {
@@ -1900,33 +1921,12 @@ class C4gReservationController extends C4GBaseController
             }
 
             if ($isEvent) {
-                $key = "reservation_object_event_" . $type;
-                $resObject = $putVars[$key];
-
-                if ($resObject) {
-                    $reservationObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE id=? AND published='1'")
-                        ->execute($resObject);
-
-                    foreach ($putVars as $key => $value) {
-                        if (strpos($key, strval($type.'-22'))) {
-                            if (!strpos($key, strval($type.'-22'.$resObject))) {
-                                unset($putVars[$key]);
-                            }
-                        }
-                    }
-
-                    if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-22')) !== 0))) {
-                        if (strpos($additionalId, strval($type.'-22'.$resObject)) === 0) {
-                            unset($putVars[$field->getFieldName()."_".$additionalId]);
-                            continue;
-                        }
+                if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-22')) !== 0))) {
+                    if (strpos($additionalId, strval($type.'-22'.$resObject)) === 0) {
+                        unset($putVars[$field->getFieldName()."_".$additionalId]);
+                        continue;
                     }
                 }
-            } else {
-                $key = "reservation_object_" . $type;
-                $resObject = $putVars[$key];
-                $reservationObject = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
-                    ->execute($resObject);
             }
 
             if ($field->getFieldName() && (!$removedFromList[$field->getFieldName()] || ($removedFromList[$field->getFieldName()] == $field->getAdditionalId()))) {
@@ -1987,7 +1987,7 @@ class C4gReservationController extends C4GBaseController
 
             $putVars['beginDate'] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
             $putVars['beginTime'] = $beginTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime) : $beginTime;
-            $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate;
+            $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate']; //ToDO Check
             $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
        } else {
             $putVars['reservationObjectType'] = '1';
@@ -2349,12 +2349,12 @@ class C4gReservationController extends C4GBaseController
 
         //ToDo hotfix
         //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
-        //ToDo use session instead
-//        if (!$eventId && $_COOKIE['reservationEventCookie']) {
-//            $eventId = $_COOKIE['reservationEventCookie'];
-//        } else if ($eventId) {
-//            setcookie('reservationEventCookie', $eventId, time()+60, '/');
-//        }
+        //ToDo check
+        if (!$eventId && $this->session->getSessionValue('reservationEventCookie')) {
+            $eventId = $this->session->getSessionValue('reservationEventCookie');
+        } else if ($eventId) {
+            $this->session->setSessionValue('reservationEventCookie', $eventId);
+        }
 
         if ($date) {
             $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($eventId), $this->showPrices);
