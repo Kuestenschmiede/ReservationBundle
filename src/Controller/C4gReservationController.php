@@ -989,7 +989,7 @@ class C4gReservationController extends C4GBaseController
                         if ($speakerLinkArr && (count($speakerLinkArr) > 0)) {
                             $speakerLinks = new C4GMultiLinkField();
                             $speakerLinks->setWrapper(true);
-                            $speakerLinks->setFieldName('speaker-links');
+                            $speakerLinks->setFieldName('speaker');
                             $speakerLinks->setInitialValue(serialize($speakerLinkArr));
                             $speakerLinks->setFormField(true);
                             $speakerLinks->setDatabaseField(false);
