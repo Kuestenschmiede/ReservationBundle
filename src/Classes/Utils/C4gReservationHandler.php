@@ -1243,6 +1243,8 @@ class C4gReservationHandler
                 $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : []);
                 $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : []);
                 $frontendObject->setLocation($event['location'] ?: 0);
+                $frontendObject->setDescription($eventObject['teaser'] ?: '');
+                $frontendObject->setImage($eventObject['singleSRC']);
                 $objectList[] = $frontendObject;
             }
         } else {
@@ -1279,6 +1281,8 @@ class C4gReservationHandler
                         $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : []);
                         $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : []);
                         $frontendObject->setLocation($event['location']);
+                        $frontendObject->setDescription($eventObject['teaser'] ?: '');
+                        $frontendObject->setImage($eventObject['singleSRC']);
                         $objectList[] = $frontendObject;
                     }
                 }

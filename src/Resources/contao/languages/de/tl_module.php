@@ -44,6 +44,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showEndTime'] = a
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'] = array("Preise anzeigen","Preise werden dargestellt.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showDateTime'] = array("Termin am Objekt anzeigen","Zeigt den ausgewählten Termin direkt am Objekt an.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showMemberData'] = array("Mitgliederdaten übernehmen","Vorhandene Mitgliederdaten werden automatisch in den Formularfeldern vorbelegt.");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showDetails'] = array("Objektdetails anzeigen","Zusatzinformationen wie Bild und Beschreibung werden dargestellt.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['removeBookedDays'] = array("Ausgebuchte Tage im Kalender sperren","Der Kalendertag ist ausgebucht nicht auswählbar. Achtung! Die Überprüfung ist zum Teil langwirrig.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['emptyOptionLabel'] = array("Text leere Objektliste (optional)","Der Text der Selectbox kann optional überschrieben werden.");
 //$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['overAllTypesReservation'] = array("Übergreifende Reservierungen","Diese Einstellung ist wichtig, wenn es um Verfügbarkeit von Personal geht, um parallele Buchungen über mehrere Reservierungsarten hinweg zu vermeiden.");

@@ -1062,40 +1062,74 @@ class C4gReservationController extends C4GBaseController
                         $audienceField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-audience');
                         $fieldList[] = $audienceField;
                     }
+
+                    if ($this->showDetails) {
+                        if ($reservationObject->getDescription()) {
+                            $descriptionField = new C4GTrixEditorField();
+                            $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
+                            $descriptionField->setFieldName('description');
+                            $descriptionField->setInitialValue($reservationObject->getDescription());
+                            $descriptionField->setCondition($objConditionArr);
+                            $descriptionField->setFormField(true);
+                            $descriptionField->setShowIfEmpty(false);
+                            $descriptionField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                            $descriptionField->setRemoveWithEmptyCondition(true);
+                            $descriptionField->setDatabaseField(false);
+                            $descriptionField->setEditable(false);
+                            $descriptionField->setNotificationField(true);
+                            $fieldList[] = $descriptionField;
+                        }
+
+                        if ($reservationObject->getImage()) {
+                            $imageField = new C4GImageField();
+                            $imageField->setFieldName('image');
+                            $imageField->setInitialValue($reservationObject->getImage());
+                            $imageField->setCondition($objConditionArr);
+                            $imageField->setFormField(true);
+                            $imageField->setShowIfEmpty(false);
+                            $imageField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                            $imageField->setRemoveWithEmptyCondition(true);
+                            $imageField->setDatabaseField(false);
+                            $imageField->setLightBoxField(true);
+                            $fieldList[] = $imageField;
+                        }
+                    }
                 }
             } else {
                 //Additional Object Info
-                foreach ($reservationObjects as $reservationObject) {
-                    $object_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId());
+                if ($this->showDetails) {
+                    foreach ($reservationObjects as $reservationObject) {
+                        $object_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId());
 
-                    if ($reservationObject->getDescription()) {
-                        $descriptionField = new C4GTrixEditorField();
-                        $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
-                        $descriptionField->setFieldName('description');
-                        $descriptionField->setInitialValue($reservationObject->getDescription());
-                        $descriptionField->setCondition($object_condition);
-                        $descriptionField->setFormField(true);
-                        $descriptionField->setShowIfEmpty(false);
-                        $descriptionField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
-                        $descriptionField->setRemoveWithEmptyCondition(true);
-                        $descriptionField->setDatabaseField(false);
-                        $descriptionField->setEditable(false);
-                        $descriptionField->setNotificationField(true);
-                        $fieldList[] = $descriptionField;
-                    }
+                        if ($reservationObject->getDescription()) {
+                            $descriptionField = new C4GTrixEditorField();
+                            $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
+                            $descriptionField->setFieldName('description');
+                            $descriptionField->setInitialValue($reservationObject->getDescription());
+                            $descriptionField->setCondition($object_condition);
+                            $descriptionField->setFormField(true);
+                            $descriptionField->setShowIfEmpty(false);
+                            $descriptionField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
+                            $descriptionField->setRemoveWithEmptyCondition(true);
+                            $descriptionField->setDatabaseField(false);
+                            $descriptionField->setEditable(false);
+                            $descriptionField->setNotificationField(true);
+                            $fieldList[] = $descriptionField;
+                        }
 
-                    if ($reservationObject->getImage()) {
-                        $imageField = new C4GImageField();
-                        $imageField->setFieldName('image');
-                        $imageField->setInitialValue($reservationObject->getImage());
-                        $imageField->setCondition($object_condition);
-                        $imageField->setFormField(true);
-                        $imageField->setShowIfEmpty(false);
-                        $imageField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
-                        $imageField->setRemoveWithEmptyCondition(true);
-                        $imageField->setDatabaseField(false);
-                        $imageField->setLightBoxField(true);
-                        $fieldList[] = $imageField;
+                        if ($reservationObject->getImage()) {
+                            $imageField = new C4GImageField();
+                            $imageField->setFieldName('image');
+                            $imageField->setInitialValue($reservationObject->getImage());
+                            $imageField->setCondition($object_condition);
+                            $imageField->setFormField(true);
+                            $imageField->setShowIfEmpty(false);
+                            $imageField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
+                            $imageField->setRemoveWithEmptyCondition(true);
+                            $imageField->setDatabaseField(false);
+                            $imageField->setLightBoxField(true);
+                            $fieldList[] = $imageField;
+                        }
                     }
                 }
             }

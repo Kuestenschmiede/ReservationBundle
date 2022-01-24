@@ -19,7 +19,7 @@ use con4gis\ReservationBundle\Controller\C4gReservationController;
 use con4gis\ReservationBundle\Controller\C4gReservationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,emptyOptionLabel,withCapacity,additionalDuration,showEndTime,showPrices,showDateTime,showMemberData, removeBookedDays, hide_selection, specialParticipantMechanism; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, speaker_redirect_site, privacy_policy_text, privacy_policy_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_types,reservationButtonCaption,emptyOptionLabel,withCapacity,additionalDuration,showEndTime,showPrices,showDateTime,showMemberData,showDetails,removeBookedDays, hide_selection, specialParticipantMechanism; {reservation_notification_center_legend},  notification_type; {reservation_redirect_legend}, reservation_redirect_site, speaker_redirect_site, privacy_policy_text, privacy_policy_site;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject, showSignatureField, cancellation_redirect_site;';
 
@@ -132,6 +132,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['showMemberData'] = array
     'filter'            => true,
     'inputType'         => 'checkbox',
     'sql'               => "int(1) unsigned NULL default 0"
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['showDetails'] = array
+(   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showDetails'],
+    'default'           => 1,
+    'exclude'           => true,
+    'filter'            => true,
+    'inputType'         => 'checkbox',
+    'sql'               => "int(1) unsigned NULL default 1"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['removeBookedDays'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['removeBookedDays'],
