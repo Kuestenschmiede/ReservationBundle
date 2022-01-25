@@ -355,7 +355,7 @@ class C4gReservationListController extends C4GBaseController
             $firstnameField->setTableColumn(true);
             $firstnameField->setMandatory(true);
             $firstnameField->setNotificationField(true);
-            $firstnameField->setStyleClass('firsname');
+            $firstnameField->setStyleClass('firstname');
             //$firstnameField->setEditable(false);
             $firstnameField->setPrintable(false);
             $firstnameField->setTableColumnPriority(2);

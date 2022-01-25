@@ -296,14 +296,14 @@ class C4gReservationController extends C4GBaseController
             $reservationTypeField->setSortColumn(false);
             $reservationTypeField->setTableColumn(false);
             $reservationTypeField->setColumnWidth(20);
-            $reservationTypeField->setSize(1);
+            $reservationTypeField->setSize(1); //count($typelist)
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
             $reservationTypeField->setCallOnChange(true);
             $reservationTypeField->setCallOnChangeFunction("setReservationForm(" . $this->id . ", -1 ," . $showDateTime . ",false)");
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
-            $reservationTypeField->setHidden(count($typelist) == 1);
+            $reservationTypeField->setEditable(count($typelist) > 1);
             $reservationTypeField->setNotificationField(true);
             $reservationTypeField->setWithOptionType(true);
             //$reservationTypeField->setInitialCallOnChange($typelist[$firstType]['isEvent']);
@@ -1099,8 +1099,14 @@ class C4gReservationController extends C4GBaseController
                 //Additional Object Info
                 if ($this->showDetails) {
                     foreach ($reservationObjects as $reservationObject) {
-                        $object_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId());
+//                        $obj_condition->setModel(C4gReservationHandler::class);
+//                        $obj_condition->setFunction('isEventObject');
+//                        $obj_condition->setValue()
 
+                        $object_condition = [
+                            new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
+                            new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id'])
+                        ];
                         if ($reservationObject->getDescription()) {
                             $descriptionField = new C4GTrixEditorField();
                             $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
@@ -1109,7 +1115,7 @@ class C4gReservationController extends C4GBaseController
                             $descriptionField->setCondition($object_condition);
                             $descriptionField->setFormField(true);
                             $descriptionField->setShowIfEmpty(false);
-                            $descriptionField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
+                            $descriptionField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
                             $descriptionField->setRemoveWithEmptyCondition(true);
                             $descriptionField->setDatabaseField(false);
                             $descriptionField->setEditable(false);
@@ -1124,10 +1130,11 @@ class C4gReservationController extends C4GBaseController
                             $imageField->setCondition($object_condition);
                             $imageField->setFormField(true);
                             $imageField->setShowIfEmpty(false);
-                            $imageField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
+                            $imageField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
                             $imageField->setRemoveWithEmptyCondition(true);
                             $imageField->setDatabaseField(false);
                             $imageField->setLightBoxField(true);
+                            $imageField->setInitInvisible(true);
                             $fieldList[] = $imageField;
                         }
                     }
