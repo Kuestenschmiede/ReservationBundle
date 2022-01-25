@@ -56,6 +56,7 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationEventTopicModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Classes\Projects\C4gReservationBrickTypes;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
@@ -121,6 +122,8 @@ class C4gReservationController extends C4GBaseController
     protected $withPermissionCheck = false;
     protected $useUuidCookie = false;
 
+    private $reservationSettings = null;
+
     public function initBrickModule($id)
     {
         \System::loadLanguageFile('fe_c4g_reservation');
@@ -128,16 +131,24 @@ class C4gReservationController extends C4GBaseController
         $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural']);
         parent::initBrickModule($id);
 
+        if (!$this->reservationSettings && $this->reservation_settings) {
+            $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
+        }
+
         $this->dialogParams->setWithoutGuiHeader(true);
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE);
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
-        $this->dialogParams->setRedirectSite($this->reservation_redirect_site);
+        $this->dialogParams->setRedirectSite($this->reservationSettings->reservation_redirect_site);
         $this->dialogParams->setSaveWithoutSavingMessage(false);
     }
 
     public function addFields() : array
     {
+        if (!$this->reservationSettings && $this->reservation_settings) {
+            $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
+        }
+
         $fieldList = array();
 
         $idField = new C4GKeyField();
@@ -212,7 +223,7 @@ class C4gReservationController extends C4GBaseController
             $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
         }
 
-        $specialParticipantMechanism = $this->specialParticipantMechanism;
+        $specialParticipantMechanism = $this->reservationSettings->specialParticipantMechanism;
 
         if ($types) {
             $memberId = 0;
@@ -223,16 +234,16 @@ class C4gReservationController extends C4GBaseController
                 }
             }
 
-            $moduleTypes = \Contao\StringUtil::deserialize($this->reservation_types);
+            $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types);
             foreach ($types as $type) {
-                if ($moduleTypes && (count($moduleTypes) > 0)) {
+                if ($moduleTypes && is_array($moduleTypes) && (count($moduleTypes) > 0)) {
                     $arrModuleTypes = $moduleTypes;
                     if (!in_array($type->id, $arrModuleTypes)) {
                         continue;
                     }
                 }
 
-                $objects = C4gReservationHandler::getReservationObjectList(array($type->id), intval($eventId), $this->showPrices);
+                $objects = C4gReservationHandler::getReservationObjectList(array($type->id), intval($eventId), $this->reservationSettings->showPrices);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
@@ -280,7 +291,7 @@ class C4gReservationController extends C4GBaseController
             }
         }
 
-        $showDateTime = $this->showDateTime ? "1" : "0";
+        $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
 
         if (count($typelist) > 0) {
             $firstType = array_key_first($typelist);
@@ -323,7 +334,7 @@ class C4gReservationController extends C4GBaseController
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
             $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
             $maxCapacity = $maxParticipants ?: 0;
-            if ($this->withCapacity) {
+            if ($this->reservationSettings->withCapacity) {
                 $conditionCapacity = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id']);
 
                 $reservationDesiredCapacity = new C4GNumberField();
@@ -369,7 +380,7 @@ class C4gReservationController extends C4GBaseController
                 $reservationObjectTypeField->setFormField(false);
                 $fieldList[] = $reservationObjectTypeField;
 
-                $additionalDuration = $this->additionalDuration;
+                $additionalDuration = $this->reservationSettings->additionalDuration;
                 if (intval($additionalDuration) >= 1) {
                     $durationField = new C4GNumberField();
                     $durationField->setFieldName('duration');
@@ -380,7 +391,7 @@ class C4gReservationController extends C4GBaseController
                     $durationField->setTableColumn(true);
                     $durationField->setMandatory(true);
                     $durationField->setCallOnChange(true);
-                    $durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_" . $listType['id'] . "'), " . $this->id . "," . $listType['id'] . "," . $this->showDateTime . ");");
+                    $durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_" . $listType['id'] . "'), " . $this->id . "," . $listType['id'] . "," . $this->reservationSettings->showDateTime . ");");
                     $durationField->setCondition(array($condition));
                     $durationField->setNotificationField(true);
                     $durationField->setStyleClass('duration');
@@ -404,7 +415,7 @@ class C4gReservationController extends C4GBaseController
                     }
 
                     if ($initialDate || $initialBookingDate) {
-                        $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."'), " . $this->id . "," . $listType['id'] . "," . $this->showDateTime . ");";
+                        $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."'), " . $this->id . "," . $listType['id'] . "," . $this->reservationSettings->showDateTime . ");";
                         $this->getDialogParams()->setOnloadScript($script);
                     }
 
@@ -413,7 +424,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationBeginDateField->setMinDate(C4gReservationHandler::getMinDate($reservationObjects));
                     $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
                     $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
-                    $reservationBeginDateField->setExcludeDates(C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $this->removeBookedDays));
+                    $reservationBeginDateField->setExcludeDates(C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $this->reservationSettings->removeBookedDays));
                     $reservationBeginDateField->setFieldName('beginDate');
                     $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
                     $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
@@ -429,7 +440,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationBeginDateField->setMandatory(true);
                     $reservationBeginDateField->setCondition(array($condition));
                     $reservationBeginDateField->setCallOnChange(true);
-                    $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this, " . $this->id . "," . $listType['id'] . "," . $this->showDateTime . ");");
+                    $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this, " . $this->id . "," . $listType['id'] . "," . $this->reservationSettings->showDateTime . ");");
                     $reservationBeginDateField->setNotificationField(true);
                     $reservationBeginDateField->setAdditionalID($listType['id']);
                     $reservationBeginDateField->setStyleClass('begin-date');
@@ -445,7 +456,7 @@ class C4gReservationController extends C4GBaseController
                 $reservationendTimeField->setSort(false);
                 $reservationendTimeField->setDatabaseField(true);
                 $reservationendTimeField->setCallOnChange(true);
-                $reservationendTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
+                $reservationendTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->reservationSettings->showDateTime . ')');
                 $reservationendTimeField->setNotificationField(true);
                 $reservationendTimeField->setRemoveWithEmptyCondition(true);
                 $reservationendTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
@@ -486,9 +497,9 @@ class C4gReservationController extends C4GBaseController
                     $reservationBeginTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
                     $reservationBeginTimeField->setFormField(true);
                     $reservationBeginTimeField->setDatabaseField(true);
-                    $reservationBeginTimeField->setOptions(C4gReservationHandler::getReservationNowTime($objects[0], $this->showEndTime, $this->showFreeSeats));
+                    $reservationBeginTimeField->setOptions(C4gReservationHandler::getReservationNowTime($objects[0], $this->reservationSettings->showEndTime, $this->reservationSettings->showFreeSeats));
                     $reservationBeginTimeField->setCallOnChange(true);
-                    $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
+                    $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->reservationSettings->showDateTime . ')');
                     $reservationBeginTimeField->setMandatory(false);
                     $reservationBeginTimeField->setInitialValue($initialBookingTime ?: $initialTime);
                     $reservationBeginTimeField->setSort(false);
@@ -519,15 +530,15 @@ class C4gReservationController extends C4GBaseController
                             '0',
                             -1,
                             0,
-                            $this->showEndTime,
-                            $this->showFreeSeats
+                            $this->reservationSettings->showEndTime,
+                            $this->reservationSettingsis->showFreeSeats
                         ));
                     $suReservationTimeField->setMandatory(true);
                     $suReservationTimeField->setInitInvisible(true);
                     $suReservationTimeField->setSort(false);
                     $suReservationTimeField->setCondition($suConditionArr);
                     $suReservationTimeField->setCallOnChange(true);
-                    $suReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
+                    $suReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->reservationSettings->showDateTime . ')');
                     $suReservationTimeField->setAdditionalID($listType['id'] . '-000');
                     $suReservationTimeField->setNotificationField(true);
                     $suReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
@@ -555,15 +566,15 @@ class C4gReservationController extends C4GBaseController
                             '1',
                             -1,
                             0,
-                            $this->showEndTime,
-                            $this->showFreeSeats
+                            $this->reservationSettings->showEndTime,
+                            $this->reservationSettings->showFreeSeats
                         ));
                     $moReservationTimeField->setMandatory(true);
                     $moReservationTimeField->setInitInvisible(true);
                     $moReservationTimeField->setSort(false);
                     $moReservationTimeField->setCondition($moConditionArr);
                     $moReservationTimeField->setCallOnChange(true);
-                    $moReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
+                    $moReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->reservationSettings->showDateTime . ')');
                     $moReservationTimeField->setAdditionalID($listType['id'] . '-001');
                     $moReservationTimeField->setNotificationField(true);
                     $moReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
@@ -591,15 +602,15 @@ class C4gReservationController extends C4GBaseController
                             '2',
                             -1,
                             0,
-                            $this->showEndTime,
-                            $this->showFreeSeats
+                            $this->reservationSettings->showEndTime,
+                            $this->reservationSettings->showFreeSeats
                         ));
                     $tuReservationTimeField->setMandatory(true);
                     $tuReservationTimeField->setInitInvisible(true);
                     $tuReservationTimeField->setSort(false);
                     $tuReservationTimeField->setCondition($tuConditionArr);
                     $tuReservationTimeField->setCallOnChange(true);
-                    $tuReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
+                    $tuReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->reservationSettings->showDateTime . ')');
                     $tuReservationTimeField->setAdditionalID($listType['id'] . '-002');
                     $tuReservationTimeField->setNotificationField(true);
                     $tuReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
@@ -627,15 +638,15 @@ class C4gReservationController extends C4GBaseController
                             '3',
                             -1,
                             0,
-                            $this->showEndTime,
-                            $this->showFreeSeats
+                            $this->reservationSettings->showEndTime,
+                            $this->reservationSettings->showFreeSeats
                         ));
                     $weReservationTimeField->setMandatory(true);
                     $weReservationTimeField->setInitInvisible(true);
                     $weReservationTimeField->setSort(false);
                     $weReservationTimeField->setCondition($weConditionArr);
                     $weReservationTimeField->setCallOnChange(true);
-                    $weReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
+                    $weReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->reservationSettings->showDateTime . ')');
                     $weReservationTimeField->setAdditionalID($listType['id'] . '-003');
                     $weReservationTimeField->setNotificationField(true);
                     $weReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
@@ -663,15 +674,15 @@ class C4gReservationController extends C4GBaseController
                             '4',
                             -1,
                             0,
-                            $this->showEndTime,
-                            $this->showFreeSeats
+                            $this->reservationSettings->showEndTime,
+                            $this->reservationSettings->showFreeSeats
                         ));
                     $thReservationTimeField->setMandatory(true);
                     $thReservationTimeField->setInitInvisible(true);
                     $thReservationTimeField->setSort(false);
                     $thReservationTimeField->setCondition($thConditionArr);
                     $thReservationTimeField->setCallOnChange(true);
-                    $thReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
+                    $thReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->reservationSettings->showDateTime . ')');
                     $thReservationTimeField->setAdditionalID($listType['id'] . '-004');
                     $thReservationTimeField->setNotificationField(true);
                     $thReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
@@ -699,15 +710,15 @@ class C4gReservationController extends C4GBaseController
                             '5',
                             -1,
                             0,
-                            $this->showEndTime,
-                            $this->showFreeSeats
+                            $this->reservationSettings->showEndTime,
+                            $this->reservationSettings->showFreeSeats
                         ));
                     $frReservationTimeField->setMandatory(true);
                     $frReservationTimeField->setInitInvisible(true);
                     $frReservationTimeField->setSort(false);
                     $frReservationTimeField->setCondition($frConditionArr);
                     $frReservationTimeField->setCallOnChange(true);
-                    $frReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
+                    $frReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->reservationSettings->showDateTime . ')');
                     $frReservationTimeField->setAdditionalID($listType['id'] . '-005');
                     $frReservationTimeField->setNotificationField(true);
                     $frReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
@@ -736,15 +747,15 @@ class C4gReservationController extends C4GBaseController
                             '6',
                             -1,
                             0,
-                            $this->showEndTime,
-                            $this->showFreeSeats
+                            $this->reservationSettings->showEndTime,
+                            $this->reservationSettings->showFreeSeats
                         ));
                     $saReservationTimeField->setMandatory(true);
                     $saReservationTimeField->setInitInvisible(true);
                     $saReservationTimeField->setSort(false);
                     $saReservationTimeField->setCondition($saConditionArr);
                     $saReservationTimeField->setCallOnChange(true);
-                    $saReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->showDateTime . ')');
+                    $saReservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $this->reservationSettings->showDateTime . ')');
                     $saReservationTimeField->setAdditionalID($listType['id'] . '-006');
                     $saReservationTimeField->setNotificationField(true);
                     $saReservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
@@ -828,6 +839,8 @@ class C4gReservationController extends C4GBaseController
             $reservationEndTimeDBField->setNotificationField(true);
             $fieldList[] = $reservationEndTimeDBField;
 
+            //$dateCondition = new C4GBrickCondition(C4GBrickConditionType::BOOLSWITCH, 'beginDate_'.$listType['id']);
+
             $reservationObjectField = new C4GSelectField();
             $reservationObjectField->setChosen(false);
             $reservationObjectField->setFieldName($isEvent ? 'reservation_object_event' : 'reservation_object');
@@ -844,7 +857,7 @@ class C4gReservationController extends C4GBaseController
             $reservationObjectField->setInitialValue(-1);
             $reservationObjectField->setShowIfEmpty(true);
             $reservationObjectField->setDatabaseField(!$isEvent);
-            $reservationObjectField->setEmptyOptionLabel($this->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
+            $reservationObjectField->setEmptyOptionLabel($this->reservationSettings->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
             $reservationObjectField->setCondition([$condition]);
             $reservationObjectField->setRemoveWithEmptyCondition(true);
             $reservationObjectField->setCallOnChange(true);
@@ -917,7 +930,7 @@ class C4gReservationController extends C4GBaseController
                         $reservationBeginTimeField->setFieldName('beginTimeEvent');
                         $reservationBeginTimeField->setTitle($isEvent ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
                         $reservationBeginTimeField->setFormField(true);
-                        $reservationBeginTimeField->setOptions(C4gReservationHandler::getReservationEventTime($reservationObject, $this->showEndTime, $this->showFreeSeats));
+                        $reservationBeginTimeField->setOptions(C4gReservationHandler::getReservationEventTime($reservationObject, $this->reservationSettings->showEndTime, $this->reservationSettings->showFreeSeats));
                         $reservationBeginTimeField->setMandatory(false);
                         $reservationBeginTimeField->setInitialValue($reservationObject->getBeginTime());
                         $reservationBeginTimeField->setDatabaseField(false);
@@ -975,8 +988,8 @@ class C4gReservationController extends C4GBaseController
                             if ($speaker) {
                                 $speakerName = $speaker->title ? $speaker->title . '&nbsp;' . $speaker->firstname . '&nbsp;' . $speaker->lastname : $speaker->firstname . '&nbsp;' . $speaker->lastname;
 
-                                if ($this->speaker_redirect_site) {
-                                    $jumpTo = \PageModel::findByPk($this->speaker_redirect_site);
+                                if ($this->reservationSettings->speaker_redirect_site) {
+                                    $jumpTo = \PageModel::findByPk($this->reservationSettings->speaker_redirect_site);
                                     if ($jumpTo) {
                                        $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerId;
                                     }
@@ -1063,7 +1076,7 @@ class C4gReservationController extends C4GBaseController
                         $fieldList[] = $audienceField;
                     }
 
-                    if ($this->showDetails) {
+                    if ($this->reservationSettings->showDetails) {
                         if ($reservationObject->getDescription()) {
                             $descriptionField = new C4GTrixEditorField();
                             $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
@@ -1097,12 +1110,8 @@ class C4gReservationController extends C4GBaseController
                 }
             } else {
                 //Additional Object Info
-                if ($this->showDetails) {
+                if ($this->reservationSettings->showDetails) {
                     foreach ($reservationObjects as $reservationObject) {
-//                        $obj_condition->setModel(C4gReservationHandler::class);
-//                        $obj_condition->setFunction('isEventObject');
-//                        $obj_condition->setValue()
-
                         $object_condition = [
                             new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
                             new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id'])
@@ -1147,7 +1156,7 @@ class C4gReservationController extends C4GBaseController
             if ($includedParams) {
                 foreach ($includedParams as $paramId) {
                     $includedParam = C4gReservationParamsModel::findByPk($paramId);
-                    if ($includedParam && $includedParam->caption && ($includedParam->price && $this->showPrices)) {
+                    if ($includedParam && $includedParam->caption && ($includedParam->price && $this->reservationSettings->showPrices)) {
                         $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption . "<span class='price'>&nbsp;(+" . number_format($includedParam->price, 2, ',', '.') . " €)</span>"];
                     } else if ($includedParam && $includedParam->caption) {
                         $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption];
@@ -1180,7 +1189,7 @@ class C4gReservationController extends C4GBaseController
                 foreach ($params as $paramId) {
                     if ($paramId) {
                         $additionalParam = C4gReservationParamsModel::findByPk($paramId);
-                        if ($additionalParam && $additionalParam->caption && ($additionalParam->price && $this->showPrices)) {
+                        if ($additionalParam && $additionalParam->caption && ($additionalParam->price && $this->reservationSettings->showPrices)) {
                             $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption . "<span class='price'>&nbsp;(+" . number_format($additionalParam->price, 2, ',', '.') . " €)</span>"];
                         } else if ($additionalParam && $additionalParam->caption) {
                             $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
@@ -1225,7 +1234,10 @@ class C4gReservationController extends C4GBaseController
             ['id' => 'various', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
         ];
 
-        $additionaldatas = StringUtil::deserialize($this->hide_selection);
+        $additionaldatas = StringUtil::deserialize($this->reservationSettings->fieldSelection);
+        if (!$additionaldatas) {
+            $additionaldatas = [];
+        }
 
         //check mandatory fields
         $mandatoryFields = ['firstname' => true, 'lastname' => true, 'email' => true];
@@ -1261,7 +1273,7 @@ class C4gReservationController extends C4GBaseController
         $memberArr['phone'] = '';
         $memberArr['dateOfBirth'] = '';
 
-        if ($this->showMemberData && FE_USER_LOGGED_IN === true) {
+        if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
             $member = FrontendUser::getInstance();
             if ($member) {
                 $memberArr['id'] = $member->id ? $member->id : '';
@@ -1611,7 +1623,7 @@ class C4gReservationController extends C4GBaseController
                         foreach ($params as $paramId) {
                             if ($paramId) {
                                 $participantParam = C4gReservationParamsModel::findByPk($paramId);
-                                if ($participantParam && $participantParam->caption && ($participantParam->price && $this->showPrices)) {
+                                if ($participantParam && $participantParam->caption && ($participantParam->price && $this->reservationSettings->showPrices)) {
                                     $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption . "<span class='price'>&nbsp;(+" . number_format($participantParam->price, 2, ',', '.') . " €)</span>"];
                                 } else if ($participantParam && $participantParam->caption) {
                                     $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption];
@@ -1663,7 +1675,7 @@ class C4gReservationController extends C4GBaseController
 
                         $fieldList[] = $reservationParticipants;
                     } else {
-                        if ($this->withCapacity) {
+                        if ($this->reservationSettings->withCapacity) {
                             $maxCapacity = $maxCapacity ?: 1;
                             for ($i = $minCapacity; $i <= $maxCapacity; $i++) {
                                 $newCondition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id'], $i);
@@ -1760,11 +1772,11 @@ class C4gReservationController extends C4GBaseController
         $reservationIdField->setStyleClass('reservation-id');
         $fieldList[] = $reservationIdField;
 
-        if ($this->privacy_policy_text) {
+        if ($this->reservationSettings->privacy_policy_text) {
             $privacyPolicyText = new C4GTextField();
             $privacyPolicyText->setSimpleTextWithoutEditing(true);
             $privacyPolicyText->setFieldName('privacy_policy_text');
-            $privacyPolicyText->setInitialValue(\Contao\Controller::replaceInsertTags($this->privacy_policy_text));
+            $privacyPolicyText->setInitialValue(\Contao\Controller::replaceInsertTags($this->reservationSettings->privacy_policy_text));
             $privacyPolicyText->setSize(4);
             $privacyPolicyText->setTableColumn(false);
             $privacyPolicyText->setEditable(false);
@@ -1775,8 +1787,8 @@ class C4gReservationController extends C4GBaseController
             $fieldList[] = $privacyPolicyText;
         }
 
-        if ($this->privacy_policy_site) {
-            $href = \Contao\Controller::replaceInsertTags('{{link_url::' . $this->privacy_policy_site . '}}');
+        if ($this->reservationSettings->privacy_policy_site) {
+            $href = \Contao\Controller::replaceInsertTags('{{link_url::' . $this->reservationSettings->privacy_policy_site . '}}');
             $desc = '<span class="c4g_field_description_text">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . '</span> <a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>';
         } else {
             $desc = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'];
@@ -1797,7 +1809,7 @@ class C4gReservationController extends C4GBaseController
 
         $clickButton = new C4GBrickButton(
             C4GBrickConst::BUTTON_CLICK,
-            $this->reservationButtonCaption ? \Contao\Controller::replaceInsertTags($this->reservationButtonCaption) : $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'],
+            $this->reservationSettings->reservationButtonCaption ? \Contao\Controller::replaceInsertTags($this->reservationSettings->reservationButtonCaption) : $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'],
             $visible = true,
             $enabled = true,
             $action = '',
@@ -1905,7 +1917,7 @@ class C4gReservationController extends C4GBaseController
 
         if ($reservationType->notification_type) {
             $this->getDialogParams()->setNotificationType($reservationType->notification_type);
-            $this->notification_type = $reservationType->notification_type;
+            $this->reservationSettings->notification_type = $reservationType->notification_type;
         }
 
         $isEvent = $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
@@ -2175,7 +2187,7 @@ class C4gReservationController extends C4GBaseController
 
         $participantsArr = [];
         foreach ($putVars as $key => $value) {
-            if ($this->specialParticipantMechanism) {
+            if ($this->reservationSettings->specialParticipantMechanism) {
                 $desiredCapacity = $putVars['desiredCapacity_'.$reservationType->id];
                 if ($desiredCapacity) {
                     $extId = $desiredCapacity-1;
@@ -2399,9 +2411,9 @@ class C4gReservationController extends C4GBaseController
         }
 
         if ($date) {
-            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($eventId), $this->showPrices);
-            $withEndTimes = $this->showEndTime;
-            $withFreeSeats = $this->showFreeSeats;
+            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($eventId), $this->reservationSettings->showPrices);
+            $withEndTimes = $this->reservationSettings->showEndTime;
+            $withFreeSeats = $this->reservationSettings->showFreeSeats;
 
             $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true);
 

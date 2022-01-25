@@ -12,10 +12,10 @@
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_module']['reservation_legend'] = 'Reservierungsobjekte';
+$GLOBALS['TL_LANG']['tl_module']['reservation_legend'] = 'Reservierungseinstellungen';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_settings'] = 'Formulareinstellungen';
 $GLOBALS['TL_LANG']['tl_module']['list_legend'] = 'Listeneinstellungen';
 $GLOBALS['TL_LANG']['tl_module']['reservation_notification_center_legend'] = 'Notification Center';
-$GLOBALS['TL_LANG']['tl_module']['reservation_jquery_theme_legend'] = 'jQuery UI-Theme';
 $GLOBALS['TL_LANG']['tl_module']['reservation_redirect_legend'] = 'Weiterleitung';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_types'] = array('Reservierungsarten', 'Wählen Sie die bei der Reservierung im Frontend zu berücksichigenden Reservierungsarten (Räume, Tische, ...). Bei keiner Auswahl werden alle Reservierungsobjekte geladen.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationView'] = array('Listenansicht', 'Verschiedene Ansichten der Liste sind möglich. Standard: Öffentlich');

@@ -25,6 +25,7 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationEvent']  = array('Event <=> Reservatio
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventAudience'] = array('Target audience', 'Here you can store target groups.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Speaker', 'Here you can maintain the speakers.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Topics', 'Here you can, for example, store the seminar topics.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Form settings', 'Here you can configure the form and link it in the module.');
 
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Form', 'Reservation form');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE]  = array('con4gis-Reservation: List', 'Reservation list');

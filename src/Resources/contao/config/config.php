@@ -34,6 +34,13 @@ $GLOBALS['BE_MOD']['con4gis'] = array_merge($GLOBALS['BE_MOD']['con4gis'], [
         'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_objects.svg',
     ),
 
+    'C4gReservationSettings' => array
+    (
+        'brick' => 'reservation',
+        'tables'    => array('tl_c4g_reservation_settings'),
+        'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_settings.svg',
+    ),
+
     'C4gReservationLocation' => array
     (
         'brick' => 'reservation',
@@ -170,6 +177,7 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle
 $GLOBALS['TL_MODELS']['tl_c4g_reservation'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_object'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_type'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel::class;
+$GLOBALS['TL_MODELS']['tl_c4g_reservation_settings'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_params'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_object_prices'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationObjectPricesModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_event'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel::class;
