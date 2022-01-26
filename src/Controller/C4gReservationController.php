@@ -317,6 +317,7 @@ class C4gReservationController extends C4GBaseController
             $reservationTypeField->setEditable(count($typelist) > 1);
             $reservationTypeField->setNotificationField(true);
             $reservationTypeField->setWithOptionType(true);
+            $reservationTypeField->setHidden((count($typelist) == 1) && $this->reservationSettings->typeHide);
             //$reservationTypeField->setInitialCallOnChange($typelist[$firstType]['isEvent']);
             $fieldList[] = $reservationTypeField;
         } else {

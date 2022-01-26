@@ -17,6 +17,7 @@ $GLOBALS['TL_LANG'][$str]['caption'] = array("Bezeichnung", "Zur Auswahl am Fron
 $GLOBALS['TL_LANG'][$str]['reservation_notification_center_legend'] = 'Notification Center';
 $GLOBALS['TL_LANG'][$str]['reservation_redirect_legend'] = 'Weiterleitung';
 $GLOBALS['TL_LANG'][$str]['reservation_types'] = array('Reservierungsarten', 'Wählen Sie die bei der Reservierung im Frontend zu berücksichigenden Reservierungsarten (Räume, Tische, ...). Bei keiner Auswahl werden alle Reservierungsobjekte geladen.');
+$GLOBALS['TL_LANG'][$str]['typeHide'] = array('Reservierungsart verstecken', 'sollte nur eine Reservierungsart zur Auswahl stehen, dann kann das Feld hierüber ausgeblendet werden.');
 $GLOBALS['TL_LANG'][$str]['reservationButtonCaption'] = array('Beschriftung Absendebutton','Hiermit können Sie den Button Text ändern. Bspw. "Zahlungspflichtig reservieren".');
 $GLOBALS['TL_LANG'][$str]['redirect_site'] = array('Weiterleitung nach Reservierung', 'Nach der Buchung wird zur ausgewählten Seite weitergeleitet. Bspw. für eine Reservierungsbestätigung.');
 $GLOBALS['TL_LANG'][$str]['speaker_redirect_site'] = array('Referentenweiterleitung', 'Falls Sie die Referenten verknüpfen wollen, können Sie hier die Weiterleitung einstellen.');
@@ -42,7 +43,11 @@ $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text leere Objektliste","
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Teilnehmermechanismus (optional)","Ist dieser Mechanismus aktiviert, dann werden Teilnehmerfelder (Titel, Name, Vorname, E-Mail, ggf. Leistungen) anhand der Personenzahl generiert.");
 
 /** LEGENDS **/
-$GLOBALS['TL_LANG'][$str]['settings_legend'] = "Moduleinstellungen";
+$GLOBALS['TL_LANG'][$str]['settings_legend'] = "Allgemeine Einstellungen";
+$GLOBALS['TL_LANG'][$str]['type_legend'] = "Einstellungen zur Reservierungsart";
+$GLOBALS['TL_LANG'][$str]['object_legend'] = "Einstellungen zu den Reservierungsobjekten";
+$GLOBALS['TL_LANG'][$str]['form_legend'] = "Formulareinstellungen";
+
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG'][$str]['new'] = array("Einstellungen hinzufügen","Einstellungen hinzufügen");

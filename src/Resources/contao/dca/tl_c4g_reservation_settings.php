@@ -86,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{settings_legend}, caption,,reservation_types,reservationButtonCaption,emptyOptionLabel,withCapacity,additionalDuration,showEndTime,showPrices,showDateTime,showMemberData,showDetails,removeBookedDays, fieldSelection, specialParticipantMechanism; {reservation_notification_center_legend}, notification_type; {reservation_redirect_legend}, reservation_redirect_site, speaker_redirect_site, privacy_policy_text, privacy_policy_site;;'
+        'default'   =>  '{settings_legend}, caption; {type_legend}, reservation_types, typeHide; {object_legend}, emptyOptionLabel; {form_legend}, reservationButtonCaption,withCapacity,additionalDuration,showEndTime,showPrices,showDateTime,showMemberData,showDetails,removeBookedDays, fieldSelection, specialParticipantMechanism; {reservation_notification_center_legend}, notification_type; {reservation_redirect_legend}, reservation_redirect_site, speaker_redirect_site, privacy_policy_text, privacy_policy_site;;'
     ),
 
 
@@ -128,6 +128,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'options_callback'        => array('tl_c4g_reservation_settings','getAllTypes'),
             'eval'                    => array('mandatory'=>false, 'multiple'=>true),
             'sql'                     => "blob NULL"
+        ),
+        'typeHide' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['typeHide'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'eval'              => array('tl_class'=>'long'),
+            'sql'               => "int(1) unsigned NULL default 0"
         ),
        'withCapacity' => array
         (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['withCapacity'],
