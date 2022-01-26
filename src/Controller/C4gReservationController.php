@@ -1944,6 +1944,11 @@ class C4gReservationController extends C4GBaseController
             $resObject = $putVars[$key];
             $reservationObject = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
                 ->execute($resObject);
+
+            if ($reservationObject && $reservationObject->notification_type) {
+                $this->getDialogParams()->setNotificationType($reservationObject->notification_type);
+                $this->reservationSettings->notification_type = $reservationObject->notification_type;
+            }
         }
 
 

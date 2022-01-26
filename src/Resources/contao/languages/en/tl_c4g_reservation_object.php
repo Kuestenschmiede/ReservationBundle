@@ -62,6 +62,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['published'] = array("Publish."
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMin'] = array("Minimum number of persons", "How many persons may appear at least? With standard 0 the number is not evaluated.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMax'] = array("Maximum number of persons", "How many persons may appear at least? With standard 0 the number is not evaluated.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location_legend'] = array("Settings for the location");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['notification_type'] = array('Automatic confirmation message (optional)', 'Select notification. This setting overrides the module settings and also the setting at the reservation type.');
 
 
 /** LEGENDS **/
