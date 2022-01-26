@@ -14,8 +14,6 @@ $str = 'tl_c4g_reservation_settings';
 $GLOBALS['TL_LANG'][$str]['id'] = array("#", "");
 $GLOBALS['TL_LANG'][$str]['caption'] = array("Designation", "For selection on the front end module.");
 
-$GLOBALS['TL_LANG'][$str]['reservation_notification_center_legend'] = 'Notification Center';
-$GLOBALS['TL_LANG'][$str]['reservation_redirect_legend'] = 'Forwarding';
 $GLOBALS['TL_LANG'][$str]['reservation_types'] = array('Reservation types', 'Select the reservation types (rooms, tables, ...) to be taken into account when making reservations in the frontend. If no selection is made, all reservation objects will be loaded.');
 $GLOBALS['TL_LANG'][$str]['typeHide'] = array('Hide reservation type', 'if only one reservation type is available for selection, then the field can be hidden via this.');
 $GLOBALS['TL_LANG'][$str]['reservationButtonCaption'] = array('Button label','Allows you to change the button text. For example, "Reserve with payment".');
@@ -43,7 +41,13 @@ $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text empty object list (o
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Participant mechanism (optional)", "If this mechanism is enabled, the participant fields are generated based on the number of people.");
 
 /** LEGENDS **/
-$GLOBALS['TL_LANG'][$str]['settings_legend'] = "Module settings";
+$GLOBALS['TL_LANG'][$str]['settings_legend'] = "General settings";
+$GLOBALS['TL_LANG'][$str]['type_legend'] = "Reservation type settings";
+$GLOBALS['TL_LANG'][$str]['object_legend'] = "Reservation object settings";
+$GLOBALS['TL_LANG'][$str]['form_legend'] = "Form settings";
+$GLOBALS['TL_LANG'][$str]['notification_legend'] = 'Notification Center';
+$GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Redirection';
+$GLOBALS['TL_LANG'][$str]['expert_legend'] = 'Expert settings';
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG'][$str]['new'] = array("Add settings","Add settings");

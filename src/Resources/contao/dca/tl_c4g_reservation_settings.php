@@ -86,7 +86,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{settings_legend}, caption; {type_legend}, reservation_types, typeHide; {object_legend}, emptyOptionLabel; {form_legend}, reservationButtonCaption,withCapacity,additionalDuration,showEndTime,showPrices,showDateTime,showMemberData,showDetails,removeBookedDays, fieldSelection, specialParticipantMechanism; {reservation_notification_center_legend}, notification_type; {reservation_redirect_legend}, reservation_redirect_site, speaker_redirect_site, privacy_policy_text, privacy_policy_site;;'
+        'default'   =>  '{settings_legend}, caption;'.
+                        '{form_legend:hide}, withCapacity, fieldSelection, privacy_policy_text, privacy_policy_site, reservationButtonCaption;'.
+                        '{type_legend:hide}, reservation_types, typeHide;'.
+                        '{object_legend:hide}, showDetails, emptyOptionLabel, showDateTime, showEndTime, showPrices;'.
+                        '{notification_legend:hide}, notification_type;'.
+                        '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site;'.
+                        '{expert_legend:hide}, removeBookedDays, showMemberData, specialParticipantMechanism, additionalDuration;'
     ),
 
 

@@ -14,13 +14,11 @@ $str = 'tl_c4g_reservation_settings';
 $GLOBALS['TL_LANG'][$str]['id'] = array("#", "");
 $GLOBALS['TL_LANG'][$str]['caption'] = array("Bezeichnung", "Zur Auswahl am Frontendmodul");
 
-$GLOBALS['TL_LANG'][$str]['reservation_notification_center_legend'] = 'Notification Center';
-$GLOBALS['TL_LANG'][$str]['reservation_redirect_legend'] = 'Weiterleitung';
 $GLOBALS['TL_LANG'][$str]['reservation_types'] = array('Reservierungsarten', 'Wählen Sie die bei der Reservierung im Frontend zu berücksichigenden Reservierungsarten (Räume, Tische, ...). Bei keiner Auswahl werden alle Reservierungsobjekte geladen.');
 $GLOBALS['TL_LANG'][$str]['typeHide'] = array('Reservierungsart verstecken', 'sollte nur eine Reservierungsart zur Auswahl stehen, dann kann das Feld hierüber ausgeblendet werden.');
 $GLOBALS['TL_LANG'][$str]['reservationButtonCaption'] = array('Beschriftung Absendebutton','Hiermit können Sie den Button Text ändern. Bspw. "Zahlungspflichtig reservieren".');
-$GLOBALS['TL_LANG'][$str]['redirect_site'] = array('Weiterleitung nach Reservierung', 'Nach der Buchung wird zur ausgewählten Seite weitergeleitet. Bspw. für eine Reservierungsbestätigung.');
-$GLOBALS['TL_LANG'][$str]['speaker_redirect_site'] = array('Referentenweiterleitung', 'Falls Sie die Referenten verknüpfen wollen, können Sie hier die Weiterleitung einstellen.');
+$GLOBALS['TL_LANG'][$str]['redirect_site'] = array('Weiterleitung nach der Reservierung', 'Nach der Buchung wird zur ausgewählten Seite weitergeleitet. Bspw. für eine Reservierungsbestätigung.');
+$GLOBALS['TL_LANG'][$str]['speaker_redirect_site'] = array('Weiterleitung zum Referenten', 'Falls Sie die Referenten verknüpfen wollen, können Sie hier die Weiterleitung einstellen.');
 $GLOBALS['TL_LANG'][$str]['login_redirect_site'] = array('Weiterleitung zur Anmeldeseite', 'Falls das Listenmodul nicht öffentlich ist.');
 $GLOBALS['TL_LANG'][$str]['privacy_policy_site'] = array('Link zur Datenschutzerklärung', 'Diese Seite wird für die Bestätigung der Datenschutzerklärung verlinkt.');
 $GLOBALS['TL_LANG'][$str]['privacy_policy_text'] = array('Datenschutzkommentar', 'Dieser Datenschutzkommentar taucht an der Checkbox zur Einwilligung auf und kann auch Inserttags enthalten.');
@@ -47,7 +45,9 @@ $GLOBALS['TL_LANG'][$str]['settings_legend'] = "Allgemeine Einstellungen";
 $GLOBALS['TL_LANG'][$str]['type_legend'] = "Einstellungen zur Reservierungsart";
 $GLOBALS['TL_LANG'][$str]['object_legend'] = "Einstellungen zu den Reservierungsobjekten";
 $GLOBALS['TL_LANG'][$str]['form_legend'] = "Formulareinstellungen";
-
+$GLOBALS['TL_LANG'][$str]['notification_legend'] = 'Notification Center';
+$GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Weiterleitung';
+$GLOBALS['TL_LANG'][$str]['expert_legend'] = 'Experteneinstellungen';
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG'][$str]['new'] = array("Einstellungen hinzufügen","Einstellungen hinzufügen");
