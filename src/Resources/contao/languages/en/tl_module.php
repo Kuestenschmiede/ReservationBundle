@@ -32,3 +32,4 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['group'] = 'Gr
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['tiles'] = 'Tiles';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['table'] = 'Data table';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['list'] = 'List elements';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['printTpl'] = ["Print template", "You can use this to store your own print template."];

@@ -186,6 +186,10 @@ class C4gReservationListController extends C4GBaseController
         if ($this->login_redirect_site) {
             $this->dialogParams->getViewParams()->setLoginRedirect($this->login_redirect_site);
         }
+
+        if ($this->printTpl) {
+            $this->printTemplate = $this->printTpl;
+        }
     }
 
     public function addFields() : array

@@ -38,3 +38,4 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['group'] = 'Gr
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['tiles'] = 'Kachelliste';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['table'] = 'Tabelle (Data table)';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['list'] = 'Listenelemente';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['printTpl'] = ["Druck-Template", "Hierüber können Sie ein eigenes Drucktemplate hinterlegen (Standard: pdf_c4g_brick)."];

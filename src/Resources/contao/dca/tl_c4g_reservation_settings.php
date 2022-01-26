@@ -9,6 +9,8 @@
  * @link https://www.con4gis.org
  */
 
+use Contao\Controller;
+
 $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
 (
     //config

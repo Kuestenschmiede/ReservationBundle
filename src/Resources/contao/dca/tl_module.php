@@ -18,10 +18,11 @@ use con4gis\ReservationBundle\Controller\C4gReservationCancellationController;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
 use con4gis\ReservationBundle\Controller\C4gReservationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
+use Contao\Controller;
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_settings;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject, showSignatureField, cancellation_redirect_site, login_redirect_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject, showSignatureField, cancellation_redirect_site, login_redirect_site, printTpl;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;';
 
@@ -130,4 +131,18 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cancellation_redirect_site'] = array
     'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
     'sql'                     => "int(10) unsigned NOT NULL default '0'",
     'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['printTpl'] = array
+(
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['printTpl'],
+    'default'                 => 'pdf_c4g_brick',
+    'exclude'                 => true,
+    'inputType'               => 'select',
+    'options_callback' => static function ()
+    {
+        return Controller::getTemplateGroup('pdf_');
+    },
+    'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'w50'),
+    'sql'                     => "varchar(64) NOT NULL default 'pdf_c4g_brick'"
 );
