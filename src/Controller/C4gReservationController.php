@@ -1249,9 +1249,9 @@ class C4gReservationController extends C4GBaseController
             $fieldList[] = $reservationNoneTypeField;
         }
 
-        $bookerHeadline = new C4GHeadlineField();
-        $bookerHeadline->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_data']);
-        $fieldList[] = $bookerHeadline;
+//        $bookerHeadline = new C4GHeadlineField();
+//        $bookerHeadline->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_data']);
+//        $fieldList[] = $bookerHeadline;
 
         $salutation = [
             ['id' => 'man', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
