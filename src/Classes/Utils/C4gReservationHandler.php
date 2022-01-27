@@ -174,11 +174,17 @@ class C4gReservationHandler
                     }
                 }
 
-                if (!$minDate || (($minDate > 1) && ($minDate > $object->getMinReservationDay()))) {
+                //remove dates without possible times
+//                if ($removeBookedDays) {
+//                    $object->get
+//                }
+
+
+                if ($minDate && ($minDate > 1) && ($minDate > $object->getMinReservationDay())) {
                     $minDate = $object->getMinReservationDay();
                 }
 
-                if (!$maxDate || (($maxDate < 365) && ($maxDate < $object->getMaxReservationDay()))) {
+                if ($maxDate && ($maxDate < 365) && ($maxDate < $object->getMaxReservationDay())) {
                     $maxDate = $object->getMaxReservationDay();
                 }
             }
@@ -1116,86 +1122,65 @@ class C4gReservationHandler
     private static function calcPrices($object, $type, $isEvent = false, $countPersons = 1) {
         $price = 0;
         if ($object) {
-            $database = Database::getInstance();
-            $priceObjs = $database->prepare("SELECT * FROM `tl_c4g_reservation_object_prices` WHERE `published`=?")
-                ->execute('1')->fetchAllAssoc();
-            if ($priceObjs) {
-                foreach ($priceObjs as $priceObj) {
-                    $days = 1;
-                    $minutes = 0;
-                    $hours = 0;
-                    if ($isEvent) {
-                        $objects = $priceObj['reservation_event'];
-                    } else {
-                        $objects = $priceObj['reservation_object'];
-                    }
 
-                    if ($objects) {
-                        $objects = \Contao\StringUtil::deserialize($objects);
-                        foreach ($objects as $objectId) {
-                            if ($objectId == $object['id']) {
-                                $priceOption = $priceObj['priceoption'];
-                                switch ($priceOption) {
-                                    case 'pMin':
-                                        if ($isEvent && $object['startTime'] && $object['endTime']) {
-                                            $diff = $object['endTime'] - $object['startTime'];
-                                            if ($diff > 0 ) {
-                                                $minutes = $diff / 60;
-                                            }
-                                        } else if (!$isEvent && $type['periodType'] && $object['time_interval']) {
-                                            switch ($type['periodType']) {
-                                                case 'minute':
-                                                    $minutes = $object['time_interval'];
-                                                    break;
-                                                case 'hour':
-                                                    $minutes = $object['time_interval'] * 60;
-                                                    break;
-                                                default: '';
-                                            }
-                                        }
-                                        $price = $price + (intval($priceObj['price'])*$minutes);
-                                        break;
-                                    case 'pHour':
-                                        if ($isEvent && $object['startTime'] && $object['endTime']) {
-                                            $diff = $object['endTime'] - $object['startTime'];
-                                            if ($diff > 0 ) {
-                                                $hours = $diff / 3600;
-                                            }
-                                        } else if (!$isEvent && $type['periodType'] && $object['time_interval']) {
-                                            switch ($type['periodType']) {
-                                                case 'minute':
-                                                    $hours = $object['time_interval'] / 60;
-                                                    break;
-                                                case 'hour':
-                                                    $hours = $object['time_interval'];
-                                                    break;
-                                                default: '';
-                                            }
-                                        }
-                                        $price = $price + (intval($priceObj['price'])*$hours);
-                                        break;
-                                    case 'pDay':
-                                        if ($isEvent && $object['startDate'] && $object['endDate']) {
-                                            $days = round(abs($object['endDate'] - $object['startDate']) / (60*60*24));
-                                        } else if (!$isEvent && $object['beginDate'] && $object['endDate']) {
-                                            $days = round(abs($object['endDate'] - $object['beginDate']) / (60*60*24));
-                                        }
-                                        $price = $price + (intval($priceObj['price'])*$days);
-                                        break;
-                                    case 'pEvent':
-                                        $price = $price + intval($priceObj['price']);
-                                        break;
-                                    case 'pPerson':
-                                        $price = ($price + intval($priceObj['price'])).$GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'];
-                                        break;
-                                }
-
+            $priceOption = $object['priceoption'];
+            switch ($priceOption) {
+                case 'pMin':
+                    if ($isEvent && $object['startTime'] && $object['endTime']) {
+                        $diff = $object['endTime'] - $object['startTime'];
+                        if ($diff > 0) {
+                            $minutes = $diff / 60;
+                        }
+                    } else if (!$isEvent && $type['periodType'] && $object['time_interval']) {
+                        switch ($type['periodType']) {
+                            case 'minute':
+                                $minutes = $object['time_interval'];
                                 break;
-                            }
+                            case 'hour':
+                                $minutes = $object['time_interval'] * 60;
+                                break;
+                            default:
+                                '';
                         }
                     }
-                }
+                    $price = $price + (intval($object['price']) * $minutes);
+                    break;
+                case 'pHour':
+                    if ($isEvent && $object['startTime'] && $object['endTime']) {
+                        $diff = $object['endTime'] - $object['startTime'];
+                        if ($diff > 0) {
+                            $hours = $diff / 3600;
+                        }
+                    } else if (!$isEvent && $type['periodType'] && $object['time_interval']) {
+                        switch ($type['periodType']) {
+                            case 'minute':
+                                $hours = $object['time_interval'] / 60;
+                                break;
+                            case 'hour':
+                                $hours = $object['time_interval'];
+                                break;
+                            default:
+                                '';
+                        }
+                    }
+                    $price = $price + (intval($object['price']) * $hours);
+                    break;
+                case 'pDay':
+                    if ($isEvent && $object['startDate'] && $object['endDate']) {
+                        $days = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24));
+                    } else if (!$isEvent && $object['beginDate'] && $object['endDate']) {
+                        $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
+                    }
+                    $price = $price + (intval($object['price']) * $days);
+                    break;
+                case 'pReservation':
+                    $price = $price + intval($object['price']);
+                    break;
+                case 'pPerson':
+                    $price = ($price + intval($object['price'])) . $GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'];
+                    break;
             }
+
         }
 
         return $price;

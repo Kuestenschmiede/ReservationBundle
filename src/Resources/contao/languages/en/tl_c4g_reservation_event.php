@@ -23,6 +23,15 @@ $GLOBALS['TL_LANG'][$str]['minParticipants'] = array("Minimum number of particip
 $GLOBALS['TL_LANG'][$str]['maxParticipants'] = array("Maximum number of participants", "Default: 0 (unlimited)");
 $GLOBALS['TL_LANG'][$str]['state'] = array("Current status", "green, orange, red");
 
+$GLOBALS['TL_LANG'][$str]['price'] = array("Price", "Specify the price for the booking (for example: 50.00).");
+$GLOBALS['TL_LANG'][$str]['priceoption'] = array("Price setting", "What should the price be calculated by.");
+
+$GLOBALS['TL_LANG'][$str]['references']['pMin'] = array("Price per minute");
+$GLOBALS['TL_LANG'][$str]['references']['pHour'] = array("Price per hour");
+$GLOBALS['TL_LANG'][$str]['references']['pDay'] = array("Price per day");
+$GLOBALS['TL_LANG'][$str]['references']['pReservation'] = array("Price per reservation");
+$GLOBALS['TL_LANG'][$str]['references']['pPerson'] = array("Price per person");
+
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['event_legend'] = "Event data";
 $GLOBALS['TL_LANG'][$str]['reservation_legend'] = "Reservation data";

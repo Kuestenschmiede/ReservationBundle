@@ -16,6 +16,7 @@ $GLOBALS['TL_LANG']['tl_module']['reservation_legend'] = 'Reservierungseinstellu
 $GLOBALS['TL_LANG']['tl_module']['list_legend'] = 'Listeneinstellungen';
 $GLOBALS['TL_LANG']['tl_module']['reservation_notification_center_legend'] = 'Notification Center';
 $GLOBALS['TL_LANG']['tl_module']['reservation_redirect_legend'] = 'Weiterleitung';
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_settings'] = array('Auswahl der Formulareinstellungen', 'Wählen Sie Ihre Konfiguration aus dem Backendmodul Formulareinstellungen aus.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type_contact_request'] = array('Benachrichtigung der Kontaktanfrage', 'Wählen Sie die Benachrichtigung für das Versenden der Kontaktanfrage aus');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_types'] = array('Reservierungsarten', 'Wählen Sie die bei der Reservierung im Frontend zu berücksichigenden Reservierungsarten (Räume, Tische, ...). Bei keiner Auswahl werden alle Reservierungsobjekte geladen.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationView'] = array('Listenansicht', 'Verschiedene Ansichten der Liste sind möglich. Standard: Öffentlich');

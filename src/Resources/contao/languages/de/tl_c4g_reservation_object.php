@@ -63,6 +63,14 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMin'] = array("
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMax'] = array("Maximale Anzahl der Personen", "Wie viele Personen dürfen maximal erscheinen? Beim Standard 0 wird die Anzahl nicht ausgewertet.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['notification_type'] = array('Automatische Bestätigungsnachricht (optional)', 'Wählen Sie die Benachrichtigung aus. Diese Einstellung überschreibt die Formulareinstellungen und auch die Einstellung an der Reservierungsart.');
 
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['price'] = array("Preis", "Bestimmen sie den Preis für die Buchung (bspw.: 50.00)");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priceoption'] = array("Preiseinstellung", "Wonach soll der Preis berechnet werden");
+
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pMin'] = array("Preis pro Minute");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pHour'] = array("Preis pro Stunde");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pDay'] = array("Preis pro Tag");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pReservation'] = array("Preis pro Reservierung");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pPerson'] = array("Preis pro Person");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['type_legend'] = "Reservierungsobjekte";
@@ -85,6 +93,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['opening_hours_sunday_legend'] 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['exclusion_legend'] = "Ausschlusszeiten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['booking_wd_legend'] = "Buchungszeiträume";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location_legend'] = 'Einstellungen zum Ort';
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['price_legend'] = 'Einstellungen zum Preis';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['expert_legend'] = 'Experteneinstellungen';
 
 /** OPERATIONS **/

@@ -97,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{event_legend}, pid, number, location, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants;',
+        'default'   =>  '{event_legend}, pid, number, location, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, price, priceoption;',
     ),
 
 
@@ -221,6 +221,27 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
             'sql'               => "blob NULL"
+        ),
+
+        'price' => array(
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['price'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('rpxp'=>'digit','mandatory'=>true, 'maxlength'=>6, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
+            'sql'                     => "double(5,2) NOT NULL default '0.00'"
+        ),
+
+        'priceoption' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['priceoption'],
+            'exclude'                 => true,
+            'inputType'               => 'radio',
+            'options'                 => array('pReservation','pPerson','pDay','pHour','pMin'),
+            'default'                 => '',
+            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['references'],
+            'eval'                    => array('mandatory'=>true, 'tl_class' => 'long clr'),
+            'sql'                     => "varchar(50) NOT NULL default ''"
         ),
 
         'state' => array(

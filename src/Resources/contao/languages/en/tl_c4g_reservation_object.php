@@ -64,6 +64,14 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMax'] = array("
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location_legend'] = array("Settings for the location");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['notification_type'] = array('Automatic confirmation message (optional)', 'Select notification. This setting overrides the module settings and also the setting at the reservation type.');
 
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['price'] = array("Price", "Specify the price for the booking (for example: 50.00).");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priceoption'] = array("Price setting", "What should the price be calculated by.");
+
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pMin'] = array("Price per minute");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pHour'] = array("Price per hour");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pDay'] = array("Price per day");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pReservation'] = array("Price per reservation");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pPerson'] = array("Price per person");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['type_legend'] = "Reservation objects";
@@ -85,6 +93,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['opening_hours_saturday_legend'
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['opening_hours_sunday_legend'] = "Opening hours Sundays";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['exclusion_legend'] = "exclusion hours";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['booking_wd_legend'] = "booking periods";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['price_legend'] = 'Price settings';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['expert_legend'] = 'Expert settings';
 
 /** OPERATIONS **/

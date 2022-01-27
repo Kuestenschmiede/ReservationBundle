@@ -18,7 +18,6 @@ $GLOBALS['TL_LANG']['MOD']['Reservation'] = array('con4gis Reservation', 'www.co
 $GLOBALS['TL_LANG']['MOD']['C4gReservation'] = array('Reservierungen', 'Auflistung bereits erfolgter Reservierungen');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationObject'] = array('Reservierungsobjekte', 'Definition der buchbaren Objekte (z.B. Tische, Räume, Seminare).');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationLocation'] = array('Veranstaltungsorte', 'Veranstaltungsorte erfassen.');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationObjectPrices'] = array('Gebühren (Preise)', 'Preisvorgaben für Objekte und Events (optional).');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservierungsarten', 'Definition der Reservierungsarten (z.B. Tischreservierung, Raumreservierung)');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationParams'] = array('Optionen (Leistungen)', 'Erfassung verschiedener Buchungsoptionen (optional).');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEvent']  = array('Event <=> Reservierung', 'Hier können Veranstaltungen und Reservierungen verknüpft werden.');
