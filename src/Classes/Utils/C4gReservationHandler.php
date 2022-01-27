@@ -174,17 +174,11 @@ class C4gReservationHandler
                     }
                 }
 
-                //remove dates without possible times
-//                if ($removeBookedDays) {
-//                    $object->get
-//                }
-
-
-                if ($minDate && ($minDate > 1) && ($minDate > $object->getMinReservationDay())) {
+                if (!$minDate || (($minDate > 1) && ($minDate > $object->getMinReservationDay()))) {
                     $minDate = $object->getMinReservationDay();
                 }
 
-                if ($maxDate && ($maxDate < 365) && ($maxDate < $object->getMaxReservationDay())) {
+                if (!$maxDate || (($maxDate < 365) && ($maxDate < $object->getMaxReservationDay()))) {
                     $maxDate = $object->getMaxReservationDay();
                 }
             }
