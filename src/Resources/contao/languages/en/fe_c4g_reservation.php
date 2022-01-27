@@ -100,6 +100,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect'] = 'Please select';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText'] = 'No times available';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'] = 'Participants';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipant'] = 'Participant';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipants'] = 'Additional participants';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant'] = 'Add participant';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant'] = 'Remove participant';

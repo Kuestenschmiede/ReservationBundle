@@ -350,7 +350,12 @@ class C4gReservationController extends C4GBaseController
         foreach ($typelist as $listType) {
             $isEvent = $listType['isEvent'];
             $reservationObjects = $listType['objects'];
-            $maxParticipants = $isEvent && $reservationObjects && $reservationObjects[0]->getDesiredCapacity() ? $reservationObjects[0]->getDesiredCapacity()[1] : $listType['maxParticipantsPerBooking'];
+            $maxParticipants = 0;
+            foreach ($reservationObjects as $reservationObj) {
+                $maxP = $reservationObj && $reservationObj->getDesiredCapacity()[0] ? $reservationObj->getDesiredCapacity()[1] : $listType['maxParticipantsPerBooking'];
+                $maxParticipants = $maxParticipants < $maxP ? $maxP : $maxParticipants;
+            }
+
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
             $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
             $maxCapacity = $maxParticipants ?: 0;
@@ -1668,6 +1673,12 @@ class C4gReservationController extends C4GBaseController
                     }
 
                     if (!$specialParticipantMechanism) {
+//                        $particpiantHeadline = new C4GHeadlineField();
+//                        $particpiantHeadline->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_participant']);
+//                        $particpiantHeadline->setCondition(array($condition));
+//                        $particpiantHeadline->setRemoveWithEmptyCondition(true);
+//                        $fieldList[] = $particpiantHeadline;
+
                         $reservationParticipants = new C4GSubDialogField();
                         $reservationParticipants->setFieldName('participants');
                         $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
@@ -1701,13 +1712,21 @@ class C4gReservationController extends C4GBaseController
                                 $participantCapacity = 10;
                             }
 
+//                            if ($participantCapacity > 1) {
+//                                $particpiantHeadline = new C4GHeadlineField();
+//                                $particpiantHeadline->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_participant']);
+//                                $particpiantHeadline->setCondition(array($condition));
+//                                $particpiantHeadline->setRemoveWithEmptyCondition(true);
+//                                $fieldList[] = $particpiantHeadline;
+//                            }
+
                             for ($i = $minCapacity; $i <= $participantCapacity; $i++) {
                                 $newCondition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id'], $i);
 
                                 //$newCondition[] = $condition;
                                 $reservationParticipants = new C4GSubDialogField();
                                 $reservationParticipants->setFieldName('participants');
-                                $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipants']);
+                                $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipant']);
                                 $reservationParticipants->setShowButtons(false);
                                 $reservationParticipants->setTable('tl_c4g_reservation_participants');
                                 $reservationParticipants->addFields($participants);
@@ -1734,6 +1753,12 @@ class C4gReservationController extends C4GBaseController
                         } else {
                             $maxCapacity = $maxCapacity ?: 1;
                             $newCondition = $condition;
+
+//                            $particpiantHeadline = new C4GHeadlineField();
+//                            $particpiantHeadline->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_participant']);
+//                            $particpiantHeadline->setCondition(array($condition));
+//                            $particpiantHeadline->setRemoveWithEmptyCondition(true);
+//                            $fieldList[] = $particpiantHeadline;
 
                             $reservationParticipants = new C4GSubDialogField();
                             $reservationParticipants->setFieldName('participants');

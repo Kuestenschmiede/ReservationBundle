@@ -94,7 +94,7 @@ function isSaturday(date, fieldName) {
 }
 
 function setObjectId(object, typeid, showDateTime = 0) {
-    var objectParam = jQuery(object).attr('data-object');
+    var objectParam = object ? jQuery(object).attr('data-object') : false;
     var typeId = typeid;
     var selectField = document.getElementById("c4g_reservation_object_"+typeId);
     var reservationObjects = jQuery(document.getElementsByClassName("displayReservationObjects"));
@@ -255,7 +255,7 @@ function checkType(dateField, event) {
 }
 
 function setReservationForm(id, typeId, showDateTime, event) {
-    jQuery(document.getElementsByClassName("reservation-id")).hide();
+    jQuery(".reservation-id").hide();
 
     if (typeId == -1) {
         var typeField = document.getElementById("c4g_reservation_type");
@@ -269,6 +269,19 @@ function setReservationForm(id, typeId, showDateTime, event) {
             }
 
         }
+    }
+
+    var capacityField = jQuery('.c4g__form-int--desiredCapacity input');
+    if (capacityField) {
+        var value = capacityField.val();
+        if (value > capacityField.attr('max')) {
+            capacityField.val(capacityField.attr('max'));
+        }
+        // var radioButton = jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
+        // if (radioButton) {
+        //     jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]').attr('checked','');
+        //     setObjectId(false,typeId,showDateTime);
+        // }
     }
 
     var dateId = 'c4g_beginDate_'+typeId;

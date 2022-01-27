@@ -42,6 +42,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'] = 'Reservierung mögli
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'] = 'Ausgebucht. Keine Reservierung möglich.';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_data'] = 'Ihre Daten';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_participant'] = 'Teilnehmer*innen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] = 'Übersicht';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'] = 'Veranstaltungsort';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'] = 'Adresse';
@@ -98,12 +99,13 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none'] = 'Derzeit sind ke
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['signature'] = 'Unterschrift';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['description'] = 'Beschreibung';
 
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'] = 'Teilnehmer';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipants'] = 'Weitere Teilnehmer';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant'] = 'Teilnehmer hinzufügen';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant'] = 'Teilnehmer entfernen';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage'] = 'Teilnehmer wirklich entfernen';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params'] = 'Teilnehmeroptionen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'] = 'Teilnehmer*innen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipant'] = 'Teilnehmer*in';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipants'] = 'Weitere Teilnehmer*innen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant'] = 'Teilnehmer*in hinzufügen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant'] = 'Teilnehmer*in entfernen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage'] = 'Teilnehmer*in wirklich entfernen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params'] = 'Optionen';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect'] = 'Bitte auswählen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText'] = 'Keine Zeiten verfügbar.';
