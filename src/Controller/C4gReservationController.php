@@ -1696,8 +1696,12 @@ class C4gReservationController extends C4GBaseController
                         $fieldList[] = $reservationParticipants;
                     } else {
                         if ($this->reservationSettings->withCapacity) {
-                            $maxCapacity = $maxCapacity ?: 1;
-                            for ($i = $minCapacity; $i <= $maxCapacity; $i++) {
+                            $participantCapacity = $maxCapacity ?: 0;
+                            if ($participantCapacity > 10) {
+                                $participantCapacity = 10;
+                            }
+
+                            for ($i = $minCapacity; $i <= $participantCapacity; $i++) {
                                 $newCondition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id'], $i);
 
                                 //$newCondition[] = $condition;
@@ -1712,8 +1716,8 @@ class C4gReservationController extends C4GBaseController
                                 $reservationParticipants->setMandatory($rowMandatory);
 
                                 $reservationParticipants->setMin($minCapacity);
-                                if ($maxCapacity) {
-                                    $reservationParticipants->setMax($maxCapacity);
+                                if ($participantCapacity) {
+                                    $reservationParticipants->setMax($participantCapacity);
                                 }
 
                                 $reservationParticipants->setNotificationField(false);
@@ -1748,7 +1752,7 @@ class C4gReservationController extends C4GBaseController
 
                             $reservationParticipants->setNotificationField(false);
 
-                            $reservationParticipants->setShowDataSetsByCount($maxCapacity);
+                            $reservationParticipants->setShowDataSetsByCount($maxCapacity <= 10 ? $maxCapacity : 10);
                             $reservationParticipants->setParentFieldList($fieldList);
                             $reservationParticipants->setDelimiter('§');
                             $reservationParticipants->setCondition(array($newCondition));
