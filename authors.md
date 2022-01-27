@@ -4,3 +4,5 @@
 - Tim Bauer (https://kuestenschmiede.de)
 - Artur Jozefiak (https://kuestenschmiede.de)
 - Malte de Vries (https://kuestenschmiede.de)
+- Nina Eilers (https://kuestenschmiede.de)
+- Nils Ulfers (https://kuestenschmiede.de)

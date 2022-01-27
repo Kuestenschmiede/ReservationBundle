@@ -9,7 +9,7 @@
  * @link https://www.con4gis.org
  */
 
-/** FIELDS */ /**DKo 13.02.19*/
+/** FIELDS */
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['id'] = array("#", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['pid'] = array("Booked", "Set automatically.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_type'] = array("Reservation type", "What type of reservation is it");

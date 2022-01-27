@@ -198,7 +198,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_c4g_reservation_location.name',
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long'),
+            'eval'              => array('chosen' => true, 'includeBlankOption' => true, 'mandatory' => false, 'tl_class' => 'long'),
             'sql'               => "int(10) unsigned NOT NULL default 0",
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
         ),
@@ -829,26 +829,4 @@ class tl_c4g_reservation_object extends Backend
         ];
         return $result;
     }
-//    public function multi_booking()
-//    {
-//        $db = $this->Database->prepare("SELECT * FROM tl_c4g_reservation_object ")
-//            ->execute()->fetchAllAssoc();
-//
-//        foreach($db as $entry)
-//        {
-//
-//            $id    = $entry['id'];
-//            $value  = $entry['desiredCapacityMax'];
-//
-//            if($entry['multiple_booking'] === '1')
-//            {
-//
-//                $this->Database->prepare("UPDATE tl_c4g_reservation_object SET quantity = $value  WHERE `id`=$id")
-//                    ->execute($entry['id']);
-//
-//
-//            }
-//
-//        }
-//    }
 }

@@ -17,7 +17,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesQuantity'] = array("Gi
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesValidity'] = array("Gilt über alle Reservierungsarten (alle Objekte)","Sollten mehrere Reservierungsarten aktiv sein, dann blockiert die Buchung auch andere Objekte.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['switchAllTypes'] = array("Gilt nur für folgende Reservierungsarten","Hiermit kann die Gültigkeit der vorherigen Checkboxen auf bestimmte Reservierungsarten reduziert werden (optional).");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priority'] = array("Soll vorrangig angeboten werden","Ist dieser Schalter aktiv, dann wir das Objekt vorausgewählt, wenn mehrere Objekte in den Zeitpunkt passen.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location'] = array("Veranstaltungsort", "Wo findet der Termin statt?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location'] = array("Veranstaltungsort", "Wo findet der Termin statt? Überschreibt die Einstellung an der Reservierungsart.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'] = array("Reservierungsarten","Ordnen Sie das Reservierungsobjekt zu den Reservierungsarten zu.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['option'] = array("Name","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['language'] = array("Sprache","");
@@ -61,7 +61,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['contao_event'] = array("Contao
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['published'] = array("Veröffentlichen.","Soll dieses Objekt im Frontend angezeigt werden?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMin'] = array("Minimale Anzahl der Personen", "Wie viele Personen dürfen mindestens erscheinen? Beim Standard 0 wird die Anzahl nicht ausgewertet.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMax'] = array("Maximale Anzahl der Personen", "Wie viele Personen dürfen maximal erscheinen? Beim Standard 0 wird die Anzahl nicht ausgewertet.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['notification_type'] = array('Automatische Bestätigungsnachricht (optional)', 'Wählen Sie die Benachrichtigung aus. Diese Einstellung überschreibt die Moduleinstellungen und auch die Einstellung an der Reservierungsart.');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['notification_type'] = array('Automatische Bestätigungsnachricht (optional)', 'Wählen Sie die Benachrichtigung aus. Diese Einstellung überschreibt die Formulareinstellungen und auch die Einstellung an der Reservierungsart.');
 
 
 /** LEGENDS **/

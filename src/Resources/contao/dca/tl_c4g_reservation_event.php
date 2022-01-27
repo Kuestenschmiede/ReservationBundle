@@ -154,7 +154,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_c4g_reservation_location.name',
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr','includeBlankOption'=>true, 'doNotCopy' => true),
+            'eval'              => array('chosen' => true, 'mandatory' => false, 'tl_class' => 'long clr','includeBlankOption'=>true, 'doNotCopy' => true),
             'sql'               => "int(10) unsigned NOT NULL default 0",
             'relation'          => array('type' => 'hasOne', 'load' => 'eager'),
         ),

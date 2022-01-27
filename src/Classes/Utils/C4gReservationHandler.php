@@ -1247,7 +1247,7 @@ class C4gReservationHandler
                 $frontendObject->setEventDuration('');
                 $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : []);
                 $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : []);
-                $frontendObject->setLocation($event['location'] ?: 0);
+                $frontendObject->setLocation($event['location'] ?: $type['location']);
                 $frontendObject->setDescription($eventObject['teaser'] ?: '');
                 $frontendObject->setImage($eventObject['singleSRC']);
                 $objectList[] = $frontendObject;
@@ -1285,7 +1285,7 @@ class C4gReservationHandler
                         $frontendObject->setEventDuration('');
                         $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : []);
                         $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : []);
-                        $frontendObject->setLocation($event['location']);
+                        $frontendObject->setLocation($event['location'] ?: $type['location']);
                         $frontendObject->setDescription($eventObject['teaser'] ?: '');
                         $frontendObject->setImage($eventObject['singleSRC']);
                         $objectList[] = $frontendObject;
@@ -1366,6 +1366,7 @@ class C4gReservationHandler
                 $frontendObject->setSwitchAllTypes($object['switchAllTypes']);
                 $frontendObject->setDescription($object['description'] ?: '');
                 $frontendObject->setImage($object['image']);
+                $frontendObject->setLocation($object['location'] ?: $type['location']);
 
                 $opening_hours = array();
                 $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);

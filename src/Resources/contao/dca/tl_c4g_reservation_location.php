@@ -165,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'long clr '),
+            'eval'              => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'mandatory'=>false, 'tl_class'=>'long clr '),
             'sql'               => "varchar(255) NOT NULL default ''"
         ),
         'contact_email' => array
@@ -174,7 +174,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'email','mandatory'=>false, 'tl_class'=>'long clr'),
+            'eval'              => array('maxlength'=>255, 'rgxp'=>'email', 'decodeEntities'=>true,'mandatory'=>false, 'tl_class'=>'long clr'),
             'sql'               => "varchar(255) NOT NULL default ''"
         ),
         'contact_street' => array

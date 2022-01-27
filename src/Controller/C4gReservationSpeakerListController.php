@@ -16,6 +16,7 @@ use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickGrid;
 use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickGridElement;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignArrayField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GGridField;
@@ -360,6 +361,21 @@ class C4gReservationSpeakerListController extends C4GBaseController
                 $fieldList[] = $eventLinks;
             }
         }
+
+//        $clickButton = new C4GBrickButton(
+//            C4GBrickConst::BUTTON_CLICK,
+//            'Test',
+//            $visible = true,
+//            $enabled = true,
+//            $action = '',
+//            $accesskey = '',
+//            $defaultByEnter = true);
+//
+//        $buttonField = new C4GButtonField($clickButton);
+//        $buttonField->setOnClickType(C4GBrickConst::ONCLICK_TYPE_CLIENT);
+//        $buttonField->setOnClick('C4GBackWithRefresh();return false;');
+//        $buttonField->setWithoutLabel(true);
+//        $fieldList[] = $buttonField;
 
         $grid = new C4GBrickGrid([
             new C4GBrickGridElement($photo),

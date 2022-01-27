@@ -12,6 +12,7 @@
 namespace con4gis\ReservationBundle\Controller;
 
 use con4gis\CoreBundle\Classes\C4GVersionProvider;
+use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\ProjectsBundle\Classes\Actions\C4GBrickActionType;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
@@ -41,6 +42,7 @@ use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\ModuleModel;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -273,7 +275,7 @@ class C4gReservationListController extends C4GBaseController
                         if (strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) {
                             $typelist[$type->id] = array(
                                 'id' => $type->id,
-                                'name' => $caption['caption'] ? $caption['caption'] : $type->caption
+                                'name' => $caption['caption'] ? StringHelper::addSpaceBeforeBracket($caption['caption']) : $type->caption
                             );
                         }
                     }
