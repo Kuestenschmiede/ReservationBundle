@@ -11,6 +11,7 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
+use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Actions\C4GSaveAndRedirectDialogAction;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
@@ -62,6 +63,7 @@ use con4gis\ReservationBundle\Classes\Projects\C4gReservationBrickTypes;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Controller;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\FrontendUser;
 use Contao\Input;
@@ -71,6 +73,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -123,6 +126,22 @@ class C4gReservationController extends C4GBaseController
     protected $useUuidCookie = false;
 
     private $reservationSettings = null;
+
+    /**
+     * @param string $rootDir
+     * @param Session $session
+     * @param ContaoFramework $framework
+     */
+    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, ModuleModel $model = null)
+    {
+        parent::__construct($rootDir, $session, $framework, $model);
+
+        if ($eventId = $this->session->getSessionValue('reservationEventCookie')) {
+            $this->session->remove('reservationEventCookie');
+            $this->session->remove('reservationInitialDateCookie_'.$eventId);
+            $this->session->remove('reservationTimeCookie_'.$eventId);
+        }
+    }
 
     public function initBrickModule($id)
     {
@@ -254,7 +273,7 @@ class C4gReservationController extends C4GBaseController
                         if (strpos($GLOBALS['TL_LANGUAGE'], $caption['language']) >= 0) {
                             $typelist[$type->id] = array(
                                 'id' => $type->id,
-                                'name' => $caption['caption'] ?: $type->caption,
+                                'name' => $caption['caption'] ?  StringHelper::addSpaceBeforeBracket($caption['caption']) : $type->caption,
                                 'periodType' => $type->periodType,
                                 'includedParams' => \Contao\StringUtil::deserialize($type->included_params),
                                 'additionalParams' => \Contao\StringUtil::deserialize($type->additional_params),
@@ -1916,9 +1935,12 @@ class C4gReservationController extends C4GBaseController
         $reservationType = $database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
             ->execute($type);
 
+        $this->notification_type = $this->reservationSettings->notification_type;
+        $this->getDialogParams()->setNotificationType($this->reservationSettings->notification_type);
+
         if ($reservationType->notification_type) {
             $this->getDialogParams()->setNotificationType($reservationType->notification_type);
-            $this->reservationSettings->notification_type = $reservationType->notification_type;
+            $this->notification_type = $reservationType->notification_type;
         }
 
         $isEvent = $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
@@ -1947,7 +1969,7 @@ class C4gReservationController extends C4GBaseController
 
             if ($reservationObject && $reservationObject->notification_type) {
                 $this->getDialogParams()->setNotificationType($reservationObject->notification_type);
-                $this->reservationSettings->notification_type = $reservationObject->notification_type;
+                $this->notification_type = $reservationObject->notification_type;
             }
         }
 
