@@ -14,18 +14,18 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']    = 'Reservierung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural'] = 'Reservierungen';
 
 /** FIELDS */
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type'] = 'Was möchten Sie reservieren?';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type'] = 'Reservierungswunsch?';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_type_short'] = 'Art';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_time'] = 'Uhrzeit';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity'] = 'Für wie viele Personen reservieren Sie?';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity'] = 'Für wie viele Personen?';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'] = "Zeitspannenart";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration'] = "Reservierungsdauer in Minuten";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['tstamp'] = 'Letzte Änderung';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'] = 'An welchem Tag möchten Sie reservieren?';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'] = 'An welchem Tag?';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateShort'] = 'Datum';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateTime'] = 'Zeitpunkt';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'Endet am';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Bitte wählen Sie eine Uhrzeit aus';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Gewünschte Uhrzeit?';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeShort'] = 'Uhrzeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Endet um';
 
@@ -95,7 +95,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['hour'] = 'Stunden';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['openingHours'] = 'Öffnungszeiten';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['md'] = 'Mehrtägig';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['event'] = 'Event';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none'] = 'Derzeit sind keine Reservierungen möglich. Bitte nehmen Sie mit uns Kontakt auf.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none'] = 'Derzeit sind keine Reservierungen möglich.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['signature'] = 'Unterschrift';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['description'] = 'Beschreibung';
 
@@ -120,9 +120,9 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['min_max_failed'] = 'Wir können Ihre 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked'] = 'Eine Reservierung ist nicht mehr möglich. Der Termin ist bereits ausgebucht.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'] = 'Eine Reservierung ist nicht mehr möglich. Die Anzahl der freien Plätze wird überschritten. Mögliche Anzahl: ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'] = 'Die Anzahl der Teilnehmer pro Buchung ist begrenzt. Maximale Anzahl: ';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte nehmen Sie mit uns Kontakt auf.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte laden Sie die Seite neu und versuchen Sie es erneut.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte laden Sie die Seite neu und versuchen Sie es erneut.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte Seite neu laden.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte die Seite neu laden und erneut versuchen.';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'] = array(" pro Minute");
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pHour'] = array(" pro Stunde");
@@ -137,7 +137,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_endDate'] = 'Wählen Sie das Dat
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_beginTime'] = 'Wählen Sie die Uhrzeit aus, zu der die Veranstaltung beginnt (9:00-12:00 & 14:00-18:00).';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_endTime'] = 'Wählen Sie die Uhrzeit aus, zu der die Veranstaltung endet (9:00-12:00 & 14:00-18:00).';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object'] = '';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_id'] = 'Diesen Schlüssel senden wir Ihnen per E-Mail zu. Sie benötigen ihn für Änderungen oder Stornierungen.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_id'] = 'Wichtig! Eindeutiger Schlüssel für Änderungen oder Stornierungen.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_lastname'] = 'Geben Sie Ihren Nachnachmen ein.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_firstname'] = 'Geben Sie Ihren Vornamen ein.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_email'] = 'Geben Sie Ihre E-Mail-Adresse an.';
@@ -145,10 +145,10 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_phone'] = 'Geben Sie Ihre Telefo
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_address'] = 'Geben Sie Ihre Anschrift an (Straße und Hausnummer).';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_postal'] = 'Geben Sie eine Postleitzahl an.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_city'] = 'Geben Sie Ort oder Stadt ein.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_comment'] = 'Hier können Sie optional eine Nachricht an uns hinterlassen.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten finden Sie in unserer ';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_comment'] = 'Optionale Nachricht.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten in unserer ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] = 'Datenschutzerklärung.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten finden Sie in unserer Datenschutzerklärung.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten in unserer Datenschutzerklärung.';
 
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'] = 'Jetzt reservieren';
