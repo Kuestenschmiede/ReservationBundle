@@ -917,13 +917,7 @@ class C4gReservationHandler
         $result = '';
 
         if ($object && $object->getAlmostFullyBookedAt() &&  $object->getDesiredCapacity() &&  $object->getDesiredCapacity()[1]) {  //orange state
-//            $t = 'tl_c4g_reservation';
             $id = $object->getId();
-//            $arrColumns = array("$t.reservation_object=$id AND $t.reservationObjectType='2' AND NOT $t.cancellation='1'");
-//            $arrValues = array();
-//            $arrOptions = array();
-//            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
-
             $database = Database::getInstance();
             $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
                 ->execute($id,'2','1')->fetchAllAssoc();

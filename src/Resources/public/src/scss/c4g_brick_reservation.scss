@@ -39,7 +39,7 @@
 }
 .reservation_time_button input[type = "radio"]:checked + label, .reservation_time_event_button input[type = "radio"]:checked + label {
     background-color: darkgreen;
-    border-bottom: yellow;
+    border: solid 1px greenyellow;
     font-weight: bold;
 }
 .reservation_time_button.radio_object_hurry_up + label, .reservation_time_event_button.c4g_radio_object_hurry_up .c4g__form-check input[type = "radio"] + label {
@@ -56,7 +56,7 @@
 .reservation_time_button_direct input[type="radio"][disabled] + label {
     background-color: darkgreen;
     opacity: 1;
-    border-bottom: yellow;
+    border: solid 1px greenyellow;
     font-weight: bold;
 }
 
@@ -86,14 +86,3 @@
     display: none;
 }
 
-//.mod_C4gReservation .datepicker-cell {
-//    color: green!important;
-//}
-//
-//.mod_C4gReservation .datepicker-cell.disabled {
-//    color: red!important;
-//}
-//
-//.mod_C4gReservation .datepicker-cell.today {
-//    background-color: yellow!important;
-//}
