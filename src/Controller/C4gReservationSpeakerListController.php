@@ -11,21 +11,16 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
-use con4gis\DataBundle\Classes\Contao\Hooks\ReplaceInsertTags;
-use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickGrid;
 use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickGridElement;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignArrayField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GGridField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GHeadlineField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GImageField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLinkField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiLinkField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTrixEditorField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GUrlField;
@@ -41,7 +36,6 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
 use Contao\ModuleModel;
-use Contao\System;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -245,21 +239,23 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $postalCityField->setFormField(true);
         $postalCityField->setDatabaseField(false);
 
-        $phone = new C4GTelField();
+        $phone = new C4GUrlField();
         $phone->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['phone']);
         $phone->setFieldName('phone');
         $phone->setEditable(false);
         $phone->setFormField(true);
         $phone->setTableColumn(true);
         $phone->setShowIfEmpty(false);
+        $phone->setLinkType(C4gLinkField::LINK_TYPE_PHONE);
 
-        $email = new C4GEmailField();
+        $email = new C4GUrlField();
         $email->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['email']);
         $email->setFieldName('email');
         $email->setEditable(false);
         $email->setFormField(true);
         $email->setTableColumn(true);
         $email->setShowIfEmpty(false);
+        $email->setLinkType(C4gLinkField::LINK_TYPE_EMAIL);
 
         $website = new C4GUrlField();
         $website->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['website']);
