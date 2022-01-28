@@ -274,8 +274,11 @@ function setReservationForm(id, typeId, showDateTime, event) {
     var capacityField = jQuery('.c4g__form-int--desiredCapacity input');
     if (capacityField) {
         var value = capacityField.val();
-        if (value > capacityField.attr('max')) {
+        if (capacityField.attr('max') && (value > capacityField.attr('max'))) {
             capacityField.val(capacityField.attr('max'));
+        }
+        if (capacityField.attr('min') && (value < capacityField.attr('min'))) {
+            capacityField.val(capacityField.attr('min'));
         }
         // var radioButton = jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
         // if (radioButton) {

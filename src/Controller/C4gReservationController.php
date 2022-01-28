@@ -351,14 +351,19 @@ class C4gReservationController extends C4GBaseController
             $isEvent = $listType['isEvent'];
             $reservationObjects = $listType['objects'];
             $maxParticipants = 0;
+            $minParticipants = 0;
             foreach ($reservationObjects as $reservationObj) {
-                $maxP = $reservationObj && $reservationObj->getDesiredCapacity()[0] ? $reservationObj->getDesiredCapacity()[1] : $listType['maxParticipantsPerBooking'];
+                $maxP = $reservationObj && $reservationObj->getDesiredCapacity() && $reservationObj->getDesiredCapacity()[1] ? $reservationObj->getDesiredCapacity()[1] : $listType['maxParticipantsPerBooking'];
                 $maxParticipants = $maxParticipants < $maxP ? $maxP : $maxParticipants;
+
+                $minP = $reservationObj && $reservationObj->getDesiredCapacity() && $reservationObj->getDesiredCapacity()[0] ? $reservationObj->getDesiredCapacity()[0] : $listType['minParticipantsPerBooking'];
+                $minParticipants = !$minParticipants || ($minP < $minParticipants) ? $minP : $minParticipants;
             }
 
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
             $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
             $maxCapacity = $maxParticipants ?: 0;
+            $minCapacity = $minParticipants ?: 1;
             if ($this->reservationSettings->withCapacity) {
                 $conditionCapacity = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id']);
 
@@ -366,7 +371,7 @@ class C4gReservationController extends C4GBaseController
                 $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
                 if ($minCapacity && $maxCapacity) {
-                    $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);/*. ' ('.$minCapacity.'-'.$maxCapacity.')')*/; //ToDo default solution
+                    $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$minCapacity.'-'.$maxCapacity.')');
                 } else {
                     $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
                 }
