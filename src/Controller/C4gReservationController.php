@@ -273,7 +273,7 @@ class C4gReservationController extends C4GBaseController
                         if (strpos($GLOBALS['TL_LANGUAGE'], $caption['language']) >= 0) {
                             $typelist[$type->id] = array(
                                 'id' => $type->id,
-                                'name' => $caption['caption'] ?  StringHelper::addSpaceBeforeBracket($caption['caption']) : $type->caption,
+                                'name' => $caption['caption'] ?  StringHelper::spaceToNbsp($caption['caption']) : $type->caption,
                                 'periodType' => $type->periodType,
                                 'includedParams' => \Contao\StringUtil::deserialize($type->included_params),
                                 'additionalParams' => \Contao\StringUtil::deserialize($type->additional_params),
@@ -292,7 +292,7 @@ class C4gReservationController extends C4GBaseController
                 } else {
                     $typelist[$type->id] = array(
                         'id' => $type->id,
-                        'name' => $type->caption,
+                        'name' => StringHelper::spaceToNbsp($type->caption),
                         'periodType' => $type->periodType,
                         'includedParams' => \Contao\StringUtil::deserialize($type->included_params),
                         'additionalParams' => \Contao\StringUtil::deserialize($type->additional_params),
@@ -350,20 +350,22 @@ class C4gReservationController extends C4GBaseController
         foreach ($typelist as $listType) {
             $isEvent = $listType['isEvent'];
             $reservationObjects = $listType['objects'];
-            $maxParticipants = 0;
-            $minParticipants = 0;
-            foreach ($reservationObjects as $reservationObj) {
-                $maxP = $reservationObj && $reservationObj->getDesiredCapacity() && $reservationObj->getDesiredCapacity()[1] ? $reservationObj->getDesiredCapacity()[1] : $listType['maxParticipantsPerBooking'];
-                $maxParticipants = $maxParticipants < $maxP ? $maxP : $maxParticipants;
+            $maxParticipants = $listType['maxParticipantsPerBooking'];
+            $minParticipants = $listType['minParticipantsPerBooking'];
 
-                $minP = $reservationObj && $reservationObj->getDesiredCapacity() && $reservationObj->getDesiredCapacity()[0] ? $reservationObj->getDesiredCapacity()[0] : $listType['minParticipantsPerBooking'];
-                $minParticipants = !$minParticipants || ($minP < $minParticipants) ? $minP : $minParticipants;
-            }
+//Type => participants per booling, Object => participants per event
+//            foreach ($reservationObjects as $reservationObj) {
+//                $maxP = $reservationObj && $reservationObj->getDesiredCapacity() && $reservationObj->getDesiredCapacity()[1] ? $reservationObj->getDesiredCapacity()[1] : $listType['maxParticipantsPerBooking'];
+//                $maxParticipants = $maxParticipants < $maxP ? $maxP : $maxParticipants;
+//
+//                $minP = $reservationObj && $reservationObj->getDesiredCapacity() && $reservationObj->getDesiredCapacity()[0] ? $reservationObj->getDesiredCapacity()[0] : $listType['minParticipantsPerBooking'];
+//                $minParticipants = !$minParticipants || ($minP < $minParticipants) ? $minP : $minParticipants;
+//            }
 
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
-            $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
             $maxCapacity = $maxParticipants ?: 0;
             $minCapacity = $minParticipants ?: 1;
+
             if ($this->reservationSettings->withCapacity) {
                 $conditionCapacity = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id']);
 
@@ -371,7 +373,7 @@ class C4gReservationController extends C4GBaseController
                 $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
                 if ($minCapacity && $maxCapacity) {
-                    $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$minCapacity.'-'.$maxCapacity.')');
+                    $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
                 } else {
                     $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
                 }
@@ -1731,7 +1733,7 @@ class C4gReservationController extends C4GBaseController
                                 //$newCondition[] = $condition;
                                 $reservationParticipants = new C4GSubDialogField();
                                 $reservationParticipants->setFieldName('participants');
-                                $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipant']);
+                                $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['additionalParticipants']);
                                 $reservationParticipants->setShowButtons(false);
                                 $reservationParticipants->setTable('tl_c4g_reservation_participants');
                                 $reservationParticipants->addFields($participants);
@@ -1850,7 +1852,7 @@ class C4gReservationController extends C4GBaseController
 
         $agreedField = new C4GCheckboxField();
         $agreedField->setFieldName('agreed');
-        $agreedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'].' '.$desc);
+        $agreedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'].'&nbsp;'.$desc);
         $agreedField->setTableRow(false);
         $agreedField->setColumnWidth(5);
         $agreedField->setSortColumn(false);

@@ -352,7 +352,7 @@ class C4gReservationInsertTags
 
                     $clock = '';
                     if (!strpos($timeFormat, 'A')) {
-                        $clock = ' ' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
+                        $clock = '&nbsp;' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
                     }
 
                     switch ($key) {
@@ -476,7 +476,7 @@ class C4gReservationInsertTags
                                     ->execute()->fetchAllAssoc();
 
                                 foreach ($speakerElements as $speaker) {
-                                    $speakerStr = $speaker['title'] ? $speaker['title'] . ' ' . $speaker['firstname'] . ' ' . $speaker['lastname'] : $speaker['firstname'] . ' ' . $speaker['lastname'];
+                                    $speakerStr = $speaker['title'] ? $speaker['title'] . '&nbsp;' . $speaker['firstname'] . '&nbsp;' . $speaker['lastname'] : $speaker['firstname'] . '&nbsp;' . $speaker['lastname'];
                                     if ($speakerStr && $speaker['speakerForwarding']) {
                                         $url = Controller::replaceInsertTags('{{link_url::' . $speaker['speakerForwarding'] . '}}');
                                         if ($url) {
@@ -588,7 +588,7 @@ class C4gReservationInsertTags
                         case 'beginTime':
                             $value = $calendarEvent->startTime && date('H', $calendarEvent->startTime) != '00' ? date($timeFormat, $calendarEvent->startTime) : false;
                             if ($value) {
-                                $value = $this->getHtmlSkeleton('beginTime', $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'], $value . ' ' . $clock);
+                                $value = $this->getHtmlSkeleton('beginTime', $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'], $value . '&nbsp;' . $clock);
                             } else {
                                 $value = '';
                             }
@@ -703,7 +703,7 @@ class C4gReservationInsertTags
                                     ->execute()->fetchAssoc();
 
                                 if ($locationElement && $locationElement['contact_street'] && $locationElement['contact_postal'] && $locationElement['contact_city']) {
-                                    $result = $locationElement['contact_street'] . ', ' . $locationElement['contact_postal'] . ' ' . $locationElement['contact_city'];
+                                    $result = $locationElement['contact_street'] . ', ' . $locationElement['contact_postal'] . '&nbsp;' . $locationElement['contact_city'];
                                 }
 
                                 return $result ? $this->getHtmlSkeleton('eventaddress', $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'], $result) : '';
@@ -717,7 +717,7 @@ class C4gReservationInsertTags
                                     ->execute()->fetchAssoc();
 
                                 if ($locationElement && $locationElement['contact_street'] && $locationElement['contact_postal'] && $locationElement['contact_city']) {
-                                    $result = $locationElement['contact_street'] . ', ' . $locationElement['contact_postal'] . ' ' . $locationElement['contact_city'];
+                                    $result = $locationElement['contact_street'] . ', ' . $locationElement['contact_postal'] . '&nbsp;' . $locationElement['contact_city'];
                                 }
 
                                 return $result ? $result : '';
@@ -798,11 +798,11 @@ class C4gReservationInsertTags
                     case 'check':
                         return true;
                     case 'name':
-                        $speakerStr = $this->getHtmlSkeleton($key, '', $speakerObject->title ? $speakerObject->title . ' ' . $speakerObject->firstname . ' ' . $speakerObject->lastname : $speakerObject->firstname . ' ' . $speakerObject->lastname, 'c4g_speaker_details');
+                        $speakerStr = $this->getHtmlSkeleton($key, '', $speakerObject->title ? $speakerObject->title . '&nbsp;' . $speakerObject->firstname . '&nbsp;' . $speakerObject->lastname : $speakerObject->firstname . '&nbsp;' . $speakerObject->lastname, 'c4g_speaker_details');
 
                         return $speakerStr;
                     case 'zipAndCity':
-                        $cityStr = $this->getHtmlSkeleton($key, '', $speakerObject->postal . ' ' . $speakerObject->city, 'c4g_speaker_details');
+                        $cityStr = $this->getHtmlSkeleton($key, '', $speakerObject->postal . '&nbsp;' . $speakerObject->city, 'c4g_speaker_details');
 
                         return $cityStr;
                     case 'website':

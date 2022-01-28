@@ -353,7 +353,7 @@ class C4gReservationHandler
         if (!strpos($GLOBALS['TL_CONFIG']['timeFormat'],'A')) {
 
             if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']) {
-                $clock = ' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
+                $clock = '&nbsp;'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
             }
         }
 
