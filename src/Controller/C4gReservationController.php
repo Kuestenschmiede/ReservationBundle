@@ -1714,7 +1714,7 @@ class C4gReservationController extends C4GBaseController
                         $fieldList[] = $reservationParticipants;
                     } else {
                         if ($this->reservationSettings->withCapacity) {
-                            $participantCapacity = $maxCapacity ?: 0;
+                            $participantCapacity = $maxCapacity ?: 10;
                             if ($participantCapacity > 10) {
                                 $participantCapacity = 10;
                             }

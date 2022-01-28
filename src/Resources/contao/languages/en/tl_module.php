@@ -35,3 +35,4 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['tiles'] = 'Ti
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['table'] = 'Data table';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['list'] = 'List elements';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['printTpl'] = ["Print template", "You can use this to store your own print template."];
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['removeListImage'] = ['Hide image in list','The image will no longer be displayed in the referent list.'];

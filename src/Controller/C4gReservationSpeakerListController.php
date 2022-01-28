@@ -170,7 +170,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $photo->setFieldName('photo');
         $photo->setEditable(false);
         $photo->setFormField(true);
-        $photo->setTableColumn(true);
+        $photo->setTableColumn(!$this->removeListImage);
         $photo->setWithoutLabel(true);
         $photo->setShowIfEmpty(false);
 

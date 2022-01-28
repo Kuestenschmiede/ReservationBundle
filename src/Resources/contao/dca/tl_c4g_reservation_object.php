@@ -712,7 +712,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'digit','mandatory'=>true, 'maxlength'=>6, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
+            'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>6, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
             'sql'                     => "double(5,2) NOT NULL default '0.00'"
         ),
 
@@ -724,7 +724,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'options'                 => array('pReservation','pPerson','pDay','pHour','pMin'),
             'default'                 => '',
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references'],
-            'eval'                    => array('mandatory'=>true, 'tl_class' => 'long clr'),
+            'eval'                    => array('mandatory'=>false, 'tl_class' => 'long clr'),
             'sql'                     => "varchar(50) NOT NULL default ''"
         ),
 

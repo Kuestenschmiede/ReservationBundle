@@ -26,7 +26,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE] 
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,event_redirect_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,removeListImage,event_redirect_site;';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_settings'] = [
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_settings'],
@@ -116,6 +116,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationObject'] = array
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['showSignatureField'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showSignatureField'],
+    'default'           => 0,
+    'exclude'           => true,
+    'filter'            => true,
+    'inputType'         => 'checkbox',
+    'sql'               => "int(1) unsigned NULL default 0"
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['removeListImage'] = array
+(   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['removeListImage'],
     'default'           => 0,
     'exclude'           => true,
     'filter'            => true,
