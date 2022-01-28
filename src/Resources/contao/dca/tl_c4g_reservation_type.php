@@ -366,7 +366,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'reference'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
             'default'               =>'no_sending',
             'options'               => array('minutely','no_sending'),
-            'eval'                  => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'submitOnChange' => true),
+            'eval'                  => array('tl_class'=>'long', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'submitOnChange' => false),
             'sql'                   => "char(25) default 'no_sending'"
         ),
         'auto_del' => array
@@ -377,7 +377,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'reference'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
             'default'               =>'no_delete',
             'options'               => array('daily','no_delete'),
-            'eval'                  => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'submitOnChange' => true),
+            'eval'                  => array('tl_class'=>'long', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'submitOnChange' => true),
             'sql'                   => "char(25) default 'no_delete'"
         ),
         'del_time' => array
@@ -386,7 +386,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                  =>true,
             'inputType'                =>'text',
             'default'                  =>'30',
-            'eval'                     =>array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50 wizard'),
+            'eval'                     =>array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'long wizard'),
             'sql'                      =>"smallint(5) unsigned NULL"
 
         ),

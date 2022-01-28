@@ -246,7 +246,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $phone->setFormField(true);
         $phone->setTableColumn(true);
         $phone->setShowIfEmpty(false);
-        $phone->setLinkType(C4gLinkField::LINK_TYPE_PHONE);
+        $phone->setLinkType(C4GUrlField::LINK_TYPE_PHONE);
 
         $email = new C4GUrlField();
         $email->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['email']);
@@ -255,7 +255,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         $email->setFormField(true);
         $email->setTableColumn(true);
         $email->setShowIfEmpty(false);
-        $email->setLinkType(C4gLinkField::LINK_TYPE_EMAIL);
+        $email->setLinkType(C4GUrlField::LINK_TYPE_EMAIL);
 
         $website = new C4GUrlField();
         $website->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['website']);
