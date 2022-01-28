@@ -132,7 +132,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['removeListImage'] = array
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['cancellation_redirect_site'] = array
 (
-    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site'],
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['cancellation_redirect_site'],
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',

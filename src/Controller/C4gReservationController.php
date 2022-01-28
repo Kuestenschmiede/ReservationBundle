@@ -136,10 +136,32 @@ class C4gReservationController extends C4GBaseController
     {
         parent::__construct($rootDir, $session, $framework, $model);
 
-        if ($eventId = $this->session->getSessionValue('reservationEventCookie')) {
+        if (!$this->reservationSettings && $this->reservation_settings) {
+            $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
+        }
+        $doIt = false;
+        $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types);
+        if ($moduleTypes) {
+            $doIt = true;
+            $t = 'tl_c4g_reservation_type';
+            $arrValues = array();
+            $arrOptions = array();
+            foreach ($moduleTypes as $moduleType) {
+                //$moduleType = intval($moduleType);
+                $arrColumns = array("$t.published='1' AND $t.reservationObjectType='2' AND $t.id = $moduleType"); //no event type selection - use get params
+                $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
+                if ($types) {
+                    $doIt = false;
+                    break;
+                }
+            }
+        }
+
+        $eventId  = Input::get('event') ? Input::get('event') : 0;
+        if (!$eventId && $doIt && ($oldEventId = $this->session->getSessionValue('reservationEventCookie'))) {
             $this->session->remove('reservationEventCookie');
-            $this->session->remove('reservationInitialDateCookie_'.$eventId);
-            $this->session->remove('reservationTimeCookie_'.$eventId);
+            $this->session->remove('reservationInitialDateCookie_'.$oldEventId);
+            $this->session->remove('reservationTimeCookie_'.$oldEventId);
         }
     }
 
@@ -184,10 +206,6 @@ class C4gReservationController extends C4GBaseController
 
         $eventId = Input::get('event') ? Input::get('event') : 0;
 
-        //ToDo hotfix
-        //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
-
-        //ToDo use session instead
         if (!$eventId && $this->session->getSessionValue('reservationEventCookie')) {
             $eventId = $this->session->getSessionValue('reservationEventCookie');
         } else if ($eventId) {
@@ -2013,7 +2031,6 @@ class C4gReservationController extends C4GBaseController
         $newFieldList = [];
         $removedFromList = [];
 
-        //$reservationIdKey = 0;
         foreach ($this->getFieldList() as $key=>$field) {
             /*if ($field->getFieldName() === 'reservation_id') {
                 $reservationIdKey = $key;
@@ -2465,11 +2482,11 @@ class C4gReservationController extends C4GBaseController
 
         $eventId  = Input::get('event') ? Input::get('event') : 0;
 
-        //ToDo hotfix
-        //Please keep it that way. The get parameters are lost during processing in Projects and are thus preserved.
-        //ToDo check
         if (!$eventId && $this->session->getSessionValue('reservationEventCookie')) {
             $eventId = $this->session->getSessionValue('reservationEventCookie');
+//            $this->session->remove('reservationEventCookie');
+//            $this->session->remove('reservationInitialDateCookie_'.$eventId);
+//            $this->session->remove('reservationTimeCookie_'.$eventId);
         } else if ($eventId) {
             $this->session->setSessionValue('reservationEventCookie', $eventId);
         }
