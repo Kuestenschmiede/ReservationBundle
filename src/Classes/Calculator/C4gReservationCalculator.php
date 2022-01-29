@@ -283,7 +283,7 @@ class C4gReservationCalculator
     private function calculateDbPercent($object, $actPersons, $capacity)
     {
         $actPercent = 0;
-        if ($object && $object->getAlmostFullyBookedAt()) {
+        if ($capacity && $object && $object->getAlmostFullyBookedAt()) {
             $percent = ($actPersons / $capacity) * 100;
             if ($percent >= $object->getAlmostFullyBookedAt()) {
                 $actPercent = $percent;

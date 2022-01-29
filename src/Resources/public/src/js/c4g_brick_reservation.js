@@ -135,9 +135,9 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
             for (i = 0; i < selectField.options.length; i++) {
                 var option = selectField.options[i];
                 var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 1;
-                var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 1;
+                var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
                 var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);
-                var capacity = desiredCapacity ? desiredCapacity.value : 1;
+                var capacity = desiredCapacity ? desiredCapacity.value : 0;
 
                 //not in values
                 var foundValue = false;
@@ -162,8 +162,8 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                     jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
                 } else if (option.value != -1) {
                     jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
-                    if (min && max && capacity && capacity > 0) {
-                        if ((capacity < min) || (capacity > max)) {
+                    if (min && capacity && (capacity > 0)) {
+                        if ((capacity < min) || (max && (capacity > max))) {
                             jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
                         } else {
                             jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
@@ -383,7 +383,7 @@ function checkTimelist(value, timeList) {
 function checkMax(objectList, arrindex, idx, value, timeList, capacity) {
     let result = true;
     let actCapacity = objectList[arrindex][idx]['act'] + parseInt(capacity);
-    if (actCapacity <= objectList[arrindex][idx]['max']) {
+    if (objectList[arrindex][idx]['max'] && (actCapacity <= objectList[arrindex][idx]['max'])) {
         for (y = 0; y < objectList.length; y++) {
             if (value && timeList && (y != arrindex)) {
 
@@ -423,7 +423,7 @@ function checkMax(objectList, arrindex, idx, value, timeList, capacity) {
 
                 if (doCheck) {
                     for (z = 0; z < objectList[y].length; z++) {
-                        if ((objectList[y][z]['act'] >= objectList[y][z]['max']) ||
+                        if (objectList[y][z]['max'] && ((objectList[y][z]['act'] >= objectList[y][z]['max'])) ||
                             ((objectList[y][z]['act'] + objectList[arrindex][idx]['act']) >= objectList[arrindex][idx]['max'])) {
                             return false;
                         }
@@ -434,7 +434,7 @@ function checkMax(objectList, arrindex, idx, value, timeList, capacity) {
             }
         }
     } else {
-        result = false;
+        result = !objectList[arrindex][idx]['max'];
     }
 
     return result;
@@ -535,7 +535,7 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
 
                 var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
                 var capMin = 1;
-                var capMax = 1;
+                var capMax = 0;
                 if (selectField) {
                     for (i = 0; i < selectField.options.length; i++) {
                         var option = selectField.options[i];
@@ -543,7 +543,7 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
                         if ((min == -1) || (min < capMin)) {
                             capMin = min;
                         }
-                        var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 1;
+                        var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
                         if ((max == -1) || (max > capMax)) {
                             capMax = max;
                         }
@@ -551,7 +551,7 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
                 }
 
                 var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+additionalId);
-                var capacity = desiredCapacity ? desiredCapacity.value : 1;
+                var capacity = desiredCapacity ? desiredCapacity.value : 0;
 
                 if (radioGroups) {
                     for (i = 0; i < radioGroups.length; i++) {
@@ -573,14 +573,19 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
                                         for (l = 0; l < objectList[arrindex].length; l++) {
                                             if (objectList[arrindex][l]['id'] != -1) {
                                                 if (checkMax(objectList, arrindex, l, value, timeList, capacity)) {
-                                                    activateTimeButton = (activateTimeButton < objectList[arrindex][l]['act']) ? objectList[arrindex][l]['act'] : activateTimeButton;
-                                                    percent = objectList[arrindex][l]['percent'];
+                                                    if (!capMax) {
+                                                        activateTimeButton = 0;
+                                                        percent = 0;
+                                                    } else {
+                                                        activateTimeButton = (activateTimeButton < objectList[arrindex][l]['act']) ? objectList[arrindex][l]['act'] : activateTimeButton;
+                                                        percent = objectList[arrindex][l]['percent'];
+                                                    }
                                                 }
                                             }
                                         }
                                     }
 
-                                    if ((activateTimeButton >= 0) && (activateTimeButton < capMax) && (capacity >= capMin) && (capacity <= capMax)) {
+                                    if ((activateTimeButton >= 0) && (!capMax || (activateTimeButton < capMax)) && (!capacity || (capacity >= capMin) && (!capMax || (capacity <= capMax)))) {
                                         let objstr = '';
                                         let withPriority = false;
                                         let objArr = [];

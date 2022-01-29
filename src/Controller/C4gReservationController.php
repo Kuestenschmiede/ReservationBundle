@@ -582,7 +582,7 @@ class C4gReservationController extends C4GBaseController
                         'id' => $reservationObject->getId(),
                         'name' => $reservationObject->getCaption(),
                         'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
-                        'max' => $reservationObject->getDesiredCapacity()[1] ? ($reservationObject->getDesiredCapacity()[1] * $reservationObject->getQuantity()) : $reservationObject->getQuantity(),
+                        'max' => $reservationObject->getDesiredCapacity()[1] ? ($reservationObject->getDesiredCapacity()[1] * $reservationObject->getQuantity()) : 0,// unbegrenzt -> $reservationObject->getQuantity(),
                         'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
                         'openingHours' => $reservationObject->getOpeningHours()
                     );
@@ -2536,9 +2536,6 @@ class C4gReservationController extends C4GBaseController
 
         if (!$eventId && $this->session->getSessionValue('reservationEventCookie')) {
             $eventId = $this->session->getSessionValue('reservationEventCookie');
-//            $this->session->remove('reservationEventCookie');
-//            $this->session->remove('reservationInitialDateCookie_'.$eventId);
-//            $this->session->remove('reservationTimeCookie_'.$eventId);
         } else if ($eventId) {
             $this->session->setSessionValue('reservationEventCookie', $eventId);
         }
