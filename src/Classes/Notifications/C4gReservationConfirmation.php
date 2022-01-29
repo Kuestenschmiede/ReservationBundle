@@ -13,6 +13,7 @@ namespace con4gis\ReservationBundle\Classes\Notifications;
 
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Notifications\C4GNotification;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationEventSpeakerModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use Contao\Controller;
 use Contao\Database;
@@ -33,10 +34,6 @@ class C4gReservationConfirmation
             try {
                 $type = $database->prepare('SELECT * FROM tl_c4g_reservation_type WHERE `id`=? LIMIT 1')->execute($reservationType)->fetchAssoc();
                 if ($type) {
-                    if ($type['location']) {
-                        $location = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($type['location'])->fetchAssoc();
-                    }
-
                     if ($reservationObjectType === '1') {
                         $reservationObject = $database->prepare('SELECT * FROM tl_c4g_reservation_object WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
                     } else {
@@ -61,6 +58,12 @@ class C4gReservationConfirmation
                             $c4gNotify->setTokenValue('reservation_object', $reservationObject['title'] ? $reservationObject['title'] : '');
                         } else {
                             $c4gNotify->setTokenValue('reservation_object', $reservationObject['caption'] ? $reservationObject['caption'] : '');
+                        }
+
+                        $locationId = $reservationObject['location'] ?: $type['location'];
+                        $location = false;
+                        if ($locationId) {
+                            $location = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($locationId)->fetchAssoc();
                         }
 
                         $c4gNotify->setTokenValue('admin_email', $GLOBALS['TL_CONFIG']['adminEmail']);
@@ -110,14 +113,71 @@ class C4gReservationConfirmation
                         }
 
                         $participants = '';
+                        $count = 0;
                         foreach ($participantsArr as $participantkey => $valueArray) {
-                            $participants .= $participants ? '; ' . $participantkey . ': ' . trim(implode(', ', $valueArray)) : $participantkey . ': ' . trim(implode(', ', $valueArray));
+                            $count++;
+                            $participants .= $participants ? '; ' . $count . ': ' . trim(implode(', ', $valueArray)) : $count . ': ' . trim(implode(', ', $valueArray));
                         }
 
                         $c4gNotify->setTokenValue('participantList', $participants);
-                        $c4gNotify->setTokenValue('speaker', 'ToDo');
-                        $c4gNotify->setTokenValue('topic', 'ToDo');
-                        $c4gNotify->setTokenValue('audience', 'ToDo');
+
+                        if ($reservationObjectType == '2') {
+                            $eventObject = $database->prepare('SELECT * FROM tl_c4g_reservation_event WHERE `pid`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
+                            if ($eventObject) {
+                                $speaker = '';
+                                if ($eventObject['speaker']) {
+                                    $speakerList = StringUtil::deserialize($eventObject['speaker']);
+                                    foreach ($speakerList as $speakerId) {
+                                        $speakerObject = C4gReservationEventSpeakerModel::findByPk($speakerId);
+                                        if ($speakerObject) {
+                                            if ($speaker) {
+                                                $speaker .= ', '.$speakerObject->title ? $speakerObject->title . ' ' . $speakerObject->firstname . ' ' . $speakerObject->lastname : $speakerObject->firstname . ' ' . $speakerObject->lastname;
+
+                                            } else {
+                                                $speaker = $speakerObject->title ? $speakerObject->title . ' ' . $speakerObject->firstname . ' ' . $speakerObject->lastname : $speakerObject->firstname . ' ' . $speakerObject->lastname;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $topic = '';
+                                if ($eventObject['topic']) {
+                                    $topicList = StringUtil::deserialize($eventObject['topic']);
+                                    foreach ($topicList as $topicId) {
+                                        $topicObject = C4gReservationEventTopicModel::findByPk($topicId);
+                                        if ($topicObject) {
+                                            if ($topic) {
+                                                $topic .= ', ' . $topicObject->topic;
+                                            } else {
+                                                $topic = $topicObject->topic;
+                                            }
+
+                                        }
+                                    }
+                                }
+
+                                $audience = '';
+                                if ($eventObject['targetAudience']) {
+                                    $audienceList = StringUtil::deserialize($eventObject['targetAudience']);
+                                    foreach ($audienceList as $audienceId) {
+                                        $audienceObject = C4gReservationEventTopicModel::findByPk($audienceId);
+                                        if ($audienceObject) {
+                                            if ($audience) {
+                                                $audience .= ', ' . $audienceObject->targetAudience;
+                                            } else {
+                                                $audience = $audienceObject->targetAudience;
+                                            }
+
+                                        }
+                                    }
+                                }
+
+                                $c4gNotify->setTokenValue('speaker', $speaker);
+                                $c4gNotify->setTokenValue('topic', $topic);
+                                $c4gNotify->setTokenValue('audience', $audience);
+
+                            }
+                        }
 
                         $salutation = [
                             'man' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['man'][0],
