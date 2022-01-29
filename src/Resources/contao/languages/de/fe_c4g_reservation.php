@@ -55,6 +55,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object'] = 'Reservierungs
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_short'] = 'Reservierung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] = 'Veranstaltung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none'] = 'Für diese Kombination ist keine Reservierung möglich.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none_date'] = 'An diesem Datum ist keine Reservierung möglich.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['included_params'] = 'Enthaltende Leistungen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional_params'] = 'Buchbare Leistungen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id'] = 'Reservierungsschlüssel: ';

@@ -24,7 +24,7 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationEvent']  = array('Event <=> Reservieru
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventAudience'] = array('Zielpublikum', 'Hier können Sie Zielgruppen hinterlegen.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Referenten', 'Hier können Sie die Referenten pflegen.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Themen', 'Hier können Sie bspw. die Seminarthemen hinterlegen.');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Formulareinstellungen', 'Hier können Sie das Formular konfigurieren und im Modul verknüpfen.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Reservierungsformular', 'Hier können Sie das Formular konfigurieren und im Modul verknüpfen.');
 
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Formular', 'Reservierungsformular');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE]  = array('con4gis-Reservation: Liste', 'Reservierungsliste');

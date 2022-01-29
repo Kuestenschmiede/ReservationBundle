@@ -229,7 +229,59 @@ class C4gReservationController extends C4GBaseController
             if ($eventObj && !$initialDate &&  $this->session->getSessionValue('reservationInitialDateCookie_'.$eventId)) {
                 $initialDate = $this->session->getSessionValue('reservationInitialDateCookie_'.$eventId);
             } else if ($eventObj && $initialDate) {
+                $recurring = $event->recurring;
+                $startDate = C4gReservationDateChecker::getBeginOfDate($event->startDate);
+                $actDate = C4gReservationDateChecker::getBeginOfDate(strtotime($initialDate));
+                if ($recurring && !($startDate == $actDate)) {
+                    $repeatEach = StringUtil::deserialize($event->repeatEach);
+                    $goodDay = false;
+                    if ($repeatEach) {
+                        $unit = $repeatEach['unit'];
+                        $value = $repeatEach['value']; //intervall
+                        $repeatEnd  = $event->repeatEnd; //0=unebfristet
+
+                        if ($unit && $value && ($actDate > $startDate) && (!$repeatEnd || ($repeatEnd >= $actDate))) {
+                            if (!$repeatEnd) {
+                                $repeatEnd = $actDate;
+                            }
+
+                            $factor = 0;
+                            switch($unit) {
+                                case 'days':
+                                    $factor = $value * 86400;
+                                    break;
+                                case 'weeks':
+                                    $factor = $value * 86400 * 7;
+                                    break;
+                                case 'months':
+                                    $factor = $value * 86400 * 30; //ToDo
+                                    break;
+                                case 'years':
+                                    $factor = $value * 31557600; //ToDo
+                                    break;
+                            }
+
+                            $i = $startDate;
+                            while($i<=$repeatEnd) {
+                                $i = $i+$factor;
+                                if ($actDate == $i) {
+                                    $goodDay = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!$goodDay) {
+                        $info = new C4GInfoTextField();
+                        $info->setFieldName('info');
+                        $info->setEditable(false);
+                        $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none_date']);
+                        return [$info];
+                    }
+                }
+
                 $this->session->setSessionValue('reservationInitialDateCookie_'.$eventId, $initialDate);
+
             }
 
             $time = Input::get('time') ? Input::get('time') : 0;
@@ -943,7 +995,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationBeginDateField->setMandatory(false);
                     $reservationBeginDateField->setCondition($objConditionArr);
                     $reservationBeginDateField->setRemoveWithEmptyCondition(true);
-                    $reservationBeginDateField->setInitialValue($reservationObject->getBeginDate());
+                    $reservationBeginDateField->setInitialValue($initialDate ? strtotime($initialDate) : $reservationObject->getBeginDate());
                     $reservationBeginDateField->setNotificationField(true);
                     $reservationBeginDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                     $reservationBeginDateField->setStyleClass('begindate-event');
@@ -967,7 +1019,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationEndDateField->setMandatory(false);
                     $reservationEndDateField->setCondition($objConditionArr);
                     $reservationEndDateField->setRemoveWithEmptyCondition(true);
-                    $reservationEndDateField->setInitialValue($reservationObject->getEndDate());
+                    $reservationEndDateField->setInitialValue($initialDate ? strtotime($initialDate) : $reservationObject->getEndDate()); //ToDo mehrtägige Termnine
                     $reservationEndDateField->setNotificationField(true);
                     $reservationEndDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                     $reservationEndDateField->setShowIfEmpty(false);
