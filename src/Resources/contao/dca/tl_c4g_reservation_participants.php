@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['TOGGLE'],
                 'icon'                => 'visible.gif',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array('tl_c4g_reservation', 'toggleIcon')
+                'button_callback'     => array('tl_c4g_reservation_participants', 'toggleIcon')
             )
         )
     ),
@@ -241,7 +241,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'foreignKey'        => 'tl_c4g_reservation_params.caption',
             'eval'              => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'               => "blob NULL",
-
         ),
 
         'cancellation' => array(
@@ -257,7 +256,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
 
 
 /**
- * Class tl_c4g_reservation
+ * Class tl_c4g_reservation_participants
  */
 class tl_c4g_reservation_participants extends Backend
 {
@@ -304,7 +303,7 @@ class tl_c4g_reservation_participants extends Backend
     public function toggleVisibility($intId, $blnCancellation)
     {
 
-        $this->createInitialVersion('tl_c4g_reservation', $intId);
+        $this->createInitialVersion('tl_c4g_reservation_participants', $intId);
 
         // Trigger the save_callback
         if (is_array($GLOBALS['TL_DCA']['tl_c4g_reservation_participants']['fields']['cancellation']['save_callback']))
@@ -330,7 +329,7 @@ class tl_c4g_reservation_participants extends Backend
             $arrRow['lastname'],
             $arrRow['firstname'],
             $arrRow['email'],
-            $arrRow['cancellation'] ? $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes'] : ''
+            $arrRow['cancellation'] ? $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['yes'] : ''
         ];
         return $result;
     }

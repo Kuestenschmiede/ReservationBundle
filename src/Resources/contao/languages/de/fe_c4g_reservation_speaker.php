@@ -26,6 +26,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['website'] = 'Website';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['vita'] = 'Vita';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['photo'] = 'Photo';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['events'] = 'Zugehörige Veranstaltungen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['back'] = 'Zurück';
 
 /** Legends */
 //$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'Reservierungsformular';

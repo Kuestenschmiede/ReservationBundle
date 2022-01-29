@@ -280,11 +280,6 @@ function setReservationForm(id, typeId, showDateTime, event) {
         if (capacityField.attr('min') && (value < capacityField.attr('min'))) {
             capacityField.val(capacityField.attr('min'));
         }
-        // var radioButton = jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
-        // if (radioButton) {
-        //     jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]').attr('checked','');
-        //     setObjectId(false,typeId,showDateTime);
-        // }
     }
 
     var dateId = 'c4g_beginDate_'+typeId;
