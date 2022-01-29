@@ -29,4 +29,4 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Reservierungsformu
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Formular', 'Reservierungsformular');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE]  = array('con4gis-Reservation: Liste', 'Reservierungsliste');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationCancellationController::TYPE]  = array('con4gis-Reservation: Stornierung', 'Reservierung');
-$GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE]  = array('con4gis-Reservation: Referenten', 'Referenten');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE]  = array('con4gis-Reservation: Referent*innen', 'Referent*innen Datenbank');
