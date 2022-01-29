@@ -513,7 +513,8 @@ class C4gReservationController extends C4GBaseController
                     }
 
                     if ($initialDate || $initialBookingDate) {
-                        $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."'), " . $this->id . "," . $listType['id'] . "," . $this->reservationSettings->showDateTime . ");";
+                        $script = $this->getDialogParams()->getOnloadScript();
+                        $script = $script."setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."'), " . $this->id . "," . $listType['id'] . "," . $this->reservationSettings->showDateTime . ");";
                         $this->getDialogParams()->setOnloadScript($script);
                     }
 
@@ -2430,6 +2431,15 @@ class C4gReservationController extends C4GBaseController
         $action->setModule($this);
         $result = $action->run();
         //$this->fieldList[$reservationIdKey]->setInitialValue(C4GBrickCommon::getUUID());
+
+        if (!$result['usermessage']) {
+            if ($oldEventId = $this->session->getSessionValue('reservationEventCookie')) {
+                $this->session->remove('reservationEventCookie');
+                $this->session->remove('reservationInitialDateCookie_'.$oldEventId);
+                $this->session->remove('reservationTimeCookie_'.$oldEventId);
+            }
+        }
+
         return $result;
     }
 

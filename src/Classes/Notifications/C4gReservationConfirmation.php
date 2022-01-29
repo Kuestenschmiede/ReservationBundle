@@ -13,7 +13,9 @@ namespace con4gis\ReservationBundle\Classes\Notifications;
 
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Notifications\C4GNotification;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationEventAudienceModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventSpeakerModel;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationEventTopicModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use Contao\Controller;
 use Contao\Database;
@@ -108,7 +110,7 @@ class C4gReservationConfirmation
                         if ($participants && (count($participants) > 0)) {
                             foreach ($participants as $participant) {
                                 //$paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
-                                $participantsArr[] = [$participant['firstname'], $participant['lastname'], $participant['email']];
+                                $participantsArr[] = [$participant['lastname'], $participant['firstname'], $participant['email']];
                             }
                         }
 
@@ -116,7 +118,7 @@ class C4gReservationConfirmation
                         $count = 0;
                         foreach ($participantsArr as $participantkey => $valueArray) {
                             $count++;
-                            $participants .= $participants ? '; ' . $count . ': ' . trim(implode(', ', $valueArray)) : $count . ': ' . trim(implode(', ', $valueArray));
+                            $participants .= $participants ? '; ' . $count . '. ' . trim(implode(', ', $valueArray)) : $count . '. ' . trim(implode(', ', $valueArray));
                         }
 
                         $c4gNotify->setTokenValue('participantList', $participants);
@@ -160,7 +162,7 @@ class C4gReservationConfirmation
                                 if ($eventObject['targetAudience']) {
                                     $audienceList = StringUtil::deserialize($eventObject['targetAudience']);
                                     foreach ($audienceList as $audienceId) {
-                                        $audienceObject = C4gReservationEventTopicModel::findByPk($audienceId);
+                                        $audienceObject = C4gReservationEventAudienceModel::findByPk($audienceId);
                                         if ($audienceObject) {
                                             if ($audience) {
                                                 $audience .= ', ' . $audienceObject->targetAudience;

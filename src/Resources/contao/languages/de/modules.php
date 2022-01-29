@@ -22,11 +22,11 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservierungsarten', '
 $GLOBALS['TL_LANG']['MOD']['C4gReservationParams'] = array('Optionen (Leistungen)', 'Erfassung verschiedener Buchungsoptionen (optional).');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEvent']  = array('Event <=> Reservierung', 'Hier können Veranstaltungen und Reservierungen verknüpft werden.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventAudience'] = array('Zielpublikum', 'Hier können Sie Zielgruppen hinterlegen.');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Referenten', 'Hier können Sie die Referenten pflegen.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Referent*innen', 'Hier können Sie die Referenten pflegen.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Themen', 'Hier können Sie bspw. die Seminarthemen hinterlegen.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Reservierungsformular', 'Hier können Sie das Formular konfigurieren und im Modul verknüpfen.');
 
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Formular', 'Reservierungsformular');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE]  = array('con4gis-Reservation: Liste', 'Reservierungsliste');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationCancellationController::TYPE]  = array('con4gis-Reservation: Stornierung', 'Reservierung');
-$GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE]  = array('con4gis-Reservation: Referent*innen', 'Referent*innen Datenbank');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE]  = array('con4gis-Reservation: Referent*innen', 'Referent*innen Liste');
