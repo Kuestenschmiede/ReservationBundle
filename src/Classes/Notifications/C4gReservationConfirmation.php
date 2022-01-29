@@ -78,7 +78,7 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('endDate', $reservation['endDate'] ? date($dateFormat, $reservation['endDate']) : '');
                         $c4gNotify->setTokenValue('endTime', $reservation['endTime'] ? date($timeFormat, $reservation['endTime']) : '');
 
-                        $c4gNotify->setTokenValue('description', $reservationObject['description']);
+                        $c4gNotify->setTokenValue('description', $reservationObject['description'] ?: '');
 
                         $params = $reservation['included_params'] ? \Contao\StringUtil::deserialize($reservation['included_params']) : [];
                         $includedParamsArr = [];
@@ -182,6 +182,7 @@ class C4gReservationConfirmation
                                 'audience', 'salutation', 'title', 'organisation', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
                                 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment', 'location', 'contact_name',
                                 'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'agreed',
+                                'description'
                             ]
                         );
 
