@@ -276,9 +276,9 @@ class C4gReservationSpeakerListController extends C4GBaseController
         ], 1);
 
         $personalDataField = new C4GGridField($grid);
-        $personalDataField->setTitle(""); //ToDO Language
-        $personalDataField->setFieldName('header-content');
-        $personalDataField->setTableColumn(true); //ToDO
+        $personalDataField->setTitle("");
+        $personalDataField->setFieldName('speaker-data');
+        $personalDataField->setTableColumn(true);
         $personalDataField->setFormField(true);
         $personalDataField->setDatabaseField(false);
 
@@ -288,9 +288,9 @@ class C4gReservationSpeakerListController extends C4GBaseController
         ], 2);
 
         $headerField = new C4GGridField($grid);
-        $headerField->setTitle(""); //ToDO Language
-        $headerField->setFieldName('header-content');
-        $headerField->setTableColumn(false); //ToDO
+        $headerField->setTitle("");
+        $headerField->setFieldName('speaker-content');
+        $headerField->setTableColumn(false);
         $headerField->setFormField(true);
         $headerField->setDatabaseField(false);
         $fieldList[] = $headerField;
