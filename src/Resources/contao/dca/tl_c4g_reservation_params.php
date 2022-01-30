@@ -75,7 +75,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
                 'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['delete'],
                 'href'          => 'act=delete',
                 'icon'          => 'delete.gif',
-                'attributes'    => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false;Backend.getScrollOffset()"',
+                'attributes'    => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\')) return false;Backend.getScrollOffset()"',
             ),
             'show' => array
             (
@@ -141,8 +141,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'digit','mandatory'=>true, 'maxlength'=>6, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
-            'sql'                     => "double(5,2) unsigned NOT NULL default '0.00'"
+            'default'                 => '0.00',
+            'eval'                    => array('rgxp'=>'digit','mandatory'=>true, 'maxlength'=>10, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
+            'sql'                     => "double(7,2) unsigned default '0.00'"
 
         ),
 

@@ -79,7 +79,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
                 'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['delete'],
                 'href'          => 'act=delete',
                 'icon'          => 'delete.gif',
-                'attributes'    => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false;Backend.getScrollOffset()"',
+                'attributes'    => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\')) return false;Backend.getScrollOffset()"',
             ),
             'show' => array
             (
@@ -122,16 +122,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
 
-        'uuid' => array
-        (
-            'label'             => array('uuid','uuid'),
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'search'            => false,
-            'eval'              => array('doNotCopy'=>true, 'maxlength'=>128),
-            'save_callback'     => array(array('tl_c4g_reservation_participants','generateUuid')),
-            'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
-        ),
+//        'uuid' => array
+//        (
+//            'label'             => array('uuid','uuid'),
+//            'exclude'           => true,
+//            'inputType'         => 'text',
+//            'search'            => false,
+//            'eval'              => array('doNotCopy'=>true, 'maxlength'=>128),
+//            'save_callback'     => array(array('tl_c4g_reservation_participants','generateUuid')),
+//            'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
+//        ),
 
         'title' => array
         (

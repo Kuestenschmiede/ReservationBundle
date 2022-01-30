@@ -220,6 +220,9 @@ class C4gReservationController extends C4GBaseController
             $date = Input::get('date') ? Input::get('date') : 0;
             if ($date) {
                 $initialDate = $date;
+                if (!is_numeric($initialDate)) {
+                    $initialDate = strtotime($initialDate);
+                }
             }
 
             if ($eventObj && !$initialDate &&  $this->session->getSessionValue('reservationInitialDateCookie_'.$eventId)) {
@@ -227,7 +230,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($eventObj && $initialDate) {
                 $recurring = $event->recurring;
                 $startDate = C4gReservationDateChecker::getBeginOfDate($event->startDate);
-                $actDate = C4gReservationDateChecker::getBeginOfDate(strtotime($initialDate));
+                $actDate = C4gReservationDateChecker::getBeginOfDate($initialDate);
                 if ($recurring && !($startDate == $actDate)) {
                     $repeatEach = StringUtil::deserialize($event->repeatEach);
                     $goodDay = false;
@@ -529,7 +532,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
                     $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate']);
                     $reservationBeginDateField->setEditable(true);
-                    $reservationBeginDateField->setInitialValue($initialBookingDate ?: strtotime($initialDate));
+                    $reservationBeginDateField->setInitialValue($initialBookingDate ?: $initialDate);
                     $reservationBeginDateField->setComparable(false);
                     $reservationBeginDateField->setSortColumn(true);
                     $reservationBeginDateField->setSortSequence('de_datetime');
@@ -586,11 +589,6 @@ class C4gReservationController extends C4GBaseController
                 }
 
                 if ($initialBookingDate && $initialBookingTime && $objects) {
-//                    if ($initialDate) {
-//                        $script = "setObjectId(this," . $listType['id'] . ",' . $this->showDateTime . ');";
-//                        $this->getDialogParams()->setOnloadScript($script);
-//                    }
-
                     $reservationBeginTimeField = new C4GRadioGroupField();
                     $reservationBeginTimeField->setFieldName('beginTime');
                     $reservationBeginTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
@@ -603,7 +601,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationBeginTimeField->setInitialValue($initialBookingTime ?: $initialTime);
                     $reservationBeginTimeField->setSort(false);
                     $reservationBeginTimeField->setCondition(array($condition));
-                    $reservationBeginTimeField->setAdditionalID($listType['id'].'-00'.date('w', strtotime($initialDate)));
+                    $reservationBeginTimeField->setAdditionalID($listType['id'].'-00'.date('w', $initialDate));
                     $reservationBeginTimeField->setNotificationField(true);
                     $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $reservationBeginTimeField->setTurnButton(true);
@@ -992,7 +990,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationBeginDateField->setMandatory(false);
                     $reservationBeginDateField->setCondition($objConditionArr);
                     $reservationBeginDateField->setRemoveWithEmptyCondition(true);
-                    $reservationBeginDateField->setInitialValue($initialDate ? strtotime($initialDate) : $reservationObject->getBeginDate());
+                    $reservationBeginDateField->setInitialValue($initialDate ? $initialDate : $reservationObject->getBeginDate());
                     $reservationBeginDateField->setNotificationField(true);
                     $reservationBeginDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                     $reservationBeginDateField->setStyleClass('begindate-event');
@@ -1016,7 +1014,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationEndDateField->setMandatory(false);
                     $reservationEndDateField->setCondition($objConditionArr);
                     $reservationEndDateField->setRemoveWithEmptyCondition(true);
-                    $reservationEndDateField->setInitialValue($initialDate ? strtotime($initialDate) : $reservationObject->getEndDate()); //ToDo mehrtägige Termnine
+                    $reservationEndDateField->setInitialValue($initialDate ? $initialDate : $reservationObject->getEndDate()); //ToDo mehrtägige Termnine
                     $reservationEndDateField->setNotificationField(true);
                     $reservationEndDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                     $reservationEndDateField->setShowIfEmpty(false);

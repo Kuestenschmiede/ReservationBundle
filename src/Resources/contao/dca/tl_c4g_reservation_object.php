@@ -81,7 +81,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                 'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['delete'],
                 'href'          => 'act=delete',
                 'icon'          => 'delete.gif',
-                'attributes'    => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false;Backend.getScrollOffset()"',
+                'attributes'    => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\')) return false;Backend.getScrollOffset()"',
             ),
             'show' => array
             (
@@ -117,17 +117,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'tstamp' => array
         (
             'sql'               => "int(10) unsigned NOT NULL default 0"
-        ),
-
-        'uuid' => array
-        (
-            'label'             => array('uuid','uuid'),
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'search'            => true,
-            'eval'              => array('doNotCopy'=>true, 'maxlength'=>128),
-            'save_callback'     => array(array('tl_c4g_reservation_object','generateUuid')),
-            'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
         ),
 
         'caption' => array
@@ -712,8 +701,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>6, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
-            'sql'                     => "double(5,2) NOT NULL default '0.00'"
+            'default'                 => '0.00',
+            'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>10, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
+            'sql'                     => "double(7,2) unsigned default '0.00'"
         ),
 
         'priceoption' => array
@@ -754,16 +744,6 @@ class tl_c4g_reservation_object extends Backend
         parent::__construct();
         $this->import('BackendUser', 'User');
     }
-
-    public function generateUuid($varValue, DataContainer $dc)
-    {
-        if ($varValue == '') {
-            return \c4g\projects\C4GBrickCommon::getGUID();
-        } else {
-            return $varValue;
-        }
-    }
-
 
     public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
     {
