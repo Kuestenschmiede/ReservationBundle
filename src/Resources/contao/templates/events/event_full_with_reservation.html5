@@ -1,67 +1,141 @@
+<div class="event layout_full layout_full_with-icons block<?= $this->class ?>" itemscope
+     itemtype="http://schema.org/Event">
 
-<div class="event layout_full block<?= $this->class ?>" itemscope itemtype="http://schema.org/Event">
+    <h1 itemprop="name"><?= $this->title ?></h1>
 
-  <h1 itemprop="name"><?= $this->title ?></h1>
+    <?php if ($this->recurring): ?>
+        <div class="info recurring flex-wrapper">
+            <span class="info-icon info-recurring-icon">
+                <i class="fas fa-info-circle"></i>
+            </span>
 
-  <?php if ($this->recurring): ?>
-    <p class="info recurring"><?= $this->recurring ?></p>
-  <?php else: ?>
-    <p class="info"><time datetime="<?= $this->datetime ?>" itemprop="startDate"><?= $this->date ?><?php if ($this->time): ?> <?= $this->time ?><?php endif; ?></time></p>
-  <?php endif; ?>
+            <span class="info-recurring-text">
+                 <?= $this->recurring ?>
+            </span>
+            <?php $startDate = $this->startDate; ?> //ToDo act recurring stamp
+        </div>
 
-  <?php if ($this->location): ?>
-    <p class="location" itemprop="location" itemscope itemtype="http://schema.org/Place">
-      <span itemprop="name"><?= $this->location ?></span>
-      <?php if ($this->address): ?>
-        (<span itemprop="address" itemscope itemtype="http://schema.org/PostalAddress"><?= $this->address ?></span>)
-      <?php endif; ?>
-    </p>
-  <?php endif; ?>
+    <?php else: ?>
 
-  <?php if ($this->details): ?>
-    <?= $this->details ?>
-  <?php else: ?>
-    <div class="ce_text block">
-      <?php if (!$this->addBefore): ?>
-        <?= $this->teaser ?>
-      <?php endif; ?>
+        <?php
+        $startDate = $this->parseDate("d.m.Y", $this->startDate);
+        $endDate = $this->parseDate("d.m.Y", $this->endDate);
+        $startTime = $this->parseDate("H:i", $this->startTime);
+        $endTime = $this->parseDate("H:i", $this->endTime);
+        ?>
 
-      <?php if ($this->addImage): ?>
-        <?php $this->insert('image', $this->arrData); ?>
-      <?php endif; ?>
+        <?php if ($this->startDate): ?>
+            <div class="start-date-wrapper flex-wrapper">
+                <span class="info-icon start-date-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </span>
+                <span class="start-date-text"><?= $startDate ?></span>
 
-      <?php if ($this->addBefore): ?>
-        <?= $this->teaser ?>
-      <?php endif; ?>
-    </div>
-  <?php endif; ?>
+                <?php if ($this->endDate): ?>
+                    <span class="end-date-text"> - <?= $endDate ?></span>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
-  <!--reservation demo data-->
-  {{c4gevent::<?= $this->id ?>::headline}}
-  {{c4gevent::<?= $this->id ?>::state}}
-  {{c4gevent::<?= $this->id ?>::number}}
-  {{c4gevent::<?= $this->id ?>::title}}
-  {{c4gevent::<?= $this->id ?>::topic}}
-  {{c4gevent::<?= $this->id ?>::audience}}
-  {{c4gevent::<?= $this->id ?>::speaker}}
-  {{c4gevent::<?= $this->id ?>::eventlocation}} <!-- ::location for event entry -->
-  {{c4gevent::<?= $this->id ?>::eventaddress}} <!-- ::address for event entry -->
-  {{c4gevent::<?= $this->id ?>::beginDate}}
-  {{c4gevent::<?= $this->id ?>::beginTime}}
-  {{c4gevent::<?= $this->id ?>::endDate}}
-  {{c4gevent::<?= $this->id ?>::endTime}}
-  {{c4gevent::<?= $this->id ?>::additional}}
-  {{c4gevent::<?= $this->id ?>::included}}
-  {{c4gevent::<?= $this->id ?>::button}}
+        <?php if ($this->startTime): ?>
+            <div class="start-time-wrapper flex-wrapper">
+                    <span class="info-icon start-time-icon">
+                        <i class="fas fa-clock"></i>
+                    </span>
 
-  <?php if ($this->enclosure): ?>
-    <ul class="enclosure">
-      <?php foreach ($this->enclosure as $enclosure): ?>
-        <li class="download-element ext-<?= $enclosure['extension'] ?>">
-           <a href="<?= $enclosure['href'] ?>" title="<?= $enclosure['title'] ?>"><?= $enclosure['link'] ?> <span class="size">(<?= $enclosure['filesize'] ?>)</span></a>
-        </li>
-      <?php endforeach; ?>
-    </ul>
-  <?php endif; ?>
+                <?php if ($this->endTime): ?>
+                    <span class="start-time-text"><?= $startTime ?> - <?= $endTime ?> Uhr</span>
+                <?php else: ?>
+                    <span class="start-time-text"><?= $startTime ?> Uhr</span>
+                <?php endif; ?>
 
+            </div>
+        <?php endif; ?>
+
+    <?php endif; ?>
+
+    <?php if ($this->location): ?>
+        <div class="location flex-wrapper"
+             itemprop="location"
+             itemscope
+             itemtype="http://schema.org/Place">
+            <span class="info-icon  location-icon"><i
+                        class="fas fa-map-marker-alt"></i></span>
+            <span itemprop="name"><?= $this->location ?></span>
+            <?php if ($this->address): ?>
+                (
+                <span itemprop="address"
+                      itemscope
+                      itemtype="http://schema.org/PostalAddress"><?= $this->address ?></span>)
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($this->details): ?>
+        <?= $this->details ?>
+    <?php else: ?>
+        <div class="ce_text block">
+            <?php if (!$this->addBefore): ?>
+                <?= $this->teaser ?>
+            <?php endif; ?>
+
+            <?php if ($this->addImage): ?>
+                <?php $this->insert('image', $this->arrData); ?>
+            <?php endif; ?>
+
+            <?php if ($this->addBefore): ?>
+                <?= $this->teaser ?>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <!--reservation demo data-->
+    {{c4gevent::<?= $this->id ?>::headline}}
+    {{c4gevent::<?= $this->id ?>::state}}
+    {{c4gevent::<?= $this->id ?>::number}}
+    {{c4gevent::<?= $this->id ?>::title}}
+    {{c4gevent::<?= $this->id ?>::topic}}
+    {{c4gevent::<?= $this->id ?>::audience}}
+    {{c4gevent::<?= $this->id ?>::speaker}}
+    {{c4gevent::<?= $this->id ?>::eventlocation}} <!-- ::location for event entry -->
+    {{c4gevent::<?= $this->id ?>::eventaddress}} <!-- ::address for event entry -->
+    <?php if ($startDate): ?>
+        {{c4gevent::<?= $this->id ?>::beginDate::<?= $startDate ?>}} <!-- recurring -->
+    <?php else: ?>
+        {{c4gevent::<?= $this->id ?>::beginDate}}
+    <?php endif; ?>
+    {{c4gevent::<?= $this->id ?>::beginTime}}
+    {{c4gevent::<?= $this->id ?>::endDate}}
+    {{c4gevent::<?= $this->id ?>::endTime}}
+    {{c4gevent::<?= $this->id ?>::additional}}
+    {{c4gevent::<?= $this->id ?>::included}}
+    <?php if ($startDate): ?>
+        {{c4gevent::<?= $this->id ?>::button::<?= $startDate ?>}} <!-- recurring -->
+    <?php else: ?>
+        {{c4gevent::<?= $this->id ?>::button}}
+    <?php endif; ?>
+
+    <?php if ($this->enclosure): ?>
+        <ul class="enclosure">
+            <?php foreach ($this->enclosure as $enclosure): ?>
+                <li class="download-element ext-<?= $enclosure['extension'] ?>">
+                    <a href="<?= $enclosure['href'] ?>" title="<?= $enclosure['title'] ?>"><?= $enclosure['link'] ?>
+                        <span class="size">(<?= $enclosure['filesize'] ?>)</span></a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Event",
+            "name": "{{c4gevent::<?= $this->id ?>::title_raw}}",
+            "location": "{{c4gevent::<?= $this->id ?>::eventaddress_raw}}",
+            "startDate": "{{c4gevent::<?= $this->id ?>::beginDate_raw}} {{c4gevent::<?= $this->id ?>::beginTime_raw}}",
+            "endDate": "{{c4gevent::<?= $this->id ?>::endDate_raw}}",
+            "url": "{{env::url}}/{{env::request}}"
+        }
+
+    </script>
 </div>

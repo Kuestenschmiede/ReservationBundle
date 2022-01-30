@@ -328,6 +328,7 @@ class C4gReservationInsertTags
             } elseif ($arrSplit[1] && $arrSplit[2]) {
                 $pid = $arrSplit[1];
                 $key = $arrSplit[2];
+                $startDate = $arrSplit[3];
                 $tableEventObject = 'tl_c4g_reservation_event';
                 $tableCalendarEvent = 'tl_calendar_events';
                 $tableSettings = 'tl_c4g_settings';
@@ -398,7 +399,11 @@ class C4gReservationInsertTags
                                 if ($settings->numRows && $settings->reservationForwarding) {
                                     $url = Controller::replaceInsertTags('{{link_url::' . $settings->reservationForwarding . '}}');
                                     if ($url) {
-                                        return '<a class="c4g_reservation_details_book-button c4g__btn c4g__btn-primary" href="' . $url . '?event=' . $pid . '&date=' . $calendarEvent->startDate . '" title="Reservieren" itemprop="url">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'] . '</a>';
+                                        if ($startDate) {
+                                            return '<a class="c4g_reservation_details_book-button c4g__btn c4g__btn-primary" href="' . $url . '?event=' . $pid . '&date=' . $startDate . '" title="Reservieren" itemprop="url">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'] . '</a>';
+                                        } else {
+                                            return '<a class="c4g_reservation_details_book-button c4g__btn c4g__btn-primary" href="' . $url . '?event=' . $pid . '" title="Reservieren" itemprop="url">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'] . '</a>';
+                                        }
                                     }
                                 }
                             }
@@ -560,14 +565,22 @@ class C4gReservationInsertTags
 
                             break;
                         case 'beginDate':
-                            $value = date($dateFormat, $calendarEvent->startDate);
+                            if ($startDate) {
+                                $value = date($dateFormat, $startDate);
+                            } else {
+                                $value = date($dateFormat, $calendarEvent->startDate);
+                            }
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('beginDate', $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'], $value);
                             }
 
                             return $value;
                         case 'beginDate_raw':
-                            return date($dateFormat, $calendarEvent->startDate);
+                            if ($startDate) {
+                                return date($dateFormat, $startDate);
+                            } else {
+                                return date($dateFormat, $calendarEvent->startDate);
+                            }
                         case 'endDate':
                             $value = '';
                             if ($calendarEvent->startDate != $calendarEvent->endDate) {
