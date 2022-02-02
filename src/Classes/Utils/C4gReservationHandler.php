@@ -879,7 +879,7 @@ class C4gReservationHandler
                         $counter = $counter + $reservation['desiredCapacity'];
                     }
 
-                    if ($reservationObject>desiredCapacityMax && (($factor * $reservationObject->desiredCapacityMax) <= $counter)) {
+                    if ($reservationObject->desiredCapacityMax && (($factor * $reservationObject->desiredCapacityMax) <= $counter)) {
                         return true;
                     }
                 }

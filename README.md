@@ -1,6 +1,6 @@
 # con4gis-Reservation
 
-## IMPORTANT for UPDATEs from Reservation version 2 to version 3
+### IMPORTANT for UPDATEs from Reservation version 2 to version 3
 - Please save your settings in the reservation module before updating. Because the module settings are now in the backend module reservation form. The reason for this is among other things a relief of the tl_module.
 - The price setting module does not exist anymore. The settings are now directly on the object.
 - The instructor list has been further elaborated in the customer order and has its own module. Forwarding pages can be configured.
