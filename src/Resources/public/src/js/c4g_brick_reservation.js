@@ -254,7 +254,7 @@ function checkType(dateField, event) {
     }
 }
 
-function setReservationForm(id, typeId, showDateTime, event) {
+function setReservationForm(typeId, showDateTime, event) {
     jQuery(".reservation-id").hide();
 
     if (typeId == -1) {
@@ -284,7 +284,7 @@ function setReservationForm(id, typeId, showDateTime, event) {
 
     var dateId = 'c4g_beginDate_'+typeId;
     if (document.getElementById(dateId)) {
-        setTimeset(document.getElementById(dateId), id, typeId, showDateTime);
+        setTimeset(document.getElementById(dateId), typeId, showDateTime);
     } else if (event) {
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
@@ -293,7 +293,7 @@ function setReservationForm(id, typeId, showDateTime, event) {
         if (eventId) {
             var dateId = 'c4g_beginDateEvent_' + typeId + '-22' + eventId;
             if (document.getElementById(dateId)) {
-                setTimeset(document.getElementById(dateId), id, typeId, showDateTime);
+                setTimeset(document.getElementById(dateId), typeId, showDateTime);
                 checkEventFields();
             }
         } else {
@@ -304,7 +304,7 @@ function setReservationForm(id, typeId, showDateTime, event) {
                     if (dateField && checkType(dateField, event) && dateField.value) {
                         var fieldId = dateField.id;
                         if (fieldId && fieldId.indexOf('c4g_beginDateEvent_' + typeId + '-22')) {
-                            setTimeset(dateField, id, typeId, showDateTime);
+                            setTimeset(dateField, typeId, showDateTime);
                             checkEventFields();
                             break;
                         }
@@ -464,7 +464,7 @@ function isElementReallyShowed (el) {
     return elementReallyShowed;
 }
 
-function setTimeset(dateField, id, additionalId, showDateTime) {
+function setTimeset(dateField, additionalId, showDateTime) {
     var elementId = 0;
     var date = 0;
     var val = -1;
@@ -495,7 +495,7 @@ function setTimeset(dateField, id, additionalId, showDateTime) {
         date = date.replace("/", "~");
     }
 
-    if (id && date && additionalId) {
+    if (date && additionalId) {
         duration = duration ? duration : -1;
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "flex";
         let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration;
