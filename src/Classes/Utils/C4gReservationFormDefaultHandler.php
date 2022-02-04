@@ -228,6 +228,13 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         } else if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute')) {
 
             for ($i=0;$i<=6;$i++) {
+                if ($this->initialValues->getDate()) {
+                    $wd = date('N', $this->initialValues->getDate());
+                    if ($i != $wd) {
+                        continue;
+                    }
+                }
+
                 $we = $reservationObject->getWeekdayExclusion();
                 foreach ($we as $key=>$value) {
                     if ($i == $key) {
