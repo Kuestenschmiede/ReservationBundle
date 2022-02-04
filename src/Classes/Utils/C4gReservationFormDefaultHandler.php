@@ -228,6 +228,14 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         } else if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute')) {
 
             for ($i=0;$i<=6;$i++) {
+                $we = $reservationObject->getWeekdayExclusion();
+                foreach ($we as $key=>$value) {
+                    if ($i == $key) {
+                        if (!$value) {
+                            continue(2);
+                        }
+                    }
+                }
                 $wdCondition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id'].'--'.$i);
                 $wdCondition->setModel(C4gReservationHandler::class);
                 $wdCondition->setFunction('isWeekday');
