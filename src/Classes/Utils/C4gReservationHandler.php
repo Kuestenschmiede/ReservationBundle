@@ -240,103 +240,24 @@ class C4gReservationHandler
         return ($object && (intval($object) > 0)) ? true : false;
     }
 
+
     /**
+     * @param $day
      * @param $date
      * @return bool
      */
-    public static function isSunday($date)
+    public static function isWeekday($datestr)
     {
-
-        $date = strtotime($date);
-        if ($date && (date("w", $date) == 0)) {
-            return true;
-        } else {
-            return false;
+        if ($pos = strpos($datestr, '--')) {
+            $date = substr($datestr, 0, $pos);
+            $day  = substr($datestr, $pos+2);
+            $date = strtotime($date);
+            if ($date && (date("w", $date) == $day)) {
+                return true;
+            }
         }
-    }
 
-    /**
-     * @param $date
-     * @return bool
-     */
-    public static function isMonday($date)
-    {
-        $date = strtotime($date);
-        if ($date && (date("w", $date) == 1)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @param $date
-     * @return bool
-     */
-    public static function isTuesday($date)
-    {
-        $date = strtotime($date);;
-        if ($date && (date("w", $date) == 2)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @param $date
-     * @return bool
-     */
-    public static function isWednesday($date)
-    {
-        $date = strtotime($date);
-        if ($date && (date("w", $date) == 3)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @param $date
-     * @return bool
-     */
-    public static function isThursday($date)
-    {
-        $date = strtotime($date);
-        if ($date && (date("w", $date) == 4)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @param $date
-     * @return bool
-     */
-    public static function isFriday($date)
-    {
-        $date = strtotime($date);
-        if ($date && (date("w", $date) == 5)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @param $date
-     * @return bool
-     */
-    public static function isSaturday($date)
-    {
-        $date = strtotime($date);
-        if ($date && (date("w", $date) == 6)) {
-            return true;
-        } else {
-            return false;
-        }
+        return false;
     }
 
     /**

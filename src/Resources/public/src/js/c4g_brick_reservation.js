@@ -37,60 +37,14 @@ function getWeekdate(date) {
     return jsdate.getDay();
 }
 
-function isSunday(date, fieldName) {
-    if (getWeekdate(date) === 0) {
-        return true;
-    } else {
-        return false;
+function isWeekday(datestr, fieldName) {
+    var dateArr = datestr.split('--');
+    if (dateArr && dateArr[1]) {
+        if (getWeekdate(dateArr[0]) == dateArr[1]) {
+            return true;
+        }
     }
-}
-
-function isMonday(date, fieldName) {
-    if (getWeekdate(date) === 1) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-function isTuesday(date, fieldName) {
-    if (getWeekdate(date) === 2) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-function isWednesday(date, fieldName) {
-    if (getWeekdate(date) === 3) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-function isThursday(date, fieldName) {
-    if (getWeekdate(date) === 4) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-function isFriday(date, fieldName) {
-    if (getWeekdate(date) === 5) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-function isSaturday(date, fieldName) {
-    if (getWeekdate(date) === 6) {
-        return true;
-    } else {
-        return false;
-    }
+    return false;
 }
 
 function setObjectId(object, typeid, showDateTime = 0) {
