@@ -596,13 +596,9 @@ class C4gReservationHandler
                         break;
                     default: '';
                 }
-                //}
 
-//                if (!$objectType->severalBookings) {
-//                    $maxObjects = $maxCount && ($maxCount < $objectQuantity) ? $maxCount : $objectQuantity;
-//                } else {
-                $maxObjects = $maxCount ?: 0;
-//                }
+                $severalBookingCount = $typeObject['severalBookings'] ? 1 : 0;
+                $maxObjects = $maxCount ?: $severalBookingCount;
 
                 //object count * max persons
                 $capacity = $objectQuantity * intval($desiredCapacity);
