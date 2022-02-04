@@ -147,7 +147,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_address'] = 'Geben Sie Ihre Ansc
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_postal'] = 'Geben Sie eine Postleitzahl an.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_city'] = 'Geben Sie Ort oder Stadt ein.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_comment'] = 'Optionale Nachricht.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten in unserer&nbsp;';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten in unserer ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] = 'Datenschutzerklärung.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten in unserer Datenschutzerklärung.';
 

@@ -177,7 +177,7 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                         }
 
                         jQuery(selectField).children('option[value="'+option.value+'"]').text(
-                            text + ' ('+ date + ' '+time+')'
+                            text + '\u00A0('+date+'\u00A0'+time+')'
                         );
                     }
                 }
