@@ -66,6 +66,12 @@ class C4gReservationCalculator
 
         $switchAllTypes = \Contao\StringUtil::deserialize($switchAllTypes);
         foreach ($reservations as $reservation) {
+            if ($objectId) {
+              $reservation['timeInterval'] = $object->getTimeinterval();
+              $reservation['duration'] = /*$reservation['duration'] ?: */$object->getDuration(); //ToDo check own duration
+              $reservation['periodType'] = $object->getPeriodType();
+            }
+
             if ($allTypesValidity) {
                 if ($switchAllTypes && count($switchAllTypes) > 0) {
                     if (!in_array($typeId, $switchAllTypes)) {
@@ -213,6 +219,18 @@ class C4gReservationCalculator
                 $timeEnd = strtotime($te);
                 $timeBeginDb = strtotime($tbdb);
                 $timeEndDb = strtotime($tedb);
+
+                if (($reservation['duration']) && ($reservation['timeInterval']) && ($reservation['duration'] > $reservation['timeInterval'])) {
+                    switch ($reservation['periodType']) {
+                        case 'minute':
+                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 60) + ($reservation['duration'] * 60);
+                            break;
+                        case 'hour':
+                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 3600) + ($reservation['duration'] * 3600);
+                            break;
+                    }
+                }
+
                 if (
                     (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
                     (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb))) {

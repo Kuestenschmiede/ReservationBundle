@@ -234,17 +234,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sql'               => "smallint(5) unsigned NOT NULL default 1"
         ),
 
-//        'periodType' => array(
-//            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'],
-//            'exclude'                 => true,
-//            'search'                  => false,
-//            'inputType'               => 'select',
-//            'options'                 => array('minute','hour','openingHours','md'),
-//            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation'],
-//            'eval'                    => array('tl_class'=>'w50','unique' =>false,'feViewable'=>true, 'mandatory'=>true),
-//            'sql'                     => "char(25) NOT NULL default ''"
-//        ),
-
         'beginDate' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['beginDate'],

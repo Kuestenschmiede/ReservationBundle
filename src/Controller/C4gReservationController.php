@@ -1369,6 +1369,11 @@ class C4gReservationController extends C4GBaseController
                 //$duration = $duration;
             } else {
                 $duration = $time_interval;
+
+//ToDo save duration by default
+//                if (!$putVars['duration'] && $reservationObject->duration) {
+//                    $putVars['duration'] = $reservationObject->duration;
+//                }
             }
 
             $duration = $duration * $interval;

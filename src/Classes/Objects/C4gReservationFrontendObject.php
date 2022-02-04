@@ -23,6 +23,7 @@ class C4gReservationFrontendObject
     private $allTypesQuantity = 1;
     private $allTypesValidity = 0;
     private $timeinterval = '30';
+    private $periodType = 'minute';
     private $duration = '30';
     private $reservationTypes = [];
     private $opening_hours = ['mo','tu','we','th','fr','sa','su'];
@@ -532,5 +533,21 @@ class C4gReservationFrontendObject
     public function setImage($image): void
     {
         $this->image = $image;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPeriodType(): string
+    {
+        return $this->periodType;
+    }
+
+    /**
+     * @param string $periodType
+     */
+    public function setPeriodType(string $periodType): void
+    {
+        $this->periodType = $periodType;
     }
 }

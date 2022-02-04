@@ -584,7 +584,6 @@ class C4gReservationHandler
                     }
                 }
 
-                //else {
                 $oh = $object->getOpeningHours();
                 switch ($periodType) {
                     case 'minute':
@@ -1227,6 +1226,7 @@ class C4gReservationHandler
                 $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".number_format($price,2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
 
                 $frontendObject->setTimeinterval($object['time_interval']);
+                $frontendObject->setPeriodType($type['periodType']);
                 $frontendObject->setDuration($object['duration']);
                 $frontendObject->setMinReservationDay($object['min_reservation_day']);
                 $frontendObject->setMaxReservationDay($object['max_reservation_day']);
