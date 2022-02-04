@@ -42,6 +42,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimestampField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTrixEditorField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBaseController;
 use con4gis\ProjectsBundle\Classes\Framework\C4GController;
@@ -344,7 +345,7 @@ class C4gReservationController extends C4GBaseController
                         if (strpos($GLOBALS['TL_LANGUAGE'], $caption['language']) >= 0) {
                             $typelist[$type->id] = array(
                                 'id' => $type->id,
-                                'name' => $caption['caption'] ?  StringHelper::spaceToNbsp($caption['caption']) : $type->caption,
+                                'name' => $caption['caption'] ?  StringHelper::spaceToNbsp($caption['caption']) : StringHelper::spaceToNbsp($type->caption),
                                 'periodType' => $type->periodType,
                                 'includedParams' => \Contao\StringUtil::deserialize($type->included_params),
                                 'additionalParams' => \Contao\StringUtil::deserialize($type->additional_params),
@@ -1053,7 +1054,7 @@ class C4gReservationController extends C4GBaseController
 
         $agreedField = new C4GCheckboxField();
         $agreedField->setFieldName('agreed');
-        $agreedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'].'&nbsp;'.$desc);
+        $agreedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'].' '.$desc);
         $agreedField->setTableRow(false);
         $agreedField->setColumnWidth(5);
         $agreedField->setSortColumn(false);
@@ -1154,6 +1155,12 @@ class C4gReservationController extends C4GBaseController
         $groupId->setNotificationField(false);
         $fieldList[] = $groupId;
 
+        $bookedAt = new C4GTextField();
+        $bookedAt->setFieldName('bookedAt');
+        $bookedAt->setTableColumn(true);
+        $bookedAt->setFormField(false);
+        $bookedAt->setNotificationField(false);
+        $fieldList[] = $bookedAt;
         return $fieldList;
     }
 
@@ -1558,6 +1565,8 @@ class C4gReservationController extends C4GBaseController
         foreach ($putVars as $key => $value) {
             $rawData .= (isset($putVars[$key]) ? $putVars[$key] : ucfirst($key)) . ': ' . (is_array($value) ? implode(', ', $value) : $value) . "\n";
         }
+
+        $putVars['bookedAt'] = time();
 
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);

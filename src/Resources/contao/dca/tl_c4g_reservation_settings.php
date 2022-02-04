@@ -310,7 +310,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'sorting'                 => false,
             'inputType'               => 'textarea',
             'default'                 => '',
-            'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
+            'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
             'sql'                     => "text NULL"
         ),
         'privacy_policy_site' => array
@@ -355,10 +355,18 @@ class tl_c4g_reservation_settings extends Backend
      */
     public function getAllTypes()
     {
-        $types = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_type ORDER BY caption")
+        $types = $this->Database->prepare("SELECT id,caption,reservationObjectType FROM tl_c4g_reservation_type ORDER BY caption")
             ->execute();
         while ($types->next()) {
-            $return[$types->id] = $types->caption;
+            $objectType = $types->reservationObjectType;
+            switch ($objectType) {
+                case '1':
+                    $return[$types->id] = $types->caption.' [Default]';
+                    break;
+                case '2':
+                    $return[$types->id] = $types->caption.' [Events]';
+                    break;
+            }
         }
         return $return;
     }

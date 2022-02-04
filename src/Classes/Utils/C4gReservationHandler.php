@@ -3,6 +3,7 @@
 namespace con4gis\ReservationBundle\Classes\Utils;
 
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
+use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
@@ -1108,7 +1109,7 @@ class C4gReservationHandler
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject['id']);
                 $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
-                $frontendObject->setCaption($showPrices && $price ? $eventObject['title']."<span class='price'>&nbsp;(+".number_format($price,2,',','.')." €)</span>" : $eventObject['title']);
+                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(+".number_format($price,2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                 $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
                 $frontendObject->setBeginDate($eventObject['startDate'] ?: 0);
                 $frontendObject->setBeginTime($eventObject['startTime'] ?: 0);
@@ -1146,7 +1147,7 @@ class C4gReservationHandler
                         $frontendObject->setType(2);
                         $frontendObject->setId($eventObject['id']);
                         $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
-                        $frontendObject->setCaption($showPrices && $price ? $eventObject['title']."<span class='price'>&nbsp;(".number_format($price,2,',','.')." €)</span>" : $eventObject['title']);
+                        $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".number_format($price,2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                         $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
                         $frontendObject->setBeginDate($eventObject['startDate'] ?: 0);
                         $frontendObject->setBeginTime($eventObject['startTime'] ?: 0);
@@ -1210,20 +1211,20 @@ class C4gReservationHandler
                 $frontendObject->setType(1);
                 $frontendObject->setId($object['id']);
 
-                $frontendObject->setCaption($object['caption']);
+                $frontendObject->setCaption(StringHelper::spaceToNbsp($object['caption']));
 
                 $captions = $object['options'];
                 if ($captions) {
                     foreach ($captions as $caption) {
                         if (strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) {
-                            $frontendObject->setCaption($caption['caption']);
+                            $frontendObject->setCaption(StringHelper::spaceToNbsp($caption['caption']));
                             break;
                         }
                     }
                 }
 
                 $price = $showPrices ? static::calcPrices($object, $type, false, 1) : 0;
-                $frontendObject->setCaption($showPrices && $price ? $frontendObject->getCaption()."<span class='price'>&nbsp;(".number_format($price,2,',','.')." €)</span>" : $frontendObject->getCaption());
+                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".number_format($price,2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
 
                 $frontendObject->setTimeinterval($object['time_interval']);
                 $frontendObject->setDuration($object['duration']);
