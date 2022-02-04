@@ -14,7 +14,7 @@ $str = 'tl_c4g_reservation_settings';
 $GLOBALS['TL_LANG'][$str]['id'] = array("#", "");
 $GLOBALS['TL_LANG'][$str]['caption'] = array("Bezeichnung", "Zur Auswahl am Frontendmodul");
 
-$GLOBALS['TL_LANG'][$str]['reservation_types'] = array('Reservierungsarten', 'Wählen Sie die bei der Reservierung im Frontend zu berücksichigenden Reservierungsarten (Räume, Tische, ...). Bei keiner Auswahl werden alle Reservierungsobjekte geladen.');
+$GLOBALS['TL_LANG'][$str]['reservation_types'] = array('Reservierungsarten', 'Wählen Sie die bei der Reservierung im Frontend zu berücksichigenden Reservierungsarten (Räume, Tische, ...). Bei keiner Auswahl werden alle Reservierungsobjekte geladen. Sie sollten nicht allzu viele Arten zuordnen (max. 10).');
 $GLOBALS['TL_LANG'][$str]['typeHide'] = array('Reservierungsart verstecken', 'sollte nur eine Reservierungsart zur Auswahl stehen, dann kann das Feld hierüber ausgeblendet werden.');
 $GLOBALS['TL_LANG'][$str]['reservationButtonCaption'] = array('Beschriftung Absendebutton','Hiermit können Sie den Button Text ändern. Bspw. "Zahlungspflichtig reservieren".');
 $GLOBALS['TL_LANG'][$str]['redirect_site'] = array('Weiterleitung nach der Reservierung', 'Nach der Buchung wird zur ausgewählten Seite weitergeleitet. Bspw. für eine Reservierungsbestätigung.');

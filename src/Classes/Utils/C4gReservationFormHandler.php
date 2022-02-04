@@ -26,10 +26,10 @@ class C4gReservationFormHandler
      */
     public function __construct(
         C4gReservationController &$module,
-        Array &$fieldList,
-        Array &$typeObject,
-        C4GBrickDialogParams &$dialogParams,
-        C4gReservationInitialValues &$initialValues)
+        Array $fieldList,
+        Array $typeObject,
+        C4GBrickDialogParams $dialogParams,
+        C4gReservationInitialValues $initialValues)
     {
         $this->module = $module;
         $this->fieldList = $fieldList;
@@ -102,7 +102,7 @@ class C4gReservationFormHandler
     /**
      * @return C4GDialogChangeHandler|null
      */
-    public function getDialogParams(): ?C4GDialogChangeHandler
+    public function getDialogParams(): ?C4GBrickDialogParams
     {
         return $this->dialogParams;
     }
@@ -110,7 +110,7 @@ class C4gReservationFormHandler
     /**
      * @param C4GDialogChangeHandler|null $dialogParams
      */
-    public function setDialogParams(?C4GDialogChangeHandler $dialogParams): void
+    public function setDialogParams(?C4GBrickDialogParams $dialogParams): void
     {
         $this->dialogParams = $dialogParams;
     }

@@ -190,15 +190,6 @@ class C4gReservationController extends C4GBaseController
             $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
         }
 
-        //ToDo
-        $specialParticipantMechanism = $this->reservationSettings->specialParticipantMechanism;
-        $maxParticipants = $listType['maxParticipantsPerBooking'];
-        $minParticipants = $listType['minParticipantsPerBooking'];
-        $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
-        $maxCapacity = $maxParticipants ?: 0;
-        $minCapacity = $minParticipants ?: 1;
-
-
         $fieldList = array();
         $typelist = array();
 
@@ -326,6 +317,8 @@ class C4gReservationController extends C4GBaseController
             }
 
             $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types);
+
+            $safetyCount = 0;
             foreach ($types as $type) {
                 if ($moduleTypes && is_array($moduleTypes) && (count($moduleTypes) > 0)) {
                     $arrModuleTypes = $moduleTypes;
@@ -337,6 +330,10 @@ class C4gReservationController extends C4GBaseController
                 $objects = C4gReservationHandler::getReservationObjectList(array($type->id), intval($eventId), $this->reservationSettings->showPrices);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
+                }
+
+                if ($safetyCount == 10) {
+                    break;
                 }
 
                 $captions = \Contao\StringUtil::deserialize($type->options);
@@ -379,6 +376,7 @@ class C4gReservationController extends C4GBaseController
                         'directBooking' => $type->directBooking
                     );
                 }
+                $safetyCount++;
             }
         }
 
@@ -450,9 +448,6 @@ class C4gReservationController extends C4GBaseController
                     $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
                     return [$info];
             }
-
-//            $isEvent = $listType['isEvent'];
-//            $reservationObjects = $listType['objects'];
         }
 
         if (!$typelist || count($typelist) <= 0) {
@@ -847,9 +842,13 @@ class C4gReservationController extends C4GBaseController
                 $emailField->setNotificationField(false);
                 $participants[] = $emailField;
 
+                $specialParticipantMechanism = $this->reservationSettings->specialParticipantMechanism;
                 foreach ($typelist as $type) {
                     $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $type['id']);
-
+                    $maxParticipants = $type['maxParticipantsPerBooking'];
+                    $minParticipants = $type['minParticipantsPerBooking'];
+                    $maxCapacity = $maxParticipants ?: 0;
+                    $minCapacity = $minParticipants ?: 1;
                     $params = $type['participantParams'];
                     $participantParamsArr = [];
 
