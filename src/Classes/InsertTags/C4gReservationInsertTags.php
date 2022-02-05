@@ -566,7 +566,7 @@ class C4gReservationInsertTags
                             break;
                         case 'beginDate':
                             if ($startDate) {
-                                $value = date($dateFormat, $startDate);
+                                $value = is_numeric($startDate) ? date($dateFormat, $startDate) : $startDate;
                             } else {
                                 $value = date($dateFormat, $calendarEvent->startDate);
                             }
@@ -577,7 +577,7 @@ class C4gReservationInsertTags
                             return $value;
                         case 'beginDate_raw':
                             if ($startDate) {
-                                return date($dateFormat, $startDate);
+                                return is_numeric($startDate) ? date($dateFormat, $startDate) : $startDate;
                             } else {
                                 return date($dateFormat, $calendarEvent->startDate);
                             }
