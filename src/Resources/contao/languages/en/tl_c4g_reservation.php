@@ -78,8 +78,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes'] = 'yes';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['participants'] = 'Participants';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmationEmail'] = 'Send confirmation';
 
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['tstamp'] = 'Last change';
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['bookedAt'] = 'Booked at';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['tstamp'] = array('Last change','');
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['bookedAt'] = array('Booked at','');
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend'] = "reservation data";

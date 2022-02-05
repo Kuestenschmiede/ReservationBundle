@@ -64,8 +64,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Bestätigen", "D
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['specialNotification'] = array("Spezialnachricht senden", "Ist dieser Schalter gesetzt wird die an der Reservierungsart verknüpfte Spezialnachricht versendet.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['emailConfirmationSend'] = array("Bestätigung wurde versendet", "Dieser Schalter wird automatisch gesetzt, sobald die E-Mail versendet wurde. Sie können die Checkbox wieder deaktivieren um eine erneute Bestätigung zu versenden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Storniert", "Wenn der Termin storniert wird, ist dieses Feld auszuwählen");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['tstamp'] = 'Letzte Änderung';
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['bookedAt'] = 'Gebucht am';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['tstamp'] = array('Letzte Änderung','');
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['bookedAt'] = array('Gebucht am','');
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'] = array("Für Mitglied", "Die Reservierung wurde durch oder für dieses Mitglied erstellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['groupId'] = array("Für Gruppe", "Die Reservierung wurde durch oder für diese Mitgliedergruppe erstellt.");
