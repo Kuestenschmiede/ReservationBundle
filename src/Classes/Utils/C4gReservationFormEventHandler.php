@@ -61,36 +61,6 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $condition = $this->condition;
         $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
 
-        if ($this->reservationSettings->withCapacity) {
-            $conditionCapacity = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id']);
-
-            $reservationDesiredCapacity = new C4GNumberField();
-            $reservationDesiredCapacity->setFieldName('desiredCapacity');
-
-            if ($minCapacity && $maxCapacity) {
-                $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
-            } else {
-                $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
-            }
-            $reservationDesiredCapacity->setFormField(true);
-            $reservationDesiredCapacity->setEditable(true);
-            $reservationDesiredCapacity->setCondition(array($condition));
-            $reservationDesiredCapacity->setInitialValue($minCapacity);
-            $reservationDesiredCapacity->setMandatory(true);
-            $reservationDesiredCapacity->setMin($minCapacity);
-            if ($maxCapacity) {
-                $reservationDesiredCapacity->setMax($maxCapacity);
-            }
-            $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
-            $reservationDesiredCapacity->setCallOnChange(true);
-            $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ",true);");
-            $reservationDesiredCapacity->setNotificationField(true);
-            $reservationDesiredCapacity->setAdditionalID($listType['id']);
-            $reservationDesiredCapacity->setStyleClass('desired-capacity');
-
-            $this->fieldList[] = $reservationDesiredCapacity;
-        }
-
         //set reservationObjectType to event
         $reservationObjectTypeDBField = new C4GNumberField();
         $reservationObjectTypeDBField->setFieldName('reservationObjectType');
@@ -306,7 +276,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     if ($speaker) {
                         $speakerName = $speaker->title ? $speaker->title . '&nbsp;' . $speaker->firstname . '&nbsp;' . $speaker->lastname : $speaker->firstname . '&nbsp;' . $speaker->lastname;
 
-                        if ($this->reservationSettings->speaker_redirect_site) {
+                        if ($reservationSettings->speaker_redirect_site) {
                             $jumpTo = \PageModel::findByPk($reservationSettings->speaker_redirect_site);
                             if ($jumpTo) {
                                 $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerId;
@@ -394,7 +364,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 $this->fieldList[] = $audienceField;
             }
 
-            if ($this->reservationSettings->showDetails) {
+            if ($reservationSettings->showDetails) {
                 if ($reservationObject->getDescription()) {
                     $descriptionField = new C4GTrixEditorField();
                     $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
