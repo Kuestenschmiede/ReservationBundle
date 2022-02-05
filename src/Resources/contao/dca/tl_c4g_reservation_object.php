@@ -165,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['switchAllTypes'],
             'exclude'           => true,
             'inputType'         => 'checkbox',
-            'foreignKey'        => 'tl_c4g_reservation_type.caption',
+            'options_callback'  => ['tl_c4g_reservation_object', 'getTypes'],
             'eval'              => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr'),
             'sql'               => "blob NULL"
         ),
@@ -217,7 +217,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'],
             'exclude'           => true,
             'inputType'         => 'checkbox',
-            'foreignKey'        => 'tl_c4g_reservation_type.caption',
+            'options_callback'  => ['tl_c4g_reservation_object', 'getTypes'],
             'eval'              => array('mandatory'=>true,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'               => "blob NULL "
         ),
@@ -829,5 +829,20 @@ class tl_c4g_reservation_object extends Backend
             $arrRow['time_interval']
         ];
         return $result;
+    }
+
+    public function getTypes(DataContainer $dc)
+    {
+        $return = [];
+
+        $types = $this->Database->prepare("SELECT id, caption, reservationObjectType, published FROM tl_c4g_reservation_type")
+            ->execute()->fetchAllAssoc();
+        foreach ($types as $type) {
+            if ($type['reservationObjectType'] == '1') {
+                $key = $type['id'];
+                $return[$key] = $type['caption'];
+            }
+        }
+        return $return;
     }
 }
