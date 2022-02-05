@@ -171,7 +171,7 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                     }
 
                     if (text && (date != '') && (time != '')) {
-                        var pos = text.lastIndexOf(' (');
+                        var pos = text.lastIndexOf('\u00A0(');
                         if (pos != -1) {
                             text = text.substr(0, pos);
                         }
