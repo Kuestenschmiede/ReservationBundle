@@ -61,35 +61,6 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $condition = $this->condition;
         $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
 
-        if ($reservationSettings->withCapacity) {
-            $reservationDesiredCapacity = new C4GNumberField();
-            $reservationDesiredCapacity->setFieldName('desiredCapacity');
-
-            if ($minCapacity && $maxCapacity) {
-                $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
-            } else {
-                $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
-            }
-            $reservationDesiredCapacity->setFormField(true);
-            $reservationDesiredCapacity->setEditable(true);
-            $reservationDesiredCapacity->setCondition(array($condition));
-            $reservationDesiredCapacity->setInitialValue($minCapacity);
-            $reservationDesiredCapacity->setMandatory(true);
-            $reservationDesiredCapacity->setMin($minCapacity);
-            if ($maxCapacity) {
-                $reservationDesiredCapacity->setMax($maxCapacity);
-            }
-            $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
-            $reservationDesiredCapacity->setCallOnChange(true);
-            $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ",false);");
-            $reservationDesiredCapacity->setNotificationField(true);
-            $reservationDesiredCapacity->setAdditionalID($listType['id']);
-            $reservationDesiredCapacity->setStyleClass('desired-capacity');
-
-            $this->fieldList[] = $reservationDesiredCapacity;
-        }
-
-
         //set reservationObjectType to default
         $reservationObjectTypeField = new C4GNumberField();
         $reservationObjectTypeField->setFieldName('reservationObjectType');
