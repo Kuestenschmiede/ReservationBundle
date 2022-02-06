@@ -187,7 +187,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginTimeField->setInitialValue($initialBookingTime ?: $this->initialValues->getTime());
             $reservationBeginTimeField->setSort(false);
             $reservationBeginTimeField->setCondition(array($condition));
-            $reservationBeginTimeField->setAdditionalID($listType['id'].'-00'.date('w', $this->initialValues->getDate()));
+            $reservationBeginTimeField->setAdditionalID($listType['id'].'-00'.date('w', $initialBookingDate));
             $reservationBeginTimeField->setNotificationField(true);
             $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
             $reservationBeginTimeField->setTurnButton(true);
@@ -200,7 +200,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
 
             for ($i=0;$i<=6;$i++) {
                 if ($this->initialValues->getDate()) {
-                    $wd = date('N', $this->initialValues->getDate());
+                    $wd = date('N', intval($this->initialValues->getDate()));
                     if ($i != $wd) {
                         continue;
                     }
