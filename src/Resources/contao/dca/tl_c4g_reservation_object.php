@@ -216,6 +216,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['viewableTypes'],
             'exclude'           => true,
+            'filter'            => true,
             'inputType'         => 'checkbox',
             'options_callback'  => ['tl_c4g_reservation_object', 'getTypes'],
             'eval'              => array('mandatory'=>true,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
@@ -838,7 +839,7 @@ class tl_c4g_reservation_object extends Backend
         $types = $this->Database->prepare("SELECT id, caption, reservationObjectType, published FROM tl_c4g_reservation_type")
             ->execute()->fetchAllAssoc();
         foreach ($types as $type) {
-            if ($type['reservationObjectType'] == '1') {
+            if ($type['reservationObjectType'] == '1' || $type['reservationObjectType'] == '3') {
                 $key = $type['id'];
                 $return[$key] = $type['caption'];
             }
