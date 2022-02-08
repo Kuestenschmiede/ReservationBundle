@@ -40,6 +40,10 @@ $GLOBALS['TL_LANG'][$str]['removeBookedDays'] = array("Lock fully booked days in
 $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text empty object list (optional)", "The text of the selectbox can optionally be overwritten.");
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Participant mechanism (optional)", "If this mechanism is enabled, the participant fields are generated based on the number of people.");
 
+$GLOBALS['TL_LANG'][$str]['referencesObjectType'][1] = 'Time selection';
+$GLOBALS['TL_LANG'][$str]['referencesObjectType'][2] = 'Events';
+$GLOBALS['TL_LANG'][$str]['referencesObjectType'][3] = 'Object selection';
+
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['settings_legend'] = "General settings";
 $GLOBALS['TL_LANG'][$str]['type_legend'] = "Reservation type settings";

@@ -60,6 +60,7 @@ use con4gis\ReservationBundle\Classes\Projects\C4gReservationBrickTypes;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationFormDefaultHandler;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationFormEventHandler;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationFormObjectFirstHandler;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationInitialValues;
 use Contao\Controller;
@@ -89,14 +90,14 @@ class C4gReservationController extends C4GBaseController
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/src/js/c4g_brick_reservation.js';
+    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
 
     //Resource Params
     protected $loadDefaultResources = true;
     protected $loadDateTimePickerResources = false;
-    protected $loadChosenResources = false;
+    protected $loadChosenResources = true;
     protected $loadClearBrowserUrlResources = false;
     protected $loadConditionalFieldDisplayResources = true;
     protected $loadMoreButtonResources = false;
@@ -392,8 +393,7 @@ class C4gReservationController extends C4GBaseController
         if (count($typelist) > 0) {
             $firstType = array_key_first($typelist);
 
-            $onLoadScript = $this->getDialogParams()->getOnloadScript();
-            $onLoadScript .= " jQuery('#c4g_reservation_type').trigger('change');";
+            $onLoadScript = "jQuery('#c4g_reservation_type').trigger('change');";
             $this->getDialogParams()->setOnloadScript(trim($onLoadScript));
 
             $reservationTypeField = new C4GSelectField();
@@ -407,13 +407,14 @@ class C4gReservationController extends C4GBaseController
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
             $reservationTypeField->setCallOnChange(true);
-            $reservationTypeField->setCallOnChangeFunction("setReservationForm(-1 ," . $showDateTime . ",false)");
+            $reservationTypeField->setCallOnChangeFunction("setReservationForm(-1 ," . $showDateTime . ")");
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
             $reservationTypeField->setEditable(count($typelist) > 1);
             $reservationTypeField->setNotificationField(true);
             $reservationTypeField->setWithOptionType(true);
             $reservationTypeField->setHidden((count($typelist) == 1) && $this->reservationSettings->typeHide);
+            //$reservationTypeField->setInitialCallOnChange(true);
             $fieldList[] = $reservationTypeField;
         } else {
             $info = new C4GInfoTextField();
@@ -454,7 +455,7 @@ class C4gReservationController extends C4GBaseController
                 }
                 $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                 $reservationDesiredCapacity->setCallOnChange(true);
-                $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ",false);");
+                $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ");");
                 $reservationDesiredCapacity->setNotificationField(true);
                 $reservationDesiredCapacity->setAdditionalID($listType['id']);
                 $reservationDesiredCapacity->setStyleClass('desired-capacity');
@@ -462,7 +463,13 @@ class C4gReservationController extends C4GBaseController
                 $fieldList[] = $reservationDesiredCapacity;
             }
 
-
+            //set reservationObjectType to default
+            $reservationObjectTypeField = new C4GNumberField();
+            $reservationObjectTypeField->setFieldName('reservationObjectType');
+            $reservationObjectTypeField->setInitialValue($listType['objectType']);
+            $reservationObjectTypeField->setDatabaseField(true);
+            $reservationObjectTypeField->setFormField(false);
+            $this->fieldList[] = $reservationObjectTypeField;
 
             switch($listType['objectType']) {
                 case '1':
@@ -474,7 +481,8 @@ class C4gReservationController extends C4GBaseController
                     $fieldList = $formHandler->addFields();
                     break;
                 case '3':
-                    //ToDo new type
+                    $formHandler = new C4gReservationFormObjectFirstHandler($this,$fieldList,$listType,$this->getDialogParams(), $initialValues);
+                    $fieldList = $formHandler->addFields();
                     break;
                 default:
                     //ToDo andere Meldung
@@ -1330,7 +1338,7 @@ class C4gReservationController extends C4GBaseController
             $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate']; //ToDO Check
             $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
        } else {
-            $putVars['reservationObjectType'] = '1';
+            $putVars['reservationObjectType'] = $reservationType->reservationObjectType;
 
             //check duplicate reservation id
             $reservations = C4gReservationModel::findBy("reservation_id", $reservationId);
@@ -1668,9 +1676,9 @@ class C4gReservationController extends C4GBaseController
      * @param $values
      * @param $putVars
      * @return array
-     * @Route("/reservation-api/currentTimeset/{date}/{type}/{duration}", methods={"GET"})
+     * @Route("/reservation-api/currentTimeset/{date}/{type}/{duration}/{objectId}", methods={"GET"})
      */
-    public function getCurrentTimesetAction(Request $request, $date, $type, $duration)
+    public function getCurrentTimesetAction(Request $request, $date, $type, $duration, $objectId)
     {
         $wd = -1;
         $times = [];
@@ -1701,16 +1709,18 @@ class C4gReservationController extends C4GBaseController
             $wd = date("w", $datetime);
         }
 
-        $eventId  = Input::get('event') ? Input::get('event') : 0;
+        if (!$objectId) {
+            $objectId  = Input::get('event') ? Input::get('event') : 0;
 
-        if (!$eventId && $this->session->getSessionValue('reservationEventCookie')) {
-            $eventId = $this->session->getSessionValue('reservationEventCookie');
-        } else if ($eventId) {
-            $this->session->setSessionValue('reservationEventCookie', $eventId);
+            if (!$objectId && $this->session->getSessionValue('reservationEventCookie')) {
+                $eventId = $this->session->getSessionValue('reservationEventCookie');
+            } else if ($objectId) {
+                $this->session->setSessionValue('reservationEventCookie', $objectId);
+            }
         }
 
         if ($date) {
-            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($eventId), $this->reservationSettings->showPrices);
+            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices);
             $withEndTimes = $this->reservationSettings->showEndTime;
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
 

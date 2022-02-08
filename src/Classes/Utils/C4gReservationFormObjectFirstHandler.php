@@ -49,7 +49,7 @@ use Contao\Input;
 use Contao\ModuleModel;
 use Contao\StringUtil;
 
-class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
+class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
 {
     public function addFields() {
         $listType = $this->typeObject;
@@ -61,6 +61,126 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $condition = $this->condition;
         $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
 
+        $objects = [];
+        foreach ($reservationObjects as $reservationObject) {
+            //ToDo Check Capacity
+            $objects[] = array(
+                'id' => $reservationObject->getId(),
+                'name' => $reservationObject->getCaption(),
+                'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
+                'max' => $reservationObject->getDesiredCapacity()[1] ? ($reservationObject->getDesiredCapacity()[1] * $reservationObject->getQuantity()) : 0,// unbegrenzt -> $reservationObject->getQuantity(),
+                'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
+                'openingHours' => $reservationObject->getOpeningHours()
+            );
+        }
+
+        $reservationObjectField = new C4GSelectField();
+        $reservationObjectField->setChosen(true);
+        $reservationObjectField->setFieldName('reservation_object');
+        $reservationObjectField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object']);
+        $reservationObjectField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object']);
+        $reservationObjectField->setFormField(true);
+        $reservationObjectField->setEditable(true);
+        $reservationObjectField->setOptions($objects);
+        $reservationObjectField->setMandatory(true);
+        $reservationObjectField->setNotificationField(true);
+        $reservationObjectField->setRangeField('desiredCapacity_' . $listType['id']);
+        $reservationObjectField->setStyleClass('reservation-object'); //displayReservationObjects
+        $reservationObjectField->setWithEmptyOption(false);
+        $reservationObjectField->setInitialValue($objects[0]['id']);
+        $reservationObjectField->setShowIfEmpty(false);
+        $reservationObjectField->setDatabaseField(true);
+        //$reservationObjectField->setEmptyOptionLabel($this->reservationSettings->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_objectsfirst_none']);
+        $reservationObjectField->setCondition([$condition]);
+        $reservationObjectField->setRemoveWithEmptyCondition(true);
+        //$reservationObjectField->setCallOnChangeFunction('C4GCallOnChange(this)');
+        $reservationObjectField->setInitialCallOnChange(true);
+        $reservationObjectField->setCallOnChange(true);
+        $reservationObjectField->setAdditionalID($listType["id"]);
+        $this->fieldList[] = $reservationObjectField;
+
+        foreach ($reservationObjects as $reservationObject) {
+            $object_condition = [
+                new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
+                $condition
+            ];
+
+            if ($reservationSettings->showDetails) {
+                if ($reservationObject->getDescription()) {
+                    $descriptionField = new C4GTrixEditorField();
+                    $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
+                    $descriptionField->setFieldName('description');
+                    $descriptionField->setInitialValue($reservationObject->getDescription());
+                    $descriptionField->setCondition($object_condition);
+                    $descriptionField->setFormField(true);
+                    $descriptionField->setShowIfEmpty(false);
+                    $descriptionField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+                    $descriptionField->setRemoveWithEmptyCondition(true);
+                    $descriptionField->setDatabaseField(false);
+                    $descriptionField->setEditable(false);
+                    $descriptionField->setNotificationField(true);
+                    $this->fieldList[] = $descriptionField;
+                }
+
+                if ($reservationObject->getImage()) {
+                    $imageField = new C4GImageField();
+                    $imageField->setFieldName('image');
+                    $imageField->setInitialValue($reservationObject->getImage());
+                    $imageField->setCondition($object_condition);
+                    $imageField->setFormField(true);
+                    $imageField->setShowIfEmpty(false);
+                    $imageField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+                    $imageField->setRemoveWithEmptyCondition(true);
+                    $imageField->setDatabaseField(false);
+                    $imageField->setLightBoxField(true);
+                    $imageField->setInitInvisible(true);
+                    $this->fieldList[] = $imageField;
+                }
+            }
+            if (!$this->initialValues->getDate() && $listType['directBooking']) {
+                $initialBookingDate = time();
+            } else {
+                $initialBookingDate = false;
+            }
+
+            if ($this->initialValues->getDate() || $initialBookingDate) {
+                $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id'] . '-' . $reservationObject->getId()."')," . $listType['id'] . "," . $showDateTime . ");";
+                $this->getDialogParams()->setOnloadScript($script);
+            }
+
+            $reservationBeginDateField = new C4GDateField();
+            $reservationBeginDateField->setFlipButtonPosition(false);
+            $reservationBeginDateField->setMinDate(C4gReservationHandler::getMinDate([$reservationObject]));
+            $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate([$reservationObject]));
+            $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString([$reservationObject]));
+            $reservationBeginDateField->setExcludeDates(C4gReservationHandler::getDateExclusionString([$reservationObject], $listType, $reservationSettings->removeBookedDays));
+            $reservationBeginDateField->setFieldName('beginDate');
+            $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
+            $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
+            $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate']);
+            $reservationBeginDateField->setEditable(true);
+            $reservationBeginDateField->setInitialValue($initialBookingDate ?: $this->initialValues->getDate());
+            $reservationBeginDateField->setComparable(false);
+            $reservationBeginDateField->setSortColumn(true);
+            $reservationBeginDateField->setSortSequence('de_datetime');
+            $reservationBeginDateField->setTableColumn(true);
+            $reservationBeginDateField->setFormField(true);
+            $reservationBeginDateField->setColumnWidth(10);
+            $reservationBeginDateField->setMandatory(true);
+            $reservationBeginDateField->setCondition($object_condition);
+            $reservationBeginDateField->setRemoveWithEmptyCondition(true);
+            $reservationBeginDateField->setCallOnChange(true);
+            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this," . $listType['id'] . "," . $showDateTime . ");");
+            $reservationBeginDateField->setNotificationField(true);
+            $reservationBeginDateField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+            $reservationBeginDateField->setStyleClass('begin-date');
+            $reservationBeginDateField->setShowInlinePicker(false);
+            $reservationBeginDateField->setInitInvisible(true);
+            $this->fieldList[] = $reservationBeginDateField;
+        }
+
+
+        //ToDo
         $additionalDuration = $reservationSettings->additionalDuration;
         if (intval($additionalDuration) >= 1) {
             $durationField = new C4GNumberField();
@@ -84,46 +204,6 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $this->fieldList[] = $durationField;
         } else {
             $additionalDuration = 0;
-        }
-
-        if (($listType['periodType'] === 'minute') || ($listType['periodType'] === 'hour')) {
-            if (!$this->initialValues->getDate() && $listType['directBooking']) {
-                $initialBookingDate = time();
-            } else {
-                $initialBookingDate = false;
-            }
-
-            if ($this->initialValues->getDate() || $initialBookingDate) {
-                $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."')," . $listType['id'] . "," . $showDateTime . ");";
-                $this->getDialogParams()->setOnloadScript($script);
-            }
-
-            $reservationBeginDateField = new C4GDateField();
-            $reservationBeginDateField->setFlipButtonPosition(false);
-            $reservationBeginDateField->setMinDate(C4gReservationHandler::getMinDate($reservationObjects));
-            $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
-            $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
-            $reservationBeginDateField->setExcludeDates(C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays));
-            $reservationBeginDateField->setFieldName('beginDate');
-            $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
-            $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
-            $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate']);
-            $reservationBeginDateField->setEditable(true);
-            $reservationBeginDateField->setInitialValue($initialBookingDate ?: $this->initialValues->getDate());
-            $reservationBeginDateField->setComparable(false);
-            $reservationBeginDateField->setSortColumn(true);
-            $reservationBeginDateField->setSortSequence('de_datetime');
-            $reservationBeginDateField->setTableColumn(true);
-            $reservationBeginDateField->setFormField(true);
-            $reservationBeginDateField->setColumnWidth(10);
-            $reservationBeginDateField->setMandatory(true);
-            $reservationBeginDateField->setCondition(array($condition));
-            $reservationBeginDateField->setCallOnChange(true);
-            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this," . $listType['id'] . "," . $showDateTime . ");");
-            $reservationBeginDateField->setNotificationField(true);
-            $reservationBeginDateField->setAdditionalID($listType['id']);
-            $reservationBeginDateField->setStyleClass('begin-date');
-            $this->fieldList[] = $reservationBeginDateField;
         }
 
         $reservationendTimeField = new C4GTextField();
@@ -151,20 +231,6 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $initialBookingTime = false;
         }
 
-        $objects = [];
-        foreach ($reservationObjects as $reservationObject) {
-
-            //ToDo Check Capacity
-            $objects[] = array(
-                'id' => $reservationObject->getId(),
-                'name' => $reservationObject->getCaption(),
-                'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
-                'max' => $reservationObject->getDesiredCapacity()[1] ? ($reservationObject->getDesiredCapacity()[1] * $reservationObject->getQuantity()) : 0,// unbegrenzt -> $reservationObject->getQuantity(),
-                'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
-                'openingHours' => $reservationObject->getOpeningHours()
-            );
-        }
-
         if ($initialBookingDate && $initialBookingTime && $objects) {
             $reservationBeginTimeField = new C4GRadioGroupField();
             $reservationBeginTimeField->setFieldName('beginTime');
@@ -172,8 +238,8 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginTimeField->setFormField(true);
             $reservationBeginTimeField->setDatabaseField(true);
             $reservationBeginTimeField->setOptions(C4gReservationHandler::getReservationNowTime($objects[0], $reservationSettings->showEndTime, $reservationSettings->showFreeSeats));
-            $reservationBeginTimeField->setCallOnChange(true);
-            $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
+            $reservationBeginTimeField->setCallOnChange(false);
+            //$reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
             $reservationBeginTimeField->setMandatory(false);
             $reservationBeginTimeField->setInitialValue($initialBookingTime ?: $this->initialValues->getTime());
             $reservationBeginTimeField->setSort(false);
@@ -228,8 +294,8 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 $reservationTimeField->setInitInvisible(true);
                 $reservationTimeField->setSort(false);
                 $reservationTimeField->setCondition($wdConditionArr);
-                $reservationTimeField->setCallOnChange(true);
-                $reservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
+                $reservationTimeField->setCallOnChange(false);
+                //$reservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
                 $reservationTimeField->setAdditionalID($listType['id'] . '-00'.$i);
                 $reservationTimeField->setNotificationField(true);
                 $reservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
@@ -262,68 +328,6 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationEndTimeDBField->setMax(9999999999999);
         $reservationEndTimeDBField->setNotificationField(true);
         $this->fieldList[] = $reservationEndTimeDBField;
-
-        $reservationObjectField = new C4GSelectField();
-        $reservationObjectField->setChosen(false);
-        $reservationObjectField->setFieldName('reservation_object');
-        $reservationObjectField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object']);
-        $reservationObjectField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_object']);
-        $reservationObjectField->setFormField(true);
-        $reservationObjectField->setEditable(false);
-        $reservationObjectField->setOptions($objects);
-        $reservationObjectField->setMandatory(true);
-        $reservationObjectField->setNotificationField(true);
-        $reservationObjectField->setRangeField('desiredCapacity_' . $listType['id']);
-        $reservationObjectField->setStyleClass('reservation-object displayReservationObjects');
-        $reservationObjectField->setWithEmptyOption(true);
-        $reservationObjectField->setInitialValue(-1);
-        $reservationObjectField->setShowIfEmpty(true);
-        $reservationObjectField->setDatabaseField(true);
-        $reservationObjectField->setEmptyOptionLabel($this->reservationSettings->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
-        $reservationObjectField->setCondition([$condition]);
-        $reservationObjectField->setRemoveWithEmptyCondition(true);
-        $reservationObjectField->setCallOnChange(true);
-        $reservationObjectField->setAdditionalID($listType["id"]);
-        $this->fieldList[] = $reservationObjectField;
-
-        if ($reservationSettings->showDetails) {
-            foreach ($reservationObjects as $reservationObject) {
-                $object_condition = [
-                    new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
-                    new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id'])
-                ];
-                if ($reservationObject->getDescription()) {
-                    $descriptionField = new C4GTrixEditorField();
-                    $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
-                    $descriptionField->setFieldName('description');
-                    $descriptionField->setInitialValue($reservationObject->getDescription());
-                    $descriptionField->setCondition($object_condition);
-                    $descriptionField->setFormField(true);
-                    $descriptionField->setShowIfEmpty(false);
-                    $descriptionField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
-                    $descriptionField->setRemoveWithEmptyCondition(true);
-                    $descriptionField->setDatabaseField(false);
-                    $descriptionField->setEditable(false);
-                    $descriptionField->setNotificationField(true);
-                    $this->fieldList[] = $descriptionField;
-                }
-
-                if ($reservationObject->getImage()) {
-                    $imageField = new C4GImageField();
-                    $imageField->setFieldName('image');
-                    $imageField->setInitialValue($reservationObject->getImage());
-                    $imageField->setCondition($object_condition);
-                    $imageField->setFormField(true);
-                    $imageField->setShowIfEmpty(false);
-                    $imageField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
-                    $imageField->setRemoveWithEmptyCondition(true);
-                    $imageField->setDatabaseField(false);
-                    $imageField->setLightBoxField(true);
-                    $imageField->setInitInvisible(true);
-                    $this->fieldList[] = $imageField;
-                }
-            }
-        }
 
         $includedParams = $listType['includedParams'];
         $includedParamsArr = [];

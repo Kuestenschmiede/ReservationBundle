@@ -443,10 +443,10 @@ class C4gReservationHandler
      * @return bool
      */
     public static function checkValidPeriod($tstamp, $period) {
-        $tstamp = C4gReservationDateChecker::getBeginOfDate(intval($tstamp));
+        $tstamp = intval($tstamp); //C4gReservationDateChecker::getBeginOfDate(intval($tstamp));
 
-        $date_from = C4gReservationDateChecker::getBeginOfDate(intval($period['date_from']));
-        $date_to = C4gReservationDateChecker::getEndOfDate(intval($period['date_to']));
+        $date_from = intval($period['date_from']); //C4gReservationDateChecker::getBeginOfDate(intval($period['date_from']));
+        $date_to = intval($period['date_to']); //C4gReservationDateChecker::getEndOfDate(intval($period['date_to']));
 
         if ($tstamp && ($date_from || $date_to)) {
             //hit the date
@@ -990,7 +990,7 @@ class C4gReservationHandler
                     }
 
                 } else {
-                    $objectlist = C4gReservationHandler::getReservationObjectDefaultList($moduleTypes, $type, $showPrices);
+                    $objectlist = C4gReservationHandler::getReservationObjectDefaultList($moduleTypes, $objectId, $type, $showPrices);
 
                     if ($getAllTypes) {
                         foreach($objectlist as $key=>$object) {
@@ -1178,14 +1178,19 @@ class C4gReservationHandler
      * @param false $showPrices
      * @return array
      */
-    public static function getReservationObjectDefaultList($moduleTypes = null, $type, $showPrices = false)
+    public static function getReservationObjectDefaultList($moduleTypes = null, $objectId = 0, $type, $showPrices = false)
     {
         $objectList = array();
 //        $t = static::$strTable;
 //        $arrOptions = array();
 //        $allObjects = C4gReservationObjectModel::findBy('published','1');
         $database = Database::getInstance();
-        $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE `published` = ?")->execute('1')->fetchAllAssoc();
+
+        if ($objectId) {
+            $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND id = ?")->execute('1', $objectId)->fetchAllAssoc();
+        } else {
+            $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ?")->execute('1')->fetchAllAssoc();
+        }
 
         $almostFullyBookedAt = $type['almostFullyBookedAt'] ?: 0;
         if ($moduleTypes) {

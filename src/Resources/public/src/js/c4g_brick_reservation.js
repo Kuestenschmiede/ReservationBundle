@@ -208,20 +208,19 @@ function checkType(dateField, event) {
     }
 }
 
-function setReservationForm(typeId, showDateTime, event) {
+function setReservationForm(typeId, showDateTime) {
     jQuery(".reservation-id").hide();
-
+    var event = false;
+    var object = false;
     if (typeId == -1) {
         var typeField = document.getElementById("c4g_reservation_type");
         typeId = typeField ? typeField.value : -1;
 
-        if (!event) {
-            var selectedIndex = typeField.selectedIndex;
-            var selectedOption = typeField.options[selectedIndex];
-            if (selectedOption) {
-                event = selectedOption.getAttribute('type') == 2 ? true : false;
-            }
-
+        var selectedIndex = typeField.selectedIndex;
+        var selectedOption = typeField.options[selectedIndex];
+        if (selectedOption) {
+            event = selectedOption.getAttribute('type') == 2 ? true : false;
+            object = selectedOption.getAttribute('type') == 3 ? true : false;
         }
     }
 
@@ -265,6 +264,12 @@ function setReservationForm(typeId, showDateTime, event) {
                     }
                 }
             }
+        }
+    } else if (object) {
+        var objectElement = document.getElementById("c4g_reservation_object_"+typeId);
+        if (objectElement) {
+            dateId = dateId + '-' +objectElement.value;
+            setTimeset(document.getElementById(dateId), typeId, showDateTime);
         }
     }
 
@@ -423,6 +428,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
     var date = 0;
     var val = -1;
     var nameField = '';
+    var objectId = 0;
 
     if (additionalId == -1) {
         jQuery(document.getElementsByClassName('reservation_time_button')) ? jQuery(document.getElementsByClassName('reservation_time_button')).hide() : false;
@@ -430,6 +436,10 @@ function setTimeset(dateField, additionalId, showDateTime) {
     } else {
         if (!dateField) {
             dateField = document.getElementById('c4g_beginDate_'+additionalId);
+        } else {
+            if (dateField.id && dateField.id.indexOf("-")) {
+                objectId = dateField.id.substr(dateField.id.indexOf("-")+1);
+            }
         }
 
         date = dateField ? dateField.value : 0;
@@ -452,7 +462,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
     if (date && additionalId) {
         duration = duration ? duration : -1;
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "flex";
-        let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration;
+        let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration + "/" + objectId;
         var targetButton = false;
         fetch(url)
             .then(response => response.json())

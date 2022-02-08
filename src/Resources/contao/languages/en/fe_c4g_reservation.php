@@ -53,6 +53,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventnumber'] = 'Number';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object'] = 'Reservation options';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none'] = 'Please select or change time';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_objectsfirst_none'] = 'Reservation request';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none_date'] = 'Reservations are not possible on this date.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id'] = 'Identification key: ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation'] = 'Company / Organization / School';

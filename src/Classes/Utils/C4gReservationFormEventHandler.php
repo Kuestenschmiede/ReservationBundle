@@ -61,14 +61,6 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $condition = $this->condition;
         $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
 
-        //set reservationObjectType to event
-        $reservationObjectTypeDBField = new C4GNumberField();
-        $reservationObjectTypeDBField->setFieldName('reservationObjectType');
-        $reservationObjectTypeDBField->setInitialValue('2');
-        $reservationObjectTypeDBField->setDatabaseField(true);
-        $reservationObjectTypeDBField->setFormField(false);
-        $this->fieldList[] = $reservationObjectTypeDBField;
-
         $objects = [];
         foreach ($reservationObjects as $reservationObject) {
 

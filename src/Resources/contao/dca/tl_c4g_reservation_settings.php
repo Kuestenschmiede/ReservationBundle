@@ -355,18 +355,12 @@ class tl_c4g_reservation_settings extends Backend
      */
     public function getAllTypes()
     {
+        \Contao\System::loadLanguageFile('tl_c4g_reservation_settings');
         $types = $this->Database->prepare("SELECT id,caption,reservationObjectType FROM tl_c4g_reservation_type ORDER BY caption")
             ->execute();
         while ($types->next()) {
             $objectType = $types->reservationObjectType;
-            switch ($objectType) {
-                case '1':
-                    $return[$types->id] = $types->caption.' [Default]';
-                    break;
-                case '2':
-                    $return[$types->id] = $types->caption.' [Events]';
-                    break;
-            }
+            $return[$types->id] = $types->caption.' ['.$GLOBALS["TL_LANG"]["tl_c4g_reservation_settings"]["referencesObjectType"][$objectType].']';
         }
         return $return;
     }
