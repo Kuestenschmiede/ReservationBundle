@@ -60,14 +60,16 @@ function setObjectId(object, typeid, showDateTime = 0) {
         jQuery(selectField).show();
         reservationObjects ? reservationObjects.show() : false;
         if (objectParam) {
-            //values = objectParam.split("_")[2];
             objects = objectParam.split('-');
 
             if (!jQuery(object).is(":disabled")) {
-                jQuery(selectField).val(objects[0]);
-                jQuery(selectField).attr('value',objects[0]);
-                jQuery(selectField).change();
+                if (!jQuery(selectField).val() || (jQuery(selectField).val() <= 0)) {
+                    jQuery(selectField).val(objects[0]);
+                    jQuery(selectField).attr('value',objects[0]);
+                }
             }
+
+            jQuery(selectField).change();
 
             values = objects ? objects : values
         }
@@ -181,6 +183,10 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                         );
                     }
                 }
+            }
+
+            if (jQuery(selectField).val() && (jQuery(selectField).val() >= 0)) {
+                first = jQuery(selectField).val();
             }
 
             if (parseInt(first) >= 0) {
