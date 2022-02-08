@@ -149,7 +149,7 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                     var date = '';
                     var time = '';
 
-                    var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+typeId);
+                    var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+typeId); //ToDo +'-'+option.value
                     if (dateFields) {
                         for (k = 0; k < dateFields.length; k++) {
                             var dateField = dateFields[k];
@@ -185,7 +185,7 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                 }
             }
 
-            if (jQuery(selectField).val() && (jQuery(selectField).val() >= 0)) {
+            if (!jQuery(selectField).is(":disabled") && jQuery(selectField).val() && (jQuery(selectField).val() >= 0)) {
                 first = jQuery(selectField).val();
             }
 
@@ -610,7 +610,9 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                             val = objArr[0]; //first valid option
                                         }
 
-                                        hideOptions(reservationObjects,additionalId, objstr, showDateTime);
+                                        if (!objectId) {
+                                            hideOptions(reservationObjects,additionalId, objstr, showDateTime);
+                                        }
                                     } else {
                                         //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
                                         jQuery(radioGroups[i].children[j].children[k]).attr('disabled', true);
