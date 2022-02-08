@@ -1108,7 +1108,7 @@ class C4gReservationHandler
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject['id']);
                 $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
-                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(+".number_format($price,2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($eventObject['title']));
+                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(+".number_format(floatval($price),2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                 $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
                 $frontendObject->setBeginDate($eventObject['startDate'] ?: 0);
                 $frontendObject->setBeginTime($eventObject['startTime'] ?: 0);
@@ -1146,7 +1146,7 @@ class C4gReservationHandler
                         $frontendObject->setType(2);
                         $frontendObject->setId($eventObject['id']);
                         $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
-                        $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".number_format($price,2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($eventObject['title']));
+                        $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".number_format(floatval($price),2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                         $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
                         $frontendObject->setBeginDate($eventObject['startDate'] ?: 0);
                         $frontendObject->setBeginTime($eventObject['startTime'] ?: 0);
@@ -1228,7 +1228,7 @@ class C4gReservationHandler
                 }
 
                 $price = $showPrices ? static::calcPrices($object, $type, false, 1) : 0;
-                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".number_format($price,2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
+                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".number_format(floatval($price),2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
 
                 $frontendObject->setTimeinterval($object['time_interval']);
                 $frontendObject->setPeriodType($type['periodType']);
