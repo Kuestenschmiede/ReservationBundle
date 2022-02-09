@@ -1222,7 +1222,7 @@ class C4gReservationController extends C4GBaseController
 
                 foreach ($putVars as $key => $value) {
                     if (strpos($key, strval($type.'-22'))) {
-                        if (!strpos($key, strval($type.'-22'.$resObject))) {
+                        if (strpos($key, strval($type.'-22'.$resObject)) === false) {
                             unset($putVars[$key]);
                         }
                     }
@@ -1238,18 +1238,32 @@ class C4gReservationController extends C4GBaseController
                 $this->getDialogParams()->setNotificationType($reservationObject->notification_type);
                 $this->notification_type = $reservationObject->notification_type;
             }
-        }
 
+            if ($reservationType->reservationObjectType === '3') {
+                foreach ($putVars as $key => $value) {
+                    if (strpos($key, strval($type.'-33'))) {
+                        if (strpos($key, strval($type.'-33'.$resObject)) === false) {
+                            unset($putVars[$key]);
+                        }
+                    } else if (
+                        (strpos($key, 'beginDate') !== false) ||
+                        (strpos($key, 'beginTime') !== false) ||
+                        (strpos($key, 'description') !== false) ||
+                        (strpos($key, 'image') !== false) ||
+                        (strpos($key, 'undefined') !== false) ||
+                        (!trim($key))) {
+                        unset($putVars[$key]);
+                    }
+                }
+            }
+        }
 
         $newFieldList = [];
         $removedFromList = [];
 
         foreach ($this->getFieldList() as $key=>$field) {
-            /*if ($field->getFieldName() === 'reservation_id') {
-                $reservationIdKey = $key;
-            }*/
             $additionalId = $field->getAdditionalID();
-            if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-')) !== 0))) {
+            if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-'))))) {
                 unset($putVars[$field->getFieldName()."_".$additionalId]);
                 continue;
             } else if ($additionalId) {
@@ -1269,24 +1283,74 @@ class C4gReservationController extends C4GBaseController
             }
 
             if ($isEvent) {
-                if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-22')) !== 0))) {
-                    if (strpos($additionalId, strval($type.'-22'.$resObject)) === 0) {
+                if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-22')) !== false))) {
+                    if (strpos($additionalId, strval($type.'-22'.$reservationObject->id)) === false) {
                         unset($putVars[$field->getFieldName()."_".$additionalId]);
                         continue;
                     }
                 }
             }
 
-            if ($field->getFieldName() && (!$removedFromList[$field->getFieldName()] || ($removedFromList[$field->getFieldName()] == $field->getAdditionalId()))) {
-                $newFieldList[] = $field;
+            if ($reservationType->reservationObjectType === '3') {
+                if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-33')) !== false))) {
+                    if (strpos($additionalId, strval($type.'-33'.$reservationObject->id)) === false) {
+                        unset($putVars[$field->getFieldName()."_".$additionalId]);
+                        continue;
+                    }
+                }
             }
 
             if (!$field->isEditable() && !$field->isDatabaseField() && $field->getInitialValue() && $field->isNotificationField()) {
                 if ($field->getAdditionalId()) {
+                    if ($isEvent) {
+                        if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type.'-22')) !== false)) {
+                            if (strpos($field->getAdditionalId(), strval($type.'-22'.$reservationObject->id)) === false) {
+                                continue;
+                            }
+                        }
+                    }
+
+                    if ($reservationType->reservationObjectType === '3') {
+                        if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type.'-33')) !== false)) {
+                            if (strpos($field->getAdditionalId(), strval($type.'-33'.$reservationObject->id)) === false) {
+                                continue;
+                            }
+                        }
+                    }
+
                     $putVars[$field->getFieldName().'_'.$field->getAdditionalId()] = $field->getInitialValue();
                 } else {
+                    if ($field->getAdditionalId()) {
+                        if ($isEvent) {
+                            if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type . '-22')) !== false)) {
+                                if (strpos($field->getAdditionalId(), strval($type . '-22' . $reservationObject->id)) === false) {
+                                    continue;
+                                }
+                            }
+                        }
+
+                        if ($reservationType->reservationObjectType === '3') {
+                            if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type . '-33')) !== false)) {
+                                if (strpos($field->getAdditionalId(), strval($type . '-33' . $reservationObject->id)) === false) {
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+
                     $putVars[$field->getFieldName()] = $field->getInitialValue();
                 }
+            }
+
+            if ((strpos($field->getAdditionalId(), '-33') === false) && (
+                (strpos($field->getFieldName(), 'beginDate') !== false) ||
+                (strpos($field->getFieldName(), 'beginTime') !== false) ||
+                (strpos($field->getFieldName(), 'description') !== false) ||
+                (strpos($field->getFieldName(), 'image') !== false))) {
+                    continue;
+                }
+            if ($field->getFieldName() && (!$removedFromList[$field->getFieldName()] || ($removedFromList[$field->getFieldName()] == $field->getAdditionalId()))) {
+                $newFieldList[] = $field;
             }
         }
 
@@ -1339,7 +1403,7 @@ class C4gReservationController extends C4GBaseController
             $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
        } else {
             $putVars['reservationObjectType'] = $reservationType->reservationObjectType;
-
+            $objectId = $reservationObject ? $reservationObject->id : 0;
             //check duplicate reservation id
             $reservations = C4gReservationModel::findBy("reservation_id", $reservationId);
             $reservationCount = is_array($reservations) ? count($reservations) : 0;
@@ -1358,20 +1422,34 @@ class C4gReservationController extends C4GBaseController
                 return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']];
             }
 
-            $beginDate = $putVars['beginDate_'.$type];
-
             $beginTime = 0;
             $timeKey = false;
             foreach ($putVars as $key => $value) {
-                if (strpos($key, "beginTime_".$type) !== false) {
-                    if ($value) {
-                        if (strpos($value, '#') !== false) {
-                            $newValue = substr($value,0, strpos($value, '#')); //remove frontend duration
-                        }
+                if ($reservationType->reservationObjectType === '3') {
+                    $beginDate = $putVars['beginDate_'.$type.'-33'.$objectId];
+                    if (strpos($key, "beginTime_".$type.'-33'.$objectId) !== false) {
+                        if ($value) {
+                            if (strpos($value, '#') !== false) {
+                                $newValue = substr($value,0, strpos($value, '#')); //remove frontend duration
+                            }
 
-                        $beginTime = $newValue ?: $value;
-                        $timeKey = $key;
-                        break;
+                            $beginTime = $newValue ?: $value;
+                            $timeKey = $key;
+                            break;
+                        }
+                    }
+                } else {
+                    $beginDate = $putVars['beginDate_'.$type];
+                    if (strpos($key, "beginTime_".$type) !== false) {
+                        if ($value) {
+                            if (strpos($value, '#') !== false) {
+                                $newValue = substr($value,0, strpos($value, '#')); //remove frontend duration
+                            }
+
+                            $beginTime = $newValue ?: $value;
+                            $timeKey = $key;
+                            break;
+                        }
                     }
                 }
             }
@@ -1404,18 +1482,29 @@ class C4gReservationController extends C4GBaseController
 
             $duration = $duration * $interval;
             $endTime = $beginTime + $duration;
-
-            $putVars['endDate'] = $putVars['beginDate_'.$type]; //ToDo multiple days
             $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$endTime);
 
             //check nxt day times
-            $bday = $putVars['beginDate_'.$type];
-            $nextDay = strtotime("+1 day", strtotime($bday));
-            if (!$reservationType->directBooking && $beginTime >= 86400) {
-                $putVars['beginDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
-                $putVars[$timeKey] = ($beginTime-86400);
+            if ($reservationType->reservationObjectType === '3') {
+                $putVars['endDate'] = $putVars['beginDate_'.$type.'-33'.$objectId]; //ToDo multiple days
+                $bday = $putVars['beginDate_'.$type.'-33'.$objectId];
+                $nextDay = strtotime("+1 day", strtotime($bday));
+                if (!$reservationType->directBooking && $beginTime >= 86400) {
+                    $putVars['beginDate_'.$type.'-33'.$objectId] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    $putVars[$timeKey] = ($beginTime-86400);
+                } else {
+                    $putVars[$timeKey] = $beginTime;
+                }
             } else {
-                $putVars[$timeKey] = $beginTime;
+                $putVars['endDate'] = $putVars['beginDate_'.$type]; //ToDo multiple days
+                $bday = $putVars['beginDate_'.$type];
+                $nextDay = strtotime("+1 day", strtotime($bday));
+                if (!$reservationType->directBooking && $beginTime >= 86400) {
+                    $putVars['beginDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    $putVars[$timeKey] = ($beginTime-86400);
+                } else {
+                    $putVars[$timeKey] = $beginTime;
+                }
             }
 
             if (!$reservationType->directBooking && ($endTime >= 86400)) {
@@ -1427,7 +1516,6 @@ class C4gReservationController extends C4GBaseController
                 $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],$beginTime), Date::getFormatFromRgxp('time'));
                 $directTime = $objDate->tstamp;
                 $putVars[$timeKey] = $directTime;
-                //$putVars['beginDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
             }
         }
 

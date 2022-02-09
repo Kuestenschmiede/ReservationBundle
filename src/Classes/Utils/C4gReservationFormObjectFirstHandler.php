@@ -114,7 +114,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $descriptionField->setCondition($object_condition);
                     $descriptionField->setFormField(true);
                     $descriptionField->setShowIfEmpty(false);
-                    $descriptionField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+                    $descriptionField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
                     $descriptionField->setRemoveWithEmptyCondition(true);
                     $descriptionField->setDatabaseField(false);
                     $descriptionField->setEditable(false);
@@ -129,7 +129,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $imageField->setCondition($object_condition);
                     $imageField->setFormField(true);
                     $imageField->setShowIfEmpty(false);
-                    $imageField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+                    $imageField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
                     $imageField->setRemoveWithEmptyCondition(true);
                     $imageField->setDatabaseField(false);
                     $imageField->setLightBoxField(true);
@@ -144,7 +144,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             }
 
             if ($this->initialValues->getDate() || $initialBookingDate) {
-                $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id'] . '-' . $reservationObject->getId()."')," . $listType['id'] . "," . $showDateTime . ");";
+                $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id'] . '-33' . $reservationObject->getId()."')," . $listType['id'] . "," . $showDateTime . ");";
                 $this->getDialogParams()->setOnloadScript($script);
             }
 
@@ -163,7 +163,8 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setComparable(false);
             $reservationBeginDateField->setSortColumn(true);
             $reservationBeginDateField->setSortSequence('de_datetime');
-            $reservationBeginDateField->setTableColumn(true);
+            $reservationBeginDateField->setTableColumn(false);
+            $reservationBeginDateField->setDatabaseField(true);
             $reservationBeginDateField->setFormField(true);
             $reservationBeginDateField->setColumnWidth(10);
             $reservationBeginDateField->setMandatory(true);
@@ -172,7 +173,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCallOnChange(true);
             $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this," . $listType['id'] . "," . $showDateTime . ");");
             $reservationBeginDateField->setNotificationField(true);
-            $reservationBeginDateField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+            $reservationBeginDateField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
             $reservationBeginDateField->setStyleClass('begin-date');
             $reservationBeginDateField->setShowInlinePicker(false);
             $reservationBeginDateField->setInitInvisible(true);
@@ -190,7 +191,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $durationField->setTableColumn(true);
                 $durationField->setMandatory(true);
                 $durationField->setCallOnChange(true);
-                $durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_" . $listType['id']  . '-' . $reservationObject->getId()."'), " . $listType['id'] . "," . $showDateTime . ");");
+                $durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_" . $listType['id']  . '-33' . $reservationObject->getId()."'), " . $listType['id'] . "," . $showDateTime . ");");
                 $durationField->setCondition($object_condition);
                 $durationField->setNotificationField(true);
                 $durationField->setStyleClass('duration');
@@ -198,7 +199,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $durationField->setMax($additionalDuration);
                 $durationField->setMaxLength(3);
                 $durationField->setStep(5);
-                $durationField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+                $durationField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
 
                 $this->fieldList[] = $durationField;
             } else {
@@ -228,7 +229,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $reservationBeginTimeField->setInitialValue($initialBookingTime ?: $this->initialValues->getTime());
                 $reservationBeginTimeField->setSort(false);
                 $reservationBeginTimeField->setCondition($object_condition);
-                $reservationBeginTimeField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId().'-00'.date('w', $initialBookingDate));
+                $reservationBeginTimeField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId().'-00'.date('w', $initialBookingDate));
                 $reservationBeginTimeField->setNotificationField(true);
                 $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                 $reservationBeginTimeField->setTurnButton(true);
@@ -255,7 +256,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                             }
                         }
                     }
-                    $wdCondition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id'] . '-' . $reservationObject->getId().'--'.$i);
+                    $wdCondition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'beginDate_' . $listType['id'] . '-33' . $reservationObject->getId().'--'.$i);
                     $wdCondition->setModel(C4gReservationHandler::class);
                     $wdCondition->setFunction('isWeekday');
                     $wdConditionArr = [$wdCondition, new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()), $condition];
@@ -280,7 +281,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $reservationTimeField->setCondition($wdConditionArr);
                     $reservationTimeField->setCallOnChange(false);
                     //$reservationTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
-                    $reservationTimeField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId() . '-00'.$i);
+                    $reservationTimeField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId() . '-00'.$i);
                     $reservationTimeField->setNotificationField(true);
                     $reservationTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
                     $reservationTimeField->setTurnButton(true);

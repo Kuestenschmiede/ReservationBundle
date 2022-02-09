@@ -230,52 +230,54 @@ function setReservationForm(typeId, showDateTime) {
         }
     }
 
-    var capacityField = jQuery('.c4g__form-int--desiredCapacity input');
-    if (capacityField) {
-        var value = capacityField.val();
-        if (capacityField.attr('max') && (value > capacityField.attr('max'))) {
-            capacityField.val(capacityField.attr('max'));
-        }
-        if (capacityField.attr('min') && (value < capacityField.attr('min'))) {
-            capacityField.val(capacityField.attr('min'));
-        }
-    }
-
-    var dateId = 'c4g_beginDate_'+typeId;
-    if (document.getElementById(dateId)) {
-        setTimeset(document.getElementById(dateId), typeId, showDateTime);
-    } else if (event) {
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        const eventId = urlParams.get('event')
-
-        if (eventId) {
-            var dateId = 'c4g_beginDateEvent_' + typeId + '-22' + eventId;
-            if (document.getElementById(dateId)) {
-                setTimeset(document.getElementById(dateId), typeId, showDateTime);
-                checkEventFields();
+    if (typeId > 0) {
+        var capacityField = document.getElementById("c4g_desiredCapacity_"+typeId);//jQuery('.c4g__form-int--desiredCapacity input');
+        if (capacityField) {
+            var value = capacityField.val();
+            if (capacityField.attr('max') && (value > capacityField.attr('max'))) {
+                capacityField.val(capacityField.attr('max'));
             }
-        } else {
-            var dateFields = document.getElementsByClassName('c4g__form-date-input');
-            if (dateFields) {
-                for (i = 0; i < dateFields.length; i++) {
-                    var dateField = dateFields[i];
-                    if (dateField && checkType(dateField, event) && dateField.value) {
-                        var fieldId = dateField.id;
-                        if (fieldId && fieldId.indexOf('c4g_beginDateEvent_' + typeId + '-22')) {
-                            setTimeset(dateField, typeId, showDateTime);
-                            checkEventFields();
-                            break;
+            if (capacityField.attr('min') && (value < capacityField.attr('min'))) {
+                capacityField.val(capacityField.attr('min'));
+            }
+        }
+
+        var dateId = 'c4g_beginDate_'+typeId;
+        if (document.getElementById(dateId)) {
+            setTimeset(document.getElementById(dateId), typeId, showDateTime);
+        } else if (event) {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const eventId = urlParams.get('event')
+
+            if (eventId) {
+                var dateId = 'c4g_beginDateEvent_' + typeId + '-22' + eventId;
+                if (document.getElementById(dateId)) {
+                    setTimeset(document.getElementById(dateId), typeId, showDateTime);
+                    checkEventFields();
+                }
+            } else {
+                var dateFields = document.getElementsByClassName('c4g__form-date-input');
+                if (dateFields) {
+                    for (i = 0; i < dateFields.length; i++) {
+                        var dateField = dateFields[i];
+                        if (dateField && checkType(dateField, event) && dateField.value) {
+                            var fieldId = dateField.id;
+                            if (fieldId && fieldId.indexOf('c4g_beginDateEvent_' + typeId + '-22')) {
+                                setTimeset(dateField, typeId, showDateTime);
+                                checkEventFields();
+                                break;
+                            }
                         }
                     }
                 }
             }
-        }
-    } else if (object) {
-        var objectElement = document.getElementById("c4g_reservation_object_"+typeId);
-        if (objectElement) {
-            dateId = dateId + '-' +objectElement.value;
-            setTimeset(document.getElementById(dateId), typeId, showDateTime);
+        } else if (object) {
+            var objectElement = document.getElementById("c4g_reservation_object_"+typeId);
+            if (objectElement) {
+                dateId = dateId + '-33' +objectElement.value;
+                setTimeset(document.getElementById(dateId), typeId, showDateTime);
+            }
         }
     }
 
@@ -443,8 +445,8 @@ function setTimeset(dateField, additionalId, showDateTime) {
         if (!dateField) {
             dateField = document.getElementById('c4g_beginDate_'+additionalId);
         } else {
-            if (dateField.id && dateField.id.indexOf("-")) {
-                objectId = dateField.id.substr(dateField.id.indexOf("-")+1);
+            if (dateField.id && dateField.id.indexOf("-33")) {
+                objectId = dateField.id.substr(dateField.id.indexOf("-33")+3);
             }
         }
 
