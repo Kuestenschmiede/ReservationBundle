@@ -28,9 +28,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['beginTime'] = array("Beginnzeit", "Wa
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['endTime'] = array("Endzeit", "Wann endet die Veranstaltung?");
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservationObjectType'] = array("Objekttyp", "Es können Reserverierungsobjekte und Contao Events reserviert werden.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][1] = 'Standard (Zeitauswahl)';
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][2] = 'Events (Aufruf aus dem Event-Template)';
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][3] = 'Objektauswahl (BETA)';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][1] = 'Zeitauswahl (Standard)';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][2] = 'Contao Events';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][3] = 'Objektauswahl (Neu!)';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_object'] = array("Gebucht wurde", "Welches Objekt soll reserviert werden?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_id'] = array("Reservierungsschlüssel", "Bitte einen Reservierungsschlüssel zur Identifizierung angeben. Der Schlüssel muss eindeutig sein und wird beim Speichern eines leeren Feldes automatisch generiert.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['man'] = ['Herr'];

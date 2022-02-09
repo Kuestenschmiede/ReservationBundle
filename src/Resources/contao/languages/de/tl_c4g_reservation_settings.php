@@ -35,19 +35,19 @@ $GLOBALS['TL_LANG'][$str]['showEndTime'] = array("Die Endzeiten werden mit ausge
 $GLOBALS['TL_LANG'][$str]['showPrices'] = array("Preise anzeigen","Preise werden dargestellt.");
 $GLOBALS['TL_LANG'][$str]['showDateTime'] = array("Termin am Objekt anzeigen","Zeigt den ausgewählten Termin direkt am Objekt an.");
 $GLOBALS['TL_LANG'][$str]['showMemberData'] = array("Mitgliederdaten übernehmen","Vorhandene Mitgliederdaten werden automatisch in den Formularfeldern vorbelegt.");
-$GLOBALS['TL_LANG'][$str]['showDetails'] = array("Objektdetails anzeigen","Zusatzinformationen wie Bild und Beschreibung werden dargestellt. Bei den Events Teaser und Bild.");
+$GLOBALS['TL_LANG'][$str]['showDetails'] = array("Details anzeigen","Zusatzinformationen wie Bild und Beschreibung werden dargestellt. Bei den Events Teaser und Bild.");
 $GLOBALS['TL_LANG'][$str]['removeBookedDays'] = array("Ausgebuchte Tage im Kalender sperren","Der Kalendertag ist ausgebucht nicht auswählbar. Achtung! Die Überprüfung ist zum Teil langwirrig.");
 $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text leere Objektliste","Der Text, der in der Objektauswahl angezeigt wird wenn kein passendes Objekt zur Verfügung steht, kann optional überschrieben werden.");
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Teilnehmermechanismus (optional)","Ist dieser Mechanismus aktiviert, dann werden Teilnehmerfelder (Titel, Name, Vorname, E-Mail, ggf. Leistungen) anhand der Personenzahl generiert.");
 
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][1] = 'Zeitauswahl';
-$GLOBALS['TL_LANG'][$str]['referencesObjectType'][2] = 'Events';
+$GLOBALS['TL_LANG'][$str]['referencesObjectType'][2] = 'Contao Events';
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][3] = 'Objektauswahl';
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['settings_legend'] = "Allgemeine Einstellungen";
 $GLOBALS['TL_LANG'][$str]['type_legend'] = "Einstellungen zur Reservierungsart";
-$GLOBALS['TL_LANG'][$str]['object_legend'] = "Einstellungen zu den Reservierungsobjekten";
+$GLOBALS['TL_LANG'][$str]['object_legend'] = "Einstellungen zur Zeitauswahl";
 $GLOBALS['TL_LANG'][$str]['form_legend'] = "Reservierungsformular";
 $GLOBALS['TL_LANG'][$str]['notification_legend'] = 'Notification Center';
 $GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Weiterleitung';

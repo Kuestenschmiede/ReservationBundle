@@ -112,6 +112,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'auto_del_daily'                => 'del_time;',
         'reservationObjectType_1'       => 'periodType,objectCount,severalBookings,directBooking',
         'reservationObjectType_2'       => '',
+        'reservationObjectType_3'       => 'periodType,objectCount,severalBookings,directBooking',
     ),
 
     //Fields

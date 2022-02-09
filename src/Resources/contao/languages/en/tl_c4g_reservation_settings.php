@@ -35,19 +35,19 @@ $GLOBALS['TL_LANG'][$str]['showEndTime'] = array("The end times are displayed wi
 $GLOBALS['TL_LANG'][$str]['showPrices'] = array("Show prices", "Prices are displayed.");
 $GLOBALS['TL_LANG'][$str]['showDateTime'] = array("Show appointment at object", "Shows the selected appointment directly at the object.");
 $GLOBALS['TL_LANG'][$str]['showMemberData'] = array("Apply member data", "Existing member data is automatically pre-populated in the form fields.");
-$GLOBALS['TL_LANG'][$str]['showDetails'] = array("Show object details", "Additional information such as image and description are displayed.");
+$GLOBALS['TL_LANG'][$str]['showDetails'] = array("Show details", "Additional information such as image and description are displayed.");
 $GLOBALS['TL_LANG'][$str]['removeBookedDays'] = array("Lock fully booked days in calendar", "The calendar day is fully booked cannot be selected. Attention. The check is partly lengthy.");
 $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text empty object list (optional)", "The text of the selectbox can optionally be overwritten.");
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Participant mechanism (optional)", "If this mechanism is enabled, the participant fields are generated based on the number of people.");
 
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][1] = 'Time selection';
-$GLOBALS['TL_LANG'][$str]['referencesObjectType'][2] = 'Events';
+$GLOBALS['TL_LANG'][$str]['referencesObjectType'][2] = 'Contao Events';
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][3] = 'Object selection';
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['settings_legend'] = "General settings";
 $GLOBALS['TL_LANG'][$str]['type_legend'] = "Reservation type settings";
-$GLOBALS['TL_LANG'][$str]['object_legend'] = "Reservation object settings";
+$GLOBALS['TL_LANG'][$str]['object_legend'] = "Time selection settings";
 $GLOBALS['TL_LANG'][$str]['form_legend'] = "Form settings";
 $GLOBALS['TL_LANG'][$str]['notification_legend'] = 'Notification Center';
 $GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Redirection';

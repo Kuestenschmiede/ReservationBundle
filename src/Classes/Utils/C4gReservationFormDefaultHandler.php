@@ -126,21 +126,6 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $this->fieldList[] = $reservationBeginDateField;
         }
 
-//        $reservationendTimeField = new C4GTextField();
-//        $reservationendTimeField->setFieldName('endTime');
-//        $reservationendTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime']);
-//        $reservationendTimeField->setFormField(false);
-//        $reservationendTimeField->setHidden(true);
-//        $reservationendTimeField->setEditable(true);
-//        $reservationendTimeField->setSort(false);
-//        $reservationendTimeField->setDatabaseField(true);
-//        $reservationendTimeField->setCallOnChange(true);
-//        $reservationendTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $showDateTime . ')');
-//        $reservationendTimeField->setNotificationField(true);
-//        $reservationendTimeField->setRemoveWithEmptyCondition(true);
-//        $reservationendTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
-//        $this->fieldList[] = $reservationendTimeField;
-
         if (!$this->initialValues->getTime() && $listType['directBooking']) {
             $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
 

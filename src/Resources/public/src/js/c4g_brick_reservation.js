@@ -231,7 +231,7 @@ function setReservationForm(typeId, showDateTime) {
     }
 
     if (typeId > 0) {
-        var capacityField = document.getElementById("c4g_desiredCapacity_"+typeId);//jQuery('.c4g__form-int--desiredCapacity input');
+        var capacityField = jQuery("#c4g_desiredCapacity_"+typeId);
         if (capacityField) {
             var value = capacityField.val();
             if (capacityField.attr('max') && (value > capacityField.attr('max'))) {
@@ -277,6 +277,7 @@ function setReservationForm(typeId, showDateTime) {
             if (objectElement) {
                 dateId = dateId + '-33' +objectElement.value;
                 setTimeset(document.getElementById(dateId), typeId, showDateTime);
+
             }
         }
     }
@@ -613,6 +614,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                         }
 
                                         if (!objectId) {
+                                            var reservationObjects = document.getElementsByClassName("displayReservationObjects");
                                             hideOptions(reservationObjects,additionalId, objstr, showDateTime);
                                         }
                                     } else {
