@@ -844,6 +844,8 @@ class tl_c4g_reservation_object extends Backend
                 $return[$key] = $type['caption'];
             }
         }
+
+        sort($return);
         return $return;
     }
 }
