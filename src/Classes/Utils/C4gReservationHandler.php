@@ -154,7 +154,7 @@ class C4gReservationHandler
         if ($list) {
             $alldates = array();
             $minDate = 0;
-            $maxDate = 0;
+            $maxDate = 7;
             //remove configured date exclusion
             foreach ($list as $object) {
                 if(!$object instanceof C4gReservationFrontendObject){
@@ -175,12 +175,6 @@ class C4gReservationHandler
                     }
                 }
 
-                //remove dates without possible times
-//                if ($removeBookedDays) {
-//                    $object->get
-//                }
-
-
                 if ($minDate && ($minDate > 1) && ($minDate > $object->getMinReservationDay())) {
                     $minDate = $object->getMinReservationDay();
                 }
@@ -192,24 +186,21 @@ class C4gReservationHandler
 
             //remove dates without possible times
             if ($removeBookedDays) {
-                $begin = new \DateTime(date('d.m.Y', time()+($minDate*86400)));
-                $end   = new \DateTime(date('d.m.Y',time()+($maxDate*86400)));
+                $begin = time()+($minDate*86400);
+                $end   = time()+($maxDate*86400);
 
-                for ($i = $begin; $i <= $end; $i->modify('+1 day')) {
-                    $beginDate = $i->format('d.m.Y');
-                    if (!$beginDate) {
-                        continue;
-                    }
-                    $weekday = date('w', strtotime($beginDate));
-                    $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $beginDate);
+                $i = $begin;
+                while ($i <= $end) {
+                    $weekday = date('w', $i);
+                    $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $i);
                     if (!$timeArr || (count($timeArr) == 0)) {
-                        $alldates[] = strtotime($beginDate);
+                        $alldates[] = $i;
                     } else {
                         $excludeTime = true;
                         foreach ($timeArr as $timeElement) {
                             if ($timeElement && $timeElement['objects']) {
                                 foreach ($timeElement['objects'] as $timeElementObj) {
-                                    if (intval($timeElementObj['id']) && intval($timeElementObj['id']) !== -1) {
+                                    if ($timeElementObj['id'] && $timeElementObj['id'] !== -1) {
                                         $excludeTime = false;
                                         break 2;
                                     }
@@ -217,9 +208,11 @@ class C4gReservationHandler
                             }
                         }
                         if ($excludeTime) {
-                            $alldates[] = strtotime($beginDate);
+                            $alldates[] = $i;
                         }
                     }
+
+                    $i = $i+86400;
                 }
             }
 
@@ -482,38 +475,38 @@ class C4gReservationHandler
             shuffle($list);
 
             if ($date !== -1) {
-                //hotfix dates with slashes
-                $date = str_replace("~", "/", $date);
-                if ($date) {
+                if (is_numeric($date) && (int)$date == $date) {
+                    $tsdate = (int)$date;
+                } else {
                     $format = $GLOBALS['TL_CONFIG']['dateFormat'];
 
                     $tsdate = \DateTime::createFromFormat($format, $date);
                     if ($tsdate) {
                         $tsdate->Format($format);
-                        $tsdate->setTime(0,0,0);
+                        $tsdate->setTime(0, 0, 0);
                         $tsdate = $tsdate->getTimestamp();
                     } else {
                         $format = "d/m/Y";
                         $tsdate = \DateTime::createFromFormat($format, $date);
                         if ($tsdate) {
                             $tsdate->Format($format);
-                            $tsdate->setTime(0,0,0);
+                            $tsdate->setTime(0, 0, 0);
                             $tsdate = $tsdate->getTimestamp();
                         } else {
                             $tsdate = strtotime($date);
                         }
                     }
-
-                    $nowDate = new \DateTime();
-                    if ($nowDate) {
-                        $nowDate->Format($format);
-                        $nowDate->setTime(0,0,0);
-                        $nowDate = $nowDate->getTimestamp();
-                    }
-
-                    $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], time()), Date::getFormatFromRgxp('time'));
-                    $nowTime = $objDate->tstamp;
                 }
+
+                $nowDate = new \DateTime();
+                if ($nowDate) {
+                    $nowDate->Format($format);
+                    $nowDate->setTime(0,0,0);
+                    $nowDate = $nowDate->getTimestamp();
+                }
+
+                $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], time()), Date::getFormatFromRgxp('time'));
+                $nowTime = $objDate->tstamp;
             }
 
             if (!$type) {
