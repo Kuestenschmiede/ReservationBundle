@@ -26,31 +26,22 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GHeadlineField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GImageField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GInfoTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLabelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiLinkField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiSelectField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GNumberField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GRadioGroupField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSelectField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSubDialogField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimestampField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTrixEditorField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBaseController;
 use con4gis\ProjectsBundle\Classes\Framework\C4GController;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationEventAudienceModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationEventSpeakerModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationEventTopicModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
@@ -90,7 +81,7 @@ class C4gReservationController extends C4GBaseController
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/src/js/c4g_brick_reservation.js';
+    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
 
@@ -463,11 +454,13 @@ class C4gReservationController extends C4GBaseController
                 $fieldList[] = $reservationDesiredCapacity;
             }
 
+            //($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute')
+
             $additionalDuration = $this->reservationSettings->additionalDuration;
             if (intval($additionalDuration) >= 1) {
                 $durationField = new C4GNumberField();
                 $durationField->setFieldName('duration');
-                $durationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['duration']);
+                $durationField->setTitle($listType['periodType'] === 'hour' ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_hourly'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_minutely']);
                 $durationField->setColumnWidth(10);
                 $durationField->setFormField(true);
                 $durationField->setSortColumn(true);
@@ -485,6 +478,7 @@ class C4gReservationController extends C4GBaseController
                 $durationField->setMaxLength(3);
                 $durationField->setStep(5);
                 $durationField->setAdditionalID($listType['id']);
+                $durationField->setDatabaseField(true);
                 $fieldList[] = $durationField;
             } else {
                 $additionalDuration = 0;
@@ -1290,6 +1284,13 @@ class C4gReservationController extends C4GBaseController
                 unset($putVars[$field->getFieldName()]);
             }
 
+            if ($additionalId && ($additionalId != $type)) {
+                if (($field->getFieldName() == 'desiredCapacity') || ($field->getFieldName() == 'duration')) {
+                    unset($putVars[$field->getFieldName()."_".$additionalId]);
+                    continue;
+                }
+            }
+
             if (!$isEvent && ($field->getFieldName() == "beginTime")) {
                 foreach ($putVars as $key => $value) {
                     if (strpos($key, "beginTime_".$type) !== false) {
@@ -1489,13 +1490,13 @@ class C4gReservationController extends C4GBaseController
                 default: '';
             }
 
-            $duration = $putVars['duration'];
-            if ($duration/* && ((!$min_residence_time || ($duration >= $min_residence_time) && (!$max_residence_time || ($duration <= $max_residence_time))))*/) {
-                //$duration = $duration;
-            } else {
+            $duration = $putVars['duration_'.$type];
+            if (!$duration) {
                 $duration = $time_interval;
-                $putVars['duration'] = $reservationObject->duration ?: $time_interval;
+                $putVars['duration_'.$type] = $reservationObject->duration ?: $duration;
             }
+
+            //$putVars['duration_'.$type] = intval($putVars['duration_'.$type]);
 
             $duration = $duration * $interval;
             $endTime = $beginTime + $duration;

@@ -492,7 +492,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                 var objectList = [];
                 var times = data['times'];
                 var size = times.length;
-                if (!document.getElementById("c4g_reservation_id").value) {
+                if (!document.getElementById("c4g_reservation_id").value || (document.getElementById("c4g_reservation_id").value != data['reservationId'])) {
                     document.getElementById("c4g_reservation_id").value = data['reservationId']; //Force regeneration
                 }
                 jQuery(document.getElementsByClassName("reservation-id")).show();

@@ -46,7 +46,7 @@ class C4gReservationHandler
             foreach ($list as $object) {
                 $we = $object->getWeekdayExclusion();
                 foreach ($we as $key => $value) {
-                    if (!$value || $weekdays[$key]) {
+                    if (!$value && !$weekdays[$key]) {
                         $weekdays[$key] = true;
                     }
                 }
@@ -500,6 +500,7 @@ class C4gReservationHandler
 
                 $nowDate = new \DateTime();
                 if ($nowDate) {
+                    $format = $GLOBALS['TL_CONFIG']['dateFormat'];
                     $nowDate->Format($format);
                     $nowDate->setTime(0,0,0);
                     $nowDate = $nowDate->getTimestamp();
@@ -561,17 +562,14 @@ class C4gReservationHandler
 
                 $calculator->loadReservations($typeObject, $object);
 
-                //im Formular können zurzeit nur Minuten gesetzt werden
                 if ($duration >= 1)
                 {
-
-                    //$oh = $object->getOpeningHours();
                     switch ($periodType) {
                         case 'minute':
                             $object->setDuration($duration);
                             break;
                         case 'hour':
-                            $object->setDuration($duration/60);
+                            $object->setDuration($duration);
                             break;
                         default: '';
                     }
@@ -776,8 +774,8 @@ class C4gReservationHandler
 
             $reservationId = $putVars['reservation_id'];
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND `beginDate`=? AND `beginTime`=? AND NOT `cancellation`=?")
-                ->execute($typeId,$objectId,'1',$beginDate,$beginTime,'1')->fetchAllAssoc();
+            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType` IN (1,3) AND `beginDate`=? AND `beginTime`=? AND NOT `cancellation`=?")
+                ->execute($typeId,$objectId,$beginDate,$beginTime,'1')->fetchAllAssoc();
 
             $reservationCount = count($reservations);
 
@@ -910,14 +908,9 @@ class C4gReservationHandler
         }
 
         if ($validDate) {
-//            $arrColumns = array("$t.reservation_object=$id AND $t.reservationObjectType='1' AND $t.beginDate<=$time AND $t.endTime>=$time AND NOT $t.cancellation='1'");
-//            $arrValues = array();
-//            $arrOptions = array();
-//            $reservations = C4gReservationModel::findBy($arrColumns, $arrValues, $arrOptions);
-
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object`=? AND `reservationObjectType`=? AND `beginDate`<=? AND `endTime`>=? AND NOT `cancellation`=?")
-                ->execute($id,'1',$time,$time,'1')->fetchAllAssoc();
+            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object`=? AND `reservationObjectType` IN(1,3) AND `beginDate`<=? AND `endTime`>=? AND NOT `cancellation`=?")
+                ->execute($id,$time,$time,'1')->fetchAllAssoc();
 
             $actPersons = 0;
             $min = $object['min'] ?: 1;

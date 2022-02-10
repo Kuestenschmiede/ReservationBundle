@@ -12,6 +12,7 @@
 namespace con4gis\ReservationBundle\Classes\Calculator;
 
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Database;
 
 class C4gReservationCalculator
@@ -33,9 +34,9 @@ class C4gReservationCalculator
         $this->objectTypeId = $objectTypeId;
 
         $database = Database::getInstance();
-        $set = [$date, $objectTypeId];
+        $set = [$date];
         $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-            "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+            "`beginDate`=? AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
             ->execute($set)->fetchAllAssoc();
         if ($result) {
             $this->reservations[$date][$objectTypeId] = $result;
@@ -64,11 +65,19 @@ class C4gReservationCalculator
 
         $this->resultList = [];
 
+        $commaDates = C4gReservationHandler::getDateExclusionString([$object], $type,0);
+        $dates = explode(',',$commaDates);
+        foreach($dates as $date) {
+            if ($date == $this->date) {
+                return false;
+            }
+        }
+
         $switchAllTypes = \Contao\StringUtil::deserialize($switchAllTypes);
         foreach ($reservations as $reservation) {
             if ($objectId) {
               $reservation['timeInterval'] = $object->getTimeinterval();
-              $reservation['duration'] = /*$reservation['duration'] ?: */$object->getDuration(); //ToDo check own duration
+              $reservation['duration'] = $object->getDuration() ?: $reservation['duration']; //ToDo
               $reservation['periodType'] = $object->getPeriodType();
             }
 
@@ -136,21 +145,21 @@ class C4gReservationCalculator
                     $allTypes = implode(',', $switchAllTypes);
 
                     if ($time >= 86400) {
-                        $set = [strtotime('+1 day', $date), $objectType];
+                        $set = [strtotime('+1 day', $date)];
                     } else {
-                        $set = [$date, $objectType];
+                        $set = [$date];
                     }
                     $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                        '`beginDate`=? AND `reservation_type` IN (' . $allTypes . ") AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                        '`beginDate`=? AND `reservation_type` IN (' . $allTypes . ") AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
                         ->execute($set)->fetchAllAssoc();
                 } else {
                     if ($time >= 86400) {
-                        $set = [strtotime('+1 day', $date), $objectType];
+                        $set = [strtotime('+1 day', $date)];
                     } else {
-                        $set = [$date, $objectType];
+                        $set = [$date];
                     }
                     $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                        "`beginDate`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                        "`beginDate`=? AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
                         ->execute($set)->fetchAllAssoc();
                 }
             } elseif ($object && $allTypesQuantity) {
@@ -165,7 +174,7 @@ class C4gReservationCalculator
                         $set = [$date, $objectId, $objectType];
                     }
                     $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                        '`beginDate`=? AND `reservation_type` IN (' . $allTypes . ") AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                        '`beginDate`=? AND `reservation_type` IN (' . $allTypes . ") AND `reservation_object`=? AND `reservationObjectType` IN (1,3) AND NOT `cancellation`='1'")
                         ->execute($set)->fetchAllAssoc();
                 } else {
                     if ($time >= 86400) {
@@ -174,17 +183,17 @@ class C4gReservationCalculator
                         $set = [$date, $objectId, $objectType];
                     }
                     $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                        "`beginDate`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                        "`beginDate`=? AND `reservation_object`=? AND `reservationObjectType` IN (1,3) AND NOT `cancellation`='1'")
                         ->execute($set)->fetchAllAssoc();
                 }
             } else {
                 if ($time >= 86400) {
-                    $set = [strtotime('+1 day', $date), $typeId, $objectType];
+                    $set = [strtotime('+1 day', $date), $typeId];
                 } else {
-                    $set = [$date, $typeId, $objectType];
+                    $set = [$date, $typeId];
                 }
                 $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType`=? AND NOT `cancellation`='1'")
+                    "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
                     ->execute($set)->fetchAllAssoc();
             }
 
