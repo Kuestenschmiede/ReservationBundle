@@ -1334,13 +1334,15 @@ class C4gReservationController extends C4GBaseController
                 }
             }
 
-            if ((strpos($field->getAdditionalId(), '-33') === false) && (
-                (strpos($field->getFieldName(), 'beginDate') !== false) ||
-                (strpos($field->getFieldName(), 'beginTime') !== false) ||
-                (strpos($field->getFieldName(), 'description') !== false) ||
-                (strpos($field->getFieldName(), 'image') !== false))) {
+            if ($reservationType->reservationObjectType === '3') {
+                if ((strpos($field->getAdditionalId(), '-33') === false) && (
+                        (strpos($field->getFieldName(), 'beginDate') !== false) ||
+                        (strpos($field->getFieldName(), 'beginTime') !== false) ||
+                        (strpos($field->getFieldName(), 'description') !== false) ||
+                        (strpos($field->getFieldName(), 'image') !== false))) {
                     continue;
                 }
+            }
             if ($field->getFieldName() && (!$removedFromList[$field->getFieldName()] || ($removedFromList[$field->getFieldName()] == $field->getAdditionalId()))) {
                 $newFieldList[] = $field;
             }
@@ -1805,6 +1807,8 @@ class C4gReservationController extends C4GBaseController
 
             $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true);
 
+
+            //ToDo the following lines are necessary obsolete
             $reservationId = C4GBrickCommon::getUUID();
             if ($type) {
                 if ($this->fieldList) {

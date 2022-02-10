@@ -13,6 +13,7 @@
  * Table tl_module
  */
 
+use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 
 $default = '{type_legend}, caption, quantity, priority, options, description, image, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration,min_residence_time,max_residence_time;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes, notification_type;{publish_legend}, published';
@@ -220,7 +221,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'filter'            => true,
             'inputType'         => 'checkbox',
             'options_callback'  => ['tl_c4g_reservation_object', 'getTypes'],
-            'eval'              => array('mandatory'=>true,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
+            'eval'              => array('mandatory'=>true,'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'qualifications','multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'               => "blob NULL "
         ),
 
@@ -846,7 +847,7 @@ class tl_c4g_reservation_object extends Backend
             }
         }
 
-        sort($return);
+        asort($return);
         return $return;
     }
 }
