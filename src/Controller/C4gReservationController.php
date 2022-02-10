@@ -1036,16 +1036,14 @@ class C4gReservationController extends C4GBaseController
         $reservationIdField->setTableColumn(true);
         $reservationIdField->setMandatory(false);
         $reservationIdField->setInitialValue(C4GBrickCommon::getUUID());
-        //$reservationIdField->setRandomValue(C4GBrickCommon::getUUID());
         $reservationIdField->setTableRow(false);
         $reservationIdField->setEditable(false);
         $reservationIdField->setUnique(true);
         $reservationIdField->setNotificationField(true);
         $reservationIdField->setDbUnique(true);
-        $reservationIdField->setSimpleTextWithoutEditing(false); //!!!
+        $reservationIdField->setSimpleTextWithoutEditing(false);
         $reservationIdField->setDatabaseField(true);
         $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id_exists']);
-        //$reservationIdField->setDbUniqueAdditionalCondition("tl_c4g_reservation.cancellation <> '1' AND tl_c4g_reservation.beginDate > UNIX_TIMESTAMP(NOW())");
         $reservationIdField->setStyleClass('reservation-id');
         $fieldList[] = $reservationIdField;
 
@@ -1683,7 +1681,6 @@ class C4gReservationController extends C4GBaseController
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
         $result = $action->run();
-        //$this->fieldList[$reservationIdKey]->setInitialValue(C4GBrickCommon::getUUID());
 
         if (!$result['usermessage']) {
             if ($oldEventId = $this->session->getSessionValue('reservationEventCookie')) {
@@ -1808,12 +1805,16 @@ class C4gReservationController extends C4GBaseController
 
             $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true);
 
+            $reservationId = C4GBrickCommon::getUUID();
             if ($type) {
                 if ($this->fieldList) {
                     foreach ($this->fieldList as $key => $field) {
                         if (($field->getFieldName() == 'beginTime') && ($field->getAdditionalId() == $type . '00' . $wd)) {
                             $this->fieldList[$key]->setOptions($times);
-                            break;
+                        }
+
+                        if (($field->getFieldName() == 'reservation_id') && ($field->getInitialValue())) {
+                            $reservationId = $field->getInitialValue();
                         }
                     }
                 }
@@ -1821,7 +1822,7 @@ class C4gReservationController extends C4GBaseController
         }
 
         return new JsonResponse(array(
-            'reservationId' => C4GBrickCommon::getUUID(),
+            'reservationId' => $reservationId,
             'times' => $times
         ));
     }

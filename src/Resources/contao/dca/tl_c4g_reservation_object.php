@@ -144,7 +144,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesQuantity'],
             'exclude'           => true,
-            'filter'            => true,
+            'filter'            => false,
             'default'           => '1',
             'inputType'         => 'checkbox',
             'sql'               => "int(1) unsigned NULL default 1"
@@ -154,7 +154,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesValidity'],
             'exclude'           => true,
-            'filter'            => true,
+            'filter'            => false,
             'default'           => '0',
             'inputType'         => 'checkbox',
             'sql'               => "int(1) unsigned NULL default 0"
@@ -163,6 +163,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'switchAllTypes' => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['switchAllTypes'],
+            'filter'            => false,
             'exclude'           => true,
             'inputType'         => 'checkbox',
             'options_callback'  => ['tl_c4g_reservation_object', 'getTypes'],
@@ -174,7 +175,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priority'],
             'exclude'           => true,
-            'filter'            => true,
+            'filter'            => false,
             'default'           => '0',
             'inputType'         => 'checkbox',
             'sql'               => "int(1) unsigned NULL default 0"
@@ -839,7 +840,7 @@ class tl_c4g_reservation_object extends Backend
         $types = $this->Database->prepare("SELECT id, caption, reservationObjectType, published FROM tl_c4g_reservation_type")
             ->execute()->fetchAllAssoc();
         foreach ($types as $type) {
-            if ($type['reservationObjectType'] == '1' || $type['reservationObjectType'] == '3') {
+            if ($type['reservationObjectType'] != '2') {
                 $key = $type['id'];
                 $return[$key] = $type['caption'];
             }

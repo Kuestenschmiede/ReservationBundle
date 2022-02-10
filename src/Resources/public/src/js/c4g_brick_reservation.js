@@ -483,7 +483,9 @@ function setTimeset(dateField, additionalId, showDateTime) {
                 var objectList = [];
                 var times = data['times'];
                 var size = times.length;
-                document.getElementById("c4g_reservation_id").value = data['reservationId']; //Force regeneration
+                if (!document.getElementById("c4g_reservation_id").value) {
+                    document.getElementById("c4g_reservation_id").value = data['reservationId']; //Force regeneration
+                }
                 jQuery(document.getElementsByClassName("reservation-id")).show();
                 jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)) ? jQuery(document.getElementsByClassName('reservation_time_button_'+additionalId)).show() : false;
                 var iterator = 0;
