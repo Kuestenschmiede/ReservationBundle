@@ -179,33 +179,6 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setInitInvisible(true);
             $this->fieldList[] = $reservationBeginDateField;
 
-            //ToDo
-            $additionalDuration = $reservationSettings->additionalDuration;
-            if (intval($additionalDuration) >= 1) {
-                $durationField = new C4GNumberField();
-                $durationField->setFieldName('duration');
-                $durationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['duration']);
-                $durationField->setColumnWidth(10);
-                $durationField->setFormField(true);
-                $durationField->setSortColumn(true);
-                $durationField->setTableColumn(true);
-                $durationField->setMandatory(true);
-                $durationField->setCallOnChange(true);
-                $durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_" . $listType['id']  . '-33' . $reservationObject->getId()."'), " . $listType['id'] . "," . $showDateTime . ");");
-                $durationField->setCondition($object_condition);
-                $durationField->setNotificationField(true);
-                $durationField->setStyleClass('duration');
-                $durationField->setMin(1);
-                $durationField->setMax($additionalDuration);
-                $durationField->setMaxLength(3);
-                $durationField->setStep(5);
-                $durationField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
-
-                $this->fieldList[] = $durationField;
-            } else {
-                $additionalDuration = 0;
-            }
-
             if (!$this->initialValues->getTime() && $listType['directBooking']) {
                 $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
 

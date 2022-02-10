@@ -463,6 +463,32 @@ class C4gReservationController extends C4GBaseController
                 $fieldList[] = $reservationDesiredCapacity;
             }
 
+            $additionalDuration = $this->reservationSettings->additionalDuration;
+            if (intval($additionalDuration) >= 1) {
+                $durationField = new C4GNumberField();
+                $durationField->setFieldName('duration');
+                $durationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['duration']);
+                $durationField->setColumnWidth(10);
+                $durationField->setFormField(true);
+                $durationField->setSortColumn(true);
+                $durationField->setTableColumn(true);
+                $durationField->setMandatory(true);
+                $durationField->setCallOnChange(true);
+                $durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_" . $listType['id'] . "'), " . $listType['id'] . "," . $showDateTime . ");");
+                $durationField->setCondition(array($condition));
+                $durationField->setNotificationField(true);
+                $durationField->setStyleClass('duration');
+                $durationField->setMin(1);
+                $durationField->setMax($additionalDuration);
+                $durationField->setInitialValue($additionalDuration);
+                $durationField->setMaxLength(3);
+                $durationField->setStep(5);
+                $durationField->setAdditionalID($listType['id']);
+                $fieldList[] = $durationField;
+            } else {
+                $additionalDuration = 0;
+            }
+
             //set reservationObjectType to default
             $reservationObjectTypeField = new C4GNumberField();
             $reservationObjectTypeField->setFieldName('reservationObjectType');

@@ -242,6 +242,17 @@ function setReservationForm(typeId, showDateTime) {
             }
         }
 
+        var durationField = jQuery("#c4g_duration"+typeId);
+        if (durationField) {
+            var value = durationField.val();
+            if (durationField.attr('max') && (value > durationField.attr('max'))) {
+                durationField.val(durationField.attr('max'));
+            }
+            if (durationField.attr('min') && (value < durationField.attr('min'))) {
+                durationField.val(durationField.attr('min'));
+            }
+        }
+
         var dateId = 'c4g_beginDate_'+typeId;
         if (document.getElementById(dateId)) {
             setTimeset(document.getElementById(dateId), typeId, showDateTime);
