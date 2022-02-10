@@ -218,7 +218,7 @@ function setReservationForm(typeId, showDateTime) {
     jQuery(".reservation-id").hide();
     var event = false;
     var object = false;
-    if (typeId == -1) {
+    if (!typeId || typeId == -1) {
         var typeField = document.getElementById("c4g_reservation_type");
         typeId = typeField ? typeField.value : -1;
 
@@ -228,27 +228,25 @@ function setReservationForm(typeId, showDateTime) {
             event = selectedOption.getAttribute('type') == 2 ? true : false;
             object = selectedOption.getAttribute('type') == 3 ? true : false;
         }
-    }
-
-    if (typeId > 0) {
+    } else if (typeId > 0) {
         var capacityField = jQuery("#c4g_desiredCapacity_"+typeId);
         if (capacityField) {
             var value = capacityField.val();
-            if (capacityField.attr('max') && (value > capacityField.attr('max'))) {
+            if (capacityField.attr('max') && (value > parseInt(capacityField.attr('max')))) {
                 capacityField.val(capacityField.attr('max'));
             }
-            if (capacityField.attr('min') && (value < capacityField.attr('min'))) {
+            if (capacityField.attr('min') && (value < parseInt(capacityField.attr('min')))) {
                 capacityField.val(capacityField.attr('min'));
             }
         }
 
-        var durationField = jQuery("#c4g_duration"+typeId);
+        var durationField = jQuery("#c4g_duration_"+typeId);
         if (durationField) {
             var value = durationField.val();
-            if (durationField.attr('max') && (value > durationField.attr('max'))) {
+            if (durationField.attr('max') && (value > parseInt(durationField.attr('max')))) {
                 durationField.val(durationField.attr('max'));
             }
-            if (durationField.attr('min') && (value < durationField.attr('min'))) {
+            if (durationField.attr('min') && (value < parseInt(durationField.attr('min')))) {
                 durationField.val(durationField.attr('min'));
             }
         }

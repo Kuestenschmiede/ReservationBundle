@@ -68,10 +68,10 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 $initialBookingDate = false;
             }
 
-            if ($this->initialValues->getDate() || $initialBookingDate) {
+            //if ($this->initialValues->getDate() || $initialBookingDate) {
                 $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."')," . $listType['id'] . "," . $showDateTime . ");";
                 $this->getDialogParams()->setOnloadScript($script);
-            }
+            //}
 
             $reservationBeginDateField = new C4GDateField();
             $reservationBeginDateField->setFlipButtonPosition(false);

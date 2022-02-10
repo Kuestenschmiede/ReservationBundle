@@ -90,7 +90,7 @@ class C4gReservationController extends C4GBaseController
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
+    protected $brickScript  = 'bundles/con4gisreservation/src/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
 
@@ -474,7 +474,8 @@ class C4gReservationController extends C4GBaseController
                 $durationField->setTableColumn(true);
                 $durationField->setMandatory(true);
                 $durationField->setCallOnChange(true);
-                $durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_" . $listType['id'] . "'), " . $listType['id'] . "," . $showDateTime . ");");
+                $durationField->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ");");
+                //$durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_" . $listType['id'] . "'), " . $listType['id'] . "," . $showDateTime . ");");
                 $durationField->setCondition(array($condition));
                 $durationField->setNotificationField(true);
                 $durationField->setStyleClass('duration');
@@ -1475,8 +1476,8 @@ class C4gReservationController extends C4GBaseController
             }
 
             $time_interval = $reservationObject->time_interval;
-            $min_residence_time = $reservationObject->min_residence_time;
-            $max_residence_time = $reservationObject->max_residence_time;
+//            $min_residence_time = $reservationObject->min_residence_time;
+//            $max_residence_time = $reservationObject->max_residence_time;
 
             switch ($reservationType->periodType) {
                 case 'minute':
@@ -1489,15 +1490,11 @@ class C4gReservationController extends C4GBaseController
             }
 
             $duration = $putVars['duration'];
-            if ($duration && ((!$min_residence_time || ($duration >= $min_residence_time) && (!$max_residence_time || ($duration <= $max_residence_time))))) {
+            if ($duration/* && ((!$min_residence_time || ($duration >= $min_residence_time) && (!$max_residence_time || ($duration <= $max_residence_time))))*/) {
                 //$duration = $duration;
             } else {
                 $duration = $time_interval;
-
-//ToDo save duration by default
-//                if (!$putVars['duration'] && $reservationObject->duration) {
-//                    $putVars['duration'] = $reservationObject->duration;
-//                }
+                $putVars['duration'] = $reservationObject->duration ?: $time_interval;
             }
 
             $duration = $duration * $interval;
