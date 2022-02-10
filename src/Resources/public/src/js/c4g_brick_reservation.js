@@ -218,7 +218,7 @@ function setReservationForm(typeId, showDateTime) {
     jQuery(".reservation-id").hide();
     var event = false;
     var object = false;
-    if (!typeId || typeId == -1) {
+    if (!typeId || (typeId == -1)) {
         var typeField = document.getElementById("c4g_reservation_type");
         typeId = typeField ? typeField.value : -1;
 
@@ -228,7 +228,9 @@ function setReservationForm(typeId, showDateTime) {
             event = selectedOption.getAttribute('type') == 2 ? true : false;
             object = selectedOption.getAttribute('type') == 3 ? true : false;
         }
-    } else if (typeId > 0) {
+    }
+
+    if (typeId > 0) {
         var capacityField = jQuery("#c4g_desiredCapacity_"+typeId);
         if (capacityField) {
             var value = capacityField.val();
