@@ -793,28 +793,22 @@ class tl_c4g_reservation extends Backend
     {
         $return = [];
 
-        if ($dc && ($dc->activeRecord) && ($dc->activeRecord->reservationObjectType === '2')) {
-            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
-                ->execute();
+        if ($dc->activeRecord->reservationObjectType) {
+            if ($dc && ($dc->activeRecord) && ($dc->activeRecord->reservationObjectType === '2')) {
+                $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
+                    ->execute();
 
-            while ($events->next()) {
-                $return[$events->id] = $events->title;
-            }
-        } else if ($dc && ($dc->activeRecord) && ($dc->activeRecord->reservationObjectType === '1')) {
-            $dc->reservationObjectType = '1';
-            $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
-                ->execute();
+                while ($events->next()) {
+                    $return[$events->id] = $events->title;
+                }
+            } else if ($dc && ($dc->activeRecord) && (($dc->activeRecord->reservationObjectType === '1') || ($dc->activeRecord->reservationObjectType === '3'))) {
+                //ToDo all elemente for filter -> duplicated ids
+                $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
+                    ->execute();
 
-            while ($objects->next()) {
-                $return[$objects->id] = $objects->caption;
-            }
-        } else {
-            //ToDo all elemente for filter -> duplicated ids
-            $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
-                ->execute();
-
-            while ($objects->next()) {
-                $return[$objects->id] = $objects->caption;
+                while ($objects->next()) {
+                    $return[$objects->id] = $objects->caption;
+                }
             }
         }
 

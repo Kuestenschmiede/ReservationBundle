@@ -490,7 +490,7 @@ class C4gReservationController extends C4GBaseController
             $reservationObjectTypeField->setInitialValue($listType['objectType']);
             $reservationObjectTypeField->setDatabaseField(true);
             $reservationObjectTypeField->setFormField(false);
-            $this->fieldList[] = $reservationObjectTypeField;
+            $fieldList[] = $reservationObjectTypeField;
 
             switch($listType['objectType']) {
                 case '1':
@@ -978,7 +978,7 @@ class C4gReservationController extends C4GBaseController
                                 $participantCapacity = $maxCapacity && ($maxCapacity < 10) ? $maxCapacity : 10;
                                 if ($maxCapacity > 1) {
                                     $start = ($minCapacity > 2) ? $minCapacity : 2;
-                                    for ($i = $minCapacity; $i <= $participantCapacity; $i++) {
+                                    for ($i = $start; $i <= $participantCapacity; $i++) {
                                         $newCondition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id'], $i);
 
                                         //$newCondition[] = $condition;
@@ -997,7 +997,7 @@ class C4gReservationController extends C4GBaseController
                                         $reservationParticipants->setShowDataSetsByCount($i - 1);
                                         $reservationParticipants->setParentFieldList($fieldList);
                                         $reservationParticipants->setDelimiter('§');
-                                        $reservationParticipants->setCondition(array($newCondition));
+                                        $reservationParticipants->setCondition(array($newCondition)); //array($condition, $newCondition)
                                         $reservationParticipants->setRemoveWithEmptyCondition(true);
                                         $reservationParticipants->setAdditionalID($listType['id'] . '-' . ($i - 1));
 
@@ -1006,7 +1006,6 @@ class C4gReservationController extends C4GBaseController
                                 }
                             } else {
                                 $maxCapacity = $maxCapacity ?: 1;
-                                $newCondition = $condition;
 
                                 $reservationParticipants = new C4GSubDialogField();
                                 $reservationParticipants->setFieldName('participants');
@@ -1028,7 +1027,7 @@ class C4gReservationController extends C4GBaseController
                                 $reservationParticipants->setShowDataSetsByCount($maxCapacity <= 10 ? $maxCapacity : 10);
                                 $reservationParticipants->setParentFieldList($fieldList);
                                 $reservationParticipants->setDelimiter('§');
-                                $reservationParticipants->setCondition(array($newCondition));
+                                $reservationParticipants->setCondition(array($condition));
                                 $reservationParticipants->setRemoveWithEmptyCondition(true);
                                 $reservationParticipants->setAdditionalID($listType['id']);
 
@@ -1275,6 +1274,11 @@ class C4gReservationController extends C4GBaseController
         $removedFromList = [];
 
         foreach ($this->getFieldList() as $key=>$field) {
+//            if ($field->getFieldName() == 'reservationObjectType') {
+//                $newFieldList[] = $field;
+//                continue;
+//            }
+
             $additionalId = $field->getAdditionalID();
             if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-'))))) {
                 unset($putVars[$field->getFieldName()."_".$additionalId]);
@@ -1323,43 +1327,43 @@ class C4gReservationController extends C4GBaseController
             if (!$field->isEditable() && !$field->isDatabaseField() && $field->getInitialValue() && $field->isNotificationField()) {
                 if ($field->getAdditionalId()) {
                     if ($isEvent) {
-                        if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type.'-22')) !== false)) {
-                            if (strpos($field->getAdditionalId(), strval($type.'-22'.$reservationObject->id)) === false) {
+                        if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type . '-22')) !== false)) {
+                            if (strpos($field->getAdditionalId(), strval($type . '-22' . $reservationObject->id)) === false) {
                                 continue;
                             }
                         }
                     }
 
                     if ($reservationType->reservationObjectType === '3') {
-                        if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type.'-33')) !== false)) {
-                            if (strpos($field->getAdditionalId(), strval($type.'-33'.$reservationObject->id)) === false) {
+                        if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type . '-33')) !== false)) {
+                            if (strpos($field->getAdditionalId(), strval($type . '-33' . $reservationObject->id)) === false) {
                                 continue;
                             }
                         }
                     }
 
-                    $putVars[$field->getFieldName().'_'.$field->getAdditionalId()] = $field->getInitialValue();
-                } else {
-                    if ($field->getAdditionalId()) {
-                        if ($isEvent) {
-                            if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type . '-22')) !== false)) {
-                                if (strpos($field->getAdditionalId(), strval($type . '-22' . $reservationObject->id)) === false) {
-                                    continue;
-                                }
-                            }
-                        }
-
-                        if ($reservationType->reservationObjectType === '3') {
-                            if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type . '-33')) !== false)) {
-                                if (strpos($field->getAdditionalId(), strval($type . '-33' . $reservationObject->id)) === false) {
-                                    continue;
-                                }
+                    $putVars[$field->getFieldName() . '_' . $field->getAdditionalId()] = $field->getInitialValue();
+                }
+            } else {
+                if ($field->getAdditionalId()) {
+                    if ($isEvent) {
+                        if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type . '-22')) !== false)) {
+                            if (strpos($field->getAdditionalId(), strval($type . '-22' . $reservationObject->id)) === false) {
+                                continue;
                             }
                         }
                     }
 
-                    $putVars[$field->getFieldName()] = $field->getInitialValue();
+                    if ($reservationType->reservationObjectType === '3') {
+                        if (($field->getAdditionalId() != $type) && (strpos($field->getAdditionalId(), strval($type . '-33')) !== false)) {
+                            if (strpos($field->getAdditionalId(), strval($type . '-33' . $reservationObject->id)) === false) {
+                                continue;
+                            }
+                        }
+                    }
                 }
+
+                //$putVars[$field->getFieldName()] = $field->getInitialValue();
             }
 
             if ($reservationType->reservationObjectType === '3') {
