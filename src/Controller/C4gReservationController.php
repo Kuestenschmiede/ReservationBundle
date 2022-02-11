@@ -462,13 +462,27 @@ class C4gReservationController extends C4GBaseController
                 $fieldList[] = $reservationDesiredCapacity;
             }
 
-            //($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute')
+
+            switch ($listType['periodType']) {
+                case 'minute':
+                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_minutely'];
+                    break;
+                case 'hour':
+                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_hourly'];
+                    break;
+                case 'day':
+                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'];
+                    break;
+                case 'week':
+                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_weekly'];
+                    break;
+            }
 
             $additionalDuration = $this->reservationSettings->additionalDuration;
             if (intval($additionalDuration) >= 1) {
                 $durationField = new C4GNumberField();
                 $durationField->setFieldName('duration');
-                $durationField->setTitle($listType['periodType'] === 'hour' ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_hourly'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_minutely']);
+                $durationField->setTitle($title);
                 $durationField->setColumnWidth(10);
                 $durationField->setFormField(true);
                 $durationField->setSortColumn(true);

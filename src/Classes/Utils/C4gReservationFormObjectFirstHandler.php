@@ -146,6 +146,21 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $this->getDialogParams()->setOnloadScript($script);
             }
 
+            switch($listType['periodType']) {
+                case 'minute':
+                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'];
+                    break;
+                case 'hour':
+                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'];
+                    break;
+                case 'day':
+                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
+                    break;
+                case 'week':
+                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
+                    break;
+            }
+
             $reservationBeginDateField = new C4GDateField();
             $reservationBeginDateField->setFlipButtonPosition(false);
             $reservationBeginDateField->setMinDate(C4gReservationHandler::getMinDate([$reservationObject]));
@@ -155,7 +170,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setFieldName('beginDate');
             $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
-            $reservationBeginDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate']);
+            $reservationBeginDateField->setTitle($title);
             $reservationBeginDateField->setEditable(true);
             $reservationBeginDateField->setInitialValue($initialBookingDate ?: $this->initialValues->getDate());
             $reservationBeginDateField->setComparable(false);
@@ -209,7 +224,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $reservationBeginTimeField->setStyleClass('reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id']);
                 $reservationBeginTimeField->setTimeButtonSpecial(true);
                 $this->fieldList[] = $reservationBeginTimeField;
-            } else if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute')) {
+            } else if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute') || ($listType['periodType'] === 'day') || ($listType['periodType'] === 'week')) {
 
                 for ($i=0;$i<=6;$i++) {
                     if ($this->initialValues->getDate()) {

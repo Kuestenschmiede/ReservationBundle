@@ -29,6 +29,7 @@ $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Preiseinstellung", "Wonach sol
 $GLOBALS['TL_LANG'][$str]['references']['pMin'] = array("Preis pro Minute");
 $GLOBALS['TL_LANG'][$str]['references']['pHour'] = array("Preis pro Stunde");
 $GLOBALS['TL_LANG'][$str]['references']['pDay'] = array("Preis pro Tag");
+$GLOBALS['TL_LANG'][$str]['references']['pWeek'] = array("Preis pro Woche");
 $GLOBALS['TL_LANG'][$str]['references']['pReservation'] = array("Preis pro Reservierung");
 $GLOBALS['TL_LANG'][$str]['references']['pPerson'] = array("Preis pro Person");
 

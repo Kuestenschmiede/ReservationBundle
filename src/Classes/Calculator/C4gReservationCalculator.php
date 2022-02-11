@@ -237,6 +237,12 @@ class C4gReservationCalculator
                         case 'hour':
                             $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 3600) + ($reservation['duration'] * 3600);
                             break;
+                        case 'day':
+                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 86400) + ($reservation['duration'] * 86400);
+                            break;
+                        case 'week':
+                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 604800) + ($reservation['duration'] * 604800);
+                            break;
                     }
                 }
 

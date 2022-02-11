@@ -125,6 +125,12 @@ class C4gReservationHandler
                     case 'hour':
                         $toSecond = 3600;
                         break;
+                    case 'day':
+                        $toSecond = 86400;
+                        break;
+                    case 'week':
+                        $toSecond = 604800;
+                        break;
                     default: '';
                 }
 
@@ -571,6 +577,12 @@ class C4gReservationHandler
                         case 'hour':
                             $object->setDuration($duration);
                             break;
+                        case 'day':
+                            $object->setDuration($duration);
+                            break;
+                        case 'week':
+                            $object->setDuration($duration);
+                            break;
                         default: '';
                     }
                 }
@@ -584,6 +596,14 @@ class C4gReservationHandler
                     case 'hour':
                         $interval = $object->getTimeinterval() * 3600;
                         $durationInterval = $object->getDuration() > $object->getTimeinterval() ? $object->getDuration() * 3600 : $interval;
+                        break;
+                    case 'day':
+                        $interval = $object->getTimeinterval() * 86400;
+                        $durationInterval = $object->getDuration() > $object->getTimeinterval() ? $object->getDuration() * 86400 : $interval;
+                        break;
+                    case 'week':
+                        $interval = $object->getTimeinterval() * 604800;
+                        $durationInterval = $object->getDuration() > $object->getTimeinterval() ? $object->getDuration() * 604800 : $interval;
                         break;
                     default: '';
                 }
@@ -1018,6 +1038,12 @@ class C4gReservationHandler
                                 break;
                             case 'hour':
                                 $minutes = $object['time_interval'] * 60;
+                                break;
+                            case 'day':
+                                $minutes = $object['time_interval'] * 60 * 24;
+                                break;
+                            case 'week':
+                                $minutes = $object['time_interval'] * 60 * 24 * 7;
                                 break;
                             default:
                                 '';
