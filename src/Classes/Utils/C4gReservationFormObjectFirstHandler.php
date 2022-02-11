@@ -56,8 +56,6 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $module = $this->module;
         $reservationSettings = $module->getReservationSettings();
         $reservationObjects = $listType['objects'];
-        $maxCapacity = $listType['maxParticipantsPerBooking'] ?: 0;
-        $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
         $condition = $this->condition;
         $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
 

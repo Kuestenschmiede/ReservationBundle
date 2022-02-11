@@ -150,7 +150,7 @@ class C4gReservationController extends C4GBaseController
         }
 
         $eventId  = Input::get('event') ? Input::get('event') : 0;
-        if (!$eventId && $doIt && ($oldEventId = $this->session->getSessionValue('reservationEventCookie'))) {
+        if (!$eventId || ($doIt && ($oldEventId = $this->session->getSessionValue('reservationEventCookie')))) {
             $this->session->remove('reservationEventCookie');
             $this->session->remove('reservationInitialDateCookie_'.$oldEventId);
             $this->session->remove('reservationTimeCookie_'.$oldEventId);
@@ -424,6 +424,12 @@ class C4gReservationController extends C4GBaseController
 
             $maxCapacity = $listType['maxParticipantsPerBooking'] ?: 0;
             $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
+
+            if ($eventObj) {
+                $minCapacity = $eventObj->minParticipants ?: $minCapacity;
+                $maxCapacity = $eventObj->maxParticipants ?: $maxCapacity;
+            }
+
             $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
 
             if ($this->reservationSettings->withCapacity) {
@@ -440,10 +446,12 @@ class C4gReservationController extends C4GBaseController
                 $reservationDesiredCapacity->setCondition(array($condition));
                 $reservationDesiredCapacity->setInitialValue($minCapacity);
                 $reservationDesiredCapacity->setMandatory(true);
+
                 $reservationDesiredCapacity->setMin($minCapacity);
                 if ($maxCapacity) {
                     $reservationDesiredCapacity->setMax($maxCapacity);
                 }
+
                 $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                 $reservationDesiredCapacity->setCallOnChange(true);
                 $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ");");
@@ -976,10 +984,10 @@ class C4gReservationController extends C4GBaseController
                         } else {
                             if ($this->reservationSettings->withCapacity) {
                                 $participantCapacity = $maxCapacity && ($maxCapacity < 10) ? $maxCapacity : 10;
-                                if ($maxCapacity > 1) {
-                                    $start = ($minCapacity > 2) ? $minCapacity : 2;
+                                if ($participantCapacity > 1) {
+                                    $start = $minCapacity ?: 1;
                                     for ($i = $start; $i <= $participantCapacity; $i++) {
-                                        $newCondition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $listType['id'], $i);
+                                        $newCondition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $type['id'], $i);
 
                                         //$newCondition[] = $condition;
                                         $reservationParticipants = new C4GSubDialogField();
@@ -997,7 +1005,7 @@ class C4gReservationController extends C4GBaseController
                                         $reservationParticipants->setShowDataSetsByCount($i - 1);
                                         $reservationParticipants->setParentFieldList($fieldList);
                                         $reservationParticipants->setDelimiter('§');
-                                        $reservationParticipants->setCondition(array($newCondition)); //array($condition, $newCondition)
+                                        $reservationParticipants->setCondition(array($condition, $newCondition));
                                         $reservationParticipants->setRemoveWithEmptyCondition(true);
                                         $reservationParticipants->setAdditionalID($listType['id'] . '-' . ($i - 1));
 
@@ -1274,10 +1282,6 @@ class C4gReservationController extends C4GBaseController
         $removedFromList = [];
 
         foreach ($this->getFieldList() as $key=>$field) {
-//            if ($field->getFieldName() == 'reservationObjectType') {
-//                $newFieldList[] = $field;
-//                continue;
-//            }
 
             $additionalId = $field->getAdditionalID();
             if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-'))))) {
