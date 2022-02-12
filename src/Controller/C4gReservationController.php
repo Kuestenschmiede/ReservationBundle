@@ -1311,6 +1311,13 @@ class C4gReservationController extends C4GBaseController
                     unset($putVars[$field->getFieldName()."_".$additionalId]);
                     continue;
                 }
+
+                if ($reservationType->reservationObjectType && $reservationType->reservationObjectType === '1') {
+                    if ($field->getFieldName() == 'beginDate') {
+                        unset($putVars[$field->getFieldName()."_".$additionalId]);
+                        continue;
+                    }
+                }
             }
 
             if (!$isEvent && ($field->getFieldName() == "beginTime")) {
