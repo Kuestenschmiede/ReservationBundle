@@ -1484,6 +1484,7 @@ class C4gReservationController extends C4GBaseController
                     }
                 } else {
                     $beginDate = $putVars['beginDate_'.$type];
+
                     if (strpos($key, "beginTime_".$type) !== false) {
                         if ($value) {
                             if (strpos($value, '#') !== false) {
@@ -1810,7 +1811,7 @@ class C4gReservationController extends C4GBaseController
         $wd = -1;
         $times = [];
 
-        //hotfix dates with slashes
+        //hotfix dates with slashesoptions
         $date = str_replace("~", "/", $date);
         if ($date)  {
             $format = $GLOBALS['TL_CONFIG']['dateFormat'];
