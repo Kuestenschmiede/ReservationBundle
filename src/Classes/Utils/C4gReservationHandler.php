@@ -777,17 +777,33 @@ class C4gReservationHandler
         if ($reservationObject and $putVars) {
             $objectId = $reservationObject->id;
             $typeId   = $reservationType->id;
-            $beginDate = strtotime($putVars['beginDate_'.$typeId]);
             $beginTime = 0;
-            foreach ($putVars as $key => $value) {
-                if (strpos($key, "beginTime_".$typeId) !== false) {
-                    if ($value) {
-                        if (strpos($value, '#') !== false) {
-                            $value = substr($value,0, strpos($value, '#')); //remove frontend duration
-                        }
+            if ($reservationType->reservationObjectType === '3') {
+                $beginDate = $putVars['beginDate_'.$typeId.'-33'.$objectId];
+                foreach ($putVars as $key => $value) {
+                    if (strpos($key, "beginTime_" . $typeId . '-33' . $objectId) !== false) {
+                        if ($value) {
+                            if (strpos($value, '#') !== false) {
+                                $newValue = substr($value, 0, strpos($value, '#')); //remove frontend duration
+                            }
 
-                        $beginTime = $value;
-                        break;
+                            $beginTime = $newValue ?: $value;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                $beginDate = strtotime($putVars['beginDate_' . $typeId]);
+                foreach ($putVars as $key => $value) {
+                    if (strpos($key, "beginTime_".$typeId) !== false) {
+                        if ($value) {
+                            if (strpos($value, '#') !== false) {
+                                $value = substr($value,0, strpos($value, '#')); //remove frontend duration
+                            }
+
+                            $beginTime = $value;
+                            break;
+                        }
                     }
                 }
             }
