@@ -94,7 +94,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
                         '{notification_legend:hide}, notification_type;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site;'.
-                        '{expert_legend:hide}, removeBookedDays, showMemberData, specialParticipantMechanism, additionalDuration;'
+                        '{expert_legend:hide}, removeBookedDays, showInlineDatepicker, showMemberData, specialParticipantMechanism, additionalDuration;'
     ),
 
 
@@ -196,6 +196,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
         ),
         'removeBookedDays' => array
         (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['removeBookedDays'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
+        'showInlineDatepicker' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['showInlineDatepicker'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',

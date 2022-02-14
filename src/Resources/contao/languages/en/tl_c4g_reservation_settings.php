@@ -37,6 +37,7 @@ $GLOBALS['TL_LANG'][$str]['showDateTime'] = array("Show appointment at object", 
 $GLOBALS['TL_LANG'][$str]['showMemberData'] = array("Apply member data", "Existing member data is automatically pre-populated in the form fields.");
 $GLOBALS['TL_LANG'][$str]['showDetails'] = array("Show details", "Additional information such as image and description are displayed.");
 $GLOBALS['TL_LANG'][$str]['removeBookedDays'] = array("Lock fully booked days in calendar", "The calendar day is fully booked cannot be selected. Attention. The check is partly lengthy.");
+$GLOBALS['TL_LANG'][$str]['showInlineDatepicker'] = array("Display date picker open", "The date picker is displayed as calendar open.");
 $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text empty object list (optional)", "The text of the selectbox can optionally be overwritten.");
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Participant mechanism (optional)", "If this mechanism is enabled, the participant fields are generated based on the number of people.");
 

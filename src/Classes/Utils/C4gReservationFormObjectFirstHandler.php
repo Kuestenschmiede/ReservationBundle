@@ -188,7 +188,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
             $reservationBeginDateField->setStyleClass('begin-date');
-            $reservationBeginDateField->setShowInlinePicker(false);
+            $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
             $reservationBeginDateField->setInitInvisible(true);
             $this->fieldList[] = $reservationBeginDateField;
 
