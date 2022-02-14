@@ -116,13 +116,17 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
 
                 if (!foundValue && (option.value != -1)) {
                     jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
+                    jQuery(selectField).children('option[value="'+option.value+'"]').attr('hidden','hidden');
                 } else if (option.value != -1) {
                     jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                    jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
                     if (min && capacity && (capacity > 0)) {
                         if ((capacity < min) || (max && (capacity > max))) {
                             jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
+                            jQuery(selectField).children('option[value="'+option.value+'"]').attr('hidden','hidden');
                         } else {
                             jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                            jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
 
                             if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
                                 first = firstValueParam;
@@ -134,6 +138,7 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                         }
                     } else {
                         jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                        jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
                         if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
                             first = firstValueParam;
                         } else {
@@ -192,11 +197,14 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
             if (parseInt(first) >= 0) {
                 jQuery(selectField).val(first).change();
                 jQuery(selectField).children('option[value="'+first+'"]').removeAttr('disabled');
+                jQuery(selectField).children('option[value="'+first+'"]').removeAttr('hidden');
                 jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
+                jQuery(selectField).children('option[value="-1"]').attr('hidden','hidden');
 
                 jQuery(selectField).removeAttr('disabled');
             } else {
                 jQuery(selectField).children('option[value="-1"]').removeAttr('disabled');
+                jQuery(selectField).children('option[value="-1"]').removeAttr('hidden');
                 jQuery(selectField).val("-1").change();
                 jQuery(selectField).prop("disabled", true);
             }
@@ -617,6 +625,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                         //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objstr);
                                         jQuery(radioGroups[i].children[j].children[k]).attr('data-object', objstr);
                                         jQuery(radioGroups[i].children[j].children[k]).attr('disabled', false);
+                                        jQuery(radioGroups[i].children[j].children[k]).attr('hidden', false);
 
                                         if (percent > 0) {
                                             jQuery(radioGroups[i].children[j].children[k]).addClass("radio_object_hurry_up");
@@ -633,6 +642,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                     } else {
                                         //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
                                         jQuery(radioGroups[i].children[j].children[k]).attr('disabled', true);
+                                        jQuery(radioGroups[i].children[j].children[k]).attr('hidden', true);
                                     }
                                 }
                             }

@@ -105,11 +105,13 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setMandatory(true);
             $reservationBeginDateField->setCondition(array($condition));
             $reservationBeginDateField->setCallOnChange(true);
+            $reservationBeginDateField->setRemoveWithEmptyCondition(true);
             $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this," . $listType['id'] . "," . $showDateTime . ");");
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id']);
             $reservationBeginDateField->setStyleClass('begin-date');
             $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
+            $reservationBeginDateField->setInitInvisible(true);
             $this->fieldList[] = $reservationBeginDateField;
         }
 
