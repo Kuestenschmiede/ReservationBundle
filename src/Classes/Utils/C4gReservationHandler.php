@@ -1215,9 +1215,9 @@ class C4gReservationHandler
         $database = Database::getInstance();
 
         if ($objectId) {
-            $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND id = ?")->execute('1', $objectId)->fetchAllAssoc();
+            $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND id = ? ORDER BY caption")->execute('1', $objectId)->fetchAllAssoc();
         } else {
-            $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ?")->execute('1')->fetchAllAssoc();
+            $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? ORDER BY caption")->execute('1')->fetchAllAssoc();
         }
 
         $almostFullyBookedAt = $type['almostFullyBookedAt'] ?: 0;

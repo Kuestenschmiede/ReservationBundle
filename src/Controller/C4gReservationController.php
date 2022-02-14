@@ -288,7 +288,7 @@ class C4gReservationController extends C4GBaseController
 
         $t = 'tl_c4g_reservation_type';
         $arrValues = array();
-        $arrOptions = array();
+        $arrOptions = array('order' => "$t.caption ASC, $t.options ASC",);
 
         if ($eventObj) {
             $typeId = $eventObj->reservationType;
