@@ -498,7 +498,7 @@ class C4gReservationController extends C4GBaseController
                 $durationField->setMax($additionalDuration);
                 $durationField->setInitialValue($additionalDuration);
                 $durationField->setMaxLength(3);
-                $durationField->setStep(5);
+                $durationField->setStep(1);
                 $durationField->setAdditionalID($listType['id']);
                 $durationField->setDatabaseField(true);
                 $fieldList[] = $durationField;
