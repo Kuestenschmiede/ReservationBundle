@@ -94,7 +94,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
                         '{notification_legend:hide}, notification_type;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site;'.
-                        '{expert_legend:hide}, removeBookedDays, showInlineDatepicker, showMemberData, specialParticipantMechanism, additionalDuration;'
+                        '{expert_legend:hide}, removeBookedDays, showInlineDatepicker, showMemberData, specialParticipantMechanism;'
     ),
 
 
@@ -218,14 +218,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
             'sql'                     => "varchar(255) NOT NULL default ''"
         ),
-        'additionalDuration' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['additionalDuration'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'eval'                    => array('maxlength'=>3, 'multiple' => false,'mandatory'=>false),
-            'sql'                     => "int(3) unsigned NULL default 0"
-        ),
+//        'additionalDuration' => array
+//        (
+//            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['additionalDuration'],
+//            'exclude'                 => true,
+//            'inputType'               => 'text',
+//            'eval'                    => array('maxlength'=>3, 'multiple' => false,'mandatory'=>false),
+//            'sql'                     => "int(3) unsigned NULL default 0"
+//        ),
         'fieldSelection' => array
         (
             'label'			=> &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['fieldSelection'],

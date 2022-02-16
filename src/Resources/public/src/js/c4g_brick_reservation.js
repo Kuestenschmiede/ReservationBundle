@@ -39,7 +39,7 @@ function getWeekdate(date) {
 
 function isWeekday(datestr, fieldName) {
     var dateArr = datestr.split('--');
-    if (dateArr && dateArr[1]) {
+    if (dateArr && dateArr[0] && dateArr[1]) {
         if (getWeekdate(dateArr[0]) == dateArr[1]) {
             return true;
         }
@@ -300,7 +300,7 @@ function setReservationForm(typeId, showDateTime) {
             }
         }
     }
-
+    //handleBrickConditions();
     document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
 }
 
@@ -473,13 +473,12 @@ function setTimeset(dateField, additionalId, showDateTime) {
         date = dateField ? dateField.value : 0;
     }
 
-    var durationNode = document.getElementById("c4g_duration");
+    var durationNode = document.getElementById("c4g_duration_"+additionalId);
     if (durationNode) {
         var duration = durationNode.value;
     }
 
-    C4GCallOnChangeMethodswitchFunction(document.getElementById("c4g_reservation_object_"+additionalId));
-    C4GCallOnChange(document.getElementById("c4g_reservation_object_"+additionalId));
+    handleBrickConditions();
 
     //hotfix dates with slashes
     if (date && date.indexOf("/")) {
@@ -704,6 +703,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
 
                 }
             }).finally(function() {
+                //handleBrickConditions();
                 document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
             });
     }

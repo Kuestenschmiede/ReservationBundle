@@ -81,7 +81,7 @@ class C4gReservationController extends C4GBaseController
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
+    protected $brickScript  = 'bundles/con4gisreservation/src/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
 
@@ -346,7 +346,9 @@ class C4gReservationController extends C4GBaseController
                                 'memberId' => $type->member_id ?: $memberId,
                                 'groupId' => $type->group_id,
                                 'type' => $type->reservationObjectType,
-                                'directBooking' => $type->directBooking
+                                'directBooking' => $type->directBooking,
+                                'min_residence_time' => $type->min_residence_time,
+                                'max_residence_time' => $type->max_residence_time
                             );
                         }
                     }
@@ -365,7 +367,9 @@ class C4gReservationController extends C4GBaseController
                         'memberId' => $type->member_id ?: $memberId,
                         'groupId' => $type->group_id,
                         'type' => $type->reservationObjectType,
-                        'directBooking' => $type->directBooking
+                        'directBooking' => $type->directBooking,
+                        'min_residence_time' => $type->min_residence_time,
+                        'max_residence_time' => $type->max_residence_time
                     );
                 }
                 $safetyCount++;
@@ -384,9 +388,6 @@ class C4gReservationController extends C4GBaseController
         if (count($typelist) > 0) {
             $firstType = array_key_first($typelist);
 
-            $onLoadScript = "jQuery('#c4g_reservation_type').trigger('change');";
-            $this->getDialogParams()->setOnloadScript(trim($onLoadScript));
-
             $reservationTypeField = new C4GSelectField();
             $reservationTypeField->setChosen(false);
             $reservationTypeField->setFieldName('reservation_type');
@@ -398,7 +399,8 @@ class C4gReservationController extends C4GBaseController
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
             $reservationTypeField->setCallOnChange(true);
-            $reservationTypeField->setCallOnChangeFunction("setReservationForm(-1 ," . $showDateTime . ")");
+            $reservationTypeField->setCallOnChangeFunction("setReservationForm(-1 ," . $showDateTime . ");");
+            $reservationTypeField->setInitialCallOnChange(true);
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
             $reservationTypeField->setEditable(count($typelist) > 1);
@@ -462,24 +464,31 @@ class C4gReservationController extends C4GBaseController
                 $fieldList[] = $reservationDesiredCapacity;
             }
 
+            $hidden = false;
+            if ((intval($listType['min_residence_time']) >= 1) && (intval($listType['max_residence_time']) >= 1)) {
+                if ($listType['min_residence_time'] == $listType['max_residence_time']) {
+                    $fromto = $listType['min_residence_time'];
+                    $hidden = true;
+                } else {
+                    $fromto = $listType['min_residence_time'].'-'.$listType['max_residence_time'];
+                }
 
-            switch ($listType['periodType']) {
-                case 'minute':
-                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_minutely'];
-                    break;
-                case 'hour':
-                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_hourly'];
-                    break;
-                case 'day':
-                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'];
-                    break;
-                case 'week':
-                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_weekly'];
-                    break;
-            }
+                $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_caption'].$fromto;
+                switch ($listType['periodType']) {
+                    case 'minute':
+                        $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_minutely'];
+                        break;
+                    case 'hour':
+                        $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_hourly'];
+                        break;
+                    case 'day':
+                        $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'];
+                        break;
+                    case 'week':
+                        $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_weekly'];
+                        break;
+                }
 
-            $additionalDuration = $this->reservationSettings->additionalDuration;
-            if (intval($additionalDuration) >= 1) {
                 $durationField = new C4GNumberField();
                 $durationField->setFieldName('duration');
                 $durationField->setTitle($title);
@@ -494,16 +503,15 @@ class C4gReservationController extends C4GBaseController
                 $durationField->setCondition(array($condition));
                 $durationField->setNotificationField(true);
                 $durationField->setStyleClass('duration');
-                $durationField->setMin(1);
-                $durationField->setMax($additionalDuration);
-                $durationField->setInitialValue($additionalDuration);
+                $durationField->setMin($listType['min_residence_time']);
+                $durationField->setMax($listType['max_residence_time']);
+                $durationField->setInitialValue($listType['min_residence_time']);
                 $durationField->setMaxLength(3);
                 $durationField->setStep(1);
                 $durationField->setAdditionalID($listType['id']);
                 $durationField->setDatabaseField(true);
+                $durationField->setHidden($hidden);
                 $fieldList[] = $durationField;
-            } else {
-                $additionalDuration = 0;
             }
 
             //set reservationObjectType to default
@@ -1273,6 +1281,12 @@ class C4gReservationController extends C4GBaseController
                 $this->notification_type = $reservationObject->notification_type;
             }
 
+            foreach ($putVars as $key => $value) {
+                if (strpos($key, '_picker') !== false) {
+                    unset($putVars[$key]);
+                }
+            }
+
             if ($reservationType->reservationObjectType === '3') {
                 foreach ($putVars as $key => $value) {
                     if (strpos($key, strval($type.'-33'))) {
@@ -1507,8 +1521,6 @@ class C4gReservationController extends C4GBaseController
             }
 
             $time_interval = $reservationObject->time_interval;
-//            $min_residence_time = $reservationObject->min_residence_time;
-//            $max_residence_time = $reservationObject->max_residence_time;
 
             switch ($reservationType->periodType) {
                 case 'minute':
@@ -1516,6 +1528,12 @@ class C4gReservationController extends C4GBaseController
                     break;
                 case 'hour':
                     $interval = 3600;
+                    break;
+                case 'day':
+                    $interval = 86400;
+                    break;
+                case 'week':
+                    $interval = 604800;
                     break;
                 default: '';
             }
@@ -1526,29 +1544,28 @@ class C4gReservationController extends C4GBaseController
                 $putVars['duration_'.$type] = $reservationObject->duration ?: $duration;
             }
 
-            //$putVars['duration_'.$type] = intval($putVars['duration_'.$type]);
-
             $duration = $duration * $interval;
             $endTime = $beginTime + $duration;
             $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$endTime);
 
-            //check nxt day times
             if ($reservationType->reservationObjectType === '3') {
-                $putVars['endDate'] = $putVars['beginDate_'.$type.'-33'.$objectId]; //ToDo multiple days
+                $putVars['endDate'] = $putVars['beginDate_'.$type.'-33'.$objectId];
                 $bday = $putVars['beginDate_'.$type.'-33'.$objectId];
                 $nextDay = strtotime("+1 day", strtotime($bday));
                 if (!$reservationType->directBooking && $beginTime >= 86400) {
-                    $putVars['beginDate_'.$type.'-33'.$objectId] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    $putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate;
                     $putVars[$timeKey] = ($beginTime-86400);
                 } else {
                     $putVars[$timeKey] = $beginTime;
                 }
             } else {
-                $putVars['endDate'] = $putVars['beginDate_'.$type]; //ToDo multiple days
+                $putVars['endDate'] = $putVars['beginDate_'.$type];
                 $bday = $putVars['beginDate_'.$type];
                 $nextDay = strtotime("+1 day", strtotime($bday));
                 if (!$reservationType->directBooking && $beginTime >= 86400) {
-                    $putVars['beginDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    $putVars['beginDate_'.$type] = $beginDate;
                     $putVars[$timeKey] = ($beginTime-86400);
                 } else {
                     $putVars[$timeKey] = $beginTime;
@@ -1556,8 +1573,17 @@ class C4gReservationController extends C4GBaseController
             }
 
             if (!$reservationType->directBooking && ($endTime >= 86400)) {
+                $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime);
+                $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime-86400);
+            }
+
+            if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week')) {
+                $nextDay = strtotime($beginDate) + $duration;
                 $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
-                $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], ($endTime-86400));
+
+                $wd = date("w", strtotime($beginDate));
+                $endTime = C4gReservationHandler::getEndTimeForMultipleDays($reservationObject, $wd);
+                $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'],$endTime) : $beginTime;
             }
 
             if ($reservationType->directBooking) {
@@ -1860,7 +1886,6 @@ class C4gReservationController extends C4GBaseController
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
 
             $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true);
-
 
             //ToDo the following lines are necessary obsolete
             $reservationId = C4GBrickCommon::getUUID();

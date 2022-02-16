@@ -98,7 +98,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['opening_hours_friday_legend'] 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['opening_hours_saturday_legend'] = "Öffnungszeiten Samstags";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['opening_hours_sunday_legend'] = "Öffnungszeiten Sonntags";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['exclusion_legend'] = "Ausschlusszeiten";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['booking_wd_legend'] = "Mögliche Buchungszeiträume (Öffnungszeiten)";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['booking_wd_legend'] = "Mögliche Buchungszeiträume bzw. Start- und Endzeiten für mehrtägige Buchungen";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['location_legend'] = 'Einstellungen zum Ort';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['price_legend'] = 'Einstellungen zum Preis';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['expert_legend'] = 'Experteneinstellungen';

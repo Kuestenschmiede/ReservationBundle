@@ -71,16 +71,20 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
 
             switch($listType['periodType']) {
                 case 'minute':
-                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'];
+                    $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'];
+                    $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'];
                     break;
                 case 'hour':
-                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'];
+                    $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'];
+                    $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'];
                     break;
                 case 'day':
-                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
+                    $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
+                    $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'];
                     break;
                 case 'week':
-                    $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
+                    $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
+                    $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'];
                     break;
             }
 
@@ -93,7 +97,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setFieldName('beginDate');
             $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
-            $reservationBeginDateField->setTitle($title);
+            $reservationBeginDateField->setTitle($titleDate);
             $reservationBeginDateField->setEditable(true);
             $reservationBeginDateField->setInitialValue($initialBookingDate ?: $this->initialValues->getDate());
             $reservationBeginDateField->setComparable(false);
@@ -142,7 +146,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         if ($initialBookingDate && $initialBookingTime && $objects) {
             $reservationBeginTimeField = new C4GRadioGroupField();
             $reservationBeginTimeField->setFieldName('beginTime');
-            $reservationBeginTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+            $reservationBeginTimeField->setTitle($titleBeginTime);
             $reservationBeginTimeField->setFormField(true);
             $reservationBeginTimeField->setDatabaseField(true);
             $reservationBeginTimeField->setOptions(C4gReservationHandler::getReservationNowTime($objects[0], $reservationSettings->showEndTime, $reservationSettings->showFreeSeats));
@@ -186,7 +190,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
 
                 $reservationTimeField = new C4GRadioGroupField();
                 $reservationTimeField->setFieldName('beginTime');
-                $reservationTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime']);
+                $reservationTimeField->setTitle($titleBeginTime);
                 $reservationTimeField->setFormField(true);
                 $reservationTimeField->setOptions(
                     C4gReservationHandler::getReservationTimes(
@@ -213,6 +217,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 $reservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
                 $reservationTimeField->setInitialValue($this->initialValues->getTime());
                 $reservationTimeField->setTimeButtonSpecial(true);
+                $reservationTimeField->setInitInvisible(true);
                 $this->fieldList[] = $reservationTimeField;
             }
         }

@@ -14,6 +14,7 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
 use Contao\Database;
 use Contao\Date;
+use Contao\StringUtil;
 
 /**
  * Main class for reservation handling
@@ -464,6 +465,24 @@ class C4gReservationHandler
     }
 
     /**
+     * @param $object
+     * @param $weekday
+     * @return false|mixed
+     */
+    public static function getEndTimeForMultipleDays($object, $weekday) {
+
+        $weekdayStr = C4gReservationDateChecker::getWeekdayStr($weekday);
+        $ohString = "oh_".C4gReservationDateChecker::getWeekdayFullStr($weekday);
+        $oh = StringUtil::deserialize($object->$ohString);
+
+        foreach ($oh as $key => $period) {
+            return $period['time_end'];
+        }
+
+        return false;
+    }
+
+    /**
      * @param $list
      * @param $type
      * @param int $weekday
@@ -537,9 +556,6 @@ class C4gReservationHandler
             }
 
             $calculator = new C4gReservationCalculator($tsdate, $objectType);
-
-            //$count = []; //count over all objects
-
             foreach ($list as $object) {
                 $found = false;
                 $timeArray = []; //count for one object
@@ -627,74 +643,13 @@ class C4gReservationHandler
                                 }
 
                                 $time_begin = intval($period['time_begin']);
-                                $time_end = intval($period['time_end']);
 
-                                if ($time_end < $time_begin) { //nxt day
+                                if (($periodType == 'day') || ($periodType == 'week')) {
+                                    $time_end = intval($period['time_end']);//intval($period['time_begin']) +  $durationInterval;
+
                                     if ($time_begin && $time_end) {
                                         $time = $time_begin;
-                                        $endOfDate = 86400 + $time_end; //24h + nxt day time
-                                        $periodEnd = $endOfDate - $durationInterval;
-
-                                        while ($time <= $periodEnd) {
-                                            $id = $object->getId();
-                                            if ($time && $typeObject) {
-                                                $endTime = $time + $interval;
-
-                                                if ($date && $tsdate) {
-                                                    $calculator->calculateAll(
-                                                        $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
-                                                    );
-                                                    $calculatorResult = $calculator->getCalculatorResult();
-                                                    $timeArray = $calculatorResult->getTimeArray();
-                                                }
-
-
-                                                $endTimeInterval = $interval;
-                                                if (!$withEndTimes) {
-                                                    $endTimeInterval = 0;
-                                                }
-
-                                                $max = $capacity;
-
-                                                $timeObj = [
-                                                    'id'=>-1,
-                                                    'act'=>$calculatorResult ? $calculatorResult->getDbPersons() : 0,
-                                                    'percent'=>$calculatorResult ? $calculatorResult->getDbPercent() : 0,
-                                                    'max'=> $max,
-                                                    'showSeats'=>$showFreeSeats,
-                                                    'priority'=>intval($object->getPriority())
-                                                ];
-
-                                                $checkTime = $time;
-                                                if ($typeObject['bookRunning']) {
-                                                    $checkTime = $endTime;
-                                                }
-
-                                                $reasionLog = '';
-                                                if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime))/* || ($typeObject->directBooking)*/)) {
-                                                    if ($capacity && ($calculatorResult->getDbPersons() >= $capacity)) {
-                                                        $reasonLog = 'too many persons';
-                                                    } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
-                                                        $reasonLog = 'too many bookings';
-                                                    } else if ($capacity && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($capacity))) {
-                                                        $reasionLog = 'too many bookings per object';
-                                                    } else {
-                                                        $timeObj['id'] = $id;
-                                                    }
-
-                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
-                                                } else if ($date === -1) {
-                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
-                                                }
-                                            }
-
-                                            $time = $time + $interval;
-                                        }
-                                    }
-                                } else {
-                                    if ($time_begin && $time_end) {
-                                        $time = $time_begin;
-                                        $periodEnd = $time_end - $durationInterval;
+                                        $periodEnd = $time_end;
 
                                         while ($time <= $periodEnd) {
                                             $id = $object->getId();
@@ -749,6 +704,132 @@ class C4gReservationHandler
                                             }
 
                                             $time = $time + $interval;
+                                        }
+                                    }
+                                } else {
+                                    $time_end = intval($period['time_end']);
+                                    if ($time_end < $time_begin) { //nxt day
+                                        if ($time_begin && $time_end) {
+                                            $time = $time_begin;
+
+                                            $endOfDate = 86400 + $time_end; //24h + nxt day time
+                                            $periodEnd = $endOfDate - $durationInterval;
+
+                                            while ($time <= $periodEnd) {
+                                                $id = $object->getId();
+                                                if ($time && $typeObject) {
+                                                    $endTime = $time + $interval;
+
+                                                    if ($date && $tsdate) {
+                                                        $calculator->calculateAll(
+                                                            $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
+                                                        );
+                                                        $calculatorResult = $calculator->getCalculatorResult();
+                                                        $timeArray = $calculatorResult->getTimeArray();
+                                                    }
+
+
+                                                    $endTimeInterval = $interval;
+                                                    if (!$withEndTimes) {
+                                                        $endTimeInterval = 0;
+                                                    }
+
+                                                    $max = $capacity;
+
+                                                    $timeObj = [
+                                                        'id'=>-1,
+                                                        'act'=>$calculatorResult ? $calculatorResult->getDbPersons() : 0,
+                                                        'percent'=>$calculatorResult ? $calculatorResult->getDbPercent() : 0,
+                                                        'max'=> $max,
+                                                        'showSeats'=>$showFreeSeats,
+                                                        'priority'=>intval($object->getPriority())
+                                                    ];
+
+                                                    $checkTime = $time;
+                                                    if ($typeObject['bookRunning']) {
+                                                        $checkTime = $endTime;
+                                                    }
+
+                                                    $reasionLog = '';
+                                                    if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime))/* || ($typeObject->directBooking)*/)) {
+                                                        if ($capacity && ($calculatorResult->getDbPersons() >= $capacity)) {
+                                                            $reasonLog = 'too many persons';
+                                                        } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
+                                                            $reasonLog = 'too many bookings';
+                                                        } else if ($capacity && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($capacity))) {
+                                                            $reasionLog = 'too many bookings per object';
+                                                        } else {
+                                                            $timeObj['id'] = $id;
+                                                        }
+
+                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                    } else if ($date === -1) {
+                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                    }
+                                                }
+
+                                                $time = $time + $interval;
+                                            }
+                                        }
+                                    } else {
+                                        if ($time_begin && $time_end) {
+                                            $time = $time_begin;
+                                            $periodEnd = $time_end - $durationInterval;
+
+                                            while ($time <= $periodEnd) {
+                                                $id = $object->getId();
+                                                if ($time && $typeObject) {
+                                                    $endTime = $time + $interval;
+
+                                                    if ($date && $tsdate) {
+                                                        $calculator->calculateAll(
+                                                            $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
+                                                        );
+                                                        $calculatorResult = $calculator->getCalculatorResult();
+                                                        $timeArray = $calculatorResult->getTimeArray();
+                                                    }
+
+                                                    $endTimeInterval = $interval;
+                                                    if (!$withEndTimes) {
+                                                        $endTimeInterval = 0;
+                                                    }
+
+                                                    $max = $capacity;
+
+                                                    $timeObj = [
+                                                        'id'=>-1,
+                                                        'act'=> $calculatorResult ? $calculatorResult->getDbPersons() : 0,
+                                                        'percent'=> $calculatorResult ? $calculatorResult->getDbPercent() : 0,
+                                                        'max'=>$max,
+                                                        'showSeats'=>$showFreeSeats,
+                                                        'priority'=>intval($object->getPriority())
+                                                    ];
+
+                                                    $checkTime = $time;
+                                                    if ($typeObject['bookRunning']) {
+                                                        $checkTime = $endTime;
+                                                    }
+
+                                                    $reasionLog = '';
+                                                    if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
+                                                        if ($max && ($calculatorResult->getDbPersons() >= $max)) {
+                                                            $reasonLog = 'too many persons';
+                                                        } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
+                                                            $reasonLog = 'too many bookings';
+                                                        } else if ($max && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($max))) {
+                                                            $reasionLog = 'too many bookings per object';
+                                                        } else {
+                                                            $timeObj['id'] = $id;
+                                                        }
+
+                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                    } else if ($date === -1) {
+                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                    }
+                                                }
+
+                                                $time = $time + $interval;
+                                            }
                                         }
                                     }
                                 }

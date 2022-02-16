@@ -26,6 +26,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateShort'] = 'Date';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateTime'] = 'Time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'end date';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Please select a time';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'] = 'Earliest possible start time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeShort'] = 'Time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Ends at';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_minutely'] = 'Individual length of use (minutes)';

@@ -106,6 +106,44 @@ class C4gReservationDateChecker
         return $weekday;
     }
 
+    public static function getWeekdayFullStr($weekday)
+    {
+        if (is_numeric($weekday)) {
+            switch (intval($weekday)) {
+                case 0:
+                    $weekday = 'sunday';
+
+                    break;
+                case 1:
+                    $weekday = 'monday';
+
+                    break;
+                case 2:
+                    $weekday = 'tuesday';
+
+                    break;
+                case 3:
+                    $weekday = 'wednesday';
+
+                    break;
+                case 4:
+                    $weekday = 'thursday';
+
+                    break;
+                case 5:
+                    $weekday = 'friday';
+
+                    break;
+                case 6:
+                    $weekday = 'saturday';
+
+                    break;
+            }
+        }
+
+        return $weekday;
+    }
+
     public static function getWeekdayNumber($weekday)
     {
         if (is_string($weekday)) {

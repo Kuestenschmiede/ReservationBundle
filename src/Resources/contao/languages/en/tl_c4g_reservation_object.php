@@ -56,8 +56,6 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['openingHours'] = array("bookin
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'] = array("time interval", "Specify how many X minutes/ X hours the object can be booked (depends on which reservation type the object is assigned to");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['duration'] = array("Duration per booking (optional)", "Normally [0] the duration is according to the time interval. However, if the actual appointment should be longer than the offered interval. For example, if a conversion or cleaning break is to be scheduled, then a longer interval can be entered here.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['date_exclusion_end'] = array("Exclusion end", "Put the last Date of exlusion in");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_residence_time'] = array("Minimum duration of use (optional)", "Minimum usage period that the customer may choose in the form. Important for multi-day bookings (days, weeks). Attention. Applies only to the reservation type Object choice. At 0, the time interval applies.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_residence_time'] = array("Maximum duration of use (optional)", "Maximum duration of use that the customer may choose in the form. Important for multi-day bookings (days, weeks). Attention. Applies only to the reservation type Object choice. At 0, the time interval applies.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['md'] = array("Several days");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_selection'] = array("event type");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['event_object'] = array("event object");
@@ -99,7 +97,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['opening_hours_friday_legend'] 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['opening_hours_saturday_legend'] = "Opening hours Saturdays";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['opening_hours_sunday_legend'] = "Opening hours Sundays";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['exclusion_legend'] = "Exclusion hours";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['booking_wd_legend'] = "Possible booking periods (opening hours)";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['booking_wd_legend'] = "Possible booking periods or start and end times for multi-day bookings";
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['price_legend'] = 'Price settings';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['expert_legend'] = 'Expert settings';
 
