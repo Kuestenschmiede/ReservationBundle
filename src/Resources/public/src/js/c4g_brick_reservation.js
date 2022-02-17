@@ -651,6 +651,8 @@ function setTimeset(dateField, additionalId, showDateTime) {
                     }
                 }
 
+                handleBrickConditions();
+
                 if (nameField) {
                     var valueElement = document.getElementById(nameField);
                     if (valueElement) {
@@ -661,7 +663,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                     reservation_time_button.prop( "checked", false );
                 }
 
-                var reservationObjects = document.getElementsByClassName("displayReservationObjects");
+                //var reservationObjects = document.getElementsByClassName("displayReservationObjects");
 
                 if (additionalId != -1) {
                     var timeGroups = jQuery('.reservation_time_button_'+additionalId+'.formdata input[type = "hidden"]');
@@ -705,7 +707,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
 
                 }
             }).finally(function() {
-                handleBrickConditions();
+
                 document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
             });
     }
