@@ -81,7 +81,7 @@ class C4gReservationController extends C4GBaseController
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
+    protected $brickScript  = 'bundles/con4gisreservation/src/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
 
@@ -129,6 +129,7 @@ class C4gReservationController extends C4GBaseController
         parent::__construct($rootDir, $session, $framework, $model);
 
         if (!$this->reservationSettings && $this->reservation_settings) {
+            $this->session->setSessionValue('reservationSettings', $this->reservation_settings);
             $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
         }
         $doIt = false;
@@ -179,6 +180,7 @@ class C4gReservationController extends C4GBaseController
     public function addFields() : array
     {
         if (!$this->reservationSettings && $this->reservation_settings) {
+            $this->session->setSessionValue('reservationSettings', $this->reservation_settings);
             $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
         }
 
@@ -1881,6 +1883,10 @@ class C4gReservationController extends C4GBaseController
         }
 
         if ($date) {
+            if ($this->session->getSessionValue('reservationSettings')) {
+                $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->session->getSessionValue('reservationSettings'));
+            }
+
             $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices);
             $withEndTimes = $this->reservationSettings->showEndTime;
             $withFreeSeats = $this->reservationSettings->showFreeSeats;

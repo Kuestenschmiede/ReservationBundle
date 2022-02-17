@@ -15,10 +15,13 @@ class C4gReservationDateChecker
     public static function mergeDateWithTime($date, $time)
     {
         $result = $date;
-        $date = date('d.m.Y', $date);
-        $time = date('H:i:s', $time);
         if ($date && $time) {
-            $result = strtotime($date) + strtotime($time);
+            $dateTimeObject = new \DateTime();
+            $dateTimeObject->setTimezone(new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
+            $dateTimeObject->setTimestamp($date+$time+3600); //ToDo lost hour - calc time diff
+            $mergedDateTime = $dateTimeObject->format($GLOBALS['TL_CONFIG']['datimFormat']);
+            $mergedDateTime = \DateTime::createFromFormat($GLOBALS['TL_CONFIG']['datimFormat'], $mergedDateTime);
+            $result = $mergedDateTime->getTimestamp();
         }
 
         return $result;

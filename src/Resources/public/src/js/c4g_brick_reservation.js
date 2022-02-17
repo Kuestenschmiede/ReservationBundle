@@ -227,7 +227,7 @@ function setReservationForm(typeId, showDateTime) {
 
     var event = false;
     var object = false;
-    if (!typeId || (typeId == -1)) {
+    //if (!typeId || (typeId == -1)) {
         var typeField = document.getElementById("c4g_reservation_type");
         typeId = typeField ? typeField.value : -1;
 
@@ -237,7 +237,7 @@ function setReservationForm(typeId, showDateTime) {
             event = selectedOption.getAttribute('type') == 2 ? true : false;
             object = selectedOption.getAttribute('type') == 3 ? true : false;
         }
-    }
+    //}
 
     if (typeId > 0) {
         var capacityField = jQuery("#c4g_desiredCapacity_"+typeId);
@@ -297,9 +297,10 @@ function setReservationForm(typeId, showDateTime) {
             if (objectElement) {
                 dateId = dateId + '-33' +objectElement.value;
                 setTimeset(document.getElementById(dateId), typeId, showDateTime);
-
             }
-        }
+        }/* else {
+            setTimeset(document.getElementById(dateId), typeId, showDateTime);
+        }*/
     }
 
     handleBrickConditions();
@@ -501,6 +502,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                 var timeList = [];
                 var intervalList = [];
                 var objectList = [];
+                var nameList = [];
                 var times = data['times'];
                 var size = times.length;
                 if (!document.getElementById("c4g_reservation_id").value || (document.getElementById("c4g_reservation_id").value != data['reservationId'])) {
@@ -516,10 +518,12 @@ function setTimeset(dateField, additionalId, showDateTime) {
                     }
                     var dataInterval = times[key]['interval'];
                     var dataObjects = times[key]['objects'];
+                    var dataName = times[key]['name'];
 
                     timeList[iterator] = dataTime;
                     intervalList[iterator] = dataInterval;
                     objectList[iterator] = dataObjects;
+                    nameList[iterator] = dataName;
                     iterator++;
                 }
 
@@ -627,6 +631,13 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                         jQuery(radioGroups[i].children[j].children[k]).attr('data-object', objstr);
                                         jQuery(radioGroups[i].children[j].children[k]).attr('disabled', false);
                                         jQuery(radioGroups[i].children[j].children[k]).attr('hidden', false);
+
+                                        if (nameList[arrindex]) {
+                                            var id = jQuery(radioGroups[i].children[j].children[k]).attr('id');
+                                            if (id) {
+                                                jQuery('label[for="'+id+'"]').text(nameList[arrindex]);
+                                            }
+                                        }
 
                                         if (percent > 0) {
                                             jQuery(radioGroups[i].children[j].children[k]).addClass("radio_object_hurry_up");

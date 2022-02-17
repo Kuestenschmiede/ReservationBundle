@@ -26,12 +26,12 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'] = " Tage)";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_weekly'] = " Wochen)";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['tstamp'] = 'Letzte Änderung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'] = 'An welchem Tag?';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'] = 'Ab welchem Tag?';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'] = 'Reservierungsbeginn';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateShort'] = 'Datum';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateTime'] = 'Zeitpunkt';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDate'] = 'Endet am';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Gewünschte Uhrzeit?';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'] = 'Frühstmögliche Startzeit';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'] = 'Reservierungszeitraum';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeShort'] = 'Uhrzeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Endet um';
 
