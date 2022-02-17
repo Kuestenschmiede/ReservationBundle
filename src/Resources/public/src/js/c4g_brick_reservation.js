@@ -224,6 +224,7 @@ function checkType(dateField, event) {
 
 function setReservationForm(typeId, showDateTime) {
     jQuery(".reservation-id").hide();
+
     var event = false;
     var object = false;
     if (!typeId || (typeId == -1)) {
@@ -300,7 +301,8 @@ function setReservationForm(typeId, showDateTime) {
             }
         }
     }
-    //handleBrickConditions();
+
+    handleBrickConditions();
     document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
 }
 
@@ -478,7 +480,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
         var duration = durationNode.value;
     }
 
-    handleBrickConditions();
+    //handleBrickConditions();
 
     //hotfix dates with slashes
     if (date && date.indexOf("/")) {
@@ -703,7 +705,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
 
                 }
             }).finally(function() {
-                //handleBrickConditions();
+                handleBrickConditions();
                 document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
             });
     }

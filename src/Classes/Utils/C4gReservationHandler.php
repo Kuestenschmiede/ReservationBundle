@@ -1162,6 +1162,12 @@ class C4gReservationHandler
                             case 'hour':
                                 $hours = $object['time_interval'];
                                 break;
+                            case 'day':
+                                $hours = $object['time_interval'] * 24;
+                                break;
+                            case 'week':
+                                $hours = $object['time_interval'] * 24 * 7;
+                                break;
                             default:
                                 '';
                         }
@@ -1175,6 +1181,14 @@ class C4gReservationHandler
                         $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
                     }
                     $price = $price + (intval($object['price']) * $days);
+                    break;
+                case 'pWeek':
+                    if ($isEvent && $object['startDate'] && $object['endDate']) {
+                        $weeks = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24 * 7));
+                    } else if (!$isEvent && $object['beginDate'] && $object['endDate']) {
+                        $weeks = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24 * 7));
+                    }
+                    $price = $price + (intval($object['price']) * $weeks);
                     break;
                 case 'pReservation':
                     $price = $price + intval($object['price']);
