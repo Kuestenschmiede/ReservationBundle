@@ -1340,7 +1340,7 @@ class C4gReservationHandler
 
                 $frontendObject->setCaption(StringHelper::spaceToNbsp($object['caption']));
 
-                $captions = $object['options'];
+                $captions = StringUtil::deserialize($object['options']);
                 if ($captions) {
                     foreach ($captions as $caption) {
                         if (strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) {
