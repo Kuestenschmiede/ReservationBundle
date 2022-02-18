@@ -333,7 +333,7 @@ class C4gReservationController extends C4GBaseController
                 $captions = \Contao\StringUtil::deserialize($type->options);
                 if ($captions && (count($captions) > 0)) {
                     foreach ($captions as $caption) {
-                        if (strpos($GLOBALS['TL_LANGUAGE'], $caption['language']) >= 0) {
+                        if ((strpos($GLOBALS['TL_LANGUAGE'], $caption['language']) >= 0) && $caption['caption']) {
                             $typelist[$type->id] = array(
                                 'id' => $type->id,
                                 'name' => $caption['caption'] ?  StringHelper::spaceToNbsp($caption['caption']) : StringHelper::spaceToNbsp($type->caption),
