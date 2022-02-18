@@ -621,19 +621,19 @@ class C4gReservationHandler
                 switch ($periodType) {
                     case 'minute':
                         $interval = $object->getTimeinterval() * 60;
-                        $durationInterval = $object->getDuration() > $object->getTimeinterval() ? $object->getDuration() * 60 : $interval;
+                        $durationInterval = /*$object->getDuration() > $object->getTimeinterval() ? */$object->getDuration() * 60/* : $interval*/;
                         break;
                     case 'hour':
                         $interval = $object->getTimeinterval() * 3600;
-                        $durationInterval = $object->getDuration() > $object->getTimeinterval() ? $object->getDuration() * 3600 : $interval;
+                        $durationInterval = /*$object->getDuration() > $object->getTimeinterval() ? */$object->getDuration() * 3600/* : $interval*/;
                         break;
                     case 'day':
                         $interval = $object->getTimeinterval() * 86400;
-                        $durationInterval = $object->getDuration() > $object->getTimeinterval() ? $object->getDuration() * 86400 : $interval;
+                        $durationInterval = /*$object->getDuration() > $object->getTimeinterval() ? */$object->getDuration() * 86400/* : $interval*/;
                         break;
                     case 'week':
                         $interval = $object->getTimeinterval() * 604800;
-                        $durationInterval = $object->getDuration() > $object->getTimeinterval() ? $object->getDuration() * 604800 : $interval;
+                        $durationInterval = /*$object->getDuration() > $object->getTimeinterval() ? */$object->getDuration() * 604800/* : $interval*/;
                         break;
                     default: '';
                 }
@@ -703,6 +703,7 @@ class C4gReservationHandler
                                                 if ($tsdate) {
                                                     $mergedTime = C4gReservationDateChecker::mergeDateWithTime($tsdate,$time);
                                                     $mergedEndTime = C4gReservationDateChecker::mergeDateWithTime($tsdate+$durationInterval,$periodEnd);
+                                                    //ToDo calc endTime from target date
                                                 }
 
 
@@ -749,7 +750,7 @@ class C4gReservationHandler
                                                     }
 
 
-                                                    $endTimeInterval = $interval;
+                                                    $endTimeInterval = $durationInterval;
                                                     if (!$withEndTimes) {
                                                         $endTimeInterval = 0;
                                                     }
@@ -809,7 +810,7 @@ class C4gReservationHandler
                                                         $timeArray = $calculatorResult->getTimeArray();
                                                     }
 
-                                                    $endTimeInterval = $interval;
+                                                    $endTimeInterval = $durationInterval;
                                                     if (!$withEndTimes) {
                                                         $endTimeInterval = 0;
                                                     }
