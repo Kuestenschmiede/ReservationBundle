@@ -151,7 +151,7 @@ class C4gReservationController extends C4GBaseController
         }
 
         $eventId  = Input::get('event') ? Input::get('event') : 0;
-        if (!$eventId || ($doIt && ($oldEventId = $this->session->getSessionValue('reservationEventCookie')))) {
+        if (!$eventId && $doIt && ($oldEventId = $this->session->getSessionValue('reservationEventCookie'))) {
             $this->session->remove('reservationEventCookie');
             $this->session->remove('reservationInitialDateCookie_'.$oldEventId);
             $this->session->remove('reservationTimeCookie_'.$oldEventId);
@@ -1411,7 +1411,7 @@ class C4gReservationController extends C4GBaseController
                     continue;
                 }
             }
-            if ($field->getFieldName() && (!$removedFromList[$field->getFieldName()] || ($removedFromList[$field->getFieldName()] == $field->getAdditionalId()))) {
+            if ($field->getFieldName() && (!$removedFromList[$field->getFieldName()] || ($removedFromList[$field->getFieldName()] && ($removedFromList[$field->getFieldName()] == $field->getAdditionalId())))) {
                 $newFieldList[] = $field;
             }
         }
