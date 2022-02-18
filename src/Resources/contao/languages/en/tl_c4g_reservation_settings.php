@@ -28,7 +28,7 @@ $GLOBALS['TL_LANG'][$str]['mandatory'] = array("Mandatory field?","");
 $GLOBALS['TL_LANG'][$str]['binding'] = array("Mandatory field?", "Should this data field be displayed as a mandatory field in the frontend?");
 $GLOBALS['TL_LANG'][$str]['initialValue'] = array("Initial value", "Here you can enter an initial value. Important for the heading - otherwise optional.");
 $GLOBALS['TL_LANG'][$str]['fieldSelection'] = array("Add data fields", "Attention! First name, last name and e-mail are appended if they are missing. The three fields are always required.");
-$GLOBALS['TL_LANG'][$str]['additionalDuration'] = array("Individual length of use (maximum)", "If 0, no individual entry of the length of use is possible (default).");
+//$GLOBALS['TL_LANG'][$str]['additionalDuration'] = array("Individual length of use (initial)", "If 0, no individual entry of the length of use is possible (default). Min and max ");
 $GLOBALS['TL_LANG'][$str]['withCapacity'] = array("Customer can specify number of persons", "The customer can specify the number of persons. This is required, for example, for a table reservation in the restaurant.");
 $GLOBALS['TL_LANG'][$str]['showFreeSeats'] = array("Show open seats", "Open seats are displayed.");
 $GLOBALS['TL_LANG'][$str]['showEndTime'] = array("The end times are displayed with", "The end times are displayed with (depending on the configuration).");
@@ -37,6 +37,7 @@ $GLOBALS['TL_LANG'][$str]['showDateTime'] = array("Show appointment at object", 
 $GLOBALS['TL_LANG'][$str]['showMemberData'] = array("Apply member data", "Existing member data is automatically pre-populated in the form fields.");
 $GLOBALS['TL_LANG'][$str]['showDetails'] = array("Show details", "Additional information such as image and description are displayed.");
 $GLOBALS['TL_LANG'][$str]['removeBookedDays'] = array("Lock fully booked days in calendar", "The calendar day is fully booked cannot be selected. Attention. The check is partly lengthy.");
+$GLOBALS['TL_LANG'][$str]['showInlineDatepicker'] = array("Display date picker open", "The date picker is displayed as calendar open.");
 $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text empty object list (optional)", "The text of the selectbox can optionally be overwritten.");
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Participant mechanism (optional)", "If this mechanism is enabled, the participant fields are generated based on the number of people.");
 

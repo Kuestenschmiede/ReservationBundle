@@ -16,7 +16,7 @@
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 
-$default = '{type_legend}, caption, quantity, priority, options, description, image, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes, notification_type;{publish_legend}, published';
+$default = '{type_legend}, caption, options, quantity, priority, description, image, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes, notification_type;{publish_legend}, published';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -131,6 +131,36 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'               => "varchar(255) NOT NULL default ''"
         ),
 
+        'options' => array
+        (
+            'label'			=> &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['options'],
+            'exclude' 		=> true,
+            'inputType'     => 'multiColumnWizard',
+            'eval' 			=> array
+            (
+                'columnFields' => array
+                (
+                    'caption' => array
+                    (
+                        'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['option'],
+                        'exclude'               => true,
+                        'inputType'             => 'text',
+                        'eval' 			        => array('tl_class'=>'w50')
+                    ),
+                    'language' => array
+                    (
+                        'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['language'],
+                        'exclude'               => true,
+                        'inputType'             => 'select',
+                        'options'               => ['de' => 'Deutsch', 'en' => 'Englisch'],
+                        'eval'                  => array('chosen' => false, 'style'=>'width: 200px')
+                    )
+                )
+            ),
+
+            'sql' => "blob NULL"
+        ),
+
         'quantity' => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['quantity'],
@@ -241,25 +271,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NOT NULL default 0"
-        ),
-
-        'min_residence_time' => array
-        (
-            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_residence_time'],
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'default'           => '0',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'               => "smallint(5) unsigned NOT NULL default 1"
-        ),
-        'max_residence_time' => array
-        (
-            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['max_residence_time'],
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'default'           => '0',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'               => "smallint(5) unsigned NOT NULL default 1"
         ),
 
         'oh_monday' => array
@@ -706,7 +717,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'inputType'               => 'text',
             'default'                 => '0.00',
             'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>10, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
-            'sql'                     => "double(7,2) unsigned default '0.00'"
+            'sql'                     => "double(7,2) unsigned default '0'"
         ),
 
         'priceoption' => array

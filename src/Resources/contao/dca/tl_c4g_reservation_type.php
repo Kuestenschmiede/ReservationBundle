@@ -101,18 +101,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,description,options;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
+        'default'       =>  '{type_legend},caption,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
     ),
 
     //Subpalettes
    'subpalettes' => array(
-        'periodType_md'                 => 'beginDate, endDate;',
-        'periodType_event'              => '{event_legend},event_dayBegin, event_timeBegin, event_dayEnd, event_timeEnd;',
-        'periodType_contao_event'       => '{event_legend},event_id;',
         'auto_del_daily'                => 'del_time;',
-        'reservationObjectType_1'       => 'periodType,objectCount,severalBookings,directBooking',
+        'reservationObjectType_1'       => 'periodType,objectCount,min_residence_time,max_residence_time,severalBookings,directBooking',
         'reservationObjectType_2'       => '',
-        'reservationObjectType_3'       => 'periodType,objectCount,severalBookings,directBooking',
+        'reservationObjectType_3'       => 'periodType,objectCount,min_residence_time,max_residence_time,severalBookings,directBooking',
     ),
 
     //Fields
@@ -229,11 +226,30 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'select',
-            'options'           => array('minute','hour'/*,'minute_period','hour_period','md','event','contao_event'*/),
+            'options'           => array('minute','hour','day','week'),
             'reference'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
             'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>true, 'submitOnChange' => true),
             'sql'               => "char(25) NOT NULL default ''"
        ),
+
+       'min_residence_time' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['min_residence_time'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'default'           => '0',
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'               => "smallint(5) unsigned NOT NULL default 0"
+        ),
+        'max_residence_time' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['max_residence_time'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'default'           => '0',
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'               => "smallint(5) unsigned NOT NULL default 0"
+        ),
 
         'objectCount' => array
         (
@@ -241,7 +257,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NULL default 0"
         ),
 

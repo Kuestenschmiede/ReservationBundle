@@ -11,7 +11,7 @@
 
 /** Fields **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['caption'] = array("Backend Bezeichnung","Bezeichnung zur Auswahl im Backend.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['options'] = array("Frontend Bezeichnung","Werden je nach Sprache im Auswahlfeld im Frontend dargestellt.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['options'] = array("Frontend Bezeichnung","Wird alternativ im Frontend dargestellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("Name","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'] = array("Objekttyp", "Es können Reserverierungsobjekte und Contao Events reserviert werden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][1] = 'Zeitauswahl (Standard)';
@@ -21,7 +21,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('Aut
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_confirmation_type'] = array('Bestätigungsnachricht (Backendversand)', 'Sie können aus der Reservierungsliste heraus eine Bestätigungsnachricht verschicken.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_special_type'] = array('Spezialnachricht (Backendversand)', 'Diese Nachricht wird aus der Reservierungsliste heraus anstelle der Bestätigungsnachricht versenden, wenn die Checkbox "Spezialnachricht senden" ausgewählt wurde.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location'] = array("Veranstaltungsort", "Wo findet der Termin statt? Diese Einstellung kann am Objekt und an den Eventeinstellungen überschrieben werden.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("Zeitspannenart","Art der Zeitspanne deklarieren");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("Zeitspannenart","Art der Zeitspanne deklarieren. Achtung! Mehrtägige Zeitspannen können aktuell nur mit der Reservierungsart Objektauswahl genutzt werden.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['min_residence_time'] = array("Minimale Nutzungsdauer (optional)", "Minimale Nutzungsdauer, die der Kunde im Formular wählen darf. Bei 0 gilt das Zeitintervall.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['max_residence_time'] = array("Maximale Nutzungsdauer (optional)", "Maximale Nutzungsdauer, die der Kunde im Formular wählen darf. Bei 0 gilt das Zeitintervall.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['objectCount'] = array("Maximale Anzahl Objekte pro Zeitspanne","Maximale Anzahl der Gleichzeitig buchbaren Objekte. Das ist sinnvoll um bspw. in der Gastronomie gleichzeitige Tischreservierungen zu minimieren.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['severalBookings'] = array("Objekte mehrfach buchbar","Alle Objekte des Typs können mehrfach gebucht werden. Nur sinnvoll mit Personenangabe. Eine bereits gebuchte Personenzahl wird subtrahiert.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['directBooking'] = array("Datum und Uhrzeit werden automatisch gesetzt","Diese Funktion wird benötigt wenn man ein Formular zum direkten Einbuchen nutzen möchte. Da wo es schnell gehen muss (z.B. Drive Through). Achtung! Funktioniert nur mit einer einzelnen Reservierungsart und nur zu den Öffnungszeiten.");
@@ -29,11 +31,13 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['language'] = array("Sprache","")
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_send'] = array("Zusätzliche Bestätigung automatisch versenden","Die E-Mails werden versendet, sobald die Reservierung bestätigt ist.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['auto_del'] = array("Intervall für Automatisches Löschen","In welchem Intervall sollen erledigte Termine gelöscht werden ");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['del_time'] = array("Wert für Intervall angeben","Anzahl der Tage nach denen ein erledigter Termin gelöscht wird");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minute'] = array("Minuten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['no_delete'] = array("Nur Manuelles löschen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['no_sending'] = array("Nicht automatisch senden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minutely'] = array("Minütlich prüfen und versenden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['hour'] = array("Stunden");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minute'] = array("Minuten");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['day'] = array("Tage");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['week'] = array("Wochen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['daily'] = array("Intervall löschen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['openingHours'] = array("Öffnungszeiten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['md'] = array("Mehrtägig");

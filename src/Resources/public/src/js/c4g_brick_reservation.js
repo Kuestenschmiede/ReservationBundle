@@ -39,7 +39,7 @@ function getWeekdate(date) {
 
 function isWeekday(datestr, fieldName) {
     var dateArr = datestr.split('--');
-    if (dateArr && dateArr[1]) {
+    if (dateArr && dateArr[0] && dateArr[1]) {
         if (getWeekdate(dateArr[0]) == dateArr[1]) {
             return true;
         }
@@ -116,13 +116,17 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
 
                 if (!foundValue && (option.value != -1)) {
                     jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
+                    jQuery(selectField).children('option[value="'+option.value+'"]').attr('hidden','hidden');
                 } else if (option.value != -1) {
                     jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                    jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
                     if (min && capacity && (capacity > 0)) {
                         if ((capacity < min) || (max && (capacity > max))) {
                             jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
+                            jQuery(selectField).children('option[value="'+option.value+'"]').attr('hidden','hidden');
                         } else {
                             jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                            jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
 
                             if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
                                 first = firstValueParam;
@@ -134,6 +138,7 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                         }
                     } else {
                         jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                        jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
                         if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
                             first = firstValueParam;
                         } else {
@@ -192,11 +197,14 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
             if (parseInt(first) >= 0) {
                 jQuery(selectField).val(first).change();
                 jQuery(selectField).children('option[value="'+first+'"]').removeAttr('disabled');
+                jQuery(selectField).children('option[value="'+first+'"]').removeAttr('hidden');
                 jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
+                jQuery(selectField).children('option[value="-1"]').attr('hidden','hidden');
 
                 jQuery(selectField).removeAttr('disabled');
             } else {
                 jQuery(selectField).children('option[value="-1"]').removeAttr('disabled');
+                jQuery(selectField).children('option[value="-1"]').removeAttr('hidden');
                 jQuery(selectField).val("-1").change();
                 jQuery(selectField).prop("disabled", true);
             }
@@ -216,9 +224,10 @@ function checkType(dateField, event) {
 
 function setReservationForm(typeId, showDateTime) {
     jQuery(".reservation-id").hide();
+
     var event = false;
     var object = false;
-    if (!typeId || (typeId == -1)) {
+    //if (!typeId || (typeId == -1)) {
         var typeField = document.getElementById("c4g_reservation_type");
         typeId = typeField ? typeField.value : -1;
 
@@ -228,7 +237,7 @@ function setReservationForm(typeId, showDateTime) {
             event = selectedOption.getAttribute('type') == 2 ? true : false;
             object = selectedOption.getAttribute('type') == 3 ? true : false;
         }
-    }
+    //}
 
     if (typeId > 0) {
         var capacityField = jQuery("#c4g_desiredCapacity_"+typeId);
@@ -288,11 +297,13 @@ function setReservationForm(typeId, showDateTime) {
             if (objectElement) {
                 dateId = dateId + '-33' +objectElement.value;
                 setTimeset(document.getElementById(dateId), typeId, showDateTime);
-
             }
-        }
+        }/* else {
+            setTimeset(document.getElementById(dateId), typeId, showDateTime);
+        }*/
     }
 
+    handleBrickConditions();
     document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
 }
 
@@ -465,13 +476,12 @@ function setTimeset(dateField, additionalId, showDateTime) {
         date = dateField ? dateField.value : 0;
     }
 
-    var durationNode = document.getElementById("c4g_duration");
+    var durationNode = document.getElementById("c4g_duration_"+additionalId);
     if (durationNode) {
         var duration = durationNode.value;
     }
 
-    C4GCallOnChangeMethodswitchFunction(document.getElementById("c4g_reservation_object_"+additionalId));
-    C4GCallOnChange(document.getElementById("c4g_reservation_object_"+additionalId));
+    //handleBrickConditions();
 
     //hotfix dates with slashes
     if (date && date.indexOf("/")) {
@@ -492,6 +502,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                 var timeList = [];
                 var intervalList = [];
                 var objectList = [];
+                var nameList = [];
                 var times = data['times'];
                 var size = times.length;
                 if (!document.getElementById("c4g_reservation_id").value || (document.getElementById("c4g_reservation_id").value != data['reservationId'])) {
@@ -507,10 +518,12 @@ function setTimeset(dateField, additionalId, showDateTime) {
                     }
                     var dataInterval = times[key]['interval'];
                     var dataObjects = times[key]['objects'];
+                    var dataName = times[key]['name'];
 
                     timeList[iterator] = dataTime;
                     intervalList[iterator] = dataInterval;
                     objectList[iterator] = dataObjects;
+                    nameList[iterator] = dataName;
                     iterator++;
                 }
 
@@ -617,6 +630,14 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                         //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objstr);
                                         jQuery(radioGroups[i].children[j].children[k]).attr('data-object', objstr);
                                         jQuery(radioGroups[i].children[j].children[k]).attr('disabled', false);
+                                        jQuery(radioGroups[i].children[j].children[k]).attr('hidden', false);
+
+                                        if (nameList[arrindex]) {
+                                            var id = jQuery(radioGroups[i].children[j].children[k]).attr('id');
+                                            if (id) {
+                                                jQuery('label[for="'+id+'"]').text(nameList[arrindex]);
+                                            }
+                                        }
 
                                         if (percent > 0) {
                                             jQuery(radioGroups[i].children[j].children[k]).addClass("radio_object_hurry_up");
@@ -633,12 +654,15 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                     } else {
                                         //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
                                         jQuery(radioGroups[i].children[j].children[k]).attr('disabled', true);
+                                        jQuery(radioGroups[i].children[j].children[k]).attr('hidden', true);
                                     }
                                 }
                             }
                         }
                     }
                 }
+
+                handleBrickConditions();
 
                 if (nameField) {
                     var valueElement = document.getElementById(nameField);
@@ -650,7 +674,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                     reservation_time_button.prop( "checked", false );
                 }
 
-                var reservationObjects = document.getElementsByClassName("displayReservationObjects");
+                //var reservationObjects = document.getElementsByClassName("displayReservationObjects");
 
                 if (additionalId != -1) {
                     var timeGroups = jQuery('.reservation_time_button_'+additionalId+'.formdata input[type = "hidden"]');
@@ -694,6 +718,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
 
                 }
             }).finally(function() {
+
                 document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
             });
     }

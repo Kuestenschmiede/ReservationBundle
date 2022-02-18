@@ -143,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'inputType'               => 'text',
             'default'                 => '0.00',
             'eval'                    => array('rgxp'=>'digit','mandatory'=>true, 'maxlength'=>10, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
-            'sql'                     => "double(7,2) unsigned default '0.00'"
+            'sql'                     => "double(7,2) unsigned default '0'"
 
         ),
 

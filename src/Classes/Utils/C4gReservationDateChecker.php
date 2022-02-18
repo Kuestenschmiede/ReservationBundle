@@ -15,10 +15,13 @@ class C4gReservationDateChecker
     public static function mergeDateWithTime($date, $time)
     {
         $result = $date;
-        $date = date('d.m.Y', $date);
-        $time = date('H:i:s', $time);
         if ($date && $time) {
-            $result = strtotime($date) + strtotime($time);
+            $dateTimeObject = new \DateTime();
+            $dateTimeObject->setTimezone(new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
+            $dateTimeObject->setTimestamp($date+$time+3600); //ToDo lost hour - calc time diff
+            $mergedDateTime = $dateTimeObject->format($GLOBALS['TL_CONFIG']['datimFormat']);
+            $mergedDateTime = \DateTime::createFromFormat($GLOBALS['TL_CONFIG']['datimFormat'], $mergedDateTime);
+            $result = $mergedDateTime->getTimestamp();
         }
 
         return $result;
@@ -98,6 +101,44 @@ class C4gReservationDateChecker
                     break;
                 case 6:
                     $weekday = 'sa';
+
+                    break;
+            }
+        }
+
+        return $weekday;
+    }
+
+    public static function getWeekdayFullStr($weekday)
+    {
+        if (is_numeric($weekday)) {
+            switch (intval($weekday)) {
+                case 0:
+                    $weekday = 'sunday';
+
+                    break;
+                case 1:
+                    $weekday = 'monday';
+
+                    break;
+                case 2:
+                    $weekday = 'tuesday';
+
+                    break;
+                case 3:
+                    $weekday = 'wednesday';
+
+                    break;
+                case 4:
+                    $weekday = 'thursday';
+
+                    break;
+                case 5:
+                    $weekday = 'friday';
+
+                    break;
+                case 6:
+                    $weekday = 'saturday';
 
                     break;
             }
