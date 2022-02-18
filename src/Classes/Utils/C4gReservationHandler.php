@@ -576,6 +576,7 @@ class C4gReservationHandler
 
                 //max persons
                 $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 0;
+
                 if ($desiredCapacity && $object->getAllTypesQuantity()) {
                     $maxCount = $objectQuantity;
                 }
@@ -682,13 +683,13 @@ class C4gReservationHandler
                                                     $endTimeInterval = 0;
                                                 }
 
-                                                $max = $capacity;
+                                                //$max = $capacity;
 
                                                 $timeObj = [
                                                     'id'=>-1,
                                                     'act'=> $calculatorResult ? $calculatorResult->getDbPersons() : 0,
                                                     'percent'=> $calculatorResult ? $calculatorResult->getDbPercent() : 0,
-                                                    'max'=> $max,
+                                                    'max'=> intval($desiredCapacity),
                                                     'showSeats'=> $showFreeSeats,
                                                     'priority'=> intval($object->getPriority())
                                                 ];
@@ -707,11 +708,11 @@ class C4gReservationHandler
 
                                                 $reasionLog = '';
                                                 if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
-                                                    if ($max && ($calculatorResult->getDbPersons() >= $max)) {
+                                                    if ($capacity && ($calculatorResult->getDbPersons() >= $capacity)) {
                                                         $reasonLog = 'too many persons';
                                                     } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
                                                         $reasonLog = 'too many bookings';
-                                                    } else if ($max && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($max))) {
+                                                    } else if ($desiredCapacity && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($desiredCapacity))) {
                                                         $reasionLog = 'too many bookings per object';
                                                     } else {
                                                         $timeObj['id'] = $id;
@@ -753,13 +754,13 @@ class C4gReservationHandler
                                                         $endTimeInterval = 0;
                                                     }
 
-                                                    $max = $capacity;
+                                                    //$max = $capacity;
 
                                                     $timeObj = [
                                                         'id'=>-1,
                                                         'act'=>$calculatorResult ? $calculatorResult->getDbPersons() : 0,
                                                         'percent'=>$calculatorResult ? $calculatorResult->getDbPercent() : 0,
-                                                        'max'=> $max,
+                                                        'max'=> intval($desiredCapacity),
                                                         'showSeats'=>$showFreeSeats,
                                                         'priority'=>intval($object->getPriority())
                                                     ];
@@ -775,7 +776,7 @@ class C4gReservationHandler
                                                             $reasonLog = 'too many persons';
                                                         } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
                                                             $reasonLog = 'too many bookings';
-                                                        } else if ($capacity && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($capacity))) {
+                                                        } else if ($desiredCapacity && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($desiredCapacity))) {
                                                             $reasionLog = 'too many bookings per object';
                                                         } else {
                                                             $timeObj['id'] = $id;
@@ -813,13 +814,13 @@ class C4gReservationHandler
                                                         $endTimeInterval = 0;
                                                     }
 
-                                                    $max = $capacity;
+                                                    //$max = $capacity;
 
                                                     $timeObj = [
                                                         'id'=>-1,
                                                         'act'=> $calculatorResult ? $calculatorResult->getDbPersons() : 0,
                                                         'percent'=> $calculatorResult ? $calculatorResult->getDbPercent() : 0,
-                                                        'max'=>$max,
+                                                        'max'=> intval($desiredCapacity),
                                                         'showSeats'=>$showFreeSeats,
                                                         'priority'=>intval($object->getPriority())
                                                     ];
@@ -831,11 +832,11 @@ class C4gReservationHandler
 
                                                     $reasionLog = '';
                                                     if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
-                                                        if ($max && ($calculatorResult->getDbPersons() >= $max)) {
+                                                        if ($capacity && ($calculatorResult->getDbPersons() >= $capacity)) {
                                                             $reasonLog = 'too many persons';
                                                         } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
                                                             $reasonLog = 'too many bookings';
-                                                        } else if ($max && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($max))) {
+                                                        } else if ($desiredCapacity && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($desiredCapacity))) {
                                                             $reasionLog = 'too many bookings per object';
                                                         } else {
                                                             $timeObj['id'] = $id;

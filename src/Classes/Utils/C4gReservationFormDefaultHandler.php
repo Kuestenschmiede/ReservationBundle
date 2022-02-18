@@ -131,13 +131,11 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
 
         $objects = [];
         foreach ($reservationObjects as $reservationObject) {
-
-            //ToDo Check Capacity
             $objects[] = array(
                 'id' => $reservationObject->getId(),
                 'name' => $reservationObject->getCaption(),
-                'min' => $reservationObject->getDesiredCapacity()[0] ? $reservationObject->getDesiredCapacity()[0] : 1,
-                'max' => $reservationObject->getDesiredCapacity()[1] ? ($reservationObject->getDesiredCapacity()[1] * $reservationObject->getQuantity()) : 0,// unbegrenzt -> $reservationObject->getQuantity(),
+                'min' => $reservationObject->getDesiredCapacity()[0] ?: 1,
+                'max' => $reservationObject->getDesiredCapacity()[1] ?: 0,
                 'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
                 'openingHours' => $reservationObject->getOpeningHours()
             );

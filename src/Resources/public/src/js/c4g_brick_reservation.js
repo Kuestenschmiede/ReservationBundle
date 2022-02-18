@@ -298,12 +298,11 @@ function setReservationForm(typeId, showDateTime) {
                 dateId = dateId + '-33' +objectElement.value;
                 setTimeset(document.getElementById(dateId), typeId, showDateTime);
             }
-        }/* else {
-            setTimeset(document.getElementById(dateId), typeId, showDateTime);
-        }*/
+        }
     }
 
     handleBrickConditions();
+
     document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
 }
 
@@ -713,6 +712,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                     }
 
                     if (targetButton && !jQuery(targetButton).is(":disabled") && !(jQuery(targetButton).hasClass("radio_object_disabled"))) {
+                        jQuery(targetButton).prop( "checked", false );
                         jQuery(targetButton).click();
                     }
 

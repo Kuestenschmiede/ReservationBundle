@@ -428,12 +428,6 @@ class C4gReservationController extends C4GBaseController
 
             $maxCapacity = $listType['maxParticipantsPerBooking'] ?: 0;
             $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
-
-            if ($eventObj) {
-                $minCapacity = $eventObj->minParticipants ?: $minCapacity;
-                $maxCapacity = $eventObj->maxParticipants ?: $maxCapacity;
-            }
-
             $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
 
             if ($this->reservationSettings->withCapacity) {
@@ -1412,7 +1406,8 @@ class C4gReservationController extends C4GBaseController
                         (strpos($field->getFieldName(), 'beginDate') !== false) ||
                         (strpos($field->getFieldName(), 'beginTime') !== false) ||
                         (strpos($field->getFieldName(), 'description') !== false) ||
-                        (strpos($field->getFieldName(), 'image') !== false))) {
+                        (strpos($field->getFieldName(), 'image') !== false)
+                    )) {
                     continue;
                 }
             }
