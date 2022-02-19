@@ -625,19 +625,19 @@ class C4gReservationHandler
                 switch ($periodType) {
                     case 'minute':
                         $interval = $object->getTimeinterval() * 60;
-                        $durationInterval = /*$object->getDuration() > $object->getTimeinterval() ? */$object->getDuration() * 60/* : $interval*/;
+                        $durationInterval = $object->getDuration() ? $object->getDuration() * 60 : $interval;
                         break;
                     case 'hour':
                         $interval = $object->getTimeinterval() * 3600;
-                        $durationInterval = /*$object->getDuration() > $object->getTimeinterval() ? */$object->getDuration() * 3600/* : $interval*/;
+                        $durationInterval = $object->getDuration() ? $object->getDuration() * 3600 : $interval;
                         break;
                     case 'day':
                         $interval = $object->getTimeinterval() * 86400;
-                        $durationInterval = /*$object->getDuration() > $object->getTimeinterval() ? */$object->getDuration() * 86400/* : $interval*/;
+                        $durationInterval = $object->getDuration() ? $object->getDuration() * 86400 : $interval;
                         break;
                     case 'week':
                         $interval = $object->getTimeinterval() * 604800;
-                        $durationInterval = /*$object->getDuration() > $object->getTimeinterval() ? */$object->getDuration() * 604800/* : $interval*/;
+                        $durationInterval = $object->getDuration() ? $object->getDuration() * 604800 : $interval;
                         break;
                     default: '';
                 }

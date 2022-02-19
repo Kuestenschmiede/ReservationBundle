@@ -162,8 +162,7 @@ class C4gReservationController extends C4GBaseController
     public function initBrickModule($id)
     {
         \System::loadLanguageFile('fe_c4g_reservation');
-        $langCookie = $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
-        $this->session->setSessionValue('reservationLangCookie', $langCookie ?: '');
+        $this->session->setSessionValue('reservationLangCookie', $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'] ?: '');
         $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']);
         $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural']);
         parent::initBrickModule($id);
@@ -334,12 +333,13 @@ class C4gReservationController extends C4GBaseController
                 }
 
                 $captions = \Contao\StringUtil::deserialize($type->options);
+                $foundCaption = false;
                 if ($captions && (count($captions) > 0)) {
                     foreach ($captions as $caption) {
                         if ((strpos($GLOBALS['TL_LANGUAGE'], $caption['language']) >= 0) && $caption['caption']) {
                             $typelist[$type->id] = array(
                                 'id' => $type->id,
-                                'name' => $caption['caption'] ?  StringHelper::spaceToNbsp($caption['caption']) : StringHelper::spaceToNbsp($type->caption),
+                                'name' => StringHelper::spaceToNbsp($caption['caption']),
                                 'periodType' => $type->periodType,
                                 'includedParams' => \Contao\StringUtil::deserialize($type->included_params),
                                 'additionalParams' => \Contao\StringUtil::deserialize($type->additional_params),
@@ -355,9 +355,13 @@ class C4gReservationController extends C4GBaseController
                                 'min_residence_time' => $type->min_residence_time,
                                 'max_residence_time' => $type->max_residence_time
                             );
+                            $foundCaption = false;
+                            break;
                         }
                     }
-                } else {
+                }
+
+                If (!$foundCaption) {
                     $typelist[$type->id] = array(
                         'id' => $type->id,
                         'name' => StringHelper::spaceToNbsp($type->caption),
@@ -1890,33 +1894,17 @@ class C4gReservationController extends C4GBaseController
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
 
             $langCookie = $this->session->getSessionValue('reservationLangCookie');
-            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true, $langCookie);
-
-            //ToDo the following lines are necessary obsolete
-            $reservationId = C4GBrickCommon::getUUID();
-            if ($type) {
-                if ($this->fieldList) {
-                    foreach ($this->fieldList as $key => $field) {
-                        if (($field->getFieldName() == 'beginTime') && ($field->getAdditionalId() == $type . '00' . $wd)) {
-                            $this->fieldList[$key]->setOptions($times);
-                        }
-
-                        if (($field->getFieldName() == 'reservation_id') && ($field->getInitialValue())) {
-                            $reservationId = $field->getInitialValue();
-                        }
-                    }
-                }
-            }
+            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true, $langCookie);;
         }
 
         foreach ($times as $key=>$values) {
             $times[$key]['name'] = str_replace('&nbsp;',' ',$times[$key]['name']);
         }
 
-        return new JsonResponse(array(
-            'reservationId' => $reservationId,
+        return new JsonResponse([
+            'reservationId' => C4GBrickCommon::getUUID(),
             'times' => $times
-        ));
+        ]);
     }
 
     /**

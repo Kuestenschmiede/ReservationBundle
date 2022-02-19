@@ -227,6 +227,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $reservationBeginTimeField->setStyleClass('reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id']);
                 $reservationBeginTimeField->setTimeButtonSpecial(true);
                 $reservationBeginTimeField->setInitInvisible(true);
+                $reservationBeginTimeField->setWithoutScripts(true);
                 $this->fieldList[] = $reservationBeginTimeField;
             } else if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute') || ($listType['periodType'] === 'day') || ($listType['periodType'] === 'week')) {
 
@@ -286,6 +287,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $reservationTimeField->setInitialValue($this->initialValues->getTime());
                     $reservationTimeField->setTimeButtonSpecial(true);
                     $reservationTimeField->setInitInvisible(true);
+                    $reservationTimeField->setWithoutScripts(true);
                     $this->fieldList[] = $reservationTimeField;
                 }
             }
