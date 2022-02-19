@@ -1909,6 +1909,10 @@ class C4gReservationController extends C4GBaseController
             }
         }
 
+        foreach ($times as $key=>$values) {
+            $times[$key]['name'] = str_replace('&nbsp;',' ',$times[$key]['name']);
+        }
+
         return new JsonResponse(array(
             'reservationId' => $reservationId,
             'times' => $times
