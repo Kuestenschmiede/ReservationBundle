@@ -61,6 +61,7 @@ use Contao\FrontendUser;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\StringUtil;
+use Contao\System;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -161,6 +162,8 @@ class C4gReservationController extends C4GBaseController
     public function initBrickModule($id)
     {
         \System::loadLanguageFile('fe_c4g_reservation');
+        $langCookie = $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
+        $this->session->setSessionValue('reservationLangCookie', $langCookie ?: '');
         $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']);
         $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural']);
         parent::initBrickModule($id);
@@ -1886,7 +1889,8 @@ class C4gReservationController extends C4GBaseController
             $withEndTimes = $this->reservationSettings->showEndTime;
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
 
-            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true);
+            $langCookie = $this->session->getSessionValue('reservationLangCookie');
+            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true, $langCookie);
 
             //ToDo the following lines are necessary obsolete
             $reservationId = C4GBrickCommon::getUUID();

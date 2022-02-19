@@ -15,6 +15,7 @@ use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
 use Contao\Database;
 use Contao\Date;
 use Contao\StringUtil;
+use Contao\System;
 
 /**
  * Main class for reservation handling
@@ -269,13 +270,15 @@ class C4gReservationHandler
      * @param $endTime
      * @return array|mixed
      */
-    private static function addTime($list, $time, $obj, $interval, $endTime = 0, $mergedTime = 0, $mergedEndTime = 0)
+    private static function addTime($list, $time, $obj, $interval, $langCookie, $endTime = 0, $mergedTime = 0, $mergedEndTime = 0)
     {
         $clock = '';
-        if (!strpos($GLOBALS['TL_CONFIG']['timeFormat'],'A')) {
 
+        if (!strpos($GLOBALS['TL_CONFIG']['timeFormat'],'A')) {
             if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']) {
                 $clock = '&nbsp;'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
+            } else {
+                $clock = '&nbsp;'.$langCookie;
             }
         }
 
@@ -301,13 +304,13 @@ class C4gReservationHandler
                 if (!$datetim) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
                 }
-                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.' - '.$end, 'objects' => [$obj]);
+                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
                 if (!$datetim) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
                 }
-                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.' - '.$end, 'objects' => [$obj]);
+                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else {
                 $key = $time;
                 $list[$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj]);
@@ -318,13 +321,13 @@ class C4gReservationHandler
                 if (!$datetim) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time + $interval).$clock;
                 }
-                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.' - '.$end, 'objects' => [$obj]);
+                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
                 if (!$datetim) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
                 }
-                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.' - '.$end, 'objects' => [$obj]);
+                $list[$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else {
                 $key = $time;
                 $list[$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj]);
@@ -505,7 +508,7 @@ class C4gReservationHandler
      * @param false $showFreeSeats
      * @return array|mixed
      */
-    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false)
+    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '')
     {
         $result = array();
 
@@ -617,6 +620,7 @@ class C4gReservationHandler
                     }
                 }
 
+
                 $oh = $object->getOpeningHours();
                 switch ($periodType) {
                     case 'minute':
@@ -718,9 +722,9 @@ class C4gReservationHandler
                                                     } else {
                                                         $timeObj['id'] = $id;
                                                     }
-                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, 0, $mergedTime, $mergedEndTime);
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie, 0, $mergedTime, $mergedEndTime);
                                                 } else if ($date === -1) {
-                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie);
                                                 }
                                             }
 
@@ -783,9 +787,9 @@ class C4gReservationHandler
                                                             $timeObj['id'] = $id;
                                                         }
 
-                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie);
                                                     } else if ($date === -1) {
-                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie);
                                                     }
                                                 }
 
@@ -843,9 +847,9 @@ class C4gReservationHandler
                                                             $timeObj['id'] = $id;
                                                         }
 
-                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie);
                                                     } else if ($date === -1) {
-                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval);
+                                                        $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie);
                                                     }
                                                 }
 
