@@ -16,7 +16,7 @@
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 
-$default = '{type_legend}, caption, options, quantity, priority, description, image, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes, notification_type;{publish_legend}, published';
+$default = '{type_legend}, caption, options, quantity, priority, description, image, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes, notification_type;{publish_legend}, published, member_id';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -113,6 +113,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'id' => array
         (
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
+        ),
+
+        'member_id' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['memberId'],
+            'default'           => 0,
+            'inputType'         => 'select',
+            'exclude'           => true,
+            'options_callback'  => array('tl_c4g_reservation_object', 'loadMemberOptions'),
+            'eval'              => array('mandatory'=>false, 'disabled' => true, 'tl_class' => 'clr long'),
+            'filter'            => true,
+            'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
 
         'tstamp' => array
@@ -860,5 +872,22 @@ class tl_c4g_reservation_object extends Backend
 
         asort($return);
         return $return;
+    }
+
+    /**
+     * @param $dc
+     * @return array
+     */
+    public function loadMemberOptions($dc) {
+        $options = [];
+        $options[$dc->activeRecord->id] = '';
+
+        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
+        $result = $stmt->execute()->fetchAllAssoc();
+
+        foreach ($result as $row) {
+            $options[$row['id']] = $row['lastname'] . ', ' . $row['firstname'];
+        }
+        return $options;
     }
 }

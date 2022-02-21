@@ -12,6 +12,7 @@
 use con4gis\ReservationBundle\Controller\C4gReservationCancellationController;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
 use con4gis\ReservationBundle\Controller\C4gReservationListController;
+use con4gis\ReservationBundle\Controller\C4gReservationObjectsController;
 use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
 
 $GLOBALS['TL_LANG']['MOD']['Reservation'] = array('con4gis Reservation', 'www.con4gis.org');
@@ -27,6 +28,7 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Themen (Schwerpu
 $GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Reservierungsformular', 'Hier können Sie das Formular konfigurieren und im Modul verknüpfen.');
 
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Formular', 'Reservierungsformular');
-$GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE]  = array('con4gis-Reservation: Liste', 'Reservierungsliste');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE] = array('con4gis-Reservation: Liste', 'Reservierungsliste');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationCancellationController::TYPE]  = array('con4gis-Reservation: Stornierung', 'Reservierung');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE]  = array('con4gis-Reservation: Referent*innen', 'Referent*innen Liste');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationObjectsController::TYPE] = array('con4gis-Reservation: Objektpflege', 'Mitglieder können eigenen Objekte pflege. Bspw. für ein Verleihsystem.');

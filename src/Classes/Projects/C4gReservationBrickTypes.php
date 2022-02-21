@@ -15,4 +15,5 @@ class C4gReservationBrickTypes
     const BRICK_RESERVATION = 'brick_reservation';
     const BRICK_RESERVATION_CANCELLATION = 'cancellation';
     const BRICK_RESERVATION_SPEAKER = 'brick_speaker';
+    const BRICK_RESERVATION_OBJECTS = 'brick_reservation_objects';
 }

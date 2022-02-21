@@ -17,6 +17,7 @@ use con4gis\ProjectsBundle\Classes\Lists\C4GBrickRenderMode;
 use con4gis\ReservationBundle\Controller\C4gReservationCancellationController;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
 use con4gis\ReservationBundle\Controller\C4gReservationListController;
+use con4gis\ReservationBundle\Controller\C4gReservationObjectsController;
 use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
 use Contao\Controller;
 
@@ -28,6 +29,16 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,removeListImage,event_redirect_site;';
 
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationObjectsController::TYPE]  = '{title_legend},name,headline,type;{reservation_objects_legend}, reservation_object_types, login_redirect_site;';
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['reservation_object_types'] = [
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_object_types'],
+    'exclude'                 => true,
+    'inputType'               => 'checkbox',
+    'foreignKey'              => 'tl_c4g_reservation_type.caption',
+    'eval'                    => array('mandatory'=>true, 'multiple'=>true),
+    'sql'                     => "blob NULL"
+];
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_settings'] = [
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_settings'],
     'exclude'                 => true,
