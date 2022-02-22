@@ -134,12 +134,13 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'Es ist ein Fehler auftrete
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte Seite neu laden.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte die Seite neu laden und erneut versuchen.';
 
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'] = array(" pro Minute");
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['pHour'] = array(" pro Stunde");
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'] = array(" pro Tag");
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['pWeek'] = array(" pro Woche");
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['pEvent'] = array(" pro Veranstaltung");
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'] = array(" pro Person");
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'] = " pro Minute";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pHour'] = " pro Stunde";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'] = " pro Tag";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pWeek'] = " pro Woche";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pEvent'] = " pro Veranstaltung";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'] = " pro Person";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['pAmount'] = " als Pfand";
 
 /** DESCRIPTIONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Wählen Sie die Reservierungsart aus.';

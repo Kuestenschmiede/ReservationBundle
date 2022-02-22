@@ -135,6 +135,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'] = array(" per day");
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pWeek'] = array(" per week");
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pEvent'] = array(" per event");
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'] = array(" per person");
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pAmount'] = array(" as pledge");
 
 /** DESCRIPTIONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Select the reservation type';

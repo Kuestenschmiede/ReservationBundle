@@ -66,6 +66,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['memberId'] = array("Link member"
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId'] = 'Default (no special member)';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['groupId'] = array("Link group", "All reservations of this type will be created for this member group.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyGroupId'] = 'Default (no special group)';
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['cloneObject'] = array("Clone object", "The object is needed only for frontend creation. More complex settings will be applied when creating new objects of the same type.");
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Details of the type of reservation";

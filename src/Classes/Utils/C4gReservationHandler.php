@@ -1146,6 +1146,7 @@ class C4gReservationHandler
         if ($object) {
 
             $priceOption = $object['priceoption'];
+            $priceInfo = '';
             switch ($priceOption) {
                 case 'pMin':
                     if ($isEvent && $object['startTime'] && $object['endTime']) {
@@ -1221,10 +1222,17 @@ class C4gReservationHandler
                 case 'pPerson':
                     $price = ($price + intval($object['price'])) . $GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'];
                     break;
+                case 'pAmount':
+                    $price = $price + intval($object['price']);
+                    $priceInfo = $GLOBALS['TL_LANG']['tl_c4g_reservation']['pAmount'];
+                    break;
             }
 
         }
 
+        if ($price) {
+            $price = number_format(floatval($price),2,',','.')."&nbsp;€ ".$priceInfo;
+        }
         return $price;
     }
 
@@ -1256,7 +1264,7 @@ class C4gReservationHandler
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject['id']);
                 $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
-                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(+".number_format(floatval($price),2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($eventObject['title']));
+                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                 $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
                 $frontendObject->setBeginDate($eventObject['startDate'] ?: 0);
                 $frontendObject->setBeginTime($eventObject['startTime'] ?: 0);
@@ -1294,7 +1302,7 @@ class C4gReservationHandler
                         $frontendObject->setType(2);
                         $frontendObject->setId($eventObject['id']);
                         $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
-                        $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".number_format(floatval($price),2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($eventObject['title']));
+                        $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                         $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
                         $frontendObject->setBeginDate($eventObject['startDate'] ?: 0);
                         $frontendObject->setBeginTime($eventObject['startTime'] ?: 0);
@@ -1358,6 +1366,11 @@ class C4gReservationHandler
         }
 
         if ($objects) {
+            $cloneObject = false;
+            if ($type['cloneObject']) {
+                $cloneObject = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id = ?")->execute($type['cloneObject'])->fetchAssoc();
+            }
+
             foreach ($objects as $object) {
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(1);
@@ -1376,18 +1389,11 @@ class C4gReservationHandler
                 }
 
                 $price = $showPrices ? static::calcPrices($object, $type, false, 1) : 0;
-                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".number_format(floatval($price),2,',','.')."&nbsp;€)</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
+                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
 
-                $frontendObject->setTimeinterval($object['time_interval']);
                 $frontendObject->setPeriodType($type['periodType']);
-                $frontendObject->setDuration($object['duration']);
-                $frontendObject->setMinReservationDay($object['min_reservation_day']);
-                $frontendObject->setMaxReservationDay($object['max_reservation_day']);
                 $frontendObject->setReservationTypes(\Contao\StringUtil::deserialize($object['viewableTypes']));
-                $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'], $object['desiredCapacityMax']]);
                 $frontendObject->setQuantity($object['quantity']);
-                $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: 0);
-                $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: 0);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                 $frontendObject->setPriority($object['priority'] ?: 0);
                 $frontendObject->setSwitchAllTypes($object['switchAllTypes']);
@@ -1395,16 +1401,45 @@ class C4gReservationHandler
                 $frontendObject->setImage($object['image']);
                 $frontendObject->setLocation($object['location'] ?: $type['location']);
 
+                if ($cloneObject) {
+                    $frontendObject->setTimeinterval($object['time_interval'] ?: $cloneObject['time_interval']);
+                    $frontendObject->setDuration($object['duration'] ?: $cloneObject['duration']);
+                    $frontendObject->setMinReservationDay($object['min_reservation_day'] ?: $cloneObject['min_reservation_day']);
+                    $frontendObject->setMaxReservationDay($object['max_reservation_day'] ?: $cloneObject['max_reservation_day']);
+                    $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'] ?: $cloneObject['desiredCapacityMin'], $object['desiredCapacityMax'] ?: $cloneObject['desiredCapacityMax']]);
+                    $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: intval($cloneObject['allTypesQuantity']));
+                    $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: intval($cloneObject['allTypesValidity']));
+                } else {
+                    $frontendObject->setTimeinterval($object['time_interval']);
+                    $frontendObject->setDuration($object['duration']);
+                    $frontendObject->setMinReservationDay($object['min_reservation_day']);
+                    $frontendObject->setMaxReservationDay($object['max_reservation_day']);
+                    $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'], $object['desiredCapacityMax']]);
+                    $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: 0);
+                    $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: 0);
+                }
+
                 $opening_hours = array();
                 $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);
 
-                $opening_hours['su'] = \Contao\StringUtil::deserialize($object['oh_sunday']);
-                $opening_hours['mo'] = \Contao\StringUtil::deserialize($object['oh_monday']);
-                $opening_hours['tu'] = \Contao\StringUtil::deserialize($object['oh_tuesday']);
-                $opening_hours['we'] = \Contao\StringUtil::deserialize($object['oh_wednesday']);
-                $opening_hours['th'] = \Contao\StringUtil::deserialize($object['oh_thursday']);
-                $opening_hours['fr'] = \Contao\StringUtil::deserialize($object['oh_friday']);
-                $opening_hours['sa'] = \Contao\StringUtil::deserialize($object['oh_saturday']);
+                if ($object['oh_sunday'] || $object['oh_monday'] || $object['oh_tuesday'] || $object['oh_wednesday'] || $object['oh_thursday'] || $object['oh_friday'] || $object['oh_saturday']) {
+                    $opening_hours['su'] = \Contao\StringUtil::deserialize($object['oh_sunday']);
+                    $opening_hours['mo'] = \Contao\StringUtil::deserialize($object['oh_monday']);
+                    $opening_hours['tu'] = \Contao\StringUtil::deserialize($object['oh_tuesday']);
+                    $opening_hours['we'] = \Contao\StringUtil::deserialize($object['oh_wednesday']);
+                    $opening_hours['th'] = \Contao\StringUtil::deserialize($object['oh_thursday']);
+                    $opening_hours['fr'] = \Contao\StringUtil::deserialize($object['oh_friday']);
+                    $opening_hours['sa'] = \Contao\StringUtil::deserialize($object['oh_saturday']);
+                } else if ($cloneObject) {
+                    $opening_hours['su'] = \Contao\StringUtil::deserialize($cloneObject['oh_sunday']);
+                    $opening_hours['mo'] = \Contao\StringUtil::deserialize($cloneObject['oh_monday']);
+                    $opening_hours['tu'] = \Contao\StringUtil::deserialize($cloneObject['oh_tuesday']);
+                    $opening_hours['we'] = \Contao\StringUtil::deserialize($cloneObject['oh_wednesday']);
+                    $opening_hours['th'] = \Contao\StringUtil::deserialize($cloneObject['oh_thursday']);
+                    $opening_hours['fr'] = \Contao\StringUtil::deserialize($cloneObject['oh_friday']);
+                    $opening_hours['sa'] = \Contao\StringUtil::deserialize($cloneObject['oh_saturday']);
+                }
+
 
                 //ToDo check if only the first record is empty.
                 if ($opening_hours['su'] != false) {

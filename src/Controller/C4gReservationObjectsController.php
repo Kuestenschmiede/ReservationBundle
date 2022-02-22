@@ -14,13 +14,18 @@ namespace con4gis\ReservationBundle\Controller;
 use con4gis\CoreBundle\Classes\C4GVersionProvider;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\ProjectsBundle\Classes\Actions\C4GBrickActionType;
+use con4gis\ProjectsBundle\Classes\Actions\C4GSaveAndRedirectDialogAction;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
+use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickCondition;
+use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickConditionType;
 use con4gis\ProjectsBundle\Classes\Fieldlist\C4GBrickFieldSourceType;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateTimePickerField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDecimalField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GFileField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GImageField;
@@ -69,8 +74,7 @@ class C4gReservationObjectsController extends C4GBaseController
     //protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
     //protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = false;
-    //protected $permalink_field = 'reservation_id';
-    //protected $permalink_name = 'token';
+    protected $permalink_name = 'object';
 
     //Resource Params
     protected $loadDefaultResources = true;
@@ -85,7 +89,7 @@ class C4gReservationObjectsController extends C4GBaseController
     protected $loadFileUploadResources = true;
     protected $loadMultiColumnResources = false;
     protected $loadMiniSearchResources = false;
-    protected $loadHistoryPushResources = false;
+    protected $loadHistoryPushResources = true;
 
     protected $loadSignaturePadResources = true;
 
@@ -125,10 +129,6 @@ class C4gReservationObjectsController extends C4GBaseController
     public function getResponse(Template $template, ModuleModel $model, Request $request): ?Response {
         $result = parent::getResponse($template, $model, $request);
 
-        System::loadLanguageFile('fe_c4g_reservation_objects');
-        $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption']);
-        $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption_plural']);
-
         return $result;
     }
 
@@ -138,7 +138,14 @@ class C4gReservationObjectsController extends C4GBaseController
      */
     public function initBrickModule($id)
     {
+        System::loadLanguageFile('fe_c4g_reservation_objects');
+        $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption']);
+        $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption_plural']);
+
         parent::initBrickModule($id);
+
+        //$this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE);
+        //$this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
 
         //$this->listParams->setScrollX(false);
         //$this->listParams->setResponsive(true);
@@ -217,6 +224,21 @@ class C4gReservationObjectsController extends C4GBaseController
         $descriptionField->setNotificationField(true);
         $fieldList[] = $descriptionField;
 
+        $condition = new C4GBrickCondition(C4GBrickConditionType::BOOLSWITCH, 'image');
+
+        $imgField = new C4GImageField();
+        $imgField->setFieldName('img');
+        //$imgField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['image']);
+        $imgField->setShowIfEmpty(false);
+        $imgField->setFileTypes(C4GBrickFileType::IMAGES_PNG_JPG);
+        $imgField->setFormField(true);
+        $imgField->setTableColumn(false);
+        $imgField->setSize(500);
+        $imgField->setDatabaseField(false);
+        $imgField->setSource(C4GBrickFieldSourceType::OTHER_FIELD);
+        $imgField->setSourceField('image');
+        $imgField->setCondition($condition);
+        $fieldList[] = $imgField;
 
         $imgFileField = new C4GFileField();
         $imgFileField->setFieldName('image');
@@ -227,25 +249,21 @@ class C4gReservationObjectsController extends C4GBaseController
         $imgFileField->setCallOnChange(true);
         $fieldList[] = $imgFileField;
 
-        $imgField = new C4GImageField();
-        $imgField->setFieldName('img');
-        $imgField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['image']);
-        $imgField->setShowIfEmpty(false);
-        $imgField->setFileTypes(C4GBrickFileType::IMAGES_PNG_JPG);
-        $imgField->setFormField(true);
-        $imgField->setTableColumn(false);
-        $imgField->setSize(500);
-        $imgField->setDatabaseField(false);
-        $imgField->setSource(C4GBrickFieldSourceType::OTHER_FIELD);
-        $imgField->setSourceField('image');
-        $fieldList[] = $imgField;
+        $quantityField = new C4GSelectField();
+        $quantityField->setFieldName('priceoption');
+        $quantityField->setInitialValue('pAmount');
+        $quantityField->setFormField(false);
+        $fieldList[] = $quantityField;
 
-        $imageField = new C4GImageField();
-        $imageField->setFieldName('image');
-        $imageField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['image']);
-        $imageField->setFormField(true);
-        $imageField->setTableColumn(false);
-        $fieldList[] = $imageField;
+        $priceField = new C4GDecimalField();
+        $priceField->setFieldName('price');
+        $priceField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['price']);
+        $priceField->setInitialValue(0);
+        $priceField->setFormField(true);
+        $priceField->setTableColumn(true);
+//        $priceField->setDecimalPoint('.');
+        $priceField->setDecimals(2);
+        $fieldList[] = $priceField;
 
         $publishedField = new C4GCheckboxField();
         $publishedField->setFieldName('published');
@@ -255,7 +273,35 @@ class C4gReservationObjectsController extends C4GBaseController
         $publishedField->setNotificationField(true);
         $fieldList[] = $publishedField;
 
+//        $clickButton = new C4GBrickButton(
+//            C4GBrickConst::BUTTON_CLICK,
+//            $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['buttonSaveObject'],
+//            $visible = true,
+//            $enabled = true,
+//            $action = '',
+//            $accesskey = '',
+//            $defaultByEnter = true);
+//
+//        $buttonField = new C4GButtonField($clickButton);
+//        $buttonField->setOnClickType(C4GBrickConst::ONCLICK_TYPE_SERVER);
+//        $buttonField->setOnClick('saveObject');
+//        $buttonField->setWithoutLabel(true);
+//        $fieldList[] = $buttonField;
+
         return $fieldList;
+    }
+
+    /**
+     * @param $values
+     * @param $putVars
+     * @return void
+     */
+    public function saveObject($values, $putVars)
+    {
+        $fieldList = $this->getFieldList();
+        $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $fieldList, $putVars, $this->getBrickDatabase());
+        $action->setModule($this);
+        $result = $action->run();
     }
 
 }

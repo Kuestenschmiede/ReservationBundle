@@ -75,6 +75,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pDay'] = array("
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pWeek'] = array("Price per week");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pReservation'] = array("Price per reservation");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pPerson'] = array("Price per person");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pAmount'] = array("Security amount (pledge)");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['type_legend'] = "Reservation objects";

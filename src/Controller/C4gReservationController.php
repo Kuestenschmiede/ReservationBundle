@@ -1279,6 +1279,26 @@ class C4gReservationController extends C4GBaseController
             $reservationObject = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
                 ->execute($resObject);
 
+            if ($reservationObject && $reservationType->cloneObject) {
+                $cloneObject = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
+                    ->execute($reservationType->cloneObject);
+                if ($cloneObject) {
+                    $reservationObject->notification_type = $reservationObject->notification_type ?: $cloneObject->notification_type;
+                    $reservationObject->time_interval = $reservationObject->time_interval ?: $cloneObject->time_interval;
+                    $reservationObject->duration = $reservationObject->duration ?: $cloneObject->duration;
+                    $reservationObject->desiredCapacityMax = $reservationObject->desiredCapacityMax ?: $cloneObject->desiredCapacityMax;
+                    $reservationObject->minParticipants = $reservationObject->minParticipants ?: $cloneObject->minParticipants;
+                    $reservationObject->maxParticipants = $reservationObject->maxParticipants ?: $cloneObject->maxParticipants;
+                    $reservationObject->oh_sunday = $reservationObject->oh_sunday ?: $cloneObject->oh_sunday;
+                    $reservationObject->oh_monday = $reservationObject->oh_monday ?: $cloneObject->oh_monday;
+                    $reservationObject->oh_tuesday = $reservationObject->oh_tuesday ?: $cloneObject->oh_tuesday;
+                    $reservationObject->oh_wednesday = $reservationObject->oh_wednesday ?: $cloneObject->oh_wednesday;
+                    $reservationObject->oh_thursday = $reservationObject->oh_thursday ?: $cloneObject->oh_thursday;
+                    $reservationObject->oh_friday = $reservationObject->oh_friday ?: $cloneObject->oh_friday;
+                    $reservationObject->oh_saturday = $reservationObject->oh_saturday ?: $cloneObject->oh_saturday;
+                }
+            }
+
             if ($reservationObject && $reservationObject->notification_type) {
                 $this->getDialogParams()->setNotificationType($reservationObject->notification_type);
                 $this->notification_type = $reservationObject->notification_type;
@@ -1647,7 +1667,11 @@ class C4gReservationController extends C4GBaseController
             }
         }
 
-        $putVars['member_id'] = $reservationType->member_id ? $reservationType->member_id : $memberId;
+        if ($reservationObject->member_id) {
+            $putVars['member_id'] = $reservationObject->member_id;
+        } else {
+            $putVars['member_id'] = $reservationType->member_id ? $reservationType->member_id : $memberId;
+        }
         $putVars['group_id'] = $reservationType->group_id;
 
         $participantsArr = [];

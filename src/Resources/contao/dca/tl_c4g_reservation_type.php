@@ -107,9 +107,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     //Subpalettes
    'subpalettes' => array(
         'auto_del_daily'                => 'del_time;',
-        'reservationObjectType_1'       => 'periodType,objectCount,min_residence_time,max_residence_time,severalBookings,directBooking',
+        'reservationObjectType_1'       => 'cloneObject,periodType,objectCount,min_residence_time,max_residence_time,severalBookings,directBooking',
         'reservationObjectType_2'       => '',
-        'reservationObjectType_3'       => 'periodType,objectCount,min_residence_time,max_residence_time,severalBookings,directBooking',
+        'reservationObjectType_3'       => 'cloneObject,periodType,objectCount,min_residence_time,max_residence_time,severalBookings,directBooking',
     ),
 
     //Fields
@@ -281,6 +281,17 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50 clr'),
             'sql'                     => "int(1) unsigned NULL default 0"
+        ),
+
+        'cloneObject' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['cloneObject'],
+            'exclude'                 => true,
+            'filter'                  => true,
+            'inputType'               => 'select',
+            'foreignKey'              => 'tl_c4g_reservation_object.caption',
+            'eval'                    => array('mandatory'=>false, 'includeBlankOption' => true, 'tl_class' => 'long clr', 'multiple'=>false, 'chosen'=>true),
+            'sql'                     => "varchar(10) NOT NULL default ''"
         ),
 
         'minParticipantsPerBooking' => array

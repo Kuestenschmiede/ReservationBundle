@@ -10,8 +10,8 @@
  */
 
 /** CONFIGURATION */
-$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption'] = 'Mein Reservierungsobjekt';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption_plural'] = 'Meine Reservierungsobjekte';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption'] = 'Reservierungsobjekt';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption_plural'] = 'Reservierungsobjekte';
 
 /** FIELDS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['viewableTypes'] = 'Reservierungsart';
@@ -19,6 +19,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['caption'] = 'Bezeichnung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['quantity'] = 'Verfügbare Menge';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['description'] = 'Beschreibung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['image'] = 'Bild';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['price'] = 'Sicherheitsbetrag (Pfand)';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['published'] = 'Veröffentlicht?';
 
 /** Legends */
@@ -31,4 +32,4 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['reservation_objects_legend'] 
 //$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['desc_reservation_type'] = 'Wählen Sie die Reservierungsart aus.';
 
 /** BUTTONS */
-//$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['button_cancel'] = 'Zur Liste';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['buttonSaveObject'] = 'Speichern';

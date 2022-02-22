@@ -66,7 +66,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['published'] = array("Veröffen
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMin'] = array("Minimale Anzahl der Personen", "Wie viele Personen dürfen mindestens erscheinen? Beim Standard 0 wird die Anzahl nicht ausgewertet.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['desiredCapacityMax'] = array("Maximale Anzahl der Personen", "Wie viele Personen dürfen maximal erscheinen? Beim Standard 0 wird die Anzahl nicht ausgewertet.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['notification_type'] = array('Automatische Bestätigungsnachricht (optional)', 'Wählen Sie die Benachrichtigung aus. Diese Einstellung überschreibt die Reservierungsformular Einstellungen und auch die Einstellung an der Reservierungsart.');
-$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['memberId'] = array("Gehört Mitglied", "Dieses Objekt ist fest einem Mietglied zugeordnet.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['memberId'] = array("Wem gehört das Objekt?", "Nur wichtig, wenn Objekte über das Frontendmodul erstellt werden.");
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['price'] = array("Preis", "Bestimmen sie den Preis für die Buchung (bspw.: 50.00)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['priceoption'] = array("Preiseinstellung", "Wonach soll der Preis berechnet werden");
@@ -77,6 +77,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pDay'] = array("
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pWeek'] = array("Preis pro Woche");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pReservation'] = array("Preis pro Reservierung");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pPerson'] = array("Preis pro Person");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references']['pAmount'] = array("Sicherheitsbetrag (Pfand)");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['type_legend'] = "Reservierungsobjekte";

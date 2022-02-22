@@ -32,6 +32,7 @@ $GLOBALS['TL_LANG'][$str]['references']['pDay'] = array("Price per day");
 $GLOBALS['TL_LANG'][$str]['references']['pWeek'] = array("Price per week");
 $GLOBALS['TL_LANG'][$str]['references']['pReservation'] = array("Price per reservation");
 $GLOBALS['TL_LANG'][$str]['references']['pPerson'] = array("Price per person");
+$GLOBALS['TL_LANG'][$str]['references']['pAmount'] = array("Security amount (pledge)");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['event_legend'] = "Event data";
