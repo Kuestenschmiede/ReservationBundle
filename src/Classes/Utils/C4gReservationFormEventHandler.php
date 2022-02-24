@@ -126,7 +126,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationObjectField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event']);
         $reservationObjectField->setDescription('');
         $reservationObjectField->setFormField(true);
-        $reservationObjectField->setEditable(!$eventId); //ToDo prüfen
+        $reservationObjectField->setEditable(false);
         $reservationObjectField->setOptions($objects);
         $reservationObjectField->setMandatory(true);
         $reservationObjectField->setNotificationField(true);

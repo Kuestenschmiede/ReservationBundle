@@ -141,12 +141,9 @@ class C4gReservationObjectsController extends C4GBaseController
         $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption_plural']);
 
         parent::initBrickModule($id);
-
-        //$this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE);
-        //$this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
-
-        //$this->listParams->setScrollX(false);
-        //$this->listParams->setResponsive(true);
+        
+        $this->listParams->setScrollX(false);
+        $this->listParams->setResponsive(true);
 
         if ($this->login_redirect_site) {
             $this->dialogParams->getViewParams()->setLoginRedirect($this->login_redirect_site);
@@ -256,7 +253,7 @@ class C4gReservationObjectsController extends C4GBaseController
         $priceField = new C4GDecimalField();
         $priceField->setFieldName('price');
         $priceField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['price']);
-        $priceField->setInitialValue(0);
+        //$priceField->setInitialValue(0);
         $priceField->setFormField(true);
         $priceField->setTableColumn(true);
 //        $priceField->setDecimalPoint('.');

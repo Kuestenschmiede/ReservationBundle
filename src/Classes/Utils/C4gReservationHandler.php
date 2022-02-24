@@ -987,6 +987,7 @@ class C4gReservationHandler
             ->execute($id,'2','1')->fetchAllAssoc();
 
         $actPersons = 0;
+        $actPercent = 0;
         $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
         $capacity = $desiredCapacity;
         if (intval($capacity) && $reservations) {
@@ -1058,6 +1059,7 @@ class C4gReservationHandler
                 ->execute($id,$time,$time,'1')->fetchAllAssoc();
 
             $actPersons = 0;
+            $actPercent = 0;
             $min = $object['min'] ?: 1;
             $max = $object['max'] ?: 0;//1;
 
@@ -1148,7 +1150,7 @@ class C4gReservationHandler
         $price = 0;
         if ($object) {
 
-            $priceOption = $object['priceoption'];
+            $priceOption = key_exists('priceoption',$object) ? $object['priceoption'] : '';
             $priceInfo = '';
             switch ($priceOption) {
                 case 'pMin':
