@@ -466,6 +466,12 @@ class C4gReservationInsertTags
                             }
 
                             break;
+                        case 'speakerId':
+                            $speakerIds = \Contao\StringUtil::deserialize($reservationEventObject->speaker);
+                            return $speakerIds ? $speakerIds[0] : 0;
+                        case 'speakerIds':
+                            $speakerIds = explode(',',\Contao\StringUtil::deserialize($reservationEventObject->speaker));
+                            return $speakerIds;
                         case 'speaker':
                             $speakerIds = \Contao\StringUtil::deserialize($reservationEventObject->speaker);
                             if ($speakerIds && count($speakerIds) > 0) {

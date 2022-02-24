@@ -71,8 +71,6 @@ class C4gReservationObjectsController extends C4GBaseController
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION_OBJECTS;
     protected $viewType     = C4GBrickViewType::MEMBERBASED;
     protected $sendEMails   = null;
-    //protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
-    //protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = false;
     protected $permalink_name = 'object';
 

@@ -53,8 +53,6 @@ class C4gReservationSpeakerListController extends C4GBaseController
     protected $brickKey = C4gReservationBrickTypes::BRICK_RESERVATION_SPEAKER;
     protected $viewType = C4GBrickViewType::PUBLICVIEW;
     protected $sendEMails = null;
-    //protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
-    //protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = false;
     protected $permalink_name = 'speaker';
 
@@ -399,10 +397,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
 
         $grid = new C4GBrickGrid([
             new C4GBrickGridElement($photo),
-            new C4GBrickGridElement($nameField),
-            new C4GBrickGridElement($phone),
-            new C4GBrickGridElement($email),
-            new C4GBrickGridElement($website)
+            new C4GBrickGridElement($nameField)
         ], 1);
 
         $tileContent = new C4GGridField($grid);
