@@ -141,7 +141,7 @@ class C4gReservationObjectsController extends C4GBaseController
         $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption_plural']);
 
         parent::initBrickModule($id);
-        
+
         $this->listParams->setScrollX(false);
         $this->listParams->setResponsive(true);
 

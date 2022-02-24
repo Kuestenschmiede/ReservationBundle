@@ -512,7 +512,7 @@ class C4gReservationHandler
     public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '')
     {
         $result = array();
-
+        $tsdate = 0;
         if ($list) {
             shuffle($list);
 
@@ -568,7 +568,6 @@ class C4gReservationHandler
 
             $objectType = $typeObject['reservationObjectType'];
 
-            $tsdate = 0;
             if (($date !== -1) && $tsdate) {
                 $tsdate = C4gReservationDateChecker::getBeginOfDate($tsdate);
             }
