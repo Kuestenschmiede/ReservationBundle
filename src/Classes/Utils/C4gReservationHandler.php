@@ -48,7 +48,7 @@ class C4gReservationHandler
             foreach ($list as $object) {
                 $we = $object->getWeekdayExclusion();
                 foreach ($we as $key => $value) {
-                    if (!$value && !$weekdays[$key]) {
+                    if (!$value && (!key_exists($key, $weekdays) || !$weekdays[$key])) {
                         $weekdays[$key] = true;
                     }
                 }
@@ -169,16 +169,17 @@ class C4gReservationHandler
                     break;
                 }
                 $exclusionPeriods = $object->getDatesExclusion();
+                if ($exclusionPeriods) {
+                    foreach ($exclusionPeriods as $period) {
+                        if ($period) {
+                            $exclusionBegin = C4gReservationDateChecker::getBeginOfDate($period['date_exclusion']);
+                            $exclusionEnd = C4gReservationDateChecker::getEndOfDate($period['date_exclusion_end']);
 
-                foreach ($exclusionPeriods as $period) {
-                    if ($period) {
-                        $exclusionBegin = C4gReservationDateChecker::getBeginOfDate($period['date_exclusion']);
-                        $exclusionEnd = C4gReservationDateChecker::getEndOfDate($period['date_exclusion_end']);
-
-                        $current = $exclusionBegin;
-                        while($current <= $exclusionEnd) {
-                            $alldates[] = C4gReservationDateChecker::getBeginOfDate($current);
-                            $current = intval($current) + 86400;
+                            $current = $exclusionBegin;
+                            while($current <= $exclusionEnd) {
+                                $alldates[] = C4gReservationDateChecker::getBeginOfDate($current);
+                                $current = intval($current) + 86400;
+                            }
                         }
                     }
                 }
@@ -567,6 +568,7 @@ class C4gReservationHandler
 
             $objectType = $typeObject['reservationObjectType'];
 
+            $tsdate = 0;
             if (($date !== -1) && $tsdate) {
                 $tsdate = C4gReservationDateChecker::getBeginOfDate($tsdate);
             }
@@ -648,6 +650,7 @@ class C4gReservationHandler
                 //object count * max persons
                 $capacity = $objectQuantity * intval($desiredCapacity);
                 $weekdayStr = C4gReservationDateChecker::getWeekdayStr($weekday);
+                $calculatorResult = 0;
 
                 if ($durationInterval && ($durationInterval > 0)) {
                     foreach ($oh as $key => $day) {
@@ -1201,17 +1204,19 @@ class C4gReservationHandler
                     $price = $price + (intval($object['price']) * $hours);
                     break;
                 case 'pDay':
+                    $days = 0;
                     if ($isEvent && $object['startDate'] && $object['endDate']) {
                         $days = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24));
-                    } else if (!$isEvent && $object['beginDate'] && $object['endDate']) {
+                    } else if (!$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
                         $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
                     }
                     $price = $price + (intval($object['price']) * $days);
                     break;
                 case 'pWeek':
+                    $weeks = 0;
                     if ($isEvent && $object['startDate'] && $object['endDate']) {
                         $weeks = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24 * 7));
-                    } else if (!$isEvent && $object['beginDate'] && $object['endDate']) {
+                    } else if (!$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
                         $weeks = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24 * 7));
                     }
                     $price = $price + (intval($object['price']) * $weeks);
@@ -1442,37 +1447,37 @@ class C4gReservationHandler
 
 
                 //ToDo check if only the first record is empty.
-                if ($opening_hours['su'] != false) {
+                if (key_exists('su', $opening_hours) && $opening_hours['su'] != false) {
                     if ($opening_hours['su'][0]['time_begin'] && $opening_hours['su'][0]['time_end']) {
                         $weekdays['0'] = true;
                     }
                 }
-                if ($opening_hours['mo'] != false) {
+                if (key_exists('mo', $opening_hours) && $opening_hours['mo'] != false) {
                     if ($opening_hours['mo'][0]['time_begin'] && $opening_hours['mo'][0]['time_end']) {
                         $weekdays['1'] = true;
                     }
                 }
-                if ($opening_hours['tu'] != false) {
+                if (key_exists('tu', $opening_hours) && $opening_hours['tu'] != false) {
                     if ($opening_hours['tu'][0]['time_begin'] && $opening_hours['tu'][0]['time_end']) {
                         $weekdays['2'] = true;
                     }
                 }
-                if ($opening_hours['we'] != false) {
+                if (key_exists('we', $opening_hours) && $opening_hours['we'] != false) {
                     if ($opening_hours['we'][0]['time_begin'] && $opening_hours['we'][0]['time_end']) {
                         $weekdays['3'] = true;
                     }
                 }
-                if ($opening_hours['th'] != false) {
+                if (key_exists('th', $opening_hours) && $opening_hours['th'] != false) {
                     if ($opening_hours['th'][0]['time_begin'] && $opening_hours['th'][0]['time_end']) {
                         $weekdays['4'] = true;
                     }
                 }
-                if ($opening_hours['fr'] != false) {
+                if (key_exists('fr', $opening_hours) && $opening_hours['fr'] != false) {
                     if ($opening_hours['fr'][0]['time_begin'] && $opening_hours['fr'][0]['time_end']) {
                         $weekdays['5'] = true;
                     }
                 }
-                if ($opening_hours['sa'] != false) {
+                if (key_exists('sa', $opening_hours) && $opening_hours['sa'] != false) {
                     if ($opening_hours['sa'][0]['time_begin'] && $opening_hours['sa'][0]['time_end']) {
                         $weekdays['6'] = true;
                     }

@@ -67,7 +67,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
     protected $loadConditionalFieldDisplayResources = false;
     protected $loadMoreButtonResources = false;
     protected $loadFontAwesomeResources = true;
-    protected $loadTriggerSearchFromOtherModuleResources = false;
+    protected $loadTriggerSearchFromOtherModuleResources = true;
     protected $loadFileUploadResources = false;
     protected $loadMultiColumnResources = false;
     protected $loadMiniSearchResources = false;

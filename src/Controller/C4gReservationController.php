@@ -82,7 +82,7 @@ class C4gReservationController extends C4GBaseController
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
+    protected $brickScript  = 'bundles/con4gisreservation/src/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
 
@@ -128,13 +128,14 @@ class C4gReservationController extends C4GBaseController
     public function __construct(string $rootDir, Session $session, ContaoFramework $framework, ModuleModel $model = null)
     {
         parent::__construct($rootDir, $session, $framework, $model);
-
-        if (!$this->reservationSettings && $this->reservation_settings) {
+        $moduleTypes = [];
+        $doIt = false;
+        if ((!property_exists($this,'reservationSettings') || !$this->reservationSettings) && property_exists($this,'reservation_settings') && $this->reservation_settings) {
             $this->session->setSessionValue('reservationSettings', $this->reservation_settings);
             $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
+            $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types);
         }
-        $doIt = false;
-        $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types);
+
         if ($moduleTypes) {
             $doIt = true;
             $t = 'tl_c4g_reservation_type';
@@ -620,7 +621,7 @@ class C4gReservationController extends C4GBaseController
         foreach ($additionaldatas as $rowdata) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
-            $rowMandatory = $rowdata['binding'];
+            $rowMandatory = key_exists('binding', $rowdata) ? $rowdata['binding'] : false;
 
             if ($rowField == "organisation") {
                 $organisationField = new C4GTextField();
@@ -1096,7 +1097,7 @@ class C4gReservationController extends C4GBaseController
         $reservationIdField->setDbUnique(true);
         $reservationIdField->setSimpleTextWithoutEditing(false);
         $reservationIdField->setDatabaseField(true);
-        $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id_exists']);
+        $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']);
         $reservationIdField->setStyleClass('reservation-id');
         $fieldList[] = $reservationIdField;
 

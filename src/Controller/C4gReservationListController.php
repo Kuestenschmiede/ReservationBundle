@@ -407,7 +407,7 @@ class C4gReservationListController extends C4GBaseController
             $reservationIdField->setDbUnique(true);
             $reservationIdField->setSimpleTextWithoutEditing(false); //!!!
             $reservationIdField->setDatabaseField(true);
-            $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id_exists']);
+            $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']);
             //$reservationIdField->setDbUniqueAdditionalCondition("tl_c4g_reservation.cancellation <> '1' AND tl_c4g_reservation.beginDate > UNIX_TIMESTAMP(NOW())");
             $reservationIdField->setStyleClass('reservation-id');
             $reservationIdField->setEditable(false);
