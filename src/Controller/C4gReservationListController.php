@@ -62,7 +62,7 @@ class C4gReservationListController extends C4GBaseController
     protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = false;
-    protected $permalink_field = 'reservation_id';
+    protected $permalink_field = 'id';
     protected $permalink_name = 'reservation';
 
     //Resource Params
@@ -174,9 +174,19 @@ class C4gReservationListController extends C4GBaseController
                     true,
                     true,
                     C4GBrickActionType::ACTION_BUTTONCLICK . ':clickCancellation');
+
                 $buttons = $this->dialogParams->getButtons();
-                $buttons[] = $button;
-                $this->dialogParams->setButtons($buttons);
+                $found = false;
+                foreach ($buttons as $btn) {
+                    if ($btn->getCaption() == $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_cancellation']) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $buttons[] = $button;
+                    $this->dialogParams->setButtons($buttons);
+                }
             }
         } else if (($this->viewType === 'group') && (C4GVersionProvider::isInstalled('con4gis/documents'))) {
             $this->dialogParams->setCaptionField('reservation_id');
