@@ -93,21 +93,25 @@
     {{c4gevent::<?= $this->id ?>::headline}}
     {{c4gevent::<?= $this->id ?>::state}}
     {{c4gevent::<?= $this->id ?>::number}}
+    <!--{{c4gevent::<?= $this->id ?>::price}}-->
     {{c4gevent::<?= $this->id ?>::title}}
     {{c4gevent::<?= $this->id ?>::topic}}
     {{c4gevent::<?= $this->id ?>::audience}}
     {{c4gevent::<?= $this->id ?>::speaker}}
 
-<?php $speakerId = \Contao\Controller::replaceInsertTags('{{c4gevent::'.$this->id.'::speakerId}}'); ?>
-{{c4gspeaker::<?=$speakerId?>::name}}
-{{c4gspeaker::<?=$speakerId?>::address}}
-{{c4gspeaker::<?=$speakerId?>::zipAndCity}}
+    <!-- special speaker data -->
+    <!--
+    <?php $speakerId = \Contao\Controller::replaceInsertTags('{{c4gevent::'.$this->id.'::speakerId}}'); ?>
+    {{c4gspeaker::<?=$speakerId?>::name}}
+    {{c4gspeaker::<?=$speakerId?>::address}}
+    {{c4gspeaker::<?=$speakerId?>::zipAndCity}}
 
-{{c4gspeaker::<?=$speakerId?>::vita}}
-{{c4gspeaker::<?=$speakerId?>::website}}
-{{c4gspeaker::<?=$speakerId?>::phone}}
-{{c4gspeaker::<?=$speakerId?>::email}}
-{{c4gspeaker::<?=$speakerId?>::photo}}
+    {{c4gspeaker::<?=$speakerId?>::vita}}
+    {{c4gspeaker::<?=$speakerId?>::website}}
+    {{c4gspeaker::<?=$speakerId?>::phone}}
+    {{c4gspeaker::<?=$speakerId?>::email}}
+    {{c4gspeaker::<?=$speakerId?>::photo}}
+    -->
 
     {{c4gevent::<?= $this->id ?>::eventlocation}} <!-- ::location for event entry -->
     {{c4gevent::<?= $this->id ?>::eventaddress}} <!-- ::address for event entry -->
