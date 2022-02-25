@@ -16,6 +16,7 @@ $GLOBALS['TL_LANG']['tl_module']['reservation_legend'] = 'reservation objects';
 $GLOBALS['TL_LANG']['tl_module']['list_legend'] = 'list settings';
 $GLOBALS['TL_LANG']['tl_module']['reservation_notification_center_legend'] = 'Notification Center';
 $GLOBALS['TL_LANG']['tl_module']['reservation_redirect_legend'] = 'forwarding';
+$GLOBALS['TL_LANG']['tl_module']['reservation_objects_legend'] = 'Settings for object care'.
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_object_types'] = array('Which species may be available for selection?','Selection of species to be used for object maintenance.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_settings'] = array('Select form settings', 'Select your configuration from the Form Settings backend module.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationView'] = array('List view', 'Default: public');

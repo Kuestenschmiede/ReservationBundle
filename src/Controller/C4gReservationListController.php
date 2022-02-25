@@ -63,7 +63,7 @@ class C4gReservationListController extends C4GBaseController
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = false;
     protected $permalink_field = 'reservation_id';
-    protected $permalink_name = 'token';
+    protected $permalink_name = 'reservation';
 
     //Resource Params
     protected $loadDefaultResources = true;
@@ -78,7 +78,7 @@ class C4gReservationListController extends C4GBaseController
     protected $loadFileUploadResources = true;
     protected $loadMultiColumnResources = false;
     protected $loadMiniSearchResources = false;
-    protected $loadHistoryPushResources = false;
+    protected $loadHistoryPushResources = true;
 
     protected $loadSignaturePadResources = true;
 
