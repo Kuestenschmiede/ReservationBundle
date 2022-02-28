@@ -129,6 +129,10 @@ class C4gReservationController extends C4GBaseController
     public function __construct(string $rootDir, Session $session, ContaoFramework $framework, ModuleModel $model = null)
     {
         parent::__construct($rootDir, $session, $framework, $model);
+    }
+
+    public function initBrickModule($id)
+    {
         $moduleTypes = [];
         $doIt = false;
         if ((!property_exists($this,'reservationSettings') || !$this->reservationSettings) && property_exists($this,'reservation_settings') && $this->reservation_settings) {
@@ -159,10 +163,7 @@ class C4gReservationController extends C4GBaseController
             $this->session->remove('reservationInitialDateCookie_'.$oldEventId);
             $this->session->remove('reservationTimeCookie_'.$oldEventId);
         }
-    }
 
-    public function initBrickModule($id)
-    {
         \System::loadLanguageFile('fe_c4g_reservation');
         $this->session->setSessionValue('reservationLangCookie', $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'] ?: '');
         $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']);
