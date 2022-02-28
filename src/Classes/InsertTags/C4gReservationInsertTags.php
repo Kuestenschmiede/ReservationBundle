@@ -469,7 +469,8 @@ class C4gReservationInsertTags
 
                             break;
                         case 'price':
-                            return $reservationEventObject->price;
+
+                            return number_format(floatval($reservationEventObject->price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']);
                         case 'speakerId':
                             $speakerIds = \Contao\StringUtil::deserialize($reservationEventObject->speaker);
                             return $speakerIds ? $speakerIds[0] : 0;

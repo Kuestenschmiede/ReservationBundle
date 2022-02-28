@@ -1237,7 +1237,7 @@ class C4gReservationHandler
         }
 
         if ($price) {
-            $price = number_format(floatval($price),2,',','.')."&nbsp;€ ".$priceInfo;
+            $price = number_format(floatval($price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency']."&nbsp;".$priceInfo;
         }
         return $price;
     }

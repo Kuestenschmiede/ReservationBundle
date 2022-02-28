@@ -957,7 +957,7 @@ class C4gReservationController extends C4GBaseController
                                 if ($paramId) {
                                     $participantParam = C4gReservationParamsModel::findByPk($paramId);
                                     if ($participantParam && $participantParam->caption && ($participantParam->price && $this->reservationSettings->showPrices)) {
-                                        $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption . "<span class='price'>&nbsp;(+" . number_format($participantParam->price, 2, ',', '.') . " €)</span>"];
+                                        $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption . "<span class='price'>&nbsp;(+" . number_format($participantParam->price, 2, $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']) . "&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'].")</span>"];
                                     } else if ($participantParam && $participantParam->caption) {
                                         $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption];
                                     }
