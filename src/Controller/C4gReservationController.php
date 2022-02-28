@@ -56,6 +56,7 @@ use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationInitialValues;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Database;
 use Contao\Date;
 use Contao\FrontendUser;
 use Contao\Input;
@@ -297,11 +298,13 @@ class C4gReservationController extends C4GBaseController
 
         if ($eventObj) {
             $typeId = $eventObj->reservationType;
-            $arrColumns = array("$t.published='1' AND $t.id=$typeId");
-            $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
+            $database = Database::getInstance();
+            $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?")
+                ->execute($typeId, '1')->fetchAllAssoc();
         } else if (!$eventObj && !$eventId) {
-            $arrColumns = array("$t.published='1' AND NOT $t.reservationObjectType='2'"); //no event type selection - use get params
-            $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
+            $database = Database::getInstance();
+            $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `published`=? AND NOT `reservationObjectType`=?")
+                ->execute('1', '2')->fetchAllAssoc();
         }
 
         if ($types) {
@@ -319,12 +322,12 @@ class C4gReservationController extends C4GBaseController
             foreach ($types as $type) {
                 if ($moduleTypes && is_array($moduleTypes) && (count($moduleTypes) > 0)) {
                     $arrModuleTypes = $moduleTypes;
-                    if (!in_array($type->id, $arrModuleTypes)) {
+                    if (!in_array($type['id'], $arrModuleTypes)) {
                         continue;
                     }
                 }
 
-                $objects = C4gReservationHandler::getReservationObjectList(array($type->id), intval($eventId), $this->reservationSettings->showPrices);
+                $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($eventId), $this->reservationSettings->showPrices);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
@@ -333,28 +336,28 @@ class C4gReservationController extends C4GBaseController
                     break;
                 }
 
-                $captions = \Contao\StringUtil::deserialize($type->options);
+                $captions = \Contao\StringUtil::deserialize($type['options']);
                 $foundCaption = false;
                 if ($captions && (count($captions) > 0)) {
                     foreach ($captions as $caption) {
                         if ((strpos($GLOBALS['TL_LANGUAGE'], $caption['language']) >= 0) && $caption['caption']) {
-                            $typelist[$type->id] = array(
-                                'id' => $type->id,
+                            $typelist[$type['id']] = array(
+                                'id' => $type['id'],
                                 'name' => StringHelper::spaceToNbsp($caption['caption']),
-                                'periodType' => $type->periodType,
-                                'includedParams' => \Contao\StringUtil::deserialize($type->included_params),
-                                'additionalParams' => \Contao\StringUtil::deserialize($type->additional_params),
-                                'participantParams' => \Contao\StringUtil::deserialize($type->participant_params),
-                                'minParticipantsPerBooking' => $type->minParticipantsPerBooking,
-                                'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
+                                'periodType' => $type['periodType'],
+                                'includedParams' => \Contao\StringUtil::deserialize($type['included_params']),
+                                'additionalParams' => \Contao\StringUtil::deserialize($type['additional_params']),
+                                'participantParams' => \Contao\StringUtil::deserialize($type['participant_params']),
+                                'minParticipantsPerBooking' => $type['minParticipantsPerBooking'],
+                                'maxParticipantsPerBooking' => $type['maxParticipantsPerBooking'],
                                 'objects' => $objects,
-                                'objectType' => $type->reservationObjectType,
-                                'memberId' => $type->member_id ?: $memberId,
-                                'groupId' => $type->group_id,
-                                'type' => $type->reservationObjectType,
-                                'directBooking' => $type->directBooking,
-                                'min_residence_time' => $type->min_residence_time,
-                                'max_residence_time' => $type->max_residence_time
+                                'objectType' => $type['reservationObjectType'],
+                                'memberId' => $type['member_id'] ?: $memberId,
+                                'groupId' => $type['group_id'],
+                                'type' => $type['reservationObjectType'],
+                                'directBooking' => $type['directBooking'],
+                                'min_residence_time' => $type['min_residence_time'],
+                                'max_residence_time' => $type['max_residence_time']
                             );
                             $foundCaption = false;
                             break;
@@ -363,23 +366,23 @@ class C4gReservationController extends C4GBaseController
                 }
 
                 If (!$foundCaption) {
-                    $typelist[$type->id] = array(
-                        'id' => $type->id,
-                        'name' => StringHelper::spaceToNbsp($type->caption),
-                        'periodType' => $type->periodType,
-                        'includedParams' => \Contao\StringUtil::deserialize($type->included_params),
-                        'additionalParams' => \Contao\StringUtil::deserialize($type->additional_params),
-                        'participantParams' => \Contao\StringUtil::deserialize($type->participant_params),
-                        'minParticipantsPerBooking' => $type->minParticipantsPerBooking,
-                        'maxParticipantsPerBooking' => $type->maxParticipantsPerBooking,
+                    $typelist[$type['id']] = array(
+                        'id' => $type['id'],
+                        'name' => StringHelper::spaceToNbsp($type['caption']),
+                        'periodType' => $type['periodType'],
+                        'includedParams' => \Contao\StringUtil::deserialize($type['included_params']),
+                        'additionalParams' => \Contao\StringUtil::deserialize($type['additional_params']),
+                        'participantParams' => \Contao\StringUtil::deserialize($type['participant_params']),
+                        'minParticipantsPerBooking' => $type['minParticipantsPerBooking'],
+                        'maxParticipantsPerBooking' => $type['maxParticipantsPerBooking'],
                         'objects' => $objects,
-                        'objectType' => $type->reservationObjectType,
-                        'memberId' => $type->member_id ?: $memberId,
-                        'groupId' => $type->group_id,
-                        'type' => $type->reservationObjectType,
-                        'directBooking' => $type->directBooking,
-                        'min_residence_time' => $type->min_residence_time,
-                        'max_residence_time' => $type->max_residence_time
+                        'objectType' => $type['reservationObjectType'],
+                        'memberId' => $type['member_id'] ?: $memberId,
+                        'groupId' => $type['group_id'],
+                        'type' => $type['reservationObjectType'],
+                        'directBooking' => $type['directBooking'],
+                        'min_residence_time' => $type['min_residence_time'],
+                        'max_residence_time' => $type['max_residence_time']
                     );
                 }
                 $safetyCount++;
@@ -986,12 +989,13 @@ class C4gReservationController extends C4GBaseController
                             $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
                             $reservationParticipants->setAddButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['addParticipant']);
                             $reservationParticipants->setRemoveButton($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant']);
+                            $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
+
                             $reservationParticipants->setTable('tl_c4g_reservation_participants');
                             $reservationParticipants->addFields($participants);
                             $reservationParticipants->setKeyField($participantsKey);
                             $reservationParticipants->setForeignKeyField($participantsForeign);
                             $reservationParticipants->setMandatory($rowMandatory);
-                            $reservationParticipants->setRemoveButtonMessage($GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage']);
 
                             $reservationParticipants->setMin($minCapacity);
                             if ($maxCapacity) {
@@ -1029,7 +1033,7 @@ class C4gReservationController extends C4GBaseController
                                         $reservationParticipants->setMax($participantCapacity);
                                         $reservationParticipants->setNotificationField(false);
                                         $reservationParticipants->setShowDataSetsByCount($i - 1);
-                                        $reservationParticipants->setParentFieldList($fieldList);
+                                        //$reservationParticipants->setParentFieldList($fieldList);
                                         $reservationParticipants->setDelimiter('§');
                                         $reservationParticipants->setCondition(array($condition, $newCondition));
                                         $reservationParticipants->setRemoveWithEmptyCondition(true);

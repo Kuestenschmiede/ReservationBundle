@@ -1105,13 +1105,21 @@ class C4gReservationHandler
         $allTypesList = array();
         foreach ($moduleTypes as $moduleType) {
             if ($moduleType) {
+                $typeArr = [];
                 //$type = C4gReservationTypeModel::findByPk($moduleType);
-                $database = Database::getInstance();
-                $type = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=?")
-                    ->execute($moduleType)->fetchAssoc();
+                if (is_array($moduleType)) {
+                    $type = $moduleType;
+                    $typeArr[] = $moduleType['id'];
+                } else {
+                    $typeArr = $moduleTypes;
+                    $database = Database::getInstance();
+                    $type = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=?")
+                        ->execute($moduleType)->fetchAssoc();
+                }
+
 
                 if ($type && $type['reservationObjectType'] === '2') {
-                    $objectlist = C4gReservationHandler::getReservationObjectEventList($moduleTypes, $objectId, $type, $showPrices);
+                    $objectlist = C4gReservationHandler::getReservationObjectEventList($typeArr, $objectId, $type, $showPrices);
 
                     if ($getAllTypes) {
                         foreach($objectlist as $key=>$object) {
@@ -1122,7 +1130,7 @@ class C4gReservationHandler
                     }
 
                 } else {
-                    $objectlist = C4gReservationHandler::getReservationObjectDefaultList($moduleTypes, $objectId, $type, $showPrices);
+                    $objectlist = C4gReservationHandler::getReservationObjectDefaultList($typeArr, $objectId, $type, $showPrices);
 
                     if ($getAllTypes) {
                         foreach($objectlist as $key=>$object) {
