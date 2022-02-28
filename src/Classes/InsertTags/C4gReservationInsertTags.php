@@ -48,13 +48,19 @@ class C4gReservationInsertTags
      * @param $value
      * @param string $className
      */
-    private function getHtmlSkeleton($fieldname, $label, $value, $className = 'c4g_reservation_details')
+    private function getHtmlSkeleton($fieldname, $label, $value, $className = 'c4g_reservation_details', $withValueSpan = true)
     {
         $result = '';
         if ($value) {
-            $result = '<p class="' . $className . ' ' . $className . '_' . $fieldname . '">' .
-                '<label class="' . $className . '_label" for="' . $className . '_value">' . $label . '</label>' .
-                '<span class="' . $className . '_value ' . $fieldname . '">' . $value . '</span></p>';
+            if ($withValueSpan) {
+                $result = '<div class="' . $className . ' ' . $className . '_' . $fieldname . '">' .
+                    '<label class="' . $className . '_label" for="' . $className . '_value">' . $label . '</label>' .
+                    '<span class="' . $className . '_value ' . $fieldname . '">' . $value . '</span></p>';
+            } else {
+                $result = '<div class="' . $className . ' ' . $className . '_' . $fieldname . '">' .
+                    '<label class="' . $className . '_label" for="' . $className . '_value">' . $label . '</label>' .
+                    $value;
+            }
         }
 
         return $result;
@@ -359,6 +365,44 @@ class C4gReservationInsertTags
                     switch ($key) {
                         case 'check':
                             return true;
+                        case 'tlState':
+                            $state = $this->getState($reservationEventObject, $calendarEvent);
+                            if ($state) {
+                                switch ($state) {
+                                    case '1':
+                                        return $this->getHtmlSkeleton(
+                                            'state',
+                                            $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
+	                                        '<div class="c4g_reservation_details_value state"></div>'.
+	                                        '<div class="c4g_reservation_details_value state"></div>'.
+                                            '<div class="c4g_reservation_details_value state c4g_reservation_state_red"><span class="invisible">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'].'</span></div>',
+                                            'c4g_reservation_details',
+                                            false
+                                        );
+                                    case '2':
+                                        return $this->getHtmlSkeleton(
+                                            'state',
+                                            $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
+                                            '<div class="c4g_reservation_details_value state"></div>'.
+                                            '<div class="c4g_reservation_details_value state c4g_reservation_state_red"><span class="invisible">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'].'</span></div>'.
+                                            '<div class="c4g_reservation_details_value state"></div>',
+                                            'c4g_reservation_details',
+                                            false
+                                        );
+                                    case '3':
+                                        return $this->getHtmlSkeleton(
+                                            'state',
+                                            $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
+                                            '<div class="c4g_reservation_details_value state c4g_reservation_state_red"><span class="invisible">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'].'</span></div>'.
+                                            '<div class="c4g_reservation_details_value state"></div>'.
+                                            '<div class="c4g_reservation_details_value state"></div>',
+                                            'c4g_reservation_details',
+                                            false
+                                        );
+                                }
+                            }
+
+                            return '';
                         case 'state':
                             $state = $this->getState($reservationEventObject, $calendarEvent);
                             if ($state) {
@@ -469,8 +513,7 @@ class C4gReservationInsertTags
 
                             break;
                         case 'price':
-
-                            return number_format(floatval($reservationEventObject->price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']);
+                            return number_format(floatval($reservationEventObject->price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
                         case 'speakerId':
                             $speakerIds = \Contao\StringUtil::deserialize($reservationEventObject->speaker);
                             return $speakerIds ? $speakerIds[0] : 0;
