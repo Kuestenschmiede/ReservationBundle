@@ -25,11 +25,5 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['published'] = 'Veröffentlich
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['reservation_objects_legend'] = 'Einstellungen zur Objektpflege';
 
-/** MESSAGES */
-//$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['min_max_failed'] = 'Wir können Ihre Reservierung nicht durchführen. Der Termin ist außerhalb des buchbaren Bereichs.';
-
-/** DESCRIPTIONS */
-//$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['desc_reservation_type'] = 'Wählen Sie die Reservierungsart aus.';
-
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['buttonSaveObject'] = 'Speichern';
