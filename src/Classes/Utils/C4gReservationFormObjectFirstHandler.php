@@ -60,6 +60,8 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
 
         $objects = [];
+        $initialIndex = 0;
+        $index = 0;
         foreach ($reservationObjects as $reservationObject) {
             $objects[] = array(
                 'id' => $reservationObject->getId(),
@@ -69,6 +71,12 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
                 'openingHours' => $reservationObject->getOpeningHours()
             );
+
+            if ($reservationObject->getPriority()) {
+                $initialIndex = $index;
+            }
+
+            $index++;
         }
 
         $reservationObjectField = new C4GSelectField();
@@ -84,7 +92,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $reservationObjectField->setRangeField('desiredCapacity_' . $listType['id']);
         $reservationObjectField->setStyleClass('reservation-object'); //displayReservationObjects
         $reservationObjectField->setWithEmptyOption(false);
-        $reservationObjectField->setInitialValue($objects[0]['id']);
+        $reservationObjectField->setInitialValue($objects[$initialIndex]['id']);
         $reservationObjectField->setShowIfEmpty(false);
         $reservationObjectField->setDatabaseField(true);
         //$reservationObjectField->setEmptyOptionLabel($this->reservationSettings->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_objectsfirst_none']);
