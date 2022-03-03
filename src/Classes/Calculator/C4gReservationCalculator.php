@@ -130,7 +130,7 @@ class C4gReservationCalculator
         $reservationList = [];
         $date = C4gReservationDateChecker::getBeginOfDate($date);
 
-        if ($endTime >= 86400) { //nxt day
+        if (($endTime >= 86400) && ($type['periodType'] !== 'day') && ($type['periodType'] !== 'week')) { //nxt day
             $database = Database::getInstance();
             $objectId = $object->getId();
             $allTypesValidity = $object->getAllTypesValidity();

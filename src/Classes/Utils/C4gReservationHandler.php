@@ -581,6 +581,7 @@ class C4gReservationHandler
                 //max persons
                 $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 0;
 
+                //ToDo TEST
                 if ($desiredCapacity && $object->getAllTypesQuantity()) {
                     $maxCount = $objectQuantity;
                 }
