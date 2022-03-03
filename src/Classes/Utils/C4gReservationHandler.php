@@ -293,7 +293,7 @@ class C4gReservationHandler
         $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
 
         $datetim = false;
-        if ($mergedTime && ((($mergedTime+$interval) - $mergedTime) >= 80640)) {
+        if ($mergedTime && $mergedEndTime/* && ((($mergedTime+$interval) - $mergedTime) >= 80640)*/) {
             $begin = date($GLOBALS['TL_CONFIG']['datimFormat'], $mergedTime).$clock;
             $end = date($GLOBALS['TL_CONFIG']['datimFormat'], $mergedEndTime).$clock;
             $datetim = true;
