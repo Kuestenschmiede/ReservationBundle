@@ -55,11 +55,11 @@ class C4gReservationInsertTags
             if ($withValueSpan) {
                 $result = '<div class="' . $className . ' ' . $className . '_' . $fieldname . '">' .
                     '<label class="' . $className . '_label" for="' . $className . '_value">' . $label . '</label>' .
-                    '<span class="' . $className . '_value ' . $fieldname . '">' . $value . '</span></p>';
+                    '<span class="' . $className . '_value ' . $fieldname . '">' . $value . '</span></div>';
             } else {
                 $result = '<div class="' . $className . ' ' . $className . '_' . $fieldname . '">' .
                     '<label class="' . $className . '_label" for="' . $className . '_value">' . $label . '</label>' .
-                    $value;
+                    $value . '</div>';
             }
         }
 
@@ -373,9 +373,9 @@ class C4gReservationInsertTags
                                         return $this->getHtmlSkeleton(
                                             'state',
                                             $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
-	                                        '<div class="c4g_reservation_details_value state"></div>'.
-	                                        '<div class="c4g_reservation_details_value state"></div>'.
-                                            '<div class="c4g_reservation_details_value state c4g_reservation_state_red"><span class="invisible">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'].'</span></div>',
+                                            '<div class="c4g_reservation_details_value state"></div>'.
+                                            '<div class="c4g_reservation_details_value state"></div>'.
+                                            '<div class="c4g_reservation_details_value state c4g_reservation_state_green" title="'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'].'"><span class="invisible">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'].'</span></div>',
                                             'c4g_reservation_details',
                                             false
                                         );
@@ -384,7 +384,7 @@ class C4gReservationInsertTags
                                             'state',
                                             $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
                                             '<div class="c4g_reservation_details_value state"></div>'.
-                                            '<div class="c4g_reservation_details_value state c4g_reservation_state_red"><span class="invisible">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'].'</span></div>'.
+                                            '<div class="c4g_reservation_details_value state c4g_reservation_state_orange" title="'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'].'"><span class="invisible">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'].'</span></div>'.
                                             '<div class="c4g_reservation_details_value state"></div>',
                                             'c4g_reservation_details',
                                             false
@@ -393,7 +393,7 @@ class C4gReservationInsertTags
                                         return $this->getHtmlSkeleton(
                                             'state',
                                             $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
-                                            '<div class="c4g_reservation_details_value state c4g_reservation_state_red"><span class="invisible">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'].'</span></div>'.
+                                            '<div class="c4g_reservation_details_value state c4g_reservation_state_red" title="'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'].'"><span class="invisible">'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'].'</span></div>'.
                                             '<div class="c4g_reservation_details_value state"></div>'.
                                             '<div class="c4g_reservation_details_value state"></div>',
                                             'c4g_reservation_details',
