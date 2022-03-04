@@ -39,7 +39,7 @@ $GLOBALS['TL_LANG'][$str]['showDetails'] = array("Details anzeigen","Zusatzinfor
 $GLOBALS['TL_LANG'][$str]['removeBookedDays'] = array("Ausgebuchte Tage im Kalender sperren","Der Kalendertag ist ausgebucht nicht auswählbar. Achtung! Die Überprüfung ist zum Teil langwirrig.");
 $GLOBALS['TL_LANG'][$str]['showInlineDatepicker'] = array("Datepicker geöffnet darstellen","Der Datepicker wird als Kalender geöffnet dargestellt.");
 $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text leere Objektliste","Der Text, der in der Objektauswahl angezeigt wird wenn kein passendes Objekt zur Verfügung steht, kann optional überschrieben werden.");
-$GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Teilnehmermechanismus (optional)","Ist dieser Mechanismus aktiviert, dann werden Teilnehmerfelder (Titel, Name, Vorname, E-Mail, ggf. Leistungen) anhand der Personenzahl generiert. Wichtig! Das Teilnehmer-Feld muss dafür ins Formular gebracht werden.");
+$GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Teilnehmermechanismus (optional)","Ist dieser Mechanismus aktiviert, dann werden Teilnehmerfelder (Titel, Name, Vorname, E-Mail, ggf. Leistungen) anhand der Personenzahl generiert. Wichtig! Das Teilnehmer-Feld muss dafür ins Formular gebracht werden. Außerdem sollten Sie die maximale Teilnehmerzahl an der Art aufgrund der Ladezeiten stark eingrenzen (max. 8 Personen).");
 
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][1] = 'Zeitauswahl';
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][2] = 'Contao Events';
