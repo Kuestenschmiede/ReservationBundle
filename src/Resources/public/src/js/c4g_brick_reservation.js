@@ -88,23 +88,40 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
         var first = -1;
         var firstValueParam = 0;
         if (selectField) {
+            var distance = 0;
+
             for (i = 0; i < selectField.options.length; i++) {
                 var option = selectField.options[i];
                 var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 1;
                 var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
                 var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);
                 var capacity = desiredCapacity ? desiredCapacity.value : 0;
+                var actMinDistance = capacity - min;
+                var actMaxDistance = max - capacity;
+                var actDistance = (actMinDistance > actMaxDistance) ? actMinDistance : actMaxDistance;
 
                 //not in values
                 var foundValue = false;
                 if (jQuery.isArray(values)) {
-                    for (j = 0; j < values.length; j++) {
-                        if (values[j] == option.value) {
-                            if (j == 0) {
-                                firstValueParam = values[j];
+                    if (min && capacity && (capacity > 0) && (capacity >= min) && (capacity <= max)) {
+                        for (j = 0; j < values.length; j++) {
+                            if (values[j] == option.value) {
+                                if (!distance || (distance == 0) || (actDistance && (actDistance > 0) && (distance > actDistance))) {
+                                    distance = actDistance ? actDistance : distance;
+                                    firstValueParam = values[j];
+                                    foundValue = true;
+                                }
                             }
-                            foundValue = true;
-                            break;
+                        }
+                    } else {
+                        for (j = 0; j < values.length; j++) {
+                            if (values[j] == option.value) {
+                                if (j == 0) {
+                                    firstValueParam = values[j];
+                                }
+                                foundValue = true;
+                                break;
+                            }
                         }
                     }
                 } else if (parseInt(values) >= 0) {
