@@ -15,7 +15,7 @@
         "php": "^7.4 || ^8.0",
         "contao/core-bundle": "^4.9",
         "contao/calendar-bundle": "^4.9",
-        "con4gis/projects": "^4.0.9",
+        "con4gis/projects": "^4.0.10",
         "con4gis/documents": "^1.5.0",
         "con4gis/groups": "^2.8.0"
     },
