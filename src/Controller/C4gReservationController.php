@@ -341,7 +341,7 @@ class C4gReservationController extends C4GBaseController
                 $foundCaption = false;
                 if ($captions && (count($captions) > 0)) {
                     foreach ($captions as $caption) {
-                        if ((strpos($GLOBALS['TL_LANGUAGE'], $caption['language']) >= 0) && $caption['caption']) {
+                        if ((strpos(strtolower($GLOBALS['TL_LANGUAGE']), strtolower($caption['language'])) >= 0) && $caption['caption']) {
                             $typelist[$type['id']] = array(
                                 'id' => $type['id'],
                                 'name' => StringHelper::spaceToNbsp($caption['caption']),
@@ -360,7 +360,7 @@ class C4gReservationController extends C4GBaseController
                                 'min_residence_time' => $type['min_residence_time'],
                                 'max_residence_time' => $type['max_residence_time']
                             );
-                            $foundCaption = false;
+                            $foundCaption = true;
                             break;
                         }
                     }
