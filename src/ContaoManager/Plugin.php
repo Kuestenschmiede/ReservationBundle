@@ -16,11 +16,12 @@ use con4gis\ProjectsBundle\con4gisProjectsBundle;
 use con4gis\ReservationBundle\con4gisReservationBundle;
 use Contao\CalendarBundle\ContaoCalendarBundle;
 use Contao\CoreBundle\ContaoCoreBundle;
+use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Config\ConfigInterface;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
-use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
+use Contao\System;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -46,13 +47,25 @@ class Plugin implements RoutingPluginInterface, BundlePluginInterface
      */
     public function getBundles(ParserInterface $parser)
     {
-        return [
-            BundleConfig::create(con4gisReservationBundle::class)
-                ->setLoadAfter([
-                    ContaoCalendarBundle::class,
-                    con4gisProjectsBundle::class,
-                    con4gisGroupsBundle::class
-                ])
-        ];
+        if (class_exists('con4gis\MapsBundle\con4gisMapsBundle')) {
+            return [
+                BundleConfig::create(con4gisReservationBundle::class)
+                    ->setLoadAfter([
+                        ContaoCalendarBundle::class,
+                        con4gis\MapsBundle\con4gisMapsBundle::class,
+                        con4gisProjectsBundle::class,
+                        con4gisGroupsBundle::class
+                    ])
+            ];
+        } else {
+            return [
+                BundleConfig::create(con4gisReservationBundle::class)
+                    ->setLoadAfter([
+                        ContaoCalendarBundle::class,
+                        con4gisProjectsBundle::class,
+                        con4gisGroupsBundle::class
+                    ])
+            ];
+        }
     }
 }

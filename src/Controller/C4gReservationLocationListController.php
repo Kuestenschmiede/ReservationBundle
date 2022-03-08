@@ -11,6 +11,7 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
+use con4gis\CoreBundle\Classes\C4GVersionProvider;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickGrid;
@@ -85,7 +86,7 @@ class C4gReservationLocationListController extends C4GBaseController
     protected $jQueryUseTable = false;
     protected $jQueryUseHistory = false;
     protected $jQueryUseTooltip = false;
-    protected $jQueryUseMaps = false;
+    protected $jQueryUseMaps = true;
     protected $jQueryUseGoogleMaps = false;
     protected $jQueryUseMapsEditor = false;
     protected $jQueryUseWswgEditor = false;
@@ -175,20 +176,22 @@ class C4gReservationLocationListController extends C4GBaseController
         $nameField->setShowIfEmpty(false);
         $fieldList[] = $nameField;
 
-        $geopickerField = new C4GGeopickerField();
-        $geopickerField->setFieldName('geopicker');
-        $geopickerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['geopicker']);
-        //$geopickerField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['geopicker'][1]);
-        $geopickerField->setSortColumn(false);
-        $geopickerField->setTableColumn(false);
-        $geopickerField->setMandatory(true);
-        $geopickerField->setWithoutAddressReloadButton(true);
-        $geopickerField->setWithoutAddressRow(true);
-        $geopickerField->setEditable(false);
-        $geopickerField->setComparable(false);
-        $geopickerField->setLatitudeField('locgeoy');
-        $geopickerField->setLongitudeField('locgeox');
-        $fieldList[] = $geopickerField;
+        if (C4GVersionProvider::isInstalled('con4gis/maps')) {
+            $geopickerField = new C4GGeopickerField();
+            $geopickerField->setFieldName('geopicker');
+            $geopickerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['geopicker']);
+            //$geopickerField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['geopicker'][1]);
+            $geopickerField->setSortColumn(false);
+            $geopickerField->setTableColumn(false);
+            $geopickerField->setMandatory(true);
+            $geopickerField->setWithoutAddressReloadButton(true);
+            $geopickerField->setWithoutAddressRow(true);
+            $geopickerField->setEditable(false);
+            $geopickerField->setComparable(false);
+            $geopickerField->setLatitudeField('locgeoy');
+            $geopickerField->setLongitudeField('locgeox');
+            $fieldList[] = $geopickerField;
+        }
 
         $contactNameField = new C4GTextField();
         $contactNameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_name']);
