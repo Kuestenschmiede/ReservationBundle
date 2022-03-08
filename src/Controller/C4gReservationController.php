@@ -400,7 +400,7 @@ class C4gReservationController extends C4GBaseController
         $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
 
         if (count($typelist) > 0) {
-            $firstType = array_key_first($typelist);
+            $firstType = $this->reservationSettings->typeDefault ?: array_key_first($typelist);
 
             $reservationTypeField = new C4GSelectField();
             $reservationTypeField->setChosen(false);

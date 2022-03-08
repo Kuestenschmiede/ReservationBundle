@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
     (
         'default'   =>  '{settings_legend}, caption;'.
                         '{form_legend:hide}, withCapacity, fieldSelection, privacy_policy_text, privacy_policy_site, reservationButtonCaption, showDetails, showPrices, showEndTime, showInlineDatepicker, removeBookedDays;'.
-                        '{type_legend:hide}, reservation_types, typeHide;'.
+                        '{type_legend:hide}, reservation_types, typeDefault, typeHide;'.
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
                         '{notification_legend:hide}, notification_type;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
@@ -136,6 +136,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'options_callback'        => array('tl_c4g_reservation_settings','getAllTypes'),
             'eval'                    => array('mandatory'=>false, 'multiple'=>true),
             'sql'                     => "blob NULL"
+        ),
+        'typeDefault' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['typeDefault'],
+            'exclude'                 => true,
+            'inputType'               => 'select',
+            'options_callback'        => array('tl_c4g_reservation_settings','getAllTypes'),
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'chosen'=>true, 'includeBlankOption' => true),
+            'sql'                     => "int(5) unsigned NULL default 0"
         ),
         'typeHide' => array
         (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['typeHide'],
