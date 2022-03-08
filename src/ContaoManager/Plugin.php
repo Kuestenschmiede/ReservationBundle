@@ -52,7 +52,7 @@ class Plugin implements RoutingPluginInterface, BundlePluginInterface
                 BundleConfig::create(con4gisReservationBundle::class)
                     ->setLoadAfter([
                         ContaoCalendarBundle::class,
-                        con4gis\MapsBundle\con4gisMapsBundle::class,
+                        \con4gis\MapsBundle\con4gisMapsBundle::class,
                         con4gisProjectsBundle::class,
                         con4gisGroupsBundle::class
                     ])

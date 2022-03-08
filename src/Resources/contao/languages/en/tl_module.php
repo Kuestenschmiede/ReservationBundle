@@ -39,3 +39,4 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['table'] = 'Da
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['list'] = 'List elements';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['printTpl'] = ["Print template", "You can use this to store your own print template."];
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['removeListImage'] = ['Hide image in list','The image will no longer be displayed in the referent list.'];
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withMap'] = ['Show location map in form', 'Important: con4gis/maps must be installed. A map content element must be linked in the dastboard setting (the content element can be invisible in the article). Also, the frontend geopicker must be active in the map profile.'];

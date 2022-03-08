@@ -30,7 +30,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,removeListImage,event_redirect_site;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationLocationListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationLocationListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,withMap;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationObjectsController::TYPE]  = '{title_legend},name,headline,type;{reservation_objects_legend}, reservation_object_types, login_redirect_site;';
 
@@ -167,4 +167,12 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['printTpl'] = array
     },
     'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'w50'),
     'sql'                     => "varchar(64) NOT NULL default 'pdf_c4g_brick'"
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['withMap'] = array
+(   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withMap'],
+    'default'           => 0,
+    'exclude'           => true,
+    'filter'            => true,
+    'inputType'         => 'checkbox',
+    'sql'               => "int(1) unsigned NULL default 0"
 );

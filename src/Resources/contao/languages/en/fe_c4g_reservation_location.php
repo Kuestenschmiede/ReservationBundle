@@ -9,20 +9,23 @@
  * @link https://www.con4gis.org
  */
 
-/** CONFIGURATION */
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['brick_caption'] = 'Ort';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['brick_caption_plural'] = 'Orte';
+/** KONFIGURATION */
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['brick_caption'] = 'Location';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['brick_caption_plural'] = 'Locations';
 
-/** FIELDS */
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['name'] = 'Bezeichnung';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['geopicker'] = 'Karte';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_name'] = 'Kontaktname';
+/** FELDER */
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['name'] = 'Caption';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['geopicker'] = 'Map';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_name'] = 'Name';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_email'] = 'E-Mail';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_phone'] = 'Telefon';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_street'] = 'Straße';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_postal'] = 'Postleitzahl';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_city'] = 'Ort';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['back'] = 'Zurück';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_phone'] = 'Phone';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_street'] = 'Street';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_postal'] = 'Postal';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_city'] = 'City';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['back'] = 'Back';
+
+/** HEADLINES */
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_headline'] = 'Contact data';
 
 /** BUTTONS */
-$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['button_cancel'] = 'Zur Liste';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['button_cancel'] = 'To list';

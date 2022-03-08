@@ -176,7 +176,7 @@ class C4gReservationLocationListController extends C4GBaseController
         $nameField->setShowIfEmpty(false);
         $fieldList[] = $nameField;
 
-        if (C4GVersionProvider::isInstalled('con4gis/maps')) {
+        if ($this->withMap && C4GVersionProvider::isInstalled('con4gis/maps')) {
             $geopickerField = new C4GGeopickerField();
             $geopickerField->setFieldName('geopicker');
             $geopickerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['geopicker']);
@@ -190,8 +190,14 @@ class C4gReservationLocationListController extends C4GBaseController
             $geopickerField->setComparable(false);
             $geopickerField->setLatitudeField('locgeoy');
             $geopickerField->setLongitudeField('locgeox');
+            $geopickerField->setShowIfEmpty(false);
             $fieldList[] = $geopickerField;
         }
+
+        $headlineField = new C4GHeadlineField();
+        $headlineField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_headline']);
+        $headlineField->setFormField(true);
+        $fieldList[] = $headlineField;
 
         $contactNameField = new C4GTextField();
         $contactNameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_name']);
@@ -201,24 +207,6 @@ class C4gReservationLocationListController extends C4GBaseController
         $contactNameField->setTableColumn(false);
         $contactNameField->setShowIfEmpty(false);
         $fieldList[] = $contactNameField;
-
-        $contactPhoneField = new C4GTelField();
-        $contactPhoneField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_phone']);
-        $contactPhoneField->setFieldName('contact_phone');
-        $contactPhoneField->setEditable(false);
-        $contactPhoneField->setFormField(true);
-        $contactPhoneField->setTableColumn(false);
-        $contactPhoneField->setShowIfEmpty(false);
-        $fieldList[] = $contactPhoneField;
-
-        $contactEmailField = new C4GEmailField();
-        $contactEmailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_email']);
-        $contactEmailField->setFieldName('contact_email');
-        $contactEmailField->setEditable(false);
-        $contactEmailField->setFormField(true);
-        $contactEmailField->setTableColumn(false);
-        $contactEmailField->setShowIfEmpty(false);
-        $fieldList[] = $contactEmailField;
 
         $contactStreetField = new C4GTextField();
         $contactStreetField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_street']);
@@ -258,8 +246,26 @@ class C4gReservationLocationListController extends C4GBaseController
             $postalCityField->setDatabaseField(false);
         } else {
             $fieldList[] = $postal;
-            $fieldList[] = city;
+            $fieldList[] = $city;
         }
+
+        $contactPhoneField = new C4GTelField();
+        $contactPhoneField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_phone']);
+        $contactPhoneField->setFieldName('contact_phone');
+        $contactPhoneField->setEditable(false);
+        $contactPhoneField->setFormField(true);
+        $contactPhoneField->setTableColumn(false);
+        $contactPhoneField->setShowIfEmpty(false);
+        $fieldList[] = $contactPhoneField;
+
+        $contactEmailField = new C4GEmailField();
+        $contactEmailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_email']);
+        $contactEmailField->setFieldName('contact_email');
+        $contactEmailField->setEditable(false);
+        $contactEmailField->setFormField(true);
+        $contactEmailField->setTableColumn(false);
+        $contactEmailField->setShowIfEmpty(false);
+        $fieldList[] = $contactEmailField;
 
         $fieldList[] = $postalCityField;
 
