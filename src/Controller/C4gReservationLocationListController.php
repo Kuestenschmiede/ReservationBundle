@@ -86,7 +86,7 @@ class C4gReservationLocationListController extends C4GBaseController
     protected $jQueryUseTable = false;
     protected $jQueryUseHistory = false;
     protected $jQueryUseTooltip = false;
-    protected $jQueryUseMaps = true;
+    protected $jQueryUseMaps = false;
     protected $jQueryUseGoogleMaps = false;
     protected $jQueryUseMapsEditor = false;
     protected $jQueryUseWswgEditor = false;
@@ -213,7 +213,7 @@ class C4gReservationLocationListController extends C4GBaseController
         $contactStreetField->setFieldName('contact_street');
         $contactStreetField->setEditable(false);
         $contactStreetField->setFormField(true);
-        $contactStreetField->setTableColumn(false);
+        $contactStreetField->setTableColumn(true);
         $contactStreetField->setShowIfEmpty(false);
         $fieldList[] = $contactStreetField;
 
@@ -222,7 +222,7 @@ class C4gReservationLocationListController extends C4GBaseController
         $postal->setFieldName('contact_postal');
         $postal->setEditable(false);
         $postal->setFormField(true);
-        $postal->setTableColumn(false);
+        $postal->setTableColumn(true);
         $postal->setShowIfEmpty(false);
 
         $city = new C4GTextField();
@@ -230,7 +230,7 @@ class C4gReservationLocationListController extends C4GBaseController
         $city->setFieldName('contact_city');
         $city->setEditable(false);
         $city->setFormField(true);
-        $city->setTableColumn(false);
+        $city->setTableColumn(true);
         $city->setShowIfEmpty(false);
 
         if (!$tableBased) {
@@ -241,7 +241,7 @@ class C4gReservationLocationListController extends C4GBaseController
 
             $postalCityField = new C4GGridField($grid);
             $postalCityField->setFieldName('postalCityGrid');
-            $postalCityField->setTableColumn(false);
+            $postalCityField->setTableColumn(true);
             $postalCityField->setFormField(true);
             $postalCityField->setDatabaseField(false);
         } else {
