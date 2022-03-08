@@ -20,6 +20,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GImageField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GInfoTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLabelField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLinkField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiLinkField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiSelectField;
@@ -33,6 +34,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTrixEditorField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GUrlField;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventAudienceModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventSpeakerModel;
@@ -146,6 +148,14 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 if ($locationId) {
                     $location = C4gReservationLocationModel::findByPk($locationId);
                     if ($location) {
+                        $href = '';
+                        if ($reservationSettings->location_redirect_site) {
+                            $jumpTo = \PageModel::findByPk($reservationSettings->location_redirect_site);
+                            if ($jumpTo) {
+                                $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$locationId;
+                            }
+                        }
+
                         $locationName = $location->name;
                         $street = $location->contact_street;
                         $postal = $location->contact_postal;
@@ -153,21 +163,28 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                         if ($street && $postal && $city) {
                             $locationName .= "&nbsp;(" . $street . ",&nbsp;" . $postal . "&nbsp;" . $city . ")";
                         }
-                        $reservationLocationField = new C4GTextField();
+
+                        if ($href) {
+                            $reservationLocationField = new C4GUrlField();
+                            $reservationLocationField->setUrl($href);
+                            $reservationLocationField->setInitialValue($locationName);
+                        } else {
+                            $reservationLocationField = new C4GTextField();
+                            $reservationLocationField->setInitialValue($locationName);
+                            $reservationLocationField->setSimpleTextWithoutEditing(true);
+                        }
                         $reservationLocationField->setFieldName('location');
                         $reservationLocationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocation']);
                         $reservationLocationField->setFormField(true);
                         $reservationLocationField->setEditable(false);
                         $reservationLocationField->setDatabaseField(false);
                         $reservationLocationField->setCondition($object_condition);
-                        $reservationLocationField->setInitialValue($locationName);
                         $reservationLocationField->setMandatory(false);
                         $reservationLocationField->setShowIfEmpty(false);
-                        $reservationLocationField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                        $reservationLocationField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
                         $reservationLocationField->setRemoveWithEmptyCondition(true);
                         $reservationLocationField->setNotificationField(true);
-                        $reservationLocationField->setSimpleTextWithoutEditing(true);
-                        $reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-location');
+                        //$reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-' . $reservationObject->getId() . ' event-location');
                         $this->fieldList[] = $reservationLocationField;
                     }
                 }
@@ -205,7 +222,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                         $speakerLinks->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['objectspeaker']);
                         $speakerLinks->setCondition($object_condition);
                         $speakerLinks->setShowIfEmpty(false);
-                        $speakerLinks->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                        $speakerLinks->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
                         $speakerLinks->setRemoveWithEmptyCondition(true);
                         $speakerLinks->setNotificationField(true);
                         $this->fieldList[] = $speakerLinks;
@@ -234,11 +251,11 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $topicField->setInitialValue($topicStr);
                     $topicField->setMandatory(false);
                     $topicField->setShowIfEmpty(false);
-                    $topicField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                    $topicField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
                     $topicField->setRemoveWithEmptyCondition(true);
                     $topicField->setNotificationField(true);
                     $topicField->setSimpleTextWithoutEditing(true);
-                    $topicField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-topic');
+                    //$topicField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-' . $reservationObject->getId() . ' event-topic');
                     $this->fieldList[] = $topicField;
 
                 }
@@ -264,11 +281,11 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $audienceField->setInitialValue($audienceStr);
                     $audienceField->setMandatory(false);
                     $audienceField->setShowIfEmpty(false);
-                    $audienceField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                    $audienceField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
                     $audienceField->setRemoveWithEmptyCondition(true);
                     $audienceField->setNotificationField(true);
                     $audienceField->setSimpleTextWithoutEditing(true);
-                    $audienceField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-audience');
+                    //$audienceField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-' . $reservationObject->getId() . ' event-audience');
                     $this->fieldList[] = $audienceField;
                 }
             }

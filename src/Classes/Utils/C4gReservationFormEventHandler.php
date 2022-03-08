@@ -33,6 +33,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimeField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTrixEditorField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GUrlField;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventAudienceModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventSpeakerModel;
@@ -226,6 +227,14 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             if ($locationId) {
                 $location = C4gReservationLocationModel::findByPk($locationId);
                 if ($location) {
+                    $href = '';
+                    if ($reservationSettings->location_redirect_site) {
+                        $jumpTo = \PageModel::findByPk($reservationSettings->location_redirect_site);
+                        if ($jumpTo) {
+                            $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$locationId;
+                        }
+                    }
+
                     $locationName = $location->name;
                     $street = $location->contact_street;
                     $postal = $location->contact_postal;
@@ -233,20 +242,28 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     if ($street && $postal && $city) {
                         $locationName .= "&nbsp;(" . $street . ",&nbsp;" . $postal . "&nbsp;" . $city . ")";
                     }
-                    $reservationLocationField = new C4GTextField();
+
+                    if ($href) {
+                        $reservationLocationField = new C4GUrlField();
+                        $reservationLocationField->setUrl($href);
+                        $reservationLocationField->setInitialValue($locationName);
+                    } else {
+                        $reservationLocationField = new C4GTextField();
+                        $reservationLocationField->setInitialValue($locationName);
+                        $reservationLocationField->setSimpleTextWithoutEditing(true);
+                    }
+
                     $reservationLocationField->setFieldName('location');
                     $reservationLocationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation']);
                     $reservationLocationField->setFormField(true);
                     $reservationLocationField->setEditable(false);
                     $reservationLocationField->setDatabaseField(false);
                     $reservationLocationField->setCondition($objConditionArr);
-                    $reservationLocationField->setInitialValue($locationName);
                     $reservationLocationField->setMandatory(false);
                     $reservationLocationField->setShowIfEmpty(false);
                     $reservationLocationField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                     $reservationLocationField->setRemoveWithEmptyCondition(true);
                     $reservationLocationField->setNotificationField(true);
-                    $reservationLocationField->setSimpleTextWithoutEditing(true);
                     $reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-location');
                     $this->fieldList[] = $reservationLocationField;
                 }
