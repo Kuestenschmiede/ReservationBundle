@@ -1287,8 +1287,8 @@ class C4gReservationHandler
                 $frontendObject->setEndTime($eventObject['endTime'] ?: 0);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                 $frontendObject->setNumber($event['number'] ?: '');
-                $frontendObject->setAudience($event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : []);
                 $frontendObject->setEventDuration('');
+                $frontendObject->setAudience($event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : []);
                 $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : []);
                 $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : []);
                 $frontendObject->setLocation($event['location'] ?: $type['location']);
@@ -1415,6 +1415,9 @@ class C4gReservationHandler
                 $frontendObject->setDescription($object['description'] ?: '');
                 $frontendObject->setImage($object['image']);
                 $frontendObject->setLocation($object['location'] ?: $type['location']);
+                $frontendObject->setAudience($object['targetAudience'] ? \Contao\StringUtil::deserialize($object['targetAudience']) : []);
+                $frontendObject->setSpeaker($object['speaker'] ? \Contao\StringUtil::deserialize($object['speaker']) : []);
+                $frontendObject->setTopic($object['topic'] ? \Contao\StringUtil::deserialize($object['topic']) : []);
 
                 if ($cloneObject) {
                     $frontendObject->setTimeinterval($object['time_interval'] ?: $cloneObject['time_interval']);

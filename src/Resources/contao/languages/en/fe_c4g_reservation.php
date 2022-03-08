@@ -39,6 +39,9 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] = 'Begin time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'] = 'End time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] = 'Event';
 
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocation'] = 'Location';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['objectspeaker'] = 'Persons';
+
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'] = '';//o\'clock'; use a.m. / p.m. with timeFormat A
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'] = 'Target audience';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'] = 'Topic';

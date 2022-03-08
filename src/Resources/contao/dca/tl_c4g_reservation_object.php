@@ -16,7 +16,7 @@
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 
-$default = '{type_legend}, caption, options, quantity, priority, description, image, location, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes, notification_type;{publish_legend}, published, member_id';
+$default = '{type_legend}, caption, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes, notification_type;{publish_legend}, published, member_id';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -234,6 +234,39 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'eval'              => array('chosen' => true, 'includeBlankOption' => true, 'mandatory' => false, 'tl_class' => 'long'),
             'sql'               => "int(10) unsigned NOT NULL default 0",
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+        ),
+
+
+        'speaker' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['speaker'],
+            'exclude'           => true,
+            'inputType'         => 'checkbox',
+            'options_callback'  => ['tl_c4g_reservation_object', 'getSpeakerName'],
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
+            'sql'               => "blob NULL"
+        ),
+
+        'topic' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['topic'],
+            'exclude'           => true,
+            'inputType'         => 'checkbox',
+            'foreignKey'        => 'tl_c4g_reservation_event_topic.topic',
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
+            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+            'sql'               => "blob NULL"
+        ),
+
+        'targetAudience' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['targetAudience'],
+            'exclude'           => true,
+            'inputType'         => 'checkbox',
+            'foreignKey'        => 'tl_c4g_reservation_event_audience.targetAudience',
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
+            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+            'sql'               => "blob NULL"
         ),
 
         'desiredCapacityMin' => array
@@ -889,5 +922,30 @@ class tl_c4g_reservation_object extends Backend
             $options[$row['id']] = $row['lastname'] . ', ' . $row['firstname'];
         }
         return $options;
+    }
+
+    /**
+     * Return all speaker as array
+     * @return array
+     */
+    public function getSpeakerName(DataContainer $dc)
+    {
+        $return = [];
+
+        $objects = $this->Database->prepare("SELECT id,title,firstname,lastname FROM tl_c4g_reservation_event_speaker ORDER BY lastname")
+            ->execute();
+
+        while ($objects->next()) {
+            $name = '';
+            if ($objects->title) {
+                $name = $objects->lastname.','.$objects->firstname.','.$objects->title;
+            } else {
+                $name = $objects->lastname.','.$objects->firstname;
+            }
+
+            $return[$objects->id] = $name;
+        }
+
+        return $return;
     }
 }

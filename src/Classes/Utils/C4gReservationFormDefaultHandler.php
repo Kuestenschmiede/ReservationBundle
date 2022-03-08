@@ -301,6 +301,136 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                     $imageField->setInitInvisible(true);
                     $this->fieldList[] = $imageField;
                 }
+
+                $locationId = $reservationObject->getLocation();
+                if ($locationId) {
+                    $location = C4gReservationLocationModel::findByPk($locationId);
+                    if ($location) {
+                        $locationName = $location->name;
+                        $street = $location->contact_street;
+                        $postal = $location->contact_postal;
+                        $city = $location->contact_city;
+                        if ($street && $postal && $city) {
+                            $locationName .= "&nbsp;(" . $street . ",&nbsp;" . $postal . "&nbsp;" . $city . ")";
+                        }
+                        $reservationLocationField = new C4GTextField();
+                        $reservationLocationField->setFieldName('location');
+                        $reservationLocationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocation']);
+                        $reservationLocationField->setFormField(true);
+                        $reservationLocationField->setEditable(false);
+                        $reservationLocationField->setDatabaseField(false);
+                        $reservationLocationField->setCondition($object_condition);
+                        $reservationLocationField->setInitialValue($locationName);
+                        $reservationLocationField->setMandatory(false);
+                        $reservationLocationField->setShowIfEmpty(false);
+                        $reservationLocationField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                        $reservationLocationField->setRemoveWithEmptyCondition(true);
+                        $reservationLocationField->setNotificationField(true);
+                        $reservationLocationField->setSimpleTextWithoutEditing(true);
+                        $reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-location');
+                        $this->fieldList[] = $reservationLocationField;
+                    }
+                }
+
+                $speakerIds = $reservationObject->getSpeaker();
+                $speakerStr = '';
+                $speakerLinkArr = [];
+                if ($speakerIds && count($speakerIds) > 0) {
+                    $speakerNr = 0;
+                    $speakerList = [];
+                    foreach ($speakerIds as $speakerId) {
+                        $speakerNr++;
+                        $speaker = C4gReservationEventSpeakerModel::findByPk($speakerId);
+                        if ($speaker) {
+                            $speakerName = $speaker->title ? $speaker->title . '&nbsp;' . $speaker->firstname . '&nbsp;' . $speaker->lastname : $speaker->firstname . '&nbsp;' . $speaker->lastname;
+
+                            if ($reservationSettings->speaker_redirect_site) {
+                                $jumpTo = \PageModel::findByPk($reservationSettings->speaker_redirect_site);
+                                if ($jumpTo) {
+                                    $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerId;
+                                }
+                            }
+
+                            $speakerLinkArr[] = ['linkHref'=>$href, 'linkTitle'=>$speakerName, 'linkNewTag'=>0];
+                        }
+                    }
+
+                    if ($speakerLinkArr && (count($speakerLinkArr) > 0)) {
+                        $speakerLinks = new C4GMultiLinkField();
+                        $speakerLinks->setWrapper(true);
+                        $speakerLinks->setFieldName('speaker');
+                        $speakerLinks->setInitialValue(serialize($speakerLinkArr));
+                        $speakerLinks->setFormField(true);
+                        $speakerLinks->setDatabaseField(false);
+                        $speakerLinks->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['objectspeaker']);
+                        $speakerLinks->setCondition($object_condition);
+                        $speakerLinks->setShowIfEmpty(false);
+                        $speakerLinks->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                        $speakerLinks->setRemoveWithEmptyCondition(true);
+                        $speakerLinks->setNotificationField(true);
+                        $this->fieldList[] = $speakerLinks;
+                    }
+
+                }
+
+                $topicIds = $reservationObject->getTopic();
+                $topicStr = '';
+                if ($topicIds && count($topicIds) > 0) {
+                    foreach ($topicIds as $topicId) {
+                        $topic = C4gReservationEventTopicModel::findByPk($topicId);
+                        if ($topic) {
+                            $topicName = $topic->topic;
+                            $topicStr = $topicStr ? $topicStr . ',&nbsp;' . $topicName : $topicName;
+                        }
+                    }
+
+                    $topicField = new C4GTextField();
+                    $topicField->setFieldName('topic');
+                    $topicField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['topic']);
+                    $topicField->setFormField(true);
+                    $topicField->setEditable(false);
+                    $topicField->setDatabaseField(false);
+                    $topicField->setCondition($object_condition);
+                    $topicField->setInitialValue($topicStr);
+                    $topicField->setMandatory(false);
+                    $topicField->setShowIfEmpty(false);
+                    $topicField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                    $topicField->setRemoveWithEmptyCondition(true);
+                    $topicField->setNotificationField(true);
+                    $topicField->setSimpleTextWithoutEditing(true);
+                    $topicField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-topic');
+                    $this->fieldList[] = $topicField;
+
+                }
+
+                $audienceIds = $reservationObject->getAudience();
+                $audienceStr = '';
+                if ($audienceIds && count($audienceIds) > 0) {
+                    foreach ($audienceIds as $audienceId) {
+                        $audience = C4gReservationEventAudienceModel::findByPk($audienceId);
+                        if ($audience) {
+                            $audienceName = $audience->targetAudience;
+                            $audienceStr = $audienceStr ? $audienceStr . ',&nbsp;' . $audienceName : $audienceName;
+                        }
+                    }
+
+                    $audienceField = new C4GTextField();
+                    $audienceField->setFieldName('audience');
+                    $audienceField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience']);
+                    $audienceField->setFormField(true);
+                    $audienceField->setEditable(false);
+                    $audienceField->setDatabaseField(false);
+                    $audienceField->setCondition($object_condition);
+                    $audienceField->setInitialValue($audienceStr);
+                    $audienceField->setMandatory(false);
+                    $audienceField->setShowIfEmpty(false);
+                    $audienceField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                    $audienceField->setRemoveWithEmptyCondition(true);
+                    $audienceField->setNotificationField(true);
+                    $audienceField->setSimpleTextWithoutEditing(true);
+                    $audienceField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-audience');
+                    $this->fieldList[] = $audienceField;
+                }
             }
         }
 
