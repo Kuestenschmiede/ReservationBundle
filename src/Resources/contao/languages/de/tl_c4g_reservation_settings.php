@@ -19,6 +19,7 @@ $GLOBALS['TL_LANG'][$str]['typeHide'] = array('Reservierungsart verstecken', 'so
 $GLOBALS['TL_LANG'][$str]['reservationButtonCaption'] = array('Beschriftung Absendebutton','Hiermit können Sie den Button Text ändern. Bspw. "Zahlungspflichtig reservieren".');
 $GLOBALS['TL_LANG'][$str]['redirect_site'] = array('Weiterleitung nach der Reservierung', 'Nach der Buchung wird zur ausgewählten Seite weitergeleitet. Bspw. für eine Reservierungsbestätigung.');
 $GLOBALS['TL_LANG'][$str]['speaker_redirect_site'] = array('Weiterleitung zu den Referenten', 'Falls Sie die Referenten verknüpfen wollen, können Sie hier die Weiterleitung einstellen.');
+$GLOBALS['TL_LANG'][$str]['location_redirect_site'] = array('Weiterleitung zu den Orten', 'Falls Sie die Orte (Veranstaltungsorte) verknüpfen wollen, können Sie hier die Weiterleitung einstellen.');
 $GLOBALS['TL_LANG'][$str]['login_redirect_site'] = array('Weiterleitung zur Anmeldeseite', 'Falls das Listenmodul nicht öffentlich ist.');
 $GLOBALS['TL_LANG'][$str]['privacy_policy_site'] = array('Link zur Datenschutzerklärung', 'Diese Seite wird für die Bestätigung der Datenschutzerklärung verlinkt.');
 $GLOBALS['TL_LANG'][$str]['privacy_policy_text'] = array('Datenschutzkommentar', 'Dieser Datenschutzkommentar taucht an der Checkbox zur Einwilligung auf und kann auch Inserttags enthalten.');

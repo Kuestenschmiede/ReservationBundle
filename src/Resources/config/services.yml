@@ -39,6 +39,15 @@ services:
     tags:
       - { name: contao.frontend_module,category: con4gis,template: mod_c4g_brick,type: C4gReservationSpeakerList }
 
+  con4gis\ReservationBundle\Controller\C4gReservationLocationListController:
+    arguments:
+      - '%kernel.project_dir%'
+      - "@session"
+      - "@contao.framework"
+    public: true
+    tags:
+      - { name: contao.frontend_module,category: con4gis,template: mod_c4g_brick,type: C4gReservationLocationList }
+
   con4gis\ReservationBundle\Controller\C4gReservationObjectsController:
     arguments:
       - '%kernel.project_dir%'

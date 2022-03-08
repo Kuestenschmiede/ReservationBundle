@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         '{type_legend:hide}, reservation_types, typeHide;'.
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
                         '{notification_legend:hide}, notification_type;'.
-                        '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site;'.
+                        '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
                         '{expert_legend:hide}, showMemberData, specialParticipantMechanism;'
     ),
 
@@ -302,6 +302,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
         'speaker_redirect_site' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['speaker_redirect_site'],
+            'exclude'                 => true,
+            'inputType'               => 'pageTree',
+            'foreignKey'              => 'tl_page.title',
+            'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+            'sql'                     => "int(10) unsigned NOT NULL default '0'",
+            'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+        ),
+        'location_redirect_site' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['location_redirect_site'],
             'exclude'                 => true,
             'inputType'               => 'pageTree',
             'foreignKey'              => 'tl_page.title',

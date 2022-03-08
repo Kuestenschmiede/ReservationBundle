@@ -17,6 +17,7 @@ use con4gis\ProjectsBundle\Classes\Lists\C4GBrickRenderMode;
 use con4gis\ReservationBundle\Controller\C4gReservationCancellationController;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
 use con4gis\ReservationBundle\Controller\C4gReservationListController;
+use con4gis\ReservationBundle\Controller\C4gReservationLocationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationObjectsController;
 use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
 use Contao\Controller;
@@ -28,6 +29,8 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE] 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,removeListImage,event_redirect_site;';
+
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationLocationListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationObjectsController::TYPE]  = '{title_legend},name,headline,type;{reservation_objects_legend}, reservation_object_types, login_redirect_site;';
 

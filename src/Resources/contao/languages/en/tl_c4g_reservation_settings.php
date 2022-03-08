@@ -19,6 +19,7 @@ $GLOBALS['TL_LANG'][$str]['typeHide'] = array('Hide reservation type', 'if only 
 $GLOBALS['TL_LANG'][$str]['reservationButtonCaption'] = array('Button label','Allows you to change the button text. For example, "Reserve with payment".');
 $GLOBALS['TL_LANG'][$str]['redirect_site'] = array('Forwarding page', 'After booking will be forwarded here.');
 $GLOBALS['TL_LANG'][$str]['speaker_redirect_site'] = array('Speaker forwarding', 'If you want to link the speakers, you can set the forwarding here.');
+$GLOBALS['TL_LANG'][$str]['location_redirect_site'] = array('Location forwarding', 'If you want to link the locations, you can set the forwarding here.');
 $GLOBALS['TL_LANG'][$str]['login_redirect_site'] = array('Redirect to login page', 'If the list module is not public.');
 $GLOBALS['TL_LANG'][$str]['privacy_policy_site'] = array('Link to privacy policy', 'This page is linked for privacy policy confirmation.');
 $GLOBALS['TL_LANG'][$str]['privacy_policy_text'] = array('Privacy comment', 'This privacy comment appears before the consent checkbox.');
