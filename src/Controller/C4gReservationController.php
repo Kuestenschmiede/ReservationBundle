@@ -626,11 +626,12 @@ class C4gReservationController extends C4GBaseController
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
             $rowMandatory = key_exists('binding', $rowdata) ? $rowdata['binding'] : false;
+            $individualLabel = $rowdata['individualLabel'];
 
             if ($rowField == "organisation") {
                 $organisationField = new C4GTextField();
                 $organisationField->setFieldName('organisation');
-                $organisationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation']);
+                $organisationField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation']);
                 $organisationField->setColumnWidth(10);
                 $organisationField->setSortColumn(false);
                 $organisationField->setTableColumn(true);
@@ -642,7 +643,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "title") {
                 $titleField = new C4GTextField();
                 $titleField->setFieldName('title');
-                $titleField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
+                $titleField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['title']);
                 $titleField->setSortColumn(false);
                 $titleField->setTableColumn(false);
                 $titleField->setMandatory(false);
@@ -653,7 +654,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "salutation") {
                 $salutationField = new C4GSelectField();
                 $salutationField->setFieldName('salutation');
-                $salutationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation']);
+                $salutationField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation']);
                 $salutationField->setSortColumn(false);
                 $salutationField->setTableColumn(false);
                 $salutationField->setOptions($salutation);
@@ -665,7 +666,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "firstname") {
                 $firstnameField = new C4GTextField();
                 $firstnameField->setFieldName('firstname');
-                $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
+                $firstnameField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
                 $firstnameField->setColumnWidth(10);
                 $firstnameField->setSortColumn(false);
                 $firstnameField->setTableColumn(true);
@@ -677,7 +678,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "lastname") {
                 $lastnameField = new C4GTextField();
                 $lastnameField->setFieldName('lastname');
-                $lastnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
+                $lastnameField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname']);
                 $lastnameField->setColumnWidth(10);
                 $lastnameField->setSortColumn(false);
                 $lastnameField->setTableColumn(true);
@@ -689,7 +690,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "email") {
                 $emailField = new C4GEmailField();
                 $emailField->setFieldName('email');
-                $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
+                $emailField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
                 $emailField->setColumnWidth(10);
                 $emailField->setSortColumn(false);
                 $emailField->setTableColumn(false);
@@ -701,7 +702,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "phone") {
                 $phoneField = new C4GTelField();
                 $phoneField->setFieldName('phone');
-                $phoneField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['phone']);
+                $phoneField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['phone']);
                 $phoneField->setColumnWidth(10);
                 $phoneField->setSortColumn(false);
                 $phoneField->setMandatory($rowMandatory);
@@ -713,7 +714,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "address") {
                 $addressField = new C4GTextField();
                 $addressField->setFieldName('address');
-                $addressField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['address']);
+                $addressField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['address']);
                 $addressField->setColumnWidth(60);
                 $addressField->setSortColumn(false);
                 $addressField->setTableColumn(false);
@@ -725,7 +726,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "postal") {
                 $postalField = new C4GPostalField();
                 $postalField->setFieldName('postal');
-                $postalField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['postal']);
+                $postalField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['postal']);
                 $postalField->setColumnWidth(60);
                 $postalField->setSize(5); //international 32
                 $postalField->setSortColumn(false);
@@ -738,7 +739,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "city") {
                 $cityField = new C4GTextField();
                 $cityField->setFieldName('city');
-                $cityField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['city']);
+                $cityField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['city']);
                 $cityField->setColumnWidth(60);
                 $cityField->setSortColumn(false);
                 $cityField->setTableColumn(false);
@@ -755,7 +756,7 @@ class C4gReservationController extends C4GBaseController
 
                 $year = date('Y');
                 $birthDateField->setMaxDate(strtotime($year . '-12-31'));
-                $birthDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['dateOfBirth']);
+                $birthDateField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['dateOfBirth']);
                 $birthDateField->setColumnWidth(60);
                 $birthDateField->setSortColumn(false);
                 $birthDateField->setTableColumn(false);
@@ -769,7 +770,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "salutation2") {
                 $salutationField2 = new C4GSelectField();
                 $salutationField2->setFieldName('salutation2');
-                $salutationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation2']);
+                $salutationField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['salutation2']);
                 $salutationField2->setSortColumn(false);
                 $salutationField2->setTableColumn(false);
                 $salutationField2->setOptions($salutation);
@@ -781,7 +782,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "title2") {
                 $titleField2 = new C4GTextField();
                 $titleField2->setFieldName('title2');
-                $titleField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['title2']);
+                $titleField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['title2']);
                 $titleField2->setSortColumn(false);
                 $titleField2->setTableColumn(false);
                 $titleField2->setMandatory(false);
@@ -792,7 +793,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "firstname2") {
                 $firstnameField2 = new C4GTextField();
                 $firstnameField2->setFieldName('firstname2');
-                $firstnameField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname2']);
+                $firstnameField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname2']);
                 $firstnameField2->setColumnWidth(10);
                 $firstnameField2->setSortColumn(false);
                 $firstnameField2->setTableColumn(true);
@@ -804,7 +805,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "lastname2") {
                 $lastnameField2 = new C4GTextField();
                 $lastnameField2->setFieldName('lastname2');
-                $lastnameField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname2']);
+                $lastnameField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['lastname2']);
                 $lastnameField2->setColumnWidth(10);
                 $lastnameField2->setSortColumn(false);
                 $lastnameField2->setTableColumn(true);
@@ -816,7 +817,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "email2") {
                 $emailField2 = new C4GEmailField();
                 $emailField2->setFieldName('email2');
-                $emailField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email2']);
+                $emailField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['email2']);
                 $emailField2->setColumnWidth(10);
                 $emailField2->setSortColumn(false);
                 $emailField2->setTableColumn(false);
@@ -828,7 +829,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "organisation2") {
                 $organisationField2 = new C4GTextField();
                 $organisationField2->setFieldName('organisation2');
-                $organisationField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation2']);
+                $organisationField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['organisation2']);
                 $organisationField2->setColumnWidth(10);
                 $organisationField2->setSortColumn(false);
                 $organisationField2->setTableColumn(true);
@@ -840,7 +841,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "phone2") {
                 $phoneField2 = new C4GTelField();
                 $phoneField2->setFieldName('phone2');
-                $phoneField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['phone2']);
+                $phoneField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['phone2']);
                 $phoneField2->setColumnWidth(10);
                 $phoneField2->setSortColumn(false);
                 $phoneField2->setMandatory($rowMandatory);
@@ -852,7 +853,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "address2") {
                 $addressField2 = new C4GTextField();
                 $addressField2->setFieldName('address2');
-                $addressField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['address2']);
+                $addressField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['address2']);
                 $addressField2->setColumnWidth(60);
                 $addressField2->setSortColumn(false);
                 $addressField2->setTableColumn(false);
@@ -864,7 +865,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "postal2") {
                 $postalField2 = new C4GPostalField();
                 $postalField2->setFieldName('postal2');
-                $postalField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['postal2']);
+                $postalField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['postal2']);
                 $postalField2->setColumnWidth(60);
                 $postalField2->setSize(5); //international 32
                 $postalField2->setSortColumn(false);
@@ -877,7 +878,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($rowField == "city2") {
                 $cityField2 = new C4GTextField();
                 $cityField2->setFieldName('city2');
-                $cityField2->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['city2']);
+                $cityField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['city2']);
                 $cityField2->setColumnWidth(60);
                 $cityField2->setSortColumn(false);
                 $cityField2->setTableColumn(false);
@@ -886,10 +887,46 @@ class C4gReservationController extends C4GBaseController
                 $cityField2->setStyleClass('city');
                 $cityField2->setInitialValue($initialValue);
                 $fieldList[] = $cityField2;
+            } else if ($rowField == "additional1") {
+                $cityField2 = new C4GTextField();
+                $cityField2->setFieldName('additional1');
+                $cityField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional1']);
+                $cityField2->setColumnWidth(60);
+                $cityField2->setSortColumn(false);
+                $cityField2->setTableColumn(false);
+                $cityField2->setMandatory($rowMandatory);
+                $cityField2->setNotificationField(true);
+                $cityField2->setStyleClass('additional1');
+                $cityField2->setInitialValue($initialValue);
+                $fieldList[] = $cityField2;
+            } else if ($rowField == "additional2") {
+                $cityField2 = new C4GTextField();
+                $cityField2->setFieldName('additional2');
+                $cityField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional2']);
+                $cityField2->setColumnWidth(60);
+                $cityField2->setSortColumn(false);
+                $cityField2->setTableColumn(false);
+                $cityField2->setMandatory($rowMandatory);
+                $cityField2->setNotificationField(true);
+                $cityField2->setStyleClass('additional2');
+                $cityField2->setInitialValue($initialValue);
+                $fieldList[] = $cityField2;
+            } else if ($rowField == "additional3") {
+                $cityField2 = new C4GTextField();
+                $cityField2->setFieldName('additional3');
+                $cityField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional3']);
+                $cityField2->setColumnWidth(60);
+                $cityField2->setSortColumn(false);
+                $cityField2->setTableColumn(false);
+                $cityField2->setMandatory($rowMandatory);
+                $cityField2->setNotificationField(true);
+                $cityField2->setStyleClass('additional3');
+                $cityField2->setInitialValue($initialValue);
+                $fieldList[] = $cityField2;
             } else if ($rowField == "comment") {
                 $commentField = new C4GTextareaField();
                 $commentField->setFieldName('comment');
-                $commentField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['comment']);
+                $commentField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['comment']);
                 $commentField->setColumnWidth(60);
                 $commentField->setSortColumn(false);
                 $commentField->setTableColumn(false);
@@ -900,7 +937,7 @@ class C4gReservationController extends C4GBaseController
                 $fieldList[] = $commentField;
             } else if ($rowField == "additionalHeadline") {
                 $headlineField = new C4GHeadlineField();
-                $headlineField->setTitle($initialValue);
+                $headlineField->setTitle($individualLabel ?: $initialValue);
                 $fieldList[] = $headlineField;
             } else if ($rowField == "participants") {
                 $participantsKey = new C4GKeyField();

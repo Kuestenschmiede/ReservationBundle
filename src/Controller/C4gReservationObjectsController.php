@@ -28,6 +28,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateTimePickerField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDecimalField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GFileField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GImageField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
@@ -35,6 +36,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GNumberField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSelectField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSignaturePadField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSubDialogField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
@@ -44,6 +46,7 @@ use con4gis\ProjectsBundle\Classes\Files\C4GBrickFileType;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBaseController;
 use con4gis\ProjectsBundle\Classes\Framework\C4GController;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
@@ -259,6 +262,79 @@ class C4gReservationObjectsController extends C4GBaseController
 //        $priceField->setDecimalPoint('.');
         $priceField->setDecimals(2);
         $fieldList[] = $priceField;
+
+        //Location
+        $locationKey = new C4GKeyField();
+        $locationKey->setFieldName('location');
+        $locationKey->setComparable(false);
+        $locationKey->setEditable(false);
+        $locationKey->setHidden(true);
+        $locationKey->setFormField(true);
+
+        $locationForeign = new C4GForeignKeyField();
+        $locationForeign->setFieldName('id');
+        $locationForeign->setHidden(true);
+        $locationForeign->setFormField(true);
+
+        $locationFields = [];
+
+        $nameField = new C4GTextField();
+        $nameField->setFieldName('name');
+        $nameField->setTitle('Bezeichnung');
+        $nameField->setColumnWidth(10);
+        $nameField->setSortColumn(false);
+        $nameField->setTableColumn(true);
+        $nameField->setMandatory(true);
+        $nameField->setNotificationField(false);
+        $locationFields[] = $nameField;
+
+        $contactNameField = new C4GTextField();
+        $contactNameField->setFieldName('contact_name');
+        $contactNameField->setTitle('Name');
+        $contactNameField->setColumnWidth(10);
+        $contactNameField->setSortColumn(false);
+        $contactNameField->setTableColumn(true);
+        $contactNameField->setMandatory(true);
+        $contactNameField->setNotificationField(false);
+        $locationFields[] = $contactNameField;
+
+        $contactEmailField = new C4GEmailField();
+        $contactEmailField->setFieldName('contact_email');
+        $contactEmailField->setTitle('E-Mail');
+        $contactEmailField->setColumnWidth(10);
+        $contactEmailField->setSortColumn(false);
+        $contactEmailField->setTableColumn(false);
+        $contactEmailField->setMandatory($rowMandatory);
+        $contactEmailField->setNotificationField(false);
+        $locationFields[] = $contactEmailField;
+
+        $locationField = new C4GTextField();
+        $locationField->setFieldName('location');
+        $locationField->setColumnWidth(10);
+        $locationField->setSortColumn(false);
+        $locationField->setTableColumn(false);
+        $locationField->setFormField(false);
+        $locationField->setMandatory(false);
+        $locationField->setNotificationField(false);
+        $fieldList[] = $locationField;
+
+        $location = new C4GSubDialogField();
+        $location->setFieldName('locationFields');
+        $location->setTitle('Ort');
+        $location->setShowButtons(false);
+        $location->setTable('tl_c4g_reservation_location');
+        $location->addFields($locationFields);
+        $location->setKeyField($locationKey);
+        $location->setForeignKeyField($locationForeign);
+        $location->setModelClass(C4gReservationLocationModel::class);
+        $location->setMandatory(true);
+        $location->setNotificationField(false);
+        $location->setShowDataSetsByCount(1);
+        $location->setParentFieldList($fieldList);
+        $location->setDelimiter('§');
+        $location->setSaveInNewDataset(true);
+        $location->setShowFirstDataSet(true);
+        $fieldList[] = $location;
 
         $publishedField = new C4GCheckboxField();
         $publishedField->setFieldName('published');

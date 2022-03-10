@@ -253,6 +253,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         'options_callback'        => array('tl_c4g_reservation_settings','getOptional'),
                         'eval'                    => array('multiple' => false,'mandatory'=>false,'includeBlankOption'=>true,'chosen' => true, 'style'=>'width: 100%')
                     ),
+                    'individualLabel' => array
+                    (
+                        'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['individualLabel'],
+                        'exclude'                 => true,
+                        'default'                 => '',
+                        'inputType'               => 'text',
+                        'eval'                    => array('multiple' => false,'mandatory'=>false, 'style'=>'width: 100%')
+                    ),
                     'initialValue' => array
                     (
                         'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['initialValue'],
@@ -418,6 +426,9 @@ class tl_c4g_reservation_settings extends Backend
         $columnsFormatted['address2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['address2'][0];
         $columnsFormatted['postal2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'][0];
         $columnsFormatted['city2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'][0];
+        $columnsFormatted['additional1'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional1'][0];
+        $columnsFormatted['additional2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional2'][0];
+        $columnsFormatted['additional3'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional3'][0];
         $columnsFormatted['additionalHeadline'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additionalHeadline'];
 
         return $columnsFormatted;

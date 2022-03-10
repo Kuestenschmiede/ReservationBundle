@@ -136,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     'palettes' => array
     (
         '__selector__' => ['reservationObjectType'/*, 'confirmed'*/],
-        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {comment_legend}, comment, fileUpload; {notification_legend}, confirmed, internal_comment, specialNotification, emailConfirmationSend; {state_legend}, cancellation, agreed, member_id, group_id, tstamp, bookedAt;',
+        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {additional_legend:hide}, additional1, additional2, additional3; {comment_legend}, comment, fileUpload; {notification_legend}, confirmed, internal_comment, specialNotification, emailConfirmationSend; {state_legend}, cancellation, agreed, member_id, group_id, tstamp, bookedAt;',
     ),
 
     // Subpalettes
@@ -529,7 +529,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>32, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
             'sql'                     => "varchar(32) NOT NULL default ''"
-
         ),
 
         'city2' => array (
@@ -541,7 +540,39 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
             'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
 
+        'additional1' => array (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['additional1'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+
+        'additional2' => array (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['additional2'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+
+        'additional3' => array (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['additional3'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
         ),
 
         'reservation_id' => array

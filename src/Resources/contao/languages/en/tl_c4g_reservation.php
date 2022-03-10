@@ -60,7 +60,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone2'] = array("phone number (2)", 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['address2'] = array("street (2)", "street");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'] = array("postal code (2)", "postcode");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'] = array("city (2)", "town");
-
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['additional1'] = array("Additional field 1", "Additional information");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['additional2'] = array("Additional field 2", "Additional information");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['additional3'] = array("Additional field 3", "Additional information");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'] = array("comment", "comment from creator");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['fileUpload'] = array("file Upload", "A file can be attached here.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'] = array("Privacy Policy", "Selected by user in frontend.");
@@ -85,12 +87,13 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['tstamp'] = array('Last change','');
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['bookedAt'] = array('Booked at','');
 
 /** LEGENDS **/
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend'] = "reservation data";
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['person_legend']      = "personal data";
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['person2_legend']     = "Billing addresse / Additional person data";
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['comment_legend']     = "Attachments";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend']  = "reservation data";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['person_legend']       = "personal data";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['person2_legend']      = "Billing addresse / Additional person data";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['additional_legend']   = "Additional informations";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['comment_legend']      = "Attachments";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['notification_legend'] = "Confirmation to the booker";
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['state_legend']       = "State";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['state_legend']        = "State";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['new'] = array("add reservation", "add reservation");
