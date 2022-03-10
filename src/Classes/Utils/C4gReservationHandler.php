@@ -48,14 +48,18 @@ class C4gReservationHandler
             foreach ($list as $object) {
                 $we = $object->getWeekdayExclusion();
                 foreach ($we as $key => $value) {
-                    if (!$value && (!key_exists($key, $weekdays) || !$weekdays[$key])) {
-                        $weekdays[$key] = true;
+                    if (!$value) {
+                        $weekdays[$key] = $weekdays[$key] !== false ? true : false;
+                    } else {
+                        $weekdays[$key] = false;
                     }
                 }
             }
 
             foreach ($weekdays as $key => $value) {
-               $result = self::addComma($result) . intval($key);
+               if ($value) {
+                   $result = self::addComma($result) . intval($key);
+               }
             }
         }
 
@@ -169,7 +173,7 @@ class C4gReservationHandler
                     break;
                 }
                 $exclusionPeriods = $object->getDatesExclusion();
-                if ($exclusionPeriods) {
+                if ($exclusionPeriods && $period['date_exclusion'] && $period['date_exclusion_end']) {
                     foreach ($exclusionPeriods as $period) {
                         if ($period) {
                             $exclusionBegin = C4gReservationDateChecker::getBeginOfDate($period['date_exclusion']);
