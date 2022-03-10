@@ -209,6 +209,10 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('comment', $reservation['comment'] ? \Contao\StringUtil::deserialize($reservation['comment']) : '');
                         $c4gNotify->setTokenValue('internal_comment', $reservation['internal_comment'] ? \Contao\StringUtil::deserialize($reservation['internal_comment']) : '');
 
+                        $c4gNotify->setTokenValue('additional1', $reservation['additional1'] ?: '');
+                        $c4gNotify->setTokenValue('additional2', $reservation['additional2'] ?: '');
+                        $c4gNotify->setTokenValue('additional3', $reservation['additional3'] ?: '');
+
                         $c4gNotify->setTokenValue('location', $location ? $location['name'] : '');
                         $c4gNotify->setTokenValue('contact_name', $location ? $location['contact_name'] : '');
                         $c4gNotify->setTokenValue('contact_phone', $location ? $location['contact_phone'] : '');
@@ -244,7 +248,7 @@ class C4gReservationConfirmation
                                 'audience', 'salutation', 'title', 'organisation', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
                                 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment', 'location', 'contact_name',
                                 'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'agreed',
-                                'description'
+                                'description', 'additional1', 'additional2', 'additional3'
                             ]
                         );
 
