@@ -36,7 +36,7 @@ class C4gReservationConfirmation
             try {
                 $type = $database->prepare('SELECT * FROM tl_c4g_reservation_type WHERE `id`=? LIMIT 1')->execute($reservationType)->fetchAssoc();
                 if ($type) {
-                    if ($reservationObjectType === '1') {
+                    if (($reservationObjectType === '1') || ($reservationObjectType === '3')) {
                         $reservationObject = $database->prepare('SELECT * FROM tl_c4g_reservation_object WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
                     } else {
                         $reservationObject = $database->prepare('SELECT * FROM tl_calendar_events WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
