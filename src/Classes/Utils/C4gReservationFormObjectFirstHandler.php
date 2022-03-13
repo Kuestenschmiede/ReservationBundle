@@ -184,6 +184,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                         $reservationLocationField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
                         $reservationLocationField->setRemoveWithEmptyCondition(true);
                         $reservationLocationField->setNotificationField(true);
+                        $reservationLocationField->setWithoutValidation(true);
                         //$reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-' . $reservationObject->getId() . ' event-location');
                         $this->fieldList[] = $reservationLocationField;
                     }
