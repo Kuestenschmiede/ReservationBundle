@@ -437,16 +437,17 @@ class C4gReservationInsertTags
                             return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'];
                         case 'button':
                             if ($this->getState($reservationEventObject, $calendarEvent) !== 3) {
-                                $settings = $this->db->prepare("SELECT reservationForwarding FROM $tableSettings")
+                                $settings = $this->db->prepare("SELECT reservationForwarding, reservationForwardingButtonCaption FROM $tableSettings")
                                     ->limit(1)
                                     ->execute();
                                 if ($settings->numRows && $settings->reservationForwarding) {
                                     $url = Controller::replaceInsertTags('{{link_url::' . $settings->reservationForwarding . '}}');
                                     if ($url) {
+                                        $buttonCaption = $settings->reservationForwardingButtonCaption ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'];
                                         if ($startDate) {
-                                            return '<a class="c4g_reservation_details_book-button c4g__btn c4g__btn-primary" href="' . $url . '?event=' . $pid . '&date=' . $startDate . '" title="Reservieren" itemprop="url">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'] . '</a>';
+                                            return '<a class="c4g_reservation_details_book-button c4g__btn c4g__btn-primary" href="' . $url . '?event=' . $pid . '&date=' . $startDate . '" title="'.$buttonCaption.'" itemprop="url">' . $buttonCaption . '</a>';
                                         } else {
-                                            return '<a class="c4g_reservation_details_book-button c4g__btn c4g__btn-primary" href="' . $url . '?event=' . $pid . '" title="Reservieren" itemprop="url">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'] . '</a>';
+                                            return '<a class="c4g_reservation_details_book-button c4g__btn c4g__btn-primary" href="' . $url . '?event=' . $pid . '" title="'.$buttonCaption.'" itemprop="url">' . $buttonCaption . '</a>';
                                         }
                                     }
                                 }
