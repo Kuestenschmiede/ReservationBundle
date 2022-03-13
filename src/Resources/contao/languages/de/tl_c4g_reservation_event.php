@@ -19,8 +19,8 @@ $GLOBALS['TL_LANG'][$str]['location'] = array("Veranstaltungsort", "Wo findet di
 $GLOBALS['TL_LANG'][$str]['speaker'] = array("Referent(en)", "Wer leitet die Veranstaltung?");
 $GLOBALS['TL_LANG'][$str]['topic'] = array("Thema/Themen", "Hier können Sie Veranstaltungsthemen verknüpfen.");
 $GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Zielgruppe(n)", "Wählen Sie das Zielpublikum.");
-$GLOBALS['TL_LANG'][$str]['minParticipants'] = array("Minimale Teilnehmerzahl", "Standard: 1");
-$GLOBALS['TL_LANG'][$str]['maxParticipants'] = array("Maximale Teilnehmerzahl", "Standard: 0 (unbegrenzt)");
+$GLOBALS['TL_LANG'][$str]['minParticipants'] = array("Minimale Teilnehmerzahl", "Minimale Teilnehmerzahl, damit das Event stattfindet. Default: 1.");
+$GLOBALS['TL_LANG'][$str]['maxParticipants'] = array("Maximale Teilnehmerzahl", "Maximum number of participants for the event. Default: 0 (unlimited).");
 $GLOBALS['TL_LANG'][$str]['state'] = array("Aktueller Status", "grün, orange, rot");
 
 $GLOBALS['TL_LANG'][$str]['price'] = array("Preis", "Bestimmen sie den Preis für die Buchung (bspw.: 50.00)");

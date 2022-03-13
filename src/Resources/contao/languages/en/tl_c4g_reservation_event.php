@@ -19,7 +19,7 @@ $GLOBALS['TL_LANG'][$str]['location'] = array("Event location", "Where will the 
 $GLOBALS['TL_LANG'][$str]['speaker'] = array("Speaker", "Who leads the event?");
 $GLOBALS['TL_LANG'][$str]['topic'] = array("Topics", "Here you can link your event topics.");
 $GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Target audience", "Select your target audience.");
-$GLOBALS['TL_LANG'][$str]['minParticipants'] = array("Minimum number of participants", "Default: 1");
+$GLOBALS['TL_LANG'][$str]['minParticipants'] = array("Minimum number of participants", "Minimum number of participants for the event to take place. Default: 1.");
 $GLOBALS['TL_LANG'][$str]['maxParticipants'] = array("Maximum number of participants", "Default: 0 (unlimited)");
 $GLOBALS['TL_LANG'][$str]['state'] = array("Current status", "green, orange, red");
 
