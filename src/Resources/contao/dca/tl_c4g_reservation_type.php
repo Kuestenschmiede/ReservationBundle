@@ -160,8 +160,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'flag'              => 1,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 255),
-            'sql'               => "varchar(255) NOT NULL default ''"
+            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 254),
+            'sql'               => "varchar(254) NOT NULL default ''"
         ),
 
 
@@ -174,8 +174,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'flag'              => 1,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 255),
-            'sql'               => "varchar(255) NOT NULL default ''"
+            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 254),
+            'sql'               => "varchar(254) NOT NULL default ''"
         ),
 
         'options' => array
@@ -217,7 +217,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'options'                 => ['1','3','2'],
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'],
             'eval'                    => ['tl_class'=>'clr long','submitOnChange' => true],
-            'sql'                     => "varchar(255) NOT NULL default '1'"
+            'sql'                     => "varchar(254) NOT NULL default '1'"
         ),
 
        'periodType' => array
@@ -353,7 +353,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'notification_confirmation_type'  => array
@@ -363,7 +363,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'notification_special_type'  => array
@@ -373,7 +373,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
         'auto_send' => array
         (

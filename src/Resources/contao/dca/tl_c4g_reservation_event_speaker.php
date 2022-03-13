@@ -114,7 +114,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "varchar(254) NOT NULL default ''"
 
         ),
 
@@ -126,7 +126,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'sorting'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "varchar(254) NOT NULL default ''"
 
         ),
 
@@ -138,7 +138,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'sorting'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "varchar(254) NOT NULL default ''"
 
         ),
          'email' => array
@@ -147,8 +147,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w50 clr'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w50 clr'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'phone' => array
@@ -167,8 +167,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long clr'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long clr'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'postal' => array (
@@ -188,8 +188,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'w50'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
 
         ),
 
@@ -225,8 +225,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'exclude'                 => true,
             'search'                  => true,
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>255, 'fieldType'=>'radio', 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'forum', 'memberLink' => true, 'tl_class'=>'clr w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>254, 'fieldType'=>'radio', 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'forum', 'memberLink' => true, 'tl_class'=>'clr w50'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'speakerForwarding' => array

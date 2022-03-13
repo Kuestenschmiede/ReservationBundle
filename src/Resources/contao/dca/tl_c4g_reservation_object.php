@@ -139,8 +139,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sorting'           => true,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 255),
-            'sql'               => "varchar(255) NOT NULL default ''"
+            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 254),
+            'sql'               => "varchar(254) NOT NULL default ''"
         ),
 
         'options' => array
@@ -728,7 +728,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'textarea',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'rte'=>'tinyMCE', 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rte'=>'tinyMCE', 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
             'sql'                     => "text NULL"
         ),
 
@@ -752,7 +752,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'price' => array(

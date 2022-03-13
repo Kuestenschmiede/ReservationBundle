@@ -298,7 +298,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'options'                 => ['1','3','2'],
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'],
             'eval'                    => ['tl_class'=>'clr long','submitOnChange' => true],
-            'sql'                     => "varchar(255) NOT NULL default '1'"
+            'sql'                     => "varchar(254) NOT NULL default '1'"
         ],
 
         'reservation_object' => array
@@ -317,8 +317,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation'],
             'exclude'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long clr'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long clr'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'salutation' => array
@@ -342,7 +342,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
+            'eval'                    => array('mandatory'=>true, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
             'sql'                     => "varchar(50) NOT NULL default ''"
         ),
 
@@ -354,8 +354,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => true,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>true, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'firstname' => array
@@ -366,8 +366,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>true, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'email' => array
@@ -376,8 +376,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'phone' => array
@@ -396,8 +396,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'postal' => array(
@@ -417,8 +417,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
 
         ),
 
@@ -439,8 +439,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation2'],
             'exclude'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long clr'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long clr'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'salutation2' => array
@@ -464,7 +464,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
             'sql'                     => "varchar(50) NOT NULL default ''"
         ),
 
@@ -476,8 +476,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'firstname2' => array
@@ -488,8 +488,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'email2' => array
@@ -498,8 +498,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'phone2' => array
@@ -518,8 +518,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'postal2' => array(
@@ -538,8 +538,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'additional1' => array (
@@ -549,8 +549,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'additional2' => array (
@@ -560,8 +560,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'additional3' => array (
@@ -571,8 +571,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
         ),
 
         'reservation_id' => array
@@ -584,12 +584,12 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'           => false,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('doNotCopy' => true, 'unique' => false, 'mandatory' => false, 'maxlength'=>255, 'tl_class' => 'long'),
+            'eval'              => array('doNotCopy' => true, 'unique' => false, 'mandatory' => false, 'maxlength'=>254, 'tl_class' => 'long'),
             'save_callback' => array
             (
                 array('tl_c4g_reservation', 'generateKey')
             ),
-            'sql'               => "varchar(255) NOT NULL default ''"
+            'sql'               => "varchar(254) NOT NULL default ''"
         ),
 
         'comment' => array (

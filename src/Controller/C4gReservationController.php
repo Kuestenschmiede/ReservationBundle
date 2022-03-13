@@ -1717,6 +1717,33 @@ class C4gReservationController extends C4GBaseController
         }
         $putVars['group_id'] = $reservationType->group_id;
 
+        $postals = $this->reservationSettings->postals;
+        if ($postals && $member) {
+            $postalArr = explode(',',$postals);
+            $found = false;
+            foreach ($postalArr as $postal) {
+                if (trim($postal) == $member->postal) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['wrong_postal']];
+            }
+        } else if ($postals && $putVars['postal']) {
+            $postalArr = explode(',',$postals);
+            $found = false;
+            foreach ($postalArr as $postal) {
+                if (trim($postal) == $putVars['postal']) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['wrong_postal']];
+            }
+        }
+
         $participantsArr = [];
         foreach ($putVars as $key => $value) {
             if ($this->reservationSettings->specialParticipantMechanism) {

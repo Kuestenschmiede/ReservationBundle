@@ -112,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_topic'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "varchar(254) NOT NULL default ''"
 
         )
     )
