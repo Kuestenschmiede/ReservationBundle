@@ -217,6 +217,26 @@ class C4gReservationLocationListController extends C4GBaseController
         $contactStreetField->setShowIfEmpty(false);
         $fieldList[] = $contactStreetField;
 
+        $contactPhoneField = new C4GUrlField();
+        $contactPhoneField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_phone']);
+        $contactPhoneField->setFieldName('contact_phone');
+        $contactPhoneField->setEditable(false);
+        $contactPhoneField->setFormField(true);
+        $contactPhoneField->setTableColumn(false);
+        $contactPhoneField->setShowIfEmpty(false);
+        $contactPhoneField->setLinkType(C4GUrlField::LINK_TYPE_PHONE);
+        $fieldList[] = $contactPhoneField;
+
+        $contactEmailField = new C4GUrlField();
+        $contactEmailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_email']);
+        $contactEmailField->setFieldName('contact_email');
+        $contactEmailField->setEditable(false);
+        $contactEmailField->setFormField(true);
+        $contactEmailField->setTableColumn(false);
+        $contactEmailField->setShowIfEmpty(false);
+        $contactEmailField->setLinkType(C4GUrlField::LINK_TYPE_EMAIL);
+        $fieldList[] = $contactEmailField;
+
         $postal = new C4GPostalField();
         $postal->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_postal']);
         $postal->setFieldName('contact_postal');
@@ -244,30 +264,11 @@ class C4gReservationLocationListController extends C4GBaseController
             $postalCityField->setTableColumn(true);
             $postalCityField->setFormField(true);
             $postalCityField->setDatabaseField(false);
+            $fieldList[] = $postalCityField;
         } else {
             $fieldList[] = $postal;
             $fieldList[] = $city;
         }
-
-        $contactPhoneField = new C4GTelField();
-        $contactPhoneField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_phone']);
-        $contactPhoneField->setFieldName('contact_phone');
-        $contactPhoneField->setEditable(false);
-        $contactPhoneField->setFormField(true);
-        $contactPhoneField->setTableColumn(false);
-        $contactPhoneField->setShowIfEmpty(false);
-        $fieldList[] = $contactPhoneField;
-
-        $contactEmailField = new C4GEmailField();
-        $contactEmailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_email']);
-        $contactEmailField->setFieldName('contact_email');
-        $contactEmailField->setEditable(false);
-        $contactEmailField->setFormField(true);
-        $contactEmailField->setTableColumn(false);
-        $contactEmailField->setShowIfEmpty(false);
-        $fieldList[] = $contactEmailField;
-
-        $fieldList[] = $postalCityField;
 
         $clickButton = new C4GBrickButton(
             C4GBrickConst::BUTTON_CLICK,
