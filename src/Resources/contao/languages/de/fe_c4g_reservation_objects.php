@@ -30,3 +30,4 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['buttonSaveObject'] = 'Speiche
 
 /** MESSAGES */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['wrong_postal'] = 'Falsche Postleitzahl. Keine Datensätze möglich.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['fill_contact_data'] = 'Bitte vor dem Anlegen Kontaktdaten füllen (persönliche Daten).';

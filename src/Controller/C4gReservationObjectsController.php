@@ -170,6 +170,7 @@ class C4gReservationObjectsController extends C4GBaseController
         $ignorePostal = false;
         if ($this->postals) {
             $ignorePostal = true;
+            $contactData = true;
             if (FE_USER_LOGGED_IN === true) {
                 $member = FrontendUser::getInstance();
                 if ($member) {
@@ -180,10 +181,16 @@ class C4gReservationObjectsController extends C4GBaseController
                             break;
                         }
                     }
+
+                    if (!$member->postal || !$member->firstname || !$member->lastname || !$member->street || !$member->phone) {
+                        $contactData = false;
+                    }
+                } else {
+                    $contactData = false;
                 }
             }
 
-            if ($ignorePostal) {
+            if ($ignorePostal || !$contactData) {
                 $this->dialogParams->setWithoutGuiHeader(true);
                 $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE);
                 $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
@@ -191,10 +198,15 @@ class C4gReservationObjectsController extends C4GBaseController
                 $this->dialogParams->setIgnoreChanges(true);
                 $this->setDialogParams($this->dialogParams);
 
+                if ($ignorePostal) {
+                    $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['wrong_postal'];
+                } else {
+                    $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['fill_contact_data'];
+                }
                 $info = new C4GInfoTextField();
                 $info->setFieldName('info');
                 $info->setEditable(false);
-                $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['wrong_postal']);
+                $info->setInitialValue($message);
                 $info->setDatabaseField(false);
                 $info->setFormField(true);
                 $info->setComparable(false);
@@ -346,24 +358,6 @@ class C4gReservationObjectsController extends C4GBaseController
         $contactEmailField->setNotificationField(false);
         $locationFieldArr[] = $contactEmailField;
 
-//        $locationFields = new C4GSubDialogField();
-//        $locationFields->setFieldName('locationFields');
-//        $locationFields->setTitle('Ort');
-//        $locationFields->setShowButtons(false);
-//        $locationFields->setTable('tl_c4g_reservation_location');
-//        $locationFields->addFields($locationFieldArr);
-//        $locationFields->setKeyField($locationKey);
-//        $locationFields->setForeignKeyField($locationForeign);
-//        $locationFields->setModelClass(C4gReservationLocationModel::class);
-//        $locationFields->setMandatory(true);
-//        $locationFields->setNotificationField(false);
-//        $locationFields->setShowDataSetsByCount(1);
-//        //$location->setParentFieldList($fieldList);
-//        $locationFields->setDelimiter('§');
-//        $locationFields->setSaveInNewDataset(true);
-//        $locationFields->setShowFirstDataSet(true);
-//        $fieldList[] = $locationFields;
-
         $publishedField = new C4GCheckboxField();
         $publishedField->setFieldName('published');
         $publishedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['published']);
@@ -371,21 +365,6 @@ class C4gReservationObjectsController extends C4GBaseController
         $publishedField->setTableColumn(true);
         $publishedField->setNotificationField(true);
         $fieldList[] = $publishedField;
-
-//        $clickButton = new C4GBrickButton(
-//            C4GBrickConst::BUTTON_CLICK,
-//            $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['buttonSaveObject'],
-//            $visible = true,
-//            $enabled = true,
-//            $action = '',
-//            $accesskey = '',
-//            $defaultByEnter = true);
-//
-//        $buttonField = new C4GButtonField($clickButton);
-//        $buttonField->setOnClickType(C4GBrickConst::ONCLICK_TYPE_SERVER);
-//        $buttonField->setOnClick('saveObject');
-//        $buttonField->setWithoutLabel(true);
-//        $fieldList[] = $buttonField;
 
         return $fieldList;
     }

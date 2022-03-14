@@ -30,3 +30,4 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['buttonSaveObject'] = 'Save';
 
 /** MESSAGES */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['wrong_postal'] = 'Wrong postal. No dataset possible.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['fill_contact_data'] = 'Please fill in contact details (personal data) before creating.';
