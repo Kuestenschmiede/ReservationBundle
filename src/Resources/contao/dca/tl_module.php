@@ -32,7 +32,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController:
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationLocationListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,withMap;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationObjectsController::TYPE]  = '{title_legend},name,headline,type;{reservation_objects_legend}, reservation_object_types, login_redirect_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationObjectsController::TYPE]  = '{title_legend},name,headline,type;{reservation_objects_legend}, reservation_object_types, login_redirect_site, postals;';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_object_types'] = [
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_object_types'],
@@ -176,3 +176,13 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['withMap'] = array
     'inputType'         => 'checkbox',
     'sql'               => "int(1) unsigned NULL default 0"
 );
+$GLOBALS['TL_DCA']['tl_module']['fields']['postals'] = [
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['postals'],
+    'default' => '',
+    'exclude' => true,
+    'inputType' => 'text',
+    'eval' => [
+        'mandatory' => false
+    ],
+    'sql' => "Text null"
+];

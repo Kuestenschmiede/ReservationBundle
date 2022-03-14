@@ -31,6 +31,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GFileField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignArrayField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GImageField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GInfoTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GNumberField;
@@ -57,6 +58,8 @@ use con4gis\ReservationBundle\Classes\Utils\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\FrontendUser;
+use Contao\Input;
 use Contao\ModuleModel;
 use Contao\StringUtil;
 use Contao\System;
@@ -112,6 +115,7 @@ class C4gReservationObjectsController extends C4GBaseController
 
     protected $withPermissionCheck = false;
 
+
     /**
      * @param string $rootDir
      * @param Session $session
@@ -140,10 +144,6 @@ class C4gReservationObjectsController extends C4GBaseController
      */
     public function initBrickModule($id)
     {
-        System::loadLanguageFile('fe_c4g_reservation_objects');
-        $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption']);
-        $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption_plural']);
-
         parent::initBrickModule($id);
 
         $this->listParams->setScrollX(false);
@@ -152,6 +152,7 @@ class C4gReservationObjectsController extends C4GBaseController
         if ($this->login_redirect_site) {
             $this->dialogParams->getViewParams()->setLoginRedirect($this->login_redirect_site);
         }
+
     }
 
     public function addFields() : array
@@ -165,6 +166,42 @@ class C4gReservationObjectsController extends C4GBaseController
         $idField->setSortColumn(false);
         $idField->setPrintable(false);
         $fieldList[] = $idField;
+
+        $ignorePostal = false;
+        if ($this->postals) {
+            $ignorePostal = true;
+            if (FE_USER_LOGGED_IN === true) {
+                $member = FrontendUser::getInstance();
+                if ($member) {
+                    $postals = explode(',', $this->postals);
+                    foreach ($postals as $postal) {
+                        if (trim($postal) == $member->postal) {
+                            $ignorePostal = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if ($ignorePostal) {
+                $this->dialogParams->setWithoutGuiHeader(true);
+                $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE);
+                $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
+                $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
+                $this->dialogParams->setIgnoreChanges(true);
+                $this->setDialogParams($this->dialogParams);
+
+                $info = new C4GInfoTextField();
+                $info->setFieldName('info');
+                $info->setEditable(false);
+                $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['wrong_postal']);
+                $info->setDatabaseField(false);
+                $info->setFormField(true);
+                $info->setComparable(false);
+                $fieldList[] = $info;
+                return $fieldList;
+            }
+        }
 
         $typeArray = StringUtil::deserialize($this->reservation_object_types);
         if ($typeArray) {

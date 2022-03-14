@@ -27,3 +27,6 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['reservation_objects_legend'] 
 
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['buttonSaveObject'] = 'Speichern';
+
+/** MESSAGES */
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['wrong_postal'] = 'Falsche Postleitzahl. Keine Datensätze möglich.';
