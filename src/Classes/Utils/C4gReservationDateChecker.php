@@ -62,8 +62,15 @@ class C4gReservationDateChecker
     public static function mergeDateWithTimeForIcs($date, $time)
     {
         $result = $date;
-        $date = date('Ymd', $date);
-        $time = date('His', $time);
+
+        if ($date) {
+            $date = date('Ymd', intval($date));
+        }
+
+        if ($time) {
+            $time = date('His', intval($time));
+        }
+
         if ($date && $time) {
             $result = $date . 'T' . $time;
         }

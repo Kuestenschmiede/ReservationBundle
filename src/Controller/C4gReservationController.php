@@ -1332,13 +1332,13 @@ class C4gReservationController extends C4GBaseController
                     $reservationObject->desiredCapacityMax = $reservationObject->desiredCapacityMax ?: $cloneObject->desiredCapacityMax;
                     $reservationObject->minParticipants = $reservationObject->minParticipants ?: $cloneObject->minParticipants;
                     $reservationObject->maxParticipants = $reservationObject->maxParticipants ?: $cloneObject->maxParticipants;
-                    $reservationObject->oh_sunday = $reservationObject->oh_sunday ?: $cloneObject->oh_sunday;
-                    $reservationObject->oh_monday = $reservationObject->oh_monday ?: $cloneObject->oh_monday;
-                    $reservationObject->oh_tuesday = $reservationObject->oh_tuesday ?: $cloneObject->oh_tuesday;
-                    $reservationObject->oh_wednesday = $reservationObject->oh_wednesday ?: $cloneObject->oh_wednesday;
-                    $reservationObject->oh_thursday = $reservationObject->oh_thursday ?: $cloneObject->oh_thursday;
-                    $reservationObject->oh_friday = $reservationObject->oh_friday ?: $cloneObject->oh_friday;
-                    $reservationObject->oh_saturday = $reservationObject->oh_saturday ?: $cloneObject->oh_saturday;
+                    $reservationObject->oh_sunday = $cloneObject->oh_sunday;
+                    $reservationObject->oh_monday = $cloneObject->oh_monday;
+                    $reservationObject->oh_tuesday = $cloneObject->oh_tuesday;
+                    $reservationObject->oh_wednesday = $cloneObject->oh_wednesday;
+                    $reservationObject->oh_thursday = $cloneObject->oh_thursday;
+                    $reservationObject->oh_friday = $cloneObject->oh_friday;
+                    $reservationObject->oh_saturday = $cloneObject->oh_saturday;
                 }
             }
 

@@ -1444,15 +1444,7 @@ class C4gReservationHandler
                 $opening_hours = array();
                 $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);
 
-                if ($object['oh_sunday'] || $object['oh_monday'] || $object['oh_tuesday'] || $object['oh_wednesday'] || $object['oh_thursday'] || $object['oh_friday'] || $object['oh_saturday']) {
-                    $opening_hours['su'] = \Contao\StringUtil::deserialize($object['oh_sunday']);
-                    $opening_hours['mo'] = \Contao\StringUtil::deserialize($object['oh_monday']);
-                    $opening_hours['tu'] = \Contao\StringUtil::deserialize($object['oh_tuesday']);
-                    $opening_hours['we'] = \Contao\StringUtil::deserialize($object['oh_wednesday']);
-                    $opening_hours['th'] = \Contao\StringUtil::deserialize($object['oh_thursday']);
-                    $opening_hours['fr'] = \Contao\StringUtil::deserialize($object['oh_friday']);
-                    $opening_hours['sa'] = \Contao\StringUtil::deserialize($object['oh_saturday']);
-                } else if ($cloneObject) {
+                if ($cloneObject) {
                     $opening_hours['su'] = \Contao\StringUtil::deserialize($cloneObject['oh_sunday']);
                     $opening_hours['mo'] = \Contao\StringUtil::deserialize($cloneObject['oh_monday']);
                     $opening_hours['tu'] = \Contao\StringUtil::deserialize($cloneObject['oh_tuesday']);
@@ -1460,6 +1452,14 @@ class C4gReservationHandler
                     $opening_hours['th'] = \Contao\StringUtil::deserialize($cloneObject['oh_thursday']);
                     $opening_hours['fr'] = \Contao\StringUtil::deserialize($cloneObject['oh_friday']);
                     $opening_hours['sa'] = \Contao\StringUtil::deserialize($cloneObject['oh_saturday']);
+                } else {
+                    $opening_hours['su'] = \Contao\StringUtil::deserialize($object['oh_sunday']);
+                    $opening_hours['mo'] = \Contao\StringUtil::deserialize($object['oh_monday']);
+                    $opening_hours['tu'] = \Contao\StringUtil::deserialize($object['oh_tuesday']);
+                    $opening_hours['we'] = \Contao\StringUtil::deserialize($object['oh_wednesday']);
+                    $opening_hours['th'] = \Contao\StringUtil::deserialize($object['oh_thursday']);
+                    $opening_hours['fr'] = \Contao\StringUtil::deserialize($object['oh_friday']);
+                    $opening_hours['sa'] = \Contao\StringUtil::deserialize($object['oh_saturday']);
                 }
 
 
