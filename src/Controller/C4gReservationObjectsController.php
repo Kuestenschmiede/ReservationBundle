@@ -12,6 +12,7 @@
 namespace con4gis\ReservationBundle\Controller;
 
 use con4gis\CoreBundle\Classes\C4GVersionProvider;
+use con4gis\CoreBundle\Classes\Callback\C4GObjectCallback;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\ProjectsBundle\Classes\Actions\C4GBrickActionType;
 use con4gis\ProjectsBundle\Classes\Actions\C4GSaveAndRedirectDialogAction;
@@ -58,6 +59,7 @@ use con4gis\ReservationBundle\Classes\Utils\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Database;
 use Contao\FrontendUser;
 use Contao\Input;
 use Contao\ModuleModel;
@@ -145,6 +147,8 @@ class C4gReservationObjectsController extends C4GBaseController
     public function initBrickModule($id)
     {
         parent::initBrickModule($id);
+
+        $this->dialogParams->setSaveCallBack(new C4GObjectCallback($this, 'saveCallback'));
 
         $this->listParams->setScrollX(false);
         $this->listParams->setResponsive(true);
@@ -382,5 +386,56 @@ class C4gReservationObjectsController extends C4GBaseController
         $result = $action->run();
     }
 
+    /**
+     * @param $tableName
+     * @param $set
+     * @param $insertId
+     * @param $type
+     * @param $fieldList
+     * @return void
+     */
+    public function saveCallback($tableName, $set, $insertId, $type, $fieldList)
+    {
+
+        if ($this->dialogParams->getMemberId()) {
+            $memberModel = \Contao\MemberModel::findByPk($this->dialogParams->getMemberId());
+
+            $locset['member_id'] = $memberModel->id;
+            $locset['tstamp'] = time();
+            $locset['name'] = $memberModel->username;
+            $locset['contact_name'] = $memberModel->firstname . ' ' . $memberModel->lastname;
+            $locset['contact_street'] = $memberModel->street;
+            $locset['contact_postal'] = $memberModel->postal;
+            $locset['contact_city'] = $memberModel->city;
+            $locset['contact_email'] = $memberModel->email;
+            $locset['contact_phone'] = $memberModel->phone;
+
+            $db = Database::getInstance();
+            $locationTable = 'tl_c4g_reservation_location';
+            $objectTable   = 'tl_c4g_reservation_object';
+
+            $stmt = $db->prepare("SELECT * FROM $locationTable WHERE name = ?");
+            $result = $stmt->execute($locset['name'])->fetchAssoc();
+            if ($result && count($result)) {
+                $stmt = $db->prepare("UPDATE $locationTable %s WHERE name = ?");
+                $stmt->set($locset);
+                $stmt->execute($locset['name']);
+                if ($stmt->affectedRows) {
+                    $locationId = $result['id'];
+                    $stmt = $db->prepare("UPDATE $objectTable SET location = ? WHERE id = ?");
+                    $stmt->execute($locationId, $insertId);
+                }
+            } else {
+                $stmt = $db->prepare("INSERT INTO $locationTable %s");
+                $stmt->set($locset);
+                $stmt->execute();
+                if ($stmt->affectedRows) {
+                    $locationId = $stmt->insertId;
+                    $stmt = $db->prepare("UPDATE $objectTable SET location = ? WHERE id = ?");
+                    $stmt->execute($locationId, $insertId);
+                }
+            }
+        }
+    }
 }
 

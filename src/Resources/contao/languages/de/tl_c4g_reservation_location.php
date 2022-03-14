@@ -16,7 +16,7 @@ $GLOBALS['TL_LANG'][$str]['name'] = array("Name des Veranstaltungsorts", "Hierü
 $GLOBALS['TL_LANG'][$str]['locgeox'] = array("X-Koordinate","Geben Sie die X-Koordinate an.");
 $GLOBALS['TL_LANG'][$str]['locgeoy'] = array("Y-Koordinate","Geben Sie die Y-Koordinate an.");
 
-$GLOBALS['TL_LANG'][$str]['contact_name'] = array("Unternehmensname","");
+$GLOBALS['TL_LANG'][$str]['contact_name'] = array("Kontaktname","");
 $GLOBALS['TL_LANG'][$str]['contact_phone'] = array("Telefonnummer","");
 $GLOBALS['TL_LANG'][$str]['contact_email'] = array("Emailadresse","");
 $GLOBALS['TL_LANG'][$str]['contact_street'] = array("Straße","");
