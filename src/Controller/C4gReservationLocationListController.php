@@ -190,6 +190,7 @@ class C4gReservationLocationListController extends C4GBaseController
             $geopickerField->setComparable(false);
             $geopickerField->setLatitudeField('locgeoy');
             $geopickerField->setLongitudeField('locgeox');
+            $geopickerField->setGeocodeAddressFields(['contact_street','contact_postal','contact_city']);
             $geopickerField->setShowIfEmpty(false);
             $fieldList[] = $geopickerField;
         }
