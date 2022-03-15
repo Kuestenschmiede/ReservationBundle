@@ -327,14 +327,16 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                             $reservationLocationField = new C4GUrlField();
                             $reservationLocationField->setUrl($href);
                             $reservationLocationField->setInitialValue($locationName);
+                            $objectLocationTitle = $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocationUrl'];
                         } else {
                             $reservationLocationField = new C4GTextField();
                             $reservationLocationField->setInitialValue($locationName);
                             $reservationLocationField->setSimpleTextWithoutEditing(true);
+                            $objectLocationTitle = $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocation'];
                         }
 
                         $reservationLocationField->setFieldName('location');
-                        $reservationLocationField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocation']);
+                        $reservationLocationField->setTitle($objectLocationTitle);
                         $reservationLocationField->setFormField(true);
                         $reservationLocationField->setEditable(false);
                         $reservationLocationField->setDatabaseField(false);

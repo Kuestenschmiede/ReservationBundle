@@ -39,6 +39,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] = 'Begin time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'] = 'End time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_event'] = 'Event';
 
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocationUrl'] = 'Location';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocation'] = 'Location';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectspeaker'] = 'Persons';
 
