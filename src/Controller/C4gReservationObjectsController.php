@@ -37,6 +37,7 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Classes\Projects\C4gReservationBrickTypes;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationCalculator;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\FrontendUser;
@@ -311,18 +312,18 @@ class C4gReservationObjectsController extends C4GBaseController
         return $fieldList;
     }
 
-    /**
-     * @param $values
-     * @param $putVars
-     * @return void
-     */
-    public function saveObject($values, $putVars)
-    {
-        $fieldList = $this->getFieldList();
-        $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $fieldList, $putVars, $this->getBrickDatabase());
-        $action->setModule($this);
-        $result = $action->run();
-    }
+//    /**
+//     * @param $values
+//     * @param $putVars
+//     * @return void
+//     */
+//    public function saveObject($values, $putVars)
+//    {
+//        $fieldList = $this->getFieldList();
+//        $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $fieldList, $putVars, $this->getBrickDatabase());
+//        $action->setModule($this);
+//        $result = $action->run();
+//    }
 
     /**
      * @param $tableName
@@ -352,16 +353,40 @@ class C4gReservationObjectsController extends C4GBaseController
             $locationTable = 'tl_c4g_reservation_location';
             $objectTable   = 'tl_c4g_reservation_object';
 
+            $daysExclusionText = $set['days_exclusion_text'];
+            if ($daysExclusionText) {
+                $daysExclusionArr = explode(',', trim($daysExclusionText));
+                $multiColumnArr = [];
+                foreach ($daysExclusionArr as $daysExclusionStr) {
+                    $fromToArray = explode('-', trim($daysExclusionStr));
+                    if (count($fromToArray) == 2) {
+                        $beginDate = trim($fromToArray[0]);
+                        $endDate = trim($fromToArray[1]);
+                    } else if (count($fromToArray) == 1) {
+                        $beginDate = trim($fromToArray[0]);
+                        $endDate = trim($fromToArray[0]);
+                    }
+
+                    if ($beginDate && $endDate) {
+                        $beginTime = intval(C4gReservationDateChecker::getBeginOfDate(strtotime($beginDate)));
+                        $endTime = intval(C4gReservationDateChecker::getEndOfDate(strtotime($endDate)));
+                        if ($beginTime && $endTime) {
+                            $multiColumnArr[] = ['date_exclusion' => $beginTime, 'date_exclusion_end' => $endTime];
+                        }
+                    }
+                }
+            }
             $stmt = $db->prepare("SELECT * FROM $locationTable WHERE name = ?");
-            $result = $stmt->execute($locset['name'])->fetchAssoc();
+            $result = $locset['name'] ? $stmt->execute($locset['name'])->fetchAssoc() : [];
+            $multiColumnStr = serialize($multiColumnArr);
             if ($result && count($result)) {
                 $stmt = $db->prepare("UPDATE $locationTable %s WHERE name = ?");
                 $stmt->set($locset);
                 $stmt->execute($locset['name']);
                 if ($stmt->affectedRows) {
                     $locationId = $result['id'];
-                    $stmt = $db->prepare("UPDATE $objectTable SET location = ? WHERE id = ?");
-                    $stmt->execute($locationId, $insertId);
+                    $stmt = $db->prepare("UPDATE $objectTable SET location = ?, days_exclusion = ? WHERE id = ?");
+                    $stmt->execute($locationId, $multiColumnStr, $insertId);
                 }
             } else {
                 $stmt = $db->prepare("INSERT INTO $locationTable %s");
@@ -369,8 +394,8 @@ class C4gReservationObjectsController extends C4GBaseController
                 $stmt->execute();
                 if ($stmt->affectedRows) {
                     $locationId = $stmt->insertId;
-                    $stmt = $db->prepare("UPDATE $objectTable SET location = ? WHERE id = ?");
-                    $stmt->execute($locationId, $insertId);
+                    $stmt = $db->prepare("UPDATE $objectTable SET location = ?, days_exclusion = ? WHERE id = ?");
+                    $stmt->execute($locationId, $multiColumnStr, $insertId);
                 }
             }
         }

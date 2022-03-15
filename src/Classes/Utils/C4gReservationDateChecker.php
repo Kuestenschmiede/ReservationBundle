@@ -27,7 +27,7 @@ class C4gReservationDateChecker
         return $result;
     }
 
-    public static function getBeginOfDate($time)
+    public static function  getBeginOfDate($time)
     {
         if ($time) {
             $dateTimeObject = new \DateTime();
