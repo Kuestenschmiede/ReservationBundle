@@ -100,7 +100,7 @@ class C4gReservationInsertTags
                 $percent = $reservationCount ? ($reservationCount / $max) * 100 : 0;
                 if ($percent >= 100) {
                     $result = 3;
-                } elseif ($reservationType->almostFullyBookedAt && ($percent >= $reservationType->almostFullyBookedAt)) {
+                } elseif ($reservationType['almostFullyBookedAt'] && ($percent >= $reservationType['almostFullyBookedAt'])) {
                     $result = 2;
                 } else {
                     $result = 1;
