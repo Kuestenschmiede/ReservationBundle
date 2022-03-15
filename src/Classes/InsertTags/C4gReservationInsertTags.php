@@ -856,6 +856,8 @@ class C4gReservationInsertTags
 
                             return serialize($additionalParamsArr);
                     }
+                } else {
+                    return false;
                 }
             }
         } elseif ($arrSplit && (($arrSplit[0] == 'c4gspeaker')) && isset($arrSplit[1])) {
