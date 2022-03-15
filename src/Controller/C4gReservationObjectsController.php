@@ -11,60 +11,37 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
-use con4gis\CoreBundle\Classes\C4GVersionProvider;
 use con4gis\CoreBundle\Classes\Callback\C4GObjectCallback;
-use con4gis\CoreBundle\Classes\Helper\StringHelper;
-use con4gis\ProjectsBundle\Classes\Actions\C4GBrickActionType;
 use con4gis\ProjectsBundle\Classes\Actions\C4GSaveAndRedirectDialogAction;
-use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
-use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickCondition;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickConditionType;
 use con4gis\ProjectsBundle\Classes\Fieldlist\C4GBrickFieldSourceType;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateTimePickerField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDecimalField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GFileField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignArrayField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GImageField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GInfoTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GNumberField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSelectField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSignaturePadField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSubDialogField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
-use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTimepickerField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTrixEditorField;
 use con4gis\ProjectsBundle\Classes\Files\C4GBrickFileType;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBaseController;
 use con4gis\ProjectsBundle\Classes\Framework\C4GController;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Classes\Projects\C4gReservationBrickTypes;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationCalculator;
-use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
-use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\FrontendUser;
-use Contao\Input;
 use Contao\ModuleModel;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -317,50 +294,11 @@ class C4gReservationObjectsController extends C4GBaseController
         $priceField->setDecimals(2);
         $fieldList[] = $priceField;
 
-        //Location
-        $locationKey = new C4GKeyField();
-        $locationKey->setFieldName('id');
-        $locationKey->setComparable(false);
-        $locationKey->setEditable(false);
-        $locationKey->setHidden(true);
-        $locationKey->setFormField(true);
-
-        $locationForeign = new C4GForeignKeyField();
-        $locationForeign->setFieldName('member_id');
-        $locationForeign->setHidden(true);
-        $locationForeign->setFormField(true);
-
-        $locationFieldArr = [];
-
-        $nameField = new C4GTextField();
-        $nameField->setFieldName('name');
-        $nameField->setTitle('Bezeichnung');
-        $nameField->setColumnWidth(10);
-        $nameField->setSortColumn(false);
-        $nameField->setTableColumn(true);
-        $nameField->setMandatory(true);
-        $nameField->setNotificationField(false);
-        $locationFieldArr[] = $nameField;
-
-        $contactNameField = new C4GTextField();
-        $contactNameField->setFieldName('contact_name');
-        $contactNameField->setTitle('Name');
-        $contactNameField->setColumnWidth(10);
-        $contactNameField->setSortColumn(false);
-        $contactNameField->setTableColumn(true);
-        $contactNameField->setMandatory(true);
-        $contactNameField->setNotificationField(false);
-        $locationFieldArr[] = $contactNameField;
-
-        $contactEmailField = new C4GEmailField();
-        $contactEmailField->setFieldName('contact_email');
-        $contactEmailField->setTitle('E-Mail');
-        $contactEmailField->setColumnWidth(10);
-        $contactEmailField->setSortColumn(false);
-        $contactEmailField->setTableColumn(false);
-        $contactEmailField->setMandatory($rowMandatory);
-        $contactEmailField->setNotificationField(false);
-        $locationFieldArr[] = $contactEmailField;
+        $dateRangeDescriptionField = new C4GTextareaField();
+        $dateRangeDescriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['days_exclusion_text'][0]);
+        $dateRangeDescriptionField->setDescription($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['days_exclusion_text'][1]);
+        $dateRangeDescriptionField->setFieldName('days_exclusion_text');
+        $fieldList[] = $dateRangeDescriptionField;
 
         $publishedField = new C4GCheckboxField();
         $publishedField->setFieldName('published');

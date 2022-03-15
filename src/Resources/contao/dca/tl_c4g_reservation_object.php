@@ -699,6 +699,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'                     => "blob NULL"
         ),
 
+        'days_exclusion_text' => array (
+            'sql'                     => "text NULL"
+        ),
+
         'min_reservation_day' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_reservation_day'],
             'exclude'                 => true,

@@ -21,6 +21,8 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['description'] = 'Beschreibung
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['image'] = 'Bild';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['price'] = 'Sicherheitsbetrag (Pfand)';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['published'] = 'Veröffentlicht?';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['days_exclusion_text'] = ['Tage ausschließen',
+    'Bitte Einträge kommagetrennt auflisten. Beispiel: 01.01.2042-15.01.2042,01.05.2042,24.12.2042-26.12.2042'];
 
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['reservation_objects_legend'] = 'Einstellungen zur Objektpflege';
