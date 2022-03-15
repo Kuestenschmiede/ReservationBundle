@@ -11,6 +11,7 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\CoreBundle\Classes\Callback\C4GObjectCallback;
 use con4gis\ProjectsBundle\Classes\Actions\C4GSaveAndRedirectDialogAction;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
@@ -348,6 +349,13 @@ class C4gReservationObjectsController extends C4GBaseController
             $locset['contact_city'] = $memberModel->city;
             $locset['contact_email'] = $memberModel->email;
             $locset['contact_phone'] = $memberModel->phone;
+
+            $coordinates = C4GUtils::geocodeAddress($memberModel->street.' '.$memberModel->postal.' '.$memberModel->city);
+            if ($coordinates) {
+                $locset['locgeox'] = $coordinates[0];
+                $locset['locgeoy'] = $coordinates[1];
+            }
+
 
             $db = Database::getInstance();
             $locationTable = 'tl_c4g_reservation_location';
