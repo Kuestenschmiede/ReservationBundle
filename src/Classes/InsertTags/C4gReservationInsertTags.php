@@ -85,9 +85,10 @@ class C4gReservationInsertTags
         } elseif ($id && $max > 0) {
             $tableReservation = 'tl_c4g_reservation';
             $reservationCount = 0;
-            $reservationObject = $this->db->prepare("SELECT id FROM $tableReservation WHERE `reservation_object` = ? AND `reservationObjectType` = '2' AND NOT `cancellation` = '1'")->execute($id)->fetchAllAssoc();
+
+            $reservationObject = $this->db->prepare("SELECT SUM(desiredCapacity) AS reservationCount FROM $tableReservation WHERE `reservation_object` = $id AND `reservationObjectType` = '2' AND NOT `cancellation` = '1'")->execute()->fetchAllAssoc();
             if ($reservationObject) {
-                $reservationCount = count($reservationObject);
+                $reservationCount = $reservationObject[0]['reservationCount'];
             }
 
             $reservationType = $reservationEventObject->reservationType;
@@ -97,10 +98,12 @@ class C4gReservationInsertTags
                     ->limit(1)
                     ->execute($reservationType);
 
+                $almostFullyBookedAt = $reservationType && $reservationType->almostFullyBookedAt ? $reservationType->almostFullyBookedAt : 0;
+
                 $percent = $reservationCount ? ($reservationCount / $max) * 100 : 0;
                 if ($percent >= 100) {
                     $result = 3;
-                } elseif ($reservationType['almostFullyBookedAt'] && ($percent >= $reservationType['almostFullyBookedAt'])) {
+                } elseif ($almostFullyBookedAt && ($percent >= $almostFullyBookedAt)) {
                     $result = 2;
                 } else {
                     $result = 1;
