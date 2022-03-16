@@ -713,8 +713,29 @@ class C4gReservationHandler
                                                 $mergedTime = 0;
                                                 if ($tsdate) {
                                                     $mergedTime = C4gReservationDateChecker::mergeDateWithTime($tsdate,$time);
+
+                                                    $wd = date('N', $tsdate+$durationInterval);
+                                                    if ($wd == 7) {
+                                                        $wd = 0;
+                                                    }
+                                                    $periodEndWeekday = C4gReservationDateChecker::getWeekdayStr($wd);
+                                                    if ($periodEndWeekday) {
+                                                        $endTimes = $oh[$periodEndWeekday];
+                                                        $endTime = 0;
+                                                        foreach ($endTimes as $endTimeSet) {
+                                                            $et = intval($endTimeSet['time_end']);
+                                                            if ($et > $endTime) {
+                                                                $endTime = $et;
+                                                            }
+                                                        }
+
+//                                                        if ($endTime) {
+                                                            $periodEnd = $endTime;
+                                                            //ToDo take next day without times?
+//                                                        }
+                                                    }
+
                                                     $mergedEndTime = C4gReservationDateChecker::mergeDateWithTime($tsdate+$durationInterval,$periodEnd);
-                                                    //ToDo calc endTime from target date
                                                 }
 
 
@@ -1464,37 +1485,37 @@ class C4gReservationHandler
 
 
                 //ToDo check if only the first record is empty.
-                if (key_exists('su', $opening_hours) && $opening_hours['su'] != false) {
+                if (key_exists('su', $opening_hours) && $opening_hours['su'] !== false) {
                     if ($opening_hours['su'][0]['time_begin'] && $opening_hours['su'][0]['time_end']) {
                         $weekdays['0'] = true;
                     }
                 }
-                if (key_exists('mo', $opening_hours) && $opening_hours['mo'] != false) {
+                if (key_exists('mo', $opening_hours) && $opening_hours['mo'] !== false) {
                     if ($opening_hours['mo'][0]['time_begin'] && $opening_hours['mo'][0]['time_end']) {
                         $weekdays['1'] = true;
                     }
                 }
-                if (key_exists('tu', $opening_hours) && $opening_hours['tu'] != false) {
+                if (key_exists('tu', $opening_hours) && $opening_hours['tu'] !== false) {
                     if ($opening_hours['tu'][0]['time_begin'] && $opening_hours['tu'][0]['time_end']) {
                         $weekdays['2'] = true;
                     }
                 }
-                if (key_exists('we', $opening_hours) && $opening_hours['we'] != false) {
+                if (key_exists('we', $opening_hours) && $opening_hours['we'] !== false) {
                     if ($opening_hours['we'][0]['time_begin'] && $opening_hours['we'][0]['time_end']) {
                         $weekdays['3'] = true;
                     }
                 }
-                if (key_exists('th', $opening_hours) && $opening_hours['th'] != false) {
+                if (key_exists('th', $opening_hours) && $opening_hours['th'] !== false) {
                     if ($opening_hours['th'][0]['time_begin'] && $opening_hours['th'][0]['time_end']) {
                         $weekdays['4'] = true;
                     }
                 }
-                if (key_exists('fr', $opening_hours) && $opening_hours['fr'] != false) {
+                if (key_exists('fr', $opening_hours) && $opening_hours['fr'] !== false) {
                     if ($opening_hours['fr'][0]['time_begin'] && $opening_hours['fr'][0]['time_end']) {
                         $weekdays['5'] = true;
                     }
                 }
-                if (key_exists('sa', $opening_hours) && $opening_hours['sa'] != false) {
+                if (key_exists('sa', $opening_hours) && $opening_hours['sa'] !== false) {
                     if ($opening_hours['sa'][0]['time_begin'] && $opening_hours['sa'][0]['time_end']) {
                         $weekdays['6'] = true;
                     }
