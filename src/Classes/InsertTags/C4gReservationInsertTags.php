@@ -860,7 +860,7 @@ class C4gReservationInsertTags
                             return serialize($additionalParamsArr);
                     }
                 } else {
-                    return false;
+                    return '';
                 }
             }
         } elseif ($arrSplit && (($arrSplit[0] == 'c4gspeaker')) && isset($arrSplit[1])) {
@@ -919,6 +919,6 @@ class C4gReservationInsertTags
             }
         }
 
-        return false;
+        return '';
     }
 }
