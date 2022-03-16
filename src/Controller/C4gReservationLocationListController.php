@@ -86,7 +86,7 @@ class C4gReservationLocationListController extends C4GBaseController
     protected $jQueryUseTable = false;
     protected $jQueryUseHistory = false;
     protected $jQueryUseTooltip = false;
-    protected $jQueryUseMaps = false;
+    protected $jQueryUseMaps = true;
     protected $jQueryUseGoogleMaps = false;
     protected $jQueryUseMapsEditor = false;
     protected $jQueryUseWswgEditor = false;
