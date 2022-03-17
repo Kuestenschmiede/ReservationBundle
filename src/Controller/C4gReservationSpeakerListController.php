@@ -357,7 +357,10 @@ class C4gReservationSpeakerListController extends C4GBaseController
                             $startDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $event->startDate);
                             $href = Controller::replaceInsertTags('{{event_url::'.$eventId.'}}');
                             $title = $startDate.' '.Controller::replaceInsertTags('{{event_title::'.$eventId.'}}');
-                            $links[] = ['linkHref'=>$href, 'linkTitle'=>$title, 'linkNewTab'=>0];
+
+                            if ($href && $title) {
+                                $links[] = ['linkHref'=>$href, 'linkTitle'=>$title, 'linkNewTab'=>0];
+                            }
                         }
                     }
                 }

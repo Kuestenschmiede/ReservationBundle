@@ -919,6 +919,6 @@ class C4gReservationInsertTags
             }
         }
 
-        return '';
+        return false;
     }
 }
