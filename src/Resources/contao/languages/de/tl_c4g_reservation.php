@@ -38,6 +38,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_id'] = array("Reservierun
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['man'] = ['Herr'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'] = ['Frau'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['various'] = [' - '];
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['divers'] = ['Divers'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation'] = ['Firma / Organisation / Schule','Firmennamen, Organisation oder Namen der Schule angeben.'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['salutation'] = ['Anrede','Bitte auswählen.'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['title'] = ['Titel', 'Titel der Person'];

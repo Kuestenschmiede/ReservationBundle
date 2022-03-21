@@ -561,9 +561,10 @@ class C4gReservationController extends C4GBaseController
         }
 
         $salutation = [
+            ['id' => 'various', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
             ['id' => 'man', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
             ['id' => 'woman', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
-            ['id' => 'various', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
+            ['id' => 'divers', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['divers']],
         ];
 
         $additionaldatas = StringUtil::deserialize($this->reservationSettings->fieldSelection);
@@ -604,23 +605,40 @@ class C4gReservationController extends C4GBaseController
         $memberArr['country'] = '';
         $memberArr['phone'] = '';
         $memberArr['dateOfBirth'] = '';
+        $memberArr['gender'] = '';
 
         if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
             $member = FrontendUser::getInstance();
             if ($member) {
-                $memberArr['id'] = $member->id ? $member->id : '';
-                $memberArr['company'] = $member->company ? $member->company : '';
-                $memberArr['firstname'] = $member->firstname ? $member->firstname : '';
-                $memberArr['lastname'] = $member->lastname ? $member->lastname : '';
-                $memberArr['email'] = $member->email ? $member->email : '';
-                $memberArr['street'] = $member->street ? $member->street : '';
-                $memberArr['postal'] = $member->postal ? $member->postal : '';
-                $memberArr['city'] = $member->city ? $member->city : '';
-                $memberArr['country'] = $member->country ? $member->country : '';
-                $memberArr['phone'] = $member->phone ? $member->phone : '';
-                $memberArr['dateOfBirth'] = $member->dateOfBirth ? $member->dateOfBirth : '';
+                $memberArr['id'] = $member->id ?: '';
+                $memberArr['company'] = $member->company ?: '';
+                $memberArr['firstname'] = $member->firstname ?: '';
+                $memberArr['lastname'] = $member->lastname ?: '';
+                $memberArr['email'] = $member->email ?: '';
+                $memberArr['street'] = $member->street ?: '';
+                $memberArr['postal'] = $member->postal ?: '';
+                $memberArr['city'] = $member->city ?: '';
+                $memberArr['country'] = $member->country ?: '';
+                $memberArr['phone'] = $member->phone ?: '';
+                $memberArr['dateOfBirth'] = $member->dateOfBirth ?: '';
+
+                switch ($member->gender) {
+                    case 'male':
+                        $memberArr['gender'] = 'man';
+                        break;
+                    case 'female':
+                        $memberArr['gender'] = 'woman';
+                        break;
+                    case 'other':
+                        $memberArr['gender'] = 'divers';
+                        break;
+                    Default:
+                        $memberArr['gender'] = 'various';
+                        break;
+                }
             }
         }
+
         $specialParticipantMechanism = $this->reservationSettings->specialParticipantMechanism;
         foreach ($additionaldatas as $rowdata) {
             $rowField = $rowdata['additionaldatas'];
@@ -638,7 +656,7 @@ class C4gReservationController extends C4GBaseController
                 $organisationField->setMandatory($rowMandatory);
                 $organisationField->setNotificationField(true);
                 $organisationField->setStyleClass('organisation');
-                $organisationField->setInitialValue($initialValue);
+                $organisationField->setInitialValue($initialValue ? $initialValue : $memberArr['company']);
                 $fieldList[] = $organisationField;
             } else if ($rowField == "title") {
                 $titleField = new C4GTextField();
@@ -661,7 +679,7 @@ class C4gReservationController extends C4GBaseController
                 $salutationField->setMandatory($rowMandatory);
                 $salutationField->setNotificationField(true);
                 $salutationField->setStyleClass('salutation');
-                $salutationField->setInitialValue($initialValue);
+                $salutationField->setInitialValue($initialValue ?: $memberArr['gender']);
                 $fieldList[] = $salutationField;
             } else if ($rowField == "firstname") {
                 $firstnameField = new C4GTextField();

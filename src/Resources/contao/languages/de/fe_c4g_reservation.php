@@ -99,6 +99,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['comment_short'] = 'Bemerkung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['man'] = 'Herr';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman'] = 'Frau';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['various'] = ' - ';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['divers'] = 'Divers';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'] = 'Einwilligung Datenschutz: ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['confirmed'] = 'Bestätigt';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['specialNotification'] = 'Spezialnachricht versenden';
