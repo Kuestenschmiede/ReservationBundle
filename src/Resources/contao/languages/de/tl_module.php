@@ -31,6 +31,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['login_redirect_si
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['event_redirect_site'] = array('Terminweiterleitung', 'Hier können Sie die Weiterleitung zum Eventleser einstellen, falls Sie die Events am Referenten darstellen wollen.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['cancellation_redirect_site'] = array('Weiterleitung zur Stornierung', 'Hierüber können Sie direkt einen Stornierungsbutton anbieten');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type'] = array('Benachrichtigung', 'Wählen Sie die Benachrichtigung aus. Die Einstellung kann in der Reservierungsart überschrieben werden.');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_add_member_location'] = array('Automatisch Veranstaltungsort für Mitglied setzen', 'Setzt automatisch einen neuen Veranstaltungsort für pflegende Mitglieder.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas'] = array("Datenfelder","Reihenfolge hier entspricht der Anzeige im Frontend. Bis auf die Überschrift, kann jedes Feld nur einmal verwendet werden.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['mandatory'] = array("Pflichtfeld?","");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['binding'] = array("Pflichtfeld?","Soll dieses Datenfeld als Pflichtfeld im Frontend angezeigt werden");

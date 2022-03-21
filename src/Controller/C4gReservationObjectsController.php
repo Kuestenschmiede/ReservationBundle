@@ -340,22 +340,23 @@ class C4gReservationObjectsController extends C4GBaseController
         if ($this->dialogParams->getMemberId()) {
             $memberModel = \Contao\MemberModel::findByPk($this->dialogParams->getMemberId());
 
-            $locset['member_id'] = $memberModel->id;
-            $locset['tstamp'] = time();
-            $locset['name'] = $memberModel->username;
-            $locset['contact_name'] = $memberModel->firstname . ' ' . $memberModel->lastname;
-            $locset['contact_street'] = $memberModel->street;
-            $locset['contact_postal'] = $memberModel->postal;
-            $locset['contact_city'] = $memberModel->city;
-            $locset['contact_email'] = $memberModel->email;
-            $locset['contact_phone'] = $memberModel->phone;
+            if ($this->reservation_add_member_location) {
+                $locset['member_id'] = $memberModel->id;
+                $locset['tstamp'] = time();
+                $locset['name'] = $memberModel->username;
+                $locset['contact_name'] = $memberModel->firstname . ' ' . $memberModel->lastname;
+                $locset['contact_street'] = $memberModel->street;
+                $locset['contact_postal'] = $memberModel->postal;
+                $locset['contact_city'] = $memberModel->city;
+                $locset['contact_email'] = $memberModel->email;
+                $locset['contact_phone'] = $memberModel->phone;
 
-            $coordinates = C4GUtils::geocodeAddress($memberModel->street.' '.$memberModel->postal.' '.$memberModel->city);
-            if ($coordinates) {
-                $locset['locgeox'] = $coordinates[0];
-                $locset['locgeoy'] = $coordinates[1];
+                $coordinates = C4GUtils::geocodeAddress($memberModel->street.' '.$memberModel->postal.' '.$memberModel->city);
+                if ($coordinates) {
+                    $locset['locgeox'] = $coordinates[0];
+                    $locset['locgeoy'] = $coordinates[1];
+                }
             }
-
 
             $db = Database::getInstance();
             $locationTable = 'tl_c4g_reservation_location';
@@ -384,8 +385,11 @@ class C4gReservationObjectsController extends C4GBaseController
                     }
                 }
             }
-            $stmt = $db->prepare("SELECT * FROM $locationTable WHERE name = ?");
-            $result = $locset['name'] ? $stmt->execute($locset['name'])->fetchAssoc() : [];
+
+            if ($this->reservation_add_member_location) {
+                $stmt = $db->prepare("SELECT * FROM $locationTable WHERE name = ?");
+                $result = $locset['name'] ? $stmt->execute($locset['name'])->fetchAssoc() : [];
+            }
             $multiColumnStr = serialize($multiColumnArr);
             if ($result && count($result)) {
                 $stmt = $db->prepare("UPDATE $locationTable %s WHERE name = ?");
@@ -397,13 +401,18 @@ class C4gReservationObjectsController extends C4GBaseController
                     $stmt->execute($locationId, $multiColumnStr, $insertId);
                 }
             } else {
-                $stmt = $db->prepare("INSERT INTO $locationTable %s");
-                $stmt->set($locset);
-                $stmt->execute();
-                if ($stmt->affectedRows) {
-                    $locationId = $stmt->insertId;
-                    $stmt = $db->prepare("UPDATE $objectTable SET location = ?, days_exclusion = ? WHERE id = ?");
-                    $stmt->execute($locationId, $multiColumnStr, $insertId);
+                if ($this->reservation_add_member_location) {
+                    $stmt = $db->prepare("INSERT INTO $locationTable %s");
+                    $stmt->set($locset);
+                    $stmt->execute();
+                    if ($stmt->affectedRows) {
+                        $locationId = $stmt->insertId;
+                        $stmt = $db->prepare("UPDATE $objectTable SET location = ?, days_exclusion = ? WHERE id = ?");
+                        $stmt->execute($locationId, $multiColumnStr, $insertId);
+                    }
+                } else {
+                    $stmt = $db->prepare("UPDATE $objectTable SET days_exclusion = ? WHERE id = ?");
+                    $stmt->execute($multiColumnStr, $insertId);
                 }
             }
         }
