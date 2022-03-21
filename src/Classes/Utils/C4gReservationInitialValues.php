@@ -14,6 +14,7 @@ class C4gReservationInitialValues
 {
     private $date = '';
     private $time = '';
+    private $object = '';
 
     /**
      * @return string
@@ -47,4 +48,19 @@ class C4gReservationInitialValues
         $this->time = $time;
     }
 
+    /**
+     * @return string
+     */
+    public function getObject(): string
+    {
+        return $this->object;
+    }
+
+    /**
+     * @param string $object
+     */
+    public function setObject(string $object): void
+    {
+        $this->object = $object;
+    }
 }

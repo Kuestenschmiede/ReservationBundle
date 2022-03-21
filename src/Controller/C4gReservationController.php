@@ -197,6 +197,7 @@ class C4gReservationController extends C4GBaseController
 
 
         $typeId = Input::get('type') ?: 0;
+        $objectId = Input::get('object') ?: 0;
 
         $eventId = Input::get('event') ? Input::get('event') : 0;
 
@@ -335,7 +336,8 @@ class C4gReservationController extends C4GBaseController
                     }
                 }
 
-                $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($eventId), $this->reservationSettings->showPrices);
+                $defaultObject = $eventId ?: $objectId;
+                $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($defaultObject), $this->reservationSettings->showPrices);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
@@ -441,6 +443,7 @@ class C4gReservationController extends C4GBaseController
         $initialValues = new C4gReservationInitialValues();
         $initialValues->setDate($initialDate);
         $initialValues->setTime($initialTime);
+        $initialValues->setObject($objectId);
 
         foreach ($typelist as $listType) {
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
