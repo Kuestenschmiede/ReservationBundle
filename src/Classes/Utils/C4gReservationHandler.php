@@ -1452,6 +1452,12 @@ class C4gReservationHandler
                     $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'] ?: $cloneObject['desiredCapacityMin'], $object['desiredCapacityMax'] ?: $cloneObject['desiredCapacityMax']]);
                     $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: intval($cloneObject['allTypesQuantity']));
                     $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: intval($cloneObject['allTypesValidity']));
+
+                    $frontendObject->setLocation($frontendObject->getLocation() ?: $cloneObject['location']);
+//                    $frontendObject->setAudience($frontendObject->getAudience() ?: \Contao\StringUtil::deserialize($cloneObject['targetAudience']));
+//                    $frontendObject->setSpeaker($frontendObject->getSpeaker() ?: \Contao\StringUtil::deserialize($cloneObject['speaker']));
+//                    $frontendObject->setTopic($frontendObject->getTopic() ?: \Contao\StringUtil::deserialize($cloneObject['topic']));
+
                 } else {
                     $frontendObject->setTimeinterval($object['time_interval']);
                     $frontendObject->setDuration($object['duration']);
