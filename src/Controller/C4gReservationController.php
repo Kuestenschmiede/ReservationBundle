@@ -195,6 +195,9 @@ class C4gReservationController extends C4GBaseController
         $initialDate = '';
         $initialTime = '';
 
+
+        $typeId = Input::get('type') ?: 0;
+
         $eventId = Input::get('event') ? Input::get('event') : 0;
 
         if (!$eventId && $this->session->getSessionValue('reservationEventCookie')) {
@@ -299,6 +302,10 @@ class C4gReservationController extends C4GBaseController
 
         if ($eventObj) {
             $typeId = $eventObj->reservationType;
+            $database = Database::getInstance();
+            $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?")
+                ->execute($typeId, '1')->fetchAllAssoc();
+        } else if ($typeId) {
             $database = Database::getInstance();
             $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?")
                 ->execute($typeId, '1')->fetchAllAssoc();
