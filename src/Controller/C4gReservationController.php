@@ -306,9 +306,13 @@ class C4gReservationController extends C4GBaseController
             $database = Database::getInstance();
             $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?")
                 ->execute($typeId, '1')->fetchAllAssoc();
-        } else if ($typeId) {
+        } else if ($typeId && is_numeric($typeId)) {
             $database = Database::getInstance();
             $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?")
+                ->execute($typeId, '1')->fetchAllAssoc();
+        }  else if ($typeId && is_string($typeId)) {
+            $database = Database::getInstance();
+            $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `alias`=? AND `published`=?")
                 ->execute($typeId, '1')->fetchAllAssoc();
         } else if (!$eventObj && !$eventId) {
             $database = Database::getInstance();
@@ -337,7 +341,7 @@ class C4gReservationController extends C4GBaseController
                 }
 
                 $defaultObject = $eventId ?: $objectId;
-                $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($defaultObject), $this->reservationSettings->showPrices);
+                $objects = C4gReservationHandler::getReservationObjectList(array($type), $defaultObject, $this->reservationSettings->showPrices);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
@@ -2044,6 +2048,5 @@ class C4gReservationController extends C4GBaseController
     {
         $this->reservationSettings = $reservationSettings;
     }
-
 }
 

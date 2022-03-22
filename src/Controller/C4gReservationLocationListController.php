@@ -60,6 +60,7 @@ class C4gReservationLocationListController extends C4GBaseController
     protected $sendEMails = null;
     protected $withNotification = false;
     protected $permalink_name = 'location';
+    protected $permalink_field = 'alias';
 
     //Resource Params
     protected $loadDefaultResources = true;
@@ -166,6 +167,14 @@ class C4gReservationLocationListController extends C4GBaseController
         $idField->setPrintable(false);
         $idField->setShowIfEmpty(false);
         $fieldList[] = $idField;
+
+        $aliasField = new C4GTextField();
+        $aliasField->setFieldName('alias');
+        $aliasField->setEditable(false);
+        $aliasField->setFormField(false);
+        $aliasField->setSortColumn(false);
+        $aliasField->setPrintable(false);
+        $fieldList[] = $aliasField;
 
         $nameField = new C4GTextField();
         $nameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['name']);

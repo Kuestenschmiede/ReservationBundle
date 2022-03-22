@@ -13,6 +13,7 @@ $str = 'tl_c4g_reservation_event_speaker';
 
 $GLOBALS['TL_LANG'][$str]['id'] = array("#", "");
 $GLOBALS['TL_LANG'][$str]['title'] = array("title", "speaker's title");
+$GLOBALS['TL_LANG'][$str]['alias'] = array("Alias", "The alias is used in the frontend instead of the ID for detail views and parameters.");
 $GLOBALS['TL_LANG'][$str]['firstname'] = array("first name", "speaker's first name");
 $GLOBALS['TL_LANG'][$str]['lastname'] = array("surname", "speaker's surname");
 $GLOBALS['TL_LANG'][$str]['email'] = array("email", "speaker's email address");

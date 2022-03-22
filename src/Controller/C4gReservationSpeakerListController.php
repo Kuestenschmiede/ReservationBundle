@@ -55,6 +55,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
     protected $sendEMails = null;
     protected $withNotification = false;
     protected $permalink_name = 'speaker';
+    protected $permalink_field = 'alias';
 
     //Resource Params
     protected $loadDefaultResources = true;

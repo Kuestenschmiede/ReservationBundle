@@ -1382,8 +1382,10 @@ class C4gReservationHandler
 //        $allObjects = C4gReservationObjectModel::findBy('published','1');
         $database = Database::getInstance();
 
-        if ($objectId) {
+        if ($objectId && is_numeric($objectId)) {
             $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND id = ? ORDER BY caption")->execute('1', $objectId)->fetchAllAssoc();
+        } else if ($objectId && is_string($objectId)) {
+            $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND alias = ? ORDER BY caption")->execute('1', $objectId)->fetchAllAssoc();
         } else {
             $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? ORDER BY caption")->execute('1')->fetchAllAssoc();
         }

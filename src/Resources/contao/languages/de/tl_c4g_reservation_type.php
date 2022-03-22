@@ -11,6 +11,7 @@
 
 /** Fields **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['caption'] = array("Backend Bezeichnung","Bezeichnung zur Auswahl im Backend.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['alias'] = array("Alias", "Der Alias wird im Frontend anstelle der ID für Detailansichten und Parameter benutzt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['options'] = array("Frontend Bezeichnung","Wird alternativ im Frontend dargestellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("Name","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'] = array("Objekttyp", "Es können Reserverierungsobjekte und Contao Events reserviert werden.");

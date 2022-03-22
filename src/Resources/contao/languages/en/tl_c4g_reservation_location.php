@@ -13,6 +13,7 @@ $str = 'tl_c4g_reservation_location';
 
 $GLOBALS['TL_LANG'][$str]['id'] = array("#", "");
 $GLOBALS['TL_LANG'][$str]['name'] = array("Name of the location", "This displays the location at various places");
+$GLOBALS['TL_LANG'][$str]['alias'] = array("Alias", "The alias is used in the frontend instead of the ID for detail views and parameters.");
 $GLOBALS['TL_LANG'][$str]['locgeox'] = array("X coordinate", "Specify the X coordinate.");
 $GLOBALS['TL_LANG'][$str]['locgeoy'] = array("Y coordinate", "Specify the Y coordinate.");
 

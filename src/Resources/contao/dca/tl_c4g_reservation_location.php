@@ -10,6 +10,7 @@
  */
 
 use con4gis\CoreBundle\Classes\C4GVersionProvider;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
 (
@@ -89,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
     'palettes' => array
     (
         '__selector__' => ['ics'],
-        'default'   =>  '{location_legend}, name, locgeox, locgeoy;{contact_legend},contact_name,contact_phone,contact_email,contact_street,contact_postal,contact_city,ics;'
+        'default'   =>  '{location_legend}, name, alias, locgeox, locgeoy;{contact_legend},contact_name,contact_phone,contact_email,contact_street,contact_postal,contact_city,ics;'
     ),
 
     'subpalettes' => array
@@ -129,9 +130,23 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'search'                  => true,
             'sorting'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
+            'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
             'sql'                     => "varchar(254) NOT NULL default ''"
 
+        ),
+
+        'alias' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['alias'],
+            'exclude' => true,
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+            'save_callback' => array
+            (
+                array('tl_c4g_reservation_location', 'generateAlias')
+            ),
+            'sql' => "varchar(255) BINARY NOT NULL default ''"
         ),
 
         'locgeox' => array
@@ -305,5 +320,39 @@ class tl_c4g_reservation_location extends Backend
             $options[$row['id']] = $row['lastname'] . ', ' . $row['firstname'];
         }
         return $options;
+    }
+
+    /**
+     * Auto-generate the object alias if it has not been set yet
+     *
+     * @param mixed         $varValue
+     * @param DataContainer $dc
+     *
+     * @return mixed
+     *
+     * @throws Exception
+     */
+    public function generateAlias($varValue, \Contao\DataContainer $dc)
+    {
+        $aliasExists = function (string $alias) use ($dc): bool
+        {
+            return $this->Database->prepare("SELECT id FROM tl_c4g_reservation_location WHERE alias=? AND id!=?")->execute($alias, $dc->id)->numRows > 0;
+        };
+
+        // Generate the alias if there is none
+        if (!$varValue)
+        {
+            $varValue = \Contao\System::getContainer()->get('contao.slug')->generate($dc->activeRecord->name, C4gReservationLocationModel::findByPk($dc->activeRecord->id)->jumpTo, $aliasExists);
+        }
+        elseif (preg_match('/^[1-9]\d*$/', $varValue))
+        {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
+        }
+        elseif ($aliasExists($varValue))
+        {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+        }
+
+        return $varValue;
     }
 }

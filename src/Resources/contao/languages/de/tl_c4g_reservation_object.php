@@ -13,6 +13,7 @@ $str = 'tl_c4g_reservation_object';
 
 /** FIELDS */
 $GLOBALS['TL_LANG'][$str]['caption'] = array("Bezeichnung", "Bezeichnung im Frontend sowie Backend. Benennen Sie das Reservierungsobjekt. Beispiele: Raum1, Tisch7, Fachkraft3");
+$GLOBALS['TL_LANG'][$str]['alias'] = array("Alias", "Der Alias wird im Frontend anstelle der ID für Detailansichten und Parameter benutzt.");
 $GLOBALS['TL_LANG'][$str]['options'] = array("Frontendbezeichnung","Wird alternativ im Frontend dargestellt.");
 $GLOBALS['TL_LANG'][$str]['quantity'] = array("Verfügbare Anzahl","Wie viele Objekte dieses Typs stehen zur Verfügung? (Standard 1)");
 $GLOBALS['TL_LANG'][$str]['allTypesQuantity'] = array("Gilt über alle Reservierungsarten (selbes Objekt)","Die verfügbare Anzahl der Objekte wird über alle Reservierungsarten berücksichtigt.");

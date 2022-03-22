@@ -9,6 +9,8 @@
  * @link https://www.con4gis.org
  */
 
+use con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel;
+
 $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
 (
     //config
@@ -86,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{speaker_legend},title, firstname, lastname, email, phone, address, postal, city, website, vita, photo, speakerForwarding;'
+        'default'   =>  '{speaker_legend},title, firstname, lastname, alias, email, phone, address, postal, city, website, vita, photo, speakerForwarding;'
     ),
 
 
@@ -141,7 +143,22 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'sql'                     => "varchar(254) NOT NULL default ''"
 
         ),
-         'email' => array
+
+        'alias' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['alias'],
+            'exclude' => true,
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'long clr'),
+            'save_callback' => array
+            (
+                array('tl_c4g_reservation_event_speaker', 'generateAlias')
+            ),
+            'sql' => "varchar(255) BINARY NOT NULL default ''"
+        ),
+
+        'email' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['email'],
             'exclude'                 => true,
@@ -261,5 +278,40 @@ class tl_c4g_reservation_event_speaker extends Backend
         } else {
             return $varValue;
         }
+    }
+
+    /**
+     * Auto-generate the object alias if it has not been set yet
+     *
+     * @param mixed         $varValue
+     * @param DataContainer $dc
+     *
+     * @return mixed
+     *
+     * @throws Exception
+     */
+    public function generateAlias($varValue, \Contao\DataContainer $dc)
+    {
+        $aliasExists = function (string $alias) use ($dc): bool
+        {
+            return $this->Database->prepare("SELECT id FROM tl_c4g_reservation_event_speaker WHERE alias=? AND id!=?")->execute($alias, $dc->id)->numRows > 0;
+        };
+
+        // Generate the alias if there is none
+        if (!$varValue)
+        {
+            $alias = $dc->activeRecord->title ? $dc->activeRecord->title.'-'.$dc->activeRecord->lastname.'-'.$dc->activeRecord->firstname : $dc->activeRecord->lastname.'-'.$dc->activeRecord->firstname;
+            $varValue = \Contao\System::getContainer()->get('contao.slug')->generate($alias, C4gReservationSettingsModel::findByPk($dc->activeRecord->id)->jumpTo, $aliasExists);
+        }
+        elseif (preg_match('/^[1-9]\d*$/', $varValue))
+        {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
+        }
+        elseif ($aliasExists($varValue))
+        {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+        }
+
+        return $varValue;
     }
 }

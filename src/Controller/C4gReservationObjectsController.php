@@ -61,6 +61,7 @@ class C4gReservationObjectsController extends C4GBaseController
     protected $sendEMails   = null;
     protected $withNotification = false;
     protected $permalink_name = 'object';
+    protected $permalink_field = 'alias';
 
     //Resource Params
     protected $loadDefaultResources = true;
@@ -94,7 +95,7 @@ class C4gReservationObjectsController extends C4GBaseController
     protected $jQueryUseScrollPane = true;
     protected $jQueryUsePopups = false;
 
-    protected $withPermissionCheck = false;
+    protected $withPermissionCheck = true;
 
 
     /**
@@ -149,6 +150,14 @@ class C4gReservationObjectsController extends C4GBaseController
         $idField->setSortColumn(false);
         $idField->setPrintable(false);
         $fieldList[] = $idField;
+
+        $aliasField = new C4GTextField();
+        $aliasField->setFieldName('alias');
+        $aliasField->setEditable(false);
+        $aliasField->setFormField(false);
+        $aliasField->setSortColumn(false);
+        $aliasField->setPrintable(false);
+        $fieldList[] = $aliasField;
 
         $ignorePostal = false;
         if ($this->postals) {
@@ -224,6 +233,7 @@ class C4gReservationObjectsController extends C4GBaseController
             $reservationTypeField->setNotificationField(true);
             $reservationTypeField->setInitialValue($typelist[0]);
             $reservationTypeField->setHidden(count($typelist) == 1);
+            $reservationTypeField->setColumnWidth(40);
             $fieldList[] = $reservationTypeField;
         } else {
             //FEHLER KEINE ART AUSGEWÄHLT
@@ -237,6 +247,7 @@ class C4gReservationObjectsController extends C4GBaseController
         $captionField->setMandatory(true);
         $captionField->setNotificationField(true);
         $captionField->setTableColumnPriority(2);
+        $captionField->setColumnWidth(40);
         $fieldList[] = $captionField;
 
         $quantityField = new C4GNumberField();
@@ -245,6 +256,8 @@ class C4gReservationObjectsController extends C4GBaseController
         $quantityField->setInitialValue(1);
         $quantityField->setFormField(true);
         $quantityField->setTableColumn(true);
+        $quantityField->setColumnWidth(10);
+        $quantityField->setAlign('center');
         $fieldList[] = $quantityField;
 
         $descriptionField = new C4GTrixEditorField();
@@ -291,7 +304,7 @@ class C4gReservationObjectsController extends C4GBaseController
         $priceField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['price']);
         //$priceField->setInitialValue(0);
         $priceField->setFormField(true);
-        $priceField->setTableColumn(true);
+        $priceField->setTableColumn(false);
 //        $priceField->setDecimalPoint('.');
         $priceField->setDecimals(2);
         $fieldList[] = $priceField;
@@ -308,23 +321,12 @@ class C4gReservationObjectsController extends C4GBaseController
         $publishedField->setSortColumn(false);
         $publishedField->setTableColumn(true);
         $publishedField->setNotificationField(true);
+        $publishedField->setColumnWidth(10);
+        $publishedField->setAlign('center');
         $fieldList[] = $publishedField;
 
         return $fieldList;
     }
-
-//    /**
-//     * @param $values
-//     * @param $putVars
-//     * @return void
-//     */
-//    public function saveObject($values, $putVars)
-//    {
-//        $fieldList = $this->getFieldList();
-//        $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $fieldList, $putVars, $this->getBrickDatabase());
-//        $action->setModule($this);
-//        $result = $action->run();
-//    }
 
     /**
      * @param $tableName
@@ -391,14 +393,16 @@ class C4gReservationObjectsController extends C4GBaseController
                 $result = $locset['name'] ? $stmt->execute($locset['name'])->fetchAssoc() : [];
             }
             $multiColumnStr = serialize($multiColumnArr);
+            $alias = \Contao\System::getContainer()->get('contao.slug')->generate($set['caption'], C4gReservationObjectModel::findByPk($insertId)->jumpTo);
+
             if ($result && count($result)) {
                 $stmt = $db->prepare("UPDATE $locationTable %s WHERE name = ?");
                 $stmt->set($locset);
                 $stmt->execute($locset['name']);
                 if ($stmt->affectedRows) {
                     $locationId = $result['id'];
-                    $stmt = $db->prepare("UPDATE $objectTable SET location = ?, days_exclusion = ? WHERE id = ?");
-                    $stmt->execute($locationId, $multiColumnStr, $insertId);
+                    $stmt = $db->prepare("UPDATE $objectTable SET alias = ?, location = ?, days_exclusion = ? WHERE id = ?");
+                    $stmt->execute($alias, $locationId, $multiColumnStr, $insertId);
                 }
             } else {
                 if ($this->reservation_add_member_location) {
@@ -407,12 +411,12 @@ class C4gReservationObjectsController extends C4GBaseController
                     $stmt->execute();
                     if ($stmt->affectedRows) {
                         $locationId = $stmt->insertId;
-                        $stmt = $db->prepare("UPDATE $objectTable SET location = ?, days_exclusion = ? WHERE id = ?");
-                        $stmt->execute($locationId, $multiColumnStr, $insertId);
+                        $stmt = $db->prepare("UPDATE $objectTable SET alias = ?,location = ?, days_exclusion = ? WHERE id = ?");
+                        $stmt->execute($alias, $locationId, $multiColumnStr, $insertId);
                     }
                 } else {
-                    $stmt = $db->prepare("UPDATE $objectTable SET days_exclusion = ? WHERE id = ?");
-                    $stmt->execute($multiColumnStr, $insertId);
+                    $stmt = $db->prepare("UPDATE $objectTable SET alias = ?,days_exclusion = ? WHERE id = ?");
+                    $stmt->execute($alias, $multiColumnStr, $insertId);
                 }
             }
         }

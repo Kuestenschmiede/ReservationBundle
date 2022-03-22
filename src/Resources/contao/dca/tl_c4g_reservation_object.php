@@ -14,9 +14,10 @@
  */
 
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 
-$default = '{type_legend}, caption, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes, notification_type;{publish_legend}, published, member_id';
+$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes, notification_type;{publish_legend}, published, member_id';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -139,8 +140,22 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sorting'           => true,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 254),
+            'eval'              => array('mandatory' => true, 'tl_class' => 'w50', 'maxlength' => 254),
             'sql'               => "varchar(254) NOT NULL default ''"
+        ),
+
+        'alias' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['alias'],
+            'exclude' => true,
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+            'save_callback' => array
+            (
+               array('tl_c4g_reservation_object', 'generateAlias')
+            ),
+            'sql' => "varchar(255) BINARY NOT NULL default ''"
         ),
 
         'options' => array
@@ -951,5 +966,39 @@ class tl_c4g_reservation_object extends Backend
         }
 
         return $return;
+    }
+
+    /**
+     * Auto-generate the object alias if it has not been set yet
+     *
+     * @param mixed         $varValue
+     * @param DataContainer $dc
+     *
+     * @return mixed
+     *
+     * @throws Exception
+     */
+    public function generateAlias($varValue, \Contao\DataContainer $dc)
+    {
+        $aliasExists = function (string $alias) use ($dc): bool
+        {
+            return $this->Database->prepare("SELECT id FROM tl_c4g_reservation_object WHERE alias=? AND id!=?")->execute($alias, $dc->id)->numRows > 0;
+        };
+
+        // Generate the alias if there is none
+        if (!$varValue)
+        {
+            $varValue = \Contao\System::getContainer()->get('contao.slug')->generate($dc->activeRecord->caption, C4gReservationObjectModel::findByPk($dc->activeRecord->id)->jumpTo, $aliasExists);
+        }
+        elseif (preg_match('/^[1-9]\d*$/', $varValue))
+        {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
+        }
+        elseif ($aliasExists($varValue))
+        {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+        }
+
+        return $varValue;
     }
 }

@@ -13,6 +13,8 @@
  * Table tl_module
  */
 
+use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
+
 $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
 (
     //config
@@ -101,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
+        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
     ),
 
     //Subpalettes
@@ -160,23 +162,36 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'flag'              => 1,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 254),
+            'eval'              => array('mandatory' => true, 'tl_class' => 'w50', 'maxlength' => 254),
             'sql'               => "varchar(254) NOT NULL default ''"
         ),
 
-
-        'event_caption' => array
+        'alias' => array
         (
-            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_caption'],
-            'exclude'           => true,
-            'default'           => '',
-            'sorting'           => true,
-            'flag'              => 1,
-            'search'            => true,
-            'inputType'         => 'text',
-            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 254),
-            'sql'               => "varchar(254) NOT NULL default ''"
+            'label' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['alias'],
+            'exclude' => true,
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+            'save_callback' => array
+            (
+                array('tl_c4g_reservation_type', 'generateAlias')
+            ),
+            'sql' => "varchar(255) BINARY NOT NULL default ''"
         ),
+//
+//        'event_caption' => array
+//        (
+//            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_caption'],
+//            'exclude'           => true,
+//            'default'           => '',
+//            'sorting'           => true,
+//            'flag'              => 1,
+//            'search'            => true,
+//            'inputType'         => 'text',
+//            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 254),
+//            'sql'               => "varchar(254) NOT NULL default ''"
+//        ),
 
         'options' => array
         (
@@ -653,5 +668,39 @@ class tl_c4g_reservation_type extends Backend
     public function showInfoMessage(Contao\DataContainer $dc)
     {
         \Contao\Message::addInfo($GLOBALS['TL_LANG']['tl_c4g_reservation_type']['infotext']);
+    }
+
+    /**
+     * Auto-generate the object alias if it has not been set yet
+     *
+     * @param mixed         $varValue
+     * @param DataContainer $dc
+     *
+     * @return mixed
+     *
+     * @throws Exception
+     */
+    public function generateAlias($varValue, \Contao\DataContainer $dc)
+    {
+        $aliasExists = function (string $alias) use ($dc): bool
+        {
+            return $this->Database->prepare("SELECT id FROM tl_c4g_reservation_type WHERE alias=? AND id!=?")->execute($alias, $dc->id)->numRows > 0;
+        };
+
+        // Generate the alias if there is none
+        if (!$varValue)
+        {
+            $varValue = \Contao\System::getContainer()->get('contao.slug')->generate($dc->activeRecord->caption, C4gReservationTypeModel::findByPk($dc->activeRecord->id)->jumpTo, $aliasExists);
+        }
+        elseif (preg_match('/^[1-9]\d*$/', $varValue))
+        {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
+        }
+        elseif ($aliasExists($varValue))
+        {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+        }
+
+        return $varValue;
     }
 }
