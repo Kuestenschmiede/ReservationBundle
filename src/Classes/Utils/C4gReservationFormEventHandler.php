@@ -231,8 +231,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     if ($reservationSettings->location_redirect_site) {
                         $jumpTo = \PageModel::findByPk($reservationSettings->location_redirect_site);
                         if ($jumpTo) {
-                            $locationALias = $location->alias ?: $locationId;
-                            $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$locationALias;
+                            $locationAlias = $location->alias ?: $locationId;
+                            $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$locationAlias;
                         }
                     }
 

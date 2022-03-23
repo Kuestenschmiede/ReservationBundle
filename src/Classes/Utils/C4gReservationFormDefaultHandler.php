@@ -311,7 +311,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                         if ($reservationSettings->location_redirect_site) {
                             $jumpTo = \PageModel::findByPk($reservationSettings->location_redirect_site);
                             if ($jumpTo) {
-                                $locationALias = $location->alias ?: $locationId;
+                                $locationAlias = $location->alias ?: $locationId;
                                 $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$locationAlias;
                             }
                         }
