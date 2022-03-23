@@ -132,6 +132,7 @@ class C4gReservationObjectsController extends C4GBaseController
 
         $this->listParams->setScrollX(false);
         $this->listParams->setResponsive(true);
+        $this->dialogParams->setHideChangesMessage(true);
 
         if ($this->login_redirect_site) {
             $this->dialogParams->getViewParams()->setLoginRedirect($this->login_redirect_site);
