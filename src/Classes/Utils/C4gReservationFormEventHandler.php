@@ -231,7 +231,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     if ($reservationSettings->location_redirect_site) {
                         $jumpTo = \PageModel::findByPk($reservationSettings->location_redirect_site);
                         if ($jumpTo) {
-                            $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$locationId;
+                            $locationALias = $location->alias ?: $locationId;
+                            $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$locationALias;
                         }
                     }
 
@@ -285,7 +286,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                         if ($reservationSettings->speaker_redirect_site) {
                             $jumpTo = \PageModel::findByPk($reservationSettings->speaker_redirect_site);
                             if ($jumpTo) {
-                                $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerId;
+                                $speakerAlias = $speaker->alias ?: $speakerId;
+                                $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerAlias;
                             }
                         }
 

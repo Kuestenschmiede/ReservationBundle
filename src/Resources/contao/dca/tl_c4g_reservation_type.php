@@ -179,19 +179,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             ),
             'sql' => "varchar(255) BINARY NOT NULL default ''"
         ),
-//
-//        'event_caption' => array
-//        (
-//            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['event_caption'],
-//            'exclude'           => true,
-//            'default'           => '',
-//            'sorting'           => true,
-//            'flag'              => 1,
-//            'search'            => true,
-//            'inputType'         => 'text',
-//            'eval'              => array('mandatory' => true, 'tl_class' => 'long', 'maxlength' => 254),
-//            'sql'               => "varchar(254) NOT NULL default ''"
-//        ),
 
         'options' => array
         (
