@@ -162,7 +162,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'flag'              => 1,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory' => true, 'tl_class' => 'w50', 'maxlength' => 254),
+            'eval'              => array('mandatory' => true, 'tl_class' => 'w50'),
             'sql'               => "varchar(254) NOT NULL default ''"
         ),
 
@@ -172,7 +172,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+            'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'tl_class'=>'w50'),
             'save_callback' => array
             (
                 array('tl_c4g_reservation_type', 'generateAlias')
@@ -204,7 +204,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
                         'options'               => ['de' => 'Deutsch', 'en' => 'Englisch'],
                         'eval'                  => array('chosen' => false, 'style'=>'width: 200px')
                     )
-                )
+                ),
+                'tl_class'=>'clr',
             ),
 
             'sql' => "blob NULL"

@@ -182,7 +182,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                         'options'               => ['de' => 'Deutsch', 'en' => 'Englisch'],
                         'eval'                  => array('chosen' => false, 'style'=>'width: 200px')
                     )
-                )
+                ),
+                'tl_class'=>'clr',
             ),
 
             'sql' => "blob NULL"
