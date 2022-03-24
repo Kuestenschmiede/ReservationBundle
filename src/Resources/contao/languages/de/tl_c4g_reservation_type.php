@@ -69,7 +69,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['memberId'] = array("Mitglied ver
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId'] = 'Standard (kein spezielles Mitglied)';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['groupId'] = array("Gruppe verknüpfen", "Alle Reservierungen dieser Art werden für diese Mitgliedergruppe erstellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyGroupId'] = 'Standard (keine spezielle Gruppe)';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['cloneObject'] = array("Klonvorlage", "Das Objekt wird nur für die Frontenderstellung benötigt. Komplexere Einstellungen werden bei der Erstellung neuer Objekte der selben Art übernommen.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['cloneObject'] = array("Klonvorlage (Objekt)", "Das Objekt wird nur für die Frontenderstellung benötigt. Komplexere Einstellungen werden bei der Erstellung neuer Objekte der selben Art übernommen.");
 
 /** Legends **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['type_legend'] = "Angaben zur Reservierungsart";
