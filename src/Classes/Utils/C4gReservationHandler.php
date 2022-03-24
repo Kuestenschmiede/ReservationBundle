@@ -218,6 +218,9 @@ class C4gReservationHandler
                                         break 2;
                                     }
                                 }
+                            } else {
+                                $excludeTime = false;
+                                break 2;
                             }
                         }
                         if ($excludeTime) {
