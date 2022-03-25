@@ -144,6 +144,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     [
         'reservationObjectType_1' => 'reservation_object, duration',
         'reservationObjectType_2' => 'reservation_object',
+        'reservationObjectType_3' => 'reservation_object, duration',
         //'confirmed' => 'internal_comment, specialNotification, emailConfirmationSend'
     ],
 //Fields
