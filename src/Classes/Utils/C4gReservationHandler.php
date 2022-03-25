@@ -673,7 +673,7 @@ class C4gReservationHandler
                                 $time_begin = intval($period['time_begin']);
 
                                 if (($periodType == 'day') || ($periodType == 'week')) {
-                                    $time_end = intval($period['time_end']);//intval($period['time_begin']) +  $durationInterval;
+                                    $time_end = intval($period['time_end']);
 
                                     if ($time_begin && $time_end) {
                                         $time = $time_begin;
@@ -759,7 +759,7 @@ class C4gReservationHandler
                                                 }
                                             }
 
-                                            $time = $time + $interval;
+                                            $time = $time + $interval; //Hier immer 1 Tag?
                                         }
                                     }
                                 } else {

@@ -34,9 +34,9 @@ class C4gReservationCalculator
         $this->objectTypeId = $objectTypeId;
 
         $database = Database::getInstance();
-        $set = [$date];
+        $set = [$date, $date];
         $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-            "`beginDate`=? AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
+            "? >= `beginDate` AND ? <= `endDate` AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
             ->execute($set)->fetchAllAssoc();
         if ($result) {
             $this->reservations[$date][$objectTypeId] = $result;
