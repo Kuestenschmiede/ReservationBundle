@@ -47,6 +47,8 @@ class C4gReservationFrontendObject
     private $switchAllTypes = null;
     private $description = '';
     private $image = null;
+    private $price = 0.00;
+    private $priceOption = 'pReservation';
 
     /**
      * C4gReservationFrontendObject constructor.
@@ -549,5 +551,37 @@ class C4gReservationFrontendObject
     public function setPeriodType(string $periodType): void
     {
         $this->periodType = $periodType;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPrice(): float
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param float $price
+     */
+    public function setPrice(float $price): void
+    {
+        $this->price = $price;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPriceOption(): string
+    {
+        return $this->priceOption;
+    }
+
+    /**
+     * @param string $priceOption
+     */
+    public function setPriceOption(string $priceOption): void
+    {
+        $this->priceOption = $priceOption;
     }
 }
