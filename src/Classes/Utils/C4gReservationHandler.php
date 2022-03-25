@@ -218,10 +218,10 @@ class C4gReservationHandler
                                         break 2;
                                     }
                                 }
-                            } else {
+                            }/* else {
                                 $excludeTime = false;
                                 break 2;
-                            }
+                            }*/
                         }
                         if ($excludeTime) {
                             $alldates[] = $i;
@@ -589,9 +589,9 @@ class C4gReservationHandler
                 $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 0;
 
                 //ToDo TEST
-                if ($desiredCapacity && $object->getAllTypesQuantity()) {
+                //if ($desiredCapacity && $object->getAllTypesQuantity()) {
                     $maxCount = $objectQuantity;
-                }
+                //}
 
                 $reservationTypes = $object->getReservationTypes();
 
@@ -1322,6 +1322,8 @@ class C4gReservationHandler
                 $frontendObject->setLocation($event['location'] ?: $type['location']);
                 $frontendObject->setDescription($eventObject['teaser'] ?: '');
                 $frontendObject->setImage($eventObject['singleSRC']);
+                $frontendObject->setPrice($event['price'] ?: 0.00);
+                $frontendObject->setPriceOption($event['priceoption']);
                 $objectList[] = $frontendObject;
             }
         } else {
@@ -1360,6 +1362,8 @@ class C4gReservationHandler
                         $frontendObject->setLocation($event['location'] ?: $type['location']);
                         $frontendObject->setDescription($eventObject['teaser'] ?: '');
                         $frontendObject->setImage($eventObject['singleSRC']);
+                        $frontendObject->setPrice($event['price'] ?: 0.00);
+                        $frontendObject->setPriceOption($event['priceoption']);
                         $objectList[] = $frontendObject;
                     }
                 }
@@ -1448,6 +1452,8 @@ class C4gReservationHandler
                 $frontendObject->setAudience($object['targetAudience'] ? \Contao\StringUtil::deserialize($object['targetAudience']) : []);
                 $frontendObject->setSpeaker($object['speaker'] ? \Contao\StringUtil::deserialize($object['speaker']) : []);
                 $frontendObject->setTopic($object['topic'] ? \Contao\StringUtil::deserialize($object['topic']) : []);
+                $frontendObject->setPrice($object['price'] ?: 0.00);
+                $frontendObject->setPriceOption($object['priceoption']);
 
                 if ($cloneObject) {
                     $frontendObject->setTimeinterval($object['time_interval'] ?: $cloneObject['time_interval']);
