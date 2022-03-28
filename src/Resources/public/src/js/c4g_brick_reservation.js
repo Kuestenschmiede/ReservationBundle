@@ -484,7 +484,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
         if (!dateField) {
             dateField = document.getElementById('c4g_beginDate_'+additionalId);
         } else {
-            if (dateField.id && dateField.id.indexOf("-33")) {
+            if (dateField.id && dateField.id.indexOf("-33") && (dateField.id.indexOf("-33") != -1)) {
                 objectId = dateField.id.substr(dateField.id.indexOf("-33")+3);
             }
         }
