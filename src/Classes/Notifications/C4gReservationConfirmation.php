@@ -19,6 +19,7 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationEventTopicModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use Contao\Controller;
 use Contao\Database;
+use Contao\MemberModel;
 use Contao\StringUtil;
 
 class C4gReservationConfirmation
@@ -72,6 +73,12 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('email', $reservation['email']);
                         $c4gNotify->setTokenValue('contact_email', $location && $location['contact_email'] ? $location['contact_email'] : false);
                         $c4gNotify->setTokenValue('reservation_type', $type['caption'] ? $type['caption'] : '');
+
+                        $memberId = $reservationObject['member_id'] ?: $reservation['member_id'];
+                        if ($memberId) {
+                            $member = MemberModel::findByPk($memberId);
+                            $c4gNotify->setTokenValue('member_email', $member->email);
+                        }
 
                         $c4gNotify->setTokenValue('desiredCapacity', $reservation['desiredCapacity'] ? $reservation['desiredCapacity'] : '');
 
