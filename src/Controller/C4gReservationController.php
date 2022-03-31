@@ -1798,23 +1798,25 @@ class C4gReservationController extends C4GBaseController
                                 $keyArr[0] = substr(trim($keyArr[0]),0, $keyPos);
                                 //$putVars[$keyArr[0].'~'.$keyArr[1].'~'.$keyArr[2]] = $value;
                             }
-                            $pos = strpos($keyArr[1],'|');
-                            if ($pos) {
-                                $keyValue = $keyArr[1];
-                                $keyArr[1] = substr($keyValue,0, $pos);
+                            $pos = $keyArr[2] && strpos($keyArr[2],'|');
+                            if ($pos && $value && $value !== 'false') {
+                                $keyValue = $keyArr[2];
+                                $keyArr[2] = substr($keyValue,0, $pos);
                                 $paramId = substr($keyValue,$pos+1);
-                                $paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
-                                if ($value && $value !== 'false' && $participantsArr[$keyArr[1]][$keyArr[0]]) {
-                                    $value = $participantsArr[$keyArr[1]][$keyArr[0]].', '.$paramCaption;
-                                } else if ($value && $value !== 'false') {
-                                    $value = $paramCaption;
+                                $paramObj = C4gReservationParamsModel::findByPk($paramId);
+                                if ($paramObj) {
+                                    $objValue = $paramObj->caption;
+                                    if ($objValue && $participantsArr[$keyArr[2]][$keyArr[1]]) {
+                                        $value = $participantsArr[$keyArr[2]][$keyArr[1]] . ', ' . $objValue;
+                                    } else if ($objValue) {
+                                        $value = $objValue;
+                                    }
                                 }
                             }
 
                             if ($value && $value !== 'false') {
                                 $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
                             }
-
                         }
                     }
                 }
@@ -1836,16 +1838,19 @@ class C4gReservationController extends C4GBaseController
                 if (strpos($key,"participants_".$type."§") !== false) {
                     $keyArr = explode("§", $key);
                     if (trim($keyArr[0]) && trim($keyArr[1]) && trim($value)) {
-                        $pos = strpos($keyArr[1],'|');
-                        if ($pos) {
-                            $keyValue = $keyArr[1];
-                            $keyArr[1] = substr($keyValue,0, $pos);
+                        $pos = $keyArr[2] && strpos($keyArr[2],'|');
+                        if ($pos && $value && $value !== 'false') {
+                            $keyValue = $keyArr[2];
+                            $keyArr[2] = substr($keyValue,0, $pos);
                             $paramId = substr($keyValue,$pos+1);
-                            $paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
-                            if ($value && $value !== 'false' && $participantsArr[$keyArr[1]][$keyArr[0]]) {
-                                $value = $participantsArr[$keyArr[1]][$keyArr[0]].', '.$paramCaption;
-                            } else if ($value && $value !== 'false') {
-                                $value = $paramCaption;
+                            $paramObj = C4gReservationParamsModel::findByPk($paramId);
+                            if ($paramObj) {
+                                $objValue = $paramObj->caption;
+                                if ($objValue && $participantsArr[$keyArr[2]][$keyArr[1]]) {
+                                    $value = $participantsArr[$keyArr[2]][$keyArr[1]] . ', ' . $objValue;
+                                } else if ($objValue) {
+                                    $value = $objValue;
+                                }
                             }
                         }
 
