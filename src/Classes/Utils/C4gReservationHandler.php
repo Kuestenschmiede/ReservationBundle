@@ -285,7 +285,7 @@ class C4gReservationHandler
         if (!strpos($GLOBALS['TL_CONFIG']['timeFormat'],'A')) {
             if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']) {
                 $clock = '&nbsp;'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
-            } else {
+            } else if ($langCookie) {
                 $clock = '&nbsp;'.$langCookie;
             }
         }
@@ -610,7 +610,7 @@ class C4gReservationHandler
 
                 $calculator->loadReservations($typeObject, $object);
 
-                if ($duration >= 1)
+                if ($duration >= 1) //duration from client can be -1 (no input)
                 {
                     switch ($periodType) {
                         case 'minute':
