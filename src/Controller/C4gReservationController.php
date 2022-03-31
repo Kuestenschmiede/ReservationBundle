@@ -1868,20 +1868,23 @@ class C4gReservationController extends C4GBaseController
 
         $participants = '';
         if ($participantsArr && count($participantsArr) > 0) {
+            $pCount = 1;
+            foreach ($participantsArr as $key => $valueArray) {
+                if (strpos($key,'|') === false) {
+                    $pCount++;
+                    $participants .= $participants ? '; '.$pCount.': '.trim(implode(', ',$valueArray)) : $pCount.': '.trim(implode(', ',$valueArray));
+                }
+            }
+
             $possible = $desiredCapacity - $reservationCount;
-            if ($desiredCapacity && $possible < count($participantsArr)) {
+            if ($desiredCapacity && $possible < $pCount) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'].$possible];
             }
 
-            if ($reservationType->maxParticipantsPerBooking && (count($participantsArr) > $reservationType->maxParticipantsPerBooking)) {
+            if ($reservationType->maxParticipantsPerBooking && ($pCount > $reservationType->maxParticipantsPerBooking)) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'].$reservationType->maxParticipantsPerBooking];
             }
 
-            $number = 0;
-            foreach ($participantsArr as $key => $valueArray) {
-                $number++;
-                $participants .= $participants ? '; '.$number.': '.trim(implode(', ',$valueArray)) : $number.': '.trim(implode(', ',$valueArray));
-            }
             $putVars['participantList'] = $participants;
         }
 
