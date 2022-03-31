@@ -269,7 +269,7 @@ function setReservationForm(typeId, showDateTime) {
         }
 
         var durationField = jQuery("#c4g_duration_"+typeId);
-        if (durationField) {
+        if (durationField && durationField.is(":visible")) {
             var value = durationField.val();
             if (durationField.attr('max') && (value > parseInt(durationField.attr('max')))) {
                 durationField.val(durationField.attr('max'));
@@ -280,8 +280,12 @@ function setReservationForm(typeId, showDateTime) {
         }
 
         var dateId = 'c4g_beginDate_'+typeId;
-        if (document.getElementById(dateId)) {
-            setTimeset(document.getElementById(dateId), typeId, showDateTime);
+        if (object) {
+            var objectElement = document.getElementById("c4g_reservation_object_"+typeId);
+            if (objectElement) {
+                dateId = dateId + '-33' +objectElement.value;
+                setTimeset(document.getElementById(dateId), typeId, showDateTime);
+            }
         } else if (event) {
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
@@ -309,12 +313,8 @@ function setReservationForm(typeId, showDateTime) {
                     }
                 }
             }
-        } else if (object) {
-            var objectElement = document.getElementById("c4g_reservation_object_"+typeId);
-            if (objectElement) {
-                dateId = dateId + '-33' +objectElement.value;
-                setTimeset(document.getElementById(dateId), typeId, showDateTime);
-            }
+        } else if (document.getElementById(dateId)) {
+            setTimeset(document.getElementById(dateId), typeId, showDateTime);
         }
     }
 
@@ -493,7 +493,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
     }
 
     var durationNode = document.getElementById("c4g_duration_"+additionalId);
-    if (durationNode) {
+    if (durationNode && jQuery(durationNode).is(":visible")) {
         var duration = durationNode.value;
     }
 
