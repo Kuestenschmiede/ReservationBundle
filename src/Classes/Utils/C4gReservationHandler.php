@@ -203,6 +203,7 @@ class C4gReservationHandler
                 $end   = time()+($maxDate*86400);
 
                 $i = $begin;
+                $nxtDays = 0;
                 while ($i <= $end) {
                     $weekday = date('w', $i);
                     $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $i);
@@ -216,16 +217,37 @@ class C4gReservationHandler
                                     if ($timeElementObj['id'] && $timeElementObj['id'] !== -1) {
                                         $excludeTime = false;
                                         break 2;
+                                    } else {
+                                        if (($timeElementObj['time'] + $timeElementObj['interval']) > ($i+86400)) {
+                                            $nd = ceil(($timeElementObj['time'] + $timeElementObj['interval']) - ($i+86400) / 86400);
+                                            $nextDays = ($nd > $nextDays) ? $nd : $nextDays;
+                                        }
                                     }
                                 }
-                            }/* else {
-                                $excludeTime = false;
-                                break 2;
-                            }*/
+                            }
                         }
+
                         if ($excludeTime) {
                             $alldates[] = $i;
+                        } else if (!$excludeTime && $nextDays && $timeArr && (count($timeArr) > 0)) {
+                            $objects = [];
+                            foreach ($timeArr as $timeElement) {
+                                if ($timeElement && $timeElement['objects']) {
+                                    foreach ($timeElement['objects'] as $timeElementObj) {
+                                        if ($timeElementObj['id'] && $timeElementObj['id'] !== -1) {
+                                            $objects[$timeElementObj['id']] = true;
+                                        }
+                                    }
+                                }
+                            }
+
+                            //ToDo Not a sufficient solution, as only partial periods could be affected.
+                            if (count($objects) <= 1) {
+                                $alldates[] = $i;
+                            }
                         }
+
+                        $nextDays = ($nextDays > 0) ? $nexdays-- : 0;
                     }
 
                     $i = $i+86400;
