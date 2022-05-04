@@ -818,30 +818,38 @@ class tl_c4g_reservation extends Backend
     }
 
     /**
-     * Return all themes as array
+     * @param DataContainer|array $dc
      * @return array
      */
-    public function getActObjects(DataContainer $dc)
+    public function getActObjects($dc) // No parameter type because union type parameters require PHP >= 8.0
     {
+        if ($dc instanceof DataContainer) {
+            $reservationObjectType = $dc->activeRecord->reservationObjectType;
+        } elseif (is_array($dc)) {
+            $reservationObjectType = $dc['reservationObjectType'];
+        } else {
+            return [];
+        }
+
         $return = [];
-
-        if ($dc->activeRecord->reservationObjectType) {
-            if ($dc && ($dc->activeRecord) && ($dc->activeRecord->reservationObjectType === '2')) {
-                $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
-                    ->execute();
-
-                while ($events->next()) {
-                    $return[$events->id] = $events->title;
-                }
-            } else if ($dc && ($dc->activeRecord) && (($dc->activeRecord->reservationObjectType === '1') || ($dc->activeRecord->reservationObjectType === '3'))) {
-                //ToDo all elemente for filter -> duplicated ids
+        switch ($reservationObjectType) {
+            case '1':
+            case '3':
                 $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
                     ->execute();
 
                 while ($objects->next()) {
                     $return[$objects->id] = $objects->caption;
                 }
-            }
+                break;
+            case '2':
+                $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
+                    ->execute();
+
+                while ($events->next()) {
+                    $return[$events->id] = $events->title;
+                }
+                break;
         }
 
         return $return;
