@@ -502,6 +502,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $includedParams->setStyleClass('included-params');
             $includedParams->setAllChecked(true);
             $includedParams->setNotificationField(true);
+            $includedParams->setSort(false);
             $this->fieldList[] = $includedParams;
         }
 
@@ -535,6 +536,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $additionalParams->setAdditionalID($listType['id'] . '-00' . $reservationObject->getId());
             $additionalParams->setStyleClass('additional-params');
             $additionalParams->setNotificationField(true);
+            $additionalParams->setSort(false);
             $this->fieldList[] = $additionalParams;
         }
 

@@ -1057,6 +1057,7 @@ class C4gReservationController extends C4GBaseController
                             $participantParamField->setModernStyle(false);
                             $participantParamField->setStyleClass('participant-params');
                             $participantParamField->setNotificationField(false);
+                            $participantParamField->setSort(false);
 
                             $participants[] = $participantParamField;
                         }
