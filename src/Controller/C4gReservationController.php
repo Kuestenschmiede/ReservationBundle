@@ -33,6 +33,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GMultiSelectField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GNumberField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GPostalField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GRadioGroupField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSelectField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSubDialogField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
@@ -1053,14 +1054,18 @@ class C4gReservationController extends C4GBaseController
                         }
 
                         if (count($participantParamsArr) > 0) {
-                            $participantParamField = new C4GMultiCheckboxField();
+                            if ($listType['participantParamsFieldType'] == 'radio') {
+                                $participantParamField = new C4GRadioGroupField();
+                            } else {
+                                $participantParamField = new C4GMultiCheckboxField();
+                                $participantParamField->setModernStyle(false);
+                            }
                             $participantParamField->setFieldName('participant_params');
                             $participantParamField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params']);
                             $participantParamField->setFormField(true);
                             $participantParamField->setEditable(true);
                             $participantParamField->setOptions($participantParamsArr);
-                            $participantParamField->setMandatory(false);
-                            $participantParamField->setModernStyle(false);
+                            $participantParamField->setMandatory($type['participantParamsMandatory']);
                             $participantParamField->setStyleClass('participant-params');
                             $participantParamField->setNotificationField(false);
                             $participantParamField->setSort(false);

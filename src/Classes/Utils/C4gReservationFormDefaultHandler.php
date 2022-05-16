@@ -471,19 +471,19 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         }
 
         if (count($includedParamsArr) > 0) {
-            if ($listType['includedParamsFieldType'] == 'radio') {
+//            if ($listType['includedParamsFieldType'] == 'radio') {
                 $includedParams = new C4GRadioGroupField();
-            } else {
-                $includedParams = new C4GMultiCheckboxField();
-                $includedParams->setModernStyle(false);
-                $includedParams->setAllChecked(true);
-            }
+//            } else {
+//                $includedParams = new C4GMultiCheckboxField();
+//                $includedParams->setModernStyle(false);
+//                $includedParams->setAllChecked(true);
+//            }
             $includedParams->setFieldName('included_params');
             $includedParams->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['included_params']);
             $includedParams->setFormField(true);
             $includedParams->setEditable(false);
             $includedParams->setOptions($includedParamsArr);
-            $includedParams->setMandatory($listType['includedParamsMandatory']);
+            $includedParams->setMandatory(/*$listType['includedParamsMandatory']*/false);
             $includedParams->setCondition(array($condition));
             $includedParams->setRemoveWithEmptyCondition(true);
             $includedParams->setAdditionalID($listType['id'] . '-00' . $reservationObject->getId());
@@ -510,14 +510,18 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         }
 
         if (count($additionalParamsArr) > 0) {
-            $additionalParams = new C4GMultiCheckboxField();
+            if ($listType['additionalParamsFieldType'] == 'radio') {
+                $additionalParams = new C4GRadioGroupField();
+            } else {
+                $additionalParams = new C4GMultiCheckboxField();
+                $additionalParams->setModernStyle(false);
+            }
             $additionalParams->setFieldName('additional_params');
             $additionalParams->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['additional_params']);
             $additionalParams->setFormField(true);
             $additionalParams->setEditable(true);
             $additionalParams->setOptions($additionalParamsArr);
             $additionalParams->setMandatory($listType['additionalParamsMandatory']);
-            $additionalParams->setModernStyle(false);
             $additionalParams->setCondition(array($condition));
             $additionalParams->setRemoveWithEmptyCondition(true);
             $additionalParams->setAdditionalID($listType['id'] . '-00' . $reservationObject->getId());

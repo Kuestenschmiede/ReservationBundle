@@ -103,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,almostFullyBookedAt,included_params,includedParamsFieldType,includedParamsMandatory,additional_params,additionalParamsFieldType,additionalParamsMandatory,participant_params,participantParamsFieldType,participantParamsMandatory,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
+        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,additionalParamsFieldType,additionalParamsMandatory,participant_params,participantParamsFieldType,participantParamsMandatory,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
     ),
 
     //Subpalettes
@@ -501,28 +501,28 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'sql'                     => "blob NULL"
         ),
 
-        'includedParamsFieldType' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['includedParamsFieldType'],
-            'exclude'                 => true,
-            'inputType'               => 'select',
-            'default'                 => 'multi',
-            'reference'               => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type'],
-            'options'                 => array('multi','radio'),
-            'eval'                    => array('tl_class'=>'w50','feViewable'=>true, 'mandatory'=>false),
-            'sql'                     => "char(25) NOT NULL default 'multi'"
-        ),
-
-        'includedParamsMandatory' => array
-        (
-            'label'             => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['includedParamsMandatory'],
-            'exclude'           => true,
-            'filter'            => false,
-            'default'           => '0',
-            'inputType'         => 'checkbox',
-            'eval'              => array('tl_class'=>'w50 clr'),
-            'sql'               => "int(1) unsigned NULL default 0"
-        ),
+//        'includedParamsFieldType' => array
+//        (
+//            'label'                   => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['includedParamsFieldType'],
+//            'exclude'                 => true,
+//            'inputType'               => 'select',
+//            'default'                 => 'multi',
+//            'reference'               => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type'],
+//            'options'                 => array('multi','radio'),
+//            'eval'                    => array('tl_class'=>'w50','feViewable'=>true, 'mandatory'=>false),
+//            'sql'                     => "char(25) NOT NULL default 'multi'"
+//        ),
+//
+//        'includedParamsMandatory' => array
+//        (
+//            'label'             => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['includedParamsMandatory'],
+//            'exclude'           => true,
+//            'filter'            => false,
+//            'default'           => '0',
+//            'inputType'         => 'checkbox',
+//            'eval'              => array('tl_class'=>'w50 clr'),
+//            'sql'               => "int(1) unsigned NULL default 0"
+//        ),
 
         'additional_params' => array
         (
