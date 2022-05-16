@@ -369,8 +369,6 @@ class C4gReservationController extends C4GBaseController
                                 'name' => StringHelper::spaceToNbsp($caption['caption']),
                                 'periodType' => $type['periodType'],
                                 'includedParams' => \Contao\StringUtil::deserialize($type['included_params']),
-                                'includedParamsFieldType' => $type['includedParamsFieldType'],
-                                'includedParamsMandatory' => $type['includedParamsMandatory'] ? true : false,
                                 'additionalParams' => \Contao\StringUtil::deserialize($type['additional_params']),
                                 'additionalParamsFieldType' => $type['additionalParamsFieldType'],
                                 'additionalParamsMandatory' => $type['additionalParamsMandatory'] ? true : false,

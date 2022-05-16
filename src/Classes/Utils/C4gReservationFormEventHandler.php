@@ -420,19 +420,16 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         }
 
         if (count($includedParamsArr) > 0) {
-//            if ($listType['includedParamsFieldType'] == 'radio') {
-//                $includedParams = new C4GRadioGroupField();
-//            } else {
-                $includedParams = new C4GMultiCheckboxField();
-                $includedParams->setModernStyle(false);
-                $includedParams->setAllChecked(true);
-//            }
+
+            $includedParams = new C4GMultiCheckboxField();
+            $includedParams->setModernStyle(false);
+            $includedParams->setAllChecked(true);
             $includedParams->setFieldName('included_params');
             $includedParams->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['included_params']);
             $includedParams->setFormField(true);
             $includedParams->setEditable(false);
             $includedParams->setOptions($includedParamsArr);
-            $includedParams->setMandatory(/*$listType['includedParamsMandatory']*/false);
+            $includedParams->setMandatory(false);
             $includedParams->setCondition(array($condition));
             $includedParams->setRemoveWithEmptyCondition(true);
             $includedParams->setAdditionalID($listType['id'] . '-00' . $reservationObject->getId());
