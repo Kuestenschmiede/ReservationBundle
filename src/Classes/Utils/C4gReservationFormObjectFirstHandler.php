@@ -494,7 +494,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $includedParams->setFormField(true);
             $includedParams->setEditable(false);
             $includedParams->setOptions($includedParamsArr);
-            $includedParams->setMandatory(false);
+            $includedParams->setMandatory($listType['includedParamsMandatory']);
             $includedParams->setModernStyle(false);
             $includedParams->setCondition(array($condition));
             $includedParams->setRemoveWithEmptyCondition(true);
@@ -529,7 +529,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $additionalParams->setFormField(true);
             $additionalParams->setEditable(true);
             $additionalParams->setOptions($additionalParamsArr);
-            $additionalParams->setMandatory(false);
+            $additionalParams->setMandatory($listType['additionalParamsMandatory']);
             $additionalParams->setModernStyle(false);
             $additionalParams->setCondition(array($condition));
             $additionalParams->setRemoveWithEmptyCondition(true);

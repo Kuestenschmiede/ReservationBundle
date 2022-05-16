@@ -103,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,participant_params,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
+        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,almostFullyBookedAt,included_params,includedParamsFieldType,includedParamsMandatory,additional_params,additionalParamsFieldType,additionalParamsMandatory,participant_params,participantParamsFieldType,participantParamsMandatory,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
     ),
 
     //Subpalettes
@@ -344,7 +344,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_c4g_reservation_location.name',
-            'eval'              => array('chosen' => true, 'includeBlankOption' => true, 'mandatory' => false, 'tl_class' => 'long'),
+            'eval'              => array('chosen' => true, 'includeBlankOption' => true, 'mandatory' => false, 'tl_class' => 'long clr'),
             'sql'               => "int(10) unsigned NOT NULL default 0",
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
         ),
@@ -501,6 +501,29 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'sql'                     => "blob NULL"
         ),
 
+        'includedParamsFieldType' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['includedParamsFieldType'],
+            'exclude'                 => true,
+            'inputType'               => 'select',
+            'default'                 => 'multi',
+            'reference'               => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type'],
+            'options'                 => array('multi','radio'),
+            'eval'                    => array('tl_class'=>'w50','feViewable'=>true, 'mandatory'=>false),
+            'sql'                     => "char(25) NOT NULL default 'multi'"
+        ),
+
+        'includedParamsMandatory' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['includedParamsMandatory'],
+            'exclude'           => true,
+            'filter'            => false,
+            'default'           => '0',
+            'inputType'         => 'checkbox',
+            'eval'              => array('tl_class'=>'w50 clr'),
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
+
         'additional_params' => array
         (
         'label'                   => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['additional_params'],
@@ -511,6 +534,29 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'sql'                     => "blob NULL"
         ),
 
+        'additionalParamsFieldType' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['additionalParamsFieldType'],
+            'exclude'                 => true,
+            'inputType'               => 'select',
+            'default'                 => 'multi',
+            'reference'               => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type'],
+            'options'                 => array('multi','radio'),
+            'eval'                    => array('tl_class'=>'w50','feViewable'=>true, 'mandatory'=>false),
+            'sql'                     => "char(25) NOT NULL default 'multi'"
+        ),
+
+        'additionalParamsMandatory' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['additionalParamsMandatory'],
+            'exclude'           => true,
+            'filter'            => false,
+            'default'           => '0',
+            'inputType'         => 'checkbox',
+            'eval'              => array('tl_class'=>'w50 clr'),
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
+
         'participant_params' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['participant_params'],
@@ -519,6 +565,29 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'foreignKey'              => 'tl_c4g_reservation_params.caption',
             'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'                     => "blob NULL"
+        ),
+
+        'participantParamsFieldType' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['participantParamsFieldType'],
+            'exclude'                 => true,
+            'inputType'               => 'select',
+            'default'                 => 'multi',
+            'reference'               => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type'],
+            'options'                 => array('multi','radio'),
+            'eval'                    => array('tl_class'=>'w50','feViewable'=>true, 'mandatory'=>false),
+            'sql'                     => "char(25) NOT NULL default 'multi'"
+        ),
+
+        'participantParamsMandatory' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['participantParamsMandatory'],
+            'exclude'           => true,
+            'filter'            => false,
+            'default'           => '0',
+            'inputType'         => 'checkbox',
+            'eval'               => array('tl_class'=>'w50 clr'),
+            'sql'               => "int(1) unsigned NULL default 0"
         ),
 
         'description' => array

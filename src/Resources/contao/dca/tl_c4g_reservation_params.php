@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  'caption, language, price, published;,'
+        'default'   =>  'caption, language, price, published;'
     ),
 
 

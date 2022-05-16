@@ -18,6 +18,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['reservationObjectType'] = array(
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][1] = 'Standard (Zeitauswahl)';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][2] = 'Contao Events';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'][3] = 'Objektauswahl';
+$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['multi'] = 'Mehrfachauswahl (Multi-Checkbox)';
+$GLOBALS['TL_LANG']['ts_c4g_reservation_type']['radio'] = 'Einfachauswahl (Radiogruppe)';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('Automatische Bestätigungsnachricht (optional)', 'Wählen Sie die Benachrichtigung aus. Diese Einstellung überschreibt die Reservierungsformular Einstellungen. Standard und Objektauswahl sind kompatibel.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_confirmation_type'] = array('Bestätigungsnachricht (Backendversand)', 'Sie können aus der Reservierungsliste heraus eine Bestätigungsnachricht verschicken.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_special_type'] = array('Spezialnachricht (Backendversand)', 'Diese Nachricht wird aus der Reservierungsliste heraus anstelle der Bestätigungsnachricht versenden, wenn die Checkbox "Spezialnachricht senden" ausgewählt wurde.');
@@ -58,8 +60,14 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['timeEnd'] = array("Uhrzeitende")
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayBegin'] = array("Starttag");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['dayEnd'] = array("Endtag");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['included_params'] = array("Enthaltende Leistungen");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['includedParamsFieldType'] = array("Feldtyp", "Wählen sie den Feldtyp für die enthaltenden Leistungen im Reservierungsformular.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['includedParamsMandatory'] = array("Pflichtfeld", "Sollen die enthaltenden Leistungen ein Pflichtfeld sein?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additional_params'] = array("Buchbare Leistungen");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additionalParamsFieldType'] = array("Feldtyp", "Wählen sie den Feldtyp für die buchbaren Leistungen im Reservierungsformular.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['additionalParamsMandatory'] = array("Pflichtfeld", "Sollen die buchbaren Leistungen ein Pflichtfeld sein?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['participant_params'] = array("Teilnehmeroptionen");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['participantParamsFieldType'] = array("Feldtyp", "Wählen sie den Feldtyp für die Teilnehmer Leistungen im Reservierungsformular.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['participantParamsMandatory'] = array("Pflichtfeld", "Sollen die Teilnehmer Leistungen ein Pflichtfeld sein?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Beschreibung");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minParticipantsPerBooking'] = array("Minimale Teilnehmerzahl pro Buchung", "Hierüber können Sie die Mindestteilnehmerzahl in der Eingabe pro Buchung erhöhen. 1 = Standard.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = array("Maximale Teilnehmerzahl pro Buchung", "Hierüber können Sie die Teilnehmerzahl in der Eingabe pro Buchung begrenzen. 0 = unbegrenzt. Sollten Sie den Teilnehmermechanismus im Formular nutzen wollen, dann sollten Sie hier die Anzahl stark eingrenzen (max. 8 Personen).");
