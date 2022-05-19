@@ -1694,13 +1694,18 @@ class C4gReservationController extends C4GBaseController
                 $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime-86400);
             }
 
-            if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week')) {
-                $nextDay = strtotime($beginDate) + $duration;
-                $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+            if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week') || ($endTime >= 86400)) {
+                if (($endTime >= 86400)) {
+                    $nextDay = strtotime($beginDate) + 86400;
+                    $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                } else {
+                    $nextDay = strtotime($beginDate) + $duration;
+                    $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
 
-                $wd = date("w", strtotime($beginDate));
-                $endTime = C4gReservationHandler::getEndTimeForMultipleDays($reservationObject, $wd);
-                $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'],intvaL($endTime)) : intval($beginTime);
+                    $wd = date("w", strtotime($beginDate));
+                    $endTime = C4gReservationHandler::getEndTimeForMultipleDays($reservationObject, $wd);
+                    $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'],intvaL($endTime)) : intval($beginTime);
+                }
             }
 
             if ($reservationType->directBooking) {
