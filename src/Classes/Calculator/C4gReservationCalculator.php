@@ -202,18 +202,16 @@ class C4gReservationCalculator
                     $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
                     $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);
 
-                    $tb = $time ? $time >= 86400 : ($time - 86400);
+                    $tb = $time && ($time >= 86400) ? $time - 86400 : $time;
                     $tb = date($GLOBALS['TL_CONFIG']['timeFormat'], $tb);
 
-                    $te = $endTime ? $endTime >= 86400 : ($endTime - 86400);
+                    $te = $endTime && ($endTime >= 86400) ? $endTime - 86400 : $endTime;
                     $te = date($GLOBALS['TL_CONFIG']['timeFormat'], $te);
                     $timeBegin = strtotime($tb);
                     $timeEnd = strtotime($te);
                     $timeBeginDb = strtotime($tbdb);
                     $timeEndDb = strtotime($tedb);
-                    if (
-                        (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
-                        (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb))) {
+                    if ($timeBegin >= $timeBeginDb) {
                         $reservationList[] = $reservation;
                     }
                 }
