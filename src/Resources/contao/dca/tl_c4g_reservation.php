@@ -245,7 +245,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'exclude'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>true, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard clr'),
+            'eval'                    => array('rgxp'=>'date', 'mandatory'=>true, 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w50 wizard clr'),
             'sql'                     => "int(10) signed NULL"
         ),
 
@@ -259,7 +259,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'                 => true,
             'inputType'               => 'text',
             'flag'                    => 6,
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
+            'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
             'sql'                     => "int(10) signed NULL"
         ),
 
@@ -272,7 +272,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'flag'                    => 12,
-            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50 clr','datepicker'=>true),
+            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>false, 'tl_class'=>'w50 clr','datepicker'=>true),
             'sql'                     => "int(10) signed NULL"
         ),
 
@@ -285,7 +285,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'flag'                    => 12,
-            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50','date','datepicker'=>true),
+            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>false, 'tl_class'=>'w50','date','datepicker'=>true),
             'sql'                     => "int(10) signed NULL"
         ),
 
@@ -431,7 +431,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'flag'                    => 6,
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard clr'),
+            'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w50 wizard clr'),
             'sql'                     => "int(10) signed NULL"
         ),
 
