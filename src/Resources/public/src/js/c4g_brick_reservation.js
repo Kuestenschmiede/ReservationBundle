@@ -87,7 +87,7 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
         var selectField = document.getElementById("c4g_reservation_object_"+typeId);
         var first = -1;
         var firstValueParam = 0;
-        if (selectField) {
+        if (selectField && Array.isArray(selectField.options)) {
             var distance = 0;
 
             for (i = 0; i < selectField.options.length; i++) {
@@ -801,14 +801,14 @@ function checkEventFields() {
         }
     } else {
         var dateFields = jQuery('.begindate-event');
-        if (dateFields) {
+        if (dateFields && Array.isArray(dateFields)) {
             for (i = 0; i < dateFields.length; i++) {
                 jQuery(dateFields[i]).hide();
             }
         }
 
         var timeFields = jQuery('.reservation_time_event_button');
-        if (timeFields) {
+        if (timeFields && Array.isArray(timeFields)) {
             for (i = 0; i < timeFields.length; i++) {
                 jQuery(timeFields[i]).hide();
             }
