@@ -20,6 +20,10 @@ function getWeekdate(date) {
         m = m<10?"0"+m:m;
         d = d<10?"0"+d:d;
 
+        if (y && y.length == 2) {
+            y = '20'+y;
+        }
+
         date = y + "/" + m + "/" + d;
     } else if (date.indexOf("/") > 0) {
         var arrDate = date.split("/")
@@ -30,6 +34,9 @@ function getWeekdate(date) {
         m = m<10?"0"+m:m;
         d = d<10?"0"+d:d;
 
+        if (y && y.length == 2) {
+            y = '20'+y;
+        }
         date = y + "/" + m + "/" + d;
     }
 
