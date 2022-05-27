@@ -13,7 +13,7 @@ $str = 'tl_calendar';
 
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('c4g_reservation_legend', 'comments_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER, true)
-    ->addField(['activateEventReservation'], 'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(['activateEventReservation','reservationForwarding','reservationForwardingButtonCaption'], 'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', $str);
 
 
@@ -26,6 +26,27 @@ $GLOBALS['TL_DCA'][$str]['fields']['activateEventReservation'] = [
     'exclude'           => true,
     'filter'            => false,
     'inputType'         => 'checkbox',
-    'eval'              => array('tl_class'=>'w50'),
+    'eval'              => array('tl_class'=>'w50 clr'),
     'sql'               => "char(1) NOT NULL default '1'"
+];
+
+$GLOBALS['TL_DCA'][$str]['fields']['reservationForwarding'] = [
+    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwarding'],
+    'exclude'                 => true,
+    'inputType'               => 'pageTree',
+    'foreignKey'              => 'tl_page.title',
+    'eval'                    => array('tl_class'=>'w50 clr wizard','mandatory'=>false, 'fieldType'=>'radio'),
+    'sql'                     => "int(10) unsigned NOT NULL default '0'",
+    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+];
+
+$GLOBALS['TL_DCA'][$str]['fields']['reservationForwardingButtonCaption'] = [
+    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwardingButtonCaption'],
+    'exclude'                 => true,
+    'filter'                  => false,
+    'search'                  => false,
+    'sorting'                 => false,
+    'inputType'               => 'text',
+    'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
+    'sql'                     => "varchar(254) NOT NULL default ''"
 ];

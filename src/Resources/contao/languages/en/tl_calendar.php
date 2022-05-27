@@ -10,5 +10,7 @@
  */
 
 $GLOBALS['TL_LANG']['tl_calendar']['activateEventReservation'] = ['Activate event reservation (con4gis)', 'Activates the event reservation via con4gis Reservation.'];
+$GLOBALS['TL_LANG']['tl_calendar']['reservationForwarding'] = ["Forwarding to module", "Select the page where the reservation module is located. If you want the forwarding to apply across calendars, then you can also make the setting in the con4gis Dashboard."];
+$GLOBALS['TL_LANG']['tl_calendar']['reservationForwardingButtonCaption'] = ["Button label forwarding", "Labeling of the forwarding button to the reservation. Default: empty. The entries from the language files or the cross-calendar setting from the con4gis Dashboard apply."];
 
 $GLOBALS['TL_LANG']['tl_calendar']['c4g_reservation_legend'] = "Reservation settings";
