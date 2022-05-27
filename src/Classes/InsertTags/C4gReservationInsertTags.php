@@ -313,9 +313,9 @@ class C4gReservationInsertTags
                         case 'included_raw':
                             $ids = [];
                             if ($isEvent) {
-                               $ids = $reservationEventObject->reservationType;
+                               $ids = $reservationObject->reservationType;
                             } else {
-                                $idArr = StringUtil::deserialize($reservationEventObject->viewableTypes);
+                                $idArr = StringUtil::deserialize($reservationObject->viewableTypes);
                                 $ids = explode(',',$idArr);
                             }
                             $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE `id` IN (?)')
@@ -334,9 +334,9 @@ class C4gReservationInsertTags
                         case 'additional_raw':
                             $ids = [];
                             if ($isEvent) {
-                                $ids = $reservationEventObject->reservationType;
+                                $ids = $reservationObject->reservationType;
                             } else {
-                                $idArr = StringUtil::deserialize($reservationEventObject->viewableTypes);
+                                $idArr = StringUtil::deserialize($reservationObject->viewableTypes);
                                 $ids = explode(',',$idArr);
                             }
                             $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE `id` IN (?)')
