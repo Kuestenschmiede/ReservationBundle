@@ -208,27 +208,30 @@ class C4gReservationHandler
                     $weekday = date('w', $i);
                     $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $i);
                     if (!$timeArr || (count($timeArr) == 0)) {
-                        $alldates[] = $i;
+                        $alldates[$i] = $i;
                     } else {
                         $excludeTime = true;
                         foreach ($timeArr as $timeElement) {
                             if ($timeElement && $timeElement['objects']) {
+
+                                //sind noch Objekte buchbar?
                                 foreach ($timeElement['objects'] as $timeElementObj) {
                                     if ($timeElementObj['id'] && $timeElementObj['id'] !== -1) {
                                         $excludeTime = false;
                                         break 2;
-                                    } else {
-                                        if (($timeElementObj['time'] + $timeElementObj['interval']) > ($i+86400)) {
-                                            $nd = ceil(($timeElementObj['time'] + $timeElementObj['interval']) - ($i+86400) / 86400);
-                                            $nextDays = ($nd > $nextDays) ? $nd : $nextDays;
-                                        }
                                     }
+                                }
+
+                                //exclude time and check next days
+                                if (($timeElement['time'] + $timeElement['interval']) > ($i+86400)) {
+                                    $nd = ceil((($timeElement['time'] + $timeElement['interval']) - ($i+86400)) / 86400);
+                                    $nextDays = ($nd > $nextDays) ? $nd : $nextDays;
                                 }
                             }
                         }
 
                         if ($excludeTime) {
-                            $alldates[] = $i;
+                            $alldates[$i] = $i;
                         } else if (!$excludeTime && $nextDays && $timeArr && (count($timeArr) > 0)) {
                             $objects = [];
                             foreach ($timeArr as $timeElement) {
@@ -243,7 +246,7 @@ class C4gReservationHandler
 
                             //ToDo Not a sufficient solution, as only partial periods could be affected.
                             if (count($objects) <= 1) {
-                                $alldates[] = $i;
+                                $alldates[$i] = $i;
                             }
                         }
 
@@ -729,7 +732,7 @@ class C4gReservationHandler
                                                     $checkTime = $endTime;
                                                 }
 
-                                                if (intvaL($time_end) >= intval($time_begin)) {
+                                                if ($time_end >= $time_begin) {
                                                     $durationInterval = $durationInterval - 86400; //first day counts
                                                 }
 
