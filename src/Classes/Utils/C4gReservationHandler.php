@@ -173,9 +173,9 @@ class C4gReservationHandler
                     break;
                 }
                 $exclusionPeriods = $object->getDatesExclusion();
-                if ($exclusionPeriods && $period['date_exclusion'] && $period['date_exclusion_end']) {
+                if ($exclusionPeriods) {
                     foreach ($exclusionPeriods as $period) {
-                        if ($period) {
+                        if ($period && $period['date_exclusion'] && $period['date_exclusion_end']) {
                             $exclusionBegin = C4gReservationDateChecker::getBeginOfDate($period['date_exclusion']);
                             $exclusionEnd = C4gReservationDateChecker::getEndOfDate($period['date_exclusion_end']);
 
