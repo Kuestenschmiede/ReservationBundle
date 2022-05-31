@@ -229,7 +229,7 @@ class C4gReservationController extends C4GBaseController
             if ($date) {
                 $initialDate = $date;
                 if (!is_numeric($initialDate)) {
-                    $initialDate = strtotime($initialDate);
+                    $initialDate = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $initialDate));
                 }
             }
 
@@ -1696,7 +1696,7 @@ class C4gReservationController extends C4GBaseController
 
             if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week') || ($endTime >= 86400)) {
                 if (($duration < 86400) && ($endTime >= 86400)) {
-                    $nextDay = strtotime($beginDate) + 86400;
+                    $nextDay = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)) + 86400;
                     $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                 } else {
                     $addDuration = $duration;
@@ -1707,10 +1707,10 @@ class C4gReservationController extends C4GBaseController
                         $addDuration = $duration - 86400; //first day counts
                     }
 
-                    $nextDay = strtotime($beginDate) + $addDuration;
+                    $nextDay = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)) + $addDuration;
                     $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
 
-                    $wd = date("w", strtotime($beginDate));
+                    $wd = date("w", strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)));
                     $endTime = C4gReservationHandler::getEndTimeForMultipleDays($reservationObject, $wd);
                     $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], intvaL($endTime)) : intval($beginTime);
                 }
@@ -1918,8 +1918,8 @@ class C4gReservationController extends C4GBaseController
 
         $icsObject = $reservationEventObject ?: $reservationObject;
 
-        $beginDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(strtotime($beginDate), $beginTime);
-        $endDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs($endDate ?: strtotime($beginDate), $endTime);
+        $beginDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $beginTime);
+        $endDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs($endDate ?: strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $endTime);
         $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $reservationId);
 
         $rawData = '';
@@ -2031,7 +2031,7 @@ class C4gReservationController extends C4GBaseController
                     $tsdate->setTime(0,0,0);
                     $tsdate = $tsdate->getTimestamp();
                 } else {
-                    $tsdate = strtotime($date);
+                    $tsdate = strtotime(C4GBrickCommon::getLongDateToConvert($format, $date));
                 }
             }
 

@@ -256,7 +256,7 @@ class C4gReservationHandler
 
             foreach ($alldates as $date) {
                 if ($date) {
-                    $result = self::addComma($result) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
+                    $result = self::addComma($result) . date('d.m.Y'/*$GLOBALS['TL_CONFIG']['dateFormat']*/, $date);
                 }
             }
         }
