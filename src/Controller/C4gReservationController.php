@@ -2046,7 +2046,7 @@ class C4gReservationController extends C4GBaseController
                 $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->session->getSessionValue('reservationSettings'));
             }
 
-            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices);
+            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices, false, $duration, $date);
             $withEndTimes = $this->reservationSettings->showEndTime;
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
 
@@ -2058,9 +2058,18 @@ class C4gReservationController extends C4GBaseController
             $times[$key]['name'] = str_replace('&nbsp;',' ',$times[$key]['name']);
         }
 
+        $captions = [];
+
+        if ($this->reservationSettings->showPrices) {
+            foreach ($objects as $object) {
+                $captions[$object->getId()] = $object->getCaption();
+            }
+        }
+
         return new JsonResponse([
             'reservationId' => C4GBrickCommon::getUUID(),
-            'times' => $times
+            'times' => $times,
+            'captions' => $captions
         ]);
     }
 

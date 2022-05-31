@@ -1150,7 +1150,7 @@ class C4gReservationHandler
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectList($moduleTypes = null, $objectId = 0, $showPrices = false, $getAllTypes = false)
+    public static function getReservationObjectList($moduleTypes = null, $objectId = 0, $showPrices = false, $getAllTypes = false, $duration = 0, $date = 0)
     {
         $objectlist = array();
         $allTypesList = array();
@@ -1181,7 +1181,7 @@ class C4gReservationHandler
                     }
 
                 } else {
-                    $objectlist = C4gReservationHandler::getReservationObjectDefaultList($typeArr, $objectId, $type, $showPrices);
+                    $objectlist = C4gReservationHandler::getReservationObjectDefaultList($typeArr, $objectId, $type, $showPrices, $duration, $date);
 
                     if ($getAllTypes) {
                         foreach($objectlist as $key=>$object) {
@@ -1204,10 +1204,10 @@ class C4gReservationHandler
     /**
      * @param $object
      */
-    private static function calcPrices($object, $type, $isEvent = false, $countPersons = 1) {
+    private static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0) {
         $price = 0;
         if ($object) {
-
+            \System::loadLanguageFile('fe_c4g_reservation');
             $priceOption = key_exists('priceoption',$object) ? $object['priceoption'] : '';
             $priceInfo = '';
             switch ($priceOption) {
@@ -1264,19 +1264,19 @@ class C4gReservationHandler
                     $price = $price + (intval($object['price']) * $hours);
                     break;
                 case 'pDay':
-                    $days = 0;
+                    $days = $duration ?: 0;
                     if ($isEvent && $object['startDate'] && $object['endDate']) {
                         $days = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24));
-                    } else if (!$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
+                    } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
                         $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
                     }
                     $price = $price + (intval($object['price']) * $days);
                     break;
                 case 'pWeek':
-                    $weeks = 0;
+                    $weeks = $duration ?: 0;
                     if ($isEvent && $object['startDate'] && $object['endDate']) {
                         $weeks = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24 * 7));
-                    } else if (!$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
+                    } else if (!$weeks && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
                         $weeks = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24 * 7));
                     }
                     $price = $price + (intval($object['price']) * $weeks);
@@ -1289,14 +1289,15 @@ class C4gReservationHandler
                     break;
                 case 'pAmount':
                     $price = $price + intval($object['price']);
-                    $priceInfo = $GLOBALS['TL_LANG']['tl_c4g_reservation']['pAmount'];
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pAmount'];
                     break;
             }
 
         }
 
         if ($price) {
-            $price = number_format(floatval($price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency']."&nbsp;".$priceInfo;
+            $priceInfo ? "&nbsp;".$priceInfo : '';
+            $price = number_format(floatval($price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'].$priceInfo;
         }
         return $price;
     }
@@ -1403,7 +1404,7 @@ class C4gReservationHandler
      * @param false $showPrices
      * @return array
      */
-    public static function getReservationObjectDefaultList($moduleTypes = null, $objectId = 0, $type, $showPrices = false)
+    public static function getReservationObjectDefaultList($moduleTypes = null, $objectId = 0, $type, $showPrices = false, $duration = 0, $date = 0)
     {
         $objectList = array();
 //        $t = static::$strTable;
@@ -1459,7 +1460,7 @@ class C4gReservationHandler
                     }
                 }
 
-                $price = $showPrices ? static::calcPrices($object, $type, false, 1) : 0;
+                $price = $showPrices ? static::calcPrices($object, $type, false, 1, $duration, $date) : 0;
                 $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
 
                 $frontendObject->setPeriodType($type['periodType']);

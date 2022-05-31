@@ -528,6 +528,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                 var nameList = [];
                 var times = data['times'];
                 var size = times.length;
+                var objCaptions = data['captions'];
                 if (!document.getElementById("c4g_reservation_id").value || (document.getElementById("c4g_reservation_id").value != data['reservationId'])) {
                     document.getElementById("c4g_reservation_id").value = data['reservationId']; //Force regeneration
                 }
@@ -673,6 +674,11 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                         if (!objectId) {
                                             var reservationObjects = document.getElementsByClassName("displayReservationObjects");
                                             hideOptions(reservationObjects,additionalId, objstr, showDateTime);
+                                        } else if (objCaptions && objCaptions[objectId]) {
+                                            var objField = document.getElementById("c4g_reservation_object_"+additionalId);
+                                            if (objField && jQuery(objField).length) {
+                                                jQuery(objField).children('option[value='+objectId+']').html(objCaptions[objectId]);
+                                            }
                                         }
                                     } else {
                                         //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
