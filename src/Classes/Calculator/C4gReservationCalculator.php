@@ -90,9 +90,7 @@ class C4gReservationCalculator
                         $this->resultList[] = $reservation;
                     }
                 } else {
-                    //if ($typeId == $reservation['reservation_type']) {
                     $this->resultList[] = $reservation;
-                    //}
                 }
             } elseif ($allTypesQuantity) {
                 if ($switchAllTypes && count($switchAllTypes) > 0) {

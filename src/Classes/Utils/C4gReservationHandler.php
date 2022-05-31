@@ -606,15 +606,8 @@ class C4gReservationHandler
                 $found = false;
                 $timeArray = []; //count for one object
                 $objectQuantity = $object->getQuantity() ?  $object->getQuantity() : 1;
-
-                //max persons
-                $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 0;
-
-                //ToDo TEST
-                //if ($desiredCapacity && $object->getAllTypesQuantity()) {
-                    $maxCount = $objectQuantity;
-                //}
-
+                $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 0; //max persons
+                $maxCount = $objectQuantity;
                 $reservationTypes = $object->getReservationTypes();
 
                 if ($reservationTypes) {
@@ -736,7 +729,7 @@ class C4gReservationHandler
                                                     $checkTime = $endTime;
                                                 }
 
-                                                if (intvaL($time_end) > intval($time_begin)) {
+                                                if (intvaL($time_end) >= intval($time_begin)) {
                                                     $durationInterval = $durationInterval - 86400; //first day counts
                                                 }
 
@@ -876,8 +869,6 @@ class C4gReservationHandler
                                                     if (!$withEndTimes) {
                                                         $endTimeInterval = 0;
                                                     }
-
-                                                    //$max = $capacity;
 
                                                     $timeObj = [
                                                         'id'=>-1,

@@ -1700,7 +1700,10 @@ class C4gReservationController extends C4GBaseController
                     $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                 } else {
                     $addDuration = $duration;
-                    if (intvaL($endTime) > intval($beginTime)) {
+
+                    $bt = $beginTime;
+                    $et = strtotime($putVars['endTime']);
+                    if (intvaL($et) >= intval($bt)) {
                         $addDuration = $duration - 86400; //first day counts
                     }
 
