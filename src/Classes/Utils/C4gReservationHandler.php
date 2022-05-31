@@ -665,6 +665,7 @@ class C4gReservationHandler
                     case 'day':
                         $interval = $object->getTimeinterval() * 86400;
                         $durationInterval = $object->getDuration() ? $object->getDuration() * 86400 : $interval;
+
                         break;
                     case 'week':
                         $interval = $object->getTimeinterval() * 604800;
@@ -733,6 +734,10 @@ class C4gReservationHandler
                                                 $checkTime = $time;
                                                 if ($typeObject['bookRunning']) {
                                                     $checkTime = $endTime;
+                                                }
+
+                                                if (intvaL($time_end) > intval($time_begin)) {
+                                                    $durationInterval = $durationInterval - 86400; //first day counts
                                                 }
 
                                                 $mergedTime = 0;

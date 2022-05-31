@@ -1695,16 +1695,21 @@ class C4gReservationController extends C4GBaseController
             }
 
             if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week') || ($endTime >= 86400)) {
-                if (($endTime >= 86400)) {
+                if (($duration < 86400) && ($endTime >= 86400)) {
                     $nextDay = strtotime($beginDate) + 86400;
                     $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                 } else {
-                    $nextDay = strtotime($beginDate) + $duration;
+                    $addDuration = $duration;
+                    if (intvaL($endTime) > intval($beginTime)) {
+                        $addDuration = $duration - 86400; //first day counts
+                    }
+
+                    $nextDay = strtotime($beginDate) + $addDuration;
                     $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
 
                     $wd = date("w", strtotime($beginDate));
                     $endTime = C4gReservationHandler::getEndTimeForMultipleDays($reservationObject, $wd);
-                    $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'],intvaL($endTime)) : intval($beginTime);
+                    $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], intvaL($endTime)) : intval($beginTime);
                 }
             }
 
@@ -2051,7 +2056,7 @@ class C4gReservationController extends C4GBaseController
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
 
             $langCookie = $this->session->getSessionValue('reservationLangCookie');
-            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true, $langCookie);;
+            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true, $langCookie);
         }
 
         foreach ($times as $key=>$values) {
