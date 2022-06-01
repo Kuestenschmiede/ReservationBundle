@@ -162,8 +162,8 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_address'] = 'Enter your address 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_postal'] = 'Enter a postal code here.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_city'] = 'Enter city or town here.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_comment'] = 'Here you can optionally leave a message for us.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] = 'Detailed information on the handling of user data can be found in our ';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] = 'privacy policy.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] = 'Detailed information on the handling of user data can be found in our';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] = 'privacy policy';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'] = 'Detailed information on the handling of user data can be found in our privacy policy.';
 
 /** BUTTONS */

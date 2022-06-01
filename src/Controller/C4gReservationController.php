@@ -1210,7 +1210,7 @@ class C4gReservationController extends C4GBaseController
 
         if ($this->reservationSettings->privacy_policy_site) {
             $href = \Contao\Controller::replaceInsertTags('{{link_url::' . $this->reservationSettings->privacy_policy_site . '}}');
-            $desc = '<span class="c4g_field_description_text">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . '</span> <a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>';
+            $desc = '<span class="c4g_field_description_text">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . ' </span>&nbsp;<a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>.';
         } else {
             $desc = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'];
         }
