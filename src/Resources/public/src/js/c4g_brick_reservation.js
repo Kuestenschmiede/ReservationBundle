@@ -81,88 +81,78 @@ function setObjectId(object, typeid, showDateTime = 0) {
             values = objects ? objects : values
         }
     }
-    hideOptions(reservationObjects, typeId, values, showDateTime);
+    hideOptions(typeId, values, showDateTime);
+
     return true;
 }
 
-function hideOptions(reservationObjects, typeId, values, showDateTime) {
-    if (reservationObjects) {
-        if (typeId == -1) {
-            var typeField = document.getElementById("c4g_reservation_type");
-            typeId = typeField ? typeField.value : -1;
-        }
-        var selectField = document.getElementById("c4g_reservation_object_"+typeId);
-        var first = -1;
-        var firstValueParam = 0;
-        if (selectField && Array.isArray(selectField.options)) {
-            var distance = 0;
+function hideOptions(typeId, values, showDateTime) {
+    if (typeId == -1) {
+        var typeField = document.getElementById("c4g_reservation_type");
+        typeId = typeField ? typeField.value : -1;
+    }
 
-            for (i = 0; i < selectField.options.length; i++) {
-                var option = selectField.options[i];
-                var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 1;
-                var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
-                var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);
-                var capacity = desiredCapacity ? desiredCapacity.value : 0;
-                var actMinDistance = capacity - min;
-                var actMaxDistance = max - capacity;
-                var actDistance = (actMinDistance > actMaxDistance) ? actMinDistance : actMaxDistance;
+    var selectField = document.getElementById("c4g_reservation_object_"+typeId);
+    var first = -1;
+    var firstValueParam = 0;
+    if (selectField) {
+        var distance = 0;
 
-                //not in values
-                var foundValue = false;
-                if (jQuery.isArray(values)) {
-                    if (min && capacity && (capacity > 0) && (capacity >= min) && (capacity <= max)) {
-                        for (j = 0; j < values.length; j++) {
-                            if (values[j] == option.value) {
-                                if (!distance || (distance == 0) || (actDistance && (actDistance > 0) && (distance > actDistance))) {
-                                    distance = actDistance ? actDistance : distance;
-                                    firstValueParam = values[j];
-                                    foundValue = true;
-                                }
-                            }
-                        }
-                    } else {
-                        for (j = 0; j < values.length; j++) {
-                            if (values[j] == option.value) {
-                                if (j == 0) {
-                                    firstValueParam = values[j];
-                                }
+        for (i = 0; i < selectField.options.length; i++) {
+            var option = selectField.options[i];
+            var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 1;
+            var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
+            var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);
+            var capacity = desiredCapacity ? desiredCapacity.value : 0;
+            var actMinDistance = capacity - min;
+            var actMaxDistance = max - capacity;
+            var actDistance = (actMinDistance > actMaxDistance) ? actMinDistance : actMaxDistance;
+
+            //not in values
+            var foundValue = false;
+            if (jQuery.isArray(values)) {
+                if (min && capacity && (capacity > 0) && (capacity >= min) && (capacity <= max)) {
+                    for (j = 0; j < values.length; j++) {
+                        if (values[j] == option.value) {
+                            if (!distance || (distance == 0) || (actDistance && (actDistance > 0) && (distance > actDistance))) {
+                                distance = actDistance ? actDistance : distance;
+                                firstValueParam = values[j];
                                 foundValue = true;
-                                break;
                             }
                         }
                     }
-                } else if (parseInt(values) >= 0) {
-                    if (values == option.value) {
-                        firstValueParam = values;
-                        foundValue = true;
+                } else {
+                    for (j = 0; j < values.length; j++) {
+                        if (values[j] == option.value) {
+                            if (j == 0) {
+                                firstValueParam = values[j];
+                            }
+                            foundValue = true;
+                            break;
+                        }
                     }
                 }
+            } else if (parseInt(values) >= 0) {
+                if (values == option.value) {
+                    firstValueParam = values;
+                    foundValue = true;
+                }
+            }
 
-                if (!foundValue && (option.value != -1)) {
-                    jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
-                    jQuery(selectField).children('option[value="'+option.value+'"]').attr('hidden','hidden');
-                } else if (option.value != -1) {
-                    jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
-                    jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
-                    if (min && capacity && (capacity > 0)) {
-                        if ((capacity < min) || (max && (capacity > max))) {
-                            jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
-                            jQuery(selectField).children('option[value="'+option.value+'"]').attr('hidden','hidden');
-                        } else {
-                            jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
-                            jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
-
-                            if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
-                                first = firstValueParam;
-                            } else {
-                                if ((first == -1) && (option.value != -1)) {
-                                    first = option.value;
-                                }
-                            }
-                        }
+            if (!foundValue && (option.value != -1)) {
+                jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
+                jQuery(selectField).children('option[value="'+option.value+'"]').attr('hidden','hidden');
+            } else if (option.value != -1) {
+                jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
+                if (min && capacity && (capacity > 0)) {
+                    if ((capacity < min) || (max && (capacity > max))) {
+                        jQuery(selectField).children('option[value="'+option.value+'"]').attr('disabled','disabled');
+                        jQuery(selectField).children('option[value="'+option.value+'"]').attr('hidden','hidden');
                     } else {
                         jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
                         jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
+
                         if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
                             first = firstValueParam;
                         } else {
@@ -171,67 +161,77 @@ function hideOptions(reservationObjects, typeId, values, showDateTime) {
                             }
                         }
                     }
-                }
-
-                if (showDateTime && (option.value != -1) && foundValue) {
-                    var text = jQuery(selectField).children('option[value="'+option.value+'"]').text();
-                    var date = '';
-                    var time = '';
-
-                    var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+typeId); //ToDo +'-'+option.value
-                    if (dateFields) {
-                        for (k = 0; k < dateFields.length; k++) {
-                            var dateField = dateFields[k];
-                            if (dateField && dateField.value) {
-                                date = dateField.value;
-                                break;
-                            }
+                } else {
+                    jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('disabled');
+                    jQuery(selectField).children('option[value="'+option.value+'"]').removeAttr('hidden');
+                    if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
+                        first = firstValueParam;
+                    } else {
+                        if ((first == -1) && (option.value != -1)) {
+                            first = option.value;
                         }
-                    }
-
-                    var radioButton = jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
-                    if (radioButton) {
-                        for (k = 0; k < radioButton.length; k++) {
-                            var button = radioButton[k];
-                            if (button) {
-                                var label = jQuery('label[for="'+ jQuery(button).attr('id') +'"]');
-                                time = label ? label[0].firstChild.nodeValue : '';
-                                break;
-                            }
-                        }
-                    }
-
-                    if (text && (date != '') && (time != '')) {
-                        var pos = text.lastIndexOf('\u00A0(');
-                        if (pos != -1) {
-                            text = text.substr(0, pos);
-                        }
-
-                        jQuery(selectField).children('option[value="'+option.value+'"]').text(
-                            text + '\u00A0('+date+'\u00A0'+time+')'
-                        );
                     }
                 }
             }
 
-            if (!jQuery(selectField).is(":disabled") && jQuery(selectField).val() && (jQuery(selectField).val() >= 0)) {
-                first = jQuery(selectField).val();
-            }
+            if (showDateTime && (option.value != -1) && foundValue) {
+                var text = jQuery(selectField).children('option[value="'+option.value+'"]').text();
+                var date = '';
+                var time = '';
 
-            if (parseInt(first) >= 0) {
-                jQuery(selectField).val(first).change();
-                jQuery(selectField).children('option[value="'+first+'"]').removeAttr('disabled');
-                jQuery(selectField).children('option[value="'+first+'"]').removeAttr('hidden');
-                jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
-                jQuery(selectField).children('option[value="-1"]').attr('hidden','hidden');
+                var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+typeId); //ToDo +'-'+option.value
+                if (dateFields) {
+                    for (k = 0; k < dateFields.length; k++) {
+                        var dateField = dateFields[k];
+                        if (dateField && dateField.value) {
+                            date = dateField.value;
+                            break;
+                        }
+                    }
+                }
 
-                jQuery(selectField).removeAttr('disabled');
-            } else {
-                jQuery(selectField).children('option[value="-1"]').removeAttr('disabled');
-                jQuery(selectField).children('option[value="-1"]').removeAttr('hidden');
-                jQuery(selectField).val("-1").change();
-                jQuery(selectField).prop("disabled", true);
+                var radioButton = jQuery('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
+                if (radioButton) {
+                    for (k = 0; k < radioButton.length; k++) {
+                        var button = radioButton[k];
+                        if (button) {
+                            var label = jQuery('label[for="'+ jQuery(button).attr('id') +'"]');
+                            time = label ? label[0].firstChild.nodeValue : '';
+                            break;
+                        }
+                    }
+                }
+
+                if (text && (date != '') && (time != '')) {
+                    var pos = text.lastIndexOf('\u00A0(');
+                    if (pos != -1) {
+                        text = text.substr(0, pos);
+                    }
+
+                    jQuery(selectField).children('option[value="'+option.value+'"]').text(
+                        text + '\u00A0('+date+'\u00A0'+time+')'
+                    );
+                }
             }
+        }
+
+        if (!jQuery(selectField).is(":disabled") && jQuery(selectField).val() && (jQuery(selectField).val() >= 0)) {
+            first = jQuery(selectField).val();
+        }
+
+        if (parseInt(first) >= 0) {
+            jQuery(selectField).val(first).change();
+            jQuery(selectField).children('option[value="'+first+'"]').removeAttr('disabled');
+            jQuery(selectField).children('option[value="'+first+'"]').removeAttr('hidden');
+            jQuery(selectField).children('option[value="-1"]').attr('disabled','disabled');
+            jQuery(selectField).children('option[value="-1"]').attr('hidden','hidden');
+
+            jQuery(selectField).removeAttr('disabled');
+        } else {
+            jQuery(selectField).children('option[value="-1"]').removeAttr('disabled');
+            jQuery(selectField).children('option[value="-1"]').removeAttr('hidden');
+            jQuery(selectField).val("-1").change();
+            jQuery(selectField).prop("disabled", true);
         }
     }
 
@@ -521,7 +521,9 @@ function setTimeset(dateField, additionalId, showDateTime) {
             .then(response => response.json())
             .then((data) => {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
+                //parentElement = c4g__form-radio-group_wrapper
                 var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g__form-radio-group") : document.querySelectorAll(".reservation_time_button .c4g__form-radio-group");
+
                 var timeList = [];
                 var intervalList = [];
                 var objectList = [];
@@ -573,16 +575,19 @@ function setTimeset(dateField, additionalId, showDateTime) {
 
                 if (radioGroups) {
                     for (i = 0; i < radioGroups.length; i++) {
-                        for (j = 0; j < radioGroups[i].children.length; j++) {
-                            if (radioGroups[i].children[j].style && radioGroups[i].children[j].style == "display:none") {
+                        var formRadioGroup = radioGroups[i];
+                        for (j = 0; j < formRadioGroup.children.length; j++) {
+                            var formCheck = formRadioGroup.children[j];
+                            if (formCheck.style && formCheck.style == "display:none") {
                                 continue;
                             }
 
-                            for (k = 0; k < radioGroups[i].children[j].children.length; k++) {
-                                var value = jQuery(radioGroups[i].children[j].children[k]).val();
+                            for (k = 0; k < formCheck.children.length; k++) {
+                                var formCheckInput = formCheck.children[k];
+                                var value = jQuery(formCheckInput).val();
 
                                 if (value) {
-                                    namefield = radioGroups[i].children[j].children[k].getAttribute('name').substr(1);
+                                    namefield = formCheckInput.getAttribute('name').substr(1);
                                     var arrindex = checkTimelist(value, timeList);
 
                                     var activateTimeButton = -1
@@ -651,20 +656,20 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                             }
                                         }
 
-                                        //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_" + objstr);
-                                        jQuery(radioGroups[i].children[j].children[k]).attr('data-object', objstr);
-                                        jQuery(radioGroups[i].children[j].children[k]).attr('disabled', false);
-                                        jQuery(radioGroups[i].children[j].children[k]).attr('hidden', false);
+                                        //jQuery(formCheckInput).removeClass().addClass("radio_object_" + objstr);
+                                        jQuery(formCheckInput).attr('data-object', objstr);
+                                        jQuery(formCheckInput).attr('disabled', false);
+                                        jQuery(formCheckInput).attr('hidden', false);
 
                                         if (nameList[arrindex]) {
-                                            var id = jQuery(radioGroups[i].children[j].children[k]).attr('id');
+                                            var id = jQuery(formCheckInput).attr('id');
                                             if (id) {
                                                 jQuery('label[for="'+id+'"]').text(nameList[arrindex]);
                                             }
                                         }
 
                                         if (percent > 0) {
-                                            jQuery(radioGroups[i].children[j].children[k]).addClass("radio_object_hurry_up");
+                                            jQuery(formCheckInput).addClass("radio_object_hurry_up");
                                         }
 
                                         if (!val || (val == -1)) {
@@ -672,8 +677,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                         }
 
                                         if (!objectId) {
-                                            var reservationObjects = document.getElementsByClassName("displayReservationObjects");
-                                            hideOptions(reservationObjects,additionalId, objstr, showDateTime);
+                                            hideOptions(additionalId, objstr, showDateTime);
                                         } else if (objCaptions && objCaptions[objectId]) {
                                             var objField = document.getElementById("c4g_reservation_object_"+additionalId);
                                             if (objField && jQuery(objField).length) {
@@ -681,9 +685,9 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                             }
                                         }
                                     } else {
-                                        //jQuery(radioGroups[i].children[j].children[k]).removeClass().addClass("radio_object_disabled");
-                                        jQuery(radioGroups[i].children[j].children[k]).attr('disabled', true);
-                                        jQuery(radioGroups[i].children[j].children[k]).attr('hidden', true);
+                                        //jQuery(formCheckInput).removeClass().addClass("radio_object_disabled");
+                                        jQuery(formCheckInput).attr('disabled', true);
+                                        jQuery(formCheckInput).attr('hidden', true);
                                     }
                                 }
                             }
@@ -814,14 +818,14 @@ function checkEventFields() {
         }
     } else {
         var dateFields = jQuery('.begindate-event');
-        if (dateFields && Array.isArray(dateFields)) {
+        if (dateFields && jQuery.isArray(dateFields)) {
             for (i = 0; i < dateFields.length; i++) {
                 jQuery(dateFields[i]).hide();
             }
         }
 
         var timeFields = jQuery('.reservation_time_event_button');
-        if (timeFields && Array.isArray(timeFields)) {
+        if (timeFields && jQuery.isArray(timeFields)) {
             for (i = 0; i < timeFields.length; i++) {
                 jQuery(timeFields[i]).hide();
             }
