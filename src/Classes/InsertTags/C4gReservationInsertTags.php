@@ -318,15 +318,20 @@ class C4gReservationInsertTags
                             break;
                         case 'included_raw':
                             $ids = [];
-                            if ($isEvent) {
-                               $ids = $reservationObject->reservationType;
-                            } else if ($reservationObject->viewableTypes) {
-                                $idArr = StringUtil::deserialize($reservationObject->viewableTypes);
-                                $ids = explode(',',$idArr);
+
+                            foreach ($reservationObject as $object) {
+                                if ($isEvent) {
+                                    $ids[] = $reservationObject->reservationType;
+                                } else if ($reservationObject->viewableTypes) {
+                                    $idArr = StringUtil::deserialize($reservationObject->viewableTypes);
+                                    $ids = array_merge($ids, $idArr);
+                                }
                             }
+
+                            $ids = explode(',',$ids);
+
                             $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE `id` IN (?)')
                                 ->execute($ids)->fetchAssoc();
-
                             $params = $includedParams && $includedParams['included_params'] ? \Contao\StringUtil::deserialize($includedParams['included_params']) : [];
                             $includedParamsArr = [];
                             foreach ($params as $param) {
@@ -339,12 +344,17 @@ class C4gReservationInsertTags
                             return serialize($includedParamsArr);
                         case 'additional_raw':
                             $ids = [];
-                            if ($isEvent) {
-                                $ids = $reservationObject->reservationType;
-                            } else if ($reservationObject->viewableTypes) {
-                                $idArr = StringUtil::deserialize($reservationObject->viewableTypes);
-                                $ids = explode(',',$idArr);
+                            foreach ($reservationObject as $object) {
+                                if ($isEvent) {
+                                    $ids[] = $reservationObject->reservationType;
+                                } else if ($reservationObject->viewableTypes) {
+                                    $idArr = StringUtil::deserialize($reservationObject->viewableTypes);
+                                    $ids = array_merge($ids, $idArr);
+                                }
                             }
+
+                            $ids = explode(',',$ids);
+
                             $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE `id` IN (?)')
                                 ->execute($ids)->fetchAssoc();
                             $params = $additionalParams ? \Contao\StringUtil::deserialize($additionalParams['additional_params']) : [];
