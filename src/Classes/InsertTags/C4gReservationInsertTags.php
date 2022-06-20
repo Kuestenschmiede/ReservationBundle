@@ -515,7 +515,7 @@ class C4gReservationInsertTags
                                 }
                             }
 
-                            break;
+                            return '';
                         case 'lon':
                             return $calendarEvent->loc_geox;
                         case 'lat':
