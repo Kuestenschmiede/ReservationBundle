@@ -67,4 +67,18 @@ class C4gReservationModel extends Model
 
         return ArrayHelper::arrayToObject($result);
     }
+
+    public static function getSpecialListItemsByGroup($groupId, $database, $listParams, $brickDatabase) {
+        $db = \Database::getInstance();
+        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(CURRENT_DATE()) AND `specialNotification` = '1'");
+        $dbResult = $stmt->execute($groupId);
+        $dbResult = $dbResult->fetchAllAssoc();
+
+        $result = [];
+        foreach ($dbResult as $dbResultItem) {
+            $result[$dbResultItem['id']] = $dbResultItem;
+        }
+
+        return ArrayHelper::arrayToObject($result);
+    }
 }
