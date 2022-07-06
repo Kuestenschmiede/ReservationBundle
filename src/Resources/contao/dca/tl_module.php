@@ -165,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['printTpl'] = array
     {
         return Controller::getTemplateGroup('pdf_');
     },
-    'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'w50'),
+    'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'long clr'),
     'sql'                     => "varchar(64) NOT NULL default 'pdf_c4g_brick'"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['withMap'] = array

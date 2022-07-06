@@ -174,9 +174,10 @@ $GLOBALS['TL_MODELS']['tl_c4g_reservation_event_speaker'] = \con4gis\Reservation
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_event_audience'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationEventAudienceModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_event_topic'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationEventTopicModel::class;
 
-$GLOBALS['TL_CRON']['daily'][] = [\con4gis\ReservationBundle\Classes\Cron\Cron::class, 'onDaily'];
+$GLOBALS['TL_CRON']['daily']['reservationOnDaily'] = [\con4gis\ReservationBundle\Classes\Cron\Cron::class, 'onDaily'];
 
-$GLOBALS['TL_CRON']['minutely'][] = [\con4gis\ReservationBundle\Classes\Cron\Cron::class, 'onMinutely'];
+//Can be overridden in the plugin bundle
+$GLOBALS['TL_CRON']['minutely']['reservationOnMinutely'] = [\con4gis\ReservationBundle\Classes\Cron\Cron::class, 'onMinutely'];
 
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_event';
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation';
