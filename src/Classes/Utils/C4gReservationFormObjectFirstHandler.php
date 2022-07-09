@@ -295,7 +295,8 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 }
             }
             if (!$this->initialValues->getDate() && $listType['directBooking']) {
-                $initialBookingDate = time();
+                $objDate = new Date(date($GLOBALS['TL_CONFIG']['dateFormat'],time()), Date::getFormatFromRgxp('date'));
+                $initialBookingDate = $objDate->tstamp;
             } else {
                 $initialBookingDate = false;
             }
@@ -356,16 +357,13 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $this->fieldList[] = $reservationBeginDateField;
 
             if (!$this->initialValues->getTime() && $listType['directBooking']) {
-                $objDate = time();//new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
-
-                //ToDo check valid initial time ???
-
+                $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
                 $initialBookingTime = $objDate->tstamp;
             } else {
                 $initialBookingTime = false;
             }
 
-            if ($initialBookingDate && $initialBookingTime && $objects) {
+            /*if ($initialBookingDate && $initialBookingTime && $objects) {
                 $reservationBeginTimeField = new C4GRadioGroupField();
                 $reservationBeginTimeField->setFieldName('beginTime');
                 $reservationBeginTimeField->setTitle($titleBeginTime);
@@ -389,7 +387,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $reservationBeginTimeField->setInitInvisible(true);
                 $reservationBeginTimeField->setWithoutScripts(true);
                 $this->fieldList[] = $reservationBeginTimeField;
-            } else if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute') || ($listType['periodType'] === 'day') || ($listType['periodType'] === 'week')) {
+            } else */if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute') || ($listType['periodType'] === 'day') || ($listType['periodType'] === 'week')) {
 
                 for ($i=0;$i<=6;$i++) {
                     if ($this->initialValues->getDate()) {
@@ -444,7 +442,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $reservationTimeField->setShowButtons(true);
                     $reservationTimeField->setRemoveWithEmptyCondition(true);
                     $reservationTimeField->setStyleClass('reservation_time_button reservation_time_button_' . $listType['id']);
-                    $reservationTimeField->setInitialValue($this->initialValues->getTime());
+                    $reservationTimeField->setInitialValue($initialBookingTime ?: $this->initialValues->getTime());
                     $reservationTimeField->setTimeButtonSpecial(true);
                     $reservationTimeField->setInitInvisible(true);
                     $reservationTimeField->setWithoutScripts(true);

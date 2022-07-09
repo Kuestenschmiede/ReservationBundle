@@ -1721,7 +1721,7 @@ class C4gReservationController extends C4GBaseController
             }
 
             if ($reservationType->directBooking) {
-                $objDate = time();//new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],$beginTime), Date::getFormatFromRgxp('time'));
+                $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],$beginTime), Date::getFormatFromRgxp('time'));
                 $directTime = $objDate->tstamp;
                 $putVars[$timeKey] = $directTime;
             }
