@@ -917,7 +917,7 @@ class C4gReservationHandler
             }
 
             if ($result && is_array($result) && (count($result) > 0)) {
-                return ArrayHelper::sortArrayByFields($result,['id' => SORT_ASC]);
+                return ArrayHelper::sortArrayByFields($result,['name' => SORT_ASC]);
             } else {
                 return [];
             }
