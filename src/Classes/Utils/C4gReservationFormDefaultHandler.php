@@ -121,7 +121,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         }
 
         if (!$this->initialValues->getTime() && $listType['directBooking']) {
-            $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
+            $objDate = time();//new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
 
             //ToDo check valid initial time ???
 

@@ -356,7 +356,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $this->fieldList[] = $reservationBeginDateField;
 
             if (!$this->initialValues->getTime() && $listType['directBooking']) {
-                $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
+                $objDate = time();//new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
 
                 //ToDo check valid initial time ???
 
