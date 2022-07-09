@@ -158,14 +158,15 @@ class C4gReservationListController extends C4GBaseController
 
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_SAVE_AND_NEW);
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
-        $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
 
         $this->listParams->setScrollX(false);
         $this->listParams->setResponsive(true);
 
         if ($this->viewType === 'publicview') {
+            $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
             $this->dialogParams->setSaveWithoutMessages(true);
         } else if (($this->viewType === 'member') || ($this->viewType === 'memberview')) {
+            $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
             $this->dialogParams->setSaveWithoutMessages(true);
 
             if ($this->cancellation_redirect_site) {
