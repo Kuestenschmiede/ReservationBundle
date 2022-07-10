@@ -1071,6 +1071,12 @@ class C4gReservationHandler
      */
     public static function getReservationNowTime($object, $withEndTimes=false, $showFreeSeats=false) {
         $t = 'tl_c4g_reservation';
+
+        if ($object && is_int($object)) {
+            $database = Database::getInstance();
+            $object = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id = ?")->execute($object)->fetchAssoc();
+        }
+
         $id = intval($object['id']);
 
         $time = time();
@@ -1133,11 +1139,13 @@ class C4gReservationHandler
                 }
             }
 
-
             $timeObj = ['id'=>$id,'act'=>$actPersons,'percent'=>$actPercent,'min'=>$min,'max'=>$max,'showSeats'=>$showFreeSeats];
 
             $endTime = 0;
-            return self::addTime([], time(), $timeObj, false, $endTime);
+
+            $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
+            $time = $objDate->tstamp;
+            return self::addTime([], $time, $timeObj, false, $endTime);
         } else {
             return [];
         }

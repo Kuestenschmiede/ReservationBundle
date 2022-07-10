@@ -363,7 +363,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $initialBookingTime = false;
             }
 
-            /*if ($initialBookingDate && $initialBookingTime && $objects) {
+            if ($initialBookingDate && $initialBookingTime && $objects) {
                 $reservationBeginTimeField = new C4GRadioGroupField();
                 $reservationBeginTimeField->setFieldName('beginTime');
                 $reservationBeginTimeField->setTitle($titleBeginTime);
@@ -387,7 +387,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $reservationBeginTimeField->setInitInvisible(true);
                 $reservationBeginTimeField->setWithoutScripts(true);
                 $this->fieldList[] = $reservationBeginTimeField;
-            } else */if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute') || ($listType['periodType'] === 'day') || ($listType['periodType'] === 'week')) {
+            } else if (($listType['periodType'] === 'hour') || ($listType['periodType'] === 'minute') || ($listType['periodType'] === 'day') || ($listType['periodType'] === 'week')) {
 
                 for ($i=0;$i<=6;$i++) {
                     if ($this->initialValues->getDate()) {
