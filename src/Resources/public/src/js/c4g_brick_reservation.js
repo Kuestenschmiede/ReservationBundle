@@ -392,6 +392,20 @@ function checkTimelist(value, timeList) {
                     if (hits == 3) {
                         break;
                     }
+                } else if (timeset[0] && valueset[1]) { //direct booking
+                    let beginTime = parseInt(timeset[0]);
+
+                    let beginValue = parseInt(valueset[0]);
+                    let endValue = beginValue + parseInt(valueset[1]);
+
+                    if ((beginValue <= beginTime) && (endValue >= beginTime)) {
+                        arrIndex = idx;
+                        hits++;
+                    }
+
+                    if (hits == 3) {
+                        break;
+                    }
                 }
             } else if (hits == 1) {
                 break;

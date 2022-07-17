@@ -203,7 +203,7 @@ class C4gReservationHandler
                 $end   = time()+($maxDate*86400);
 
                 $i = $begin;
-                $nxtDays = 0;
+                $nextDays = 0;
                 while ($i <= $end) {
                     $weekday = date('w', $i);
                     $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $i);
