@@ -470,6 +470,8 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
 
         if (count($includedParamsArr) > 0) {
             $includedParams = new C4GMultiCheckboxField();
+            $includedParams->setModernStyle(false);
+            $includedParams->setAllChecked(true);
             $includedParams->setFieldName('included_params');
             $includedParams->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['included_params']);
             $includedParams->setFormField(true);
