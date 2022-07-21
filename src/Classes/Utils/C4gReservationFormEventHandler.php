@@ -411,9 +411,9 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         if ($includedParams) {
             foreach ($includedParams as $paramId) {
                 $includedParam = C4gReservationParamsModel::findByPk($paramId);
-                if ($includedParam && $includedParam->caption && ($includedParam->price && $reservationSettings->showPrices)) {
+                if ($includedParam && $includedParam->caption && $includedParam->published && ($includedParam->price && $reservationSettings->showPrices)) {
                     $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption . "<span class='price'>&nbsp;(+" . number_format($includedParam->price, 2, $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'], $GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']) . " ".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'].")</span>"];
-                } else if ($includedParam && $includedParam->caption) {
+                } else if ($includedParam && $includedParam->caption && $includedParam->published) {
                     $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption];
                 }
             }
@@ -446,9 +446,9 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             foreach ($params as $paramId) {
                 if ($paramId) {
                     $additionalParam = C4gReservationParamsModel::findByPk($paramId);
-                    if ($additionalParam && $additionalParam->caption && ($additionalParam->price && $reservationSettings->showPrices)) {
+                    if ($additionalParam && $additionalParam->caption && $additionalParam->published && ($additionalParam->price && $reservationSettings->showPrices)) {
                         $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption . "<span class='price'>&nbsp;(+" . number_format($additionalParam->price, 2, $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'], $GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']) . " ".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'].")</span>"];
-                    } else if ($additionalParam && $additionalParam->caption) {
+                    } else if ($additionalParam && $additionalParam->caption && $additionalParam->published) {
                         $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
                     }
                 }
