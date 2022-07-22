@@ -84,10 +84,10 @@ class C4gReservationModel extends Model
         if ($types) {
             $inTypes = C4GUtils::buildInString($types);
 
-            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(CURRENT_DATE()) AND `specialNotification` = '1' AND `reservation_type` $inTypes");
+            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY)) AND (`specialNotification` = '1' OR (`reservation_type` $inTypes))");
             $dbResult = $stmt->execute($groupId, ...$types);
         } else {
-            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(CURRENT_DATE()) AND `specialNotification` = '1'");
+            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY)) AND `specialNotification` = '1'");
             $dbResult = $stmt->execute($groupId);
         }
 
