@@ -124,7 +124,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipant'] = 'Remove partici
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage'] = 'Really remove participant';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params'] = 'Participant services';
 
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['emptyOptionLabel'] = 'Please select';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['emptyOptionLabel'] = '- Please select -';
 
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'reservation form';
