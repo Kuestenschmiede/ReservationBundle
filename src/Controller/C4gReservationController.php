@@ -1058,7 +1058,8 @@ class C4gReservationController extends C4GBaseController
                         if (count($participantParamsArr) > 0) {
                             if ($listType['participantParamsFieldType'] == 'radio') {
                                 $participantParamField = new C4GRadioGroupField();
-                                $additionalParams->setInitialValue($participantParamsArr[0]['id']);
+                                $participantParamField->setInitialValue($participantParamsArr[0]['id']);
+                                $participantParamField->setSaveAsArray(true);
                             } else {
                                 $participantParamField = new C4GMultiCheckboxField();
                                 $participantParamField->setModernStyle(false);

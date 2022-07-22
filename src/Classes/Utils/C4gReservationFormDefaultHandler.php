@@ -507,6 +507,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             if ($listType['additionalParamsFieldType'] == 'radio') {
                 $additionalParams = new C4GRadioGroupField();
                 $additionalParams->setInitialValue($additionalParamsArr[0]['id']);
+                $additionalParams->setSaveAsArray(true);
             } else {
                 $additionalParams = new C4GMultiCheckboxField();
                 $additionalParams->setModernStyle(false);
