@@ -447,11 +447,21 @@ class C4gReservationController extends C4GBaseController
             $reservationTypeField->setInitialCallOnChange(true);
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
-            $reservationTypeField->setEditable(count($typelist) > 1);
             $reservationTypeField->setNotificationField(true);
             $reservationTypeField->setWithOptionType(true);
             $reservationTypeField->setHidden((count($typelist) == 1) && $this->reservationSettings->typeHide);
             //$reservationTypeField->setInitialCallOnChange(true);
+
+            if ($this->reservationSettings->typeWithEmptyOption) {
+                $reservationTypeField->setEditable(count($typelist) > 0);
+                $reservationTypeField->setInitialValue(-1);
+                $reservationTypeField->setWithEmptyOption(true);
+                $reservationTypeField->setEmptyOptionLabel($GLOBALS['TL_LANG']['fe_c4g_reservation']['emptyOptionLabel']);
+            } else {
+                $reservationTypeField->setEditable(count($typelist) > 1);
+                $reservationTypeField->setInitialValue($firstType);
+            }
+
             $fieldList[] = $reservationTypeField;
         } else {
             $info = new C4GInfoTextField();

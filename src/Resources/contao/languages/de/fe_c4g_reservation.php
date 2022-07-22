@@ -128,6 +128,8 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params'] = 'Optionen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pleaseSelect'] = 'Bitte auswählen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText'] = 'Keine Zeiten verfügbar.';
 
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['emptyOptionLabel'] = 'Bitte auswählen';
+
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'Reservierungsformular';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['person_data'] = 'Ihre Daten';

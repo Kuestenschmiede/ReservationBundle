@@ -45,6 +45,8 @@ $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text leere Objektliste","
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Teilnehmermechanismus (optional)","Ist dieser Mechanismus aktiviert, dann werden Teilnehmerfelder (Titel, Name, Vorname, E-Mail, ggf. Leistungen) anhand der Personenzahl generiert. Wichtig! Das Teilnehmer-Feld muss dafür ins Formular gebracht werden. Außerdem sollten Sie die maximale Teilnehmerzahl an der Art aufgrund der Ladezeiten stark eingrenzen (max. 8 Personen).");
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Postleitzahlen einschränken","Hierüber können Sie ermöglichen, dass Reservierungen nur über bestimmte Postleitzahlen möglich sind (kommagetrennte Liste).");
 
+$GLOBALS['TL_LANG'][$str]['typeWithEmptyOption'] = array('Reservierungsart Auswahl treffen', 'Wenn dieser Schalter gesetzt ist, wird die Reservierungsart nicht vorbelegt und muss ausgewählt werden.');
+
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][1] = 'Zeitauswahl';
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][2] = 'Contao Events';
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][3] = 'Objektauswahl';
