@@ -123,7 +123,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'inputType'         => 'select',
             'exclude'           => true,
             'options_callback'  => array('tl_c4g_reservation_object', 'loadMemberOptions'),
-            'eval'              => array('mandatory'=>false, 'disabled' => true, 'tl_class' => 'clr long'),
+            'eval'              => array('mandatory'=>false, 'disabled' => true, 'tl_class' => 'clr long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['noMember']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),

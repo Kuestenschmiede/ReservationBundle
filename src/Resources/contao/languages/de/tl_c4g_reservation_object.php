@@ -85,6 +85,8 @@ $GLOBALS['TL_LANG'][$str]['references']['pReservation'] = array("Preis pro Reser
 $GLOBALS['TL_LANG'][$str]['references']['pPerson'] = array("Preis pro Person");
 $GLOBALS['TL_LANG'][$str]['references']['pAmount'] = array("Sicherheitsbetrag (Pfand)");
 
+$GLOBALS['TL_LANG'][$str]['noMember'] = 'kein Mitglied zugeordnet';
+
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['type_legend'] = "Reservierungsobjekte";
 $GLOBALS['TL_LANG'][$str]['md_legend'] = "Mehrtägig";

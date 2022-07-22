@@ -85,6 +85,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['yes'] = 'ja';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['participants'] = 'Teilnehmer';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmationEmail'] = 'Bestätigung versenden';
 
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['noMember'] = 'kein Mitglied zugeordnet';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['noGroup'] = 'keine Gruppe zugeordnet';
+
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend'] = "Reservierungsdaten";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['person_legend']      = "Kontaktdaten";
