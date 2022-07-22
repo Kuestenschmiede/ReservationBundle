@@ -11,6 +11,7 @@
 namespace con4gis\ReservationBundle\Classes\Models;
 
 
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use Contao\Model;
 
@@ -68,10 +69,28 @@ class C4gReservationModel extends Model
         return ArrayHelper::arrayToObject($result);
     }
 
-    public static function getSpecialListItemsByGroup($groupId, $database, $listParams, $brickDatabase) {
+    /**
+     * @param $groupId
+     * @param $database
+     * @param $listParams
+     * @param $brickDatabase
+     * @return bool|\stdClass
+     *
+     * get special notifcations and special types
+     */
+    public static function getAddressListItemsByGroup($groupId, $database, $listParams, $brickDatabase) {
+        $types = $listParams->getModelListParams();
         $db = \Database::getInstance();
-        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(CURRENT_DATE()) AND `specialNotification` = '1'");
-        $dbResult = $stmt->execute($groupId);
+        if ($types) {
+            $inTypes = C4GUtils::buildInString($types);
+
+            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(CURRENT_DATE()) AND `specialNotification` = '1' AND `reservation_type` $inTypes");
+            $dbResult = $stmt->execute($groupId, ...$types);
+        } else {
+            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(CURRENT_DATE()) AND `specialNotification` = '1'");
+            $dbResult = $stmt->execute($groupId);
+        }
+
         $dbResult = $dbResult->fetchAllAssoc();
 
         $result = [];

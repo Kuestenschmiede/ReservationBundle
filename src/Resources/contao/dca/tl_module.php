@@ -14,6 +14,7 @@
  */
 //ToDo showFreeSeats, additionalDuration
 use con4gis\ProjectsBundle\Classes\Lists\C4GBrickRenderMode;
+use con4gis\ReservationBundle\Controller\C4gReservationAddressListController;
 use con4gis\ReservationBundle\Controller\C4gReservationCancellationController;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
 use con4gis\ReservationBundle\Controller\C4gReservationListController;
@@ -33,6 +34,8 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController:
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationLocationListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,withMap;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationObjectsController::TYPE]  = '{title_legend},name,headline,type;{reservation_objects_legend}, reservation_object_types, login_redirect_site, postals, reservation_add_member_location;';
+
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationAddressListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservation_object_types, printTpl';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_object_types'] = [
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_object_types'],

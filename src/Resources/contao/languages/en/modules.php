@@ -15,6 +15,7 @@ use con4gis\ReservationBundle\Controller\C4gReservationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationLocationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationObjectsController;
 use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
+use con4gis\ReservationBundle\Controller\C4gReservationAddressListController;
 
 $GLOBALS['TL_LANG']['MOD']['Reservation'] = array('con4gis Reservation', 'www.con4gis.org');
 $GLOBALS['TL_LANG']['MOD']['C4gReservation'] = array('Reservations', 'What times have already been reserved?');
@@ -34,3 +35,4 @@ $GLOBALS['TL_LANG']['FMD'][C4gReservationCancellationController::TYPE] = array('
 $GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE]  = array('con4gis-Reservation: Speaker', 'Speaker');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationLocationListController::TYPE]  = array('con4gis-Reservation: Location', 'Location');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationObjectsController::TYPE]  = array('con4gis-Reservation: Object maintenance', 'Members can maintain their own objects. E.g. for a rental system.');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationAddressListController::TYPE] = array('con4gis-Reservation: address list', 'Address list e.g. for label printing (special notifications and reservation types).');
