@@ -144,6 +144,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'Es ist ein Fehler auftrete
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte Seite neu laden.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte die Seite neu laden und erneut versuchen.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['wrong_postal'] = 'Mit Ihrer Postleitzahl kann keine Reservierung durchgeführt werden.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte die Seite neu laden und erneut versuchen.';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'] = " pro Minute";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pHour'] = " pro Stunde";

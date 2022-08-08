@@ -1687,7 +1687,7 @@ class C4gReservationController extends C4GBaseController
             $endTime = $beginTime + intval($duration);
             $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$endTime);
 
-            if ($reservationType->reservationObjectType === '3') {
+            if ($reservationType->reservationObjectType === '3' && $timeKey) {
                 $putVars['endDate'] = $putVars['beginDate_'.$type.'-33'.$objectId];
                 $bday = $putVars['beginDate_'.$type.'-33'.$objectId];
                 $nextDay = strtotime("+1 day", strtotime($bday));
@@ -1698,7 +1698,7 @@ class C4gReservationController extends C4GBaseController
                 } else {
                     $putVars[$timeKey] = $beginTime;
                 }
-            } else {
+            } else if ($timeKey) {
                 $putVars['endDate'] = $putVars['beginDate_'.$type];
                 $bday = $putVars['beginDate_'.$type];
                 $nextDay = strtotime("+1 day", strtotime($bday));
@@ -1738,10 +1738,14 @@ class C4gReservationController extends C4GBaseController
                 }
             }
 
-            if ($reservationType->directBooking) {
+            if ($reservationType->directBooking && $timeKey) {
                 $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],$beginTime), Date::getFormatFromRgxp('time'));
                 $directTime = $objDate->tstamp;
                 $putVars[$timeKey] = $directTime;
+            }
+
+            if (!$timeKey) {
+                return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_BEGINTIME_ERROR']];
             }
 
             //just notification
