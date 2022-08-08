@@ -471,6 +471,15 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $reservationEndTimeDBField->setNotificationField(true);
         $this->fieldList[] = $reservationEndTimeDBField;
 
+        //price for notification
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('price');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
         $includedParams = $listType['includedParams'];
         $includedParamsArr = [];
 

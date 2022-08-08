@@ -1599,6 +1599,12 @@ class C4gReservationController extends C4GBaseController
             $putVars['beginTime'] = $beginTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime) : $beginTime;
             $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate']; //ToDO Check
             $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
+
+            //just notification
+            if ($reservationEventObject->price) {
+                $price = number_format(floatval($reservationEventObject->price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
+                $putVars['price'] = $price;
+            }
        } else {
             $putVars['reservationObjectType'] = $reservationType->reservationObjectType;
             $objectId = $reservationObject ? $reservationObject->id : 0;
@@ -1736,6 +1742,12 @@ class C4gReservationController extends C4GBaseController
                 $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],$beginTime), Date::getFormatFromRgxp('time'));
                 $directTime = $objDate->tstamp;
                 $putVars[$timeKey] = $directTime;
+            }
+
+            //just notification
+            if ($reservationObject->price) {
+                $price = number_format(floatval($reservationObject->price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
+                $putVars['price'] = $price;
             }
         }
 
