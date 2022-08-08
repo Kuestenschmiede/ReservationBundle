@@ -419,6 +419,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $reservationTimeField->setFieldName('beginTime');
                     $reservationTimeField->setTitle($titleBeginTime);
                     $reservationTimeField->setFormField(true);
+                    $reservationTimeField->setDatabaseField(true);
                     $reservationTimeField->setOptions(
                         C4gReservationHandler::getReservationTimes(
                             [$reservationObject],

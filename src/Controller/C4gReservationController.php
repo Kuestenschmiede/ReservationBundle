@@ -1689,11 +1689,20 @@ class C4gReservationController extends C4GBaseController
 
             if ($reservationType->reservationObjectType === '3' && $timeKey) {
                 $putVars['endDate'] = $putVars['beginDate_'.$type.'-33'.$objectId];
-                $bday = $putVars['beginDate_'.$type.'-33'.$objectId];
+
+                $beginDateKey = 'beginDate_'.$type.'-33'.$objectId;
+//                foreach ($putVars as $putVar=>$value) {
+//                    if (strpos($putVar, 'beginDate_'.$type.'-33'.$objectId) !== false) {
+//                        $beginDateKey = $putVar;
+//                        break;
+//                    }
+//                }
+
+                $bday = $putVars[$beginDateKey];
                 $nextDay = strtotime("+1 day", strtotime($bday));
                 if (!$reservationType->directBooking && $beginTime >= 86400) {
                     $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
-                    $putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate;
+                    $putVars[$beginDateKey] = $beginDate;
                     $putVars[$timeKey] = ($beginTime-86400);
                 } else {
                     $putVars[$timeKey] = $beginTime;
@@ -1745,7 +1754,7 @@ class C4gReservationController extends C4GBaseController
             }
 
             if (!$timeKey) {
-                return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_BEGINTIME_ERROR']];
+                return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['empty_time_key']];
             }
 
             //just notification
