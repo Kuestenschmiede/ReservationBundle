@@ -1060,7 +1060,7 @@ class C4gReservationHandler
         if ($withEndTimes) {
             $endTime = $object->getEndTime();
         }
-        return self::addTime([], $object->getBeginTime(), $timeObj, false, $endTime);
+        return self::addTime([], $object->getBeginTime(), $timeObj, false, 0, $endTime);
     }
 
     /**
