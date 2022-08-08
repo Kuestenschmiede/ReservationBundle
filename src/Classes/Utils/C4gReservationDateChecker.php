@@ -32,7 +32,7 @@ class C4gReservationDateChecker
         if ($time) {
             $dateTimeObject = new \DateTime();
             $dateTimeObject->setTimezone(new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
-            $dateTimeObject->setTimestamp($time);
+            $dateTimeObject->setTimestamp(intval($time));
             $beginOfDayString = $dateTimeObject->format('Y-m-d 00:00:00');
             $beginOfDayObject = \DateTime::createFromFormat('Y-m-d H:i:s', $beginOfDayString);
             $beginOfDay = $beginOfDayObject->getTimestamp();
@@ -48,7 +48,7 @@ class C4gReservationDateChecker
         if ($time) {
             $dateTimeObject = new \DateTime();
             $dateTimeObject->setTimezone(new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
-            $dateTimeObject->setTimestamp($time);
+            $dateTimeObject->setTimestamp(intval($time));
             $endOfDayString = $dateTimeObject->format('Y-m-d 23:59:59');
             $endOfDayObject = \DateTime::createFromFormat('Y-m-d H:i:s', $endOfDayString);
             $endOfDay = $endOfDayObject->getTimestamp();
