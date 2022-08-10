@@ -303,9 +303,17 @@ class C4gReservationHandler
      * @param $endTime
      * @return array|mixed
      */
-    private static function addTime($list, $time, $obj, $interval, $langCookie, $endTime = 0, $mergedTime = 0, $mergedEndTime = 0)
+    private static function addTime($list, $time, $obj, $interval, $langCookie, $endTime = 0, $mergedTime = 0, $mergedEndTime = 0, $timeFormatCookie = '', $datimFormatCookie = '')
     {
         $clock = '';
+
+        if ($timeFormatCookie && !$GLOBALS['TL_CONFIG']['timeFormat']) {
+            $GLOBALS['TL_CONFIG']['timeFormat'] = $timeFormatCookie;
+        }
+
+        if ($datimFormatCookie && !$GLOBALS['TL_CONFIG']['datimFormat']) {
+            $GLOBALS['TL_CONFIG']['datimFormat'] = $datimFormatCookie;
+        }
 
         if (!strpos($GLOBALS['TL_CONFIG']['timeFormat'],'A')) {
             if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']) {
@@ -541,7 +549,7 @@ class C4gReservationHandler
      * @param false $showFreeSeats
      * @return array|mixed
      */
-    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '')
+    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '', $timeFormatCookie = '', $datimFormatCookie = '')
     {
         $result = array();
         $tsdate = 0;
@@ -776,9 +784,9 @@ class C4gReservationHandler
                                                     } else {
                                                         $timeObj['id'] = $id;
                                                     }
-                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie, 0, $mergedTime, $mergedEndTime);
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie, 0, $mergedTime, $mergedEndTime, $timeFormatCookie, $datimFormatCookie);
                                                 } else if ($date === -1) {
-                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie);
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie, $timeFormatCookie, $datimFormatCookie);
                                                 }
                                             }
 

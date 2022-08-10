@@ -170,6 +170,9 @@ class C4gReservationController extends C4GBaseController
             $this->session->setSessionValue('reservationLangCookie', $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']);
         }
 
+        $this->session->setSessionValue('reservationTimeFormatCookie', $GLOBALS['TL_CONFIG']['timeFormat']);
+        $this->session->setSessionValue('reservationDatimFormatCookie', $GLOBALS['TL_CONFIG']['datimFormat']);
+
         $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']);
         $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural']);
         parent::initBrickModule($id);
@@ -197,6 +200,9 @@ class C4gReservationController extends C4GBaseController
         if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']) {
             $this->session->setSessionValue('reservationLangCookie', $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']);
         }
+
+        $this->session->setSessionValue('reservationTimeFormatCookie', $GLOBALS['TL_CONFIG']['timeFormat']);
+        $this->session->setSessionValue('reservationDatimFormatCookie', $GLOBALS['TL_CONFIG']['datimFormat']);
 
         $fieldList = array();
         $typelist = array();
@@ -2100,7 +2106,9 @@ class C4gReservationController extends C4GBaseController
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
 
             $langCookie = $this->session->getSessionValue('reservationLangCookie');
-            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true, $langCookie);
+            $timeFormatCookie = $this->session->getSessionValue('reservationTimeFormatCookie');
+            $datimFormatCookie = $this->session->getSessionValue('reservationDatimFormatCookie');
+            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true, $langCookie, $timeFormatCookie, $datimFormatCookie);
         }
 
         foreach ($times as $key=>$values) {
