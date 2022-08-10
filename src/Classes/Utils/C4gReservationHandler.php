@@ -1312,7 +1312,7 @@ class C4gReservationHandler
 
         if ($price) {
             $priceInfo ? "&nbsp;".$priceInfo : '';
-            $price = number_format(floatval($price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'].$priceInfo;
+            $price = number_format(floatval($price),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'].$priceInfo;
         }
         return $price;
     }

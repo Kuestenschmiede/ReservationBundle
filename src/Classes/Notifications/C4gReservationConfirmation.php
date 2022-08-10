@@ -231,7 +231,7 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('agreed', $reservation['agreed']);
 
 
-                        $price = number_format(floatval($reservationObject['price']),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
+                        $price = number_format(floatval($reservationObject['price']),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
                         $c4gNotify->setTokenValue('price', $price);
 
                         $binFileUuid = $reservation['fileUpload'];

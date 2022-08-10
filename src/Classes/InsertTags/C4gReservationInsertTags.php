@@ -578,7 +578,7 @@ class C4gReservationInsertTags
 
                             return $result ? serialize($result) : '';
                         case 'price':
-                            return number_format(floatval($reservationObject->price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
+                            return number_format(floatval($reservationObject->price),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
                         case 'speakerId':
                             if ($reservationObject->speaker) {
                                 $speakerIds = \Contao\StringUtil::deserialize($reservationObject->speaker);

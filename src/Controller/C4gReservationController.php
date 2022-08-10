@@ -1063,7 +1063,7 @@ class C4gReservationController extends C4GBaseController
                                 if ($paramId) {
                                     $participantParam = C4gReservationParamsModel::findByPk($paramId);
                                     if ($participantParam && $participantParam->caption && $participantParam->published && ($participantParam->price && $this->reservationSettings->showPrices)) {
-                                        $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption . "<span class='price'>&nbsp;(+" . number_format($participantParam->price, 2, $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']) . "&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'].")</span>"];
+                                        $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption . "<span class='price'>&nbsp;(+" . number_format($participantParam->price, $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'], $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']) . "&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'].")</span>"];
                                     } else if ($participantParam && $participantParam->caption && $participantParam->published) {
                                         $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption];
                                     }
@@ -1608,7 +1608,7 @@ class C4gReservationController extends C4GBaseController
 
             //just notification
             if ($reservationEventObject->price) {
-                $price = number_format(floatval($reservationEventObject->price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
+                $price = number_format(floatval($reservationEventObject->price),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
                 $putVars['price'] = $price;
             }
        } else {
@@ -1765,7 +1765,7 @@ class C4gReservationController extends C4GBaseController
 
             //just notification
             if ($reservationObject->price) {
-                $price = number_format(floatval($reservationObject->price),2,$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
+                $price = number_format(floatval($reservationObject->price),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
                 $putVars['price'] = $price;
             }
         }

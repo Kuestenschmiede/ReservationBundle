@@ -179,6 +179,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'] = 'Jetzt reservi
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_cancellation'] = 'Stornieren';
 
 /** SPECIAL */
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'] = 2;
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'] = ',';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'] = '.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] = '€';
