@@ -1344,6 +1344,8 @@ class C4gReservationHandler
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject['id']);
+                $eventObject['price'] = $event['price'];
+                $eventObject['priceoption'] = $event['priceoption'];
                 $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                 $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                 $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
@@ -1384,6 +1386,8 @@ class C4gReservationHandler
                         $frontendObject = new C4gReservationFrontendObject();
                         $frontendObject->setType(2);
                         $frontendObject->setId($eventObject['id']);
+                        $eventObject['price'] = $event['price'];
+                        $eventObject['priceoption'] = $event['priceoption'];
                         $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                         $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                         $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);

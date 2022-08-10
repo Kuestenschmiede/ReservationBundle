@@ -317,7 +317,7 @@ class C4gReservationListController extends C4GBaseController
             $reservationTypeField->setComparable(false);
             $fieldList[] = $reservationTypeField;
 
-            $reservationObjects = C4gReservationHandler::getReservationObjectList($typeArr, 0,false, true);
+            $reservationObjects = C4gReservationHandler::getReservationObjectList($typeArr, 0,$this->showPrices, true);
             $objects = [];
 
             foreach ($reservationObjects as $type=>$objList) {

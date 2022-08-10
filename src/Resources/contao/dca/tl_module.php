@@ -25,7 +25,7 @@ use Contao\Controller;
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_settings;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject, showSignatureField, cancellation_redirect_site, login_redirect_site, printTpl;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject, showSignatureField, showPrices, cancellation_redirect_site, login_redirect_site, printTpl;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;';
 
@@ -133,6 +133,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationObject'] = array
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['showSignatureField'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showSignatureField'],
+    'default'           => 0,
+    'exclude'           => true,
+    'filter'            => true,
+    'inputType'         => 'checkbox',
+    'sql'               => "int(1) unsigned NULL default 0"
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['showPrices'] = array
+(   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'],
     'default'           => 0,
     'exclude'           => true,
     'filter'            => true,

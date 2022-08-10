@@ -26,6 +26,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['renderMode'] = ar
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationType'] = array("Reservierungsart darstellen","Die Reservierungsart wird standardmäßig in Liste und Detail nicht dargestellt. Das können Sie hier ändern.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationObject'] = array("Reservierungsobjekt darstellen","Das Reservierungsobjekt wird standardmäßig dargestellt. Es gibt Szenarien in denen das Ausblenden sinnvoll ist.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showSignatureField'] = array("Unterschriftenfeld (nur Gruppenansicht)","Möglichkeit eine Unterschrift abzufragen. Zurzeit nur in der Gruppenliste möglich.");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'] = array("Preise anzeigen","Wenn möglich werden definierte Preise dargestellt.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site'] = array('Weiterleitungsseite', 'Nach der Buchung wird hierhin weitergeleitet.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['login_redirect_site'] = array('Weiterleitung zur Anmeldeseite', 'Falls das Listenmodul nicht öffentlich ist.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['event_redirect_site'] = array('Terminweiterleitung', 'Hier können Sie die Weiterleitung zum Eventleser einstellen, falls Sie die Events am Referenten darstellen wollen.');
