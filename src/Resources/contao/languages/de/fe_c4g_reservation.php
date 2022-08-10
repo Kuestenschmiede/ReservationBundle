@@ -37,7 +37,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Endet um';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'] = 'Startet am';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'] = 'Endet am';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] = 'Startet um';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] = 'Uhrzeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'] = 'Endet um';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'] = 'Uhr';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'] = 'Reservieren';
