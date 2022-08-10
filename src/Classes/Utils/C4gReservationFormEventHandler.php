@@ -155,11 +155,10 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $this->fieldList[] = $reservationObjectField;
 
         foreach ($reservationObjects as $reservationObject) {
-            $type_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
-            $obj_condition = new C4GBrickCondition(C4GBrickConditionType::METHODSWITCH, 'reservation_object_event_' . $listType['id']. '-22' . $reservationObject->getId());
+            $obj_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $listType['id'], $reservationObject->getId());
             $obj_condition->setModel(C4gReservationHandler::class);
             $obj_condition->setFunction('isEventObject');
-            $objConditionArr = $type_condition;//[$obj_condition,$val_condition]; //ToDo check
+            $objConditionArr = $obj_condition;
 
             $reservationBeginDateField = new C4gDateField();
             $reservationBeginDateField->setFlipButtonPosition(true);
@@ -179,7 +178,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setMandatory(false);
             $reservationBeginDateField->setCondition($objConditionArr);
             $reservationBeginDateField->setRemoveWithEmptyCondition(true);
-            $reservationBeginDateField->setInitialValue($this->initialValues->getDate() ? $this->initialValues->getDate() : $reservationObject->getBeginDate());
+            $reservationBeginDateField->setInitialValue($this->initialValues->getDate() ?: $reservationObject->getBeginDate());
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
             $reservationBeginDateField->setStyleClass('begindate-event');
