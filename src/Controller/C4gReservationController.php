@@ -166,12 +166,9 @@ class C4gReservationController extends C4GBaseController
         }
 
         \System::loadLanguageFile('fe_c4g_reservation');
-        if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']) {
-            $this->session->setSessionValue('reservationLangCookie', $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']);
+        if ($GLOBALS['TL_LANGUAGE']) {
+            $this->session->setSessionValue('reservationLangCookie', $GLOBALS['TL_LANGUAGE']);
         }
-
-        $this->session->setSessionValue('reservationTimeFormatCookie', $GLOBALS['TL_CONFIG']['timeFormat']);
-        $this->session->setSessionValue('reservationDatimFormatCookie', $GLOBALS['TL_CONFIG']['datimFormat']);
 
         $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']);
         $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural']);
@@ -197,12 +194,9 @@ class C4gReservationController extends C4GBaseController
         }
 
         \System::loadLanguageFile('fe_c4g_reservation');
-        if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']) {
-            $this->session->setSessionValue('reservationLangCookie', $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']);
+        if ($GLOBALS['TL_LANGUAGE']) {
+            $this->session->setSessionValue('reservationLangCookie', $GLOBALS['TL_LANGUAGE']);
         }
-
-        $this->session->setSessionValue('reservationTimeFormatCookie', $GLOBALS['TL_CONFIG']['timeFormat']);
-        $this->session->setSessionValue('reservationDatimFormatCookie', $GLOBALS['TL_CONFIG']['datimFormat']);
 
         $fieldList = array();
         $typelist = array();
@@ -2060,6 +2054,10 @@ class C4gReservationController extends C4GBaseController
         $wd = -1;
         $times = [];
 
+        $this->framework->initialize();
+        $langCookie = $this->session->getSessionValue('reservationLangCookie');
+        \Contao\System::loadLanguageFile($this->languageFile,$langCookie);
+
         //hotfix dates with slashesoptions
         $date = str_replace("~", "/", $date);
         if ($date)  {
@@ -2101,14 +2099,10 @@ class C4gReservationController extends C4GBaseController
                 $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->session->getSessionValue('reservationSettings'));
             }
 
-            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices, false, $duration, $date);
+            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices, false, $duration, $date, $langCookie);
             $withEndTimes = $this->reservationSettings->showEndTime;
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
-
-            $langCookie = $this->session->getSessionValue('reservationLangCookie');
-            $timeFormatCookie = $this->session->getSessionValue('reservationTimeFormatCookie');
-            $datimFormatCookie = $this->session->getSessionValue('reservationDatimFormatCookie');
-            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true, $langCookie, $timeFormatCookie, $datimFormatCookie);
+            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true, $langCookie);
         }
 
         foreach ($times as $key=>$values) {

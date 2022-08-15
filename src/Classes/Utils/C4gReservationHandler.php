@@ -303,23 +303,15 @@ class C4gReservationHandler
      * @param $endTime
      * @return array|mixed
      */
-    private static function addTime($list, $time, $obj, $interval, $langCookie, $endTime = 0, $mergedTime = 0, $mergedEndTime = 0, $timeFormatCookie = '', $datimFormatCookie = '')
+    private static function addTime($list, $time, $obj, $interval, $langCookie, $endTime = 0, $mergedTime = 0, $mergedEndTime = 0)
     {
         $clock = '';
 
-        if ($timeFormatCookie && !$GLOBALS['TL_CONFIG']['timeFormat']) {
-            $GLOBALS['TL_CONFIG']['timeFormat'] = $timeFormatCookie;
-        }
-
-        if ($datimFormatCookie && !$GLOBALS['TL_CONFIG']['datimFormat']) {
-            $GLOBALS['TL_CONFIG']['datimFormat'] = $datimFormatCookie;
-        }
+        \Contao\System::loadLanguageFile('fe_c4g_reservation',$langCookie);
 
         if (!strpos($GLOBALS['TL_CONFIG']['timeFormat'],'A')) {
             if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']) {
                 $clock = '&nbsp;'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
-            } else if ($langCookie) {
-                $clock = '&nbsp;'.$langCookie;
             }
         }
 
@@ -549,7 +541,7 @@ class C4gReservationHandler
      * @param false $showFreeSeats
      * @return array|mixed
      */
-    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '', $timeFormatCookie = '', $datimFormatCookie = '')
+    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '')
     {
         $result = array();
         $tsdate = 0;
@@ -784,9 +776,9 @@ class C4gReservationHandler
                                                     } else {
                                                         $timeObj['id'] = $id;
                                                     }
-                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie, 0, $mergedTime, $mergedEndTime, $timeFormatCookie, $datimFormatCookie);
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie, 0, $mergedTime, $mergedEndTime);
                                                 } else if ($date === -1) {
-                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie, $timeFormatCookie, $datimFormatCookie);
+                                                    $result = self::addTime($result, $time, $timeObj, $endTimeInterval, $langCookie);
                                                 }
                                             }
 
@@ -1165,14 +1157,14 @@ class C4gReservationHandler
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectList($moduleTypes = null, $objectId = 0, $showPrices = false, $getAllTypes = false, $duration = 0, $date = 0)
+    public static function getReservationObjectList($moduleTypes = null, $objectId = 0, $showPrices = false, $getAllTypes = false, $duration = 0, $date = 0, $langCookie = '')
     {
+        \Contao\System::loadLanguageFile('fe_c4g_reservation',$langCookie ?: $GLOBALS['TL_LANGUAGE']);
         $objectlist = array();
         $allTypesList = array();
         foreach ($moduleTypes as $moduleType) {
             if ($moduleType) {
                 $typeArr = [];
-                //$type = C4gReservationTypeModel::findByPk($moduleType);
                 if (is_array($moduleType)) {
                     $type = $moduleType;
                     $typeArr[] = $moduleType['id'];
@@ -1185,7 +1177,7 @@ class C4gReservationHandler
 
 
                 if ($type && $type['reservationObjectType'] === '2') {
-                    $objectlist = C4gReservationHandler::getReservationObjectEventList($typeArr, $objectId, $type, $showPrices);
+                    $objectlist = C4gReservationHandler::getReservationObjectEventList($typeArr, $objectId, $type, $showPrices, $langCookie);
 
                     if ($getAllTypes) {
                         foreach($objectlist as $key=>$object) {
@@ -1196,7 +1188,7 @@ class C4gReservationHandler
                     }
 
                 } else {
-                    $objectlist = C4gReservationHandler::getReservationObjectDefaultList($typeArr, $objectId, $type, $showPrices, $duration, $date);
+                    $objectlist = C4gReservationHandler::getReservationObjectDefaultList($typeArr, $objectId, $type, $showPrices, $duration, $date, $langCookie);
 
                     if ($getAllTypes) {
                         foreach($objectlist as $key=>$object) {
@@ -1219,10 +1211,12 @@ class C4gReservationHandler
     /**
      * @param $object
      */
-    private static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0) {
+    private static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '') {
         $price = 0;
         if ($object) {
-            \System::loadLanguageFile('fe_c4g_reservation');
+            if ($langCookie) {
+                \System::loadLanguageFile('fe_c4g_reservation', $langCookie);
+            }
             $priceOption = key_exists('priceoption',$object) ? $object['priceoption'] : '';
             $priceInfo = '';
             switch ($priceOption) {
@@ -1322,7 +1316,7 @@ class C4gReservationHandler
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0, $type, $showPrices = false)
+    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0, $type, $showPrices = false, $langCookie = '')
     {
         $objectList = array();
         $database = Database::getInstance();
@@ -1337,6 +1331,11 @@ class C4gReservationHandler
                     $event = $events[0];
                 }
             }
+
+            if ($langCookie) {
+                $GLOBALS['LANGUAGE'] = $GLOBALS['LANGUAGE'] ?: $langCookie;
+            }
+            System::loadLanguageFile('fe_c4g_reservation', $GLOBALS['LANGUAGE']);
 
             $eventObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($objectId)->fetchAssoc();
             //$eventObject = \CalendarEventsModel::findByPk($objectId);
@@ -1423,13 +1422,16 @@ class C4gReservationHandler
      * @param false $showPrices
      * @return array
      */
-    public static function getReservationObjectDefaultList($moduleTypes = null, $objectId = 0, $type, $showPrices = false, $duration = 0, $date = 0)
+    public static function getReservationObjectDefaultList($moduleTypes = null, $objectId = 0, $type, $showPrices = false, $duration = 0, $date = 0, $langCookie = '')
     {
         $objectList = array();
-//        $t = static::$strTable;
-//        $arrOptions = array();
-//        $allObjects = C4gReservationObjectModel::findBy('published','1');
+
         $database = Database::getInstance();
+
+        if ($langCookie) {
+            $GLOBALS['LANGUAGE'] = $GLOBALS['LANGUAGE'] ?: $langCookie;
+        }
+        System::loadLanguageFile('fe_c4g_reservation', $GLOBALS['LANGUAGE']);
 
         if ($objectId && is_numeric($objectId)) {
             $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND id = ? ORDER BY caption")->execute('1', $objectId)->fetchAllAssoc();
@@ -1505,12 +1507,7 @@ class C4gReservationHandler
                     $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'] ?: $cloneObject['desiredCapacityMin'], $object['desiredCapacityMax'] ?: $cloneObject['desiredCapacityMax']]);
                     $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: intval($cloneObject['allTypesQuantity']));
                     $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: intval($cloneObject['allTypesValidity']));
-
                     $frontendObject->setLocation($frontendObject->getLocation() ?: $cloneObject['location']);
-//                    $frontendObject->setAudience($frontendObject->getAudience() ?: \Contao\StringUtil::deserialize($cloneObject['targetAudience']));
-//                    $frontendObject->setSpeaker($frontendObject->getSpeaker() ?: \Contao\StringUtil::deserialize($cloneObject['speaker']));
-//                    $frontendObject->setTopic($frontendObject->getTopic() ?: \Contao\StringUtil::deserialize($cloneObject['topic']));
-
                 } else {
                     $frontendObject->setTimeinterval($object['time_interval']);
                     $frontendObject->setDuration($object['duration']);
