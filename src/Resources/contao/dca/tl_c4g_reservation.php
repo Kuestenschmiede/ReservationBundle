@@ -821,7 +821,7 @@ class tl_c4g_reservation extends Backend
      * @param DataContainer|array $dc
      * @return array
      */
-    public function getActObjects($dc) // No parameter type because union type parameters require PHP >= 8.0
+    public function getActObjects($dc)
     {
         if ($dc instanceof DataContainer) {
             $reservationObjectType = $dc->activeRecord->reservationObjectType;

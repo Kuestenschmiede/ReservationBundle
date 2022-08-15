@@ -161,6 +161,7 @@ class C4gReservationListController extends C4GBaseController
 
         $this->listParams->setScrollX(false);
         $this->listParams->setResponsive(true);
+        $this->listParams->setModelListParams([$this->past_day_number ?: 1]);
 
         if ($this->viewType === 'publicview') {
             $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
