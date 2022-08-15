@@ -823,33 +823,47 @@ class tl_c4g_reservation extends Backend
      */
     public function getActObjects($dc)
     {
-        if ($dc instanceof DataContainer) {
+        $return = [];
+        if ($dc instanceof DataContainer && $dc->activeRecord->reservationObjectType) {
             $reservationObjectType = $dc->activeRecord->reservationObjectType;
         } elseif (is_array($dc)) {
             $reservationObjectType = $dc['reservationObjectType'];
-        } else {
-            return [];
         }
 
-        $return = [];
-        switch ($reservationObjectType) {
-            case '1':
-            case '3':
-                $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
-                    ->execute();
+        if (!$reservationObjectType) {
+            $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
+                ->execute();
 
-                while ($objects->next()) {
-                    $return[$objects->id] = $objects->caption;
-                }
-                break;
-            case '2':
-                $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
-                    ->execute();
+            while ($objects->next()) {
+                $return[$objects->id] = $objects->caption;
+            }
 
-                while ($events->next()) {
-                    $return[$events->id] = $events->title;
-                }
-                break;
+            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
+                ->execute();
+
+            while ($events->next()) {
+                $return[$events->id] = $events->title;
+            }
+        } else {
+            switch ($reservationObjectType) {
+                case '1':
+                case '3':
+                    $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
+                        ->execute();
+
+                    while ($objects->next()) {
+                        $return[$objects->id] = $objects->caption;
+                    }
+                    break;
+                case '2':
+                    $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
+                        ->execute();
+
+                    while ($events->next()) {
+                        $return[$events->id] = $events->title;
+                    }
+                    break;
+            }
         }
 
         return $return;
