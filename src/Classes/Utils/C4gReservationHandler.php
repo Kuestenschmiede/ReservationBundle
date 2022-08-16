@@ -1316,7 +1316,7 @@ class C4gReservationHandler
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0, $type, $showPrices = false, $langCookie = '')
+    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0, $type, $showPrices = false, $langCookie = '', $startTime = 0)
     {
         $objectList = array();
         $database = Database::getInstance();
@@ -1338,8 +1338,11 @@ class C4gReservationHandler
             System::loadLanguageFile('fe_c4g_reservation', $GLOBALS['LANGUAGE']);
 
             $eventObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($objectId)->fetchAssoc();
+
+            $startTime = $startTime ?: time();
+
             //$eventObject = \CalendarEventsModel::findByPk($objectId);
-            if ($event && $eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > time())) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= time()))) {
+            if ($event && $eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > $startTime)) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= $startTime))) {
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject['id']);
@@ -1381,7 +1384,7 @@ class C4gReservationHandler
                 foreach ($allEvents as $event) {
                     //$eventObject = \CalendarEventsModel::findByPk($event['pid']);
                     $eventObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($event['pid'])->fetchAssoc();
-                    if ($eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > time())) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= time()))) {
+                    if ($eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > $startTime)) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= $startTime))) {
                         $frontendObject = new C4gReservationFrontendObject();
                         $frontendObject->setType(2);
                         $frontendObject->setId($eventObject['id']);

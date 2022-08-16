@@ -287,14 +287,16 @@ class C4gReservationListController extends C4GBaseController
                         if (strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) {
                             $typelist[$type->id] = array(
                                 'id' => $type->id,
-                                'name' => $caption['caption'] ? StringHelper::addSpaceBeforeBracket($caption['caption']) : $type->caption
+                                'name' => $caption['caption'] ? StringHelper::addSpaceBeforeBracket($caption['caption']) : $type->caption,
+                                'type' => $type->reservationObjectType
                             );
                         }
                     }
                 } else {
                     $typelist[$type->id] = array(
                         'id' => $type->id,
-                        'name' => $type->caption
+                        'name' => $type->caption,
+                        'type' => $type->reservationObjectType
                     );
                 }
             }
@@ -318,11 +320,12 @@ class C4gReservationListController extends C4GBaseController
             $reservationTypeField->setComparable(false);
             $fieldList[] = $reservationTypeField;
 
-            $reservationObjects = C4gReservationHandler::getReservationObjectList($typeArr, 0,$this->showPrices, true);
+            $startTime = time() - (($this->past_day_number ?: 1) * 86400);
+            $reservationObjects = C4gReservationHandler::getReservationObjectList($typeArr, 0,$this->showPrices, true, 0, 0, '', $startTime);
             $objects = [];
 
             foreach ($reservationObjects as $type=>$objList) {
-                foreach($objList as $reservationObject) {
+                foreach ($objList as $reservationObject) {
                     $objects[] = array(
                         'id' => $reservationObject->getId(),
                         'name' => $reservationObject->getCaption(),
