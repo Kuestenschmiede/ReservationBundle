@@ -2056,7 +2056,9 @@ class C4gReservationController extends C4GBaseController
 
         $this->framework->initialize();
         $langCookie = $this->session->getSessionValue('reservationLangCookie');
-        \Contao\System::loadLanguageFile($this->languageFile,$langCookie);
+        if ($langCookie) {
+            \Contao\System::loadLanguageFile($this->languageFile, $langCookie);
+        }
 
         //hotfix dates with slashesoptions
         $date = str_replace("~", "/", $date);

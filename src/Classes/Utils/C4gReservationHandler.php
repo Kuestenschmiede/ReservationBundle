@@ -307,7 +307,9 @@ class C4gReservationHandler
     {
         $clock = '';
 
-        \Contao\System::loadLanguageFile('fe_c4g_reservation',$langCookie);
+        if ($langCookie) {
+            \Contao\System::loadLanguageFile('fe_c4g_reservation',$langCookie);
+        }
 
         if (!strpos($GLOBALS['TL_CONFIG']['timeFormat'],'A')) {
             if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['clock']) {
