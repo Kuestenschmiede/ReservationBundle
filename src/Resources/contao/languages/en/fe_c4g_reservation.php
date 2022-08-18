@@ -29,10 +29,13 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'] = 'Please select a time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'] = 'Reservation period';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeShort'] = 'Time';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Ends at';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_minutely'] = 'Individual length of use (minutes)';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_hourly'] = 'Individual length of use (hours)';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'] = 'Individual length of use (days)';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_weeky'] = 'Individual length of use (weeks)';
+
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_caption'] = "Individual length of use (";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_minutely'] = " minutes)";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_hourly'] = " hours)";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'] = " days)";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_weekly'] = " weeks)";
+
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'] = 'Begin date';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'] = 'End date';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] = 'Time';
