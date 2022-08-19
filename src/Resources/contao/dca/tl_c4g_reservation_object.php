@@ -748,7 +748,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'textarea',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rte'=>'tinyMCE', 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>2048, 'rte'=>'tinyMCE', 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
             'sql'                     => "text NULL"
         ),
 
