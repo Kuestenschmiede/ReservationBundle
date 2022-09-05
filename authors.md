@@ -6,3 +6,4 @@
 - Malte de Vries (https://kuestenschmiede.de)
 - Nina Eilers (https://kuestenschmiede.de)
 - Nils Ulfers (https://kuestenschmiede.de)
+- Marc Zakrzewski (https://kuestenschmiede.de)

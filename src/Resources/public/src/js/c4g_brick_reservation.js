@@ -269,44 +269,39 @@ function setReservationForm(typeId, showDateTime) {
 
     var event = false;
     var object = false;
-    //if (!typeId || (typeId == -1)) {
-        var typeField = document.getElementById("c4g_reservation_type");
-        typeId = typeField ? typeField.value : -1;
 
-        var selectedIndex = typeField.selectedIndex;
-        var selectedOption = typeField.options[selectedIndex];
-        if (selectedOption) {
-            event = selectedOption.getAttribute('type') == 2 ? true : false;
-            object = selectedOption.getAttribute('type') == 3 ? true : false;
-        }
-    //}
+    var typeField = document.getElementById("c4g_reservation_type");
+    typeId = typeField ? typeField.value : -1;
+
+    var selectedIndex = typeField.selectedIndex;
+    var selectedOption = typeField.options[selectedIndex];
+    if (selectedOption) {
+        event = selectedOption.getAttribute('type') == 2 ? true : false;
+        object = selectedOption.getAttribute('type') == 3 ? true : false;
+    }
 
     if (typeId > 0) {
         var capacityField = document.getElementById("c4g_desiredCapacity_"+typeId);
         if (capacityField) {
-            var value = capacityField.value();
+            var value = capacityField.value;
             if (capacityField.getAttribute('max') && (value > parseInt(capacityField.getAttribute('max')))) {
-                capacityField.value(capacityField.getAttribute('max'));
+                capacityField.value = capacityField.getAttribute('max');
             }
             if (capacityField.getAttribute('min') && (value < parseInt(capacityField.getAttribute('min')))) {
-                capacityField.value(capacityField.getAttribute('min'));
+                capacityField.value = capacityField.getAttribute('min');
             }
         }
 
         var durationField = document.getElementById("c4g_duration_"+typeId);
         if (durationField && durationField.style.display !== "none") {
-            for (i=0; i < durationField.length; i++) {
-               var durationField = durationField[i];
-               durationField.style.display = "block";
-            }
-
+           durationField.style.display = "block";
 
             var value = durationField.value;
             if (durationField && durationField.getAttribute('max') && (value > parseInt(durationField.getAttribute('max')))) {
-                durationField.value(durationField.getAttribute('max'));
+                durationField.value = durationField.getAttribute('max');
             }
             if (durationField && durationField.getAttribute('min') && (value < parseInt(durationField.getAttribute('min')))) {
-                durationField.value(durationField.getAttribute('min'));
+                durationField.value = durationField.getAttribute('min');
             }
         }
 
@@ -731,12 +726,13 @@ function setTimeset(dateField, additionalId, showDateTime) {
 
                                         formCheckInput.setAttribute('data-object', objstr);
                                         formCheckInput.disabled = false;
-                                        formCheckInput.style.display != "none";
+                                        formCheckInput.style.display = "block";
 
                                         if (nameList[arrindex]) {
                                             var id = formCheckInput.getAttribute('id');
                                             if (id) {
-                                                document.querySelectorAll('label[for="'+id+'"]').textContent = nameList[arrindex];
+                                                var formCheckLabel = formCheckInput.parentNode.getElementsByTagName('label')[0];
+                                                formCheckLabel.innerHTML = nameList[arrindex];
                                             }
                                         }
 
