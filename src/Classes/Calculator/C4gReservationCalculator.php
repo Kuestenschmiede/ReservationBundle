@@ -120,7 +120,7 @@ class C4gReservationCalculator
      * @param int $capacity
      * @param $timeArray
      */
-    public function calculateAll(int $date, int $time, int $endTime, $object, $type, int $capacity, $timeArray)
+    public function calculateAll(int $date, int $time, int $endTime, $object, $type, int $capacity, $timeArray, $actDuration = 0)
     {
         $objectId = $object->getId();
         $typeId = $type['id'];
@@ -225,22 +225,24 @@ class C4gReservationCalculator
                 $timeBeginDb = strtotime($tbdb);
                 $timeEndDb = strtotime($tedb);
 
-                if (($reservation['duration']) && ($reservation['timeInterval']) && ($reservation['duration'] > $reservation['timeInterval'])) {
+                //$actDuration = $actDuration ?: $reservation['duration']; //ToDo object interval?
+
+               /* if ($actDuration && ($reservation['timeInterval']) && ($actDuration > $reservation['timeInterval'])) {
                     switch ($reservation['periodType']) {
                         case 'minute':
-                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 60) + ($reservation['duration'] * 60);
+                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 60) + ($actDuration * 60);
                             break;
                         case 'hour':
-                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 3600) + ($reservation['duration'] * 3600);
+                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 3600) + ($actDuration * 3600);
                             break;
                         case 'day':
-                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 86400) + ($reservation['duration'] * 86400);
+                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 86400) + ($actDuration * 86400);
                             break;
                         case 'week':
-                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 604800) + ($reservation['duration'] * 604800);
+                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 604800) + ($actDuration * 604800);
                             break;
                     }
-                }
+                }*/
 
                 if (
                     (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||

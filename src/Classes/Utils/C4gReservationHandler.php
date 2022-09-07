@@ -707,7 +707,7 @@ class C4gReservationHandler
 
                                                 if ($date && $tsdate) {
                                                     $calculator->calculateAll(
-                                                        $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
+                                                        $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray, $duration
                                                     );
                                                     $calculatorResult = $calculator->getCalculatorResult();
                                                     $timeArray = $calculatorResult->getTimeArray();
@@ -803,7 +803,7 @@ class C4gReservationHandler
 
                                                     if ($date && $tsdate) {
                                                         $calculator->calculateAll(
-                                                            $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
+                                                            $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray, $duration
                                                         );
                                                         $calculatorResult = $calculator->getCalculatorResult();
                                                         $timeArray = $calculatorResult->getTimeArray();
@@ -864,7 +864,7 @@ class C4gReservationHandler
 
                                                     if ($date && $tsdate) {
                                                         $calculator->calculateAll(
-                                                            $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray
+                                                            $tsdate, $time, $endTime, $object, $typeObject, $capacity, $timeArray, $duration
                                                         );
                                                         $calculatorResult = $calculator->getCalculatorResult();
                                                         $timeArray = $calculatorResult->getTimeArray();
