@@ -62,9 +62,10 @@ function setObjectId(object, typeid, showDateTime = 0) {
     var emptyOption = null;
     var objects = null;
     var values = '';
-
+    var oldValue = false;
     if (selectField) {
         selectField.style.display = 'block';
+        oldValue = selectField.value && (parseInt(selectField.value) > 0) ? selectField.value : oldValue;
 
         if (reservationObjects) {
             for (i=0; i < reservationObjects.length; i++) {
@@ -75,18 +76,42 @@ function setObjectId(object, typeid, showDateTime = 0) {
 
         if (objectParam) {
             objects = objectParam.split('-');
-
-            if (!object.disabled && (!selectField.value || (selectField.value <= 0))) {
-                    selectField.value = objects[0];
+            var breakDance = false;
+            for (i=0; i < objects.length; i++) {
+                for (j = 0; j < selectField.options.length; j++) {
+                    if (!selectField.options[j].getAttribute('hidden')) {
+                        if (selectField.options[j].value == objects[i]) {
+                            selectField.value = objects[i];
+                            handleBrickConditions();
+                            breakDance = true;
+                            break;
+                        }
+                    }
+                }
+                if (breakDance) {
+                    break;
+                }
             }
 
-            handleBrickConditions();
-            
             values = objects ? objects : values
         }
     }
+
     hideOptions(typeId, values, showDateTime);
 
+    if (oldValue) {
+       for (i = 0; i < selectField.options.length; i++) {
+           if (!selectField.options[i].getAttribute('hidden')) {
+               if (selectField.options[i].value == oldValue) {
+                   selectField.value = oldValue;
+                   handleBrickConditions();
+                   break;
+               }
+           }
+       }
+    }
+
+    hideOptions(typeId, values, showDateTime);
     return true;
 }
 
@@ -145,6 +170,7 @@ function hideOptions(typeId, values, showDateTime) {
                 if (values == option.value) {
                     firstValueParam = values;
                     foundValue = true;
+
                 }
             }
 
@@ -189,9 +215,8 @@ function hideOptions(typeId, values, showDateTime) {
                 var date = '';
                 var time = '';
 
-
-                //var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+typeId); //ToDo +'-'+option.value
-                var dateFields = document.getElementsByClassName('.c4g__form-date-container .c4g_beginDate_'+typeId); //ToDo +'-'+option.value
+                var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+typeId); //ToDo +'-'+option.value
+                //var dateFields = document.getElementsByClassName('.c4g__form-date-container .c4g_beginDate_'+typeId); //ToDo +'-'+option.value
 
 
                 if (dateFields) {
@@ -231,17 +256,15 @@ function hideOptions(typeId, values, showDateTime) {
 
         if (!selectField.disabled && selectField.value && (selectField.value >= 0)) {
             first = selectField.value;
+
         }
 
         if (parseInt(first) >= 0) {
-            selectField.value = first;
-
             if (selectField.options[first]) {
+              selectField.value = first;
               selectField.options[first].removeAttribute('disabled');
               selectField.options[first].removeAttribute('hidden');
-            }
-
-            if (emptyKey != false) {
+            } else if (emptyKey != false) {
               selectField.options[emptyKey].setAttribute('disabled','disabled');
               selectField.options[emptyKey].setAttribute('hidden','hidden');
             }
@@ -521,11 +544,10 @@ function shuffle(array) {
     return array;
 }
 
-/*
 function isElementReallyShowed (el) {
     var elementReallyShowed = !el.disabled && (el.style.display != "none");
-    
-    var timeButtonParents = el && el.parentNode ? el.parentNode.parentNode.childNodes : [];
+
+    var timeButtonParents = el && el.parent ? el.parent.parent.children : [];
     if (timeButtonParents && timeButtonParents.length) {
         for (i=0; i < timeButtonParents.length; i++) {
           elementReallyShowed = elementReallyShowed && !timeButtonParents[i].disabled && (timeButtonParents[i].style.display != "none") && (document.querySelector("#"+timeButtonParents[i].getAttribute('id')+":not([hidden])"));
@@ -533,7 +555,7 @@ function isElementReallyShowed (el) {
     }
 
     return elementReallyShowed;
-}*/
+}
 
 function eventFire(el, etype){
   if (el.fireEvent) {
@@ -572,8 +594,6 @@ function setTimeset(dateField, additionalId, showDateTime) {
         var duration = durationNode.value;
     }
 
-    //handleBrickConditions();
-
     //hotfix dates with slashes
     if (date && date.indexOf("/")) {
         date = date.replace("/", "~");
@@ -589,9 +609,8 @@ function setTimeset(dateField, additionalId, showDateTime) {
             .then(response => response.json())
             .then((data) => {
                 var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
-                //parentElement = c4g__form-radio-group_wrapper
-                //var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g__form-radio-group") : document.querySelectorAll(".reservation_time_button .c4g__form-radio-group");
-                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g__form-radio-group") : document.getElementsByClassName(".reservation_time_button .c4g__form-radio-group");
+                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g__form-radio-group") : document.querySelectorAll(".reservation_time_button .c4g__form-radio-group");
+                //var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g__form-radio-group") : document.getElementsByClassName(".reservation_time_button .c4g__form-radio-group");
 
 
                 var timeList = [];
@@ -762,6 +781,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                                         objField.options[z].innerHtml = objCaptions[objectId];
                                                         break;
                                                     }
+
                                                 }
                                             }
                                         }
@@ -784,8 +804,9 @@ function setTimeset(dateField, additionalId, showDateTime) {
                    }
 
                    var reservation_time_button = document.querySelectorAll('.reservation_time_button_'+additionalId+' input[type = "radio"]');
-                   // var formCheckTimeButton = reservation_time_button.parentNode.getElementsByClassName('.reservation_time_button_'+additionalId+' input[type = "radio"]');
-                   formCheckTimeButton.removeAttribute("checked");
+                   for (z=0; z < reservation_time_button.length; z++) {
+                       reservation_time_button[z].removeAttribute("checked");
+                   }
                 }
 
                 //var reservationObjects = document.getElementsByClassName("displayReservationObjects");
@@ -826,6 +847,13 @@ function setTimeset(dateField, additionalId, showDateTime) {
                         }
                     }
 
+                    if (selectField) {
+                        setObjectId(0,additionalId,showDateTime);
+                        selectField.value = -1;
+                        eventFire(selectField,'change');
+                        selectField.disabled = true;
+                    }
+
                     if (!objectId) {
                         if (targetButton && !targetButton.disabled && !targetButton.classList.contains("radio_object_disabled")) {
                             targetButton.removeAttribute("checked");
@@ -837,9 +865,11 @@ function setTimeset(dateField, additionalId, showDateTime) {
                                 visibleButtons[z].removeAttribute("checked");
 
                             }
-                            selectField.value = -1;                                        
-                            eventFire(selectField,'change');
-                            selectField.disabled = true;
+                            if (selectField) {
+                                selectField.value = -1;
+                                eventFire(selectField,'change');
+                                selectField.disabled = true;
+                            }
                         }                                    
                     }
                 }
@@ -857,12 +887,13 @@ function setTimeset(dateField, additionalId, showDateTime) {
 function checkEventFields() {
     var typeField = document.getElementById("c4g_reservation_type");
     var typeId = typeField ? typeField.value : -1;
-    var selectField = document.querySelectorAll('.reservation-event-object select');
+    var selectField = document.querySelector('.reservation-event-object select');
     //handleBrickConditions();
     //ToDo test with contao events
-    let eventData = document.getElementsByClassName('.eventdata');
+    let eventData = document.getElementsByClassName('eventdata');
     if (eventData[0]) {
         eventData[0].style.display = 'none';
+
     }
 
     if (selectField && (document.querySelector("reservation-id:not([hidden])"))) {
@@ -874,28 +905,28 @@ function checkEventFields() {
                 var additional = -1;
                 if (selectField[i].value) {
                     additional = typeId.toString() + "-22" + selectField[i].value.toString();
-                    document.getElementsByClassName('.eventdata_' + additional).style.display = "block";
-                    document.getElementsByClassName('.eventdata_' + additional).children[0].style.display = "block";
+                    document.getElementsByClassName('eventdata_' + additional).style.display = "block";
+                    document.getElementsByClassName('eventdata_' + additional).children[0].style.display = "block";
                 }
 
                 var dateFields = document.getElementsByClassName('begindate-event');
                 if (dateFields) {
                     for (j = 0; j < dateFields.length; j++) {
-                        if ((additional != -1) && dateFields[j].children[0].getElementsByClassName('.c4g__form-date-container')[0].children[0].getElementsByTagName('input')[0].classList.contains('c4g_beginDateEvent_' + additional)) {
+                        if ((additional != -1) && dateFields[j].children[0].getElementsByClassName('c4g__form-date-container')[0].children[0].getElementsByTagName('input')[0].classList.contains('c4g_beginDateEvent_' + additional)) {
                             dateFields[j].style.display = "block";
                             dateFields[j].children[0].getElementsByTagName('label')[0].style.display = "block";
-                            dateFields[j].children[0].getElementsByClassName('.c4g__form-date-container')[0].style.display = "block";
-                            dateFields[j].children[0].getElementsByClassName('.c4g__form-date-container')[0].children[0].getElementsByTagName('input')[0].style.display = "block";
+                            dateFields[j].children[0].getElementsByClassName('c4g__form-date-container')[0].style.display = "block";
+                            dateFields[j].children[0].getElementsByClassName('c4g__form-date-container')[0].children[0].getElementsByTagName('input')[0].style.display = "block";
                         } else {
                             dateFields[j].style.display = "none";
                             dateFields[j].getElementsByTagName('label')[0].style.display = "none";
-                            dateFields[j].children[0].getElementsByClassName('.c4g__form-date-container')[0].style.display = "none";
-                            dateFields[j].children[0].getElementsByClassName('.c4g__form-date-container')[0].children[0].getElementsByTagName('input')[0].style.display = "none";
+                            dateFields[j].children[0].getElementsByClassName('c4g__form-date-container')[0].style.display = "none";
+                            dateFields[j].children[0].getElementsByClassName('c4g__form-date-container')[0].children[0].getElementsByTagName('input')[0].style.display = "none";
                         }
                     }
                 }
 
-                var timeFields = document.getElementsByClassName('.reservation_time_event_button');
+                var timeFields = document.getElementsByClassName('reservation_time_event_button');
                 if (timeFields) {
                     for (j = 0; j < timeFields.length; j++) {
                         if ((additional != -1) && timeFields[j].classList.contains('reservation_time_event_button_' + additional)) {
@@ -916,14 +947,14 @@ function checkEventFields() {
             }
         }
     } else {
-        var dateFields = document.getElementsByClassName('.begindate-event');
+        var dateFields = document.getElementsByClassName('begindate-event');
         if (dateFields && Array.isArray(dateFields)) {
             for (i = 0; i < dateFields.length; i++) {
                 dateFields[i].style.display = "none";
             }
         }
 
-        var timeFields = document.getElementsByClassName('.reservation_time_event_button');
+        var timeFields = document.getElementsByClassName('reservation_time_event_button');
         if (timeFields && Array.isArray(timeFields)) {
             for (i = 0; i < timeFields.length; i++) {
                 timeFields[i].style.display = "none";
