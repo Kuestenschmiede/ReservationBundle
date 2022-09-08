@@ -5,15 +5,21 @@
   position: absolute;
   z-index: 999
 }
-.c4g__form-radio-group {
+.c4g_brick_dialog .c4g__brick_radio_group {
+  display: block
+}
+.reservation_time_button .c4g__form-radio-group {
   margin-left: 0;
-  padding-left: 0;
+  padding-left: .5em;
   margin-right: 0;
-  padding-right: 0
+  padding-right: .6em
+}
+.c4g_brick_dialog .reservation_time_button .c4g__form-radio-group .c4g__form-check {
+  display: inline-flex;
+  padding-left: .1em
 }
 .reservation_time_button .c4g__form-radio-group label,
 .reservation_time_event_button .c4g__form-radio-group label {
-  min-width: 120px;
   padding-right: 1em;
   padding-left: 1em;
   height: 30px;
@@ -25,7 +31,8 @@
   line-height: 30px;
   color: #fff;
   cursor: pointer;
-  font-weight: 400
+  font-weight: 400;
+  white-space: nowrap
 }
 .c4g_brick_dialog .c4g__form-radio-group .lbl_turned {
   margin: 2px
