@@ -59,10 +59,10 @@ function setObjectId(object, typeid, showDateTime = 0) {
     var typeId = typeid;
     var selectField = document.getElementById("c4g_reservation_object_"+typeId);
     var reservationObjects = document.getElementsByClassName('displayReservationObjects');
-    var emptyOption = null;
     var objects = null;
     var values = '';
     var oldValue = false;
+
     if (selectField) {
         selectField.style.display = 'block';
         oldValue = selectField.value && (parseInt(selectField.value) > 0) ? selectField.value : oldValue;
@@ -109,6 +109,15 @@ function setObjectId(object, typeid, showDateTime = 0) {
                }
            }
        }
+    }
+
+    if (selectField && parseInt(selectField.value) != -1) {
+        for (i = 0; i < selectField.options.length; i++) {
+            if (parseInt(selectField.options[i].value) == -1 && selectField.options[i].style.display != "none") {
+                selectField.options[i].style.display = "none";
+                break;
+            }
+        }
     }
 
     hideOptions(typeId, values, showDateTime);
@@ -557,16 +566,6 @@ function isElementReallyShowed (el) {
     return elementReallyShowed;
 }
 
-function eventFire(el, etype){
-  if (el.fireEvent) {
-    el.fireEvent('on' + etype);
-  } else {
-    var evObj = document.createEvent('Events');
-    evObj.initEvent(etype, true, false);
-    el.dispatchEvent(evObj);
-  }
-}
-
 function setTimeset(dateField, additionalId, showDateTime) {
     var elementId = 0;
     var date = 0;
@@ -847,7 +846,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
                         }
                     }
 
-                    if (selectField) {
+                    if (!objectId && selectField) {
                         setObjectId(0,additionalId,showDateTime);
                         selectField.value = -1;
                         eventFire(selectField,'change');
