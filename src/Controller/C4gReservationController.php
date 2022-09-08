@@ -77,7 +77,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class C4gReservationController extends C4GBaseController
 {
     public const TYPE = 'C4gReservation';
-
     protected $tableName    = 'tl_c4g_reservation';
     protected $modelClass   = C4gReservationModel::class;
     protected $languageFile = 'fe_c4g_reservation';
@@ -91,7 +90,7 @@ class C4gReservationController extends C4GBaseController
     //Resource Params
     protected $loadDefaultResources = true;
     protected $loadDateTimePickerResources = false;
-    protected $loadChosenResources = true;
+    protected $loadChosenResources = false;
     protected $loadClearBrowserUrlResources = false;
     protected $loadConditionalFieldDisplayResources = true;
     protected $loadMoreButtonResources = false;
@@ -101,6 +100,7 @@ class C4gReservationController extends C4GBaseController
     protected $loadMultiColumnResources = false;
     protected $loadMiniSearchResources = false;
     protected $loadHistoryPushResources = false;
+    protected $loadDatePicker = true;
 
     //JQuery GUI Resource Params
     protected $jQueryAddCore = true;
