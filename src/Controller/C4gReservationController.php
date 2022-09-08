@@ -340,7 +340,6 @@ class C4gReservationController extends C4GBaseController
 
             $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types);
 
-            $safetyCount = 0;
             foreach ($types as $type) {
                 if ($moduleTypes && is_array($moduleTypes) && (count($moduleTypes) > 0)) {
                     $arrModuleTypes = $moduleTypes;
@@ -353,10 +352,6 @@ class C4gReservationController extends C4GBaseController
                 $objects = C4gReservationHandler::getReservationObjectList(array($type), $defaultObject, $this->reservationSettings->showPrices);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
-                }
-
-                if ($safetyCount == 10) {
-                    break;
                 }
 
                 $captions = \Contao\StringUtil::deserialize($type['options']);
@@ -416,7 +411,6 @@ class C4gReservationController extends C4GBaseController
                         'max_residence_time' => $type['max_residence_time']
                     );
                 }
-                $safetyCount++;
             }
         }
 
