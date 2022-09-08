@@ -188,12 +188,14 @@ class C4gReservationHandler
                     }
                 }
 
-                if ($minDate && ($minDate > 1) && ($minDate > $object->getMinReservationDay())) {
-                    $minDate = $object->getMinReservationDay();
+                $minReservationDay = $object->getMinReservationDay() ?: 1;
+                if ($minDate && ($minDate > 1) && ($minDate > $minReservationDay)) {
+                    $minDate = $minReservationDay;
                 }
 
-                if ($maxDate && ($maxDate < 365) && ($maxDate < $object->getMaxReservationDay())) {
-                    $maxDate = $object->getMaxReservationDay();
+                $maxReservationDay = $object->getMaxReservationDay() ?: 365;
+                if ($maxDate && ($maxDate < 365) && ($maxDate < $maxReservationDay)) {
+                    $maxDate = $maxReservationDay;
                 }
             }
 
