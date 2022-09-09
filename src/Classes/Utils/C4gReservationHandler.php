@@ -1298,7 +1298,8 @@ class C4gReservationHandler
                     $price = $price + intval($object['price']);
                     break;
                 case 'pPerson':
-                    $price = ($price + intval($object['price'])) . $GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'];
+                    $price = ($price + intval($object['price']));
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'];
                     break;
                 case 'pAmount':
                     $price = $price + intval($object['price']);

@@ -152,7 +152,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'] = " pro Tag";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pWeek'] = " pro Woche";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pEvent'] = " pro Veranstaltung";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'] = " pro Person";
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['pAmount'] = " als Pfand";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['pAmount'] = " als Pfand";
 
 /** DESCRIPTIONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Wählen Sie die Reservierungsart aus.';
