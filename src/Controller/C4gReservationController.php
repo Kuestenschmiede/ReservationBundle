@@ -2041,9 +2041,9 @@ class C4gReservationController extends C4GBaseController
      * @param $values
      * @param $putVars
      * @return array
-     * @Route("/reservation-api/currentTimeset/{date}/{type}/{duration}/{objectId}", methods={"GET"})
+     * @Route("/reservation-api/currentTimeset/{date}/{type}/{duration}/{capacity}/{objectId}", methods={"GET"})
      */
-    public function getCurrentTimesetAction(Request $request, $date, $type, $duration, $objectId)
+    public function getCurrentTimesetAction(Request $request, $date, $type, $duration, $capacity, $objectId)
     {
         $wd = -1;
         $times = [];
@@ -2098,7 +2098,7 @@ class C4gReservationController extends C4GBaseController
             $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices, false, $duration, $date, $langCookie);
             $withEndTimes = $this->reservationSettings->showEndTime;
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
-            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $withEndTimes, $withFreeSeats, true, $langCookie);
+            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $capacity, $withEndTimes, $withFreeSeats, true, $langCookie);
         }
 
         foreach ($times as $key=>$values) {

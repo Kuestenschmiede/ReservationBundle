@@ -588,9 +588,14 @@ function setTimeset(dateField, additionalId, showDateTime) {
         date = dateField ? dateField.value : 0;
     }
 
-    var durationNode = document.getElementById("c4g_duration_"+additionalId); //&& document.getElementById("c4g_duration_"+additionalId).style.display != "none";
+    var durationNode = document.getElementById("c4g_duration_"+additionalId);
     if (durationNode && durationNode.style && durationNode.style !== "none"){
         var duration = durationNode.value;
+    }
+
+    var capacityNode = document.getElementById("c4g_desiredCapacity_"+additionalId);
+    if (capacityNode && capacityNode.style && capacityNode.style !== "none"){
+        var capacity = capacityNode.value;
     }
 
     //hotfix dates with slashes
@@ -601,8 +606,9 @@ function setTimeset(dateField, additionalId, showDateTime) {
 
     if (date && additionalId) {
         duration = duration ? duration : -1;
+        capacity = capacity ? capacity : -1;
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "flex";
-        let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration + "/" + objectId;
+        let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration + "/" + capacity + "/" + objectId;
         var targetButton = false;
         fetch(url)
             .then(response => response.json())

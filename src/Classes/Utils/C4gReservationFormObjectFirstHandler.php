@@ -427,6 +427,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                             $i,
                             -1,
                             0,
+                            0,
                             $reservationSettings->showEndTime,
                             $reservationSettings->showFreeSeats
                         ));

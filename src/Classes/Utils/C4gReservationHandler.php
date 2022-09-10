@@ -558,7 +558,7 @@ class C4gReservationHandler
      * @param false $showFreeSeats
      * @return array|mixed
      */
-    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '')
+    public static function getReservationTimes($list, $type, $weekday = -1, $date = null, $duration=0, $actCapacity=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '')
     {
         $result = array();
         $tsdate = 0;
@@ -622,11 +622,24 @@ class C4gReservationHandler
             }
 
             $calculator = new C4gReservationCalculator($tsdate, $objectType);
+
+            if ($actCapacity > 0) {
+                $desiredCapacity = $actCapacity;
+            }
+
             foreach ($list as $object) {
                 $found = false;
                 $timeArray = []; //count for one object
                 $objectQuantity = $object->getQuantity() ?  $object->getQuantity() : 1;
-                $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 0; //max persons
+
+                if ($actCapacity <= 0) {
+                    $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 0; //max persons
+                } else {
+                    if ( ($actCapacity < $object->getDesiredCapacity()[0]) || ($actCapacity > $object->getDesiredCapacity()[1]) ) {
+                        $date = -1;
+                    }
+                }
+
                 $maxCount = $objectQuantity;
                 $reservationTypes = $object->getReservationTypes();
 
