@@ -160,14 +160,16 @@ class C4gReservationHandler
      * @return string
      * @throws \Exception
      */
-    public static function getDateExclusionString($list, $type, $removeBookedDays=1)
+    public static function getDateExclusionString($list, $type, $removeBookedDays=1, $asArray=0)
     {
         $result = '';
         if ($list) {
-            $alldates = array();
+            $alldates = [];
             $minDate = 0;
             $maxDate = 7;
+
             //remove configured date exclusion
+            $allObjectDates = [];
             foreach ($list as $object) {
                 if(!$object instanceof C4gReservationFrontendObject){
                     break;
@@ -181,7 +183,7 @@ class C4gReservationHandler
 
                             $current = $exclusionBegin;
                             while($current <= $exclusionEnd) {
-                                $alldates[] = C4gReservationDateChecker::getBeginOfDate($current);
+                                $allObjectDates[$current][] = $current;
                                 $current = intval($current) + 86400;
                             }
                         }
@@ -196,6 +198,13 @@ class C4gReservationHandler
                 $maxReservationDay = $object->getMaxReservationDay() ?: 365;
                 if ($maxDate && ($maxDate < 365) && ($maxDate < $maxReservationDay)) {
                     $maxDate = $maxReservationDay;
+                }
+            }
+
+            //check if all objects exluded
+            foreach ($allObjectDates as $date => $dateArray) {
+                if (count($dateArray) === count($list)) {
+                    $alldates[] = $date;
                 }
             }
 
@@ -259,9 +268,13 @@ class C4gReservationHandler
                 }
             }
 
-            foreach ($alldates as $date) {
-                if ($date) {
-                    $result = self::addComma($result) . date('d.m.Y'/*$GLOBALS['TL_CONFIG']['dateFormat']*/, $date);
+            if ($asArray) {
+                return $alldates;
+            } else {
+                foreach ($alldates as $date) {
+                    if ($date) {
+                        $result = self::addComma($result) . date('d.m.Y'/*$GLOBALS['TL_CONFIG']['dateFormat']*/, $date);
+                    }
                 }
             }
         }
@@ -617,6 +630,16 @@ class C4gReservationHandler
                 $maxCount = $objectQuantity;
                 $reservationTypes = $object->getReservationTypes();
 
+                if (($date !== -1) && $tsdate) {
+                    $exclusionDates = self::getDateExclusionString([$object],$type,0,1);
+                    foreach ($exclusionDates as $exclusionDate) {
+                        if ($exclusionDate === $tsdate) {
+                            $date = -1;
+                            break;
+                        }
+                    }
+                }
+
                 if ($reservationTypes) {
                     foreach ($reservationTypes as $reservationType) {
                         if ($reservationType == $type) {
@@ -770,7 +793,7 @@ class C4gReservationHandler
 
 
                                                 $reasionLog = '';
-                                                if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
+                                                if (($date !== -1) && $tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
                                                     if ($capacity && ($calculatorResult->getDbPersons() >= $capacity)) {
                                                         $reasonLog = 'too many persons';
                                                     } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
@@ -834,7 +857,7 @@ class C4gReservationHandler
                                                     }
 
                                                     $reasionLog = '';
-                                                    if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime))/* || ($typeObject->directBooking)*/)) {
+                                                    if (($date !== -1) && $tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime))/* || ($typeObject->directBooking)*/)) {
                                                         if ($capacity && ($calculatorResult->getDbPersons() >= $capacity)) {
                                                             $reasonLog = 'too many persons';
                                                         } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
@@ -892,7 +915,7 @@ class C4gReservationHandler
                                                     }
 
                                                     $reasionLog = '';
-                                                    if ($tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
+                                                    if (($date !== -1) && $tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
                                                         if ($capacity && ($calculatorResult->getDbPersons() >= $capacity)) {
                                                             $reasonLog = 'too many persons';
                                                         } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
