@@ -566,6 +566,101 @@ function isElementReallyShowed (el) {
     return elementReallyShowed;
 }
 
+function addRadioFieldSet(radioGroup, data, additionalId) {
+    var times = data['times'];
+    let objstr = '';
+
+    //delete all childs from radioGroup
+    if (radioGroup) {
+        while (radioGroup.firstChild) {
+            radioGroup.firstChild.remove();
+        }
+    }
+
+    //add new childs to radioGroup
+    for (let key in times) {
+        var name = times[key]['name'];
+        var interval = times[key]['interval'];
+        var objects = times[key]['objects'];
+        var percent = 0;
+        var priority = 0;
+        let objArr = [];
+        let value = '';
+        var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
+        var disabled = false;
+
+        objects = shuffle(objects);
+        for (j = 0; j < objects.length; j++) {
+            var object = objects[j];
+
+            if (object['id'] != -1) {
+                percent = object['percent'];
+                if (object['priority'] && (object['priority'] == 1)) {
+                    objArr.splice(0, 0, object['id']);
+                } else {
+                    objArr.push(object['id']);
+                }
+
+                // for (var k = 0; k < selectField.length; k++) {
+                //     if (selectField[k].value == object['id']) {
+                //         if (object['priority'] && (object['priority'] == 1)) {
+                //             value = object['id'];
+                //             break;
+                //         } else {
+                //             value = object['id'];
+                //             break;
+                //         }
+                //     }
+                // }
+                value = object['id'];
+            } else {
+                disabled = true;
+            }
+        }
+
+        for (j = 0; j < objArr.length; j++) {
+            if (j == 0) {
+                objstr = objstr + objArr[j];
+            } else {
+                objstr = objstr + '-' + objArr[j];
+            }
+        }
+
+        var c4gFormCheck = document.createElement('div');
+        c4gFormCheck.className = "c4g__form-check";
+
+        var c4gFormCheckInput = document.createElement('input');
+        c4gFormCheckInput.type = 'radio';
+        c4gFormCheckInput.className = "c4g__form-check-input c4g__btn-check";
+        c4gFormCheckInput.id = 'beginTime_'+additionalId+'-'+value;
+        c4gFormCheckInput.setAttribute('name', '_c4g_beginTime_'+additionalId);
+        c4gFormCheckInput.setAttribute('data-object', objstr);
+
+
+        c4gFormCheckInput.setAttribute("onchange", "setObjectId(document.getElementById('"+c4gFormCheckInput.id+"'),"+additionalId+",0);");
+        c4gFormCheckInput.setAttribute("onclick", "document.getElementById('c4g_beginTime_"+additionalId+"').value=document.querySelector('input[name=_c4g_beginTime_"+additionalId+"]:checked').value;");
+        // c4gFormCheckInput.setAttribute("onclick", "document.getElementById('c4g_beginTime_"+additionalId+"')&&document.querySelector('input[name=_c4g_beginTime_"+additionalId+"]:checked')?document.getElementsId('c4g_beginTime_"+additionalId+"').value=document.querySelector('input[name=_c4g_beginTime_"+additionalId+"]:checked');.value:'';");
+        c4gFormCheckInput.setAttribute("value", value);
+        c4gFormCheckInput.style = "display: block;";
+
+        if (percent > 0) {
+            c4gFormCheckInput.classList.add("radio_object_hurry_up");
+        }
+        c4gFormCheck.appendChild(c4gFormCheckInput);
+
+        var c4gFormCheckLabel = document.createElement('label');
+        c4gFormCheckLabel.className = "c4g__form-check-label c4g__btn c4g__btn-radio";
+        c4gFormCheckLabel.innerText = name;
+        c4gFormCheckLabel.htmlFor = c4gFormCheckInput.id;
+        c4gFormCheckLabel.disabled = disabled;
+        c4gFormCheck.appendChild(c4gFormCheckLabel);
+
+        radioGroup.appendChild(c4gFormCheck);
+    }
+
+    return objstr;
+}
+
 function setTimeset(dateField, additionalId, showDateTime) {
     var elementId = 0;
     var date = 0;
@@ -613,192 +708,198 @@ function setTimeset(dateField, additionalId, showDateTime) {
         fetch(url)
             .then(response => response.json())
             .then((data) => {
-                var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
-                var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g__form-radio-group") : document.querySelectorAll(".reservation_time_button .c4g__form-radio-group");
+                //var timeGroup = document.getElementById("c4g_beginTime_"+additionalId+"-00"+getWeekdate(date));
+                //var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g__form-radio-group") : document.querySelectorAll(".reservation_time_button .c4g__form-radio-group");
                 //var radioGroups = timeGroup ? timeGroup.parentElement.getElementsByClassName("c4g__form-radio-group") : document.getElementsByClassName(".reservation_time_button .c4g__form-radio-group");
-
-
-                var timeList = [];
-                var intervalList = [];
-                var objectList = [];
-                var nameList = [];
-                var times = data['times'];
-                var size = times.length;
-                var objCaptions = data['captions'];
-                if (!document.getElementById("c4g_reservation_id").value || (document.getElementById("c4g_reservation_id").value != data['reservationId'])) {
-                    document.getElementById("c4g_reservation_id").value = data['reservationId']; //Force regeneration
-                }
-
-                document.getElementsByClassName("reservation-id")[0].style.display = "block";
-
-                var timeButtons = document.getElementsByClassName('reservation_time_button_'+additionalId);
-                for (i=0; i<timeButtons.length;i++) {
-                    timeButtons[i].style.display = "block"
-                }
-
-                var iterator = 0;
-                for (let key in times) {
-                    var dataTime = times[key]['time'];
-                    if (parseInt(times[key]['interval']) > 0) {
-                        dataTime = times[key]['time']+'#'+times[key]['interval'];
-                    }
-                    var dataInterval = times[key]['interval'];
-                    var dataObjects = times[key]['objects'];
-                    var dataName = times[key]['name'];
-
-                    timeList[iterator] = dataTime;
-                    intervalList[iterator] = dataInterval;
-                    objectList[iterator] = dataObjects;
-                    nameList[iterator] = dataName;
-                    iterator++;
-                }
-
+                var radioGroup = document.querySelector(".reservation_time_button_"+additionalId+" fieldset");
+                var objstr = addRadioFieldSet(radioGroup, data, additionalId);
                 var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
-                var capMin = 1;
-                var capMax = 0;
-                if (selectField) {
-                    for (i = 0; i < selectField.options.length; i++) {
-                        var option = selectField.options[i];
-                        var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 1;
-                        if ((min == -1) || (min < capMin)) {
-                            capMin = min;
-                        }
-                        var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
-                        if ((max == -1) || (max > capMax)) {
-                            capMax = max;
+
+                // //ab hier wird alles anders. Mögen die Spiele beginnen ...
+                // var timeList = [];
+                // var intervalList = [];
+                // var objectList = [];
+                // var nameList = [];
+                // var times = data['times'];
+                // var size = times.length;
+                // var objCaptions = data['captions'];
+                // if (!document.getElementById("c4g_reservation_id").value || (document.getElementById("c4g_reservation_id").value != data['reservationId'])) {
+                //     document.getElementById("c4g_reservation_id").value = data['reservationId']; //Force regeneration
+                // }
+                //
+                // document.getElementsByClassName("reservation-id")[0].style.display = "block";
+                //
+                // var timeButtons = document.getElementsByClassName('reservation_time_button_'+additionalId);
+                // for (i=0; i<timeButtons.length;i++) {
+                //     timeButtons[i].style.display = "block"
+                // }
+                //
+                // var iterator = 0;
+                // for (let key in times) {
+                //     var dataTime = times[key]['time'];
+                //     if (parseInt(times[key]['interval']) > 0) {
+                //         dataTime = times[key]['time']+'#'+times[key]['interval'];
+                //     }
+                //     var dataInterval = times[key]['interval'];
+                //     var dataObjects = times[key]['objects'];
+                //     var dataName = times[key]['name'];
+                //
+                //     timeList[iterator] = dataTime;
+                //     intervalList[iterator] = dataInterval;
+                //     objectList[iterator] = dataObjects;
+                //     nameList[iterator] = dataName;
+                //     iterator++;
+                // }
+                //
+                // var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
+                // var capMin = 1;
+                // var capMax = 0;
+                // if (selectField) {
+                //     for (i = 0; i < selectField.options.length; i++) {
+                //         var option = selectField.options[i];
+                //         var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 1;
+                //         if ((min == -1) || (min < capMin)) {
+                //             capMin = min;
+                //         }
+                //         var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
+                //         if ((max == -1) || (max > capMax)) {
+                //             capMax = max;
+                //         }
+                //     }
+                // }
+                //
+                // var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+additionalId);
+                // var capacity = desiredCapacity ? desiredCapacity.value : 0;
+                //
+                // if (radioGroups) {
+                //     for (i = 0; i < radioGroups.length; i++) {
+                //         var formRadioGroup = radioGroups[i];
+                //
+                //
+                //
+                //         for (j = 0; j < formRadioGroup.children.length; j++) {
+                //             var formCheck = formRadioGroup.children[j];
+                //             if (formCheck.style && formCheck.style == "display:none") {
+                //                 continue;
+                //             }
+                //
+                //             for (k = 0; k < formCheck.children.length; k++) {
+                //                 var formCheckInput = formCheck.children[k];
+                //                 var value = formCheckInput.value;
+                //
+                //                 if (value) {
+                //                     namefield = formCheckInput.getAttribute('name').substr(1);
+                //                     var arrindex = checkTimelist(value, timeList);
+                //
+                //                     var activateTimeButton = -1
+                //                     var percent = 0;
+                //                     if (arrindex !== -1) {
+                //                         for (l = 0; l < objectList[arrindex].length; l++) {
+                //                             if (objectList[arrindex][l]['id'] != -1) {
+                //                                 if (checkMax(objectList, arrindex, l, value, timeList, capacity)) {
+                //                                     if (!capMax) {
+                //                                         activateTimeButton = 0;
+                //                                         percent = 0;
+                //                                     } else {
+                //                                         activateTimeButton = (activateTimeButton < objectList[arrindex][l]['act']) ? objectList[arrindex][l]['act'] : activateTimeButton;
+                //                                         percent = objectList[arrindex][l]['percent'];
+                //                                     }
+                //                                 }
+                //                             }
+                //                         }
+                //                     }
+                //
+                //                     if ((activateTimeButton >= 0) && (!capMax || (activateTimeButton < capMax)) && (!capacity || (capacity >= capMin) && (!capMax || (capacity <= capMax)))) {
+                //                         let objstr = '';
+                //                         let withPriority = false;
+                //                         let objArr = [];
+                //                         for (l = 0; l < objectList[arrindex].length; l++) {
+                //                             let listObj = objectList[arrindex][l];
+                //                             if (listObj['priority'] && (listObj['priority'] == 1)) {
+                //                                 withPriority = true;
+                //                                 break;
+                //                             }
+                //                         }
+                //
+                //                         objectList[arrindex] = shuffle(objectList[arrindex]); //random object selection
+                //                         for (l = 0; l < objectList[arrindex].length; l++) {
+                //                             let listObj = objectList[arrindex][l];
+                //                             let interval = intervalList[arrindex];
+                //                             let time = timeList[arrindex];
+                //
+                //                             if (withPriority && listObj['priority'] && (listObj['priority'] == 1)) {
+                //                                 objArr.splice( 0, 0, listObj['id'] );
+                //                             } else {
+                //                                 objArr.push(listObj['id']);
+                //                             }
+                //
+                //                             var optionidx = -1;
+                //                             for (var m = 0; m < selectField.length; m++) {
+                //                                 if (selectField[m].value == listObj['id']) {
+                //                                     if (withPriority && listObj['priority'] && (listObj['priority'] == 1)) {
+                //                                         optionidx = m;
+                //                                         val = listObj['id'];
+                //                                         break;
+                //                                     } else if (!withPriority) {
+                //                                         optionidx = m;
+                //                                         val = listObj['id'];
+                //                                         break;
+                //                                     }
+                //                                 }
+                //                             }
+                //                         }
+                //
+                //                         for (l = 0; l < objArr.length; l++) {
+                //                             if (l == 0) {
+                //                                 objstr = objstr + objArr[l];
+                //                             } else {
+                //                                 objstr = objstr + '-' + objArr[l];
+                //                             }
+                //                         }
+                //
+                //                         formCheckInput.setAttribute('data-object', objstr);
+                //                         formCheckInput.disabled = false;
+                //                         formCheckInput.style.display = "block";
+                //
+                //                         if (nameList[arrindex]) {
+                //                             var id = formCheckInput.getAttribute('id');
+                //                             if (id) {
+                //                                 var formCheckLabel = formCheckInput.parentNode.getElementsByTagName('label')[0];
+                //                                 formCheckLabel.innerHTML = nameList[arrindex];
+                //                             }
+                //                         }
+                //
+                //                         if (percent > 0) {
+                //                             formCheckInput.classList.add("radio_object_hurry_up");
+                //                         }
+                //
+                //                         if (!val || (val == -1)) {
+                //                             val = objArr[0]; //first valid option
+                //                         }
+
+                if (!objectId) {
+                    hideOptions(additionalId, objstr, showDateTime);
+                } else if (objCaptions && objCaptions[objectId]) {
+                    var objField = document.getElementById("c4g_reservation_object_"+additionalId);
+                    if (objField && objField.length) {
+                        for (z=0; z < objField.options.length; z++) {
+                            if (objField.options[z].value == objectId) {
+                                objField.options[z].innerHtml = objCaptions[objectId];
+                                break;
+                            }
+
                         }
                     }
                 }
-
-                var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+additionalId);
-                var capacity = desiredCapacity ? desiredCapacity.value : 0;
-
-                if (radioGroups) {
-                    for (i = 0; i < radioGroups.length; i++) {
-                        var formRadioGroup = radioGroups[i];
-                        for (j = 0; j < formRadioGroup.children.length; j++) {
-                            var formCheck = formRadioGroup.children[j];
-                            if (formCheck.style && formCheck.style == "display:none") {
-                                continue;
-                            }
-
-                            for (k = 0; k < formCheck.children.length; k++) {
-                                var formCheckInput = formCheck.children[k];
-                                var value = formCheckInput.value;
-
-                                if (value) {
-                                    namefield = formCheckInput.getAttribute('name').substr(1);
-                                    var arrindex = checkTimelist(value, timeList);
-
-                                    var activateTimeButton = -1
-                                    var percent = 0;
-                                    if (arrindex !== -1) {
-                                        for (l = 0; l < objectList[arrindex].length; l++) {
-                                            if (objectList[arrindex][l]['id'] != -1) {
-                                                if (checkMax(objectList, arrindex, l, value, timeList, capacity)) {
-                                                    if (!capMax) {
-                                                        activateTimeButton = 0;
-                                                        percent = 0;
-                                                    } else {
-                                                        activateTimeButton = (activateTimeButton < objectList[arrindex][l]['act']) ? objectList[arrindex][l]['act'] : activateTimeButton;
-                                                        percent = objectList[arrindex][l]['percent'];
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if ((activateTimeButton >= 0) && (!capMax || (activateTimeButton < capMax)) && (!capacity || (capacity >= capMin) && (!capMax || (capacity <= capMax)))) {
-                                        let objstr = '';
-                                        let withPriority = false;
-                                        let objArr = [];
-                                        for (l = 0; l < objectList[arrindex].length; l++) {
-                                            let listObj = objectList[arrindex][l];
-                                            if (listObj['priority'] && (listObj['priority'] == 1)) {
-                                                withPriority = true;
-                                                break;
-                                            }
-                                        }
-
-                                        objectList[arrindex] = shuffle(objectList[arrindex]); //random object selection
-                                        for (l = 0; l < objectList[arrindex].length; l++) {
-                                            let listObj = objectList[arrindex][l];
-                                            let interval = intervalList[arrindex];
-                                            let time = timeList[arrindex];
-
-                                            if (withPriority && listObj['priority'] && (listObj['priority'] == 1)) {
-                                                objArr.splice( 0, 0, listObj['id'] );
-                                            } else {
-                                                objArr.push(listObj['id']);
-                                            }
-
-                                            var optionidx = -1;
-                                            for (var m = 0; m < selectField.length; m++) {
-                                                if (selectField[m].value == listObj['id']) {
-                                                    if (withPriority && listObj['priority'] && (listObj['priority'] == 1)) {
-                                                        optionidx = m;
-                                                        val = listObj['id'];
-                                                        break;
-                                                    } else if (!withPriority) {
-                                                        optionidx = m;
-                                                        val = listObj['id'];
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        for (l = 0; l < objArr.length; l++) {
-                                            if (l == 0) {
-                                                objstr = objstr + objArr[l];
-                                            } else {
-                                                objstr = objstr + '-' + objArr[l];
-                                            }
-                                        }
-
-                                        formCheckInput.setAttribute('data-object', objstr);
-                                        formCheckInput.disabled = false;
-                                        formCheckInput.style.display = "block";
-
-                                        if (nameList[arrindex]) {
-                                            var id = formCheckInput.getAttribute('id');
-                                            if (id) {
-                                                var formCheckLabel = formCheckInput.parentNode.getElementsByTagName('label')[0];
-                                                formCheckLabel.innerHTML = nameList[arrindex];
-                                            }
-                                        }
-
-                                        if (percent > 0) {
-                                            formCheckInput.classList.add("radio_object_hurry_up");
-                                        }
-
-                                        if (!val || (val == -1)) {
-                                            val = objArr[0]; //first valid option
-                                        }
-
-                                        if (!objectId) {
-                                            hideOptions(additionalId, objstr, showDateTime);
-                                        } else if (objCaptions && objCaptions[objectId]) {
-                                            var objField = document.getElementById("c4g_reservation_object_"+additionalId);
-                                            if (objField && objField.length) {
-                                                for (z=0; z < objField.options.length; z++) {
-                                                    if (objField.options[z].value == objectId) {
-                                                        objField.options[z].innerHtml = objCaptions[objectId];
-                                                        break;
-                                                    }
-
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        formCheckInput.setAttribute('disabled', true);
-                                        formCheckInput.setAttribute('hidden', true);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                    //                 } else {
+                    //                     formCheckInput.setAttribute('disabled', true);
+                    //                     formCheckInput.setAttribute('hidden', true);
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
+                    // }
+                //}
 
                 handleBrickConditions();
 
