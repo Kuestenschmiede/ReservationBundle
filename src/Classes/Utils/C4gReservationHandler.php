@@ -1054,9 +1054,9 @@ class C4gReservationHandler
             $desiredCapacity = $object->getDesiredCapacity()[1];
 
             if ((($reservationCount / $desiredCapacity) * 100) >= 100) {
-                $result = ' c4g_radio_object_fully_booked';
+                $result = ' radio_object_fully_booked';
             } else if ((($reservationCount / $desiredCapacity) * 100) >= $percent) {
-                $result = ' c4g_radio_object_hurry_up';
+                $result = ' radio_object_hurry_up';
             }
         }
 

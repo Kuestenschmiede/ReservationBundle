@@ -42,22 +42,22 @@
   background-color: #006400;
   border: solid 1px #adff2f
 }
-.reservation_time_button.radio_object_hurry_up + label,
-.reservation_time_event_button.c4g_radio_object_hurry_up .c4g__form-check input[type=radio] + label {
-  background-color: #ff8c00
-}
-.reservation_time_button input[type=radio][disabled] + label,
-.reservation_time_event_button.c4g_radio_object_fully_booked .c4g__form-check input[type=radio] + label {
-  background-color: red;
-  opacity: 1;
-  cursor: no-drop;
-  font-weight: 400
-}
 .reservation_time_button_direct input[type=radio][disabled] + label {
   background-color: #006400;
   opacity: 1;
   border: solid 1px #adff2f;
   font-weight: 700
+}
+.reservation_time_button .radio_object_hurry_up + label,
+.reservation_time_event_button.radio_object_hurry_up .c4g__form-check input[type=radio] + label {
+  background-color: #ff8c00
+}
+.reservation_time_button input[type=radio][disabled] + label,
+.reservation_time_event_button.radio_object_fully_booked .c4g__form-check input[type=radio] + label {
+  background-color: red;
+  opacity: 1;
+  cursor: no-drop;
+  font-weight: 400
 }
 .mod_C4gReservation label.agreed.c4g_agreed,
 .mod_C4gReservation label.reservation_id.c4g_reservation_id {
