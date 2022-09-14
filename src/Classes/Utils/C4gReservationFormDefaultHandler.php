@@ -142,6 +142,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
 
         if ($initialBookingTime) {
             $options = C4gReservationHandler::getReservationNowTime($objects[0], $reservationSettings->showEndTime, $reservationSettings->showFreeSeats);
+            $classes = 'reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id'];
         } else {
             $options = C4gReservationHandler::getReservationTimes(
                         $reservationObjects,
@@ -153,6 +154,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                         $reservationSettings->showEndTime,
                         $reservationSettings->showFreeSeats
                     );
+            $classes = 'reservation_time_button reservation_time_button_' . $listType['id'];
         }
 
         $reservationBeginTimeField = new C4GRadioGroupField();
@@ -173,7 +175,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setTurnButton(true);
         $reservationBeginTimeField->setShowButtons(true);
         $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
-        $reservationBeginTimeField->setStyleClass('reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id']);
+        $reservationBeginTimeField->setStyleClass($classes);
         $reservationBeginTimeField->setTimeButtonSpecial(true);
         $reservationBeginTimeField->setWithoutScripts(true);
         $this->fieldList[] = $reservationBeginTimeField;

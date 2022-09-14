@@ -100,7 +100,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         //$reservationObjectField->setEmptyOptionLabel($this->reservationSettings->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_objectsfirst_none']);
         $reservationObjectField->setCondition([$condition]);
         $reservationObjectField->setRemoveWithEmptyCondition(true);
-        //$reservationObjectField->setCallOnChangeFunction('C4GCallOnChange(this)');
+        $reservationObjectField->setCallOnChangeFunction("var actValue = document.getElementById('c4g_reservation_object_".$listType['id']."').value;setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+actValue),".$listType['id'].",".$showDateTime.");handleBrickConditions();");
         $reservationObjectField->setInitialCallOnChange(true);
         $reservationObjectField->setCallOnChange(true);
         $reservationObjectField->setAdditionalID($listType["id"]);
@@ -108,8 +108,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
 
         foreach ($reservationObjects as $reservationObject) {
             $object_condition = [
-                new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
-                $condition
+                new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId())
             ];
 
             if ($reservationSettings->showDetails) {
@@ -365,6 +364,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
 
             if ($initialBookingTime) {
                 $options = C4gReservationHandler::getReservationNowTime($objects[0], $reservationSettings->showEndTime, $reservationSettings->showFreeSeats);
+                $classes = 'reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id'];
             } else {
                 $options = C4gReservationHandler::getReservationTimes(
                     $reservationObjects,
@@ -376,6 +376,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $reservationSettings->showEndTime,
                     $reservationSettings->showFreeSeats
                 );
+                $classes = 'reservation_time_button reservation_time_button_' . $listType['id'];
             }
 
             $reservationBeginTimeField = new C4GRadioGroupField();
@@ -390,13 +391,13 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginTimeField->setInitialValue($initialBookingTime ?: $this->initialValues->getTime());
             $reservationBeginTimeField->setSort(false);
             $reservationBeginTimeField->setCondition($object_condition);
-            $reservationBeginTimeField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId().'-00'.date('w', $initialBookingDate));
+            $reservationBeginTimeField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
             $reservationBeginTimeField->setNotificationField(true);
             $reservationBeginTimeField->setClearGroupText($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText']);
             $reservationBeginTimeField->setTurnButton(true);
             $reservationBeginTimeField->setShowButtons(true);
             $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
-            $reservationBeginTimeField->setStyleClass('reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id']);
+            $reservationBeginTimeField->setStyleClass($classes);
             $reservationBeginTimeField->setTimeButtonSpecial(true);
             $reservationBeginTimeField->setInitInvisible(true);
             $reservationBeginTimeField->setWithoutScripts(true);
