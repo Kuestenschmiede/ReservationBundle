@@ -335,7 +335,7 @@ class C4gReservationCalculator
         if ($reservations) {
             foreach ($reservations as $reservation) {
                 if ($reservation['reservation_object']) {
-                    if ($reservation['reservation_object'] === $objectId) {
+                    if (intval($reservation['reservation_object']) === intval($objectId)) {
                         $timeArray[$tsdate][$time] = $timeArray[$tsdate][$time] ? $timeArray[$tsdate][$time] + 1 : 1;
                     }
                 }

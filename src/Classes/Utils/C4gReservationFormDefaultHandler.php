@@ -68,7 +68,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 $initialBookingDate = false;
             }
 
-            $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."')," . $listType['id'] . "," . $showDateTime . ");";
+            $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."').value," . $listType['id'] . "," . $showDateTime . ",0);";
             $this->getDialogParams()->setOnloadScript($script);
 
             switch($listType['periodType']) {
@@ -112,7 +112,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCondition(array($condition));
             $reservationBeginDateField->setCallOnChange(true);
             $reservationBeginDateField->setRemoveWithEmptyCondition(true);
-            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this," . $listType['id'] . "," . $showDateTime . ");");
+            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",0);");
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id']);
             $reservationBeginDateField->setStyleClass('begin-date');

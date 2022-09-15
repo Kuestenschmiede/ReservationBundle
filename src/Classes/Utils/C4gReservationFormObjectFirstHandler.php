@@ -100,7 +100,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         //$reservationObjectField->setEmptyOptionLabel($this->reservationSettings->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_objectsfirst_none']);
         $reservationObjectField->setCondition([$condition]);
         $reservationObjectField->setRemoveWithEmptyCondition(true);
-        $reservationObjectField->setCallOnChangeFunction("var actValue = document.getElementById('c4g_reservation_object_".$listType['id']."').value;setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+actValue),".$listType['id'].",".$showDateTime.");handleBrickConditions();");
+        $reservationObjectField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+document.getElementById('c4g_reservation_object_".$listType['id']."').value).value,".$listType['id'].",".$showDateTime.",document.getElementById('c4g_reservation_object_".$listType['id']."').value);handleBrickConditions();");
         $reservationObjectField->setInitialCallOnChange(true);
         $reservationObjectField->setCallOnChange(true);
         $reservationObjectField->setAdditionalID($listType["id"]);
@@ -301,7 +301,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             }
 
             if ($this->initialValues->getDate() || $initialBookingDate) {
-                $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id'] . '-33' . $reservationObject->getId()."')," . $listType['id'] . "," . $showDateTime . ");";
+                $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+document.getElementById('c4g_reservation_object_".$listType['id']."').value).value,".$listType['id'].",".$showDateTime.",document.getElementById('c4g_reservation_object_".$listType['id']."').value);handleBrickConditions();)";
                 $this->getDialogParams()->setOnloadScript($script);
             }
 
@@ -347,7 +347,8 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCondition($object_condition);
             $reservationBeginDateField->setRemoveWithEmptyCondition(true);
             $reservationBeginDateField->setCallOnChange(true);
-            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this," . $listType['id'] . "," . $showDateTime . ");");
+            //"var actValue = document.getElementById('c4g_reservation_object_".$listType['id']."').value;setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+actValue).value,".$listType['id'].",".$showDateTime.",actValue);handleBrickConditions();"
+            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",". $reservationObject->getId().");");
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
             $reservationBeginDateField->setStyleClass('begin-date');

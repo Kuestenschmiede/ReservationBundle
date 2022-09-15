@@ -348,7 +348,7 @@ function setReservationForm(typeId, showDateTime) {
             var objectElement = document.getElementById("c4g_reservation_object_"+typeId);
             if (objectElement) {
                 dateId = dateId + '-33' +objectElement.value;
-                setTimeset(document.getElementById(dateId), typeId, showDateTime);
+                setTimeset(document.getElementById(dateId).value, typeId, showDateTime,objectElement.value);
             }
         } else if (event) {
             const queryString = window.location.search;
@@ -358,7 +358,7 @@ function setReservationForm(typeId, showDateTime) {
             if (eventId) {
                 var dateId = 'c4g_beginDateEvent_' + typeId + '-22' + eventId;
                 if (document.getElementById(dateId)) {
-                    setTimeset(document.getElementById(dateId), typeId, showDateTime);
+                    setTimeset(document.getElementById(dateId).value, typeId, showDateTime,0);
                     checkEventFields();
                 }
             } else {
@@ -369,7 +369,7 @@ function setReservationForm(typeId, showDateTime) {
                         if (dateField && checkType(dateField, event) && dateField.value) {
                             var fieldId = dateField.id;
                             if (fieldId && fieldId.indexOf('c4g_beginDateEvent_' + typeId + '-22')) {
-                                setTimeset(dateField, typeId, showDateTime);
+                                setTimeset(dateField.value, typeId, showDateTime,0);
                                 checkEventFields();
                                 break;
                             }
@@ -378,7 +378,7 @@ function setReservationForm(typeId, showDateTime) {
                 }
             }
         } else if (document.getElementById(dateId)) {
-            setTimeset(document.getElementById(dateId), typeId, showDateTime);
+            setTimeset(document.getElementById(dateId).value, typeId, showDateTime, 0);
         }
     }
 
@@ -628,12 +628,14 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         var c4gFormCheckInput = document.createElement('input');
         c4gFormCheckInput.type = 'radio';
         c4gFormCheckInput.className = "c4g__form-check-input c4g__btn-check";
-        c4gFormCheckInput.id = 'beginTime_'+additionalId+'-'+time+'#'+interval;
-        c4gFormCheckInput.setAttribute('name', '_c4g_beginTime_'+additionalId);
         c4gFormCheckInput.setAttribute("onchange", "setObjectId(this,"+additionalId+","+showDateTime+");");
         if (objId) {
+            c4gFormCheckInput.setAttribute('name', '_c4g_beginTime_'+additionalId+"-33"+objId);
+            c4gFormCheckInput.id = 'beginTime_'+additionalId+" 3"+objId+'-'+time+'#'+interval;
             c4gFormCheckInput.setAttribute("onclick", "document.getElementById('c4g_beginTime_"+additionalId+"-33"+objId+"').value=this.value;");
         } else {
+            c4gFormCheckInput.setAttribute('name', '_c4g_beginTime_'+additionalId);
+            c4gFormCheckInput.id = 'beginTime_'+additionalId+'-'+time+'#'+interval;
             c4gFormCheckInput.setAttribute("onclick", "document.getElementById('c4g_beginTime_"+additionalId+"').value=this.value;");
         }
         c4gFormCheckInput.setAttribute('data-object', objstr);
@@ -644,10 +646,6 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
             c4gFormCheckInput.setAttribute('disabled', disabled);
             c4gFormCheckInput.setAttribute('hidden', disabled);
         }
-        // if (!disabled) {
-        //     c4gFormCheckInput.removeAttribute('disabled');
-        //     c4gFormCheckInput.removeAttribute('hidden');
-        // }
 
         if (percent > 0) {
             c4gFormCheckInput.className = c4gFormCheckInput.className+" radio_object_hurry_up";
@@ -666,26 +664,44 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
     //return objstr;
 }
 
-function setTimeset(dateField, additionalId, showDateTime) {
+function setTimeset(date, additionalId, showDateTime, objectId) {
     var elementId = 0;
-    var date = 0;
-    var val = -1;
-    var nameField = '';
-    var objectId = 0;
+    // var date = 0;
+    // var nameField = '';
+    //var objectId = 0;
 
-    if (additionalId == -1) {
-        document.getElementsByClassName('reservation_time_button') ? document.getElementsByClassName('reservation_time_button').style.display = "none" : false;
-        document.getElementsByClassName('displayReservationObjects') ? document.getElementsByClassName('displayReservationObjects').style.display = "none" : false;
-    } else {
-        if (!dateField) {
-            dateField = document.getElementById('c4g_beginDate_'+additionalId);
-        } else {
-            if (dateField.id && dateField.id.indexOf("-33") && (dateField.id.indexOf("-33") != -1)) {
-                objectId = dateField.id.substr(dateField.id.indexOf("-33")+3);
+    // if (additionalId == -1) {
+    //     document.getElementsByClassName('reservation_time_button') ? document.getElementsByClassName('reservation_time_button').style.display = "none" : false;
+    //     document.getElementsByClassName('displayReservationObjects') ? document.getElementsByClassName('displayReservationObjects').style.display = "none" : false;
+    // } else {
+    //     if (!dateField) {
+    //         dateField = document.getElementById('c4g_beginDate_'+additionalId);
+    //     } else {
+    //         if (dateField.id && dateField.id.indexOf("-33") && (dateField.id.indexOf("-33") != -1)) {
+    //             objectId = dateField.id.substr(dateField.id.indexOf("-33")+3);
+    //             if (objectId) {
+    //                 objectId = document.getElementById("c4g_reservation_object_"+additionalId).value;
+    //             }
+    //         }
+    //     }
+    //
+    //     date = dateField ? dateField.value : 0;
+    // }
+
+    if (objectId) {
+        var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
+        //selectField.value = objectId;
+        selectField.setAttribute('value',objectId);
+        for (i=0;i<selectField.options.length;i++) {
+            let option = selectField.options[i];
+            if (option.value == selectField.value) {
+                //option.selected = true;
+                option.setAttribute("selected","true");
+            } else {
+                //option.selected = false;
+                option.removeAttribute("selected");
             }
         }
-
-        date = dateField ? dateField.value : 0;
     }
 
     var durationNode = document.getElementById("c4g_duration_"+additionalId);
@@ -699,6 +715,7 @@ function setTimeset(dateField, additionalId, showDateTime) {
     }
 
     //hotfix dates with slashes
+
     if (date && date.indexOf("/")) {
         date = date.replace("/", "~");
         date = date.replace("/", "~");
@@ -744,17 +761,17 @@ function setTimeset(dateField, additionalId, showDateTime) {
 
                 handleBrickConditions();
 
-                if (nameField) {
-                   var valueElement = document.getElementById(nameField);
-                   if (valueElement) {
-                      valueElement.value = '';
-                   }
-
-                   var reservation_time_button = document.querySelectorAll('.reservation_time_button_'+addId+' input[type = "radio"]');
-                   for (z=0; z < reservation_time_button.length; z++) {
-                       reservation_time_button[z].removeAttribute("checked");
-                   }
-                }
+                // if (nameField) {
+                //    var valueElement = document.getElementById(nameField);
+                //    if (valueElement) {
+                //       valueElement.value = '';
+                //    }
+                //
+                //    var reservation_time_button = document.querySelectorAll('.reservation_time_button_'+addId+' input[type = "radio"]');
+                //    for (z=0; z < reservation_time_button.length; z++) {
+                //        reservation_time_button[z].removeAttribute("checked");
+                //    }
+                // }
 
                 if (additionalId != -1) {
                     var timeGroups = document.querySelectorAll('.reservation_time_button_'+addId+'.formdata input[type = "hidden"]');
