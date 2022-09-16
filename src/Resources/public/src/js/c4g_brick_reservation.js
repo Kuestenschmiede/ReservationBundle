@@ -631,7 +631,7 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         c4gFormCheckInput.setAttribute("onchange", "setObjectId(this,"+additionalId+","+showDateTime+");");
         if (objId) {
             c4gFormCheckInput.setAttribute('name', '_c4g_beginTime_'+additionalId+"-33"+objId);
-            c4gFormCheckInput.id = 'beginTime_'+additionalId+" 3"+objId+'-'+time+'#'+interval;
+            c4gFormCheckInput.id = 'beginTime_'+additionalId+"-33"+objId+'-'+time+'#'+interval;
             c4gFormCheckInput.setAttribute("onclick", "document.getElementById('c4g_beginTime_"+additionalId+"-33"+objId+"').value=this.value;");
         } else {
             c4gFormCheckInput.setAttribute('name', '_c4g_beginTime_'+additionalId);
