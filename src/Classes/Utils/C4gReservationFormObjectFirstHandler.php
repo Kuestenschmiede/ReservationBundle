@@ -108,7 +108,8 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
 
         foreach ($reservationObjects as $reservationObject) {
             $object_condition = [
-                new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId())
+                new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
+                $condition
             ];
 
             if ($reservationSettings->showDetails) {
