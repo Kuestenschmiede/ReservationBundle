@@ -34,9 +34,9 @@ class C4gReservationCalculator
         $this->objectTypeId = $objectTypeId;
 
         $database = Database::getInstance();
-        $set = [$date, $date];
+        $set = [$date, $date, $objectTypeId];
         $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-            "? >= `beginDate` AND ? <= `endDate` AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
+            "? >= `beginDate` AND ? <= `endDate` AND `reservationObjectType` = ? AND NOT `cancellation`='1'")
             ->execute($set)->fetchAllAssoc();
         if ($result) {
             $this->reservations[$date][$objectTypeId] = $result;
@@ -216,6 +216,17 @@ class C4gReservationCalculator
             }
         } elseif ($this->resultList) {
             foreach ($this->resultList as $reservation) {
+
+                if ($object) {
+                    $allTypesValidity = $object->getAllTypesValidity();
+//                    $allTypesQuantity = $object->getAllTypesQuantity();
+//                    $switchAllTypes = $object->getSwitchAllTypes();
+//                    $switchAllTypes = \Contao\StringUtil::deserialize($switchAllTypes);
+                }
+
+                if (!$allTypesValidity && $reservation['reservation_object'] != $objectId) {
+                    continue;
+                }
                 $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
                 $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);
                 $tb = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
@@ -225,24 +236,31 @@ class C4gReservationCalculator
                 $timeBeginDb = strtotime($tbdb);
                 $timeEndDb = strtotime($tedb);
 
-                //$actDuration = $actDuration ?: $reservation['duration']; //ToDo object interval?
+                //ToDo Test
+                $actDuration = intval($actDuration) ?: intval($reservation['duration']); //ToDo object interval?
+                $reservationInterval = intval($reservation['timeInterval']);
 
-               /* if ($actDuration && ($reservation['timeInterval']) && ($actDuration > $reservation['timeInterval'])) {
+                if ($actDuration && $reservationInterval && ($actDuration != $reservationInterval)) {
                     switch ($reservation['periodType']) {
                         case 'minute':
-                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 60) + ($actDuration * 60);
+                            $timeEnd = $timeEnd - ($reservationInterval * 60) + ($actDuration * 60);
                             break;
                         case 'hour':
-                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 3600) + ($actDuration * 3600);
+                            $timeEnd = $timeEnd - ($reservationInterval * 3600) + ($actDuration * 3600);
                             break;
                         case 'day':
-                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 86400) + ($actDuration * 86400);
+                            $timeEnd = $timeEnd - ($reservationInterval * 86400) + ($actDuration * 86400);
                             break;
                         case 'week':
-                            $timeEndDb = $timeEndDb - ($reservation['timeInterval'] * 604800) + ($actDuration * 604800);
+                            $timeEnd = $timeEnd - ($reservationInterval * 604800) + ($actDuration * 604800);
                             break;
                     }
-                }*/
+                }
+//                /* Todo Wurde nur zum Testen aufgeschrieben und sollte ausgebaut werden*/
+//                $realBegin = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBegin);
+//                $realEnd   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEnd);
+//                $realBeginDb = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBeginDb);
+//                $realEndDb   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEndDb);
 
                 if (
                     (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
