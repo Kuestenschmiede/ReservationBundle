@@ -8,52 +8,6 @@
  * @link https://www.con4gis.org
  */
 
-// function getWeekdate(date) {
-//
-//     //ToDo internationalize
-//     if (date.indexOf(".") > 0) {
-//         var arrDate = date.split(".")
-//         var y = arrDate[2];
-//         var m = arrDate[1];
-//         var d = arrDate[0];
-//         //important for safari browser
-//         m = m<10?"0"+m:m;
-//         d = d<10?"0"+d:d;
-//
-//         if (y && y.length == 2) {
-//             y = '20'+y;
-//         }
-//
-//         date = y + "/" + m + "/" + d;
-//     } else if (date.indexOf("/") > 0) {
-//         var arrDate = date.split("/")
-//         var y = arrDate[2];
-//         var m = arrDate[1];
-//         var d = arrDate[0];
-//         //important for safari browser
-//         m = m<10?"0"+m:m;
-//         d = d<10?"0"+d:d;
-//
-//         if (y && y.length == 2) {
-//             y = '20'+y;
-//         }
-//         date = y + "/" + m + "/" + d;
-//     }
-//
-//     var jsdate = new Date(date);
-//     return jsdate.getDay();
-// }
-//
-// function isWeekday(datestr, fieldName) {
-//     var dateArr = datestr.split('--');
-//     if (dateArr && dateArr[0] && dateArr[1]) {
-//         if (getWeekdate(dateArr[0]) == dateArr[1]) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
 function setObjectId(object, typeid, showDateTime = 0) {
     var objectParam = object ? object.getAttribute('data-object'): false;
     var typeId = typeid;
@@ -62,10 +16,6 @@ function setObjectId(object, typeid, showDateTime = 0) {
     var objects = null;
     var values = '';
     var oldValue = false;
-
-    // if (object) {
-    //     return;
-    // }
 
     if (selectField) {
         selectField.style.display = 'block';
@@ -101,9 +51,7 @@ function setObjectId(object, typeid, showDateTime = 0) {
         }
     }
 
-    //if (!object) {
-        hideOptions(typeId, values, showDateTime);
-    //}
+    hideOptions(typeId, values, showDateTime);
 
     if (oldValue) {
        for (i = 0; i < selectField.options.length; i++) {
@@ -126,7 +74,6 @@ function setObjectId(object, typeid, showDateTime = 0) {
         }
     }
 
-    //hideOptions(typeId, values, showDateTime);
     return true;
 }
 
@@ -381,7 +328,6 @@ function setReservationForm(typeId, showDateTime) {
             setTimeset(document.getElementById(dateId).value, typeId, showDateTime, 0);
         }
     }
-
     handleBrickConditions();
 
     document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
@@ -667,42 +613,21 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
 
 function setTimeset(date, additionalId, showDateTime, objectId) {
     var elementId = 0;
-    // var date = 0;
-    // var nameField = '';
-    //var objectId = 0;
 
-    // if (additionalId == -1) {
-    //     document.getElementsByClassName('reservation_time_button') ? document.getElementsByClassName('reservation_time_button').style.display = "none" : false;
-    //     document.getElementsByClassName('displayReservationObjects') ? document.getElementsByClassName('displayReservationObjects').style.display = "none" : false;
-    // } else {
-    //     if (!dateField) {
-    //         dateField = document.getElementById('c4g_beginDate_'+additionalId);
-    //     } else {
-    //         if (dateField.id && dateField.id.indexOf("-33") && (dateField.id.indexOf("-33") != -1)) {
-    //             objectId = dateField.id.substr(dateField.id.indexOf("-33")+3);
-    //             if (objectId) {
-    //                 objectId = document.getElementById("c4g_reservation_object_"+additionalId).value;
-    //             }
-    //         }
-    //     }
-    //
-    //     date = dateField ? dateField.value : 0;
-    // }
-
+    var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
     if (objectId) {
-        var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
-        //selectField.value = objectId;
         selectField.setAttribute('value',objectId);
         for (i=0;i<selectField.options.length;i++) {
             let option = selectField.options[i];
             if (option.value == selectField.value) {
-                //option.selected = true;
                 option.setAttribute("selected","true");
             } else {
-                //option.selected = false;
                 option.removeAttribute("selected");
             }
         }
+    } else {
+        selectField.value = -1;
+        eventFire(selectField, 'change');
     }
 
     var durationNode = document.getElementById("c4g_duration_"+additionalId);
@@ -762,18 +687,6 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
 
                 handleBrickConditions();
 
-                // if (nameField) {
-                //    var valueElement = document.getElementById(nameField);
-                //    if (valueElement) {
-                //       valueElement.value = '';
-                //    }
-                //
-                //    var reservation_time_button = document.querySelectorAll('.reservation_time_button_'+addId+' input[type = "radio"]');
-                //    for (z=0; z < reservation_time_button.length; z++) {
-                //        reservation_time_button[z].removeAttribute("checked");
-                //    }
-                // }
-
                 if (additionalId != -1) {
                     var timeGroups = document.querySelectorAll('.reservation_time_button_'+addId+'.formdata input[type = "hidden"]');
                     var timeValue = false;
@@ -832,12 +745,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                                 selectField.disabled = true;
                             }
                         }                                    
-                    } /*else if (objCaptions && objCaptions[objectId]) {
-                        var objField = document.getElementById("c4g_reservation_object_"+addId);
-                        if (objField && jQuery(objField).length) {
-                            jQuery(objField).children('option[value='+objectId+']').html(objCaptions[objectId]);
-                        }
-                    }*/
+                    }
                 }
             }).finally(function() {
                 document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
@@ -854,16 +762,12 @@ function checkEventFields() {
     var typeField = document.getElementById("c4g_reservation_type");
     var typeId = typeField ? typeField.value : -1;
     var selectField = document.querySelector('.reservation-event-object select');
-    //handleBrickConditions();
-    //ToDo test with contao events
     let eventData = document.getElementsByClassName('eventdata');
     if (eventData[0]) {
         eventData[0].style.display = 'none';
-
     }
 
     if (selectField && (document.querySelector("reservation-id:not([hidden])"))) {
-
         document.getElementsByClassName("reservation-id");
         for (i = 0; i < selectField.length; i++) {
             if (selectField[i]) {

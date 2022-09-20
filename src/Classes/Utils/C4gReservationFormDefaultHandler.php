@@ -68,8 +68,8 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 $initialBookingDate = false;
             }
 
-            $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."').value," . $listType['id'] . "," . $showDateTime . ",0);";
-            $this->getDialogParams()->setOnloadScript($script);
+//            $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."').value," . $listType['id'] . "," . $showDateTime . ",0);";
+//            $this->getDialogParams()->setOnloadScript($script);
 
             switch($listType['periodType']) {
                 case 'minute':
