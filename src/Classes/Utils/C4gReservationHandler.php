@@ -1247,6 +1247,16 @@ class C4gReservationHandler
         }
     }
 
+    public static function formatPrice($price) {
+        $price = number_format(floatval($price),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']);
+
+        if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['switchCurrencyPosition']) {
+            return $GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] . ' ' .$price;
+        } else {
+            return $price.' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
+        }
+    }
+
     /**
      * @param $object
      */
@@ -1346,7 +1356,7 @@ class C4gReservationHandler
 
         if ($price) {
             $priceInfo ? "&nbsp;".$priceInfo : '';
-            $price = $price ? number_format(floatval($price),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'].$priceInfo : '';
+            $price = $price ? C4gReservationHandler::formatPrice($price).$priceInfo : '';
         }
         return $price;
     }

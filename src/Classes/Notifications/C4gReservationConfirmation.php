@@ -17,6 +17,7 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationEventAudienceModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventSpeakerModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventTopicModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Controller;
 use Contao\Database;
 use Contao\MemberModel;
@@ -231,7 +232,7 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('agreed', $reservation['agreed']);
 
 
-                        $price = number_format(floatval($reservationObject['price']),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
+                        $price = C4gReservationHandler::formatPrice($reservationObjec['price']);
                         $c4gNotify->setTokenValue('price', $price);
 
                         $binFileUuid = $reservation['fileUpload'];

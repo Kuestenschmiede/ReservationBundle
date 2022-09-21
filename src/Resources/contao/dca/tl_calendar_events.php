@@ -11,6 +11,7 @@
 
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\DataBundle\Classes\Contao\Hooks\ReplaceInsertTags;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Calendar;
 use Contao\Config;
 use Contao\Controller;
@@ -123,13 +124,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
 
         //price
         if ($arrChildRow['price']) {
-
-            if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['switchCurrencyPosition']) {
-                $price = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['price'].':</strong></div><div>' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] . ' ' . number_format(floatval($arrChildRow['price']),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']) . '</div></div>';
-
-            } else {
-                $price = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['price'].':</strong></div><div>' . number_format(floatval($arrChildRow['price']),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']).' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] . '</div></div>';
-            }
+            $price = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['price'].':</strong></div><div>'.C4gReservationHandler::formatPrice($arrChildRow['price']) . '</div></div>';
         }
 
         //location

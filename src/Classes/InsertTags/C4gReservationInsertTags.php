@@ -12,6 +12,7 @@ namespace con4gis\ReservationBundle\Classes\InsertTags;
 
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Controller;
 use Contao\Database;
 use Contao\StringUtil;
@@ -584,7 +585,7 @@ class C4gReservationInsertTags
 
                             return $result ? serialize($result) : '';
                         case 'price':
-                            return number_format(floatval($reservationObject->price),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'])."&nbsp;".$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'];
+                            return C4gReservationHandler::formatPrice($reservationObject->price);
                         case 'speakerId':
                             if ($reservationObject->speaker) {
                                 $speakerIds = \Contao\StringUtil::deserialize($reservationObject->speaker);
