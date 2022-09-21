@@ -114,7 +114,6 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['openingHours'] = 'opening hours';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['included_params'] = 'Included services';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional_params'] = 'Bookable services';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['md'] = 'several days';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['event'] = 'Event';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['signature'] = 'Signature';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['description'] = 'Description';
 
@@ -182,3 +181,4 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'] = 2;
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'] = '.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'] = '’';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] = '€';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['switchCurrencyPosition'] = false;

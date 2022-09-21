@@ -86,9 +86,15 @@ class C4gReservationInsertTags
             $tableReservation = 'tl_c4g_reservation';
             $reservationCount = 0;
 
-            $reservationObject = $this->db->prepare("SELECT SUM(desiredCapacity) AS reservationCount FROM $tableReservation WHERE `reservation_object` = $id AND `reservationObjectType` = '2' AND NOT `cancellation` = '1'")->execute()->fetchAllAssoc();
-            if ($reservationObject) {
-                $reservationCount = $reservationObject[0]['reservationCount'];
+            $participants = Database::getInstance()->prepare(
+                "SELECT count(tl_c4g_reservation_participants.id) as participantsCount, count(tl_c4g_reservation.id) AS bookersCount FROM tl_c4g_reservation_participants 
+                            LEFT JOIN tl_c4g_reservation ON tl_c4g_reservation_participants.pid = tl_c4g_reservation.id
+                            WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($id)->fetchAssoc();
+
+            if (is_array($participants)) {
+                //we count booker + participants
+                //ToDo switch to count without booker
+                $reservationCount = $participants['participantsCount'] + $participants['bookersCount'];
             }
 
             $reservationType = $reservationEventObject->reservationType;

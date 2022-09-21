@@ -121,8 +121,15 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             }
         }
 
+        //price
         if ($arrChildRow['price']) {
-            $price = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['price'].':</strong></div><div>' . number_format(floatval($arrChildRow['price']),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']).' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] . '</div></div>';
+
+            if ($GLOBALS['TL_LANG']['fe_c4g_reservation']['switchCurrencyPosition']) {
+                $price = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['price'].':</strong></div><div>' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] . ' ' . number_format(floatval($arrChildRow['price']),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']) . '</div></div>';
+
+            } else {
+                $price = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['price'].':</strong></div><div>' . number_format(floatval($arrChildRow['price']),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']).' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] . '</div></div>';
+            }
         }
 
         //location
@@ -130,11 +137,30 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             $locationResult = Database::getInstance()->prepare('SELECT name FROM tl_c4g_reservation_location WHERE id = '.$arrChildRow['location'])->execute()->fetchAssoc();
             $locationName = $locationResult['name'];
             if ($locationName) {
-                $location = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'].'</strong></div><div>' . $locationName . '</div></div>';
+                $location = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'].':</strong></div><div>' . $locationName . '</div></div>';
             }
         }
 
-        return '<strong><div style="margin-bottom:10px">' . $row['title'] . '</div></strong>' . $event . $topics . $speakers . $price . $location;
+        //participants
+        $participants = Database::getInstance()->prepare(
+            "SELECT count(tl_c4g_reservation_participants.id) as participantsCount, count(tl_c4g_reservation.id) AS bookersCount FROM tl_c4g_reservation_participants 
+                            LEFT JOIN tl_c4g_reservation ON tl_c4g_reservation_participants.pid = tl_c4g_reservation.id
+                            WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($row['id'])->fetchAssoc();
+
+        if (is_array($participants)) {
+            //we count booker + participants
+            //ToDo switch to count without booker
+            $count = $participants['participantsCount'] + $participants['bookersCount'];
+            if ($arrChildRow['maxParticipants']) {
+                $count .= '/' . $arrChildRow['maxParticipants'];
+                $percent = $count ? ($count / $arrChildRow['maxParticipants']) * 100 : 0;
+                $count .= ' ('.$percent.'%)';
+            }
+
+            $participants = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'].':</strong></div><div>' . $count . '</div></div>';
+        }
+
+        return '<strong><div style="margin-bottom:10px">' . $row['title'] . '</div></strong>' . $event . $topics . $speakers . $price . $location . $participants;
     }
 
     /**

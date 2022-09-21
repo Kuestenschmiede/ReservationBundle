@@ -114,7 +114,6 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['day'] = 'Tage';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['week'] = 'Wochen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['openingHours'] = 'Öffnungszeiten';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['md'] = 'Mehrtägig';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['event'] = 'Event';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none'] = 'Derzeit sind keine Reservierungen möglich.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['signature'] = 'Unterschrift';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['description'] = 'Beschreibung';
@@ -185,3 +184,5 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'] = 2;
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'] = ',';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'] = '.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] = '€';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['switchCurrencyPosition'] = true;
+
