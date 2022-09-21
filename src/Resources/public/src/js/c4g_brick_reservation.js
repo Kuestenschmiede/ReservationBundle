@@ -625,7 +625,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                 option.removeAttribute("selected");
             }
         }
-    } else {
+    } else if (selectField) {
         selectField.value = -1;
         eventFire(selectField, 'change');
     }

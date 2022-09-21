@@ -701,7 +701,6 @@ class C4gReservationHandler
                     case 'day':
                         $interval = $object->getTimeinterval() * 86400;
                         $durationInterval = $object->getDuration() ? $object->getDuration() * 86400 : $interval;
-
                         break;
                     case 'week':
                         $interval = $object->getTimeinterval() * 604800;
@@ -893,7 +892,7 @@ class C4gReservationHandler
                                     } else {
                                         if ($time_begin && $time_end) {
                                             $time = $time_begin;
-                                            $periodEnd = $time_end - $durationInterval;
+                                            $periodEnd = $time_end - $interval;//$durationInterval;
 
                                             while ($time <= $periodEnd) {
                                                 $id = $object->getId();
@@ -908,7 +907,7 @@ class C4gReservationHandler
                                                         $timeArray = $calculatorResult->getTimeArray();
                                                     }
 
-                                                    $endTimeInterval = $durationInterval;
+                                                    $endTimeInterval = $interval;//$durationInterval;
                                                     if (!$withEndTimes) {
                                                         $endTimeInterval = 0;
                                                     }

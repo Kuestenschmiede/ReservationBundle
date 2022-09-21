@@ -117,13 +117,15 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setAdditionalID($listType['id']);
             $reservationBeginDateField->setStyleClass('begin-date');
             $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
-            $reservationBeginDateField->setInitInvisible(true);
+            $reservationBeginDateField->setInitInvisible(false);
             $this->fieldList[] = $reservationBeginDateField;
         }
 
         if (!$this->initialValues->getTime() && $listType['directBooking']) {
             $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
             $initialBookingTime = $objDate->tstamp;
+        } else if ($this->initialValues->getTime()) {
+            $initialBookingTime = $this->initialValues->getTime();
         } else {
             $initialBookingTime = false;
         }
@@ -153,7 +155,8 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                         0,
                         $reservationSettings->showEndTime,
                         $reservationSettings->showFreeSeats
-                    );
+
+        );
             $classes = 'reservation_time_button reservation_time_button_' . $listType['id'];
         }
 
@@ -162,11 +165,11 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setTitle($titleBeginTime);
         $reservationBeginTimeField->setFormField(true);
         $reservationBeginTimeField->setDatabaseField(true);
-        $reservationBeginTimeField->setOptions($options);
+        $reservationBeginTimeField->setOptions($initialBookingTime ? $options : []);
         $reservationBeginTimeField->setCallOnChange(true);
         $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
         $reservationBeginTimeField->setMandatory(false);
-        $reservationBeginTimeField->setInitialValue($initialBookingTime ?: $this->initialValues->getTime());
+        $reservationBeginTimeField->setInitialValue($initialBookingTime);
         $reservationBeginTimeField->setSort(false);
         $reservationBeginTimeField->setCondition(array($condition));
         $reservationBeginTimeField->setAdditionalID($listType['id']);
@@ -178,6 +181,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setStyleClass($classes);
         $reservationBeginTimeField->setTimeButtonSpecial(true);
         $reservationBeginTimeField->setWithoutScripts(true);
+        $reservationBeginTimeField->setShowIfEmpty(true);
         $this->fieldList[] = $reservationBeginTimeField;
 
         //save endDate

@@ -354,12 +354,14 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
             $reservationBeginDateField->setStyleClass('begin-date');
             $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
-            $reservationBeginDateField->setInitInvisible(true);
+            $reservationBeginDateField->setInitInvisible(false);
             $this->fieldList[] = $reservationBeginDateField;
 
             if (!$this->initialValues->getTime() && $listType['directBooking']) {
                 $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
                 $initialBookingTime = $objDate->tstamp;
+            } else if ($this->initialValues->getTime()) {
+                $initialBookingTime = $this->initialValues->getTime();
             } else {
                 $initialBookingTime = false;
             }
@@ -386,7 +388,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginTimeField->setTitle($titleBeginTime);
             $reservationBeginTimeField->setFormField(true);
             $reservationBeginTimeField->setDatabaseField(true);
-            $reservationBeginTimeField->setOptions($options);
+            $reservationBeginTimeField->setOptions($initialBookingTime ? $options : []);
             $reservationBeginTimeField->setCallOnChange(false);
             //$reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
             $reservationBeginTimeField->setMandatory(false);
@@ -402,7 +404,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginTimeField->setStyleClass($classes);
             $reservationBeginTimeField->setTimeButtonSpecial(true);
             $reservationBeginTimeField->setInitInvisible(true);
-            $reservationBeginTimeField->setWithoutScripts(true);
+            $reservationBeginTimeField->setWithoutScripts(false);
             $this->fieldList[] = $reservationBeginTimeField;
         }
 
