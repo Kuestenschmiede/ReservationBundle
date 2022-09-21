@@ -838,11 +838,11 @@ class tl_c4g_reservation extends Backend
                 $return[$objects->id] = $objects->caption;
             }
 
-            $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
+            $events = $this->Database->prepare("SELECT id,title,startDate FROM tl_calendar_events")
                 ->execute();
 
             while ($events->next()) {
-                $return[$events->id] = $events->title;
+                $return[$events->id] = '['.date($GLOBALS['TL_CONFIG']['dateFormat'],$events->startDate).'] '.$events->title;
             }
         } else {
             switch ($reservationObjectType) {
@@ -856,11 +856,11 @@ class tl_c4g_reservation extends Backend
                     }
                     break;
                 case '2':
-                    $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events")
+                    $events = $this->Database->prepare("SELECT id,title,startDate FROM tl_calendar_events")
                         ->execute();
 
                     while ($events->next()) {
-                        $return[$events->id] = $events->title;
+                        $return[$events->id] = '['.date($GLOBALS['TL_CONFIG']['dateFormat'],$events->startDate).'] '.$events->title;
                     }
                     break;
             }
