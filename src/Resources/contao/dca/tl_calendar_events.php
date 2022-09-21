@@ -10,6 +10,12 @@
  */
 
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
+use con4gis\DataBundle\Classes\Contao\Hooks\ReplaceInsertTags;
+use Contao\Calendar;
+use Contao\Config;
+use Contao\Controller;
+use Contao\Database;
+use Contao\Date;
 use Contao\Image;
 use Contao\StringUtil;
 
@@ -17,6 +23,8 @@ $str = 'tl_calendar_events';
 
 $GLOBALS['TL_DCA'][$str]['config']['ctable'][] = 'tl_c4g_reservation_event';
 $GLOBALS['TL_DCA'][$str]['config']['onload_callback'][] = ['tl_c4g_reservation_event_bridge', 'c4gLoadReservationData'];
+
+$GLOBALS['TL_DCA'][$str]['list']['sorting']['child_record_callback'] = ['tl_c4g_reservation_event_bridge', 'loadChildRecord'];
 
 $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gEditEvent'] = [
     'label'               => &$GLOBALS['TL_LANG'][$str]['c4gEditEvent'],
@@ -65,6 +73,70 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
         }
     }
 
+    public function loadChildRecord(array $row) {
+        \System::loadLanguageFile('fe_c4g_reservation');
+        $arrChildRow = \Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event WHERE pid=?')->execute($row['id'])->fetchAssoc();
+        if (!$arrChildRow) {
+            return '';
+        }
+        $span = Calendar::calculateSpan($row['startTime'], $row['endTime']);
+
+        if ($span > 0)
+        {
+            $date = Date::parse(Config::get(($row['addTime'] ? 'datimFormat' : 'dateFormat')), $row['startTime']) . '' . ' - ' . Date::parse(Config::get(($row['addTime'] ? 'datimFormat' : 'dateFormat')), $row['endTime']) . '';
+        }
+        elseif ($row['startTime'] == $row['endTime'])
+        {
+            $date = Date::parse(Config::get('dateFormat'), $row['startTime']) . ($row['addTime'] ? ' ' . Date::parse(Config::get('timeFormat'), $row['startTime']) : '');
+        }
+        else
+        {
+            $date = Date::parse(Config::get('dateFormat'), $row['startTime']) . ($row['addTime'] ? ' ' . Date::parse(Config::get('timeFormat'), $row['startTime']) . ' - ' . Date::parse(Config::get('timeFormat'), $row['endTime']) . ' ' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'] : '');
+        }
+        if ($date) {
+            $event = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['event'].':</strong></div><div>' . $date . '</div></div>';
+        }
+
+        //topics
+        if ($arrChildRow['topic']) {
+            $topic = Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event_topic WHERE id IN ('.implode(',',unserialize($arrChildRow['topic'])).')')->execute()->fetchAllAssoc();
+            $topicNames = [];
+            foreach ($topic as $topicElement) {
+                $topicNames[] = $topicElement['topic'];
+            }
+            if (!empty($topicNames)) {
+                $topics = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'].':</strong></div><div>' . implode(', ',$topicNames) . '</div></div>';
+            }
+        }
+
+        //speaker
+        if ($arrChildRow['speaker']) {
+            $speaker = Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event_speaker WHERE id IN ('.implode(',',unserialize($arrChildRow['speaker'])).')')->execute()->fetchAllAssoc();
+            $speakerNames = [];
+            foreach ($speaker as $speakerElement) {
+                $speakerNames[] = $speakerElement['title'] ? $speakerElement['title'] . ' ' . $speakerElement['firstname'] . ' ' . $speakerElement['lastname'] : $speakerElement['firstname'] .' '.$speakerElement['lastname'];
+            }
+            if (!empty($speakerNames)) {
+                $speakers = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'].':</strong></div><div>' . implode(', ',$speakerNames) . '</div></div>';
+            }
+        }
+
+        if ($arrChildRow['price']) {
+            $price = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['price'].':</strong></div><div>' . number_format(floatval($arrChildRow['price']),$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimals'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'],$GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator']).' '.$GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] . '</div></div>';
+        }
+
+        //location
+        if ($arrChildRow['location']) {
+            $locationResult = Database::getInstance()->prepare('SELECT name FROM tl_c4g_reservation_location WHERE id = '.$arrChildRow['location'])->execute()->fetchAssoc();
+            $locationName = $locationResult['name'];
+            if ($locationName) {
+                $location = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'].'</strong></div><div>' . $locationName . '</div></div>';
+            }
+        }
+
+        return '<strong><div style="margin-bottom:10px">' . $row['title'] . '</div></strong>' . $event . $topics . $speakers . $price . $location;
+    }
+
     /**
      * @param $row
      * @param $href
@@ -96,7 +168,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
 
             $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $row['id'];
 
-            return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a> ';
+            return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a>';
         }
     }
 

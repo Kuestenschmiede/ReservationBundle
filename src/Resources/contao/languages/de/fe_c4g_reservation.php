@@ -35,6 +35,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'] = 'Reservieru
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeShort'] = 'Uhrzeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTime'] = 'Endet um';
 
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['event'] = 'Termin';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'] = 'Startet am';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'] = 'Endet am';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'] = 'Uhrzeit';
@@ -53,9 +54,10 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] = 'Übersicht';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'] = 'Adresse';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventnumber'] = 'Nr.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'] = 'Veranstaltungsort';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'] = 'Referent(en)';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'] = 'Referent*innen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'] = 'Zielgruppe(n)';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'] = 'Thema/Themen';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['price'] = 'Preis';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocationUrl'] = 'Ort und Kontakt';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocation'] = 'Ort';
