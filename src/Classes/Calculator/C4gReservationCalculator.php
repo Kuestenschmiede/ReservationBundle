@@ -237,7 +237,7 @@ class C4gReservationCalculator
                 $timeEndDb = strtotime($tedb);
 
                 //ToDo Test
-                $actDuration = intval($actDuration) && (intval($actDuration) != -1) ? intval($actDuration) : intval($reservation['duration']); //ToDo object interval?
+                $actDuration = intval($actDuration) ?: intval($reservation['duration']); //ToDo object interval?
                 $reservationInterval = intval($reservation['timeInterval']);
 
                 if ($actDuration && $reservationInterval && ($actDuration != $reservationInterval)) {

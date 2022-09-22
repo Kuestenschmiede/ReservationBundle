@@ -404,7 +404,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginTimeField->setStyleClass($classes);
             $reservationBeginTimeField->setTimeButtonSpecial(true);
             $reservationBeginTimeField->setInitInvisible(true);
-            $reservationBeginTimeField->setWithoutScripts(false);
+            $reservationBeginTimeField->setWithoutScripts(true);
             $this->fieldList[] = $reservationBeginTimeField;
         }
 
