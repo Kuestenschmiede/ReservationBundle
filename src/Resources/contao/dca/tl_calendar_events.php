@@ -11,6 +11,7 @@
 
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\DataBundle\Classes\Contao\Hooks\ReplaceInsertTags;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Calendar;
 use Contao\Config;
@@ -57,6 +58,7 @@ $GLOBALS['TL_DCA'][$str]['fields']['c4g_reservation_number'] = [
  */
 class tl_c4g_reservation_event_bridge extends tl_calendar_events
 {
+    private $states = [];
 
     public function c4gLoadReservationData()
     {
@@ -136,9 +138,10 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             }
         }
 
-        //participants
+        //participants & state
+        $state = 0;
         $participants = Database::getInstance()->prepare(
-            "SELECT count(tl_c4g_reservation_participants.id) as participantsCount, count(tl_c4g_reservation.id) AS bookersCount, sum(tl_c4g_reservation.desiredCapacity) AS capacitySum FROM tl_c4g_reservation_participants 
+            "SELECT count(tl_c4g_reservation_participants.id) as participantsCount, count(tl_c4g_reservation.id) AS bookersCount, sum(tl_c4g_reservation.desiredCapacity) AS capacitySum FROM tl_c4g_reservation_participants
                             LEFT JOIN tl_c4g_reservation ON tl_c4g_reservation_participants.pid = tl_c4g_reservation.id
                             WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($row['id'])->fetchAssoc();
 
@@ -160,12 +163,27 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
         }
 
         if ($arrChildRow['maxParticipants']) {
-            $count .= '/' . $arrChildRow['maxParticipants'];
+            $showCount = $count . '/' . $arrChildRow['maxParticipants'];
             $percent = $count ? ($count / $arrChildRow['maxParticipants']) * 100 : 0;
-            $count .= ' ('.$percent.'%)';
-        }
+            $showCount .= ' ('.$percent.'%)';
 
-        $participants = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'].':</strong></div><div>' . $count . '</div></div>';
+            if ($count >= $arrChildRow['maxParticipants']) {
+                $state = 3;
+            } else if ($arrChildRow['reservationType']) {
+                $type = C4gReservationTypeModel::findByPk($arrChildRow['reservationType']);
+                if ($type) {
+                    $almostFullyBookedAt = $type->almostFullyBookedAt;
+                    If ($almostFullyBookedAt && ($percent >= $almostFullyBookedAt)) {
+                        $state = 2;
+                    }
+                }
+            } else if ($count < $arrChildRow['maxParticipants']) {
+                $state = 1;
+            }
+        }
+        $this->states[$arrChildRow['pid']] = $state;
+
+        $participants = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'].':</strong></div><div>' . $showCount . '</div></div>';
 
         return '<strong><div style="margin-bottom:10px">' . $row['title'] . '</div></strong>' . $event . $topics . $speakers . $price . $location . $participants;
     }
@@ -226,7 +244,11 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
 
             $href = "/contao?do=$do&table=tl_c4g_reservation&amp&id=" . $row['id'] . "&pid=" . $row['pid'] . "&rt=" . $rt . "&ref=" . $ref;
 
-            $state = InsertTags::replaceInsertTags('{{c4gevent::' . $row['id'] . '::state_raw}}');
+            if ($this->states[$row['id']]) {
+                $state = $this->states[$row['id']];
+            } else {
+                $state = InsertTags::replaceInsertTags('{{c4gevent::' . $row['id'] . '::state_raw}}');
+            }
             switch ($state) {
                 case '1':
                     $icon = 'bundles/con4gisreservation/images/circle_green.svg';
