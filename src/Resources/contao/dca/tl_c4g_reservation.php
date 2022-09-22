@@ -842,7 +842,7 @@ class tl_c4g_reservation extends Backend
                 ->execute();
 
             while ($events->next()) {
-                $return[$events->id] = '['.date($GLOBALS['TL_CONFIG']['dateFormat'],$events->startDate).'] '.$events->title;
+                $return[$events->id] = date($GLOBALS['TL_CONFIG']['dateFormat'],$events->startDate).': '.$events->title;
             }
         } else {
             switch ($reservationObjectType) {
@@ -860,7 +860,7 @@ class tl_c4g_reservation extends Backend
                         ->execute();
 
                     while ($events->next()) {
-                        $return[$events->id] = '['.date($GLOBALS['TL_CONFIG']['dateFormat'],$events->startDate).'] '.$events->title;
+                        $return[$events->id] = date($GLOBALS['TL_CONFIG']['dateFormat'],$events->startDate).': '.$events->title;
                     }
                     break;
             }
