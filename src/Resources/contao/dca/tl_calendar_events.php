@@ -138,22 +138,34 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
 
         //participants
         $participants = Database::getInstance()->prepare(
-            "SELECT count(tl_c4g_reservation_participants.id) as participantsCount, count(tl_c4g_reservation.id) AS bookersCount FROM tl_c4g_reservation_participants 
+            "SELECT count(tl_c4g_reservation_participants.id) as participantsCount, count(tl_c4g_reservation.id) AS bookersCount, sum(tl_c4g_reservation.desiredCapacity) AS capacitySum FROM tl_c4g_reservation_participants 
                             LEFT JOIN tl_c4g_reservation ON tl_c4g_reservation_participants.pid = tl_c4g_reservation.id
                             WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($row['id'])->fetchAssoc();
 
-        if (is_array($participants)) {
-            //we count booker + participants
-            //ToDo switch to count without booker
-            $count = $participants['participantsCount'] + $participants['bookersCount'];
-            if ($arrChildRow['maxParticipants']) {
-                $count .= '/' . $arrChildRow['maxParticipants'];
-                $percent = $count ? ($count / $arrChildRow['maxParticipants']) * 100 : 0;
-                $count .= ' ('.$percent.'%)';
+        if (!$participants || !is_array($participants) || count($participants) == 0) {
+            $participants = Database::getInstance()->prepare(
+                "SELECT count(tl_c4g_reservation.id) AS bookersCount, sum(tl_c4g_reservation.desiredCapacity) AS capacitySum FROM tl_c4g_reservation 
+                            WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($row['id'])->fetchAssoc();
+            if (is_array($participants)) {
+                $participants['participantsCount'] = 0;
             }
-
-            $participants = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'].':</strong></div><div>' . $count . '</div></div>';
         }
+
+        //we count booker + participants
+        //ToDo switch to count without booker
+        $count = $participants['participantsCount'] + $participants['bookersCount'];
+        $capacitySum = $participants['capacitySum'];
+        if ($capacitySum && ( ($capacitySum > $count) || ($count == 0) )) {
+            $count = $capacitySum;
+        }
+
+        if ($arrChildRow['maxParticipants']) {
+            $count .= '/' . $arrChildRow['maxParticipants'];
+            $percent = $count ? ($count / $arrChildRow['maxParticipants']) * 100 : 0;
+            $count .= ' ('.$percent.'%)';
+        }
+
+        $participants = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'].':</strong></div><div>' . $count . '</div></div>';
 
         return '<strong><div style="margin-bottom:10px">' . $row['title'] . '</div></strong>' . $event . $topics . $speakers . $price . $location . $participants;
     }
