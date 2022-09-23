@@ -140,31 +140,17 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
 
         //participants & state
         $state = 0;
+        $capacitySum = 0;
         $participants = Database::getInstance()->prepare(
-            "SELECT count(tl_c4g_reservation_participants.id) as participantsCount, count(tl_c4g_reservation.id) AS bookersCount, sum(tl_c4g_reservation.desiredCapacity) AS capacitySum FROM tl_c4g_reservation_participants
-                            LEFT JOIN tl_c4g_reservation ON tl_c4g_reservation_participants.pid = tl_c4g_reservation.id
-                            WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($row['id'])->fetchAssoc();
-
-        if (!$participants || !is_array($participants) || count($participants) == 0) {
-            $participants = Database::getInstance()->prepare(
-                "SELECT count(tl_c4g_reservation.id) AS bookersCount, sum(tl_c4g_reservation.desiredCapacity) AS capacitySum FROM tl_c4g_reservation 
-                            WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($row['id'])->fetchAssoc();
-            if (is_array($participants)) {
-                $participants['participantsCount'] = 0;
-            }
-        }
-
-        //we count booker + participants
-        //ToDo switch to count without booker
-        $count = $participants['participantsCount'] + $participants['bookersCount'];
-        $capacitySum = $participants['capacitySum'];
-        if ($capacitySum && ( ($capacitySum > $count) || ($count == 0) )) {
-            $count = $capacitySum;
+            "SELECT SUM(tl_c4g_reservation.desiredCapacity) AS 'capacitySum' FROM tl_c4g_reservation 
+                        WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($row['id'])->fetchAssoc();
+        if ($participants && is_array($participants)) {
+            $capacitySum = $participants['capacitySum'] ?: 0;
         }
 
         if ($arrChildRow['maxParticipants']) {
-            $showCount = $count . '/' . $arrChildRow['maxParticipants'];
-            $percent = $count ? ($count / $arrChildRow['maxParticipants']) * 100 : 0;
+            $showCount = $capacitySum . '/' . $arrChildRow['maxParticipants'];
+            $percent = number_format($capacitySum ? ($capacitySum / $arrChildRow['maxParticipants']) * 100 : 0,0);
             $showCount .= ' ('.$percent.'%)';
 
             if ($count >= $arrChildRow['maxParticipants']) {

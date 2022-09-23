@@ -85,28 +85,12 @@ class C4gReservationInsertTags
             $result = 3;
         } elseif ($id && $max > 0) {
             $tableReservation = 'tl_c4g_reservation';
-            $reservationCount = 0;
-
+            $capacitySum = 0;
             $participants = Database::getInstance()->prepare(
-                "SELECT count(tl_c4g_reservation_participants.id) as participantsCount, count(tl_c4g_reservation.id) AS bookersCount, sum(tl_c4g_reservation.desiredCapacity) AS capacitySum FROM tl_c4g_reservation_participants 
-                            LEFT JOIN tl_c4g_reservation ON tl_c4g_reservation_participants.pid = tl_c4g_reservation.id
-                            WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($id)->fetchAssoc();
-
-            if (!$participants || !is_array($participants) || count($participants) == 0) {
-                $participants = Database::getInstance()->prepare(
-                    "SELECT count(tl_c4g_reservation.id) AS bookersCount, sum(tl_c4g_reservation.desiredCapacity) AS capacitySum FROM tl_c4g_reservation 
-                            WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($id)->fetchAssoc();
-                if (is_array($participants)) {
-                    $participants['participantsCount'] = 0;
-                }
-            }
-
-            //we count booker + participants
-            //ToDo switch to count without booker
-            $reservationCount = $participants['participantsCount'] + $participants['bookersCount'];
-            $capacitySum = $participants['capacitySum'];
-            if ($capacitySum && ( ($capacitySum > $count) || ($count = 0) )) {
-                $reservationCount = $capacitySum;
+                "SELECT SUM(tl_c4g_reservation.desiredCapacity) AS 'capacitySum' FROM tl_c4g_reservation 
+                        WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($id)->fetchAssoc();
+            if ($participants && is_array($participants)) {
+                $capacitySum = $participants['capacitySum'] ?: 0;
             }
 
             $reservationType = $reservationEventObject->reservationType;
@@ -118,7 +102,7 @@ class C4gReservationInsertTags
 
                 $almostFullyBookedAt = $reservationType && $reservationType->almostFullyBookedAt ? $reservationType->almostFullyBookedAt : 0;
 
-                $percent = $reservationCount ? ($reservationCount / $max) * 100 : 0;
+                $percent = number_format($capacitySum ? ($capacitySum / $max) * 100 : 0,0);
                 if ($percent >= 100) {
                     $result = 3;
                 } elseif ($almostFullyBookedAt && ($percent >= $almostFullyBookedAt)) {
