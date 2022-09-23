@@ -188,21 +188,24 @@ function hideOptions(typeId, values, showDateTime) {
                     }
                 }
 
-                var radioButton = document.querySelectorAll('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
-                var labels = document.getElementsByTagName('LABEL');
-                for (var k = 0; k < labels.length; k++) {
-                    if (labels[k].htmlFor == radioButton.id) {
-                        time = labels[k].value;
-                    }
-                }
-
-                if (text && (date != '') && (time != '')) {
-                    var pos = text.lastIndexOf('\u00A0(');
-                    if (pos != -1) {
-                        text = text.substr(0, pos);
+                var radioButtons = document.querySelectorAll('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
+                if (radioButtons) {
+                    var labels = document.getElementsByClassName('c4g__form-check-label');
+                    for (var k = 0; k < labels.length; k++) {
+                        if (labels[k].htmlFor == radioButtons[0].id) {
+                            time = labels[k].textContent;
+                            break;
+                        }
                     }
 
-                    option.textContent = text + '\u00A0('+date+'\u00A0'+time+')';
+                    if (text && (date != '') && (time != '')) {
+                        var pos = text.lastIndexOf('\u00A0(');
+                        if (pos != -1) {
+                            text = text.substr(0, pos);
+                        }
+
+                        option.textContent = text + '\u00A0('+date+'\u00A0'+time+')';
+                    }
                 }
             }
         }
