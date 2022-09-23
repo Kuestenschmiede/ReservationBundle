@@ -14,7 +14,7 @@ $str = 'tl_c4g_reservation_settings';
 $GLOBALS['TL_LANG'][$str]['id'] = array("#", "");
 $GLOBALS['TL_LANG'][$str]['caption'] = array("Bezeichnung", "Zur Auswahl am Frontendmodul");
 
-$GLOBALS['TL_LANG'][$str]['reservation_types'] = array('Reservierungsarten', 'Wählen Sie die bei der Reservierung im Frontend zu berücksichigenden Reservierungsarten (Räume, Tische, ...). Bei keiner Auswahl werden alle Reservierungsobjekte geladen. Sie sollten nicht allzu viele Arten zuordnen (max. 10).');
+$GLOBALS['TL_LANG'][$str]['reservation_types'] = array('Reservierungsarten', 'Wählen Sie die bei der Reservierung im Frontend zu berücksichigenden Reservierungsarten (Räume, Tische, ...). Bei keiner Auswahl werden alle Reservierungsobjekte geladen. Wenn Teilnehmer ins Formular gebracht werden, darf zurzeit lediglich eine entsprechende Art verknüpft werden.');
 $GLOBALS['TL_LANG'][$str]['typeDefault'] = array('Reservierungsart vorauswählen', 'Hier können Sie festlegen, welche Art als in der Auswahlbox vorausgewählt werden soll. Wenn hier keine Art ausgewählt wird, dann greift der Standard.');
 $GLOBALS['TL_LANG'][$str]['typeHide'] = array('Reservierungsart verstecken', 'sollte nur eine Reservierungsart zur Auswahl stehen, dann kann das Feld hierüber ausgeblendet werden.');
 $GLOBALS['TL_LANG'][$str]['reservationButtonCaption'] = array('Beschriftung Absendebutton','Hiermit können Sie den Button Text ändern. Bspw. "Zahlungspflichtig reservieren".');
@@ -42,7 +42,7 @@ $GLOBALS['TL_LANG'][$str]['showDetails'] = array("Details anzeigen","Zusatzinfor
 $GLOBALS['TL_LANG'][$str]['removeBookedDays'] = array("Ausgebuchte Tage im Kalender sperren","Der Kalendertag ist ausgebucht nicht auswählbar. Achtung! Die Überprüfung ist zum Teil langwirrig.");
 $GLOBALS['TL_LANG'][$str]['showInlineDatepicker'] = array("Datepicker geöffnet darstellen","Der Datepicker wird als Kalender geöffnet dargestellt.");
 $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text leere Objektliste","Der Text, der in der Objektauswahl angezeigt wird wenn kein passendes Objekt zur Verfügung steht, kann optional überschrieben werden.");
-$GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Teilnehmermechanismus (optional)","Ist dieser Mechanismus aktiviert, dann werden Teilnehmerfelder (Titel, Name, Vorname, E-Mail, ggf. Leistungen) anhand der Personenzahl generiert. Wichtig! Das Teilnehmer-Feld muss dafür ins Formular gebracht werden. Außerdem sollten Sie die maximale Teilnehmerzahl an der Art aufgrund der Ladezeiten stark eingrenzen (max. 8 Personen).");
+$GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Teilnehmermechanismus (optional)","Ist dieser Mechanismus aktiviert, dann werden Teilnehmerfelder (Titel, Name, Vorname, E-Mail, ggf. Leistungen) anhand der Personenzahl generiert. Wichtig! Das Teilnehmer-Feld muss dafür ins Formular gebracht werden. Außerdem sollten Sie die maximale Teilnehmerzahl an der Art aufgrund der Ladezeiten stark eingrenzen. Für die Teilnehmerfelder darf aktuell nur eine Reservierungsart im Formular verknüpft sein.");
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Postleitzahlen einschränken","Hierüber können Sie ermöglichen, dass Reservierungen nur über bestimmte Postleitzahlen möglich sind (kommagetrennte Liste).");
 
 $GLOBALS['TL_LANG'][$str]['typeWithEmptyOption'] = array('Reservierungsart Auswahl treffen', 'Wenn dieser Schalter gesetzt ist, wird die Reservierungsart nicht vorbelegt und muss ausgewählt werden.');
