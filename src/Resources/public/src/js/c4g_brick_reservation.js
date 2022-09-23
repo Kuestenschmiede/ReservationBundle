@@ -189,7 +189,7 @@ function hideOptions(typeId, values, showDateTime) {
                 }
 
                 var radioButtons = document.querySelectorAll('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
-                if (radioButtons) {
+                if (radioButtons && radioButtons[0]) {
                     var labels = document.getElementsByClassName('c4g__form-check-label');
                     for (var k = 0; k < labels.length; k++) {
                         if (labels[k].htmlFor == radioButtons[0].id) {
