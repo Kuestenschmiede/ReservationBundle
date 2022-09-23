@@ -199,12 +199,12 @@ function hideOptions(typeId, values, showDateTime) {
                     }
 
                     if (text && (date != '') && (time != '')) {
-                        var pos = text.lastIndexOf('\u00A0(');
+                        var pos = text.lastIndexOf(')');
                         if (pos != -1) {
-                            text = text.substr(0, pos);
+                            option.textContent = text.substr(0, pos) + ';\u00A0'+date+'\u00A0'+time+')';
+                        } else {
+                            option.textContent = text + '\u00A0('+date+'\u00A0'+time+')';
                         }
-
-                        option.textContent = text + '\u00A0('+date+'\u00A0'+time+')';
                     }
                 }
             }
