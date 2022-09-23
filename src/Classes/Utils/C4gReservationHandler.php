@@ -1355,7 +1355,7 @@ class C4gReservationHandler
         }
 
         if ($price) {
-            $priceInfo ? "&nbsp;".$priceInfo : '';
+            $priceInfo = $priceInfo ? "&nbsp;".$priceInfo : '';
             $price = $price ? C4gReservationHandler::formatPrice($price).$priceInfo : '';
         }
         return $price;

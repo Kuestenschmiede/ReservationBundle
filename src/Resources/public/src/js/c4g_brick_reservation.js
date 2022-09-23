@@ -189,15 +189,10 @@ function hideOptions(typeId, values, showDateTime) {
                 }
 
                 var radioButton = document.querySelectorAll('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
-                if (radioButton) {
-                    for (k = 0; k < radioButton.length; k++) {
-                        var button = radioButton[k];
-                        if (button) {
-
-                            var buttonLabel = button.parentNode.getElementsByTagName('label')[0];
-                            time = buttonLabel ? buttonLabel.value : '';
-                            break;
-                        }
+                var labels = document.getElementsByTagName('LABEL');
+                for (var k = 0; k < labels.length; k++) {
+                    if (labels[k].htmlFor == radioButton.id) {
+                        time = labels[k].value;
                     }
                 }
 
