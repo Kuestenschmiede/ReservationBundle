@@ -161,7 +161,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             $objConditionArr = $obj_condition;
 
             $reservationBeginDateField = new C4gDateField();
-            $reservationBeginDateField->setFlipButtonPosition(true);
+            //$reservationBeginDateField->setFlipButtonPosition(true);
             $reservationBeginDateField->setFieldName('beginDateEvent');
             $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
@@ -185,7 +185,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             $this->fieldList[] = $reservationBeginDateField;
 
             $reservationEndDateField = new C4GDateField();
-            $reservationEndDateField->setFlipButtonPosition(true);
+            //$reservationEndDateField->setFlipButtonPosition(true);
             $reservationEndDateField->setFieldName('endDateEvent');
             $reservationEndDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationEndDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);

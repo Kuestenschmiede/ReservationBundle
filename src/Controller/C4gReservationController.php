@@ -803,7 +803,7 @@ class C4gReservationController extends C4GBaseController
                 $fieldList[] = $cityField;
             } else if ($rowField == "dateOfBirth") {
                 $birthDateField = new C4GDateField();
-                $birthDateField->setFlipButtonPosition(true);
+                //$birthDateField->setFlipButtonPosition(true);
                 $birthDateField->setFieldName('dateOfBirth');
                 $birthDateField->setMinDate(strtotime('-120 year'));
 

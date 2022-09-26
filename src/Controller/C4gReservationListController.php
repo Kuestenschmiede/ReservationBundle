@@ -239,7 +239,7 @@ class C4gReservationListController extends C4GBaseController
         $fieldList[] = $reservationBeginDateTimeField;
 
         $reservationBeginDateField = new C4GDateField();
-        $reservationBeginDateField->setFlipButtonPosition(true);
+        //$reservationBeginDateField->setFlipButtonPosition(true);
         $reservationBeginDateField->setFieldName('beginDate');
         $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
         $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
@@ -560,7 +560,7 @@ class C4gReservationListController extends C4GBaseController
             $fieldList[] = $phoneField;
 
             $birthDateField = new C4GDateField();
-            $birthDateField->setFlipButtonPosition(true);
+            //$birthDateField->setFlipButtonPosition(true);
             $birthDateField->setFieldName('dateOfBirth');
             $birthDateField->setMinDate(strtotime('-120 year'));
             $year = date('Y');
