@@ -11,6 +11,7 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
+use con4gis\ProjectsBundle\Classes\Actions\C4GRedirectAction;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Dialogs\C4GBrickGrid;
@@ -145,7 +146,21 @@ class C4gReservationSpeakerListController extends C4GBaseController
         
         $this->listParams->setRenderMode($this->renderMode ?: C4GBrickRenderMode::TILEBASED);
 
+        if ($this->speaker_redirect_site) {
+            $this->listParams->setWithFunctionCallOnClick(true);
+            $this->listParams->setOnClickFunction('redirectOnclick');
+        }
+
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_CANCEL);
+    }
+
+    public function redirectOnclick($values, $putVars) {
+        $speakerId = $values[2];
+        $this->dialogParams->setRedirectSite($this->speaker_redirect_site.'&speaker='.$speakerId);
+        $this->dialogParams->setRedirectWithSaving(false);
+        $action = new C4GRedirectAction($this->dialogParams, $this->listParams, $this->fieldList, $putVars, null);
+        $action->setRedirectToDetail(true);
+        return $action->run();
     }
 
     public function addFields() : array

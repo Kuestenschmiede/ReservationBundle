@@ -29,7 +29,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE] 
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,removeListImage,event_redirect_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,removeListImage,event_redirect_site,speaker_redirect_site;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationLocationListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,withMap;';
 
@@ -68,6 +68,16 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['renderMode'] = array
 $GLOBALS['TL_DCA']['tl_module']['fields']['event_redirect_site'] = array
 (
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['event_redirect_site'],
+    'exclude'                 => true,
+    'inputType'               => 'pageTree',
+    'foreignKey'              => 'tl_page.title',
+    'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+    'sql'                     => "int(10) unsigned NOT NULL default '0'",
+    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['speaker_redirect_site'] = array
+(
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['speaker_redirect_site'],
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',
