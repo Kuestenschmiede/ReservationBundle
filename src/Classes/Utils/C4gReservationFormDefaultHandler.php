@@ -91,7 +91,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             }
 
             $reservationBeginDateField = new C4GDateField();
-            $reservationBeginDateField->setFlipButtonPosition(false);
+            //$reservationBeginDateField->setFlipButtonPosbition(false);
             $reservationBeginDateField->setMinDate(C4gReservationHandler::getMinDate($reservationObjects));
             $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
