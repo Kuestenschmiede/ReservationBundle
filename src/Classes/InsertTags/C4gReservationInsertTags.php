@@ -604,7 +604,7 @@ class C4gReservationInsertTags
                                         }
                                     }
                                     $speakers .= ')';
-                                    $speakerElements = $this->db->prepare("SELECT id,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE `id` IN $speakers")
+                                    $speakerElements = $this->db->prepare("SELECT id,alias,title,firstname,lastname,speakerForwarding FROM $tableSpeaker WHERE `id` IN $speakers")
                                         ->execute()->fetchAllAssoc();
 
                                     $result = '';
@@ -613,7 +613,12 @@ class C4gReservationInsertTags
                                         if ($speakerStr && $speaker['speakerForwarding']) {
                                             $url = Controller::replaceInsertTags('{{link_url::' . $speaker['speakerForwarding'] . '}}');
                                             if ($url) {
-                                                $speakerStr = '<a href="' . $url . '?speaker=' . $speaker['id'] . '" title="' . $speakerStr . '" itemprop="url">' . $speakerStr . '</a>';
+                                                $speakerAlias = $speaker['id'];
+                                                if ($speaker['alias']) {
+                                                    $speakerAlias = $speaker['alias'];
+                                                }
+
+                                                $speakerStr = '<a href="' . $url . '?speaker=' . $speakerAlias . '" title="' . $speakerStr . '" itemprop="url">' . $speakerStr . '</a>';
                                             }
                                         }
 
