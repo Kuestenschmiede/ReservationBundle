@@ -237,7 +237,7 @@ class C4gReservationCalculator
                 $timeEndDb = strtotime($tedb);
 
                 //ToDo Test
-                $actDuration = intval($actDuration) ?: intval($reservation['duration']); //ToDo object interval?
+                $actDuration = intval($actDuration) && (intval($actDuration) > 0) ? intval($actDuration) : intval($reservation['duration']); //ToDo object interval?
                 $reservationInterval = intval($reservation['timeInterval']);
 
                 if ($actDuration && $reservationInterval && ($actDuration != $reservationInterval)) {
@@ -257,10 +257,10 @@ class C4gReservationCalculator
                     }
                 }
 //                /* Todo Wurde nur zum Testen aufgeschrieben und sollte ausgebaut werden*/
-//                $realBegin = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBegin);
-//                $realEnd   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEnd);
-//                $realBeginDb = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBeginDb);
-//                $realEndDb   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEndDb);
+                $realBegin = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBegin);
+                $realEnd   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEnd);
+                $realBeginDb = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBeginDb);
+                $realEndDb   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEndDb);
 
                 if (
                     (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||

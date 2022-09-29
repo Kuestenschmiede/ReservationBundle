@@ -611,6 +611,8 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
 
 function setTimeset(date, additionalId, showDateTime, objectId) {
     var elementId = 0;
+    var duration = -1;
+    var capacity = -1;
 
     var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
     if (objectId) {
@@ -629,24 +631,23 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
     }
 
     var durationNode = document.getElementById("c4g_duration_"+additionalId);
-    if (durationNode && durationNode.style && durationNode.style !== "none"){
+    if (durationNode && durationNode.style && durationNode.display !== "none"){
         var duration = durationNode.value;
     }
 
     var capacityNode = document.getElementById("c4g_desiredCapacity_"+additionalId);
-    if (capacityNode && capacityNode.style && capacityNode.style !== "none"){
+    if (capacityNode && capacityNode.style && capacityNode.display !== "none"){
         var capacity = capacityNode.value;
     }
 
     //hotfix dates with slashes
-
     if (date && date.indexOf("/")) {
         date = date.replace("/", "~");
         date = date.replace("/", "~");
     }
 
     if (date && additionalId) {
-        duration = duration ? duration : -1;
+        duration = duration  ? duration : -1;
         capacity = capacity ? capacity : -1;
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "flex";
         let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration + "/" + capacity + "/" + objectId;
