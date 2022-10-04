@@ -199,21 +199,26 @@ function hideOptions(typeId, values, showDateTime) {
                     }
 
                     if (text && (date != '') && (time != '')) {
-                        var pos = text.lastIndexOf(')');
+                        //ToDo merge price
+                        //var pos_price = text.lastIndexOf(')');
+                        var pos = text.lastIndexOf('\u00A0(');
+                        var priceText = '';
+                        // if (pos != -1 && pos_price != -1 && pos_price > pos) {
+                        //     priceText = text.substr(pos+7, pos_price);
+                        // }
                         if (pos != -1) {
-                            option.textContent = text.substr(0, pos) + ';\u00A0'+date+'\u00A0'+time+')';
-                        } else {
-                            option.textContent = text + '\u00A0('+date+'\u00A0'+time+')';
+                            text = text.substr(0, pos);
                         }
+
+                        // if (priceText) {
+                        //     option.textContent = text + '\u00A0('+priceText+';'+date+'\u00A0'+time+')';
+                        // } else {
+                            option.textContent = text + '\u00A0('+date+'\u00A0'+time+')';
+                        // }
                     }
                 }
             }
         }
-
-        /*
-        if (!selectField.disabled && selectField.value && (selectField.value >= 0)) {
-            first = selectField.value;
-        }*/
 
         if ((parseInt(firstKey) !== -1) && selectField.options[firstKey]) {
           selectField.value = selectField.options[firstKey].value;
