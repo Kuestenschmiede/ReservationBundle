@@ -153,7 +153,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             $percent = number_format($capacitySum ? ($capacitySum / $arrChildRow['maxParticipants']) * 100 : 0,0);
             $showCount .= ' ('.$percent.'%)';
 
-            if ($count >= $arrChildRow['maxParticipants']) {
+            if ($capacitySum >= $arrChildRow['maxParticipants']) {
                 $state = 3;
             } else if ($arrChildRow['reservationType']) {
                 $type = C4gReservationTypeModel::findByPk($arrChildRow['reservationType']);
@@ -163,7 +163,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
                         $state = 2;
                     }
                 }
-            } else if ($count < $arrChildRow['maxParticipants']) {
+            } else if ($capacitySum < $arrChildRow['maxParticipants']) {
                 $state = 1;
             }
         }
