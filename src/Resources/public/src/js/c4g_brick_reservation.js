@@ -216,7 +216,8 @@ function hideOptions(typeId, values, showDateTime) {
                             text = text.substr(0 , pos);
                         }
 
-                        if (priceText && priceText.search("$|€|CHF") !== -1) {
+                        //ToDo other currencies
+                        if (priceText && priceText.search(/€/) !== -1) {
                             option.textContent = text + '\u00A0('+priceText+';\u00A0'+date+'\u00A0'+time+')';
                         } else {
                             option.textContent = text + '\u00A0('+date+'\u00A0'+time+')';
