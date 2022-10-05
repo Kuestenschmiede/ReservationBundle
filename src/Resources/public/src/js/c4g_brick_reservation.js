@@ -55,7 +55,7 @@ function setObjectId(object, typeid, showDateTime = 0) {
 
     if (oldValue) {
        for (i = 0; i < selectField.options.length; i++) {
-           if (!selectField.options[i].getAttribute('hidden')) {
+           if (!selectField.options[i].getAttribute('hidden') && !selectField.options[i].getAttribute('disabled')) {
                if (selectField.options[i].value == oldValue) {
                    selectField.value = oldValue;
                    handleBrickConditions();
@@ -714,7 +714,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                     if (radioButton && radioButton.length) {
                         for (z = 0; z < radioButton.length; z++) {
                             var button = radioButton[z];
-                            if (button) {
+                            if (button && !button.getAttribute('disabled') && !button.getAttribute('hidden')) {
                                 if (timeValue && button.value === timeValue) {
                                     targetButton = button;
                                 } else if (button.value) {
@@ -724,8 +724,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                         }
                     }
 
-                    //if there are just one time button then select automaticly.
-                    if (!targetButton && visibleButtons && visibleButtons.length === 1) {
+                    if (!targetButton && visibleButtons && visibleButtons.length >= 1) {
                         for (z = 0; z < visibleButtons.length; z++) {
                                 targetButton = visibleButtons[z];
                                 break;
@@ -741,8 +740,8 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
 
                     if (!objectId) {
                         if (targetButton && !targetButton.disabled && !targetButton.classList.contains("radio_object_disabled")) {
-                            targetButton.removeAttribute("checked");
-                            eventFire(targetButton,'click');
+                            targetButton.setAttribute("checked", true);
+                            document.getElementById('c4g_beginTime_'+additionalId).value=targetButton.value;
                             setObjectId(targetButton,additionalId,showDateTime);
                         } else {
                             for (z=0; z<visibleButtons.length; z++) {
