@@ -199,22 +199,28 @@ function hideOptions(typeId, values, showDateTime) {
                     }
 
                     if (text && (date != '') && (time != '')) {
-                        //ToDo merge price
-                        //var pos_price = text.lastIndexOf(')');
+                        var pos_price = text.lastIndexOf(')');
                         var pos = text.lastIndexOf('\u00A0(');
                         var priceText = '';
-                        // if (pos != -1 && pos_price != -1 && pos_price > pos) {
-                        //     priceText = text.substr(pos+7, pos_price);
-                        // }
-                        if (pos != -1) {
-                            text = text.substr(0, pos);
+
+                        if (pos != -1 && pos_price != -1 && pos_price > pos) {
+                            var pos_semicolon = text.indexOf(';');
+                            if (pos_semicolon !== -1) {
+                                priceText = text.substr(pos+2, pos_semicolon-pos-2);
+                            } else {
+                                priceText = text.substr(pos+2, pos_price-pos-2);
+                            }
                         }
 
-                        // if (priceText) {
-                        //     option.textContent = text + '\u00A0('+priceText+';'+date+'\u00A0'+time+')';
-                        // } else {
+                        if (pos != -1) {
+                            text = text.substr(0 , pos);
+                        }
+
+                        if (priceText && priceText.search("$|€|CHF") !== -1) {
+                            option.textContent = text + '\u00A0('+priceText+';\u00A0'+date+'\u00A0'+time+')';
+                        } else {
                             option.textContent = text + '\u00A0('+date+'\u00A0'+time+')';
-                        // }
+                        }
                     }
                 }
             }
