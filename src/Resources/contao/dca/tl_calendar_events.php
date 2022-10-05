@@ -77,11 +77,16 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
     }
 
     public function loadChildRecord(array $row) {
+//        if ($row['pid']) {
+//            $calendar = \Database::getInstance()->prepare('SELECT activateEventReservation FROM tl_calendar WHERE id=?')->execute($row['pid'])->fetchAssoc();
+//            if ($calendar && !$calendar['activateEventReservation']) {
+//                return;
+//            }
+//        }
+
         \System::loadLanguageFile('fe_c4g_reservation');
         $arrChildRow = \Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event WHERE pid=?')->execute($row['id'])->fetchAssoc();
-        if (!$arrChildRow) {
-            return '';
-        }
+
         $span = Calendar::calculateSpan($row['startTime'], $row['endTime']);
 
         if ($span > 0)
@@ -101,7 +106,8 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
         }
 
         //topics
-        if ($arrChildRow['topic']) {
+        $topics = '';
+        if ($arrChildRow && $arrChildRow['topic']) {
             $topic = Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event_topic WHERE id IN ('.implode(',',unserialize($arrChildRow['topic'])).')')->execute()->fetchAllAssoc();
             $topicNames = [];
             foreach ($topic as $topicElement) {
@@ -113,7 +119,8 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
         }
 
         //speaker
-        if ($arrChildRow['speaker']) {
+        $speakers = '';
+        if ($arrChildRow && $arrChildRow['speaker']) {
             $speaker = Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event_speaker WHERE id IN ('.implode(',',unserialize($arrChildRow['speaker'])).')')->execute()->fetchAllAssoc();
             $speakerNames = [];
             foreach ($speaker as $speakerElement) {
@@ -125,12 +132,14 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
         }
 
         //price
-        if ($arrChildRow['price']) {
+        $price = '';
+        if ($arrChildRow && $arrChildRow['price']) {
             $price = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['price'].':</strong></div><div>'.C4gReservationHandler::formatPrice($arrChildRow['price']) . '</div></div>';
         }
 
         //location
-        if ($arrChildRow['location']) {
+        $location = '';
+        if ($arrChildRow && $arrChildRow['location']) {
             $locationResult = Database::getInstance()->prepare('SELECT name FROM tl_c4g_reservation_location WHERE id = '.$arrChildRow['location'])->execute()->fetchAssoc();
             $locationName = $locationResult['name'];
             if ($locationName) {
@@ -139,16 +148,17 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
         }
 
         //participants & state
-        $state = 0;
-        $capacitySum = 0;
-        $participants = Database::getInstance()->prepare(
-            "SELECT SUM(tl_c4g_reservation.desiredCapacity) AS 'capacitySum' FROM tl_c4g_reservation 
+        $participants = '';
+        if ($arrChildRow && $arrChildRow['maxParticipants']) {
+            $state = 0;
+            $capacitySum = 0;
+            $participants = Database::getInstance()->prepare(
+                "SELECT SUM(tl_c4g_reservation.desiredCapacity) AS 'capacitySum' FROM tl_c4g_reservation 
                         WHERE tl_c4g_reservation.reservation_object=? AND (tl_c4g_reservation.reservationObjectType=2) AND NOT tl_c4g_reservation.cancellation = '1'")->execute($row['id'])->fetchAssoc();
-        if ($participants && is_array($participants)) {
-            $capacitySum = $participants['capacitySum'] ?: 0;
-        }
+            if ($participants && is_array($participants)) {
+                $capacitySum = $participants['capacitySum'] ?: 0;
+            }
 
-        if ($arrChildRow['maxParticipants']) {
             $showCount = $capacitySum . '/' . $arrChildRow['maxParticipants'];
             $percent = number_format($capacitySum ? ($capacitySum / $arrChildRow['maxParticipants']) * 100 : 0,0);
             $showCount .= ' ('.$percent.'%)';
@@ -166,10 +176,10 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             } else if ($capacitySum < $arrChildRow['maxParticipants']) {
                 $state = 1;
             }
-        }
-        $this->states[$arrChildRow['pid']] = $state;
+            $this->states[$arrChildRow['pid']] = $state;
 
-        $participants = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'].':</strong></div><div>' . $showCount . '</div></div>';
+            $participants = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['participants'].':</strong></div><div>' . $showCount . '</div></div>';
+        }
 
         return '<strong><div style="margin-bottom:10px">' . $row['title'] . '</div></strong>' . $event . $topics . $speakers . $price . $location . $participants;
     }
