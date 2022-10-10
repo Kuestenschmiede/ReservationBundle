@@ -11,5 +11,6 @@
 
 $GLOBALS['TL_LANG']['tl_calendar_events']['c4gEditEvent'] = ['Event <=> Reservation', 'Here you can link events and reservations.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['c4gEditReservations'] = ['Reservations', 'Here reservations for the event can be displayed and edited.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['c4gExportReservations'] = ['Export', 'Export reservations.'];
 
 $GLOBALS['TL_LANG']['tl_calendar_events']['c4g_reservation_number'] = ['Number', 'Identifier of the event. E.g. seminar number.'];

@@ -11,4 +11,5 @@
 
 $GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwarding'] = ["Weiterleitung zum Modul", "Wählen Sie die Seite aus, auf der sich das Reservierungsmodul befindet."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwardingButtonCaption'] = ["Buttonbeschriftung Weiterleitung", "Beschriftung des Weiterleitungsbutton zur Reservierung. Standard: leer. Es greifen die Einträge aus den Sprachdateien."];
+$GLOBALS['TL_LANG']['tl_c4g_settings']['exportSelection'] = ["Export auswählen", "Wählen Sie die Seite aus, auf der sich die Reservierung befindet, die Sie exportieren möchten."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['c4g_reservation_legend'] = "Einstellungen zu den Reservierungen";

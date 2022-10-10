@@ -34,6 +34,12 @@ $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gEditEvent'] = [
     'button_callback'     => ['tl_c4g_reservation_event_bridge', 'c4gEditEvent'],
     'exclude'             => true
 ];
+$GLOBALS['TL_DCA'][$str]['list']['operations']['c4gExportReservations'] = [
+    'label'               => &$GLOBALS['TL_LANG'][$str]['c4gExportReservations'],
+    'icon'                => 'bundles/con4gisexport/images/be-icons/export.svg',
+    'button_callback'     => ['tl_c4g_reservation_event_bridge', 'c4gExportReservations'],
+    'exclude'             => true
+];
 
 $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gEditReservations'] = [
     'label'               => &$GLOBALS['TL_LANG'][$str]['c4gEditReservations'],
@@ -225,6 +231,21 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
      * @param $label
      * @param $title
      * @param $icon
+     * @return void
+     */
+    public function c4gExportReservations($row, $href, $label, $title, $icon)
+    {
+        //settings laden
+        //exportId
+        return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a>';
+    }
+
+    /**
+     * @param $row
+     * @param $href
+     * @param $label
+     * @param $title
+     * @param $icon
      * @return string
      */
     public function c4gShowReservations($row, $href, $label, $title, $icon)
@@ -263,4 +284,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a> ';
         }
     }
+
+
+
 }
