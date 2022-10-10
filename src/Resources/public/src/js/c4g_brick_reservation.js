@@ -741,7 +741,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
 
                     if (!objectId) {
                         if (targetButton && !targetButton.disabled && !targetButton.classList.contains("radio_object_disabled")) {
-                            targetButton.setAttribute("checked", true);
+                            targetButton.setAttribute("checked", "checked");
                             document.getElementById('c4g_beginTime_'+additionalId).value=targetButton.value;
                             setObjectId(targetButton,additionalId,showDateTime);
                         } else {
