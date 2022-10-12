@@ -134,7 +134,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationType'] = array
     'sql'               => "int(1) unsigned NULL default 0"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['selectReservationTypes'] = [
-    'label'                   => ['Reservierungsarten','Keine Auswahl = Alle'],//&$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['selectReservationTypes'], //ToDo language
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['selectReservationTypes'],
     'exclude'                 => true,
     'inputType'               => 'checkbox',
     'options_callback'        => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationType::class,'getAllTypes'],
