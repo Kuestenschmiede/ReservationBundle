@@ -10,6 +10,7 @@
  */
 
 use Contao\Controller;
+use Contao\Database;
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
 (
@@ -133,7 +134,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['reservation_types'],
             'exclude'                 => true,
             'inputType'               => 'checkbox',
-            'options_callback'        => array('tl_c4g_reservation_settings','getAllTypes'),
+            'options_callback'        => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationType::class,'getAllTypes'],
             'eval'                    => array('mandatory'=>false, 'multiple'=>true),
             'sql'                     => "blob NULL"
         ),
@@ -142,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['typeDefault'],
             'exclude'                 => true,
             'inputType'               => 'select',
-            'options_callback'        => array('tl_c4g_reservation_settings','getAllTypes'),
+            'options_callback'        => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationType::class,'getAllTypes'],
             'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'chosen'=>true, 'includeBlankOption' => true),
             'sql'                     => "int(5) unsigned NULL default 0"
         ),
@@ -400,21 +401,6 @@ class tl_c4g_reservation_settings extends Backend
         } else {
             return $varValue;
         }
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAllTypes()
-    {
-        \Contao\System::loadLanguageFile('tl_c4g_reservation_settings');
-        $types = $this->Database->prepare("SELECT id,caption,reservationObjectType FROM tl_c4g_reservation_type ORDER BY caption")
-            ->execute();
-        while ($types->next()) {
-            $objectType = $types->reservationObjectType;
-            $return[$types->id] = $types->caption.' ['.$GLOBALS["TL_LANG"]["tl_c4g_reservation_settings"]["referencesObjectType"][$objectType].']';
-        }
-        return $return;
     }
 
     public function getOptional($dc)
