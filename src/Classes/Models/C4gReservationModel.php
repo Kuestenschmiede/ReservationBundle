@@ -31,10 +31,21 @@ class C4gReservationModel extends Model
     /**
      * @return mixed
      */
-    public static function getListItems() {
+    public static function getListItems($listParams = null) {
         $db = \Database::getInstance();
-        $pastDayNumber = 1;//intval($listParams->getModelListParams());
-        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ".$pastDayNumber." DAY))");
+
+        $types = '';
+        $pastDayNumber = 1;
+        if ($listParams) {
+            $pastDayNumber = intval($listParams->getModelListParams()[0]);
+            $types = $listParams->getModelListParams()[1];
+        }
+
+        if ($types) {
+            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `reservation_type` IN (" . $types . ") AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ".$pastDayNumber." DAY))");
+        } else {
+            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ".$pastDayNumber." DAY))");
+        }
         $dbResult = $stmt->execute();
         $dbResult = $dbResult->fetchAllAssoc();
         $result = $dbResult;
@@ -44,8 +55,17 @@ class C4gReservationModel extends Model
 
     public static function getListItemsByMember($memberId, $tableName, $database, $fieldList, $listParams) {
         $db = \Database::getInstance();
-        $pastDayNumber = intval($listParams->getModelListParams()[0]);
-        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `member_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ".$pastDayNumber." DAY))");
+        $types = '';
+        $pastDayNumber = 1;
+        if ($listParams) {
+            $pastDayNumber = intval($listParams->getModelListParams()[0]);
+            $types = $listParams->getModelListParams()[1];
+        }
+        if ($types) {
+            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `reservation_type` IN (" . $types . ") AND `member_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))");
+        } else {
+            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `member_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))");
+        }
         $dbResult = $stmt->execute($memberId);
         $dbResult = $dbResult->fetchAllAssoc();
 
@@ -60,7 +80,17 @@ class C4gReservationModel extends Model
     public static function getListItemsByGroup($groupId, $database, $listParams, $brickDatabase) {
         $db = \Database::getInstance();
         $pastDayNumber = intval($listParams->getModelListParams()[0]);
-        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND beginDate >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ".$pastDayNumber." DAY))");
+        $types = '';
+        $pastDayNumber = 1;
+        if ($listParams) {
+            $pastDayNumber = intval($listParams->getModelListParams()[0]);
+            $types = $listParams->getModelListParams()[1];
+        }
+        if ($types) {
+            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `reservation_type` IN (" . $types . ") AND `group_id`=? AND `cancellation` <> '1' AND beginDate >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))");
+        } else {
+            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND beginDate >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))");
+        }
         $dbResult = $stmt->execute($groupId);
         $dbResult = $dbResult->fetchAllAssoc();
 

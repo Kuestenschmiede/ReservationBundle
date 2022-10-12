@@ -25,7 +25,7 @@ use Contao\Controller;
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_settings;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, showReservationType, showReservationObject, showSignatureField, showPrices, past_day_number, cancellation_redirect_site, login_redirect_site, printTpl;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, selectReservationTypes, showReservationType, showReservationObject, showSignatureField, showPrices, past_day_number, cancellation_redirect_site, login_redirect_site, printTpl;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;';
 
@@ -133,6 +133,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationType'] = array
     'inputType'         => 'checkbox',
     'sql'               => "int(1) unsigned NULL default 0"
 );
+$GLOBALS['TL_DCA']['tl_module']['fields']['selectReservationTypes'] = [
+    'label'                   => ['Reservierungsarten','Keine Auswahl = Alle'],//&$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['selectReservationTypes'], //ToDo language
+    'exclude'                 => true,
+    'inputType'               => 'checkbox',
+    'options_callback'        => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationType::class,'getAllTypes'],
+    'eval'                    => ['mandatory'=>false, 'multiple'=>true],
+    'sql'                     => "blob NULL"
+];
 $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationObject'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationObject'],
     'default'           => 1,

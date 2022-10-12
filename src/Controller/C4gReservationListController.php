@@ -41,6 +41,7 @@ use con4gis\ReservationBundle\Classes\Utils\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Database;
 use Contao\ModuleModel;
 use Contao\StringUtil;
 use Contao\System;
@@ -161,7 +162,14 @@ class C4gReservationListController extends C4GBaseController
 
         $this->listParams->setScrollX(false);
         $this->listParams->setResponsive(true);
-        $this->listParams->setModelListParams([$this->past_day_number ?: 1]);
+
+        $types = unserialize($this->selectReservationTypes);
+        if ($types && (count($types) > 0)) {
+            $types = implode(',', $types);
+            $this->listParams->setModelListParams([$this->past_day_number ?: 1, $types]);
+        } else {
+            $this->listParams->setModelListParams([$this->past_day_number ?: 1]);
+        }
 
         if ($this->viewType === 'publicview') {
             $this->listParams->deleteButton(C4GBrickConst::BUTTON_ADD);
@@ -270,33 +278,38 @@ class C4gReservationListController extends C4GBaseController
         $reservationBeginTimeField->setTableColumnPriority(1);
         $fieldList[] = $reservationBeginTimeField;
 
-        $t = 'tl_c4g_reservation_type';
-        $arrValues = array();
-        $arrOptions = array();
-        $arrColumns = array("$t.published='1'");
-        $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
+        $selectTypes = unserialize($this->selectReservationTypes);
+        if ($selectTypes && count($selectTypes) > 0) {
+            $database = Database::getInstance();
+            $allTypes = implode(',', $selectTypes);
+            $types = $database->prepare('SELECT * FROM `tl_c4g_reservation_type` WHERE ' .
+                '`id` IN (' . $allTypes . ') AND `published`=?')
+                ->execute('1')->fetchAllAssoc();
+        } else {
+            $database = Database::getInstance();
+            $types = $database->prepare('SELECT * FROM `tl_c4g_reservation_type` WHERE `published`=?')
+                ->execute('1')->fetchAllAssoc();
+        }
 
         if ($types) {
-            $typeArr = [];
-            $typeList = [];
+            $typelist = [];
             foreach ($types as $type) {
-                $typeArr[] = $type->id;
-                $captions = \Contao\StringUtil::deserialize($type->options);
+                $captions = \Contao\StringUtil::deserialize($type['options']);
                 if ($captions && count($captions) > 0) {
                     foreach ($captions as $caption) {
                         if (strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) {
-                            $typelist[$type->id] = array(
-                                'id' => $type->id,
-                                'name' => $caption['caption'] ? StringHelper::addSpaceBeforeBracket($caption['caption']) : $type->caption,
-                                'type' => $type->reservationObjectType
+                            $typelist[$type['id']] = array(
+                                'id' => $type['id'],
+                                'name' => $caption['caption'] ? StringHelper::addSpaceBeforeBracket($caption['caption']) : $type['caption'],
+                                'type' => $type['reservationObjectType']
                             );
                         }
                     }
                 } else {
-                    $typelist[$type->id] = array(
-                        'id' => $type->id,
-                        'name' => $type->caption,
-                        'type' => $type->reservationObjectType
+                    $typelist[$type['id']] = array(
+                        'id' => $type['id'],
+                        'name' => $type['caption'],
+                        'type' => $type['reservationObjectType']
                     );
                 }
             }
@@ -321,15 +334,15 @@ class C4gReservationListController extends C4GBaseController
             $fieldList[] = $reservationTypeField;
 
             $startTime = time() - (($this->past_day_number ?: 1) * 86400);
-            $reservationObjects = C4gReservationHandler::getReservationObjectList($typeArr, 0,$this->showPrices, true, 0, 0, '', $startTime);
+            $reservationObjects = C4gReservationHandler::getReservationObjectList($selectTypes, 0,$this->showPrices, true, 0, 0, '', $startTime);
             $objects = [];
 
-            foreach ($reservationObjects as $type=>$objList) {
+            foreach ($reservationObjects as $objectType=>$objList) {
                 foreach ($objList as $reservationObject) {
                     $objects[] = array(
                         'id' => $reservationObject->getId(),
                         'name' => $reservationObject->getCaption(),
-                        'type' => $type
+                        'type' => $objectType
                     );
                 }
             }
