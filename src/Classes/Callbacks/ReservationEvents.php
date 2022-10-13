@@ -27,7 +27,7 @@ class ReservationEvents {
                 $ref = Input::get('ref');
                 $do = Input::get('do');
 
-                $link = '<a href="/contao?do=c4g_export&table=tl_c4g_export&calendar='.$row['id'].'&' . $href . '&id=' . $settings['exportSelection'].'&rt='.$rt. "&ref=" . $ref;
+                $link = '<a href="/contao?do=c4g_export&table=tl_c4g_export&calendar='.$row['pid'].'&' . $href . '&id=' . $settings['exportSelection'].'&rt='.$rt. "&ref=" . $ref;
                 $link .= '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label);
                 $link .= '</a> ';
                 return $link;
