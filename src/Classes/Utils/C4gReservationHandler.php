@@ -190,8 +190,8 @@ class C4gReservationHandler
                     }
                 }
 
-                $minReservationDay = $object->getMinReservationDay() ?: 1;
-                if ($minDate && ($minDate > 1) && ($minDate > $minReservationDay)) {
+                $minReservationDay = $object->getMinReservationDay() ?: 0;
+                if ($minDate && ($minDate > 0) && ($minDate > $minReservationDay)) {
                     $minDate = $minReservationDay;
                 }
 
