@@ -9,11 +9,18 @@
  * @link https://www.con4gis.org
  */
 
-Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-    ->addLegend('c4g_reservation_legend', 'con4gisIoLegend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER, true)
-    ->addField(['reservationForwarding','reservationForwardingButtonCaption','exportSelection'], 'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->applyToPalette('default', 'tl_c4g_settings');
-
+$exportExists = class_exists('con4gis\ExportBundle\con4gisExportBundle');
+if ($exportExists) {
+    Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+        ->addLegend('c4g_reservation_legend', 'con4gisIoLegend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER, true)
+        ->addField(['reservationForwarding','reservationForwardingButtonCaption','exportSelection'], 'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+        ->applyToPalette('default', 'tl_c4g_settings');
+} else {
+    Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+        ->addLegend('c4g_reservation_legend', 'con4gisIoLegend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER, true)
+        ->addField(['reservationForwarding','reservationForwardingButtonCaption'], 'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+        ->applyToPalette('default', 'tl_c4g_settings');
+}
 
 /**
  * Add fields
@@ -40,13 +47,15 @@ $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['reservationForwardingButtonCapt
     'sql'                     => "varchar(254) NOT NULL default ''"
 );
 
-$GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['exportSelection'] = array (
-    'label'             => &$GLOBALS['TL_LANG']['tl_c4g_settings']['exportSelection'],
-    'inputType'         => 'select',
-    'filter'            => true,
-    'exclude'           => true,
-    'foreignKey'        => 'tl_c4g_export.title',
-    'eval'              => array('mandatory' => true, 'tl_class' => 'long'),
-    'sql'               => "int(10) unsigned NOT NULL default 0",
-    'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
-);
+if ($exportExists) {
+    $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['exportSelection'] = array (
+        'label'             => &$GLOBALS['TL_LANG']['tl_c4g_settings']['exportSelection'],
+        'inputType'         => 'select',
+        'filter'            => true,
+        'exclude'           => true,
+        'foreignKey'        => 'tl_c4g_export.title',
+        'eval'              => array('mandatory' => false, 'tl_class' => 'long', 'chosen' => true, 'includeBlankOption' => true),
+        'sql'               => "int(10) unsigned NOT NULL default 0",
+        'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+    );
+}

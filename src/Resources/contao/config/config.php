@@ -183,4 +183,9 @@ $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_even
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation';
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_participants';
 
+$exportExists = class_exists('con4gis\ExportBundle\con4gisExportBundle');
+if ($exportExists) {
+    $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_export';
+}
+
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array(\con4gis\ReservationBundle\Classes\InsertTags\C4gReservationInsertTags::class, 'replaceTag');

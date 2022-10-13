@@ -76,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             ),
             'back' => [
                 'class'               => 'header_back',
-                'href'                => Input::get('pid') ? 'do=calendar&table=tl_calendar_events&id='.Input::get('pid') : 'do=calendar&table=tl_calendar_events&id='.Input::get('id'),
+                'href'                => Input::get('pid') ? 'do=calendar&table=tl_calendar_events&id='.Input::get('pid') : 'key=back',
                 'icon'                => 'back.svg',
                 'label'               => &$GLOBALS['TL_LANG']['MSC']['backBT'],
             ]

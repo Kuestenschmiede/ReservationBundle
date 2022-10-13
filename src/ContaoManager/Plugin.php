@@ -47,25 +47,23 @@ class Plugin implements RoutingPluginInterface, BundlePluginInterface
      */
     public function getBundles(ParserInterface $parser)
     {
-        if (class_exists('con4gis\MapsBundle\con4gisMapsBundle')) {
-            return [
-                BundleConfig::create(con4gisReservationBundle::class)
-                    ->setLoadAfter([
-                        ContaoCalendarBundle::class,
-                        \con4gis\MapsBundle\con4gisMapsBundle::class,
-                        con4gisProjectsBundle::class,
-                        con4gisGroupsBundle::class
-                    ])
-            ];
-        } else {
-            return [
-                BundleConfig::create(con4gisReservationBundle::class)
-                    ->setLoadAfter([
-                        ContaoCalendarBundle::class,
-                        con4gisProjectsBundle::class,
-                        con4gisGroupsBundle::class
-                    ])
-            ];
+        $mapsExists = class_exists('con4gis\MapsBundle\con4gisMapsBundle');
+        $exportExists = class_exists('con4gis\ExportBundle\con4gisExportBundle');
+
+        $loadAfterArr = [ContaoCalendarBundle::class];
+        if ($mapsExists) {
+            $loadAfterArr[] = \con4gis\MapsBundle\con4gisMapsBundle::class;
         }
+        if ($exportExists) {
+            $loadAfterArr[] = \con4gis\ExportBundle\con4gisExportBundle::class;
+        }
+
+        $loadAfterArr[] = con4gisProjectsBundle::class;
+        $loadAfterArr[] = con4gisGroupsBundle::class;
+
+        return [
+            BundleConfig::create(con4gisReservationBundle::class)
+                ->setLoadAfter($loadAfterArr)
+        ];
     }
 }

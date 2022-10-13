@@ -35,9 +35,10 @@ $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gEditEvent'] = [
     'exclude'             => true
 ];
 $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gExportReservations'] = [
+    'href'                => 'key=runexport',
     'label'               => &$GLOBALS['TL_LANG'][$str]['c4gExportReservations'],
     'icon'                => 'bundles/con4gisexport/images/be-icons/export.svg',
-    'button_callback'     => ['tl_c4g_reservation_event_bridge', 'c4gExportReservations'],
+    'button_callback'     => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationEvents::class, 'runExport'],
     'exclude'             => true
 ];
 
@@ -83,13 +84,6 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
     }
 
     public function loadChildRecord(array $row) {
-//        if ($row['pid']) {
-//            $calendar = \Database::getInstance()->prepare('SELECT activateEventReservation FROM tl_calendar WHERE id=?')->execute($row['pid'])->fetchAssoc();
-//            if ($calendar && !$calendar['activateEventReservation']) {
-//                return;
-//            }
-//        }
-
         \System::loadLanguageFile('fe_c4g_reservation');
         $arrChildRow = \Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event WHERE pid=?')->execute($row['id'])->fetchAssoc();
 
@@ -231,21 +225,6 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
      * @param $label
      * @param $title
      * @param $icon
-     * @return void
-     */
-    public function c4gExportReservations($row, $href, $label, $title, $icon)
-    {
-        //settings laden
-        //exportId
-        return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a>';
-    }
-
-    /**
-     * @param $row
-     * @param $href
-     * @param $label
-     * @param $title
-     * @param $icon
      * @return string
      */
     public function c4gShowReservations($row, $href, $label, $title, $icon)
@@ -259,7 +238,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             $attributes = 'style="margin-right:3px"';
             $imgAttributes = 'style="width: 18px; height: 18px"';
 
-            $href = "/contao?do=$do&table=tl_c4g_reservation&amp&id=" . $row['id'] . "&pid=" . $row['pid'] . "&rt=" . $rt . "&ref=" . $ref;
+            $href = "/contao?do=".$do."&table=tl_c4g_reservation&id=" . $row['id'] . "&pid=" . $row['pid'] . "&rt=" . $rt . "&ref=" . $ref;
 
             if ($this->states[$row['id']]) {
                 $state = $this->states[$row['id']];

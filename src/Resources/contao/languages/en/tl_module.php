@@ -20,14 +20,13 @@ $GLOBALS['TL_LANG']['tl_module']['reservation_objects_legend'] = 'Settings for o
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_object_types'] = array('Which species may be available for selection?','Selection of species to be used for object maintenance.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_settings'] = array('Select form settings', 'Select your configuration from the Form Settings backend module.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationView'] = array('List view', 'Default: public');
-$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservationView'] = array('List view', 'Default: public');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['renderMode'] = array('List display', 'Different displays of the list are possible. Default: Tiles');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['selectReservationTypes'] = array('Reservation types', 'Select the reservation types (rooms, tables, ...) to be taken into account when making reservations in the frontend. If no selection is made, all reservation objects will be loaded.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationType'] = array("Show reservation type", "The reservation type is not shown in list and detail by default. You can change that here.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationObject'] = array("Show reservation object", "The reservation object is shown by default. There are scenarios in which hiding it makes sense.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showSignatureField'] = array("Signature field (group view only)", "Possibility to request a signature. Currently only possible in the group list.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'] = array("Show prices", "If possible, defined prices are shown.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['past_day_number'] = array("Load data from the past (days)", "How many days should the list data go back (default 1 day).");
-$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['selectReservationTypes'] = array('Reservation types','No selection = All');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site'] = array('Forwarding page', 'After booking, you will be forwarded here.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['login_redirect_site'] = array('Redirect to login page', 'If list module is not public.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['event_redirect_site'] = array('Event forwarding', 'Here you can set the forwarding to the event detail page. In case you want to display the events at the referent.');
