@@ -33,7 +33,12 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['event_redirect_si
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['speaker_redirect_site'] = array('Forward speakers', 'Clicking on the tiles will redirect to another page.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['cancellation_redirect_site'] = array('Redirect to cancellation', 'You can offer a cancellation button directly via this');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type_contact_request'] = array('Contact request notification', 'Select the notification for sending the contact request');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['notification_type'] = array('Notification', 'Select the notification. The preference can be overridden in the reservation type.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_add_member_location'] = array('Automatically set location for member', 'Automatically sets a new location for maintaining members.');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas'] = array("Data fields", "The order here corresponds to the appearance shown in the frontend. Except for the heading, each field can be used only once.");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['mandatory'] = array("Mandatory?","");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['binding'] = array("Mandatory?","Should this data field be displayed as a mandatory field in the frontend");
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['initialValue'] = array("Initial value", "Here you can enter an initial value. Important for the heading - otherwise optional.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['publicview'] = 'Public (reservations will be visible)';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['memberview'] = 'Member view (Only reservations for logged in member, without editing)';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['member'] = 'Member based (Only reservations for logged in member, with editing)';

@@ -62,6 +62,8 @@ $GLOBALS['TL_LANG'][$str]['openingHours'] = array("booking hours");
 $GLOBALS['TL_LANG'][$str]['time_interval'] = array("time interval", "Specify how many X minutes/ X hours the object can be booked (depends on which reservation type the object is assigned to");
 $GLOBALS['TL_LANG'][$str]['duration'] = array("Duration per booking (optional)", "Normally [0] the duration is according to the time interval. However, if the actual appointment should be longer than the offered interval. For example, if a conversion or cleaning break is to be scheduled, then a longer interval can be entered here.");
 $GLOBALS['TL_LANG'][$str]['date_exclusion_end'] = array("Exclusion end", "Put the last Date of exlusion in");
+$GLOBALS['TL_LANG'][$str]['min_residence_time'] = array("Minimum usage duration (optional)", "Minimum usage duration that the customer may choose in the form. Important for multi-day bookings (days, weeks). Attention. Applies only to the reservation type Object selection. If 0, the time interval applies.");
+$GLOBALS['TL_LANG'][$str]['max_residence_time'] = array("Maximum usage duration (optional)", "Maximum usage duration that the customer may choose in the form. Important for multi-day bookings (days, weeks). Attention. Applies only to the reservation type Object selection. If 0, the time interval applies.");
 $GLOBALS['TL_LANG'][$str]['md'] = array("Several days");
 $GLOBALS['TL_LANG'][$str]['event_selection'] = array("event type");
 $GLOBALS['TL_LANG'][$str]['event_object'] = array("event object");
@@ -70,6 +72,7 @@ $GLOBALS['TL_LANG'][$str]['published'] = array("Publish.", "Should this object b
 $GLOBALS['TL_LANG'][$str]['desiredCapacityMin'] = array("Minimum number of persons", "How many persons may appear at least? With standard 0 the number is not evaluated.");
 $GLOBALS['TL_LANG'][$str]['desiredCapacityMax'] = array("Maximum number of persons", "How many persons may appear at least? With standard 0 the number is not evaluated.");
 $GLOBALS['TL_LANG'][$str]['location_legend'] = array("Settings for the location");
+$GLOBALS['TL_LANG'][$str]['memberId'] = array("Who owns the object?", "Only important if objects are created via the frontend module.");
 $GLOBALS['TL_LANG'][$str]['notification_type'] = array('Automatic confirmation message (optional)', 'Select notification. This setting overrides the module settings and also the setting at the reservation type.');
 
 $GLOBALS['TL_LANG'][$str]['price'] = array("Price", "Specify the price for the booking (for example: 50.00).");
