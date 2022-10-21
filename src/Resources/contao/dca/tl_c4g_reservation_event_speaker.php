@@ -88,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{speaker_legend},title, firstname, lastname, alias, email, phone, address, postal, city, website, vita, photo, speakerForwarding;'
+        'default'   =>  '{speaker_legend},title, firstname, lastname, alias, email, phone, address, postal, city, website, vita, photo, speakerForwarding, sorting;'
     ),
 
 
@@ -255,6 +255,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'eval'                    => array('tl_class'=>'w50 wizard','mandatory'=>false, 'fieldType'=>'radio'),
             'sql'                     => "int(10) unsigned NOT NULL default '0'",
             'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+        ),
+
+        'sorting' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['sorting'],
+            'exclude'           => true,
+            'default'           => '0',
+            'sorting'           => true,
+            'search'            => false,
+            'inputType'         => 'text',
+            'eval'              => array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'sql'               => "int(5) unsigned NOT NULL default '0'"
         )
 
     )

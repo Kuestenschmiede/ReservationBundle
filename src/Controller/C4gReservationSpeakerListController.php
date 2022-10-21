@@ -50,6 +50,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
 
     protected $tableName = 'tl_c4g_reservation_event_speaker';
     protected $modelClass = C4gReservationEventSpeakerModel::class;
+    protected $modelListFunction = 'getListItems';
     protected $languageFile = 'fe_c4g_reservation_speaker';
     protected $brickKey = C4gReservationBrickTypes::BRICK_RESERVATION_SPEAKER;
     protected $viewType = C4GBrickViewType::PUBLICVIEW;

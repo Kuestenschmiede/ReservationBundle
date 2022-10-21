@@ -11,6 +11,7 @@
 namespace con4gis\ReservationBundle\Classes\Models;
 
 
+use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use Contao\Model;
 
 /**
@@ -25,4 +26,18 @@ class C4gReservationEventSpeakerModel extends Model
      * @var string
      */
     protected static $strTable = 'tl_c4g_reservation_event_speaker';
+
+    /**
+     * @return mixed
+     */
+    public static function getListItems($listParams = null) {
+        $db = \Database::getInstance();
+        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation_event_speaker ORDER BY sorting DESC, id ASC");
+        $dbResult = $stmt->execute();
+        $dbResult = $dbResult->fetchAllAssoc();
+        $result = $dbResult;
+
+        return ArrayHelper::arrayToObject($result);
+    }
+
 }
