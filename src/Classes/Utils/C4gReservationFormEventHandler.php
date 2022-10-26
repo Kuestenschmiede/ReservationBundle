@@ -184,30 +184,32 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setStyleClass('begindate-event');
             $this->fieldList[] = $reservationBeginDateField;
 
-            $reservationEndDateField = new C4GDateField();
-            //$reservationEndDateField->setFlipButtonPosition(true);
-            $reservationEndDateField->setFieldName('endDateEvent');
-            $reservationEndDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
-            $reservationEndDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
-            $reservationEndDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent']);
-            $reservationEndDateField->setEditable(false);
-            $reservationEndDateField->setComparable(false);
-            $reservationEndDateField->setWithoutValidation(true);
-            $reservationEndDateField->setSortColumn(true);
-            $reservationEndDateField->setSortSequence('de_datetime');
-            $reservationEndDateField->setDatabaseField(false);
-            $reservationEndDateField->setTableColumn(false);
-            $reservationEndDateField->setFormField(true);
-            $reservationEndDateField->setColumnWidth(10);
-            $reservationEndDateField->setMandatory(false);
-            $reservationEndDateField->setCondition($objConditionArr);
-            $reservationEndDateField->setRemoveWithEmptyCondition(true);
-            $reservationEndDateField->setInitialValue($this->initialValues->getDate() ? $this->initialValues->getDate() : $reservationObject->getEndDate()); //ToDo mehrtägige Termnine
-            $reservationEndDateField->setNotificationField(true);
-            $reservationEndDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
-            $reservationEndDateField->setShowIfEmpty(false);
-            $reservationEndDateField->setStyleClass('enddate-event');
-            $this->fieldList[] = $reservationEndDateField;
+            if ($reservationObject->getEndDate() && ( $reservationObject->getEndDate() != $reservationObject->getBeginDate())) {
+                $reservationEndDateField = new C4GDateField();
+                //$reservationEndDateField->setFlipButtonPosition(true);
+                $reservationEndDateField->setFieldName('endDateEvent');
+                $reservationEndDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
+                $reservationEndDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
+                $reservationEndDateField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent']);
+                $reservationEndDateField->setEditable(false);
+                $reservationEndDateField->setComparable(false);
+                $reservationEndDateField->setWithoutValidation(true);
+                $reservationEndDateField->setSortColumn(true);
+                $reservationEndDateField->setSortSequence('de_datetime');
+                $reservationEndDateField->setDatabaseField(false);
+                $reservationEndDateField->setTableColumn(false);
+                $reservationEndDateField->setFormField(true);
+                $reservationEndDateField->setColumnWidth(10);
+                $reservationEndDateField->setMandatory(false);
+                $reservationEndDateField->setCondition($objConditionArr);
+                $reservationEndDateField->setRemoveWithEmptyCondition(true);
+                $reservationEndDateField->setInitialValue($reservationObject->getEndDate()); //ToDo mehrtägige Termnine
+                $reservationEndDateField->setNotificationField(true);
+                $reservationEndDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                $reservationEndDateField->setShowIfEmpty(false);
+                $reservationEndDateField->setStyleClass('enddate-event');
+                $this->fieldList[] = $reservationEndDateField;
+            }
 
             //ToDo find better solution for empty beginTime
             if ($reservationObject->getBeginTime() && date('H', $reservationObject->getBeginTime()) != '00') {
@@ -401,6 +403,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $imageField = new C4GImageField();
                     $imageField->setFieldName('image');
                     $imageField->setInitialValue($reservationObject->getImage());
+                    $imageField->setDeserialize(false);
                     $imageField->setCondition($objConditionArr);
                     $imageField->setFormField(true);
                     $imageField->setShowIfEmpty(false);
