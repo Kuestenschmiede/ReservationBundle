@@ -281,7 +281,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['endTime'],
             'exclude'                 => true,
             'filter'                  => false,
-            'default'                 => time(), 'duration',//time()+3600,
+            'default'                 => time(),//time()+3600,
             'sorting'                 => false,
             'inputType'               => 'text',
             'flag'                    => 12,
@@ -706,7 +706,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'           => true,
             'flag'              => 12,
             'default'           => time(),
-            'eval' => array('rgxp'=>'datim', 'doNotCopy'=>true, 'tl_class'=>'w50', 'disabled'=>true )
+            'eval' => array('rgxp'=>'datim', 'doNotCopy'=>true, 'tl_class'=>'w50', 'disabled'=>true)
         )
 
     )
