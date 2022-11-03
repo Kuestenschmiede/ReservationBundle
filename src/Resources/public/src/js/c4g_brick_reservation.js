@@ -659,7 +659,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
     }
 
     if (date && additionalId) {
-        duration = duration  ? duration : -1;
+        duration = duration ? duration : -1;
         capacity = capacity ? capacity : -1;
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "flex";
         let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration + "/" + capacity + "/" + objectId;
