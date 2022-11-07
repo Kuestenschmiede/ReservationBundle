@@ -61,6 +61,7 @@ use Contao\Database;
 use Contao\Date;
 use Contao\FrontendUser;
 use Contao\Input;
+use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\StringUtil;
 use Contao\System;
@@ -83,7 +84,7 @@ class C4gReservationController extends C4GBaseController
     protected $brickKey     = C4gReservationBrickTypes::BRICK_RESERVATION;
     protected $viewType     = C4GBrickViewType::PUBLICFORM;
     protected $sendEMails   = null;
-    protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
+    protected $brickScript  = 'bundles/con4gisreservation/src/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
 
@@ -1321,6 +1322,13 @@ class C4gReservationController extends C4GBaseController
         $memberId->setNotificationField(false);
         $fieldList[] = $memberId;
 
+        $memberEmail = new C4GTextField();
+        $memberEmail->setFieldName('member_email');
+        $memberEmail->setTableColumn(false);
+        $memberEmail->setFormField(false);
+        $memberEmail->setNotificationField(true);
+        $fieldList[] = $memberEmail;
+
         $groupId = new C4GTextField();
         $groupId->setFieldName('group_id');
         $groupId->setTableColumn(true);
@@ -1813,6 +1821,12 @@ class C4gReservationController extends C4GBaseController
         } else {
             $putVars['member_id'] = $reservationType->member_id ? $reservationType->member_id : $memberId;
         }
+
+        if ($putVars['member_id']) {
+            $member = MemberModel::findByPk($putVars['member_id']);
+            $putVars['member_email'] = $member->email;
+        }
+
         $putVars['group_id'] = $reservationType->group_id;
 
         $postals = $this->reservationSettings->postals;
