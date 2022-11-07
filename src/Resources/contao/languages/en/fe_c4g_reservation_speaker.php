@@ -28,5 +28,14 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['photo'] = 'Photo';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['events'] = 'Events';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['back'] = 'Back';
 
+/** Legends */
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'Reservationform';
+
+/** MESSAGES */
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['min_max_failed'] = 'We are unable to make your reservation. The reservation is outside the bookable range.';
+
+/** DESCRIPTIONS */
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Select the reservation type..';
+
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['button_cancel'] = 'To list';

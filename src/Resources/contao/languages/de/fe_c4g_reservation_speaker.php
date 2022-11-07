@@ -29,13 +29,13 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['events'] = 'Veranstaltungen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['back'] = 'Zurück';
 
 /** Legends */
-//$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'Reservierungsformular';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'Reservierungsformular';
 
 /** MESSAGES */
-//$GLOBALS['TL_LANG']['fe_c4g_reservation']['min_max_failed'] = 'Wir können Ihre Reservierung nicht durchführen. Der Termin ist außerhalb des buchbaren Bereichs.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['min_max_failed'] = 'Wir können Ihre Reservierung nicht durchführen. Der Termin ist außerhalb des buchbaren Bereichs.';
 
 /** DESCRIPTIONS */
-//$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Wählen Sie die Reservierungsart aus.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_reservation_type'] = 'Wählen Sie die Reservierungsart aus.';
 
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_speaker']['button_cancel'] = 'Zur Liste';
