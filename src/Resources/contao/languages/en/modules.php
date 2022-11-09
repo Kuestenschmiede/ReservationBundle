@@ -30,7 +30,7 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Topics', 'Here y
 $GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Form settings', 'Here you can configure the form and link it in the module.');
 
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Form', 'Reservation form');
-$GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE]  = array('con4gis-Reservation: List', 'Reservation list');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE] = array('con4gis-Reservation: List', 'Reservation list');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationCancellationController::TYPE] = array('con4gis-Reservation: Cancellation', 'Reservation');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE]  = array('con4gis-Reservation: Speaker', 'Speaker');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationLocationListController::TYPE]  = array('con4gis-Reservation: Location', 'Location');

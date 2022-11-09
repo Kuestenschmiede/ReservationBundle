@@ -10,7 +10,7 @@
  */
 
 /** Fields **/
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['caption'] = array("backend name", "name for selection in backend.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['caption'] = array("Backend name", "Name for selection in backend.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['alias'] = array("Alias", "The alias is used in the frontend instead of the ID for detail views and parameters.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['options'] = array("Frontend name", "Displayed in the selection field in the frontend depending on the language.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['option'] = array("Name","");

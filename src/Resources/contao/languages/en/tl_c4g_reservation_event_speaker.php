@@ -12,18 +12,18 @@
 $str = 'tl_c4g_reservation_event_speaker';
 
 $GLOBALS['TL_LANG'][$str]['id'] = array("#", "");
-$GLOBALS['TL_LANG'][$str]['title'] = array("title", "speaker's title");
+$GLOBALS['TL_LANG'][$str]['title'] = array("Title", "Speaker's title");
 $GLOBALS['TL_LANG'][$str]['alias'] = array("Alias", "The alias is used in the frontend instead of the ID for detail views and parameters.");
-$GLOBALS['TL_LANG'][$str]['firstname'] = array("first name", "speaker's first name");
-$GLOBALS['TL_LANG'][$str]['lastname'] = array("surname", "speaker's surname");
-$GLOBALS['TL_LANG'][$str]['email'] = array("email", "speaker's email address");
-$GLOBALS['TL_LANG'][$str]['phone'] = array("phone number", "speaker's phone number");
-$GLOBALS['TL_LANG'][$str]['address'] = array("address", "speaker's address");
-$GLOBALS['TL_LANG'][$str]['postal'] = array("postal code", "speaker's postal code");
-$GLOBALS['TL_LANG'][$str]['city'] = array("city", "speaker's city");
-$GLOBALS['TL_LANG'][$str]['website'] = array("website", "speaker's website");
-$GLOBALS['TL_LANG'][$str]['vita'] = array("vita", "vita of the speaker");
-$GLOBALS['TL_LANG'][$str]['photo'] = array("photo", "photo of the speaker");
+$GLOBALS['TL_LANG'][$str]['firstname'] = array("First name", "speaker's first name");
+$GLOBALS['TL_LANG'][$str]['lastname'] = array("Surname", "Speaker's surname");
+$GLOBALS['TL_LANG'][$str]['email'] = array("Email", "Speaker's email address");
+$GLOBALS['TL_LANG'][$str]['phone'] = array("Phone number", "Speaker's phone number");
+$GLOBALS['TL_LANG'][$str]['address'] = array("Address", "Speaker's address");
+$GLOBALS['TL_LANG'][$str]['postal'] = array("Postal code", "Speaker's postal code");
+$GLOBALS['TL_LANG'][$str]['city'] = array("City", "Speaker's city");
+$GLOBALS['TL_LANG'][$str]['website'] = array("Website", "Speaker's website");
+$GLOBALS['TL_LANG'][$str]['vita'] = array("Vita", "Vita of the speaker");
+$GLOBALS['TL_LANG'][$str]['photo'] = array("Photo", "Photo of the speaker");
 $GLOBALS['TL_LANG'][$str]['speakerForwarding'] = array("Forwarding", "This page is called up after clicking on the speaker.");
 $GLOBALS['TL_LANG'][$str]['sorting'] = array("Sort value", "The higher the value, the higher the position in the list (frontend).");
 

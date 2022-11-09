@@ -10,6 +10,6 @@
  */
 
 $GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwarding'] = ["Continue to module", "Select the page where the reservation module is located."];
-$GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwardingButtonCaption'] = ["Button Label Forwarding", "Label Forwarding Button to Reservation. Default: empty. The entries from the language files take effect."];
+$GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwardingButtonCaption'] = ["Button Labeled Forwarding", "Labeled Forwarding Button to Reservation. Default: empty. The entries from the language files take effect."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['exportSelection'] = ["Export selection", "Select the export that should be preselected at the events."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['c4g_reservation_legend'] = "Reservation settings";

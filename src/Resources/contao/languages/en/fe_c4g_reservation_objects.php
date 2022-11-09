@@ -11,15 +11,15 @@
 
 /** CONFIGURATION */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption'] = 'Reservation object';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption_plural'] = 'reservation objects';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['brick_caption_plural'] = 'Reservation objects';
 
 /** FIELDS */
-$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['viewableTypes'] = 'reservation type';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['caption'] = 'caption';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['viewableTypes'] = 'Reservation type';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['caption'] = 'Caption';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['quantity'] = 'Available quantity';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['description'] = 'description';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['image'] = 'image';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['price'] = 'Security amount (deposit)';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['description'] = 'Description';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['image'] = 'Image';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['price'] = 'Contingency amount (deposit)';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['published'] = 'Published?';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_objects']['days_exclusion_text'] = ['Exclude days',
     'Please list entries comma separated. Beispiel: 01.01.2042-15.01.2042,01.05.2042,24.12.2050-26.12.2042'];

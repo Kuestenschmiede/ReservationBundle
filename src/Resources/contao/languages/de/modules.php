@@ -31,8 +31,8 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Reservierungsformu
 
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Formular', 'Reservierungsformular');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE] = array('con4gis-Reservation: Liste', 'Reservierungsliste');
-$GLOBALS['TL_LANG']['FMD'][C4gReservationCancellationController::TYPE]  = array('con4gis-Reservation: Stornierung', 'Reservierung');
-$GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE]  = array('con4gis-Reservation: Referent*innen', 'Referent*innen Liste');
-$GLOBALS['TL_LANG']['FMD'][C4gReservationLocationListController::TYPE]  = array('con4gis-Reservation: Orte', 'Orte Liste (z.B. Veranstaltungsorte)');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationCancellationController::TYPE] = array('con4gis-Reservation: Stornierung', 'Reservierung');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE] = array('con4gis-Reservation: Referent*innen', 'Referent*innen Liste');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationLocationListController::TYPE] = array('con4gis-Reservation: Orte', 'Orte Liste (z.B. Veranstaltungsorte)');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationObjectsController::TYPE] = array('con4gis-Reservation: Objektpflege', 'Mitglieder können eigenen Objekte pflege. Bspw. für ein Verleihsystem.');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationAddressListController::TYPE] = array('con4gis-Reservation: Adressliste', 'Adressliste bspw. für den Labeldruck (Spezialbenachrichtigungen und Reservierungsarten).');

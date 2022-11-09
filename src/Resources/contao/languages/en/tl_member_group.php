@@ -27,5 +27,5 @@
  * RIGHTS
  */
 $GLOBALS['TL_LANG']['tl_member_group']['cg_rights']['brick_reservation'] = 'Reservations';
-$GLOBALS['TL_LANG']['tl_member_group']['cg_rights']['brick_reservation_objects'] = 'Reservations object maintenance';
+$GLOBALS['TL_LANG']['tl_member_group']['cg_rights']['brick_reservation_objects'] = 'Reservations object management';
 

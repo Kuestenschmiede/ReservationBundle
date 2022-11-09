@@ -28,7 +28,6 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['beginDate'] = array("Beginndatum");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['endDate'] = array("Enddatum");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['beginTime'] = array("Beginnzeit", "Wann startet die Veranstaltung");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['endTime'] = array("Endzeit", "Wann endet die Veranstaltung?");
-
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservationObjectType'] = array("Objekttyp", "Es können Reserverierungsobjekte und Contao Events reserviert werden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][1] = 'Zeitauswahl (Standard)';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][2] = 'Contao Events';

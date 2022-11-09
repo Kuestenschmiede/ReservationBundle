@@ -13,13 +13,13 @@
 $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['headline'] = 'Cancellation data';
 
 /** CONFIGURATION */
-$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['brick_caption'] = 'cancellation';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['brick_caption'] = 'Cancellation';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['brick_caption_plural'] = 'Cancellations';
 
 /** FIELDS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['lastname'] = 'Last name';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['firstname'] = 'firstname';
-$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['reservation_id'] = 'identification key';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['firstname'] = 'Firstname';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['reservation_id'] = 'Identification key';
 
 /** DESCRIPTIONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['desc_lastname'] = 'Enter your descendant.';
