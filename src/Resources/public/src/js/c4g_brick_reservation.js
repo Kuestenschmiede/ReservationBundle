@@ -771,37 +771,40 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
 function checkEventFields() {
     var typeField = document.getElementById("c4g_reservation_type");
     var typeId = typeField ? typeField.value : -1;
-    var selectField = document.querySelector('.reservation-event-object select');
-    let eventData = document.getElementsByClassName('eventdata');
-    if (eventData[0]) {
-        eventData[0].style.display = 'none';
+    var selectField = document.querySelectorAll('#c4g_reservation_object_event_' + typeId)[0];
+    var eventData = document.getElementsByClassName('eventdata');
+    if (eventData) {
+
+        eventData.hidden = true;
     }
 
-    if (selectField && (document.querySelector("reservation-id:not([hidden])"))) {
-        document.getElementsByClassName("reservation-id");
+    if (selectField && selectField != 'hidden') {
+        document.getElementsByClassName("reservation-id").hidden != true;
         for (i = 0; i < selectField.length; i++) {
-            if (selectField[i]) {
-                var selectField = selectField[i];
+            if (selectField[i].value) {
                 var additional = -1;
                 if (selectField[i].value) {
                     additional = typeId.toString() + "-22" + selectField[i].value.toString();
-                    document.getElementsByClassName('eventdata_' + additional).style.display = "block";
-                    document.getElementsByClassName('eventdata_' + additional).children[0].style.display = "block";
+                    document.querySelectorAll('.eventdata_' + additional).visibility = "hidden";
+                    document.querySelectorAll('.eventdata_' + additional)[i].childNodes[i].visibility = "hidden";
+                    document.querySelectorAll('.eventdata_' + additional).hidden = true;
+                    document.querySelectorAll('.eventdata_' + additional)[i].childNodes[i].hidden = true;
                 }
 
                 var dateFields = document.getElementsByClassName('begindate-event');
                 if (dateFields) {
                     for (j = 0; j < dateFields.length; j++) {
-                        if ((additional != -1) && dateFields[j].children[0].getElementsByClassName('c4g__form-date-container')[0].children[0].getElementsByTagName('input')[0].classList.contains('c4g_beginDateEvent_' + additional)) {
-                            dateFields[j].style.display = "block";
-                            dateFields[j].children[0].getElementsByTagName('label')[0].style.display = "block";
-                            dateFields[j].children[0].getElementsByClassName('c4g__form-date-container')[0].style.display = "block";
-                            dateFields[j].children[0].getElementsByClassName('c4g__form-date-container')[0].children[0].getElementsByTagName('input')[0].style.display = "block";
+                        if ((additional != -1) && dateFields[j].querySelectorAll('.c4g__form-date-container')[j].childNodes[j].classList.contains('c4g_beginDateEvent_' + additional)) {
+                            dateFields[j].visible = true;
+                            dateFields[j].childNodes[j].getElementsByTagName('label').visible = true;
+                            dateFields[j].childNodes[j].querySelectorAll('.c4g__form-date-container').visible = true;
+                            dateFields[j].childNodes[j].getElementsByTagName('input').visible = true;
+
                         } else {
-                            dateFields[j].style.display = "none";
-                            dateFields[j].getElementsByTagName('label')[0].style.display = "none";
-                            dateFields[j].children[0].getElementsByClassName('c4g__form-date-container')[0].style.display = "none";
-                            dateFields[j].children[0].getElementsByClassName('c4g__form-date-container')[0].children[0].getElementsByTagName('input')[0].style.display = "none";
+                            dateFields[j].hidden = true;
+                            dateFields[j].getElementsByTagName('label').hidden = true;
+                            dateFields[j].childNodes[j].querySelectorAll('.c4g__form-date-container').hidden = true;
+                            dateFields[j].childNodes[j].getElementsByTagName('input').hidden = true;
                         }
                     }
                 }
@@ -810,17 +813,17 @@ function checkEventFields() {
                 if (timeFields) {
                     for (j = 0; j < timeFields.length; j++) {
                         if ((additional != -1) && timeFields[j].classList.contains('reservation_time_event_button_' + additional)) {
-                            timeFields[j].style.display = "block";
-                            timeFields[j].children[0].getElementsByTagName('label')[0].style.display = "block";
-                            timeFields[j].parent.style.display = "block";
-                            timeFields[j].parent.parent.style.display = "block";
-                            timeFields[j].parent.parent.parent.style.display = "block";
+                            timeFields[j].visible = true;
+                            timeFields[j].childNodes[j].getElementsByTagName('label').visible = true;
+                            timeFields[j].parentNode.visible = true;
+                            timeFields[j].parentNode.parentNode.visible = true;
+                            timeFields[j].parentNode.parentNode.parentNode.visible = true;
                         } else {
-                            timeFields[j].style.display = "none";
-                            timeFields[j].children[0].getElementsByTagName('label')[0].style.display = "none";
-                            timeFields[j].parent.style.display = "none";
-                            timeFields[j].parent.parent.style.display = "none";
-                            timeFields[j].parent.parent.parent.style.display = "none";
+                            timeFields[j].hidden = true;
+                            timeFields[j].childNodes[j].getElementsByTagName('label').hidden = true;
+                            timeFields[j].parentNode.hidden = true;
+                            timeFields[j].parentNode.parentNode.hidden = true;
+                            timeFields[j].parentNode.parentNode.parentNode.hidden = true;
                         }
                     }
                 }
@@ -830,14 +833,14 @@ function checkEventFields() {
         var dateFields = document.getElementsByClassName('begindate-event');
         if (dateFields && Array.isArray(dateFields)) {
             for (i = 0; i < dateFields.length; i++) {
-                dateFields[i].style.display = "none";
+                dateFields[i].hidden = true
             }
         }
 
         var timeFields = document.getElementsByClassName('reservation_time_event_button');
         if (timeFields && Array.isArray(timeFields)) {
             for (i = 0; i < timeFields.length; i++) {
-                timeFields[i].style.display = "none";
+                timeFields[i].hidden = true
             }
         }
     }
