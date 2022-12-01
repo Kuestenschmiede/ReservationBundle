@@ -16,8 +16,11 @@
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
+use Contao\CalendarBundle\Security\ContaoCalendarPermissions;
 
-$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, switchAllTypes, notification_type;{publish_legend}, published, member_id';
+
+
+$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -219,13 +222,24 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'               => "int(1) unsigned NULL default 0"
         ),
 
+        'allTypesEvents' => array
+        (
+            'label'             => $GLOBALS['TL_LANG']['tl_c4g_reservation_object']['allTypesEvents'],
+            'filter'            => false,
+            'exclude'           => true,
+            'inputType'         => 'checkbox',
+            'options_callback'  => array('tl_module_calendar', 'getCalendars'),
+            'eval'              => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr'),
+            'sql'               => "blob NULL"
+        ),
+
         'switchAllTypes' => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['switchAllTypes'],
             'filter'            => false,
             'exclude'           => true,
             'inputType'         => 'checkbox',
-            'options_callback'  => ['tl_c4g_reservation_object', 'getTypes'],
+            'options_callback'  =>  ['tl_c4g_reservation_object', 'getTypes'],
             'eval'              => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr'),
             'sql'               => "blob NULL"
         ),
@@ -809,6 +823,66 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
 
 );
+/**
+ * Provide miscellaneous methods that are used by the data configuration array.
+ */
+class tl_module_calendar extends Backend
+{
+    /**
+     * Import the back end user object
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->import(BackendUser::class, 'User');
+    }
+
+    /**
+     * Get all calendars and return them as array
+     *
+     * @return array
+     */
+    public function getCalendars()
+    {
+        if (!$this->User->isAdmin && !is_array($this->User->calendars))
+        {
+            return array();
+        }
+
+        $arrCalendars = array();
+        $objCalendars = $this->Database->execute("SELECT id, title FROM tl_calendar ORDER BY title");
+        $security = System::getContainer()->get('security.helper');
+
+        while ($objCalendars->next())
+        {
+            if ($security->isGranted(ContaoCalendarPermissions::USER_CAN_EDIT_CALENDAR, $objCalendars->id))
+            {
+                $arrCalendars[$objCalendars->id] = $objCalendars->title;
+            }
+        }
+
+        return $arrCalendars;
+    }
+
+    /**
+     * Get all event reader modules and return them as array
+     *
+     * @return array
+     */
+    public function getReaderModules()
+    {
+        $arrModules = array();
+        $objModules = $this->Database->execute("SELECT m.id, m.name, t.name AS theme FROM tl_module m LEFT JOIN tl_theme t ON m.pid=t.id WHERE m.type='eventreader' ORDER BY t.name, m.name");
+
+        while ($objModules->next())
+        {
+            $arrModules[$objModules->theme][$objModules->id] = $objModules->name . ' (ID ' . $objModules->id . ')';
+        }
+
+        return $arrModules;
+    }
+}
+
 
 /**
  * Class tl_c4g_reservation_object
@@ -1002,4 +1076,5 @@ class tl_c4g_reservation_object extends Backend
 
         return $varValue;
     }
+
 }

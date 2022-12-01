@@ -18,6 +18,7 @@ $GLOBALS['TL_LANG'][$str]['options'] = array("Frontendbezeichnung","Wird alterna
 $GLOBALS['TL_LANG'][$str]['quantity'] = array("Verfügbare Anzahl","Wie viele Objekte dieses Typs stehen zur Verfügung? (Standard 1)");
 $GLOBALS['TL_LANG'][$str]['allTypesQuantity'] = array("Gilt über alle Reservierungsarten (selbes Objekt)","Die verfügbare Anzahl der Objekte wird über alle Reservierungsarten berücksichtigt.");
 $GLOBALS['TL_LANG'][$str]['allTypesValidity'] = array("Gilt über alle Reservierungsarten (alle Objekte)","Sollten mehrere Reservierungsarten aktiv sein, dann blockiert die Buchung auch andere Objekte.");
+$GLOBALS['TL_LANG'][$str]['allTypesEvents'] = array("Kalender Events berücksichtigen", "Wählen Sie den Kalender aus, den Sie berücksichtigen möchten");
 $GLOBALS['TL_LANG'][$str]['switchAllTypes'] = array("Gilt nur für folgende Reservierungsarten","Hiermit kann die Gültigkeit der vorherigen Checkboxen auf bestimmte Reservierungsarten reduziert werden (optional).");
 $GLOBALS['TL_LANG'][$str]['priority'] = array("Soll vorrangig angeboten werden","Ist dieser Schalter aktiv, dann wir das Objekt vorausgewählt, wenn mehrere Objekte in den Zeitpunkt passen.");
 $GLOBALS['TL_LANG'][$str]['location'] = array("Veranstaltungsort", "Wo findet der Termin statt? Überschreibt die Einstellung an der Reservierungsart.");
