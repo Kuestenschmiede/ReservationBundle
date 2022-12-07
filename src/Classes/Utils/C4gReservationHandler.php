@@ -1645,12 +1645,12 @@ class C4gReservationHandler
 
                 foreach ($calendars as $calendarId) {
                     if ($calendarId) {
-                        $events = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ?")->execute($calendarId)->fetchAllAssoc();
+                        $events = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ? AND `published`  = '1'")->execute($calendarId)->fetchAllAssoc();
 
                         foreach ($events as $event) {
                             if ($event){
                                 $startDate = $event['startDate'];
-                                $endDate = $event['startDate'] ?: $startDate;
+                                $endDate = $event['endDate'] ?: $startDate;
                                 $startTime = $event['startTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate']);
                                 $endTime = $event['endTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
 
