@@ -49,6 +49,7 @@ class C4gReservationFrontendObject
     private $image = null;
     private $price = 0.00;
     private $priceOption = 'pReservation';
+    private $allTypesEvents = null;
 
     /**
      * C4gReservationFrontendObject constructor.
@@ -583,5 +584,21 @@ class C4gReservationFrontendObject
     public function setPriceOption(string $priceOption): void
     {
         $this->priceOption = $priceOption;
+    }
+
+    /**
+     * @return null
+     */
+    public function getAllTypesEvents()
+    {
+        return $this->allTypesEvents;
+    }
+
+    /**
+     * @param null $allTypesEvents
+     */
+    public function setAllTypesEvents($allTypesEvents): void
+    {
+        $this->allTypesEvents = $allTypesEvents;
     }
 }

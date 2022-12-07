@@ -12,6 +12,7 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectPricesModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
+use Contao\CalendarEventsModel;
 use Contao\Database;
 use Contao\Date;
 use Contao\StringUtil;
@@ -175,15 +176,17 @@ class C4gReservationHandler
                     break;
                 }
                 $exclusionPeriods = $object->getDatesExclusion();
+
                 if ($exclusionPeriods) {
                     foreach ($exclusionPeriods as $period) {
                         if ($period && $period['date_exclusion'] && $period['date_exclusion_end']) {
-                            $exclusionBegin = C4gReservationDateChecker::getBeginOfDate($period['date_exclusion']);
-                            $exclusionEnd = C4gReservationDateChecker::getEndOfDate($period['date_exclusion_end']);
+                            $exclusionBegin = $period['date_exclusion'];
+                            $exclusionEnd = $period['date_exclusion_end'];
 
                             $current = $exclusionBegin;
                             while($current <= $exclusionEnd) {
-                                $allObjectDates[$current][] = $current;
+                                $allObjectDates[$current][] = $current; //ToDo remember begin/end time
+                                //Alternativ: weiter unten excludeTime auf true setzen, wenn Zeitraum stimmt.
                                 $current = intval($current) + 86400;
                             }
                         }
@@ -287,7 +290,7 @@ class C4gReservationHandler
      * @return bool
      */
     public static function isEventObject($object) {
-        return ($object && (intval($object) > 0)) ? true : false;
+
     }
 
 
@@ -1560,6 +1563,7 @@ class C4gReservationHandler
                     $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'] ?: $cloneObject['desiredCapacityMin'], $object['desiredCapacityMax'] ?: $cloneObject['desiredCapacityMax']]);
                     $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: intval($cloneObject['allTypesQuantity']));
                     $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: intval($cloneObject['allTypesValidity']));
+                    //$frontendObject->setAllTypesEvents(\Contao\StringUtil::deserialize($object['allTypesEvents']) ?: \Contao\StringUtil::deserialize($cloneObject['allTypesEvents']));
                     $frontendObject->setLocation($frontendObject->getLocation() ?: $cloneObject['location']);
                 } else {
                     $frontendObject->setTimeinterval($object['time_interval']);
@@ -1569,6 +1573,7 @@ class C4gReservationHandler
                     $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'], $object['desiredCapacityMax']]);
                     $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: 0);
                     $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: 0);
+                    //$frontendObject->setAllTypesEvents(\Contao\StringUtil::deserialize($object['allTypesEvents']) ?: []);
                 }
 
                 $opening_hours = array();
@@ -1632,7 +1637,33 @@ class C4gReservationHandler
 
                 $frontendObject->setWeekdayExclusion($weekdays);
                 $frontendObject->setOpeningHours($opening_hours);
-                $frontendObject->setDatesExclusion(\Contao\StringUtil::deserialize($object['days_exclusion']));
+
+
+                $datesExclusion = \Contao\StringUtil::deserialize($object['days_exclusion']);
+
+                $calendars = \Contao\StringUtil::deserialize($object['allTypesEvents']);
+
+                foreach ($calendars as $calendarId) {
+                    if ($calendarId) {
+                        $events = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ?")->execute($calendarId)->fetchAllAssoc();
+
+                        foreach ($events as $event) {
+                            if ($event){
+                                $startDate = $event['startDate'];
+                                $endDate = $event['startDate'] ?: $startDate;
+                                $startTime = $event['startTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate']);
+                                $endTime = $event['endTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
+
+                                $startDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($startDate, $startTime);
+                                $endDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($endDate, $endTime);
+                                $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
+                            }
+                        }
+                    }
+                }
+
+
+                $frontendObject->setDatesExclusion($datesExclusion);
 
                 $objectList[] = $frontendObject;
             }

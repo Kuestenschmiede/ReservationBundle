@@ -228,7 +228,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'filter'            => false,
             'exclude'           => true,
             'inputType'         => 'checkbox',
-            'options_callback'  => array('tl_module_calendar', 'getCalendars'),
+            'foreignKey'        => 'tl_calendar.title',
             'eval'              => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr'),
             'sql'               => "blob NULL"
         ),
@@ -712,7 +712,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 120px;'),
+                    'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 120px;'),
                     'sql'                     => "varchar(10) NOT NULL default ''"
                 ),
                 'date_exclusion_end' => array
@@ -721,7 +721,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'default'                 => '',
                     'exclude'                 => true,
                     'inputType'               => 'text',
-                    'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 120px;'),
+                    'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 120px;'),
                     'sql'                     => "varchar(10) NOT NULL default ''"
                 )
 
@@ -823,65 +823,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
 
 );
-/**
- * Provide miscellaneous methods that are used by the data configuration array.
- */
-class tl_module_calendar extends Backend
-{
-    /**
-     * Import the back end user object
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import(BackendUser::class, 'User');
-    }
-
-    /**
-     * Get all calendars and return them as array
-     *
-     * @return array
-     */
-    public function getCalendars()
-    {
-        if (!$this->User->isAdmin && !is_array($this->User->calendars))
-        {
-            return array();
-        }
-
-        $arrCalendars = array();
-        $objCalendars = $this->Database->execute("SELECT id, title FROM tl_calendar ORDER BY title");
-        $security = System::getContainer()->get('security.helper');
-
-        while ($objCalendars->next())
-        {
-            if ($security->isGranted(ContaoCalendarPermissions::USER_CAN_EDIT_CALENDAR, $objCalendars->id))
-            {
-                $arrCalendars[$objCalendars->id] = $objCalendars->title;
-            }
-        }
-
-        return $arrCalendars;
-    }
-
-    /**
-     * Get all event reader modules and return them as array
-     *
-     * @return array
-     */
-    public function getReaderModules()
-    {
-        $arrModules = array();
-        $objModules = $this->Database->execute("SELECT m.id, m.name, t.name AS theme FROM tl_module m LEFT JOIN tl_theme t ON m.pid=t.id WHERE m.type='eventreader' ORDER BY t.name, m.name");
-
-        while ($objModules->next())
-        {
-            $arrModules[$objModules->theme][$objModules->id] = $objModules->name . ' (ID ' . $objModules->id . ')';
-        }
-
-        return $arrModules;
-    }
-}
 
 
 /**

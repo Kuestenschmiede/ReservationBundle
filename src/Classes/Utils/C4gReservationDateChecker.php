@@ -27,6 +27,25 @@ class C4gReservationDateChecker
         return $result;
     }
 
+    public static function mergeDateAndTimeStamp($date, $time)
+    {
+        $result = $date;
+        if ($date && $time) {
+            $dateTimeObject = new \DateTime();
+            $dateTimeObject->setTimezone(new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
+
+            $dateStamp = self::getBeginOfDate($date);
+            $timeStamp = $time - self::getBeginOfDate($time);
+
+//            $dateTimeObject->setTimestamp($dateStamp+$timeStamp); //+3600 - ToDo lost hour - calc time diff
+//            $mergedDateTime = $dateTimeObject->format($GLOBALS['TL_CONFIG']['datimFormat']);
+//            $mergedDateTime = \DateTime::createFromFormat($GLOBALS['TL_CONFIG']['datimFormat'], $mergedDateTime);
+            $result = $dateStamp+$timeStamp;
+        }
+
+        return $result;
+    }
+
     public static function getBeginOfDate($time)
     {
         if ($time) {
