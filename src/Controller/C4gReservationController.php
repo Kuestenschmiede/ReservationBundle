@@ -1756,7 +1756,7 @@ class C4gReservationController extends C4GBaseController
             }
 
             if (!$timeKey) {
-                return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['empty_time_key']];
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key']];
             }
 
             //just notification
