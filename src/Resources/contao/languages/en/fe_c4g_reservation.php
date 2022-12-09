@@ -145,7 +145,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'] =
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'An error has occurred. The reservation cannot be made. Please contact us.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id'] = 'Sorry. An error has occurred. The reservation cannot be made.  Please reload the page and try again.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking'] = 'Sorry. An error has occurred. The reservation cannot be made.  Please reload the page and try again.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key'] = 'Sorry. An error has occurred.  The reservation cannot be made. Please reload the page and try again.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key'] = 'The reservation cannot be made. Has a period been selected?';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['wrong_postal'] = 'No reservation can be made with your zip code.';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'] = array(" per minute");
