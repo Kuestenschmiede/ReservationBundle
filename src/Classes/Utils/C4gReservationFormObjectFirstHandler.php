@@ -330,7 +330,12 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setMinDate(C4gReservationHandler::getMinDate([$reservationObject]));
             $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate([$reservationObject]));
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString([$reservationObject]));
-            $reservationBeginDateField->setExcludeDates(C4gReservationHandler::getDateExclusionString([$reservationObject], $listType, $reservationSettings->removeBookedDays));
+            $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
+            if ($commaDates) {
+                $commaDates = $commaDates['dates'];
+            }
+
+            $reservationBeginDateField->setExcludeDates($commaDates);
             $reservationBeginDateField->setFieldName('beginDate');
             $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);

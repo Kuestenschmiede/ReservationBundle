@@ -37,9 +37,6 @@ class C4gReservationDateChecker
             $dateStamp = self::getBeginOfDate($date);
             $timeStamp = $time - self::getBeginOfDate($time);
 
-//            $dateTimeObject->setTimestamp($dateStamp+$timeStamp); //+3600 - ToDo lost hour - calc time diff
-//            $mergedDateTime = $dateTimeObject->format($GLOBALS['TL_CONFIG']['datimFormat']);
-//            $mergedDateTime = \DateTime::createFromFormat($GLOBALS['TL_CONFIG']['datimFormat'], $mergedDateTime);
             $result = $dateStamp+$timeStamp;
         }
 
@@ -49,13 +46,7 @@ class C4gReservationDateChecker
     public static function getBeginOfDate($time)
     {
         if ($time) {
-            $dateTimeObject = new \DateTime();
-            $dateTimeObject->setTimezone(new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
-            $dateTimeObject->setTimestamp(intval($time));
-            $beginOfDayString = $dateTimeObject->format('Y-m-d 00:00:00');
-            $beginOfDayObject = \DateTime::createFromFormat('Y-m-d H:i:s', $beginOfDayString);
-            $beginOfDay = $beginOfDayObject->getTimestamp();
-
+            $beginOfDay = strtotime("today", $time);
             return $beginOfDay;
         }
 
@@ -65,13 +56,8 @@ class C4gReservationDateChecker
     public static function getEndOfDate($time)
     {
         if ($time) {
-            $dateTimeObject = new \DateTime();
-            $dateTimeObject->setTimezone(new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
-            $dateTimeObject->setTimestamp(intval($time));
-            $endOfDayString = $dateTimeObject->format('Y-m-d 23:59:59');
-            $endOfDayObject = \DateTime::createFromFormat('Y-m-d H:i:s', $endOfDayString);
-            $endOfDay = $endOfDayObject->getTimestamp();
-
+            $beginOfDay = strtotime("today", $time);
+            $endOfDay   = strtotime("tomorrow", $beginOfDay) - 1;
             return $endOfDay;
         }
 
@@ -272,5 +258,9 @@ class C4gReservationDateChecker
         }
 
         return false;
+    }
+
+    public static function isStampInPeriod($stamp, $begin, $end) {
+        return (($stamp >= $begin) && ($stamp < $end));
     }
 }

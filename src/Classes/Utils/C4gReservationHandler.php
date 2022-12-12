@@ -171,24 +171,28 @@ class C4gReservationHandler
 
             //remove configured date exclusion
             $allObjectDates = [];
+            $excludePeriodArr = [];
             foreach ($list as $object) {
                 if(!$object instanceof C4gReservationFrontendObject){
                     break;
                 }
                 $exclusionPeriods = $object->getDatesExclusion();
-
                 if ($exclusionPeriods) {
                     foreach ($exclusionPeriods as $period) {
                         if ($period && $period['date_exclusion'] && $period['date_exclusion_end']) {
                             $exclusionBegin = $period['date_exclusion'];
                             $exclusionEnd = $period['date_exclusion_end'];
 
-                            $current = $exclusionBegin;
-                            while($current <= $exclusionEnd) {
-                                $allObjectDates[$current][] = $current; //ToDo remember begin/end time
-                                //Alternativ: weiter unten excludeTime auf true setzen, wenn Zeitraum stimmt.
-                                $current = intval($current) + 86400;
-                            }
+                            $excludePeriodArr[] = ['begin'=>$exclusionBegin, 'end'=> $exclusionEnd];
+
+//                            $current = $exclusionBegin;
+//                            while($current <= $exclusionEnd) {
+//                                //$allObjectDates[$current][] = $current; //ToDo remember begin/end time
+//                                //Alternativ: weiter unten excludeTime auf true setzen, wenn Zeitraum stimmt.
+//
+//
+//                                $current = intval($current) + 86400;
+//                            }
                         }
                     }
                 }
@@ -221,6 +225,8 @@ class C4gReservationHandler
                 while ($i <= $end) {
                     $weekday = date('w', $i);
                     $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $i);
+                    //$timeArr = array_merge($timeArr, $newTimeElements);
+
                     if (!$timeArr || (count($timeArr) == 0)) {
                         $alldates[$i] = $i;
                     } else {
@@ -271,12 +277,15 @@ class C4gReservationHandler
                 }
             }
 
+            $result = [];
+            $result['periods'] = $excludePeriodArr;
+
             if ($asArray) {
-                return $alldates;
+                $result['dates'] = $alldates;
             } else {
                 foreach ($alldates as $date) {
                     if ($date) {
-                        $result = self::addComma($result) . date('d.m.Y'/*$GLOBALS['TL_CONFIG']['dateFormat']*/, $date);
+                        $result['dates'] = self::addComma($result['dates']) . date('d.m.Y'/*$GLOBALS['TL_CONFIG']['dateFormat']*/, $date);
                     }
                 }
             }
@@ -573,7 +582,6 @@ class C4gReservationHandler
                     $tsdate = (int)$date;
                 } else {
                     $format = $GLOBALS['TL_CONFIG']['dateFormat'];
-
                     $tsdate = \DateTime::createFromFormat($format, $date);
                     if ($tsdate) {
                         $tsdate->Format($format);
@@ -621,7 +629,7 @@ class C4gReservationHandler
             $objectType = $typeObject['reservationObjectType'];
 
             if (($date !== -1) && $tsdate) {
-                $tsdate = C4gReservationDateChecker::getBeginOfDate($tsdate);
+                $tsdate = C4gReservationDateChecker::getBeginOfDate($tsdate) +3600; //ToDo lost hour - calc time diff
             }
 
             $calculator = new C4gReservationCalculator($tsdate, $objectType);
@@ -646,13 +654,19 @@ class C4gReservationHandler
                 $maxCount = $objectQuantity;
                 $reservationTypes = $object->getReservationTypes();
 
+                $periodTypes = [];
                 if (($date !== -1) && $tsdate) {
                     $exclusionDates = self::getDateExclusionString([$object],$type,0,1);
-                    foreach ($exclusionDates as $exclusionDate) {
-                        if ($exclusionDate === $tsdate) {
-                            $date = -1;
-                            break;
+
+                    if ($exclusionDates) {
+                        $periodTypes = $exclusionDates['periods'];
+                        foreach ($exclusionDates['dates'] as $exclusionDate) {
+                            if ($exclusionDate === $tsdate) {
+                                $date = -1;
+                                break;
+                            }
                         }
+
                     }
                 }
 
@@ -806,15 +820,24 @@ class C4gReservationHandler
                                                     $mergedEndTime = C4gReservationDateChecker::mergeDateWithTime($tsdate+$durationInterval,$periodEnd);
                                                 }
 
+                                                $removeButton = false;
+                                                foreach ($periodTypes as $excludePeriod) {
+                                                    if (C4gReservationDateChecker::isStampInPeriod($tsdate+$time,$excludePeriod['begin'],$excludePeriod['end']) ||
+                                                        C4gReservationDateChecker::isStampInPeriod($tsdate+intval($endTime),$excludePeriod['begin'],$excludePeriod['end'])) {
+                                                        $removeButton = true;
+                                                    }
+                                                }
 
-                                                $reasionLog = '';
+                                                $reasonLog = '';
                                                 if (($date !== -1) && $tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
                                                     if ($capacity && ($calculatorResult->getDbPersons() >= $capacity)) {
                                                         $reasonLog = 'too many persons';
                                                     } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
                                                         $reasonLog = 'too many bookings';
                                                     } else if ($desiredCapacity && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($desiredCapacity))) {
-                                                        $reasionLog = 'too many bookings per object';
+                                                        $reasonLog = 'too many bookings per object';
+                                                    } else if ($removeButton) {
+                                                        $reasonLog = 'exlude period with event configuration or exclude dates';
                                                     } else {
                                                         $timeObj['id'] = $id;
                                                     }
@@ -871,14 +894,25 @@ class C4gReservationHandler
                                                         $checkTime = $endTime;
                                                     }
 
-                                                    $reasionLog = '';
+                                                    $removeButton = false;
+                                                    foreach ($periodTypes as $excludePeriod) {
+                                                        if (
+                                                            (($tsdate+$time > $excludePeriod['begin']) && ($tsdate+$time < $excludePeriod['end'])) ||
+                                                            (($tsdate+intval($endTime) > $excludePeriod['begin']) && ($tsdate+intval($endTime) < $excludePeriod['end']))) {
+                                                            $removeButton = true;
+                                                        }
+                                                    }
+
+                                                    $reasonLog = '';
                                                     if (($date !== -1) && $tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime))/* || ($typeObject->directBooking)*/)) {
                                                         if ($capacity && ($calculatorResult->getDbPersons() >= $capacity)) {
                                                             $reasonLog = 'too many persons';
                                                         } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
                                                             $reasonLog = 'too many bookings';
                                                         } else if ($desiredCapacity && ($timeArray && !empty($timeArray)) && ($timeArray[$tsdate][$time] >= intval($desiredCapacity))) {
-                                                            $reasionLog = 'too many bookings per object';
+                                                            $reasonLog = 'too many bookings per object';
+                                                        } else if ($removeButton) {
+                                                            $reasonLog = 'exlude period with event configuration or exclude dates';
                                                         } else {
                                                             $timeObj['id'] = $id;
                                                         }
@@ -929,14 +963,25 @@ class C4gReservationHandler
                                                         $checkTime = $endTime;
                                                     }
 
-                                                    $reasionLog = '';
+                                                    $removeButton = false;
+                                                    foreach ($periodTypes as $excludePeriod) {
+                                                        if (
+                                                            (($tsdate+$time > $excludePeriod['begin']) && ($tsdate+$time < $excludePeriod['end'])) ||
+                                                            (($tsdate+intval($endTime) > $excludePeriod['begin']) && ($tsdate+intval($endTime) < $excludePeriod['end']))) {
+                                                            $removeButton = true;
+                                                        }
+                                                    }
+
+                                                    $reasonLog = '';
                                                     if (($date !== -1) && $tsdate && $nowDate && (!$checkToday || ($nowDate < $tsdate) || (($nowDate == $tsdate) && ($nowTime < $checkTime)))) {
                                                         if ($capacity && ($calculatorResult->getDbPersons() >= $capacity)) {
                                                             $reasonLog = 'too many persons';
                                                         } else if ($maxObjects && ($calculatorResult->getDbBookings() >= intval($maxObjects)) && (!$typeObject['severalBookings'] || $object->getAllTypesQuantity() || $object->getAllTypesValidity())) {
                                                             $reasonLog = 'too many bookings';
                                                         } else if ($desiredCapacity && ($timeArray && !empty($timeArray)) && (($timeArray[$tsdate][$time] >= intval($desiredCapacity))/* || ($timeArray[$tsdate][$endTime] >= intval($desiredCapacity))*/)) {
-                                                            $reasionLog = 'too many bookings per object';
+                                                            $reasonLog = 'too many bookings per object';
+                                                        } else if ($removeButton) {
+                                                            $reasonLog = 'exclude period with event configuration or exclude dates';
                                                         } else {
                                                             $timeObj['id'] = $id;
                                                         }
@@ -1657,11 +1702,45 @@ class C4gReservationHandler
                                 $startDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($startDate, $startTime);
                                 $endDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($endDate, $endTime);
                                 $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
+
+                                if ($event['recurring']) {
+                                    $repeatEach = StringUtil::deserialize($event['repeatEach']);
+                                    $repeatEnd = $event['repeatEnd']; //timestamp
+                                    $recurrences = $event['recurrences'];
+
+                                    switch ($repeatEach['unit']) {
+                                        case 'days':
+                                          $recInterval = 86400*$repeatEach['value'];
+                                          break;
+                                        case 'weeks':
+                                            $recInterval = 86400*7*$repeatEach['value'];
+                                            break;
+//                                        case 'months':
+//                                            $recInterval = 86400*7*4*$repeatEach['value'];
+//                                            break;
+//                                        case 'years';
+//                                            $recInterval = 86400*12*4*7*$repeatEach['value'];
+//                                            break;
+                                        default:
+                                            $recInterval = 0;
+                                            break;
+                                    }
+
+                                    for ($i=0;$i<=$recurrences;$i++) {
+                                        $startDateTime = $startDateTime + $recInterval;
+                                        $endDateTime = $endDateTime + $recInterval;
+
+                                        if ($startDateTime >= $repeatEnd) {
+                                            break;
+                                        }
+
+                                        $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
+                                    }
+                                }
                             }
                         }
                     }
                 }
-
 
                 $frontendObject->setDatesExclusion($datesExclusion);
 

@@ -66,6 +66,9 @@ class C4gReservationCalculator
         $this->resultList = [];
 
         $commaDates = C4gReservationHandler::getDateExclusionString([$object], $type,0);
+        if ($commaDates) {
+            $commaDates = $commaDates['dates'];
+        }
         $dates = explode(',',$commaDates);
         foreach($dates as $date) {
             if ($date == $this->date) {
