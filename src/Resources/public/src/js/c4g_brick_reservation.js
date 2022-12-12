@@ -699,7 +699,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                 handleBrickConditions();
 
                 if (additionalId != -1) {
-                    var timeGroups = document.querySelectorAll('.reservation_time_button_'+addId+'.formdata input[type = "hidden"]');
+                    var timeGroups = document.querySelectorAll('.radio-group-beginTime_'+addId+' input[type = "hidden"]');
                     var timeValue = false;
                     if (timeGroups) {
                         for (z = 0; z < timeGroups.length; z++) {
@@ -710,7 +710,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                         }
                     }
 
-                    var radioButton = document.querySelectorAll('.reservation_time_button_'+addId+' input[type = "radio"]');
+                    var radioButton = document.querySelectorAll('.radio-group-beginTime_'+addId+' input[type = "radio"]');
                     var visibleButtons = [];
                     if (radioButton && radioButton.length) {
                         for (z = 0; z < radioButton.length; z++) {
@@ -755,6 +755,10 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                                 selectField.disabled = true;
                             }
                         }                                    
+                    } else {
+                        if (targetButton && !targetButton.disabled && !targetButton.classList.contains("radio_object_disabled")) {
+                            targetButton.click();
+                        }
                     }
                 }
             }).finally(function() {
