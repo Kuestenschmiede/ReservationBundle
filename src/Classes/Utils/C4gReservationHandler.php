@@ -184,15 +184,6 @@ class C4gReservationHandler
                             $exclusionEnd = $period['date_exclusion_end'];
 
                             $excludePeriodArr[] = ['begin'=>$exclusionBegin, 'end'=> $exclusionEnd];
-
-//                            $current = $exclusionBegin;
-//                            while($current <= $exclusionEnd) {
-//                                //$allObjectDates[$current][] = $current; //ToDo remember begin/end time
-//                                //Alternativ: weiter unten excludeTime auf true setzen, wenn Zeitraum stimmt.
-//
-//
-//                                $current = intval($current) + 86400;
-//                            }
                         }
                     }
                 }
@@ -225,7 +216,6 @@ class C4gReservationHandler
                 while ($i <= $end) {
                     $weekday = date('w', $i);
                     $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $i);
-                    //$timeArr = array_merge($timeArr, $newTimeElements);
 
                     if (!$timeArr || (count($timeArr) == 0)) {
                         $alldates[$i] = $i;
@@ -618,7 +608,7 @@ class C4gReservationHandler
             $database = Database::getInstance();
             $typeObject = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=?")
                 ->execute($type)->fetchAssoc();
-            //$typeObject = C4gReservationTypeModel::findByPk($type);
+
             if (!$typeObject) {
                 return [];
             }
@@ -629,7 +619,7 @@ class C4gReservationHandler
             $objectType = $typeObject['reservationObjectType'];
 
             if (($date !== -1) && $tsdate) {
-                $tsdate = C4gReservationDateChecker::getBeginOfDate($tsdate) +3600; //ToDo lost hour - calc time diff
+                $tsdate = C4gReservationDateChecker::getBeginOfDate($tsdate) + 3600; //ToDo lost hour - calc time diff
             }
 
             $calculator = new C4gReservationCalculator($tsdate, $objectType);
@@ -811,10 +801,7 @@ class C4gReservationHandler
                                                             }
                                                         }
 
-//                                                        if ($endTime) {
-                                                            $periodEnd = $endTime;
-                                                            //ToDo take next day without times?
-//                                                        }
+                                                        $periodEnd = $endTime;
                                                     }
 
                                                     $mergedEndTime = C4gReservationDateChecker::mergeDateWithTime($tsdate+$durationInterval,$periodEnd);
@@ -822,8 +809,11 @@ class C4gReservationHandler
 
                                                 $removeButton = false;
                                                 foreach ($periodTypes as $excludePeriod) {
-                                                    if (C4gReservationDateChecker::isStampInPeriod($tsdate+$time,$excludePeriod['begin'],$excludePeriod['end']) ||
-                                                        C4gReservationDateChecker::isStampInPeriod($tsdate+intval($endTime),$excludePeriod['begin'],$excludePeriod['end'])) {
+                                                    if (C4gReservationDateChecker::isStampInPeriod($tsdate+$time,$excludePeriod['begin'],$excludePeriod['end'],0) ||
+                                                        C4gReservationDateChecker::isStampInPeriod($tsdate+intval($endTime),$excludePeriod['begin'],$excludePeriod['end'],1)) {
+                                                        $removeButton = true;
+                                                    } else if (C4gReservationDateChecker::isStampInPeriod($excludePeriod['begin'],$tsdate+$time,$tsdate+intval($endTime),0) ||
+                                                        C4gReservationDateChecker::isStampInPeriod($excludePeriod['end'],$tsdate+$time,$tsdate+intval($endTime),1)) {
                                                         $removeButton = true;
                                                     }
                                                 }
@@ -896,9 +886,11 @@ class C4gReservationHandler
 
                                                     $removeButton = false;
                                                     foreach ($periodTypes as $excludePeriod) {
-                                                        if (
-                                                            (($tsdate+$time > $excludePeriod['begin']) && ($tsdate+$time < $excludePeriod['end'])) ||
-                                                            (($tsdate+intval($endTime) > $excludePeriod['begin']) && ($tsdate+intval($endTime) < $excludePeriod['end']))) {
+                                                        if (C4gReservationDateChecker::isStampInPeriod($tsdate+$time,$excludePeriod['begin'],$excludePeriod['end'],0) ||
+                                                            C4gReservationDateChecker::isStampInPeriod($tsdate+intval($endTime),$excludePeriod['begin'],$excludePeriod['end'],1)) {
+                                                            $removeButton = true;
+                                                        } else if (C4gReservationDateChecker::isStampInPeriod($excludePeriod['begin'],$tsdate+$time,$tsdate+intval($endTime),0) ||
+                                                            C4gReservationDateChecker::isStampInPeriod($excludePeriod['end'],$tsdate+$time,$tsdate+intval($endTime),1)) {
                                                             $removeButton = true;
                                                         }
                                                     }
@@ -965,9 +957,11 @@ class C4gReservationHandler
 
                                                     $removeButton = false;
                                                     foreach ($periodTypes as $excludePeriod) {
-                                                        if (
-                                                            (($tsdate+$time > $excludePeriod['begin']) && ($tsdate+$time < $excludePeriod['end'])) ||
-                                                            (($tsdate+intval($endTime) > $excludePeriod['begin']) && ($tsdate+intval($endTime) < $excludePeriod['end']))) {
+                                                        if (C4gReservationDateChecker::isStampInPeriod($tsdate+$time,$excludePeriod['begin'],$excludePeriod['end'],0) ||
+                                                            C4gReservationDateChecker::isStampInPeriod($tsdate+intval($endTime),$excludePeriod['begin'],$excludePeriod['end'],1)) {
+                                                            $removeButton = true;
+                                                        } else if (C4gReservationDateChecker::isStampInPeriod($excludePeriod['begin'],$tsdate+$time,$tsdate+intval($endTime),0) ||
+                                                            C4gReservationDateChecker::isStampInPeriod($excludePeriod['end'],$tsdate+$time,$tsdate+intval($endTime),1)) {
                                                             $removeButton = true;
                                                         }
                                                     }
@@ -1690,14 +1684,19 @@ class C4gReservationHandler
 
                 foreach ($calendars as $calendarId) {
                     if ($calendarId) {
-                        $events = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ? AND `published`  = '1'")->execute($calendarId)->fetchAllAssoc();
+                        $events = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ? AND `published` = '1'")->execute($calendarId)->fetchAllAssoc();
 
                         foreach ($events as $event) {
                             if ($event){
                                 $startDate = $event['startDate'];
                                 $endDate = $event['endDate'] ?: $startDate;
                                 $startTime = $event['startTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate']);
-                                $endTime = $event['endTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
+                                $endTime = $event['endTime'];
+                                if ($startTime != $endTime) {
+                                    $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
+                                } else {
+                                    $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
+                                }
 
                                 $startDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($startDate, $startTime);
                                 $endDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($endDate, $endTime);

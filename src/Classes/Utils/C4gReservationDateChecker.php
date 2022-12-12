@@ -18,7 +18,7 @@ class C4gReservationDateChecker
         if ($date && $time) {
             $dateTimeObject = new \DateTime();
             $dateTimeObject->setTimezone(new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
-            $dateTimeObject->setTimestamp($date+$time+3600); //ToDo lost hour - calc time diff
+            $dateTimeObject->setTimestamp($date+$time/*+3600*/); //ToDo lost hour - calc time diff
             $mergedDateTime = $dateTimeObject->format($GLOBALS['TL_CONFIG']['datimFormat']);
             $mergedDateTime = \DateTime::createFromFormat($GLOBALS['TL_CONFIG']['datimFormat'], $mergedDateTime);
             $result = $mergedDateTime->getTimestamp();
@@ -31,12 +31,8 @@ class C4gReservationDateChecker
     {
         $result = $date;
         if ($date && $time) {
-            $dateTimeObject = new \DateTime();
-            $dateTimeObject->setTimezone(new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
-
             $dateStamp = self::getBeginOfDate($date);
             $timeStamp = $time - self::getBeginOfDate($time);
-
             $result = $dateStamp+$timeStamp;
         }
 
@@ -260,7 +256,7 @@ class C4gReservationDateChecker
         return false;
     }
 
-    public static function isStampInPeriod($stamp, $begin, $end) {
-        return (($stamp >= $begin) && ($stamp < $end));
+    public static function isStampInPeriod($stamp, $begin, $end, $reverse = 0) {
+        return $reverse ? (($stamp > $begin) && ($stamp <= $end)) : (($stamp >= $begin) && ($stamp < $end));
     }
 }
