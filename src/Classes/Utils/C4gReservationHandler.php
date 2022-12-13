@@ -921,7 +921,7 @@ class C4gReservationHandler
                                     } else {
                                         if ($time_begin && $time_end) {
                                             $time = $time_begin;
-                                            $periodEnd = $time_end - $interval;//$durationInterval;
+                                            $periodEnd = $time_end - $durationInterval;
 
                                             while ($time <= $periodEnd) {
                                                 $id = $object->getId();
@@ -936,7 +936,7 @@ class C4gReservationHandler
                                                         $timeArray = $calculatorResult->getTimeArray();
                                                     }
 
-                                                    $endTimeInterval = $interval;//$durationInterval;
+                                                    $endTimeInterval = $durationInterval;
                                                     if (!$withEndTimes) {
                                                         $endTimeInterval = 0;
                                                     }
