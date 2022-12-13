@@ -998,7 +998,7 @@ class C4gReservationHandler
             }
 
             if ($result && is_array($result) && (count($result) > 0)) {
-                return ArrayHelper::sortArrayByFields($result,['name' => SORT_ASC]);
+                return $result; //ToDo Sorting nicht sinnvoll. So landen Zeiten nach Mitternacht vorne (ArrayHelper::sortArrayByFields($result,['name' => SORT_ASC]);)
             } else {
                 return [];
             }
