@@ -28,18 +28,22 @@ class C4gReservationCalculator
      * @param $type
      * @param int $objectTypeId
      */
-    public function __construct($date, $objectTypeId)
+    public function __construct($date, $objectTypeId, $testResults = [])
     {
         $this->date = $date;
         $this->objectTypeId = $objectTypeId;
 
-        $database = Database::getInstance();
-        $set = [$date, $date, $objectTypeId];
-        $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-            "? >= `beginDate` AND ? <= `endDate` AND `reservationObjectType` = ? AND NOT `cancellation`='1'")
-            ->execute($set)->fetchAllAssoc();
-        if ($result) {
-            $this->reservations[$date][$objectTypeId] = $result;
+        if ($testResults) {
+            $this->reservations[$date][$objectTypeId] = $testResults;
+        } else {
+            $database = Database::getInstance();
+            $set = [$date, $date, $objectTypeId];
+            $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                "? >= `beginDate` AND ? <= `endDate` AND `reservationObjectType` = ? AND NOT `cancellation`='1'")
+                ->execute($set)->fetchAllAssoc();
+            if ($result) {
+                $this->reservations[$date][$objectTypeId] = $result;
+            }
         }
     }
 
