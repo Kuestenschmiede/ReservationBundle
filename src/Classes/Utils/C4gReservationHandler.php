@@ -2,6 +2,7 @@
 
 namespace con4gis\ReservationBundle\Classes\Utils;
 
+
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
@@ -341,6 +342,7 @@ class C4gReservationHandler
             }
         }
 
+        //date_default_timezone_set('Europe/Berlin');
         $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
 
         $datetim = false;
@@ -356,6 +358,8 @@ class C4gReservationHandler
                 if (!$datetim) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
                 }
+
+                $obj['id'] = $obj['id'];
                 $list[$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
@@ -498,7 +502,6 @@ class C4gReservationHandler
                     }
                 }
             }
-
         }
 
         return false;
@@ -619,7 +622,16 @@ class C4gReservationHandler
             $objectType = $typeObject['reservationObjectType'];
 
             if (($date !== -1) && $tsdate) {
-                $tsdate = C4gReservationDateChecker::getBeginOfDate($tsdate) + 3600; //ToDo lost hour - calc time diff
+
+
+//                $user_time = new \DateTime($tsdate,new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
+//                $event_time= new \DateTime($tsdate,new \DateTimeZone('GMT'));
+//                $timediff = $event_time->diff($user_time);
+
+                date_default_timezone_set($GLOBALS['TL_CONFIG']['timeZone']);
+                $timediff = date('I', $tsdate) ? 7200 : 3600;
+
+                $tsdate = C4gReservationDateChecker::getBeginOfDate($tsdate) + $timediff;
             }
 
             $calculator = new C4gReservationCalculator($tsdate, $objectType);
@@ -644,12 +656,12 @@ class C4gReservationHandler
                 $maxCount = $objectQuantity;
                 $reservationTypes = $object->getReservationTypes();
 
-                $periodTypes = [];
+                $exclusionPeriods = [];
                 if (($date !== -1) && $tsdate) {
                     $exclusionDates = self::getDateExclusionString([$object],$type,0,1);
 
                     if ($exclusionDates) {
-                        $periodTypes = $exclusionDates['periods'];
+                        $exclusionPeriods = $exclusionDates['periods'];
                         foreach ($exclusionDates['dates'] as $exclusionDate) {
                             if ($exclusionDate === $tsdate) {
                                 $date = -1;
@@ -673,8 +685,6 @@ class C4gReservationHandler
                     continue;
                 }
 
-                $calculator->loadReservations($typeObject, $object);
-
                 if ($duration >= 1) //duration from client can be -1 (no input)
                 {
                     switch ($periodType) {
@@ -694,6 +704,7 @@ class C4gReservationHandler
                     }
                 }
 
+                $calculator->loadReservations($typeObject, $object);
 
                 $oh = $object->getOpeningHours();
                 switch ($periodType) {
@@ -808,7 +819,7 @@ class C4gReservationHandler
                                                 }
 
                                                 $removeButton = false;
-                                                foreach ($periodTypes as $excludePeriod) {
+                                                foreach ($exclusionPeriods as $excludePeriod) {
                                                     if (C4gReservationDateChecker::isStampInPeriod($tsdate+$time,$excludePeriod['begin'],$excludePeriod['end'],0) ||
                                                         C4gReservationDateChecker::isStampInPeriod($tsdate+intval($endTime),$excludePeriod['begin'],$excludePeriod['end'],1)) {
                                                         $removeButton = true;
@@ -885,7 +896,7 @@ class C4gReservationHandler
                                                     }
 
                                                     $removeButton = false;
-                                                    foreach ($periodTypes as $excludePeriod) {
+                                                    foreach ($exclusionPeriods as $excludePeriod) {
                                                         if (C4gReservationDateChecker::isStampInPeriod($tsdate+$time,$excludePeriod['begin'],$excludePeriod['end'],0) ||
                                                             C4gReservationDateChecker::isStampInPeriod($tsdate+intval($endTime),$excludePeriod['begin'],$excludePeriod['end'],1)) {
                                                             $removeButton = true;
@@ -921,12 +932,12 @@ class C4gReservationHandler
                                     } else {
                                         if ($time_begin && $time_end) {
                                             $time = $time_begin;
-                                            $periodEnd = $time_end - $durationInterval;
+                                            $periodEnd = $time_end - $durationInterval;//$interval;
 
                                             while ($time <= $periodEnd) {
                                                 $id = $object->getId();
                                                 if ($time && $typeObject) {
-                                                    $endTime = $time + $interval;
+                                                    $endTime = $time + $durationInterval;
 
                                                     if ($date && $tsdate) {
                                                         $calculator->calculateAll(
@@ -936,7 +947,7 @@ class C4gReservationHandler
                                                         $timeArray = $calculatorResult->getTimeArray();
                                                     }
 
-                                                    $endTimeInterval = $durationInterval;
+                                                    $endTimeInterval = $durationInterval; //$interval;
                                                     if (!$withEndTimes) {
                                                         $endTimeInterval = 0;
                                                     }
@@ -956,7 +967,7 @@ class C4gReservationHandler
                                                     }
 
                                                     $removeButton = false;
-                                                    foreach ($periodTypes as $excludePeriod) {
+                                                    foreach ($exclusionPeriods as $excludePeriod) {
                                                         if (C4gReservationDateChecker::isStampInPeriod($tsdate+$time,$excludePeriod['begin'],$excludePeriod['end'],0) ||
                                                             C4gReservationDateChecker::isStampInPeriod($tsdate+intval($endTime),$excludePeriod['begin'],$excludePeriod['end'],1)) {
                                                             $removeButton = true;
@@ -1712,14 +1723,14 @@ class C4gReservationHandler
                                           $recInterval = 86400*$repeatEach['value'];
                                           break;
                                         case 'weeks':
-                                            $recInterval = 86400*7*$repeatEach['value'];
-                                            break;
-//                                        case 'months':
-//                                            $recInterval = 86400*7*4*$repeatEach['value'];
-//                                            break;
-//                                        case 'years';
-//                                            $recInterval = 86400*12*4*7*$repeatEach['value'];
-//                                            break;
+                                          $recInterval = 86400*7*$repeatEach['value'];
+                                          break;
+//                                      case 'months':
+//                                         $recInterval = 86400*7*4*$repeatEach['value'];
+//                                         break;
+//                                      case 'years';
+//                                          $recInterval = 86400*12*4*7*$repeatEach['value'];
+//                                          break;
                                         default:
                                             $recInterval = 0;
                                             break;

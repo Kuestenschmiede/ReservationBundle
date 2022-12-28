@@ -30,19 +30,22 @@ class C4gReservationCalculator
      */
     public function __construct($date, $objectTypeId, $testResults = [])
     {
-        $this->date = $date;
+        $beginDate = C4gReservationDateChecker::getBeginOfDate($date);
+        $endDate = C4gReservationDateChecker::getEndOfDate($date);
+        $this->date = $beginDate;
         $this->objectTypeId = $objectTypeId;
 
         if ($testResults) {
             $this->reservations[$date][$objectTypeId] = $testResults;
         } else {
             $database = Database::getInstance();
-            $set = [$date, $date, $objectTypeId];
+            $set = [$beginDate, $endDate, $objectTypeId];
+//            $set = [$date, $date, $objectTypeId];
             $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                "? >= `beginDate` AND ? <= `endDate` AND `reservationObjectType` = ? AND NOT `cancellation`='1'")
+                "? <= `beginDate` AND ? >= `endDate` AND `reservationObjectType` = ? AND NOT `cancellation`='1'")
                 ->execute($set)->fetchAllAssoc();
             if ($result) {
-                $this->reservations[$date][$objectTypeId] = $result;
+                $this->reservations[$beginDate][$objectTypeId] = $result;
             }
         }
     }
@@ -204,18 +207,14 @@ class C4gReservationCalculator
 
             if ($reservations) {
                 foreach ($reservations as $reservation) {
-                    $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
-                    $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);
-
                     $tb = $time && ($time >= 86400) ? $time - 86400 : $time;
-                    $tb = date($GLOBALS['TL_CONFIG']['timeFormat'], $tb);
-
                     $te = $endTime && ($endTime >= 86400) ? $endTime - 86400 : $endTime;
-                    $te = date($GLOBALS['TL_CONFIG']['timeFormat'], $te);
-                    $timeBegin = strtotime($tb);
-                    $timeEnd = strtotime($te);
-                    $timeBeginDb = strtotime($tbdb);
-                    $timeEndDb = strtotime($tedb);
+
+                    $timeBegin = C4gReservationDateChecker::mergeDateWithTime($date,$tb);
+                    $timeEnd = C4gReservationDateChecker::mergeDateWithTime($date,$te);
+                    $timeBeginDb = C4gReservationDateChecker::mergeDateWithTime($date,$reservation['beginTime']);
+                    $timeEndDb = C4gReservationDateChecker::mergeDateWithTime($date,$reservation['endTime']);
+
                     if ($timeBegin >= $timeBeginDb) {
                         $reservationList[] = $reservation;
                     }
@@ -234,17 +233,13 @@ class C4gReservationCalculator
                 if (!$allTypesValidity && $reservation['reservation_object'] != $objectId) {
                     continue;
                 }
-                $tbdb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['beginTime']);
-                $tedb = date($GLOBALS['TL_CONFIG']['timeFormat'], $reservation['endTime']);
-                $tb = date($GLOBALS['TL_CONFIG']['timeFormat'], $time);
-                $te = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
-                $timeBegin = strtotime($tb);
-                $timeEnd = strtotime($te);
-                $timeBeginDb = strtotime($tbdb);
-                $timeEndDb = strtotime($tedb);
 
-                //ToDo Test
-                $actDuration = intval($actDuration) && (intval($actDuration) > 0) ? intval($actDuration) : intval($reservation['duration']); //ToDo object interval?
+                $timeBegin = C4gReservationDateChecker::mergeDateWithTime($date,$time);
+                $timeEnd = C4gReservationDateChecker::mergeDateWithTime($date,$endTime);
+                $timeBeginDb = C4gReservationDateChecker::mergeDateWithTime($date,$reservation['beginTime']);
+                $timeEndDb = C4gReservationDateChecker::mergeDateWithTime($date,$reservation['endTime']);
+
+                $actDuration = intval($actDuration) && (intval($actDuration) > 0) ? intval($actDuration) : intval($reservation['duration']); //ToDo object
                 $reservationInterval = intval($reservation['timeInterval']);
 
                 if ($actDuration && $reservationInterval && ($actDuration != $reservationInterval)) {
@@ -263,15 +258,17 @@ class C4gReservationCalculator
                             break;
                     }
                 }
-//                /* Todo Wurde nur zum Testen aufgeschrieben und sollte ausgebaut werden*/
+                /* Todo Nur zum Testen */
+//                date_default_timezone_set('Europe/Berlin');
                 $realBegin = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBegin);
                 $realEnd   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEnd);
                 $realBeginDb = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBeginDb);
                 $realEndDb   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEndDb);
 
-                if (
-                    (($timeBegin >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
-                    (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb))) {
+                if (C4gReservationDateChecker::isStampInPeriod($timeBegin, $timeBeginDb, $timeEndDb) ||
+                    C4gReservationDateChecker::isStampInPeriod($timeEnd, $timeBeginDb, $timeEndDb, 1) ||
+                    C4gReservationDateChecker::isStampInPeriod($timeBeginDb, $timeBegin, $timeEnd) ||
+                    C4gReservationDateChecker::isStampInPeriod($timeEndDb, $timeBegin, $timeEnd,1)) {
                     $reservationList[] = $reservation;
                 }
             }
@@ -282,7 +279,7 @@ class C4gReservationCalculator
         $calculatorResult->setDbBookedObjects($this->calculateDbObjectsPerType($reservationList));
         $calculatorResult->setDbPersons($this->calculateDbPersons($reservationList, $objectId));
         $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $capacity));
-        $calculatorResult->setTimeArray($this->calculateTimeArray($reservationList, $timeArray, $date, $time, $objectId));
+        $calculatorResult->setTimeArray($timeArray);//$this->calculateTimeArray($reservationList, $timeArray, $date, $time, $objectId));
 
         $this->calculatorResult = $calculatorResult;
     }
@@ -347,27 +344,6 @@ class C4gReservationCalculator
         }
 
         return $actPercent;
-    }
-
-    /**
-     * @param $tsdate
-     * @param $time
-     * @param $objectId
-     * @return array
-     */
-    private function calculateTimeArray($reservations, $timeArray, $tsdate, $time, $objectId)
-    {
-        if ($reservations) {
-            foreach ($reservations as $reservation) {
-                if ($reservation['reservation_object']) {
-                    if (intval($reservation['reservation_object']) === intval($objectId)) {
-                        $timeArray[$tsdate][$time] = $timeArray[$tsdate][$time] ? $timeArray[$tsdate][$time] + 1 : 1;
-                    }
-                }
-            }
-        }
-
-        return $timeArray;
     }
 
     /**

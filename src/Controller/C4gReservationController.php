@@ -2071,6 +2071,7 @@ class C4gReservationController extends C4GBaseController
         //hotfix dates with slashesoptions
         $date = str_replace("~", "/", $date);
         if ($date)  {
+            date_default_timezone_set($GLOBALS['TL_CONFIG']['timeZone'] && ($GLOBALS['TL_CONFIG']['timeZone'] != 'UTC') ?: 'Europe/Berlin');
             $format = $GLOBALS['TL_CONFIG']['dateFormat'];
 
             $tsdate = \DateTime::createFromFormat($format, $date);

@@ -43,7 +43,7 @@ class C4gReservationCalculatorTest extends ContaoTestCase
     }
 
     private function getTableReservations() {
-        $reservations = [
+        $reservationLists = [
             [
                 'id' => 99000,
                 'tstamp' => time(),
@@ -55,30 +55,64 @@ class C4gReservationCalculatorTest extends ContaoTestCase
                 'beginTime' => 32400,
                 'endTime' => 36000,
                 'reservation_object' => 1,
-                'reservation_id' => C4GUtils::getGUID(),
+//                'reservation_id' => C4GUtils::getGUID(),
+                'published' => 1
+            ],
+            [
+                'id' => 99001,
+                'tstamp' => time(),
+                'reservation_type' => 3,
+                'desiredCapacity' => 1,
+                'duration' => 1,
+                'beginDate' => 1672441200,
+                'endDate' => 1672527600,
+                'beginTime' => 32400,
+                'endTime' => 36000,
+                'reservation_object' => 1,
+//                'reservation_id' => C4GUtils::getGUID(),
+                'published' => 1
+            ],
+            [
+                'id' => 99001,
+                'tstamp' => time(),
+                'reservation_type' => 3,
+                'desiredCapacity' => 1,
+                'duration' => 1,
+                'beginDate' => 1672441200,
+                'endDate' => 1672527600,
+                'beginTime' => 36000,
+                'endTime' => 43200,
+                'reservation_object' => 1,
+//                'reservation_id' => C4GUtils::getGUID(),
                 'published' => 1
             ]
         ];
 
-        return $reservations;
+        return $reservationLists;
     }
 
     public function testCalculator() {
         $framework = $this->mockContaoFramework();
-        //$framework->expects($this->atLeastOnce());
-            //->method('initialize');
+//        $framework->expects($this->atLeastOnce())
+//            ->method('initialize');
         $container = $this->getContainerWithContaoConfiguration();
         \Contao\System::setContainer($container);
 
-        $reservations = $this->getTableReservations();
+        $reservationLists = $this->getTableReservations();
 
-        $c4gReservationCalculator = new C4gReservationCalculator('23.12.2023', 1, $reservations);
+        $c4gReservationCalculator = new C4gReservationCalculator(1703286000+32400, 1, $reservationLists);
 
         $object = $this->getTableObject();
         $type   = $this->getTableType();
 
-        $c4gReservationCalculator->calculateAll(1703286000, 32400, 36000, $object, $type, 1, [], $actDuration = 1);
+        $c4gReservationCalculator->calculateAll(1703286000, 32400, 36000, $object, $type, 1, [], 1);
         $this->assertNotEmpty($c4gReservationCalculator->getCalculatorResult());
         $this->assertEquals(0, $c4gReservationCalculator->getCalculatorResult()->getDbPersons());
+
+        $this->assertEquals(true, 36000 && (36000 >= 86400) ? 36000 - 86400 : 36000);
+//        $this->assertEquals(true, ((32400 >= $timeBeginDb) && ($timeBegin < $timeEndDb)) ||
+//            (($timeEnd > $timeBeginDb) && ($timeEnd <= $timeEndDb)));
+
+
     }
 }
