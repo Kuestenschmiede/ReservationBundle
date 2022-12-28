@@ -15,9 +15,10 @@ namespace con4gis\ReservationBundle\Tests;
 
 use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
 use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
-use con4gis\ReservationBundle\con4gisReservationBundle;
 use Contao\TestCase\ContaoTestCase;
+use PHPUnit\Framework\TestCase;
 
 class C4gReservationCalculatorTest extends ContaoTestCase
 {
@@ -47,16 +48,17 @@ class C4gReservationCalculatorTest extends ContaoTestCase
             [
                 'id' => 99000,
                 'tstamp' => time(),
-                'reservation_type' => 3,
+                'reservation_type' => 99000,
                 'desiredCapacity' => 1,
                 'duration' => 1,
                 'beginDate' => 1703286000,
                 'endDate' => 1703286000,
                 'beginTime' => 32400,
                 'endTime' => 36000,
-                'reservation_object' => 1,
+                'reservationObjectType' => 1,
                 'reservation_id' => C4GUtils::getGUID(),
-                'published' => 1
+                'published' => 1,
+                'reservation_object' => 99000
             ]
         ];
 
@@ -64,21 +66,22 @@ class C4gReservationCalculatorTest extends ContaoTestCase
     }
 
     public function testCalculator() {
-        $framework = $this->mockContaoFramework();
-        //$framework->expects($this->atLeastOnce());
-            //->method('initialize');
-        $container = $this->getContainerWithContaoConfiguration();
-        \Contao\System::setContainer($container);
-
         $reservations = $this->getTableReservations();
+//        $reservationModel = $this->mockClassWithProperties(C4gReservationModel::class);
+//        $reservationAdapter = $this->mockConfiguredAdapter(['findBy'=>$reservations]);
+//        $adapters = [
+//            C4gReservationModel::class => $reservationAdapter
+//        ];
+//        $framework = $this->mockContaoFramework($adapters);
 
-        $c4gReservationCalculator = new C4gReservationCalculator('23.12.2023', 1, $reservations);
+        $c4gReservationCalculator = new C4gReservationCalculator($reservations[0]['beginDate'] + $reservations[0]['beginTime'], 1, $reservations);
 
         $object = $this->getTableObject();
         $type   = $this->getTableType();
 
         $c4gReservationCalculator->calculateAll(1703286000, 32400, 36000, $object, $type, 1, [], $actDuration = 1);
-        $this->assertNotEmpty($c4gReservationCalculator->getCalculatorResult());
-        $this->assertEquals(0, $c4gReservationCalculator->getCalculatorResult()->getDbPersons());
+        $calculatorResult = $c4gReservationCalculator->getCalculatorResult();
+        $this->assertNotEmpty($calculatorResult);
+        $this->assertEquals(0, $calculatorResult->getDbPersons());
     }
 }
