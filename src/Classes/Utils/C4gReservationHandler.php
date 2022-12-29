@@ -634,7 +634,7 @@ class C4gReservationHandler
                 $tsdate = C4gReservationDateChecker::getBeginOfDate($tsdate) + $timediff;
             }
 
-            $calculator = new C4gReservationCalculator($tsdate, $objectType);
+            $calculator = new C4gReservationCalculator($tsdate, $type, $objectType, $list);
 
             if ($actCapacity > 0) {
                 $desiredCapacity = $actCapacity;

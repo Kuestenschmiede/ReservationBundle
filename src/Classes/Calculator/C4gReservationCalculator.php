@@ -23,12 +23,14 @@ class C4gReservationCalculator
     private $date = 0;
     private $objectTypeId = 1;
 
+    private $objectListString = '';
+
     /**
      * @param $date
      * @param $type
      * @param int $objectTypeId
      */
-    public function __construct($date, $objectTypeId, $testResults = [])
+    public function __construct($date, $typeId, $objectTypeId, $objectList, $testResults = [])
     {
         $beginDate = C4gReservationDateChecker::getBeginOfDate($date);
         $endDate = C4gReservationDateChecker::getEndOfDate($date);
@@ -39,10 +41,18 @@ class C4gReservationCalculator
             $this->reservations[$date][$objectTypeId] = $testResults;
         } else {
             $database = Database::getInstance();
-            $set = [$beginDate, $endDate, $objectTypeId];
-//            $set = [$date, $date, $objectTypeId];
+            $set = [$beginDate, $endDate, $typeId, $objectTypeId];
+
+            $objStr = '';
+            foreach ($objectList as $object) {
+                $objStr .= $objStr ? ",".$object->getId() : strval($object->getId());
+            }
+
+            $this->objectListString = $objStr;
+
+            //ToDo Arten/Objekte aktiv?
             $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                "? <= `beginDate` AND ? >= `endDate` AND `reservationObjectType` = ? AND NOT `cancellation`='1'")
+                "? <= `beginDate` AND ? >= `endDate` AND `reservation_type` = ? AND `reservationObjectType` = ? AND `reservation_object` IN (".$objStr.") AND NOT `cancellation`='1'")
                 ->execute($set)->fetchAllAssoc();
             if ($result) {
                 $this->reservations[$beginDate][$objectTypeId] = $result;
@@ -158,7 +168,7 @@ class C4gReservationCalculator
                         $set = [$date];
                     }
                     $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                        '`beginDate`=? AND `reservation_type` IN (' . $allTypes . ") AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
+                        '`beginDate`=? AND `reservation_type` IN (' . $allTypes . ") AND `reservation_object` IN ('.$this->objectListString.') AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
                         ->execute($set)->fetchAllAssoc();
                 } else {
                     if ($time >= 86400) {
@@ -167,7 +177,7 @@ class C4gReservationCalculator
                         $set = [$date];
                     }
                     $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                        "`beginDate`=? AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
+                        "`beginDate`=? AND `reservationObjectType` IN(1,3) AND `reservation_object` IN ('.$this->objectListString.') AND NOT `cancellation`='1'")
                         ->execute($set)->fetchAllAssoc();
                 }
             } elseif ($object && $allTypesQuantity) {
@@ -201,7 +211,7 @@ class C4gReservationCalculator
                     $set = [$date, $typeId];
                 }
                 $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "`beginDate`=? AND `reservation_type`=? AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
+                    "`beginDate`=? AND `reservation_type`=? AND `reservation_object` IN ('.$this->objectListString.') AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
                     ->execute($set)->fetchAllAssoc();
             }
 
