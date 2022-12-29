@@ -104,7 +104,7 @@ class C4gReservationCalculatorTest extends ContaoTestCase
 
         $reservationLists = $this->getTableReservations();
 
-        $c4gReservationCalculator = new C4gReservationCalculator(1703286000+32400, 1, $reservationLists);
+        $c4gReservationCalculator = new C4gReservationCalculator(1703286000+32400, 99000, 3, [$this->getTableObject()], $reservationLists);
 
         $object = $this->getTableObject();
         $type   = $this->getTableType();
