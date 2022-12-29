@@ -16,12 +16,14 @@ class C4gReservationDateChecker
     {
         $result = $date;
         if ($date && $time) {
-            $dateTimeObject = new \DateTime();
-            $dateTimeObject->setTimezone(new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']));
-            $dateTimeObject->setTimestamp($date+$time/*+3600*/); //ToDo lost hour - calc time diff
-            $mergedDateTime = $dateTimeObject->format($GLOBALS['TL_CONFIG']['datimFormat']);
-            $mergedDateTime = \DateTime::createFromFormat($GLOBALS['TL_CONFIG']['datimFormat'], $mergedDateTime);
-            $result = $mergedDateTime->getTimestamp();
+            if ($time > 86400) {
+                $dateStamp = self::getBeginOfDate($date);
+                $timeStamp = $time - self::getBeginOfDate($time);
+                $result = $dateStamp+$timeStamp;
+            } else  {
+                $dateStamp = self::getBeginOfDate($date);
+                $result = $dateStamp+$time;
+            }
         }
 
         return $result;
@@ -29,14 +31,7 @@ class C4gReservationDateChecker
 
     public static function mergeDateAndTimeStamp($date, $time)
     {
-        $result = $date;
-        if ($date && $time) {
-            $dateStamp = self::getBeginOfDate($date);
-            $timeStamp = $time - self::getBeginOfDate($time);
-            $result = $dateStamp+$timeStamp;
-        }
-
-        return $result;
+        return self::mergeDateWithTime($date, $time, $timeZone);
     }
 
     public static function getBeginOfDate($time)
@@ -158,98 +153,63 @@ class C4gReservationDateChecker
     public static function getWeekdayNumber($weekday)
     {
         if (is_string($weekday)) {
-            switch ($weekday) {
-                case 'su':
-                    $weekday = 0;
-
-                    break;
-                case 'mo':
-                    $weekday = 1;
-
-                    break;
-                case 'tu':
-                    $weekday = 2;
-
-                    break;
-                case 'we':
-                    $weekday = 3;
-
-                    break;
-                case 'th':
-                    $weekday = 4;
-
-                    break;
-                case 'fr':
-                    $weekday = 5;
-
-                    break;
-                case 'sa':
-                    $weekday = 6;
-
-                    break;
+            switch (strtolower($weekday)) {
+                case 'su': return 0;
+                case 'mo': return 1;
+                case 'tu': return 2;
+                case 'we': return 3;
+                case 'th': return 4;
+                case 'fr': return 5;
+                case 'sa': return 6;
             }
+
         }
 
-        return $weekday;
     }
 
-    public static function isSunday($date)
+    /**
+     * @param $date
+     * @param $timeZone
+     * @return bool
+     */
+    public static function isSunday($date, $timeZone = '')
     {
-        if ($date && (date('w', $date) == 0)) {
-            return true;
-        }
-
-        return false;
+        return self::checkDay(0, $date, $timeZone);
     }
 
-    public static function isMonday($date)
+    public static function isMonday($date, $timeZone = '')
     {
-        if ($date && (date('w', $date) == 1)) {
-            return true;
-        }
-
-        return false;
+        return self::checkDay(1, $date, $timeZone);
     }
 
-    public static function isTuesday($date)
+    public static function isTuesday($date, $timeZone = '')
     {
-        if ($date && (date('w', $date) == 2)) {
-            return true;
-        }
-
-        return false;
+        return self::checkDay(2, $date, $timeZone);
     }
 
-    public static function isWednesday($date)
+    public static function isWednesday($date, $timeZone = '')
     {
-        if ($date && (date('w', $date) == 3)) {
-            return true;
-        }
-
-        return false;
+        return self::checkDay(3, $date, $timeZone);
     }
 
-    public static function isThursday($date)
+    public static function isThursday($date, $timeZone = '')
     {
-        if ($date && (date('w', $date) == 4)) {
-            return true;
-        }
-
-        return false;
+        return self::checkDay(4, $date, $timeZone);
     }
 
-    public static function isFriday($date)
+    public static function isFriday($date, $timeZone = '')
     {
-        if ($date && (date('w', $date) == 5)) {
-            return true;
-        }
-
-        return false;
+        return self::checkDay(5, $date, $timeZone);
     }
 
-    public static function isSaturday($date)
+    public static function isSaturday($date, $timeZone = '')
     {
-        if ($date && (date('w', $date) == 6)) {
+        return self::checkDay(6, $date, $timeZone);
+    }
+
+    public static function checkDay($day, $date, $timeZone = '') {
+        date_default_timezone_set($timeZone ?: $GLOBALS['TL_CONFIG']['timeZone']);
+        if ($date && (date('w', $date) == $day)) {
             return true;
         }
 
