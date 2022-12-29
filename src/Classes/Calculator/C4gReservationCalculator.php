@@ -37,7 +37,7 @@ class C4gReservationCalculator
         $this->date = $beginDate;
         $this->objectTypeId = $objectTypeId;
 
-        if ($testResults) {
+        if ($testResults && !empty($testResults)) {
             $this->reservations[$date][$objectTypeId] = $testResults;
         } else {
             $database = Database::getInstance();

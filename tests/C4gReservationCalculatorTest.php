@@ -15,9 +15,10 @@ namespace con4gis\ReservationBundle\Tests;
 
 use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
 use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
-use con4gis\ReservationBundle\con4gisReservationBundle;
 use Contao\TestCase\ContaoTestCase;
+use PHPUnit\Framework\TestCase;
 
 class C4gReservationCalculatorTest extends ContaoTestCase
 {
@@ -47,43 +48,46 @@ class C4gReservationCalculatorTest extends ContaoTestCase
             [
                 'id' => 99000,
                 'tstamp' => time(),
-                'reservation_type' => 3,
+                'reservation_type' => 99000,
                 'desiredCapacity' => 1,
                 'duration' => 1,
                 'beginDate' => 1703286000,
                 'endDate' => 1703286000,
                 'beginTime' => 32400,
                 'endTime' => 36000,
-                'reservation_object' => 1,
-//                'reservation_id' => C4GUtils::getGUID(),
+                'reservation_object' => 99000,
+                'reservationObjectType' => 3,
+                'reservation_id' => C4GUtils::getGUID(),
                 'published' => 1
             ],
             [
                 'id' => 99001,
                 'tstamp' => time(),
-                'reservation_type' => 3,
+                'reservation_type' => 99000,
                 'desiredCapacity' => 1,
                 'duration' => 1,
                 'beginDate' => 1672441200,
                 'endDate' => 1672527600,
                 'beginTime' => 32400,
                 'endTime' => 36000,
-                'reservation_object' => 1,
-//                'reservation_id' => C4GUtils::getGUID(),
+                'reservation_object' => 99000,
+                'reservationObjectType' => 3,
+                'reservation_id' => C4GUtils::getGUID(),
                 'published' => 1
             ],
             [
                 'id' => 99001,
                 'tstamp' => time(),
-                'reservation_type' => 3,
+                'reservation_type' => 99000,
                 'desiredCapacity' => 1,
                 'duration' => 1,
                 'beginDate' => 1672441200,
                 'endDate' => 1672527600,
                 'beginTime' => 36000,
                 'endTime' => 43200,
-                'reservation_object' => 1,
-//                'reservation_id' => C4GUtils::getGUID(),
+                'reservation_object' => 99000,
+                'reservationObjectType' => 3,
+                'reservation_id' => C4GUtils::getGUID(),
                 'published' => 1
             ]
         ];
