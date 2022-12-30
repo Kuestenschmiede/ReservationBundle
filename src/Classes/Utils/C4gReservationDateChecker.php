@@ -10,8 +10,46 @@
  */
 namespace con4gis\ReservationBundle\Classes\Utils;
 
+use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
+
 class C4gReservationDateChecker
 {
+    /**
+     * @param $date
+     * @return void
+     */
+    public static function getDateAsStamp($date) {
+        $tsdate = 0;
+
+        if ($date !== -1) {
+            if (is_numeric($date) && (int)$date == $date) {
+                $tsdate = (int)$date;
+            } else {
+                //date_default_timezone_set($GLOBALS['TL_CONFIG']['timeZone'] && ($GLOBALS['TL_CONFIG']['timeZone'] != 'UTC') ?: 'Europe/Berlin');
+                $format = $GLOBALS['TL_CONFIG']['dateFormat'];
+
+                $tsdate = \DateTime::createFromFormat($format, $date);
+                if ($tsdate) {
+                    $tsdate->Format($format);
+                    $tsdate->setTime(0, 0, 0);
+                    $tsdate = $tsdate->getTimestamp();
+                } else {
+                    $format = "d/m/Y";
+                    $tsdate = \DateTime::createFromFormat($format, $date);
+                    if ($tsdate) {
+                        $tsdate->Format($format);
+                        $tsdate->setTime(0, 0, 0);
+                        $tsdate = $tsdate->getTimestamp();
+                    } else {
+                        $tsdate = strtotime(C4GBrickCommon::getLongDateToConvert($format, $date));
+                    }
+                }
+            }
+        }
+
+        return $tsdate;
+    }
+
     public static function mergeDateWithTime($date, $time)
     {
         $result = $date;

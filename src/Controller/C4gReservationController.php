@@ -2071,26 +2071,7 @@ class C4gReservationController extends C4GBaseController
         //hotfix dates with slashesoptions
         $date = str_replace("~", "/", $date);
         if ($date)  {
-            date_default_timezone_set($GLOBALS['TL_CONFIG']['timeZone'] && ($GLOBALS['TL_CONFIG']['timeZone'] != 'UTC') ?: 'Europe/Berlin');
-            $format = $GLOBALS['TL_CONFIG']['dateFormat'];
-
-            $tsdate = \DateTime::createFromFormat($format, $date);
-            if ($tsdate) {
-                $tsdate->Format($format);
-                $tsdate->setTime(0,0,0);
-                $tsdate = $tsdate->getTimestamp();
-            } else {
-                $format = "d/m/Y";
-                $tsdate = \DateTime::createFromFormat($format, $date);
-                if ($tsdate) {
-                    $tsdate->Format($format);
-                    $tsdate->setTime(0,0,0);
-                    $tsdate = $tsdate->getTimestamp();
-                } else {
-                    $tsdate = strtotime(C4GBrickCommon::getLongDateToConvert($format, $date));
-                }
-            }
-
+            $tsdate = C4gReservationDateChecker::getDateAsStamp($date);
             $datetime = C4gReservationDateChecker::getBeginOfDate($tsdate);
             $wd = date("w", $datetime);
         }
