@@ -64,6 +64,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_data'] = 'Your data';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['headline_participant'] = 'Participant';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] = 'Overview';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'] = 'Location';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['organizer'] = 'Organizer';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'] = 'Address';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventnumber'] = 'Number';
 

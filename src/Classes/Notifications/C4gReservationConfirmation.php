@@ -70,9 +70,21 @@ class C4gReservationConfirmation
                             $location = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($locationId)->fetchAssoc();
                         }
 
+                        $organizerId = $reservationObject['organier'];
+                        $organizer = false;
+                        if ($organizerId) {
+                            $organizer = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($organizerId)->fetchAssoc();
+                        }
+
                         $c4gNotify->setTokenValue('admin_email', $GLOBALS['TL_CONFIG']['adminEmail']);
                         $c4gNotify->setTokenValue('email', $reservation['email']);
-                        $c4gNotify->setTokenValue('contact_email', $location && $location['contact_email'] ? $location['contact_email'] : false);
+
+                        if ($organizer) {
+                            $c4gNotify->setTokenValue('contact_email', $organizer && $organizer['contact_email'] ? $organizer['contact_email'] : false);
+                        } else {
+                            $c4gNotify->setTokenValue('contact_email', $location && $location['contact_email'] ? $location['contact_email'] : false);
+                        }
+
                         $c4gNotify->setTokenValue('reservation_type', $type['caption'] ? $type['caption'] : '');
 
                         $memberId = $reservationObject['member_id'] ?: $reservation['member_id'];

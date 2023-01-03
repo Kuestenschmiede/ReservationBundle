@@ -54,6 +54,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] = 'Übersicht';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'] = 'Adresse';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventnumber'] = 'Nr.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventlocation'] = 'Veranstaltungsort';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['organizer'] = 'Veranstalter';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'] = 'Referent*innen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'] = 'Zielgruppe(n)';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'] = 'Thema/Themen';
