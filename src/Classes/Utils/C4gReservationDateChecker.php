@@ -11,6 +11,7 @@
 namespace con4gis\ReservationBundle\Classes\Utils;
 
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
+use Contao\Date;
 
 class C4gReservationDateChecker
 {
@@ -41,7 +42,7 @@ class C4gReservationDateChecker
                         $tsdate->setTime(0, 0, 0);
                         $tsdate = $tsdate->getTimestamp();
                     } else {
-                        $tsdate = strtotime(C4GBrickCommon::getLongDateToConvert($format, $date));
+                        $tsdate = strtotime(C4GBrickCommon::getLongDateToConvert($format, $date).' '.$GLOBALS['TL_CONFIG']['timeZone']);
                     }
                 }
             }
@@ -50,18 +51,34 @@ class C4gReservationDateChecker
         return $tsdate;
     }
 
-    public static function mergeDateWithTime($date, $time)
+    public static function mergeDateWithTime($date, $time, $timeZone = false) //ToDo check
     {
         $result = $date;
         if ($date && $time) {
+            $beginOfDate = self::getBeginOfDate($date,$timeZone ?: $GLOBALS['TL_CONFIG']['timeZone']);
             if ($time > 86400) {
-                $dateStamp = self::getBeginOfDate($date);
-                $timeStamp = $time - self::getBeginOfDate($time);
-                $result = $dateStamp+$timeStamp;
-            } else  {
-                $dateStamp = self::getBeginOfDate($date);
-                $result = $dateStamp+$time;
+                $result = $time;
+            } else {
+                $result = $beginOfDate+$time;
             }
+//            $timeZone = $timeZone ? new \DateTimeZone($timeZone) : new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']);
+//            if ($timeZone && ($time > 86400)) {
+//                $dateStamp = self::getBeginOfDate($date,$GLOBALS['TL_CONFIG']['timeZone']);
+//                $dateTime = \DateTime::createFromFormat($GLOBALS['TL_CONFIG']['timeFormat'], $time, $timeZone);
+//                if ($dateTime) {
+//                    $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], $dateTime->getTimestamp()), Date::getFormatFromRgxp('time'));
+//                    $timeStamp = $objDate->tstamp;
+//                    $result = $dateStamp+$timeStamp;
+//                }
+//            } else if ($timeZone) {
+//                $dateStamp = self::getBeginOfDate($date,$GLOBALS['TL_CONFIG']['timeZone']);
+//                $dateTime = \DateTime::createFromFormat($GLOBALS['TL_CONFIG']['timeFormat'], $dateStamp+$time, $timeZone);
+//                if ($dateTime) {
+//                    $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], $dateTime->getTimestamp()), Date::getFormatFromRgxp('time'));
+//                    $timeStamp = $objDate->tstamp;
+//                    $result = $dateStamp+$timeStamp;
+//                }
+//            }
         }
 
         return $result;
@@ -69,24 +86,26 @@ class C4gReservationDateChecker
 
     public static function mergeDateAndTimeStamp($date, $time)
     {
-        return self::mergeDateWithTime($date, $time, $timeZone);
+        return self::mergeDateWithTime($date, $time);
     }
 
-    public static function getBeginOfDate($time)
+    public static function getBeginOfDate($time, $timeZone = false)
     {
         if ($time) {
-            $beginOfDay = strtotime("today", $time);
+            $timeZone = $timeZone ?: $GLOBALS['TL_CONFIG']['timeZone'];
+            $beginOfDay = strtotime("today ".$timeZone, $time);
             return $beginOfDay;
         }
 
         return $time;
     }
 
-    public static function getEndOfDate($time)
+    public static function getEndOfDate($time, $timeZone = false)
     {
         if ($time) {
-            $beginOfDay = strtotime("today", $time);
-            $endOfDay   = strtotime("tomorrow", $beginOfDay) - 1;
+            $timeZone = $timeZone ?: $GLOBALS['TL_CONFIG']['timeZone'];
+            $beginOfDay = strtotime("today ".$timeZone, $time);
+            $endOfDay   = strtotime("tomorrow ".$timeZone, $beginOfDay) - 1;
             return $endOfDay;
         }
 
@@ -246,7 +265,7 @@ class C4gReservationDateChecker
     }
 
     public static function checkDay($day, $date, $timeZone = '') {
-        date_default_timezone_set($timeZone ?: $GLOBALS['TL_CONFIG']['timeZone']);
+//        date_default_timezone_set($timeZone ?: $GLOBALS['TL_CONFIG']['timeZone']);
         if ($date && (date('w', $date) == $day)) {
             return true;
         }

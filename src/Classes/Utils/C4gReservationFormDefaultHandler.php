@@ -92,7 +92,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
 
             $reservationBeginDateField = new C4GDateField();
             //$reservationBeginDateField->setFlipButtonPosbition(false);
-            $reservationBeginDateField->setMinDate(C4gReservationHandler::getMinDate($reservationObjects));
+            $reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
             $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
 
@@ -107,7 +107,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
             $reservationBeginDateField->setTitle($titleDate);
             $reservationBeginDateField->setEditable(true);
-            $reservationBeginDateField->setInitialValue($initialBookingDate ?: $this->initialValues->getDate());
+            $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
             $reservationBeginDateField->setComparable(false);
             $reservationBeginDateField->setSortColumn(true);
             $reservationBeginDateField->setSortSequence('de_datetime');
@@ -171,7 +171,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setTitle($titleBeginTime);
         $reservationBeginTimeField->setFormField(true);
         $reservationBeginTimeField->setDatabaseField(true);
-        $reservationBeginTimeField->setOptions($initialBookingTime ? $options : []);
+        $reservationBeginTimeField->setOptions($initialBookingTime || $options ? $options : []);
         $reservationBeginTimeField->setCallOnChange(true);
         $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
         $reservationBeginTimeField->setMandatory(false);

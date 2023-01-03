@@ -30,10 +30,10 @@ class C4gReservationCalculator
      * @param $type
      * @param int $objectTypeId
      */
-    public function __construct($date, $typeId, $objectTypeId, $objectList, $testResults = [])
+    public function __construct($date, $endDate, $typeId, $objectTypeId, $objectList, $testResults = [])
     {
-        $beginDate = C4gReservationDateChecker::getBeginOfDate($date);
-        $endDate = C4gReservationDateChecker::getEndOfDate($date);
+        $beginDate = $date;
+        $endDate = $endDate;
         $this->date = $beginDate;
         $this->objectTypeId = $objectTypeId;
 
@@ -41,7 +41,7 @@ class C4gReservationCalculator
             $this->reservations[$date][$objectTypeId] = $testResults;
         } else {
             $database = Database::getInstance();
-            $set = [$beginDate, $endDate, $typeId, $objectTypeId];
+            $set = [$beginDate, $beginDate, $endDate, $endDate, $typeId, $objectTypeId];
 
             $objStr = '';
             foreach ($objectList as $object) {
@@ -50,9 +50,9 @@ class C4gReservationCalculator
 
             $this->objectListString = $objStr;
 
-            //ToDo Arten/Objekte aktiv?
+            //ToDo check OR vs. AND on begin and end date
             $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                "? <= `beginDate` AND ? >= `endDate` AND `reservation_type` = ? AND `reservationObjectType` = ? AND `reservation_object` IN (".$objStr.") AND NOT `cancellation`='1'")
+                "((? >= `beginDate` AND ? <= `endDate`) OR (? >= `beginDate` AND ? <= `endDate`)) AND `reservation_type` = ? AND `reservationObjectType` = ? AND `reservation_object` IN (".$objStr.") AND NOT `cancellation`='1'")
                 ->execute($set)->fetchAllAssoc();
             if ($result) {
                 $this->reservations[$beginDate][$objectTypeId] = $result;
@@ -157,30 +157,11 @@ class C4gReservationCalculator
                     continue;
                 }
 
-                $timeBegin = C4gReservationDateChecker::mergeDateWithTime($date,$time);
-                $timeEnd = C4gReservationDateChecker::mergeDateWithTime($date,$endTime);
-                $timeBeginDb = C4gReservationDateChecker::mergeDateWithTime($date,$reservation['beginTime']);
-                $timeEndDb = C4gReservationDateChecker::mergeDateWithTime($date,$reservation['endTime']);
+                $timeBegin = C4gReservationDateChecker::mergeDateWithTime($date,$time,'GMT');
+                $timeEnd = C4gReservationDateChecker::mergeDateWithTime($date,$endTime,'GMT');
+                $timeBeginDb = C4gReservationDateChecker::mergeDateWithTime($date,$reservation['beginTime'],'GMT');
+                $timeEndDb = C4gReservationDateChecker::mergeDateWithTime($date,$reservation['endTime'],'GMT');
 
-                $actDuration = intval($actDuration) && (intval($actDuration) > 0) ? intval($actDuration) : intval($reservation['duration']); //ToDo object
-                $reservationInterval = intval($reservation['timeInterval']);
-
-                if ($actDuration && $reservationInterval && ($actDuration != $reservationInterval)) {
-                    switch ($reservation['periodType']) {
-                        case 'minute':
-                            $timeEnd = $timeEnd - ($reservationInterval * 60) + ($actDuration * 60);
-                            break;
-                        case 'hour':
-                            $timeEnd = $timeEnd - ($reservationInterval * 3600) + ($actDuration * 3600);
-                            break;
-                        case 'day':
-                            $timeEnd = $timeEnd - ($reservationInterval * 86400) + ($actDuration * 86400);
-                            break;
-                        case 'week':
-                            $timeEnd = $timeEnd - ($reservationInterval * 604800) + ($actDuration * 604800);
-                            break;
-                    }
-                }
                 /* Todo Nur zum Testen */
                 $realBegin = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBegin);
                 $realEnd   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEnd);
@@ -217,101 +198,7 @@ class C4gReservationCalculator
      */
     public function calculateNextDay(int $date, int $time, int $endTime, $object, $type, int $capacity, $timeArray, $actDuration = 0)
     {
-        $objectId = $object->getId();
-        $typeId = $type['id'];
-        $objectType = $type['reservationObjectType'];
-        $reservationList = [];
-        $date = C4gReservationDateChecker::getBeginOfDate($date);
-        $database = Database::getInstance();
-        $objectId = $object->getId();
-        $allTypesValidity = $object->getAllTypesValidity();
-        $allTypesQuantity = $object->getAllTypesQuantity();
-        $switchAllTypes = $object->getSwitchAllTypes();
-        $switchAllTypes = \Contao\StringUtil::deserialize($switchAllTypes);
-        if ($object && $allTypesValidity) {
-            if ($switchAllTypes && count($switchAllTypes) > 0) {
-                if (!in_array($typeId, $switchAllTypes)) {
-                    $switchAllTypes[] = $typeId;
-                }
-                $allTypes = implode(',', $switchAllTypes);
-
-                if ($time >= 86400) {
-                    $set = [strtotime('+1 day', $date)];
-                } else {
-                    $set = [$date];
-                }
-                $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    '`beginDate`=? AND `reservation_type` IN (' . $allTypes . ") AND `reservation_object` IN ('.$this->objectListString.') AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc();
-            } else {
-                if ($time >= 86400) {
-                    $set = [strtotime('+1 day', $date)];
-                } else {
-                    $set = [$date];
-                }
-                $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "`beginDate`=? AND `reservationObjectType` IN(1,3) AND `reservation_object` IN ('.$this->objectListString.') AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc();
-            }
-        } elseif ($object && $allTypesQuantity) {
-            if ($switchAllTypes && count($switchAllTypes) > 0) {
-                if (!in_array($typeId, $switchAllTypes)) {
-                    $switchAllTypes[] = $typeId;
-                }
-                $allTypes = implode(',', $switchAllTypes);
-                if ($time >= 86400) {
-                    $set = [strtotime('+1 day', $date), $objectId, $objectType];
-                } else {
-                    $set = [$date, $objectId, $objectType];
-                }
-                $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    '`beginDate`=? AND `reservation_type` IN (' . $allTypes . ") AND `reservation_object`=? AND `reservationObjectType` IN (1,3) AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc();
-            } else {
-                if ($time >= 86400) {
-                    $set = [strtotime('+1 day', $date), $objectId, $objectType];
-                } else {
-                    $set = [$date, $objectId, $objectType];
-                }
-                $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "`beginDate`=? AND `reservation_object`=? AND `reservationObjectType` IN (1,3) AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc();
-            }
-        } else {
-            if ($time >= 86400) {
-                $set = [strtotime('+1 day', $date), $typeId];
-            } else {
-                $set = [$date, $typeId];
-            }
-            $reservations = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                "`beginDate`=? AND `reservation_type`=? AND `reservation_object` IN ('.$this->objectListString.') AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
-                ->execute($set)->fetchAllAssoc();
-        }
-
-        if ($reservations) {
-            foreach ($reservations as $reservation) {
-                $tb = $time && ($time >= 86400) ? $time - 86400 : $time;
-                $te = $endTime && ($endTime >= 86400) ? $endTime - 86400 : $endTime;
-
-                $timeBegin = C4gReservationDateChecker::mergeDateWithTime($date,$tb);
-                $timeEnd = C4gReservationDateChecker::mergeDateWithTime(strtotime('+1 day', $date),$te);
-                $timeBeginDb = C4gReservationDateChecker::mergeDateWithTime($reservation['beginDate'],$reservation['beginTime']);
-                $timeEndDb = C4gReservationDateChecker::mergeDateWithTime($reservation['endDate'],$reservation['endTime']);
-
-                if ($timeBegin >= $timeBeginDb) {
-                    $reservationList[] = $reservation;
-                }
-            }
-        }
-
-        $calculatorResult = new C4gReservationCalculatorResult();
-        $calculatorResult->setDbBookings($this->calculateDbBookingsPerType($reservationList));
-        $calculatorResult->setDbBookedObjects($this->calculateDbObjectsPerType($reservationList));
-        $calculatorResult->setDbPersons($this->calculateDbPersons($reservationList, $objectId));
-        $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $capacity));
-        $calculatorResult->setTimeArray($timeArray);//$this->calculateTimeArray($reservationList, $timeArray, $date, $time, $objectId));
-
-        $this->calculatorResult = $calculatorResult;
+        $this->calculateMultipleDays($date,$time,$endTime,$object,$type,$capacity,$timeArray,$actDuration);
     }
 
     /**
@@ -342,30 +229,11 @@ class C4gReservationCalculator
                     continue;
                 }
 
-                $timeBegin = C4gReservationDateChecker::mergeDateWithTime($date,$time);
-                $timeEnd = $endTime;//C4gReservationDateChecker::mergeDateWithTime($endTime,$endTime);
-                $timeBeginDb = C4gReservationDateChecker::mergeDateWithTime($reservation['beginDate'],$reservation['beginTime']);
-                $timeEndDb = C4gReservationDateChecker::mergeDateWithTime($reservation['endDate'],$reservation['endTime']);
+                $timeBegin = C4gReservationDateChecker::mergeDateWithTime($date,$time,'GMT');
+                $timeEnd = $endTime > 86400 ? $endTime : C4gReservationDateChecker::mergeDateWithTime($date,$endTime, 'GMT');
+                $timeBeginDb = C4gReservationDateChecker::mergeDateWithTime($reservation['beginDate'],$reservation['beginTime'], 'GMT');
+                $timeEndDb = C4gReservationDateChecker::mergeDateWithTime($reservation['endDate'],$reservation['endTime'], 'GMT');
 
-                $actDuration = intval($actDuration) && (intval($actDuration) > 0) ? intval($actDuration) : intval($reservation['duration']); //ToDo object
-                $reservationInterval = intval($reservation['timeInterval']);
-
-                if ($actDuration && $reservationInterval && ($actDuration != $reservationInterval)) {
-                    switch ($reservation['periodType']) {
-                        case 'minute':
-                            $timeEnd = $timeEnd - ($reservationInterval * 60) + ($actDuration * 60);
-                            break;
-                        case 'hour':
-                            $timeEnd = $timeEnd - ($reservationInterval * 3600) + ($actDuration * 3600);
-                            break;
-                        case 'day':
-                            $timeEnd = $timeEnd - ($reservationInterval * 86400) + ($actDuration * 86400);
-                            break;
-                        case 'week':
-                            $timeEnd = $timeEnd - ($reservationInterval * 604800) + ($actDuration * 604800);
-                            break;
-                    }
-                }
                 /* Todo Nur zum Testen */
                 $realBegin = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBegin);
                 $realEnd   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEnd);

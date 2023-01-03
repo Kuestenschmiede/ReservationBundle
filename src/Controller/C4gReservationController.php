@@ -1592,6 +1592,8 @@ class C4gReservationController extends C4GBaseController
             $putVars['reservation_object'] = $objectId;
 
             //ToDo implement all event possibilities
+            //ToDo check with is_numeric
+
             $beginDate = $reservationObject->startDate ? intval($reservationObject->startDate) : 0;
             $beginTime = $reservationObject->startTime ? intval($reservationObject->startTime) : 0;
             $endDate   = $reservationObject->endDate ? intval($reservationObject->endDate) : 0;
@@ -1722,13 +1724,17 @@ class C4gReservationController extends C4GBaseController
                 }
             }
 
-            if (!$reservationType->directBooking && ($endTime >= 86400)) {
-                $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime);
+            if (!$reservationType->directBooking && ($endTime > 86400)) {
+                //$putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime);
                 $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime-86400);
+            } else if (!$reservationType->directBooking && ($endTime == 86400)) {
+                //$putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime-1);
+                $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
             }
 
-            if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week') || ($endTime >= 86400)) {
-                if (($duration < 86400) && ($endTime >= 86400)) {
+            //ToDo check
+            if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week') || ($endTime > 86400)) { //ToDo check
+                if (($duration < 86400) && ($endTime > 86400)) { //ToDo check
                     $nextDay = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)) + 86400;
                     $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                 } else {
