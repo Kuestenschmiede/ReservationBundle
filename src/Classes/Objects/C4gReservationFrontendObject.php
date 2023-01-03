@@ -42,6 +42,7 @@ class C4gReservationFrontendObject
     private $audience = [];
     private $speaker = [];
     private $location = 0;
+    private $organizer = 0;
     private $eventDuration = ''; //ToDo
     private $priority = 0;
     private $switchAllTypes = null;
@@ -456,6 +457,22 @@ class C4gReservationFrontendObject
     public function setLocation(int $location): void
     {
         $this->location = $location;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrganizer(): int
+    {
+        return $this->organizer;
+    }
+
+    /**
+     * @param int $organizer
+     */
+    public function setOrganizer(int $organizer): void
+    {
+        $this->organizer = $organizer;
     }
 
     /**

@@ -281,6 +281,54 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 }
             }
 
+            $organizerId = $reservationObject->getOrganizer();
+            if ($organizerId) {
+                $organizer = C4gReservationLocationModel::findByPk($organizerId);
+                if ($organizer) {
+                    $href = '';
+                    if ($reservationSettings->location_redirect_site) {
+                        $jumpTo = \PageModel::findByPk($reservationSettings->location_redirect_site);
+                        if ($jumpTo) {
+                            $organizerAlias = $organizer->alias ?: $organizerId;
+                            $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$organizerAlias;
+                        }
+                    }
+
+                    $organizerName = $organizer->name;
+                    $street = $organizer->contact_street;
+                    $postal = $organizer->contact_postal;
+                    $city = $organizer->contact_city;
+                    if ($street && $postal && $city) {
+                        $organizerName .= "&nbsp;(" . $street . ",&nbsp;" . $postal . "&nbsp;" . $city . ")";
+                    }
+
+                    if ($href) {
+                        $organizerField = new C4GUrlField();
+                        $organizerField->setUrl($href);
+                        $organizerField->setInitialValue($organizerName);
+                    } else {
+                        $organizerField = new C4GTextField();
+                        $organizerField->setInitialValue($organizerName);
+                        $organizerField->setSimpleTextWithoutEditing(true);
+                    }
+
+                    $organizerField->setFieldName('organizer');
+                    $organizerField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['organizer']);
+                    $organizerField->setFormField(true);
+                    $organizerField->setEditable(false);
+                    $organizerField->setDatabaseField(false);
+                    $organizerField->setCondition($objConditionArr);
+                    $organizerField->setMandatory(false);
+                    $organizerField->setShowIfEmpty(false);
+                    $organizerField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                    $organizerField->setRemoveWithEmptyCondition(true);
+                    $organizerField->setNotificationField(true);
+                    $organizerField->setWithoutValidation(true);
+                    $organizerField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-organizer');
+                    $this->fieldList[] = $organizerField;
+                }
+            }
+
             $speakerIds = $reservationObject->getSpeaker();
             $speakerStr = '';
             $speakerLinkArr = [];

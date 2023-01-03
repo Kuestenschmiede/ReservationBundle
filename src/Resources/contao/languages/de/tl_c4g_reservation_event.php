@@ -16,6 +16,7 @@ $GLOBALS['TL_LANG'][$str]['pid'] = array("Contao Event", "Wählen Sie ein Contao
 $GLOBALS['TL_LANG'][$str]['number'] = array("Nummer", "Hier können Sie eine Kennung für die Veranstaltung eingeben, bspw. eine Seminarnummer.");
 $GLOBALS['TL_LANG'][$str]['reservationType'] = array("Reservierungsart", "Um welche Reservierungsart handelt es sich?");
 $GLOBALS['TL_LANG'][$str]['location'] = array("Veranstaltungsort", "Wo findet die Veranstaltung statt? Überschreibt die Einstellung an der Reservierungsart.");
+$GLOBALS['TL_LANG'][$str]['organizer'] = array("Veranstalter", "Wer ist Veranstalter?");
 $GLOBALS['TL_LANG'][$str]['speaker'] = array("Referent*innen", "Wer leitet die Veranstaltung?");
 $GLOBALS['TL_LANG'][$str]['topic'] = array("Thema/Themen", "Hier können Sie Veranstaltungsthemen verknüpfen.");
 $GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Zielgruppe(n)", "Wählen Sie das Zielpublikum.");
