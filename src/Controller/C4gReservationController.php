@@ -1711,6 +1711,7 @@ class C4gReservationController extends C4GBaseController
                 } else {
                     $putVars[$timeKey] = $beginTime;
                 }
+//                $putVars[$timeKey] = $beginTime;
             } else if ($timeKey) {
                 $putVars['endDate'] = $putVars['beginDate_'.$type];
                 $bday = $putVars['beginDate_'.$type];
@@ -1722,6 +1723,7 @@ class C4gReservationController extends C4GBaseController
                 } else {
                     $putVars[$timeKey] = $beginTime;
                 }
+//                $putVars[$timeKey] = $beginTime;
             }
 
             if (!$reservationType->directBooking && ($endTime > 86400)) {
@@ -1735,7 +1737,11 @@ class C4gReservationController extends C4GBaseController
             //ToDo check
             if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week') || ($endTime > 86400)) { //ToDo check
                 if (($duration < 86400) && ($endTime > 86400)) { //ToDo check
-                    $nextDay = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)) + 86400;
+                    if ($beginTime >= 86400) {
+                        $nextDay = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate));
+                    } else {
+                        $nextDay = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)) + 86400;
+                    }
                     $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                 } else {
                     $addDuration = $duration;

@@ -139,11 +139,12 @@ class C4gReservationCalculator
      * @param int $capacity
      * @param $timeArray
      */
-    public function calculateDefault(int $date, int $time, int $endTime, $object, $type, int $capacity, $timeArray, $actDuration = 0)
+    public function calculate(int $date, int $time, int $endTime, $object, $type, int $capacity, $timeArray, $actDuration = 0)
     {
         $objectId = $object->getId();
         $reservationList = [];
-        $date = C4gReservationDateChecker::getBeginOfDate($date);
+        $firstDate = C4gReservationDateChecker::getBeginOfDate($date, 'GMT');
+        $nextDate = C4gReservationDateChecker::getBeginOfDate($date+86400, 'GMT');
 
         if ($this->resultList) {
             foreach ($this->resultList as $reservation) {
@@ -156,22 +157,26 @@ class C4gReservationCalculator
                     continue;
                 }
 
-                $timeBegin = C4gReservationDateChecker::mergeDateWithTime($date,$time,'GMT');
-                $timeEnd = C4gReservationDateChecker::mergeDateWithTime($date,$endTime,'GMT');
-                $timeBeginDb = C4gReservationDateChecker::mergeDateWithTime($date,$reservation['beginTime'],'GMT');
-                $timeEndDb = C4gReservationDateChecker::mergeDateWithTime($date,$reservation['endTime'],'GMT');
+                $timeBegin = $firstDate+$time;
+
+                //ToDo multiple days
+                $timeEnd = $endTime > 86400 ? $nextDate+($endTime-86400) : $firstDate+$endTime;
+                $timeBeginDb = C4gReservationDateChecker::getBeginOfDate($reservation['beginDate'], 'GMT')+$reservation['beginTime'];
+                $timeEndDb = C4gReservationDateChecker::getBeginOfDate($reservation['endDate'], 'GMT')+$reservation['endTime'];
 
                 /* Todo Nur zum Testen */
-                $realBegin = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBegin);
-                $realEnd   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEnd);
-                $realBeginDb = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBeginDb);
-                $realEndDb   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEndDb);
+                $realBegin = date($GLOBALS['TL_CONFIG']['datimFormat'], $timeBegin);
+                $realEnd   = date($GLOBALS['TL_CONFIG']['datimFormat'], $timeEnd);
+                $realBeginDb = date($GLOBALS['TL_CONFIG']['datimFormat'], $timeBeginDb);
+                $realEndDb   = date($GLOBALS['TL_CONFIG']['datimFormat'], $timeEndDb);
 
                 if (C4gReservationDateChecker::isStampInPeriod($timeBegin, $timeBeginDb, $timeEndDb) ||
                     C4gReservationDateChecker::isStampInPeriod($timeEnd, $timeBeginDb, $timeEndDb, 1) ||
                     C4gReservationDateChecker::isStampInPeriod($timeBeginDb, $timeBegin, $timeEnd) ||
                     C4gReservationDateChecker::isStampInPeriod($timeEndDb, $timeBegin, $timeEnd,1)) {
                     $reservationList[] = $reservation;
+                } else {
+                    $test = 2;
                 }
             }
         }
@@ -181,7 +186,7 @@ class C4gReservationCalculator
         $calculatorResult->setDbBookedObjects($this->calculateDbObjectsPerType($reservationList));
         $calculatorResult->setDbPersons($this->calculateDbPersons($reservationList, $objectId));
         $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $capacity));
-        $calculatorResult->setTimeArray($timeArray);//$this->calculateTimeArray($reservationList, $timeArray, $date, $time, $objectId));
+        $calculatorResult->setTimeArray($timeArray);
 
         $this->calculatorResult = $calculatorResult;
     }
@@ -195,54 +200,54 @@ class C4gReservationCalculator
      * @param int $capacity
      * @param $timeArray
      */
-    public function calculateMultipleDays(int $date, int $time, int $endTime, $object, $type, int $capacity, $timeArray, $actDuration = 0)
-    {
-        $objectId = $object->getId();
-        $typeId = $type['id'];
-        $objectType = $type['reservationObjectType'];
-        $reservationList = [];
-        $date = C4gReservationDateChecker::getBeginOfDate($date);
-
-        if ($this->resultList) {
-            foreach ($this->resultList as $reservation) {
-
-                if ($object) {
-                    $allTypesValidity = $object->getAllTypesValidity();
-                }
-
-                if (!$allTypesValidity && $reservation['reservation_object'] != $objectId) {
-                    continue;
-                }
-
-                $timeBegin = C4gReservationDateChecker::mergeDateWithTime($date,$time,'GMT');
-                $timeEnd = $endTime > 86400 ? $endTime : C4gReservationDateChecker::mergeDateWithTime($date,$endTime, 'GMT');
-                $timeBeginDb = C4gReservationDateChecker::mergeDateWithTime($reservation['beginDate'],$reservation['beginTime'], 'GMT');
-                $timeEndDb = C4gReservationDateChecker::mergeDateWithTime($reservation['endDate'],$reservation['endTime'], 'GMT');
-
-                /* Todo Nur zum Testen */
-                $realBegin = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBegin);
-                $realEnd   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEnd);
-                $realBeginDb = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBeginDb);
-                $realEndDb   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEndDb);
-
-                if (C4gReservationDateChecker::isStampInPeriod($timeBegin, $timeBeginDb, $timeEndDb) ||
-                    C4gReservationDateChecker::isStampInPeriod($timeEnd, $timeBeginDb, $timeEndDb, 1) ||
-                    C4gReservationDateChecker::isStampInPeriod($timeBeginDb, $timeBegin, $timeEnd) ||
-                    C4gReservationDateChecker::isStampInPeriod($timeEndDb, $timeBegin, $timeEnd,1)) {
-                    $reservationList[] = $reservation;
-                }
-            }
-        }
-
-        $calculatorResult = new C4gReservationCalculatorResult();
-        $calculatorResult->setDbBookings($this->calculateDbBookingsPerType($reservationList));
-        $calculatorResult->setDbBookedObjects($this->calculateDbObjectsPerType($reservationList));
-        $calculatorResult->setDbPersons($this->calculateDbPersons($reservationList, $objectId));
-        $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $capacity));
-        $calculatorResult->setTimeArray($timeArray ?: []);//$this->calculateTimeArray($reservationList, $timeArray, $date, $time, $objectId));
-
-        $this->calculatorResult = $calculatorResult;
-    }
+//    public function calculateMultipleDays(int $date, int $time, int $endTime, $object, $type, int $capacity, $timeArray, $actDuration = 0)
+//    {
+//        $objectId = $object->getId();
+//        $typeId = $type['id'];
+//        $objectType = $type['reservationObjectType'];
+//        $reservationList = [];
+//        $date = C4gReservationDateChecker::getBeginOfDate($date);
+//
+//        if ($this->resultList) {
+//            foreach ($this->resultList as $reservation) {
+//
+//                if ($object) {
+//                    $allTypesValidity = $object->getAllTypesValidity();
+//                }
+//
+//                if (!$allTypesValidity && $reservation['reservation_object'] != $objectId) {
+//                    continue;
+//                }
+//
+//                $timeBegin = C4gReservationDateChecker::mergeDateWithTime($date,$time,'GMT');
+//                $timeEnd = $endTime > 86400 ? $endTime : C4gReservationDateChecker::mergeDateWithTime($date,$endTime, 'GMT');
+//                $timeBeginDb = C4gReservationDateChecker::mergeDateWithTime($reservation['beginDate'],$reservation['beginTime'], 'GMT');
+//                $timeEndDb = C4gReservationDateChecker::mergeDateWithTime($reservation['endDate'],$reservation['endTime'], 'GMT');
+//
+//                /* Todo Nur zum Testen */
+//                $realBegin = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBegin);
+//                $realEnd   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEnd);
+//                $realBeginDb = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeBeginDb);
+//                $realEndDb   = date($GLOBALS['TL_CONFIG']['timeFormat'], $timeEndDb);
+//
+//                if (C4gReservationDateChecker::isStampInPeriod($timeBegin, $timeBeginDb, $timeEndDb) ||
+//                    C4gReservationDateChecker::isStampInPeriod($timeEnd, $timeBeginDb, $timeEndDb, 1) ||
+//                    C4gReservationDateChecker::isStampInPeriod($timeBeginDb, $timeBegin, $timeEnd) ||
+//                    C4gReservationDateChecker::isStampInPeriod($timeEndDb, $timeBegin, $timeEnd,1)) {
+//                    $reservationList[] = $reservation;
+//                }
+//            }
+//        }
+//
+//        $calculatorResult = new C4gReservationCalculatorResult();
+//        $calculatorResult->setDbBookings($this->calculateDbBookingsPerType($reservationList));
+//        $calculatorResult->setDbBookedObjects($this->calculateDbObjectsPerType($reservationList));
+//        $calculatorResult->setDbPersons($this->calculateDbPersons($reservationList, $objectId));
+//        $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $capacity));
+//        $calculatorResult->setTimeArray($timeArray ?: []);//$this->calculateTimeArray($reservationList, $timeArray, $date, $time, $objectId));
+//
+//        $this->calculatorResult = $calculatorResult;
+//    }
 
 
     /**
