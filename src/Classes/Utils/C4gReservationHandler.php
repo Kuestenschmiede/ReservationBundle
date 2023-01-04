@@ -675,10 +675,6 @@ class C4gReservationHandler
         $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
         if (($time_begin !== false) && ($time_end !== false)) {
             $time = $time_begin;
-            if ($timeParams['nowDate'] && ($timeParams['nowDate'] == $timeParams['tsdate'])) {
-
-                $time = $time < $timeParams['nowTime'] ? $timeParams['nowTime'] : $time;
-            }
 
             $periodEnd = $time_end - $timeObjectParams['durationInterval']; //ToDo Test interval
             $periodChanged = false;
@@ -688,6 +684,10 @@ class C4gReservationHandler
             }
             $timeArray = [];
             while ($time <= $periodEnd) {
+                if ($timeParams['nowDate'] && ($timeParams['nowDate'] == $timeParams['tsdate']) && ($time < $timeParams['nowTime'])) {
+                    continue;
+                }
+
                 if ($timeParams['type']) {
                     if ($periodChanged && ($time >= 86400)) {
                         $timeParams['tsdate'] += 86400;
