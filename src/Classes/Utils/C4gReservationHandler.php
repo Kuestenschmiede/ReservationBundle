@@ -685,6 +685,7 @@ class C4gReservationHandler
             $timeArray = [];
             while ($time <= $periodEnd) {
                 if ($timeParams['nowDate'] && ($timeParams['nowDate'] == $timeParams['tsdate']) && ($time < $timeParams['nowTime'])) {
+                    $time = $time + $timeObjectParams['interval'];
                     continue;
                 }
 
