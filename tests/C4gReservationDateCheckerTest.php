@@ -23,13 +23,13 @@ class C4gReservationDateCheckerTest extends ContaoTestCase
 //        $config = $framework->getAdapter(Config::class);
 
         $now = time();
-        $date = C4gReservationDateChecker::getBeginOfDate($now);
+        $date = C4gReservationDateChecker::getBeginOfDate($now, 'GMT');
         $time = $now - $date;
 
-        $mergedDateTime = C4gReservationDateChecker::mergeDateWithTime($date,$time);
+        $mergedDateTime = C4gReservationDateChecker::mergeDateWithTime($date,$time, 'GMT');
         self::assertEquals($now,$mergedDateTime);
 
-        $mergedDateTime = C4gReservationDateChecker::mergeDateWithTime($date,$now);
+        $mergedDateTime = C4gReservationDateChecker::mergeDateWithTime($date,$now, 'GMT');
         self::assertEquals($now,$mergedDateTime);
     }
     /*
@@ -37,7 +37,7 @@ class C4gReservationDateCheckerTest extends ContaoTestCase
     */
     public function testBeginOfDate() {
         $now = time();
-        $beginOfDay = C4gReservationDateChecker::getBeginOfDate($now);
+        $beginOfDay = C4gReservationDateChecker::getBeginOfDate($now, 'GMT');
         $hour = date('H', $beginOfDay);
         self::assertEquals(0,$hour);
 
@@ -52,7 +52,7 @@ class C4gReservationDateCheckerTest extends ContaoTestCase
     */
     public function testEndOfDate() {
         $now = time();
-        $endOfDay = C4gReservationDateChecker::getEndOfDate($now);
+        $endOfDay = C4gReservationDateChecker::getEndOfDate($now, 'GMT');
         $hour = date('H', $endOfDay);
         self::assertEquals(23,$hour);
 
