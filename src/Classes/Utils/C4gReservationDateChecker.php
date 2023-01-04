@@ -26,7 +26,6 @@ class C4gReservationDateChecker
             if (is_numeric($date) && (int)$date == $date) {
                 $tsdate = (int)$date;
             } else {
-                //date_default_timezone_set($GLOBALS['TL_CONFIG']['timeZone'] && ($GLOBALS['TL_CONFIG']['timeZone'] != 'UTC') ?: 'Europe/Berlin');
                 $format = $GLOBALS['TL_CONFIG']['dateFormat'];
 
                 $tsdate = \DateTime::createFromFormat($format, $date);
@@ -61,24 +60,6 @@ class C4gReservationDateChecker
             } else {
                 $result = $beginOfDate+$time;
             }
-//            $timeZone = $timeZone ? new \DateTimeZone($timeZone) : new \DateTimeZone($GLOBALS['TL_CONFIG']['timeZone']);
-//            if ($timeZone && ($time > 86400)) {
-//                $dateStamp = self::getBeginOfDate($date,$GLOBALS['TL_CONFIG']['timeZone']);
-//                $dateTime = \DateTime::createFromFormat($GLOBALS['TL_CONFIG']['timeFormat'], $time, $timeZone);
-//                if ($dateTime) {
-//                    $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], $dateTime->getTimestamp()), Date::getFormatFromRgxp('time'));
-//                    $timeStamp = $objDate->tstamp;
-//                    $result = $dateStamp+$timeStamp;
-//                }
-//            } else if ($timeZone) {
-//                $dateStamp = self::getBeginOfDate($date,$GLOBALS['TL_CONFIG']['timeZone']);
-//                $dateTime = \DateTime::createFromFormat($GLOBALS['TL_CONFIG']['timeFormat'], $dateStamp+$time, $timeZone);
-//                if ($dateTime) {
-//                    $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], $dateTime->getTimestamp()), Date::getFormatFromRgxp('time'));
-//                    $timeStamp = $objDate->tstamp;
-//                    $result = $dateStamp+$timeStamp;
-//                }
-//            }
         }
 
         return $result;
@@ -265,7 +246,6 @@ class C4gReservationDateChecker
     }
 
     public static function checkDay($day, $date, $timeZone = '') {
-//        date_default_timezone_set($timeZone ?: $GLOBALS['TL_CONFIG']['timeZone']);
         if ($date && (date('w', $date) == $day)) {
             return true;
         }

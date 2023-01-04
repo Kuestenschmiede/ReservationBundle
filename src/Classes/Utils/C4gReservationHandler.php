@@ -298,9 +298,9 @@ class C4gReservationHandler
      * @param $object
      * @return bool
      */
-    public static function isEventObject($object) {
-        //ToDo ???
-    }
+//    public static function isEventObject($object) {
+//        //ToDo ???
+//    }
 
 
     /**
@@ -724,61 +724,6 @@ class C4gReservationHandler
         return $timeParams['result'];
     }
 
-    private static function getReservationTimesNextDay($timeParams, $timeObjectParams, $period) {
-//        $time_begin = intval($period['time_begin']);
-//        $time_end = intval($period['time_end']);
-//        if ($time_begin && $time_end) {
-//            $time = $time_begin;
-//
-//            $endOfDate = 86400 + $time_end; //24h + nxt day time
-//            $periodEnd = $endOfDate - $timeObjectParams['durationInterval'];
-//            $timeArray = [];
-//            while ($time <= $periodEnd) {
-//                if ($time && $timeParams['type']) {
-//                    $endTime = $time + $timeObjectParams['durationInterval']; //ToDo check
-//
-//                    if ($timeParams['date'] && $timeParams['tsdate']) {
-//                        $timeParams['calculator']->calculateNextDay(
-//                            $timeParams['tsdate'],
-//                            $time,
-//                            $endTime,
-//                            $timeObjectParams['object'],
-//                            $timeParams['type'],
-//                            $timeObjectParams['capacity'],
-//                            $timeArray,
-//                            $timeParams['actDuration']
-//                        );
-//                        $calculatorResult = $timeParams['calculator']->getCalculatorResult();
-//                        $timeArray = $calculatorResult->getTimeArray();
-//                    }
-//
-//                    $timeObj = [
-//                        'id'=>-1,
-//                        'act'=> $calculatorResult ? $calculatorResult->getDbPersons() : 0,
-//                        'percent'=> $calculatorResult ? $calculatorResult->getDbPercent() : 0,
-//                        'max'=> intval($timeObjectParams['desiredCapacity']), //ToDo check max
-//                        'showSeats'=> $timeParams['showFreeSeats'],
-//                        'priority'=> intval($timeObjectParams['object']->getPriority()),
-//                        'removeButton' => false,
-//                        'mergedTime' => false,
-//                        'mergedEndTime' => false
-//                    ];
-//
-//                    $checkTime = $time;
-//                    if ($timeParams['$type']['bookRunning']) {
-//                        $checkTime = $endTime;
-//                    }
-//
-//                    $timeParams['result'] = self::getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj);
-//                }
-//
-//                $time = $time + $timeObjectParams['interval'];
-//            }
-//        }
-
-        return self::getReservationTimesMultipleDays($timeParams, $timeObjectParams, $period);$timeParams['result'];
-    }
-
     private static function getReservationTimesMultipleDays($timeParams, $timeObjectParams, $period) {
         $time_begin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
         $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
@@ -1094,7 +1039,7 @@ class C4gReservationHandler
                                         $timeParams['result'] = self::getReservationTimesMultipleDays($timeParams, $timeObjectParams, $period);
                                     } else {
                                         if ($time_end < $time_begin) {
-                                            $timeParams['result'] = self::getReservationTimesNextDay($timeParams, $timeObjectParams, $period);
+                                            $timeParams['result'] = self::getReservationTimesMultipleDays($timeParams, $timeObjectParams, $period);
                                         } else {
                                             $timeParams['result'] = self::getReservationTimesDefault($timeParams, $timeObjectParams, $period);
                                         }
@@ -1876,12 +1821,12 @@ class C4gReservationHandler
                                         case 'weeks':
                                           $recInterval = 86400*7*$repeatEach['value'];
                                           break;
-//                                      case 'months':
-//                                         $recInterval = 86400*7*4*$repeatEach['value'];
-//                                         break;
-//                                      case 'years';
-//                                          $recInterval = 86400*12*4*7*$repeatEach['value'];
-//                                          break;
+                                        case 'months': //ToDo other solution
+                                          $recInterval = 86400*7*4*$repeatEach['value'];
+                                          break;
+                                        case 'years':  //ToDo other solution
+                                          $recInterval = 86400*12*4*7*$repeatEach['value'];
+                                          break;
                                         default:
                                             $recInterval = 0;
                                             break;

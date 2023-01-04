@@ -50,7 +50,6 @@ class C4gReservationCalculator
 
             $this->objectListString = $objStr;
 
-            //ToDo check OR vs. AND on begin and end date
             $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
                 "((? >= `beginDate` AND ? <= `endDate`) OR (? >= `beginDate` AND ? <= `endDate`)) AND `reservation_type` = ? AND `reservationObjectType` = ? AND `reservation_object` IN (".$objStr.") AND NOT `cancellation`='1'")
                 ->execute($set)->fetchAllAssoc();
@@ -185,20 +184,6 @@ class C4gReservationCalculator
         $calculatorResult->setTimeArray($timeArray);//$this->calculateTimeArray($reservationList, $timeArray, $date, $time, $objectId));
 
         $this->calculatorResult = $calculatorResult;
-    }
-
-    /**
-     * @param int $date
-     * @param int $time
-     * @param int $endTime
-     * @param $object
-     * @param $type
-     * @param int $capacity
-     * @param $timeArray
-     */
-    public function calculateNextDay(int $date, int $time, int $endTime, $object, $type, int $capacity, $timeArray, $actDuration = 0)
-    {
-        $this->calculateMultipleDays($date,$time,$endTime,$object,$type,$capacity,$timeArray,$actDuration);
     }
 
     /**

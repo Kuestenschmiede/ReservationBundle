@@ -156,8 +156,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
 
         foreach ($reservationObjects as $reservationObject) {
             $obj_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $listType['id'], $reservationObject->getId());
-            $obj_condition->setModel(C4gReservationHandler::class);
-            $obj_condition->setFunction('isEventObject');
+//            $obj_condition->setModel(C4gReservationHandler::class);
+//            $obj_condition->setFunction('isEventObject');
             $objConditionArr = $obj_condition;
 
             $reservationBeginDateField = new C4gDateField();
