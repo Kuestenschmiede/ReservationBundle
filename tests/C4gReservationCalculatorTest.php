@@ -109,7 +109,7 @@ class C4gReservationCalculatorTest extends ContaoTestCase
         $object = $this->getTableObject();
         $type   = $this->getTableType();
 
-        $c4gReservationCalculator->calculateDefault(1703286000, 32400, 36000, $object, $type, 1, [], 1);
+        $c4gReservationCalculator->calculate(1703286000, 32400, 36000, $object, $type, 1, [], 1);
         $this->assertNotEmpty($c4gReservationCalculator->getCalculatorResult());
         $this->assertEquals(0, $c4gReservationCalculator->getCalculatorResult()->getDbPersons());
 
