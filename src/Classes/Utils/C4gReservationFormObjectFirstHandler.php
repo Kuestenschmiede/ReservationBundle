@@ -327,7 +327,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
 
             $reservationBeginDateField = new C4GDateField();
             //$reservationBeginDateField->setFlipButtonPosition(false);
-            $reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
+            $reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate([$reservationObject], $listType));
             $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate([$reservationObject]));
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString([$reservationObject]));
             $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);

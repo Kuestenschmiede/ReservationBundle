@@ -52,7 +52,7 @@ class C4gReservationDateChecker
 
     public static function mergeDateWithTime($date, $time, $timeZone = false) //ToDo check
     {
-        $result = $date;
+        $result = $date ?: 0;
         if ($date && $time) {
             $beginOfDate = self::getBeginOfDate($date,$timeZone ?: $GLOBALS['TL_CONFIG']['timeZone']);
             if ($time > 86400) {
