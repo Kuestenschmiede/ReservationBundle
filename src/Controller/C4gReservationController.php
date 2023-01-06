@@ -1735,8 +1735,8 @@ class C4gReservationController extends C4GBaseController
             }
 
             //ToDo check
-            if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week') || ($endTime > 86400)) { //ToDo check
-                if (($duration < 86400) && ($endTime > 86400)) { //ToDo check
+            if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week') || ($endTime >= 86400)) { //ToDo check
+                if (($duration < 86400) && ($endTime >= 86400)) { //ToDo check
                     if ($beginTime >= 86400) {
                         $nextDay = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate));
                     } else {
