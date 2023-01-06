@@ -44,15 +44,24 @@ class C4gReservationCalculator
             $set = [$beginDate, $beginDate, $endDate, $endDate, $typeId, $objectTypeId];
 
             $objStr = '';
+            $all = false;
             foreach ($objectList as $object) {
+                $all = $all || ($object->getAllTypesValidity() || $object->getAllTypesQuantity());
                 $objStr .= $objStr ? ",".$object->getId() : strval($object->getId());
             }
 
             $this->objectListString = $objStr;
 
-            $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                "((? >= `beginDate` AND ? <= `endDate`) OR (? >= `beginDate` AND ? <= `endDate`)) AND `reservation_type` = ? AND `reservationObjectType` = ? AND `reservation_object` IN (".$objStr.") AND NOT `cancellation`='1'")
-                ->execute($set)->fetchAllAssoc();
+            if ($all) {
+                $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                    "((? >= `beginDate` AND ? <= `endDate`) OR (? >= `beginDate` AND ? <= `endDate`)) IN(1,3) AND NOT `cancellation`='1'")
+                    ->execute($set)->fetchAllAssoc();
+            } else {
+                $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                    "((? >= `beginDate` AND ? <= `endDate`) OR (? >= `beginDate` AND ? <= `endDate`)) AND `reservation_type` = ? AND `reservationObjectType` = ? AND `reservation_object` IN (".$objStr.") AND NOT `cancellation`='1'")
+                    ->execute($set)->fetchAllAssoc();
+            }
+
             if ($result) {
                 $this->reservations[$beginDate][$objectTypeId] = $result;
             }
@@ -102,6 +111,7 @@ class C4gReservationCalculator
 
             if ($allTypesValidity) {
                 if ($switchAllTypes && count($switchAllTypes) > 0) {
+
                     if (!in_array($typeId, $switchAllTypes)) {
                         $switchAllTypes[] = $typeId;
                     }
@@ -175,8 +185,6 @@ class C4gReservationCalculator
                     C4gReservationDateChecker::isStampInPeriod($timeBeginDb, $timeBegin, $timeEnd) ||
                     C4gReservationDateChecker::isStampInPeriod($timeEndDb, $timeBegin, $timeEnd,1)) {
                     $reservationList[] = $reservation;
-                } else {
-                    $test = 2;
                 }
             }
         }

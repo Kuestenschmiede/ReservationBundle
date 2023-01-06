@@ -702,7 +702,7 @@ class C4gReservationHandler
                     if ($time >= 86400) {
                         $realTime = $time - 86400;
                     }
-                    $endTime = $realTime + $timeObjectParams['durationInterval'];
+                    $endTime = $realTime + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'];
 
                     if ($timeParams['date'] && $timeParams['tsdate']) {
                         $timeParams['calculator']->calculate(
@@ -756,7 +756,7 @@ class C4gReservationHandler
             $timeArray = [];
             while ($time <= $periodEnd) {
                 if ($time && $timeParams['type']) {
-                    $endTime = $time + $timeObjectParams['durationInterval'];
+                    $endTime = $time + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'];
 
                     if ($timeParams['date'] && $timeParams['tsdate']) {
                         $timeParams['calculator']->calculate(
@@ -790,11 +790,11 @@ class C4gReservationHandler
                         $checkTime = $endTime;
                     }
 
-                    $durationInterval = $timeObjectParams['durationInterval'];
+                    $durationInterval = $timeObjectParams['interval']+$timeObjectParams['durationDiff'];
 
                     //ToDo Test
                     if ($time_end >= $time_begin) {
-                        $durationInterval = $timeObjectParams['durationInterval'] - 86400; //ToDo first day counts
+                        $durationInterval = $durationInterval - 86400; //ToDo first day counts
                     }
 
                     if ($timeParams['tsdate']) {
@@ -946,7 +946,7 @@ class C4gReservationHandler
                     'quantity' => $object->getQuantity() ?  $object->getQuantity() : 1,
                     'capacity' => $capacity,
                     'interval' => 0, //default interval
-                    'durationInterval' => 0, //interval with additional time
+                    'durationDiff' => 0, //interval with additional time
                     'severalBookings' => 0,
                     'maxObjects' => 0,
                     'exclusionPeriods' => []
@@ -981,20 +981,22 @@ class C4gReservationHandler
                     continue;
                 }
 
+                $durationDiff = $timeObjectParams['object']->getDuration() ? $timeObjectParams['object']->getDuration() - $timeObjectParams['object']->getTimeInterval() : 0;
+
                 if ($timeParams['actDuration'] >= 1) //actDuration from client can be -1 (no input)
                 {
                     switch ($timeParams['type']['periodType']) {
                         case 'minute':
-                            $timeObjectParams['object']->setDuration($timeParams['actDuration']);
+                            $timeObjectParams['object']->setTimeInterval($timeParams['actDuration']);
                             break;
                         case 'hour':
-                            $timeObjectParams['object']->setDuration($timeParams['actDuration']);
+                            $timeObjectParams['object']->setTimeInterval($timeParams['actDuration']);
                             break;
                         case 'day':
-                            $timeObjectParams['object']->setDuration($timeParams['actDuration']);
+                            $timeObjectParams['object']->setTimeInterval($timeParams['actDuration']);
                             break;
                         case 'week':
-                            $timeObjectParams['object']->setDuration($timeParams['actDuration']);
+                            $timeObjectParams['object']->setTimeInterval($timeParams['actDuration']);
                             break;
                         default: '';
                     }
@@ -1007,19 +1009,19 @@ class C4gReservationHandler
                 switch ($timeParams['type']['periodType']) {
                     case 'minute':
                         $timeObjectParams['interval'] = $timeInterval * 60;
-                        $timeObjectParams['durationInterval'] = $duration ? $duration * 60 : $timeObjectParams['interval'];
+                        $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 60 : 0;
                         break;
                     case 'hour':
                         $timeObjectParams['interval'] = $timeInterval * 3600;
-                        $timeObjectParams['durationInterval'] = $duration ? $duration * 3600 : $timeObjectParams['interval'];
+                        $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 3600 : 0;
                         break;
                     case 'day':
                         $timeObjectParams['interval'] = $timeInterval * 86400;
-                        $timeObjectParams['durationInterval'] = $duration ? $duration * 86400 : $timeObjectParams['interval'];
+                        $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 86400 : 0;
                         break;
                     case 'week':
                         $timeObjectParams['interval'] = $timeInterval * 604800;
-                        $timeObjectParams['durationInterval'] = $duration ? $duration * 604800 : $timeObjectParams['interval'];
+                        $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 604800 : 0;
                         break;
                     default: '';
                 }
@@ -1077,7 +1079,7 @@ class C4gReservationHandler
     public static function getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj) {
         $reasonLog = '';
         $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'], 'GMT')+$time;
-        $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'], 'GMT')+$time+$timeObjectParams['durationInterval'] + 1; //ToDo Why?
+        $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'], 'GMT')+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']+1; //ToDo Why?
         foreach ($timeObjectParams['exclusionPeriods'] as $excludePeriod) {
             if (C4gReservationDateChecker::isStampInPeriod($beginStamp,$excludePeriod['begin'],$excludePeriod['end'],0) ||
                 C4gReservationDateChecker::isStampInPeriod($endStamp,$excludePeriod['begin'],$excludePeriod['end'],1)) {
@@ -1089,6 +1091,11 @@ class C4gReservationHandler
         }
 
         $endTimeInterval = $timeObjectParams['interval'];
+
+        $freeButton = $time-$endTimeInterval.'#'.$endTimeInterval;
+        if (array_key_exists($freeButton,$timeParams['result'])) {
+            $freeButton = $timeParams['result'][$freeButton]['objects'][0]['id'] !== -1;
+        }
 
         if (($timeParams['date'] !== -1) && $timeParams['tsdate'] && $timeParams['nowDate'] &&
             (!$timeParams['checkToday'] || ($timeParams['nowDate'] < $timeParams['tsdate']) ||
@@ -1103,6 +1110,8 @@ class C4gReservationHandler
                 $reasonLog = 'too many bookings per object';
             } else if ($timeObj['removeButton']) {
                 $reasonLog = 'exclude period with event configuration or exclude dates';
+            } else if ( ($timeObjectParams['interval'] < ($timeObjectParams['interval'] + $timeObjectParams['durationDiff'])) && !$freeButton) {
+                $reasonLog = 'last button with additional duration';
             } else {
                 $timeObj['id'] = $timeObjectParams['object']->getId();
             }
