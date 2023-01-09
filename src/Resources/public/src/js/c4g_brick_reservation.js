@@ -88,7 +88,7 @@ function hideOptions(typeId, values, showDateTime) {
     var firstValueParam = 0;
     var emptyKey = false;
     if (selectField) {
-        var distance = 0;
+        //var distance = 0;
 
         for (i = 0; i < selectField.options.length; i++) {
             var option = selectField.options[i];
@@ -96,9 +96,10 @@ function hideOptions(typeId, values, showDateTime) {
             var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
             var desiredCapacity = document.getElementById("c4g_desiredCapacity_"+typeId);
             var capacity = desiredCapacity ? desiredCapacity.value : 0;
-            var actMinDistance = capacity - min;
-            var actMaxDistance = max - capacity;
-            var actDistance = (actMinDistance > actMaxDistance) ? actMinDistance : actMaxDistance;
+
+            // var actMin = capacity - min;
+            // var actMax = max - capacity;
+            // var actCapacity = (actMin > actMax) ? actMin : actMax;
 
             if (option['value'] && (parseInt(option['value']) == -1)) {
                 emptyKey = i;
@@ -110,11 +111,11 @@ function hideOptions(typeId, values, showDateTime) {
                 if (min && capacity && (capacity > 0) && (capacity >= min) && (capacity <= max)) {
                     for (j = 0; j < values.length; j++) {
                         if (values[j] == option.value) {
-                            if (!distance || (distance == 0) || (actDistance && (actDistance > 0) && (distance >= actDistance))) {
-                                distance = actDistance ? actDistance : distance;
-                                firstValueParam = values[j];
-                                foundValue = true;
-                            }
+                            // if (!distance || (distance == 0) || (actCapacity && (actCapacity > 0) && (distance >= actCapacity))) {
+                            //     distance = actCapacity ? actCapacity : distance;
+                            firstValueParam = values[j];
+                            foundValue = true;
+                            //}
                         }
                     }
                 } else {

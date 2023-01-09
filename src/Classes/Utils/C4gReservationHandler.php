@@ -930,14 +930,13 @@ class C4gReservationHandler
                 $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 0;
                 $capacity = $timeParams['actCapacity'] && $timeParams['actCapacity'] > 0 ? $timeParams['actCapacity'] : $desiredCapacity;
 
-                //ToDo check
                 if ( ($timeParams['actCapacity'] > 0) &&
                     (
                         ($object->getDesiredCapacity()[0] && ($timeParams['actCapacity'] < $object->getDesiredCapacity()[0])) ||
                         ($object->getDesiredCapacity()[1] && ($timeParams['actCapacity'] > $object->getDesiredCapacity()[1]))
                     )
                 ) {
-                    $timeParams['date'] = -1;
+                    continue;
                 }
 
                 $timeObjectParams = [
