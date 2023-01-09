@@ -137,7 +137,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         }
 
         $objects = [];
-        foreach ($reservationObjects as $reservationObject) {
+            foreach ($reservationObjects as $reservationObject) {
             $objects[] = array(
                 'id' => $reservationObject->getId(),
                 'name' => $reservationObject->getCaption(),

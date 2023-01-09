@@ -900,7 +900,7 @@ class C4gReservationHandler
             $periodType = $timeParams['type']['periodType'];
             $et = $timeParams['tsdate'];
             $endDate = $timeParams['tsdate']+86399;
-            foreach ($objectList as $object) {
+            foreach ($timeParams['objectList'] as $object) {
                 foreach ($object->getOpeningHours() as $key => $day) {
                     if (($day != -1) && ($key == $weekdayStr)) {
                         foreach ($day as $period) {
@@ -925,7 +925,7 @@ class C4gReservationHandler
                 $timeParams['tsdate'], $endDate, $timeParams['typeId'],
                 $timeParams['type']['reservationObjectType'], $timeParams['objectList']);
 
-            foreach ($objectList as $object) {
+            foreach ($timeParams['objectList'] as $object) {
                 $found = false;
                 $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 0;
                 $capacity = $timeParams['actCapacity'] && $timeParams['actCapacity'] > 0 ? $timeParams['actCapacity'] : $desiredCapacity;
@@ -1079,7 +1079,7 @@ class C4gReservationHandler
     public static function getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj) {
         $reasonLog = '';
         $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'], 'GMT')+$time;
-        $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'], 'GMT')+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']; //+1 ToDo Why?
+        $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'], 'GMT')+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']; //+1 ToDo Check Why?
         foreach ($timeObjectParams['exclusionPeriods'] as $excludePeriod) {
             if (C4gReservationDateChecker::isStampInPeriod($beginStamp,$excludePeriod['begin'],$excludePeriod['end'],0) ||
                 C4gReservationDateChecker::isStampInPeriod($endStamp,$excludePeriod['begin'],$excludePeriod['end'],1)) {

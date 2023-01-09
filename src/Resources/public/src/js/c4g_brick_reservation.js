@@ -110,7 +110,7 @@ function hideOptions(typeId, values, showDateTime) {
                 if (min && capacity && (capacity > 0) && (capacity >= min) && (capacity <= max)) {
                     for (j = 0; j < values.length; j++) {
                         if (values[j] == option.value) {
-                            if (!distance || (distance == 0) || (actDistance && (actDistance > 0) && (distance > actDistance))) {
+                            if (!distance || (distance == 0) || (actDistance && (actDistance > 0) && (distance >= actDistance))) {
                                 distance = actDistance ? actDistance : distance;
                                 firstValueParam = values[j];
                                 foundValue = true;
