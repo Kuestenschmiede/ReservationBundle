@@ -178,24 +178,37 @@ function hideOptions(typeId, values, showDateTime) {
                 var date = '';
                 var time = '';
 
-                var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+typeId);
-                if (dateFields) {
-                    for (k = 0; k < dateFields.length; k++) {
-                        var dateField = dateFields[k];
-                        if (dateField && dateField.value) {
-                            date = dateField.value;
-                            break;
-                        }
-                    }
-                }
-
                 var radioButtons = document.querySelectorAll('.reservation_time_button_'+typeId+' input[type = "radio"]:checked');
                 if (radioButtons && radioButtons[0]) {
+                    var begin =  radioButtons[0].getAttribute('data-stamp') ? parseInt( radioButtons[0].getAttribute('data-stamp')) : 0;
                     var labels = document.getElementsByClassName('c4g__form-check-label');
                     for (var k = 0; k < labels.length; k++) {
                         if (labels[k].htmlFor == radioButtons[0].id) {
                             time = labels[k].textContent;
                             break;
+                        }
+                    }
+
+                    var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+typeId);
+                    if (dateFields) {
+                        for (k = 0; k < dateFields.length; k++) {
+                            var dateField = dateFields[k];
+                            if (dateField && dateField.value) {
+                                if (begin >= 86400) {
+                                    //ToDo international
+                                    var pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+                                    var newDate = new Date(dateField.value.replace(pattern,'$3-$2-$1'));
+                                    newDate.setSeconds(newDate.getSeconds() + 86400);
+                                    let ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+                                    let mo = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+                                    let da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+                                    date = da+'.'+mo+'.'+ye;
+                                    dateField.value = date;
+                                } else {
+                                    date = dateField.value;
+                                }
+                                break;
+                            }
                         }
                     }
 
@@ -526,6 +539,7 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         var interval = times[key]['interval'];
         var time = times[key]['time'];
         var objects = times[key]['objects'];
+        var begin = times[key]['begin'];
         var percent = 0;
         var priority = 0;
         let value = '';
@@ -598,6 +612,7 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         }
         c4gFormCheckInput.setAttribute('data-object', objstr);
         c4gFormCheckInput.setAttribute("value", time+'#'+interval);
+        c4gFormCheckInput.setAttribute("data-stamp", begin);
         c4gFormCheckInput.style = "display: block;";
 
         if (disabled) {
