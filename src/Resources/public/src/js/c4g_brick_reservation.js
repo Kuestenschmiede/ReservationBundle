@@ -199,9 +199,8 @@ function hideOptions(typeId, values, showDateTime) {
                                     dateField.value = org;
                                 }
 
-                                if (begin >= 86400) {
-                                    //ToDo international
-
+                                //ToDo international
+                                if (begin >= 82800) {
                                     var pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
                                     var newDate = new Date(dateField.value.replace(pattern,'$3-$2-$1'));
                                     newDate.setSeconds(newDate.getSeconds() + 86400);
