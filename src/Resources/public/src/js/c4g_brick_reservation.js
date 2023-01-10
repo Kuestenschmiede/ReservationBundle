@@ -194,8 +194,14 @@ function hideOptions(typeId, values, showDateTime) {
                         for (k = 0; k < dateFields.length; k++) {
                             var dateField = dateFields[k];
                             if (dateField && dateField.value) {
+                                var org = dateField.getAttribute('data-org');
+                                if (org !== null) {
+                                    dateField.value = org;
+                                }
+
                                 if (begin >= 86400) {
                                     //ToDo international
+
                                     var pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
                                     var newDate = new Date(dateField.value.replace(pattern,'$3-$2-$1'));
                                     newDate.setSeconds(newDate.getSeconds() + 86400);
@@ -203,10 +209,12 @@ function hideOptions(typeId, values, showDateTime) {
                                     let mo = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
                                     let da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
                                     date = da+'.'+mo+'.'+ye;
+                                    dateField.setAttribute('data-org', dateField.value);
                                     dateField.value = date;
                                 } else {
                                     date = dateField.value;
                                 }
+
                                 break;
                             }
                         }
@@ -642,6 +650,16 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
     var duration = -1;
     var capacity = -1;
 
+    var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+additionalId);
+    if (dateFields) {
+        for (k = 0; k < dateFields.length; k++) {
+            var dateField = dateFields[k];
+            if (dateField) {
+                dateField.removeAttribute('data-org');
+            }
+        }
+    }
+
     var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
     if (objectId) {
         selectField.setAttribute('value',objectId);
@@ -673,6 +691,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
         date = date.replace("/", "~");
         date = date.replace("/", "~");
     }
+
 
     if (date && additionalId) {
         duration = duration ? duration : -1;
