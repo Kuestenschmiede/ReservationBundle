@@ -149,7 +149,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
 
         //location
         $organizer = '';
-        if ($arrChildRow && $arrChildRow['location']) {
+        if ($arrChildRow && $arrChildRow['organizer']) {
             $organizerResult = Database::getInstance()->prepare('SELECT name FROM tl_c4g_reservation_location WHERE id = '.$arrChildRow['organizer'])->execute()->fetchAssoc();
             $organizerName = $organizerResult['name'];
             if ($organizerName) {
