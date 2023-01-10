@@ -330,7 +330,7 @@ class C4gReservationHandler
      * @param $endTime
      * @return array|mixed
      */
-    private static function addTime($list, $time, $obj, $interval, $endTime = 0)
+    private static function addTime($list, $time, $obj, $interval, $endTime = 0, $nxtDay = false)
     {
         $clock = '';
 
@@ -363,22 +363,27 @@ class C4gReservationHandler
             $mergedTime = true;
         }
 
+        $beginStamp = $time;
+        if ($nxtDay) {
+            $beginStamp+=86400;
+        }
+
         if ($obj && ($obj['id'] == -1)) {
             if ($withEndTimes && $interval) {
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
                 if (!$mergedTime) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp);
             } else {
                 $key = $time.'#'.$interval;
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj]);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj], 'begin' => $beginStamp);
             }
         } else {
             if ($withEndTimes && $interval) {
@@ -386,16 +391,16 @@ class C4gReservationHandler
                 if (!$mergedTime) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time + $interval).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
                 if (!$mergedTime) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj]);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp);
             } else {
                 $key = $time.'#'.$interval;
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj]);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj], 'begin' => $beginStamp);
             }
         }
 
@@ -676,6 +681,7 @@ class C4gReservationHandler
     private static function getReservationTimesDefault($timeParams, $timeObjectParams, $period) {
         $time_begin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
         $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
+
         if (($time_begin !== false) && ($time_end !== false)) {
             $time = $time_begin;
 
@@ -687,6 +693,7 @@ class C4gReservationHandler
             }
             $timeArray = [];
             while ($time <= $periodEnd) {
+                $nxtDay = false;
                 if ($timeParams['nowDate'] && ($timeParams['nowDate'] == $timeParams['tsdate']) && ($time < $timeParams['nowTime'])) {
                     $time = $time + $timeObjectParams['interval'];
                     continue;
@@ -696,12 +703,14 @@ class C4gReservationHandler
                     if ($periodChanged && ($time >= 86400)) {
                         $timeParams['tsdate'] += 86400;
                         $periodChanged = false;
+                        $nxtDay = true;
                     }
 
                     $realTime = $time;
-                    if ($time >= 86400) {
+                    if ($nxtDay) {
                         $realTime = $time - 86400;
                     }
+
                     $endTime = $realTime + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'];
 
                     if ($timeParams['date'] && $timeParams['tsdate']) {
@@ -736,7 +745,7 @@ class C4gReservationHandler
                         $checkTime = $endTime;
                     }
 
-                    $timeParams['result'] = self::getTimeResult($realTime, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj);
+                    $timeParams['result'] = self::getTimeResult($realTime, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj, $nxtDay);
                 }
 
                 $time = $time + $timeObjectParams['interval'];
@@ -1057,7 +1066,7 @@ class C4gReservationHandler
             }
 
             if ($timeParams['result'] && is_array($timeParams['result']) && (count($timeParams['result']) > 0)) {
-                return $timeParams['result']; //ToDo Sorting nicht sinnvoll. So landen Zeiten nach Mitternacht vorne (ArrayHelper::sortArrayByFields($result,['name' => SORT_ASC]);)
+                return ArrayHelper::sortArrayByFields($timeParams['result'], ['begin'  => SORT_ASC, 'name'  => SORT_ASC]);
             } else {
                 return [];
             }
@@ -1075,7 +1084,7 @@ class C4gReservationHandler
      * @param $timeObj
      * @return array|mixed
      */
-    public static function getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj) {
+    public static function getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj, $nxtDay=false) {
         $reasonLog = '';
         $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'], 'GMT')+$time;
         $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'], 'GMT')+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']; //+1 ToDo Check Why?
@@ -1108,9 +1117,9 @@ class C4gReservationHandler
                 $timeObj['id'] = $timeObjectParams['object']->getId();
             }
 
-            $timeParams['result'] = self::addTime($timeParams, $time, $timeObj, $endTimeInterval);
+            $timeParams['result'] = self::addTime($timeParams, $time, $timeObj, $endTimeInterval, 0, $nxtDay);
         } else if ($timeParams['date'] === -1) {
-            $timeParams['result'] = self::addTime($timeParams, $time, $timeObj, $endTimeInterval);
+            $timeParams['result'] = self::addTime($timeParams, $time, $timeObj, $endTimeInterval, 0, $nxtDay);
         }
 
         return $timeParams['result'];
