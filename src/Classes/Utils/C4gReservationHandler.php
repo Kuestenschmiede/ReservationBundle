@@ -748,7 +748,7 @@ class C4gReservationHandler
                     $timeParams['result'] = self::getTimeResult($realTime, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj, $nxtDay);
                 }
 
-                $time = $time + $timeObjectParams['interval'];
+                $time = $time + $timeObjectParams['defaultInterval'];
             }
         }
 
@@ -953,8 +953,9 @@ class C4gReservationHandler
                     'timeArray' => [],
                     'quantity' => $object->getQuantity() ?  $object->getQuantity() : 1,
                     'capacity' => $capacity,
-                    'interval' => 0, //default interval
+                    'interval' => 0, //act interval
                     'durationDiff' => 0, //interval with additional time
+                    'timeInterval' => 0, //default interval
                     'severalBookings' => 0,
                     'maxObjects' => 0,
                     'exclusionPeriods' => []
@@ -990,44 +991,36 @@ class C4gReservationHandler
                 }
 
                 $durationDiff = $timeObjectParams['object']->getDuration() ? $timeObjectParams['object']->getDuration() - $timeObjectParams['object']->getTimeInterval() : 0;
+                $defaultInterval = $timeObjectParams['object']->getTimeInterval();
 
                 if ($timeParams['actDuration'] >= 1) //actDuration from client can be -1 (no input)
                 {
-                    switch ($timeParams['type']['periodType']) {
-                        case 'minute':
-                            $timeObjectParams['object']->setTimeInterval($timeParams['actDuration']);
-                            break;
-                        case 'hour':
-                            $timeObjectParams['object']->setTimeInterval($timeParams['actDuration']);
-                            break;
-                        case 'day':
-                            $timeObjectParams['object']->setTimeInterval($timeParams['actDuration']);
-                            break;
-                        case 'week':
-                            $timeObjectParams['object']->setTimeInterval($timeParams['actDuration']);
-                            break;
-                        default: '';
-                    }
+                    $timeInterval = $timeParams['actDuration'];
+                } else {
+                    $timeInterval = $timeObjectParams['object']->getTimeinterval();
                 }
 
                 $timeParams['calculator']->loadReservations($timeParams['type'], $timeObjectParams['object']);
-                $timeInterval = $timeObjectParams['object']->getTimeinterval();
                 $duration = $timeObjectParams['object']->getDuration();
 
                 switch ($timeParams['type']['periodType']) {
                     case 'minute':
+                        $timeObjectParams['defaultInterval'] = $defaultInterval * 60;
                         $timeObjectParams['interval'] = $timeInterval * 60;
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 60 : 0;
                         break;
                     case 'hour':
+                        $timeObjectParams['defaultInterval'] = $defaultInterval * 3600;
                         $timeObjectParams['interval'] = $timeInterval * 3600;
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 3600 : 0;
                         break;
                     case 'day':
+                        $timeObjectParams['defaultInterval'] = $defaultInterval * 86400;
                         $timeObjectParams['interval'] = $timeInterval * 86400;
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 86400 : 0;
                         break;
                     case 'week':
+                        $timeObjectParams['defaultInterval'] = $defaultInterval * 604800;
                         $timeObjectParams['interval'] = $timeInterval * 604800;
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 604800 : 0;
                         break;
@@ -1037,7 +1030,7 @@ class C4gReservationHandler
                 $timeObjectParams['severalBookings'] = !$timeParams['type']['severalBookings'] ? 1 : 0;
                 $timeObjectParams['maxObjects'] = $timeObjectParams['quantity'] ?: $timeObjectParams['severalBookings'];
 
-                if ($timeObjectParams['interval'] && ($timeObjectParams['interval'] > 0)) {
+                if ($timeObjectParams['defaultInterval'] && ($timeObjectParams['defaultInterval'] > 0)) {
                     foreach ($timeObjectParams['object']->getOpeningHours() as $key => $day) {
                         if (($day != -1) && ($key == $weekdayStr)) {
                             foreach ($day as $period) {
