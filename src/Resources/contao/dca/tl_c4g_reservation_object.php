@@ -20,7 +20,7 @@ use Contao\CalendarBundle\Security\ContaoCalendarPermissions;
 
 
 
-$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id';
+$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -754,6 +754,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'eval'                    => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50'),
             'sql'                     => "smallint(3) NOT NULL default 365"
         ),
+
+        'maxBeginTime' => [
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['maxBeginTime'],
+            'default'                 => '72000', //22 Uhr
+            'exclude'                 => true,
+            'inputType'               => 'text',
+            'flag'                    => 8,
+            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
+            'sql'                     => "varchar(10) default '72000'" //22 Uhr
+        ],
 
         'description' => array (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['description'],

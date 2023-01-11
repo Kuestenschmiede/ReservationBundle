@@ -31,6 +31,7 @@ class C4gReservationFrontendObject
     private $weekday_exclusion = [];
     private $min_reservation_day = '1';
     private $max_reservation_day = '365';
+    private $maxBeginTime = '72000';
     private $desiredCapacity = [];
     private $beginDate = 0;
     private $beginTime = 0;
@@ -618,4 +619,21 @@ class C4gReservationFrontendObject
     {
         $this->allTypesEvents = $allTypesEvents;
     }
+
+    /**
+     * @return string
+     */
+    public function getMaxBeginTime(): string
+    {
+        return $this->maxBeginTime;
+    }
+
+    /**
+     * @param string $maxBeginTime
+     */
+    public function setMaxBeginTime(string $maxBeginTime): void
+    {
+        $this->maxBeginTime = $maxBeginTime;
+    }
+
 }

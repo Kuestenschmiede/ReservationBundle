@@ -48,6 +48,7 @@ $GLOBALS['TL_LANG'][$str]['date_exclusion'] = array("", "");
 $GLOBALS['TL_LANG'][$str]['date_exclusion_end'] = array("", "");
 $GLOBALS['TL_LANG'][$str]['min_reservation_day'] = array("Frühester Reservierungstermin (in Tagen)", "Heute + wie viele Tage?");
 $GLOBALS['TL_LANG'][$str]['max_reservation_day'] = array("Spätester Reservierungstermin (in Tagen)", "Heute + wie viele Tage?");
+$GLOBALS['TL_LANG'][$str]['maxBeginTime'] = array("Spätester Reservierungsbeginn (Uhrzeit)", "Bis zu welcher Uhrzeit kann gebucht werden. Bsp. Veranstaltungsort: Es können Veranstaltungen bis 2 Uhr Nachts gebucht werden. Die Veranstaltungen sollen aber spätestens um 21 Uhr starten.");
 $GLOBALS['TL_LANG'][$str]['periodType'] = array("Zeitart","Wählen Sie aus was für eine Art von Zeitintervall genutzt werden soll.");
 $GLOBALS['TL_LANG'][$str]['event_id'] = array("Eventauswahl","");
 $GLOBALS['TL_LANG'][$str]['event_dayBegin'] = array("Eventbeginn","Am welchen Tag startet das Event.");

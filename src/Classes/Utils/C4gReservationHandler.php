@@ -695,8 +695,12 @@ class C4gReservationHandler
             while ($time <= $periodEnd) {
                 $nxtDay = false;
                 if ($timeParams['nowDate'] && ($timeParams['nowDate'] == $timeParams['tsdate']) && ($time < $timeParams['nowTime'])) {
-                    $time = $time + $timeObjectParams['interval'];
+                    $time = $time + $timeObjectParams['defaultInterval'];
                     continue;
+                }
+
+                if ($time > $timeObjectParams['maxBeginTime']) {
+                    break;
                 }
 
                 if ($timeParams['type']) {
@@ -774,6 +778,15 @@ class C4gReservationHandler
                 if ($time && $timeParams['type']) {
                     $endTime = $time + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'];
 
+                    if ($timeParams['nowDate'] && ($timeParams['nowDate'] == $timeParams['tsdate']) && ($time < $timeParams['nowTime'])) {
+                        $time = $time + $timeObjectParams['defaultInterval'];
+                        continue;
+                    }
+
+                    if ($time > $timeObjectParams['maxBeginTime']) {
+                        break;
+                    }
+
                     if ($timeParams['date'] && $timeParams['tsdate']) {
                         $timeParams['calculator']->calculate(
                             $timeParams['tsdate'],
@@ -833,7 +846,7 @@ class C4gReservationHandler
                     $timeParams['result'] = self::getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj);
                 }
 
-                $time = $time + $timeObjectParams['defaultInterval']; //ToDo test
+                $time = $time + $timeObjectParams['defaultInterval'];
             }
         }
 
@@ -958,7 +971,8 @@ class C4gReservationHandler
                     'timeInterval' => 0, //default interval
                     'severalBookings' => 0,
                     'maxObjects' => 0,
-                    'exclusionPeriods' => []
+                    'exclusionPeriods' => [],
+                    'maxBeginTime' => $object->getMaxBeginTime()
                 ];
 
                 if (($timeParams['date'] !== -1) && $timeParams['tsdate']) {
@@ -1710,6 +1724,7 @@ class C4gReservationHandler
                     $frontendObject->setDuration($object['duration'] ?: $cloneObject['duration']);
                     $frontendObject->setMinReservationDay($object['min_reservation_day'] ?: $cloneObject['min_reservation_day']);
                     $frontendObject->setMaxReservationDay($object['max_reservation_day'] ?: $cloneObject['max_reservation_day']);
+                    $frontendObject->setMaxBeginTime($object['maxBeginTime'] ?: $cloneObject['maxBeginTime']);
                     $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'] ?: $cloneObject['desiredCapacityMin'], $object['desiredCapacityMax'] ?: $cloneObject['desiredCapacityMax']]);
                     $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: intval($cloneObject['allTypesQuantity']));
                     $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: intval($cloneObject['allTypesValidity']));
@@ -1720,6 +1735,7 @@ class C4gReservationHandler
                     $frontendObject->setDuration($object['duration']);
                     $frontendObject->setMinReservationDay($object['min_reservation_day']);
                     $frontendObject->setMaxReservationDay($object['max_reservation_day']);
+                    $frontendObject->setMaxBeginTime($object['maxBeginTime'] ?: 72000);
                     $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'], $object['desiredCapacityMax']]);
                     $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: 0);
                     $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: 0);

@@ -137,4 +137,9 @@ class C4gReservationDateCheckerTest extends ContaoTestCase
 
     }
 
+    //ToDo
+    public function testAddTime(){
+        //C4gReservationHandler::addTime();
+    }
+
 }
