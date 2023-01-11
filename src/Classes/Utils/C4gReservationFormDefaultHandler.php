@@ -95,7 +95,6 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
             $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
-
             $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
             if ($commaDates) {
                 $commaDates = $commaDates['dates'];
@@ -172,10 +171,10 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setFormField(true);
         $reservationBeginTimeField->setDatabaseField(true);
         $reservationBeginTimeField->setOptions($initialBookingTime || $options ? $options : []);
-        $reservationBeginTimeField->setCallOnChange(true);
-        $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
+        $reservationBeginTimeField->setCallOnChange(false);
+//        $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
         $reservationBeginTimeField->setMandatory(false);
-        $reservationBeginTimeField->setInitialValue($initialBookingTime);
+        $reservationBeginTimeField->setInitialValue($initialBookingTime ?: $this->initialValues->getTime());
         $reservationBeginTimeField->setSort(false);
         $reservationBeginTimeField->setCondition(array($condition));
         $reservationBeginTimeField->setAdditionalID($listType['id']);

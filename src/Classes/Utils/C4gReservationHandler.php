@@ -700,16 +700,16 @@ class C4gReservationHandler
                 }
 
                 if ($timeParams['type']) {
-                    if ($periodChanged && ($time >= 86400)) {
-                        $timeParams['tsdate'] += 86400;
-                        $periodChanged = false;
-                        $nxtDay = true;
-                    }
-
+//                    if ($periodChanged && ($time >= 86400)) {
+//                        $timeParams['tsdate'] += 86400;
+//                        $periodChanged = false;
+//                        $nxtDay = true;
+//                    }
+//
                     $realTime = $time;
-                    if ($nxtDay) {
-                        $realTime = $time - 86400;
-                    }
+//                    if ($nxtDay) {
+//                        $realTime = $time - 86400;
+//                    }
 
                     $endTime = $realTime + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'];
 
@@ -758,6 +758,13 @@ class C4gReservationHandler
     private static function getReservationTimesMultipleDays($timeParams, $timeObjectParams, $period) {
         $time_begin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
         $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
+
+        //ToDo check arrival and departure times
+        $durationInterval = $timeObjectParams['interval']+$timeObjectParams['durationDiff'];
+        if ($time_end >= $time_begin) {
+            $durationInterval = $durationInterval - 86400; //ToDo first day counts
+        }
+
         if (($time_begin !== false) && ($time_end !== false)) {
             $time = $time_begin;
             $periodEnd = $time_end;
@@ -799,13 +806,6 @@ class C4gReservationHandler
                         $checkTime = $endTime;
                     }
 
-                    $durationInterval = $timeObjectParams['interval']+$timeObjectParams['durationDiff'];
-
-                    //ToDo Test
-                    if ($time_end >= $time_begin) {
-                        $durationInterval = $durationInterval - 86400; //ToDo first day counts
-                    }
-
                     if ($timeParams['tsdate']) {
                         $timeObj['mergedTime'] = C4gReservationDateChecker::mergeDateWithTime($timeParams['tsdate'], $time, 'GMT');
 
@@ -833,7 +833,7 @@ class C4gReservationHandler
                     $timeParams['result'] = self::getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj);
                 }
 
-                $time = $time + $timeObjectParams['interval'];
+                $time = $time + $timeObjectParams['defaultInterval']; //ToDo test
             }
         }
 
@@ -993,7 +993,7 @@ class C4gReservationHandler
                 $durationDiff = $timeObjectParams['object']->getDuration() ? $timeObjectParams['object']->getDuration() - $timeObjectParams['object']->getTimeInterval() : 0;
                 $defaultInterval = $timeObjectParams['object']->getTimeInterval();
 
-                if ($timeParams['actDuration'] >= 1) //actDuration from client can be -1 (no input)
+                if (intval($timeParams['actDuration']) >= 1) //actDuration from client can be -1 (no input)
                 {
                     $timeInterval = $timeParams['actDuration'];
                 } else {
@@ -1001,7 +1001,6 @@ class C4gReservationHandler
                 }
 
                 $timeParams['calculator']->loadReservations($timeParams['type'], $timeObjectParams['object']);
-                $duration = $timeObjectParams['object']->getDuration();
 
                 switch ($timeParams['type']['periodType']) {
                     case 'minute':

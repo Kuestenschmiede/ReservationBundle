@@ -1641,7 +1641,7 @@ class C4gReservationController extends C4GBaseController
                                 $newValue = substr($value,0, strpos($value, '#')); //remove frontend duration
                             }
 
-                            $beginTime = $newValue ?: $value;
+                            $beginTime = is_numeric($newValue) ? intval($newValue) : $value;
                             $timeKey = $key;
                             break;
                         }
@@ -1655,7 +1655,7 @@ class C4gReservationController extends C4GBaseController
                                 $newValue = substr($value,0, strpos($value, '#')); //remove frontend duration
                             }
 
-                            $beginTime = $newValue ?: $value;
+                            $beginTime = is_numeric($newValue) ? intval($newValue) : $value;
                             $timeKey = $key;
                             break;
                         }
