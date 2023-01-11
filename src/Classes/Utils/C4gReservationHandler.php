@@ -699,7 +699,7 @@ class C4gReservationHandler
                     continue;
                 }
 
-                if ($time > $timeObjectParams['maxBeginTime']) {
+                if ($timeObjectParams['maxBeginTime'] && ($time > $timeObjectParams['maxBeginTime'])) {
                     break;
                 }
 
@@ -1735,7 +1735,7 @@ class C4gReservationHandler
                     $frontendObject->setDuration($object['duration']);
                     $frontendObject->setMinReservationDay($object['min_reservation_day']);
                     $frontendObject->setMaxReservationDay($object['max_reservation_day']);
-                    $frontendObject->setMaxBeginTime($object['maxBeginTime'] ?: 72000);
+                    $frontendObject->setMaxBeginTime($object['maxBeginTime'] ?: '');
                     $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'], $object['desiredCapacityMax']]);
                     $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: 0);
                     $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: 0);

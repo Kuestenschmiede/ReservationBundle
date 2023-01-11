@@ -31,7 +31,7 @@ class C4gReservationFrontendObject
     private $weekday_exclusion = [];
     private $min_reservation_day = '1';
     private $max_reservation_day = '365';
-    private $maxBeginTime = '72000';
+    private $maxBeginTime = '';
     private $desiredCapacity = [];
     private $beginDate = 0;
     private $beginTime = 0;

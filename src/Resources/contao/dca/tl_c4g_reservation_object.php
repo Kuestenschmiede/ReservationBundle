@@ -757,12 +757,12 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'maxBeginTime' => [
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['maxBeginTime'],
-            'default'                 => '72000', //22 Uhr
+            'default'                 => '',
             'exclude'                 => true,
             'inputType'               => 'text',
             'flag'                    => 8,
             'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-            'sql'                     => "varchar(10) default '72000'" //22 Uhr
+            'sql'                     => "varchar(10) default ''"
         ],
 
         'description' => array (
