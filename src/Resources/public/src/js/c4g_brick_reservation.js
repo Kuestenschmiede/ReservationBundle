@@ -812,21 +812,24 @@ function checkEventFields() {
     var selectField = document.querySelectorAll('#c4g_reservation_object_event_' + typeId)[0];
     var eventData = document.getElementsByClassName('eventdata');
     if (eventData) {
-
         eventData.hidden = true;
     }
 
     if (selectField && selectField != 'hidden') {
-        document.getElementsByClassName("reservation-id").hidden != true;
+        //document.getElementsByClassName("reservation-id").hidden != true;
         for (i = 0; i < selectField.length; i++) {
             if (selectField[i].value) {
                 var additional = -1;
                 if (selectField[i].value) {
                     additional = typeId.toString() + "-22" + selectField[i].value.toString();
-                    document.querySelectorAll('.eventdata_' + additional).visibility = "hidden";
-                    document.querySelectorAll('.eventdata_' + additional)[i].childNodes[i].visibility = "hidden";
-                    document.querySelectorAll('.eventdata_' + additional).hidden = true;
-                    document.querySelectorAll('.eventdata_' + additional)[i].childNodes[i].hidden = true;
+
+                    var eventDataWithType = document.querySelectorAll('.eventdata_' + additional);
+                    if (eventDataWithType) {
+                        eventDataWithType.visibility = "hidden";
+                        //eventDataWithType[i].childNodes[i].visibility = "hidden";
+                        eventDataWithType.hidden = true;
+                        //eventDataWithType[i].childNodes[i].hidden = true;
+                    }
                 }
 
                 var dateFields = document.getElementsByClassName('begindate-event');
