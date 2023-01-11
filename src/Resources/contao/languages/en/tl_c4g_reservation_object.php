@@ -47,6 +47,7 @@ $GLOBALS['TL_LANG'][$str]['days_exclusion'] = array("Exclude Period", "This allo
 $GLOBALS['TL_LANG'][$str]['date_exclusion'] = array("", "");
 $GLOBALS['TL_LANG'][$str]['min_reservation_day'] = array("Earliest reservation date (in days)", "Today + how many days?");
 $GLOBALS['TL_LANG'][$str]['max_reservation_day'] = array("Latest reservation date (in days)", "Today + how many days?");
+$GLOBALS['TL_LANG'][$str]['maxBeginTime'] = array("Latest reservation start (time)", "Until what time can be booked. Ex. venue: Events can be booked until 2 am. However, the events should start at 9 pm at the latest.");
 $GLOBALS['TL_LANG'][$str]['periodType'] = array("Time type", "Select what kind of time interval should be used.");
 $GLOBALS['TL_LANG'][$str]['event_id'] = array("Event selection","");
 $GLOBALS['TL_LANG'][$str]['event_dayBegin'] = array("Event start", "On which day the event starts.");
