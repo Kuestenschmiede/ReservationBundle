@@ -783,7 +783,7 @@ class C4gReservationHandler
                         continue;
                     }
 
-                    if ($time > $timeObjectParams['maxBeginTime']) {
+                    if ($timeObjectParams['maxBeginTime'] && ($time > $timeObjectParams['maxBeginTime'])) {
                         break;
                     }
 
