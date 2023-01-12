@@ -6,6 +6,7 @@ namespace con4gis\ReservationBundle\Classes\Utils;
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
+use con4gis\ExportBundle\Classes\Events\ExportLoadDataEvent;
 use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
@@ -686,10 +687,10 @@ class C4gReservationHandler
             $time = $time_begin;
 
             $periodEnd = $time_end - $timeObjectParams['interval'];
-            $periodChanged = false;
+//            $periodChanged = false;
             if ($time_end <= $time) {
                 $periodEnd += 86400;
-                $periodChanged = true;
+//                $periodChanged = true;
             }
             $timeArray = [];
             while ($time <= $periodEnd) {
@@ -704,16 +705,16 @@ class C4gReservationHandler
                 }
 
                 if ($timeParams['type']) {
-//                    if ($periodChanged && ($time >= 86400)) {
-//                        $timeParams['tsdate'] += 86400;
-//                        $periodChanged = false;
-//                        $nxtDay = true;
-//                    }
-//
+                    if ($periodChanged && ($time >= 86400)) {
+                        $timeParams['tsdate'] += 86400;
+                        $periodChanged = false;
+                        $nxtDay = true;
+                    }
+
                     $realTime = $time;
-//                    if ($nxtDay) {
-//                        $realTime = $time - 86400;
-//                    }
+                    if ($nxtDay) {
+                        $realTime = $time - 86400;
+                    }
 
                     $endTime = $realTime + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'];
 
@@ -921,21 +922,28 @@ class C4gReservationHandler
             $weekdayStr = C4gReservationDateChecker::getWeekdayStr($timeParams['weekday']);
             $periodType = $timeParams['type']['periodType'];
             $et = $timeParams['tsdate'];
-            $endDate = $timeParams['tsdate']+86399;
+            $endDate = $et+86399;
             foreach ($timeParams['objectList'] as $object) {
                 foreach ($object->getOpeningHours() as $key => $day) {
                     if (($day != -1) && ($key == $weekdayStr)) {
                         foreach ($day as $period) {
                             if ($timeParams['date'] !== -1) {
                                 $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
+                                $time_begin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
 
-                                if ($time_end !== false) {
+                                if ($time_end !== false && $time_begin !== false) {
                                     $periodEnd = $time_end;
-                                    if ($periodEnd <= $period['time_begin']) {
+                                    if ($periodEnd < $period['time_begin']) {
                                         $periodEnd += 86400;
                                     }
-                                    $endDate = (($timeParams['tsdate'] + $periodEnd) > $endDate) ? $timeParams['tsdate'] + $periodEnd : $endDate;
-                                    $endDate = C4gReservationDateChecker::getBeginOfDate($endDate); //ToDo better solution
+
+                                    if ($period['time_end'] < $period['time_begin']){
+                                        $endDate = C4gReservationDateChecker::getEndOfDate($endDate); //ToDo better solution
+                                        $endDate = (($timeParams['tsdate'] + $periodEnd) > $endDate) ? $timeParams['tsdate'] + $periodEnd : $endDate;
+                                    } else {
+                                        $endDate = C4gReservationDateChecker::getBeginOfDate($endDate); //ToDo better solution
+                                        $endDate = (($timeParams['tsdate'] + $periodEnd) > $endDate) ? $timeParams['tsdate'] + $periodEnd : $endDate;
+                                    }
                                 }
                             }
                         }
