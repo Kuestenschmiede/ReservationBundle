@@ -55,7 +55,7 @@ class C4gReservationDateChecker
         $result = $date ?: 0;
         if ($date && $time) {
             $beginOfDate = self::getBeginOfDate($date,$timeZone ?: $GLOBALS['TL_CONFIG']['timeZone']);
-            if ($time > 86400) {
+            if ($time > 170000) { //2 days
                 $result = $time;
             } else {
                 $result = $beginOfDate+$time;
@@ -79,6 +79,15 @@ class C4gReservationDateChecker
         }
 
         return $time;
+    }
+
+    public static function getStampAsTime($stamp) {
+        if ($stamp) {
+            $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], $stamp), Date::getFormatFromRgxp('time'));
+            return $objDate->tstamp;
+        } else {
+            return $stamp;
+        }
     }
 
     public static function getEndOfDate($time, $timeZone = false)

@@ -704,16 +704,16 @@ class C4gReservationHandler
                 }
 
                 if ($timeParams['type']) {
-//                    if ($periodChanged && ($time >= 86400)) {
-//                        $timeParams['tsdate'] += 86400;
-//                        $periodChanged = false;
-//                        $nxtDay = true;
-//                    }
-//
+                    if ($periodChanged && ($time >= 86400)) {
+                        $timeParams['tsdate'] += 86400;
+                        $periodChanged = false;
+                        $nxtDay = true;
+                    }
+
                     $realTime = $time;
-//                    if ($nxtDay) {
-//                        $realTime = $time - 86400;
-//                    }
+                    if ($nxtDay) {
+                        $realTime = $time - 86400;
+                    }
 
                     $endTime = $realTime + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'];
 
@@ -920,22 +920,23 @@ class C4gReservationHandler
 
             $weekdayStr = C4gReservationDateChecker::getWeekdayStr($timeParams['weekday']);
             $periodType = $timeParams['type']['periodType'];
-            $et = $timeParams['tsdate'];
-            $endDate = $timeParams['tsdate']+86399;
+
+            $beginDate = $timeParams['tsdate'];
+            $endDate = $timeParams['tsdate'];
             foreach ($timeParams['objectList'] as $object) {
                 foreach ($object->getOpeningHours() as $key => $day) {
                     if (($day != -1) && ($key == $weekdayStr)) {
                         foreach ($day as $period) {
                             if ($timeParams['date'] !== -1) {
-                                $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
+                                $timeBegin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
+                                $timeEnd = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
 
-                                if ($time_end !== false) {
-                                    $periodEnd = $time_end;
-                                    if ($periodEnd <= $period['time_begin']) {
+                                if (($timeEnd !== false) && ($timeBegin !== false)) {
+                                    $periodEnd = $timeEnd;
+                                    if ($periodEnd <= $timeBegin) {
                                         $periodEnd += 86400;
                                     }
-                                    $endDate = (($timeParams['tsdate'] + $periodEnd) > $endDate) ? $timeParams['tsdate'] + $periodEnd : $endDate;
-                                    $endDate = C4gReservationDateChecker::getBeginOfDate($endDate); //ToDo better solution
+                                    $endDate = (($beginDate + $periodEnd) > $endDate) ? $beginDate + $periodEnd : $endDate;
                                 }
                             }
                         }
@@ -944,7 +945,7 @@ class C4gReservationHandler
             }
 
             $timeParams['calculator'] = new C4gReservationCalculator(
-                $timeParams['tsdate'], $endDate, $timeParams['typeId'],
+                $beginDate, $endDate, $timeParams['typeId'],
                 $timeParams['type']['reservationObjectType'], $timeParams['objectList']);
 
             foreach ($timeParams['objectList'] as $object) {

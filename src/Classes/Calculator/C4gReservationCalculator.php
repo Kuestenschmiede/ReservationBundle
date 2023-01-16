@@ -30,10 +30,11 @@ class C4gReservationCalculator
      * @param $type
      * @param int $objectTypeId
      */
-    public function __construct($date, $endDate, $typeId, $objectTypeId, $objectList, $testResults = [])
+    public function __construct($startDay, $endDay, $typeId, $objectTypeId, $objectList, $testResults = [])
     {
-        $beginDate = $date;
-        $endDate = $endDate;
+        $beginDate = C4gReservationDateChecker::getBeginOfDate($startDay);
+        $endDate = C4gReservationDateChecker::getEndOfDate($endDay);
+
         $this->date = $beginDate;
         $this->objectTypeId = $objectTypeId;
 
@@ -41,7 +42,7 @@ class C4gReservationCalculator
             $this->reservations[$date][$objectTypeId] = $testResults;
         } else {
             $database = Database::getInstance();
-            $set = [$beginDate, $beginDate, $endDate, $endDate, $typeId, $objectTypeId];
+
 
             $objStr = '';
             $all = false;
@@ -53,12 +54,14 @@ class C4gReservationCalculator
             $this->objectListString = $objStr;
 
             if ($all) {
+                $set = [$beginDate, $endDate, $beginDate, $endDate, $objectTypeId];
                 $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "((? >= `beginDate` AND ? <= `endDate`) OR (? >= `beginDate` AND ? <= `endDate`)) IN(1,3) AND NOT `cancellation`='1'")
+                    "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
                     ->execute($set)->fetchAllAssoc();
             } else {
+                $set = [$beginDate, $endDate, $beginDate, $endDate, $typeId, $objectTypeId];
                 $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "((? >= `beginDate` AND ? <= `endDate`) OR (? >= `beginDate` AND ? <= `endDate`)) AND `reservation_type` = ? AND `reservationObjectType` = ? AND `reservation_object` IN (".$objStr.") AND NOT `cancellation`='1'")
+                    "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) AND ? <= `endDate`) AND `reservation_type` = ? AND `reservationObjectType` = ? AND `reservation_object` IN (".$objStr.") AND NOT `cancellation`='1'")
                     ->execute($set)->fetchAllAssoc();
             }
 
@@ -153,8 +156,8 @@ class C4gReservationCalculator
     {
         $objectId = $object->getId();
         $reservationList = [];
-        $firstDate = C4gReservationDateChecker::getBeginOfDate($date, 'GMT');
-        $nextDate = C4gReservationDateChecker::getBeginOfDate($date+86400, 'GMT');
+        $firstDate = C4gReservationDateChecker::getBeginOfDate($date);
+        $nextDate = $firstDate+86400;
 
         if ($this->resultList) {
             foreach ($this->resultList as $reservation) {
@@ -168,13 +171,34 @@ class C4gReservationCalculator
                 }
 
                 $timeBegin = $firstDate+$time;
+                $timeBeginDb = $reservation['beginDate']+C4gReservationDateChecker::getStampAsTime($reservation['beginTime']);
 
-                //ToDo multiple days
-                $timeEnd = $endTime > 86400 ? $nextDate+($endTime-86400) : $firstDate+$endTime;
-                $timeBeginDb = C4gReservationDateChecker::getBeginOfDate($reservation['beginDate'], 'GMT')+$reservation['beginTime'];
-                $timeEndDb = C4gReservationDateChecker::getBeginOfDate($reservation['endDate'], 'GMT')+$reservation['endTime'];
+                if ($endTime >= 86400) {
+                    $endTime = ($endTime-86400);
+                }
+
+                $endTime = C4gReservationDateChecker::getStampAsTime($endTime);
+
+                if ($time > $endTime) {
+                    $timeEnd = $nextDate+$endTime;
+                } else {
+                    $timeEnd = $firstDate+$endTime;
+                }
+
+                $dbBeginTime = C4gReservationDateChecker::getStampAsTime($reservation['beginTime']);
+                $dbEndTime = C4gReservationDateChecker::getStampAsTime($reservation['endTime']);
+                if (($reservation['beginDate'] == $reservation['endDate']) && ($dbBeginTime > $dbEndTime)) {
+                   $timeEndDb = $reservation['endDate']+(86400+$dbEndTime);
+                } else {
+                   $timeEndDb = $reservation['endDate']+$dbEndTime;
+                }
 
                 /* for testing */
+                $realBeginTimeDb = date($GLOBALS['TL_CONFIG']['datimFormat'], $reservation['beginTime']);
+                $realEndTimeDb   = date($GLOBALS['TL_CONFIG']['datimFormat'], $reservation['endTime']);
+                $realBeginDateDb = date($GLOBALS['TL_CONFIG']['datimFormat'], $reservation['beginDate']);
+                $realEndDateDb   = date($GLOBALS['TL_CONFIG']['datimFormat'], $reservation['endDate']);
+
                 $realBegin = date($GLOBALS['TL_CONFIG']['datimFormat'], $timeBegin);
                 $realEnd   = date($GLOBALS['TL_CONFIG']['datimFormat'], $timeEnd);
                 $realBeginDb = date($GLOBALS['TL_CONFIG']['datimFormat'], $timeBeginDb);
@@ -183,7 +207,7 @@ class C4gReservationCalculator
                 if (C4gReservationDateChecker::isStampInPeriod($timeBegin, $timeBeginDb, $timeEndDb) ||
                     C4gReservationDateChecker::isStampInPeriod($timeEnd, $timeBeginDb, $timeEndDb, 1) ||
                     C4gReservationDateChecker::isStampInPeriod($timeBeginDb, $timeBegin, $timeEnd) ||
-                    C4gReservationDateChecker::isStampInPeriod($timeEndDb, $timeBegin, $timeEnd,1)) {
+                    C4gReservationDateChecker::isStampInPeriod($timeEndDb, $timeBegin, $timeEnd, 1)) {
                     $reservationList[] = $reservation;
                 }
             }
