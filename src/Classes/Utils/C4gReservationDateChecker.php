@@ -70,6 +70,15 @@ class C4gReservationDateChecker
         return self::mergeDateWithTime($date, $time);
     }
 
+    /**
+     * @return void
+     */
+    public static function getCESDiffToGMT($stamp) {
+        $timezone = timezone_open($GLOBALS['TL_CONFIG']['timeZone']);
+        $datetime_eur = date_create("now", timezone_open('GMT'));
+        return timezone_offset_get( $timezone, $datetime_eur );
+    }
+
     public static function getBeginOfDate($time, $timeZone = false)
     {
         if ($time) {

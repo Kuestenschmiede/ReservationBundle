@@ -750,6 +750,8 @@ class C4gReservationHandler
                         $checkTime = $endTime;
                     }
 
+                    $realTime += C4gReservationDateChecker::getCESDiffToGMT($realTime);
+
                     $timeParams['result'] = self::getTimeResult($realTime, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj, $nxtDay);
                 }
 
@@ -821,7 +823,7 @@ class C4gReservationHandler
                     }
 
                     if ($timeParams['tsdate']) {
-                        $timeObj['mergedTime'] = C4gReservationDateChecker::mergeDateWithTime($timeParams['tsdate'], $time, 'GMT');
+                        $timeObj['mergedTime'] = C4gReservationDateChecker::mergeDateWithTime($timeParams['tsdate'], $time);
 
                         $wd = date('N', $timeParams['tsdate']+$durationInterval);
                         if ($wd == 7) {
@@ -841,8 +843,12 @@ class C4gReservationHandler
                             $periodEnd = $endTime;
                         }
 
-                        $timeObj['mergedEndTime'] = C4gReservationDateChecker::mergeDateWithTime($timeParams['tsdate']+$durationInterval, $periodEnd, 'GMT');
+                        $timeObj['mergedEndTime'] = C4gReservationDateChecker::mergeDateWithTime($timeParams['tsdate']+$durationInterval, $periodEnd);
                     }
+
+                    $timeObj['mergedTime'] += C4gReservationDateChecker::getCESDiffToGMT($timeObj['mergedTime']);
+                    $timeObj['mergedEndTime'] += C4gReservationDateChecker::getCESDiffToGMT($timeObj['mergedEndTime']);
+                    $time += C4gReservationDateChecker::getCESDiffToGMT($time);
 
                     $timeParams['result'] = self::getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj);
                 }
@@ -1094,8 +1100,8 @@ class C4gReservationHandler
      */
     public static function getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj, $nxtDay=false) {
         $reasonLog = '';
-        $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'], 'GMT')+$time;
-        $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'], 'GMT')+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']; //+1 ToDo Check Why?
+        $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time;
+        $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']; // +1 ToDo Check Why?
         foreach ($timeObjectParams['exclusionPeriods'] as $excludePeriod) {
             if (C4gReservationDateChecker::isStampInPeriod($beginStamp,$excludePeriod['begin'],$excludePeriod['end'],0) ||
                 C4gReservationDateChecker::isStampInPeriod($endStamp,$excludePeriod['begin'],$excludePeriod['end'],1)) {
@@ -1129,6 +1135,7 @@ class C4gReservationHandler
         } else if ($timeParams['date'] === -1) {
             $timeParams['result'] = self::addTime($timeParams, $time, $timeObj, $endTimeInterval, 0, $nxtDay);
         }
+
 
         return $timeParams['result'];
     }
@@ -1570,10 +1577,10 @@ class C4gReservationHandler
                 $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                 $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                 $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
-                $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime'], 'GMT'));
-                $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime'], 'GMT'));
-                $frontendObject->setEndDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime'], 'GMT'));
-                $frontendObject->setEndTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime'], 'GMT'));
+                $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
+                $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
+                $frontendObject->setEndDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
+                $frontendObject->setEndTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                 $frontendObject->setNumber($event['number'] ?: '');
                 $frontendObject->setEventDuration('');
@@ -1612,10 +1619,10 @@ class C4gReservationHandler
                         $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                         $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                         $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
-                        $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime'], 'GMT'));
-                        $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime'], 'GMT'));
-                        $frontendObject->setEndDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime'], 'GMT'));
-                        $frontendObject->setEndTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime'], 'GMT'));
+                        $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
+                        $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
+                        $frontendObject->setEndDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
+                        $frontendObject->setEndTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
                         $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                         $frontendObject->setNumber($event['number']);
                         $frontendObject->setAudience($event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : []);
@@ -1819,16 +1826,16 @@ class C4gReservationHandler
                             if ($event){
                                 $startDate = $event['startDate'];
                                 $endDate = $event['endDate'] ?: $startDate;
-                                $startTime = $event['startTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'], 'GMT');
+                                $startTime = $event['startTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate']);
                                 $endTime = $event['endTime'];
                                 if ($startTime != $endTime) {
-                                    $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'], 'GMT')+86399;
+                                    $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
                                 } else {
-                                    $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'], 'GMT')+86399;
+                                    $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
                                 }
 
-                                $startDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($startDate, $startTime, 'GMT'); //+1 ToDo Check Why?
-                                $endDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($endDate, $endTime, 'GMT');
+                                $startDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($startDate, $startTime); //+1 ToDo Check Why?
+                                $endDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($endDate, $endTime);
                                 $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
 
                                 if ($event['recurring']) {
