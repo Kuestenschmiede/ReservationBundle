@@ -721,13 +721,12 @@ class C4gReservationHandler
                     if ($timeParams['date'] && $timeParams['tsdate']) {
                         $timeParams['calculator']->calculate(
                             $timeParams['tsdate'],
+                            $timeParams['tsdate'],
                             $realTime - $timeObjectParams['durationDiff'],
                             $endTime,
                             $timeObjectParams['object'],
-                            $timeParams['type'],
                             $timeObjectParams['capacity'],
-                            $timeArray,
-                            $timeParams['actDuration']
+                            $timeArray
                         );
                         $calculatorResult = $timeParams['calculator']->getCalculatorResult();
                         $timeArray = $calculatorResult->getTimeArray();
@@ -793,13 +792,12 @@ class C4gReservationHandler
                     if ($timeParams['date'] && $timeParams['tsdate']) {
                         $timeParams['calculator']->calculate(
                             $timeParams['tsdate'],
+                            $timeParams['tsdate']+$time + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'],
                             $time - $timeObjectParams['durationDiff'],
                             $endTime,
                             $timeObjectParams['object'],
-                            $timeParams['type'],
                             $timeObjectParams['capacity'],
-                            $timeArray,
-                            $timeParams['actDuration']
+                            $timeArray
                         );
                         $calculatorResult = $timeParams['calculator']->getCalculatorResult();
                         $timeArray = $calculatorResult->getTimeArray();
@@ -928,8 +926,19 @@ class C4gReservationHandler
             $weekdayStr = C4gReservationDateChecker::getWeekdayStr($timeParams['weekday']);
             $periodType = $timeParams['type']['periodType'];
 
+            $addDuration = 0;
+            switch ($periodType) {
+                case 'day':
+                    $addDuration = $actDuration ? $actDuration * 86400 : 86400; //ToDO
+                    break;
+                case 'week':
+                    $addDuration = $actDuration ? $actDuration * 86400 * 7 : 86400 * 7; //ToDO
+                    break;
+                default: '';
+            }
+
             $beginDate = $timeParams['tsdate'];
-            $endDate = $timeParams['tsdate'];
+            $endDate = $timeParams['tsdate']+(86400*5);
             foreach ($timeParams['objectList'] as $object) {
                 foreach ($object->getOpeningHours() as $key => $day) {
                     if (($day != -1) && ($key == $weekdayStr)) {
