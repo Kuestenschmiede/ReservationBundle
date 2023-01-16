@@ -6,6 +6,7 @@ namespace con4gis\ReservationBundle\Classes\Utils;
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
+use con4gis\ExportBundle\Classes\Events\ExportLoadDataEvent;
 use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
@@ -686,10 +687,10 @@ class C4gReservationHandler
             $time = $time_begin;
 
             $periodEnd = $time_end - $timeObjectParams['interval'];
-            $periodChanged = false;
+//            $periodChanged = false;
             if ($time_end <= $time) {
                 $periodEnd += 86400;
-                $periodChanged = true;
+//                $periodChanged = true;
             }
             $timeArray = [];
             while ($time <= $periodEnd) {

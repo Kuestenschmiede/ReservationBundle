@@ -171,10 +171,10 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setFormField(true);
         $reservationBeginTimeField->setDatabaseField(true);
         $reservationBeginTimeField->setOptions($initialBookingTime || $options ? $options : []);
-        $reservationBeginTimeField->setCallOnChange(false);
-//        $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
+        $reservationBeginTimeField->setCallOnChange(true);
+        $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
         $reservationBeginTimeField->setMandatory(false);
-        $reservationBeginTimeField->setInitialValue($initialBookingTime ?: $this->initialValues->getTime());
+        $reservationBeginTimeField->setInitialValue($initialBookingTime);
         $reservationBeginTimeField->setSort(false);
         $reservationBeginTimeField->setCondition(array($condition));
         $reservationBeginTimeField->setAdditionalID($listType['id']);
