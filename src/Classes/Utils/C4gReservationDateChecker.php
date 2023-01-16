@@ -74,9 +74,18 @@ class C4gReservationDateChecker
      * @return void
      */
     public static function getCESDiffToGMT($stamp) {
+        $timezone = timezone_open('GMT');
+        $datetime = date_create(\Safe\date($GLOBALS['TL_CONFIG']['datimFormat'], $time), timezone_open($GLOBALS['TL_CONFIG']['timeZone']));
+        return timezone_offset_get($timezone, $datetime);
+    }
+
+    /**
+     * @return void
+     */
+    public static function getCESDiffToLocale($stamp) {
         $timezone = timezone_open($GLOBALS['TL_CONFIG']['timeZone']);
-        $datetime_eur = date_create("now", timezone_open('GMT'));
-        return timezone_offset_get( $timezone, $datetime_eur );
+        $datetime = date_create(\Safe\date($GLOBALS['TL_CONFIG']['datimFormat'], $time), timezone_open('GMT'));
+        return timezone_offset_get($timezone, $datetime);
     }
 
     public static function getBeginOfDate($time, $timeZone = false)

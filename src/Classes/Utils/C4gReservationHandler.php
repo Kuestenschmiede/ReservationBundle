@@ -749,7 +749,7 @@ class C4gReservationHandler
                         $checkTime = $endTime;
                     }
 
-                    $realTime += C4gReservationDateChecker::getCESDiffToGMT($realTime);
+                    //$realTime += C4gReservationDateChecker::getCESDiffToGMT($realTime);
 
                     $timeParams['result'] = self::getTimeResult($realTime, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj, $nxtDay);
                 }
@@ -844,8 +844,8 @@ class C4gReservationHandler
                         $timeObj['mergedEndTime'] = C4gReservationDateChecker::mergeDateWithTime($timeParams['tsdate']+$durationInterval, $periodEnd);
                     }
 
-                    $timeObj['mergedTime'] += C4gReservationDateChecker::getCESDiffToGMT($timeObj['mergedTime']);
-                    $timeObj['mergedEndTime'] += C4gReservationDateChecker::getCESDiffToGMT($timeObj['mergedEndTime']);
+                    $timeObj['mergedTime'] += C4gReservationDateChecker::getCESDiffToLocale($timeObj['mergedTime']);
+                    $timeObj['mergedEndTime'] += C4gReservationDateChecker::getCESDiffToLocale($timeObj['mergedEndTime']);
                     $time += C4gReservationDateChecker::getCESDiffToGMT($time);
 
                     $timeParams['result'] = self::getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj);
