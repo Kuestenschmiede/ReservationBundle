@@ -658,7 +658,7 @@ class C4gReservationHandler
             }
         }
 
-        return true; //ToDo check
+        return true;
     }
 
     /**
@@ -1743,7 +1743,13 @@ class C4gReservationHandler
                     $frontendObject->setDuration($object['duration'] ?: $cloneObject['duration']);
                     $frontendObject->setMinReservationDay($object['min_reservation_day'] ?: $cloneObject['min_reservation_day']);
                     $frontendObject->setMaxReservationDay($object['max_reservation_day'] ?: $cloneObject['max_reservation_day']);
-                    $frontendObject->setMaxBeginTime($object['maxBeginTime'] ?: $cloneObject['maxBeginTime']);
+
+                    if ($object['maxBeginTime'] || $cloneObject['maxBeginTime']) {
+                        $frontendObject->setMaxBeginTime($object['maxBeginTime'] ?: $cloneObject['maxBeginTime']);
+                    } else {
+                        $frontendObject->setMaxBeginTime('');
+                    }
+
                     $frontendObject->setDesiredCapacity([$object['desiredCapacityMin'] ?: $cloneObject['desiredCapacityMin'], $object['desiredCapacityMax'] ?: $cloneObject['desiredCapacityMax']]);
                     $frontendObject->setAllTypesQuantity($object['allTypesQuantity'] ?: intval($cloneObject['allTypesQuantity']));
                     $frontendObject->setAllTypesValidity($object['allTypesValidity'] ?: intval($cloneObject['allTypesValidity']));
