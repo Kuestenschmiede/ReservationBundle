@@ -59,6 +59,7 @@ $GLOBALS['TL_LANG'][$str]['image'] = array("Image", "Matching image to reservati
 $GLOBALS['TL_LANG'][$str]['minute'] = array("minutes");
 $GLOBALS['TL_LANG'][$str]['hour'] = array("hours");
 $GLOBALS['TL_LANG'][$str]['day'] = array("days");
+$GLOBALS['TL_LANG'][$str]['overnight'] = array("overnights");
 $GLOBALS['TL_LANG'][$str]['week'] = array("weeks");
 $GLOBALS['TL_LANG'][$str]['openingHours'] = array("booking hours");
 $GLOBALS['TL_LANG'][$str]['time_interval'] = array("time interval", "Specify how many X minutes/ X hours the object can be booked (depends on which reservation type the object is assigned to");

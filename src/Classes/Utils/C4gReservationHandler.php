@@ -137,6 +137,9 @@ class C4gReservationHandler
                     case 'day':
                         $toSecond = 86400;
                         break;
+                    case 'overnight':
+                        $toSecond = 86400;
+                        break;
                     case 'week':
                         $toSecond = 604800;
                         break;
@@ -982,7 +985,7 @@ class C4gReservationHandler
                 $timeObjectParams = [
                     'object' => $object,
                     'timeArray' => [],
-                    'quantity' => $object->getQuantity() ?  $object->getQuantity() : 1,
+                    'quantity' => $object->getQuantity() ? $object->getQuantity() : 1,
                     'capacity' => $capacity,
                     'interval' => 0, //act interval
                     'durationDiff' => 0, //interval with additional time
@@ -1046,6 +1049,11 @@ class C4gReservationHandler
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 3600 : 0;
                         break;
                     case 'day':
+                        $timeObjectParams['defaultInterval'] = $defaultInterval * 86400;
+                        $timeObjectParams['interval'] = $timeInterval * 86400;
+                        $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 86400 : 0;
+                        break;
+                    case 'overnight':
                         $timeObjectParams['defaultInterval'] = $defaultInterval * 86400;
                         $timeObjectParams['interval'] = $timeInterval * 86400;
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 86400 : 0;
@@ -1470,6 +1478,9 @@ class C4gReservationHandler
                                 $minutes = $object['time_interval'] * 60;
                                 break;
                             case 'day':
+                                $minutes = $object['time_interval'] * 60 * 24;
+                                break;
+                            case 'overnight':
                                 $minutes = $object['time_interval'] * 60 * 24;
                                 break;
                             case 'week':

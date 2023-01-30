@@ -60,6 +60,7 @@ $GLOBALS['TL_LANG'][$str]['image'] = array("Bild", "Passendes Bild zur Reservier
 $GLOBALS['TL_LANG'][$str]['minute'] = array("Minuten");
 $GLOBALS['TL_LANG'][$str]['hour'] = array("Stunden");
 $GLOBALS['TL_LANG'][$str]['day'] = array("Tage");
+$GLOBALS['TL_LANG'][$str]['overnight'] = array("Übernachtungen");
 $GLOBALS['TL_LANG'][$str]['week'] = array("Wochen");
 $GLOBALS['TL_LANG'][$str]['openingHours'] = array("Buchungszeiten");
 $GLOBALS['TL_LANG'][$str]['time_interval'] = array("Zeitintervall","Geben sie an wie viele X Min./Std./Tage/Wochen das Objekt gebucht werden kann (hängt davon ab welcher Reservierungs-und zeitspannenart das Objekt zugeordnet ist");
