@@ -165,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'inputType'         => 'select',
             'exclude'           => true,
             'options_callback'  => array('tl_c4g_reservation', 'loadMemberOptions'),
-            'eval'              => array('mandatory'=>false, 'disabled' => true, 'tl_class' => 'clr long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['noMember']),
+            'eval'              => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'clr long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['noMember']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
@@ -177,7 +177,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'inputType'         => 'select',
             'exclude'           => true,
             'options_callback'  => array('tl_c4g_reservation', 'loadGroupOptions'),
-            'eval'              => array('mandatory'=>false, 'disabled' => true, 'tl_class' => 'clr long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['noGroup']),
+            'eval'              => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'clr long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['noGroup']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
@@ -737,7 +737,7 @@ class tl_c4g_reservation extends Backend
             $this->redirect($this->getReferer());
         }
 
-        $href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.$row[''];
+        $href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.($row['published'] ? '' : 1);
 
         if ($row['cancellation'])
         {
