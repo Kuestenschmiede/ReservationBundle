@@ -35,6 +35,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_caption'] = "Individual leng
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_minutely'] = " minutes)";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_hourly'] = " hours)";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'] = " days)";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['overnight'] = 'overnights';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_weekly'] = " weeks)";
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'] = 'Begin date';

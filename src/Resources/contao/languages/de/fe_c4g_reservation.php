@@ -112,6 +112,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['periodType'] = 'Zeitspannenart';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['minute'] = 'Minuten';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['hour'] = 'Stunden';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['day'] = 'Tage';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['overnight'] = 'Übernachtungen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['week'] = 'Wochen';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['openingHours'] = 'Öffnungszeiten';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['md'] = 'Mehrtägig';

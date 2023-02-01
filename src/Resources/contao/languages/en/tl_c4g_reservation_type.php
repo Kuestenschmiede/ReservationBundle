@@ -41,6 +41,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minutely'] = array("Check and se
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minute'] = array("minutes");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['hour'] = array("hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['day'] = array("days");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['overnight'] = array("overnights");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['week'] = array("weeks");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['openingHours'] = array("opening hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['md'] = array("several days");

@@ -40,6 +40,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minutely'] = array("Minütlich p
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['hour'] = array("Stunden");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minute'] = array("Minuten");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['day'] = array("Tage");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['overnight'] = array("Übernachtungen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['week'] = array("Wochen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['daily'] = array("Intervall löschen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['openingHours'] = array("Öffnungszeiten");

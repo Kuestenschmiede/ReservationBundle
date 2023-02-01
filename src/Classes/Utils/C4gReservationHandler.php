@@ -669,14 +669,20 @@ class C4gReservationHandler
      * @param $weekday
      * @return false|mixed
      */
-    public static function getEndTimeForMultipleDays($object, $weekday) {
+    public static function getEndTimeForMultipleDays($object, $weekday, $isOvernight=false) {
 
         $weekdayStr = C4gReservationDateChecker::getWeekdayStr($weekday);
         $ohString = "oh_".C4gReservationDateChecker::getWeekdayFullStr($weekday);
         $oh = StringUtil::deserialize($object->$ohString);
 
-        foreach ($oh as $key => $period) {
-            return $period['time_end'];
+        if ($isOvernight) {
+            if (key_exists(1, $oh)) {
+                return $oh[1]['time_end'];
+            }
+        } else {
+            foreach ($oh as $key => $period) {
+                return $period['time_end'];
+            }
         }
 
         return false;
@@ -839,8 +845,10 @@ class C4gReservationHandler
                                 if (($et !== false) && ($et > $endTime)) {
                                     $endTime = $et;
                                 }
+                                if ($timeParams['type']['periodType'] == 'overnight') {
+                                    break;
+                                }
                             }
-
                             $periodEnd = $endTime;
                         }
 
@@ -935,6 +943,9 @@ class C4gReservationHandler
                 case 'day':
                     $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 : 86400;
                     break;
+                case 'overnight':
+                    $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 : 86400;
+                     break;
                 case 'week':
                     $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 * 7 : 86400 * 7;
                     break;
@@ -1072,10 +1083,18 @@ class C4gReservationHandler
                 if ($timeObjectParams['defaultInterval'] && ($timeObjectParams['defaultInterval'] > 0)) {
                     foreach ($timeObjectParams['object']->getOpeningHours() as $key => $day) {
                         if (($day != -1) && ($key == $weekdayStr)) {
-                            foreach ($day as $period) {
+                            foreach ($day as $key=>$period) {
+                                if ($periodType == 'overnight') {
+                                    if (($key !== 0) || !key_exists(1,$day)) {
+                                        break;
+                                    }
+
+                                    //$day[0]['time_end'] = $day[1]['time_end'];
+                                    $period['time_end'] = $day[1]['time_end'] < $period['time_end'] ? $day[1]['time_end']+86400 : $day[1]['time_end'];
+                                }
                                 if ($timeParams['date'] !== -1) {
                                     $periodValid = C4gReservationHandler::checkValidPeriod($timeParams['tsdate'], $period);
-                                    if (!$periodValid) {
+                                    if (!$periodValid && ($periodType !== 'overnight')) {
                                         continue;
                                     }
                                     $time_begin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
@@ -1085,8 +1104,11 @@ class C4gReservationHandler
                                         continue;
                                     }
 
-                                    if ( (($periodType == 'day') || ($periodType == 'week'))) {
+                                    if (($periodType == 'day') || ($periodType == 'overnight') || ($periodType == 'week')) {
                                         $timeParams['result'] = self::getReservationTimesMultipleDays($timeParams, $timeObjectParams, $period);
+                                        if ($periodType == 'overnight') {
+                                            break;
+                                        }
                                     } else {
                                         $timeParams['result'] = self::getReservationTimesDefault($timeParams, $timeObjectParams, $period);
                                     }
@@ -1509,6 +1531,9 @@ class C4gReservationHandler
                             case 'day':
                                 $hours = $object['time_interval'] * 24;
                                 break;
+                            case 'overnight':
+                                $hours = $object['time_interval'] * 24;
+                                break;
                             case 'week':
                                 $hours = $object['time_interval'] * 24 * 7;
                                 break;
@@ -1665,6 +1690,30 @@ class C4gReservationHandler
     }
 
     /**
+     * @param $opening_hours
+     * @param $type
+     * @return false[]
+     */
+    private static function checkWeekdays(&$opening_hours, $type) {
+        $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);
+        $timeBeginKey = 0;
+        $timeEndKey = $type['periodType'] == 'overnight' ? 1 : 0;
+
+        foreach ($opening_hours as $day=>$period) {
+            if ($opening_hours[$day][$timeBeginKey]['time_begin'] && $opening_hours[$day][$timeEndKey]['time_end']) {
+
+                if ($timeEndKey) {
+                    $opening_hours[$day][$timeBeginKey]['time_end'] = $opening_hours[$day][$timeEndKey]['time_end'] < $opening_hours[$day][$timeBeginKey]['time_end'] ? $opening_hours[$day][$timeEndKey]['time_end'] + 86400 : $opening_hours[$day][$timeEndKey]['time_end'];
+                }
+
+                $weekdays[C4gReservationDateChecker::getWeekdayNumber($day)] = true;
+            }
+        }
+
+        return $weekdays;
+    }
+
+    /**
      * @param null $moduleTypes
      * @param $type
      * @param $calculator
@@ -1779,7 +1828,6 @@ class C4gReservationHandler
                 }
 
                 $opening_hours = array();
-                $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);
 
                 if ($cloneObject) {
                     $opening_hours['su'] = \Contao\StringUtil::deserialize($cloneObject['oh_sunday']);
@@ -1799,50 +1847,11 @@ class C4gReservationHandler
                     $opening_hours['sa'] = \Contao\StringUtil::deserialize($object['oh_saturday']);
                 }
 
-
-                //ToDo check if only the first record is empty.
-                if (key_exists('su', $opening_hours) && $opening_hours['su'] !== false) {
-                    if ($opening_hours['su'][0]['time_begin'] && $opening_hours['su'][0]['time_end']) {
-                        $weekdays['0'] = true;
-                    }
-                }
-                if (key_exists('mo', $opening_hours) && $opening_hours['mo'] !== false) {
-                    if ($opening_hours['mo'][0]['time_begin'] && $opening_hours['mo'][0]['time_end']) {
-                        $weekdays['1'] = true;
-                    }
-                }
-                if (key_exists('tu', $opening_hours) && $opening_hours['tu'] !== false) {
-                    if ($opening_hours['tu'][0]['time_begin'] && $opening_hours['tu'][0]['time_end']) {
-                        $weekdays['2'] = true;
-                    }
-                }
-                if (key_exists('we', $opening_hours) && $opening_hours['we'] !== false) {
-                    if ($opening_hours['we'][0]['time_begin'] && $opening_hours['we'][0]['time_end']) {
-                        $weekdays['3'] = true;
-                    }
-                }
-                if (key_exists('th', $opening_hours) && $opening_hours['th'] !== false) {
-                    if ($opening_hours['th'][0]['time_begin'] && $opening_hours['th'][0]['time_end']) {
-                        $weekdays['4'] = true;
-                    }
-                }
-                if (key_exists('fr', $opening_hours) && $opening_hours['fr'] !== false) {
-                    if ($opening_hours['fr'][0]['time_begin'] && $opening_hours['fr'][0]['time_end']) {
-                        $weekdays['5'] = true;
-                    }
-                }
-                if (key_exists('sa', $opening_hours) && $opening_hours['sa'] !== false) {
-                    if ($opening_hours['sa'][0]['time_begin'] && $opening_hours['sa'][0]['time_end']) {
-                        $weekdays['6'] = true;
-                    }
-                }
-
+                $weekdays = C4gReservationHandler::checkWeekdays($opening_hours, $type);
                 $frontendObject->setWeekdayExclusion($weekdays);
                 $frontendObject->setOpeningHours($opening_hours);
 
-
                 $datesExclusion = \Contao\StringUtil::deserialize($object['days_exclusion']);
-
                 $calendars = \Contao\StringUtil::deserialize($object['allTypesEvents']);
 
                 foreach ($calendars as $calendarId) {

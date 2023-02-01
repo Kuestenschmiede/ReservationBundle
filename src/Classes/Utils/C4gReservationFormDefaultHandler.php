@@ -60,7 +60,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $condition = $this->condition;
         $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
 
-        if (($listType['periodType'] === 'minute') || ($listType['periodType'] === 'hour') || ($listType['periodType'] === 'day') || ($listType['periodType'] === 'week')) {
+        if (($listType['periodType'] === 'minute') || ($listType['periodType'] === 'hour') || ($listType['periodType'] === 'day') || ($listType['periodType'] === 'overnight') || ($listType['periodType'] === 'week')) {
             if (!$this->initialValues->getDate() && $listType['directBooking']) {
                 $objDate = new Date(date($GLOBALS['TL_CONFIG']['dateFormat'],time()), Date::getFormatFromRgxp('date'));
                 $initialBookingDate = $objDate->tstamp;
@@ -81,6 +81,10 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                     $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'];
                     break;
                 case 'day':
+                    $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
+                    $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'];
+                    break;
+                case 'overnight':
                     $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
                     $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'];
                     break;
