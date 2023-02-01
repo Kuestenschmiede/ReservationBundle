@@ -229,7 +229,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'select',
-            'options'           => array('minute','hour','day','week'),
+            'options'           => array('minute','hour','day','overnight','week'),
             'reference'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
             'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>true, 'submitOnChange' => true),
             'sql'               => "char(25) NOT NULL default ''"

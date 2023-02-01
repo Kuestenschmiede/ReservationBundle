@@ -20,6 +20,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['periodType'] = array("Time span type"
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['minute'] = array("Minutes");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['hour'] = array("Hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['day'] = array("Days");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['overnight'] = array("Overnights");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['week'] = array("Weeks");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['openingHours'] = array("Opening hours");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['md'] = array("Several days");
