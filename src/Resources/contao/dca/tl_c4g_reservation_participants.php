@@ -289,7 +289,7 @@ class tl_c4g_reservation_participants extends Backend
             $this->redirect($this->getReferer());
         }
 
-        $href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.$row[''];
+        $href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.($row['published'] ? '' : 1);
 
         if ($row['cancellation'])
         {
