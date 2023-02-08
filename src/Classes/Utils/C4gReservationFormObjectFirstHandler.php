@@ -395,6 +395,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginTimeField = new C4GRadioGroupField();
             $reservationBeginTimeField->setFieldName('beginTime');
             $reservationBeginTimeField->setTitle($titleBeginTime);
+            $reservationBeginTimeField->setDescription('');
             $reservationBeginTimeField->setFormField(true);
             $reservationBeginTimeField->setDatabaseField(true);
             $reservationBeginTimeField->setOptions($initialBookingTime || $options ? $options : []);

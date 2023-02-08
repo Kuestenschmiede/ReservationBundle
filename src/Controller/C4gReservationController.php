@@ -528,6 +528,9 @@ class C4gReservationController extends C4GBaseController
                     case 'day':
                         $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'];
                         break;
+                    case 'overnight':
+                        $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'];
+                        break;
                     case 'week':
                         $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_weekly'];
                         break;
@@ -1675,6 +1678,9 @@ class C4gReservationController extends C4GBaseController
                 case 'day':
                     $interval = 86400;
                     break;
+                case 'overnight':
+                    $interval = 86400;
+                    break;
                 case 'week':
                     $interval = 604800;
                     break;
@@ -1735,7 +1741,7 @@ class C4gReservationController extends C4GBaseController
             }
 
             //ToDo check
-            if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'week') || ($endTime >= 86400)) { //ToDo check
+            if (($reservationType->periodType == 'day') || ($reservationType->periodType == 'overnight') || ($reservationType->periodType == 'week') || ($endTime >= 86400)) { //ToDo check
                 if (($duration < 86400) && ($endTime >= 86400)) { //ToDo check
                     if ($beginTime >= 86400) {
                         $nextDay = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate));
@@ -1760,7 +1766,12 @@ class C4gReservationController extends C4GBaseController
                     $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
 
                     $wd = date("w", strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)));
-                    $endTime = C4gReservationHandler::getEndTimeForMultipleDays($reservationObject, $wd);
+                    $endTime = C4gReservationHandler::getEndTimeForMultipleDays($reservationObject, $wd, ($reservationType->periodType == 'overnight'));
+
+                    //ToDo test
+                    if ($endTime <= $beginTime) {
+                        $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay+86400);
+                    }
                     $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], intvaL($endTime)) : intval($beginTime);
                 }
             }
@@ -2110,7 +2121,8 @@ class C4gReservationController extends C4GBaseController
             $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices, false, $duration, $date, $langCookie);
             $withEndTimes = $this->reservationSettings->showEndTime;
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
-            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $capacity, $withEndTimes, $withFreeSeats, true, $langCookie);
+            $showArrivalAndDeparture = $this->reservationSettings->showArrivalAndDeparture;
+            $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $capacity, $withEndTimes, $withFreeSeats, true, $langCookie, $showArrivalAndDeparture);
         }
 
         foreach ($times as $key=>$values) {

@@ -372,6 +372,12 @@ class C4gReservationHandler
             $beginStamp+=86400;
         }
 
+        if ($list['showArrivalAndDeparture']) {
+            $begin =
+            $end =
+            $description = '(Anreise: ...';
+        }
+
         if ($obj && ($obj['id'] == -1)) {
             if ($withEndTimes && $interval) {
                 $key = $time.'#'.$interval;
@@ -879,7 +885,7 @@ class C4gReservationHandler
      * @param false $showFreeSeats
      * @return array|mixed
      */
-    public static function getReservationTimes($objectList, $typeId, $weekday = -1, $date = null, $actDuration=0, $actCapacity=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '')
+    public static function getReservationTimes($objectList, $typeId, $weekday = -1, $date = null, $actDuration=0, $actCapacity=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '', $showArrivalAndDeparture=false)
     {
         $timeParams = [
           'tsdate' => 0,
@@ -897,6 +903,7 @@ class C4gReservationHandler
           'checkToday' => $checkToday,
           'langCookie' => $langCookie,
           'calculator' => null,
+          'showArrivalAndDeparture' => $showArrivalAndDeparture,
           'result' => []
         ];
 

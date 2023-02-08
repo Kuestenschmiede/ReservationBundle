@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
     'palettes' => array
     (
         'default'   =>  '{settings_legend}, caption;'.
-                        '{form_legend:hide}, withCapacity, fieldSelection, privacy_policy_text, privacy_policy_site, reservationButtonCaption, showDetails, showPrices, showEndTime, showInlineDatepicker, removeBookedDays;'.
+                        '{form_legend:hide}, withCapacity, fieldSelection, privacy_policy_text, privacy_policy_site, reservationButtonCaption, showDetails, showPrices, showEndTime, showInlineDatepicker, removeBookedDays,showArrivalAndDeparture;'.
                         '{type_legend:hide}, reservation_types, typeDefault, typeHide, typeWithEmptyOption;'.
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
                         '{notification_legend:hide}, notification_type;'.
@@ -221,6 +221,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
         ),
         'removeBookedDays' => array
         (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['removeBookedDays'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
+        'showArrivalAndDeparture' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['showArrivalAndDeparture'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
