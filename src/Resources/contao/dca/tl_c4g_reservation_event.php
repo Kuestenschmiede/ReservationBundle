@@ -289,6 +289,32 @@ class tl_c4g_reservation_event extends Backend
         $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $pid;
         $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['sql'] = "int(10) unsigned NOT NULL default ".$pid;
 
+        $calendarId = \Database::getInstance()->prepare('SELECT pid FROM tl_calendar_events WHERE id=?')->execute($pid)->fetchAssoc();
+        $calendarRow =  $calendarId ? \Database::getInstance()->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($calendarId['pid'])->fetchAssoc() : false;
+        if ($calendarRow) {
+            $dc->location = $calendarRow['reservationLocation'];
+            $dc->organizer = $calendarRow['reservationOrganizer'];
+            $dc->reservationType = $calendarRow['reservationType'];
+            $dc->minParticipants = $calendarRow['reservationMinParticipants'];
+            $dc->maxParticipants = $calendarRow['reservationMaxParticipants'];
+            $dc->speaker = $calendarRow['reservationSpeaker'];
+            $dc->topic = $calendarRow['reservationTopic'];
+            $dc->targetAudience = $calendarRow['reservationtargetAudience'];
+            $dc->price = $calendarRow['reservationPrice'];
+            $dc->priceoption = $calendarRow['reservationPriceOption'];
+
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['location']['default'] = $calendarRow['reservationLocation'];
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['organizer']['default'] = $calendarRow['reservationOrganizer'];
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['reservationType']['default'] = $calendarRow['reservationType'];
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['minParticipants']['default'] = $calendarRow['reservationMinParticipants'];
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['maxParticipants']['default'] = $calendarRow['reservationMaxParticipants'];
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['speaker']['default'] = $calendarRow['reservationSpeaker'];
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['topic']['default'] = $calendarRow['reservationTopic'];
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['targetAudience']['default'] = $calendarRow['reservationtargetAudience'];
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['price']['default'] = $calendarRow['reservationPrice'];
+            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['priceoption']['default'] = $calendarRow['reservationPriceOption'];
+        }
+
         return $dc;
     }
 
