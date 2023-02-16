@@ -1617,6 +1617,7 @@ class C4gReservationHandler
             System::loadLanguageFile('fe_c4g_reservation', $GLOBALS['LANGUAGE']);
 
             $eventObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($objectId)->fetchAssoc();
+            $calendarObject =  $database->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($eventObject['pid'])->fetchAssoc();
 
             $startTime = $startTime ?: time();
 
@@ -1625,11 +1626,11 @@ class C4gReservationHandler
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject['id']);
-                $eventObject['price'] = $event['price'];
-                $eventObject['priceoption'] = $event['priceoption'];
+                $eventObject['price'] = $event['price'] ?: $calendarObject['reservationPrice'];
+                $eventObject['priceoption'] = $event['priceoption'] ?: $calendarObject['reservationPriceOption'];
                 $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                 $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
-                $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
+                $frontendObject->setDesiredCapacity([$event['minParticipants'] ?:  $calendarObject['reservationMinParticipants'], $event['maxParticipants'] ?:  $calendarObject['reservationMaxParticipants']]);
                 $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                 $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                 $frontendObject->setEndDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
@@ -1637,14 +1638,15 @@ class C4gReservationHandler
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                 $frontendObject->setNumber($event['number'] ?: '');
                 $frontendObject->setEventDuration('');
-                $frontendObject->setAudience($event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : []);
-                $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : []);
-                $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : []);
-                $frontendObject->setLocation($event['location'] ?: $type['location']);
+                $frontendObject->setAudience($event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience']) : []);
+                $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : $calendarObject['reservationSpeaker'] ? \Contao\StringUtil::deserialize($calendarObject['reservationSpeaker']) : []);
+                $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic']) : []);
+                $frontendObject->setLocation($event['location'] ?: $calendarObject['reservationLocation'] ?: $type['location']);
+                $frontendObject->setOrganizer($event['organizer'] ?: $calendarObject['reservationOrganizer'] ?: []);
                 $frontendObject->setDescription($eventObject['teaser'] ?: '');
                 $frontendObject->setImage($eventObject['singleSRC']);
-                $frontendObject->setPrice($event['price'] ?: 0.00);
-                $frontendObject->setPriceOption($event['priceoption']);
+                $frontendObject->setPrice($event['price'] ?: $calendarObject['reservationPrice'] ?: 0.00);
+                $frontendObject->setPriceOption($event['priceoption'] ?: $calendarObject['reservationPriceOption']);
                 $objectList[] = $frontendObject;
             }
         } else {
@@ -1663,30 +1665,32 @@ class C4gReservationHandler
                 foreach ($allEvents as $event) {
                     //$eventObject = \CalendarEventsModel::findByPk($event['pid']);
                     $eventObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($event['pid'])->fetchAssoc();
+                    $calendarObject =  $database->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($eventObject['pid'])->fetchAssoc();
                     if ($eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > $startTime)) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= $startTime))) {
                         $frontendObject = new C4gReservationFrontendObject();
                         $frontendObject->setType(2);
                         $frontendObject->setId($eventObject['id']);
-                        $eventObject['price'] = $event['price'];
-                        $eventObject['priceoption'] = $event['priceoption'];
+                        $eventObject['price'] = $event['price'] ?: $calendarObject['reservationPrice'];
+                        $eventObject['priceoption'] = $event['priceoption'] ?: $calendarObject['reservationPriceOption'];
                         $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                         $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
-                        $frontendObject->setDesiredCapacity([$event['minParticipants'],$event['maxParticipants']]);
+                        $frontendObject->setDesiredCapacity([$event['minParticipants'] ?:  $calendarObject['reservationMinParticipants'], $event['maxParticipants'] ?:  $calendarObject['reservationMaxParticipants']]);
                         $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                         $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                         $frontendObject->setEndDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
                         $frontendObject->setEndTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
                         $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                         $frontendObject->setNumber($event['number']);
-                        $frontendObject->setAudience($event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : []);
                         $frontendObject->setEventDuration('');
-                        $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : []);
-                        $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : []);
-                        $frontendObject->setLocation($event['location'] ?: $type['location']);
+                        $frontendObject->setAudience($event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience']) : []);
+                        $frontendObject->setSpeaker($event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : $calendarObject['reservationSpeaker'] ? \Contao\StringUtil::deserialize($calendarObject['reservationSpeaker']) : []);
+                        $frontendObject->setTopic($event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic']) : []);
+                        $frontendObject->setLocation($event['location'] ?: $calendarObject['reservationLocation'] ?: $type['location']);
+                        $frontendObject->setOrganizer($event['organizer'] ?: $calendarObject['reservationOrganizer'] ?: []);
                         $frontendObject->setDescription($eventObject['teaser'] ?: '');
                         $frontendObject->setImage($eventObject['singleSRC']);
-                        $frontendObject->setPrice($event['price'] ?: 0.00);
-                        $frontendObject->setPriceOption($event['priceoption']);
+                        $frontendObject->setPrice($event['price'] ?: $calendarObject['reservationPrice'] ?: 0.00);
+                        $frontendObject->setPriceOption($event['priceoption'] ?: $calendarObject['reservationPriceOption']);
                         $objectList[] = $frontendObject;
                     }
                 }

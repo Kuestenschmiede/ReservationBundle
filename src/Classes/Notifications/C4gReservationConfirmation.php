@@ -144,11 +144,13 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('participantList', $participants);
 
                         if ($reservationObjectType == '2') {
+                            $calendarObject =  $database->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($reservationObject['pid'])->fetchAssoc();
                             $eventObject = $database->prepare('SELECT * FROM tl_c4g_reservation_event WHERE `pid`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
-                            if ($eventObject) {
+                            if ($eventObject && $calendarObject) {
                                 $speaker = '';
-                                if ($eventObject['speaker']) {
-                                    $speakerList = StringUtil::deserialize($eventObject['speaker']);
+                                if ($eventObject['speaker'] || $calendarObject['reservationSpeaker']) {
+                                    $speakers = $eventObject['speaker'] ?: $calendarObject['reservationSpeaker'];
+                                    $speakerList = StringUtil::deserialize($speakers);
                                     foreach ($speakerList as $speakerId) {
                                         $speakerObject = C4gReservationEventSpeakerModel::findByPk($speakerId);
                                         if ($speakerObject) {
@@ -163,8 +165,9 @@ class C4gReservationConfirmation
                                 }
 
                                 $topic = '';
-                                if ($eventObject['topic']) {
-                                    $topicList = StringUtil::deserialize($eventObject['topic']);
+                                if ($eventObject['topic'] || $calendarObject['reservationTopic']) {
+                                    $topic = $eventObject['topic'] ?: $calendarObject['reservationTopic'];
+                                    $topicList = StringUtil::deserialize($topic);
                                     foreach ($topicList as $topicId) {
                                         $topicObject = C4gReservationEventTopicModel::findByPk($topicId);
                                         if ($topicObject) {
@@ -179,8 +182,9 @@ class C4gReservationConfirmation
                                 }
 
                                 $audience = '';
-                                if ($eventObject['targetAudience']) {
-                                    $audienceList = StringUtil::deserialize($eventObject['targetAudience']);
+                                if ($eventObject['targetAudience'] || $calendarObject['reservationTargetAudience']) {
+                                    $audiences = $eventObject['targetAudience'] ?: $calendarObject['reservationTargetAudience'];
+                                    $audienceList = StringUtil::deserialize($audiences);
                                     foreach ($audienceList as $audienceId) {
                                         $audienceObject = C4gReservationEventAudienceModel::findByPk($audienceId);
                                         if ($audienceObject) {
@@ -198,6 +202,11 @@ class C4gReservationConfirmation
                                 $c4gNotify->setTokenValue('topic', $topic);
                                 $c4gNotify->setTokenValue('audience', $audience);
 
+                            }
+
+                            if ($eventObject['price'] || $calendarObject['reservationPrice']) {
+                                $price = C4gReservationHandler::formatPrice($eventObject['price'] ?: $calendarObject['reservationPrice']);
+                                $c4gNotify->setTokenValue('price', $price);
                             }
                         }
 
@@ -244,8 +253,10 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('agreed', $reservation['agreed']);
 
 
-                        $price = C4gReservationHandler::formatPrice($reservationObjec['price']);
-                        $c4gNotify->setTokenValue('price', $price);
+                        if ($reservationObject['price']) {
+                            $price = C4gReservationHandler::formatPrice($reservationObject['price']);
+                            $c4gNotify->setTokenValue('price', $price);
+                        }
 
                         $binFileUuid = $reservation['fileUpload'];
                         $filePath = '';

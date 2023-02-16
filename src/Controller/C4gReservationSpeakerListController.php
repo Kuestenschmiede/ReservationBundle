@@ -354,6 +354,8 @@ class C4gReservationSpeakerListController extends C4GBaseController
             $reservationEvents = $database->prepare("SELECT pid, speaker FROM tl_c4g_reservation_event WHERE speaker LIKE '%" . $dialogId . "%'")
                 ->execute()->fetchAllAssoc();
 
+            //ToDo check calendar default settings
+
             $links = [];
             $speakerEvents = [];
             if ($reservationEvents) {
