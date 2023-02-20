@@ -529,7 +529,7 @@ class C4gReservationController extends C4GBaseController
                         $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'];
                         break;
                     case 'overnight':
-                        $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'];
+                        $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_overnight'];
                         break;
                     case 'week':
                         $title .= $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_weekly'];

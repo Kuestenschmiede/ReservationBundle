@@ -352,6 +352,19 @@ class C4gReservationHandler
             }
         }
 
+        $withoutTime = false;
+        $description = '';
+        $weekday = C4gReservationDateChecker::getWeekdayStr($list['weekday']);
+        if ($list['showArrivalAndDeparture'][$weekday] && is_array($list['showArrivalAndDeparture'][$weekday])) {
+            $arrivalTimeBegin =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][0]['time_begin']);
+            $arrivalTimeEnd =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][0]['time_end_org']);
+            $departureTimeBegin =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][1]['time_begin']);
+            $departureTimeEnd =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][1]['time_end']);
+
+            $description = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_arrivalTime'] . $arrivalTimeBegin . '-' . $arrivalTimeEnd.$clock.", " . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_departureTime'] . $departureTimeBegin . '-' . $departureTimeEnd.$clock;
+            $withoutTime = true;
+        }
+
         foreach ($list['result'] as $key => $item) {
             if ($key === $time || ($interval && ($key === ($time.'#'.$interval))) || ($endTime && ($key === ($time.'#'.($endTime-$time))))) {
                 $list['result'][$key]['objects'][] = $obj;
@@ -363,29 +376,21 @@ class C4gReservationHandler
 
         $mergedTime = false;
         if ($obj['mergedTime'] && $obj['mergedEndTime']) {
-            $begin = date($GLOBALS['TL_CONFIG']['datimFormat'], $obj['mergedTime']).$clock;
-            $end = date($GLOBALS['TL_CONFIG']['datimFormat'], $obj['mergedEndTime']).$clock;
+
+            if ($withoutTime) {
+                $begin = date($GLOBALS['TL_CONFIG']['dateFormat'], $obj['mergedTime']);
+                $end = date($GLOBALS['TL_CONFIG']['dateFormat'], $obj['mergedEndTime']);
+            } else {
+                $begin = date($GLOBALS['TL_CONFIG']['datimFormat'], $obj['mergedTime']).$clock;
+                $end = date($GLOBALS['TL_CONFIG']['datimFormat'], $obj['mergedEndTime']).$clock;
+            }
+
             $mergedTime = true;
         }
 
         $beginStamp = $time;
         if ($nxtDay) {
             $beginStamp+=86400;
-        }
-
-        $description = '';
-        $weekday = C4gReservationDateChecker::getWeekdayStr($list['weekday']);
-        if ($list['showArrivalAndDeparture'][$weekday]) {
-           $arrivalTimeBegin =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][0]['time_begin']);
-           $arrivalTimeEnd =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][0]['time_end_org']);
-           $departureTimeBegin =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][1]['time_begin']);
-           $departureTimeEnd =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][1]['time_end']);
-
-           $description = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_arrivalTime'] . $arrivalTimeBegin . '-' . $arrivalTimeEnd.$clock.", " . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_departureTime'] . $departureTimeBegin . '-' . $departureTimeEnd.$clock;
-
-            $begin = date($GLOBALS['TL_CONFIG']['dateFormat'], $obj['mergedTime']);
-            $end = date($GLOBALS['TL_CONFIG']['dateFormat'], $obj['mergedEndTime']);
-            $mergedTime = true;
         }
 
         if ($obj && ($obj['id'] == -1)) {
@@ -898,8 +903,6 @@ class C4gReservationHandler
      */
     public static function getReservationTimes($objectList, $typeId, $weekday = -1, $date = null, $actDuration=0, $actCapacity=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '', $showArrivalAndDeparture=false)
     {
-        $showArrivalAndDeparture = $showArrivalAndDeparture ? [] : false;
-
         $timeParams = [
           'tsdate' => 0,
           'objectList' => $objectList,
@@ -916,7 +919,7 @@ class C4gReservationHandler
           'checkToday' => $checkToday,
           'langCookie' => $langCookie,
           'calculator' => null,
-          'showArrivalAndDeparture' => $showArrivalAndDeparture,
+          'showArrivalAndDeparture' => false,
           'result' => []
         ];
 
@@ -970,6 +973,10 @@ class C4gReservationHandler
                     $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 * 7 : 86400 * 7;
                     break;
                 default: '';
+            }
+
+            if ($periodType == 'overnight') {
+                $showArrivalAndDeparture = $showArrivalAndDeparture ? [] : false;
             }
 
             $beginDate = $timeParams['tsdate'];
@@ -1107,7 +1114,9 @@ class C4gReservationHandler
 
                         if (($dayPeriods != -1) && ($key == $weekdayStr)) {
                             $dbPeriods = $dayPeriods;
-                            $timeParams['showArrivalAndDeparture'][$key] = is_array($showArrivalAndDeparture) ? $dbPeriods : false;
+                            if ($periodType == 'overnight') {
+                                $timeParams['showArrivalAndDeparture'][$key] = is_array($showArrivalAndDeparture) ? $dbPeriods : false;
+                            }
                             foreach ($dayPeriods as $key=>$period) {
                                 if ($periodType == 'overnight') {
 

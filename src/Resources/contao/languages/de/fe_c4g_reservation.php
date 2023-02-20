@@ -23,6 +23,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_caption'] = "Individuelle Nu
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_minutely'] = " Minuten)";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_hourly'] = " Stunden)";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_daily'] = " Tage)";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_overnight'] = " Übernachtungen)";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['duration_weekly'] = " Wochen)";
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['tstamp'] = 'Letzte Änderung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'] = 'An welchem Tag?';
