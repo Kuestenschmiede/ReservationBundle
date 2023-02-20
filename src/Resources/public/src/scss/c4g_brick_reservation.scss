@@ -7,7 +7,6 @@
  * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
-
 .reservation_time_button .c4g__form-radio-group input[type="radio"], .reservation_time_event_button .c4g__form-radio-group input[type="radio"] {
     left:-9999px;
     position:absolute;
@@ -97,3 +96,7 @@
     display: none;
 }
 
+.c4g__form-radio-group_wrapper .c4g_field_descripton {
+    margin-left: 1em;
+    color: black;
+}

@@ -176,7 +176,8 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_comment'] = 'Optionale Nachricht
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten in unserer';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] = 'Datenschutzerklärung';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'] = 'Detaillierte Informationen zum Umgang mit Nutzerdaten in unserer Datenschutzerklärung.';
-
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_arrivalTime'] = 'Ankunft: ';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_departureTime'] = 'Abreise: ';
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'] = 'Jetzt reservieren';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_cancellation'] = 'Stornieren';
