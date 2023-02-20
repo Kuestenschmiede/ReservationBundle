@@ -178,7 +178,8 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_comment'] = 'Here you can option
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] = 'Detailed information on the handling of user data can be found in our';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] = 'privacy policy';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'] = 'Detailed information on the handling of user data can be found in our privacy policy.';
-
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_arrivalTime'] = 'Arrival: ';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_departureTime'] = 'Departure: ';
 /** BUTTONS */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'] = 'Reserve appointment';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_cancellation'] = 'Cancellation';

@@ -547,6 +547,7 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         var time = times[key]['time'];
         var objects = times[key]['objects'];
         var begin = times[key]['begin'];
+        var description = times[key]['description'];
         var percent = 0;
         var priority = 0;
         let value = '';
@@ -639,6 +640,8 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         c4gFormCheck.appendChild(c4gFormCheckLabel);
 
         radioGroup.appendChild(c4gFormCheck);
+
+        radioGroup.parentNode.parentNode.getElementsByClassName('c4g__form-description')[0].innerText = description;
     }
 
     //return objstr;
