@@ -83,3 +83,7 @@
 .mod_C4gReservation .displayReservationObjects select option:disabled {
   display: none
 }
+.c4g__form-radio-group_wrapper .c4g_field_descripton {
+  margin-left: 1em;
+  color: #000
+}
