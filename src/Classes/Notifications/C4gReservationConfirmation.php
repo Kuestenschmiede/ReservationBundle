@@ -146,10 +146,11 @@ class C4gReservationConfirmation
                         if ($reservationObjectType == '2') {
                             $calendarObject =  $database->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($reservationObject['pid'])->fetchAssoc();
                             $eventObject = $database->prepare('SELECT * FROM tl_c4g_reservation_event WHERE `pid`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
-                            if ($eventObject && $calendarObject) {
+                            if ($eventObject || $calendarObject) {
                                 $speaker = '';
-                                if ($eventObject['speaker'] || $calendarObject['reservationSpeaker']) {
-                                    $speakers = $eventObject['speaker'] ?: $calendarObject['reservationSpeaker'];
+
+                                if (($eventObject && $eventObject['speaker']) || ($calendarObject && $calendarObject['reservationSpeaker'])) {
+                                    $speakers = $eventObject && $eventObject['speaker'] ? $eventObject['speaker'] : $calendarObject['reservationSpeaker'];
                                     $speakerList = StringUtil::deserialize($speakers);
                                     foreach ($speakerList as $speakerId) {
                                         $speakerObject = C4gReservationEventSpeakerModel::findByPk($speakerId);
@@ -165,8 +166,8 @@ class C4gReservationConfirmation
                                 }
 
                                 $topic = '';
-                                if ($eventObject['topic'] || $calendarObject['reservationTopic']) {
-                                    $topic = $eventObject['topic'] ?: $calendarObject['reservationTopic'];
+                                if (($eventObject && $eventObject['topic']) || ($calendarObject && $calendarObject['reservationTopic'])) {
+                                    $topic = $eventObject && $eventObject['topic'] ? $eventObject['topic'] : $calendarObject['reservationTopic'];
                                     $topicList = StringUtil::deserialize($topic);
                                     foreach ($topicList as $topicId) {
                                         $topicObject = C4gReservationEventTopicModel::findByPk($topicId);
@@ -182,8 +183,8 @@ class C4gReservationConfirmation
                                 }
 
                                 $audience = '';
-                                if ($eventObject['targetAudience'] || $calendarObject['reservationTargetAudience']) {
-                                    $audiences = $eventObject['targetAudience'] ?: $calendarObject['reservationTargetAudience'];
+                                if (($eventObject && $eventObject['targetAudience']) || ($calendarObject && $calendarObject['reservationTargetAudience'])) {
+                                    $audiences = $eventObject && $eventObject['targetAudience'] ? $eventObject['targetAudience'] : $calendarObject['reservationTargetAudience'];
                                     $audienceList = StringUtil::deserialize($audiences);
                                     foreach ($audienceList as $audienceId) {
                                         $audienceObject = C4gReservationEventAudienceModel::findByPk($audienceId);
@@ -204,8 +205,8 @@ class C4gReservationConfirmation
 
                             }
 
-                            if ($eventObject['price'] || $calendarObject['reservationPrice']) {
-                                $price = C4gReservationHandler::formatPrice($eventObject['price'] ?: $calendarObject['reservationPrice']);
+                            if (($eventObject && $eventObject['price']) || ($calendarObject && $calendarObject['reservationPrice'])) {
+                                $price = C4gReservationHandler::formatPrice($eventObject && $eventObject['price'] ? $eventObject['price'] : $calendarObject['reservationPrice']);
                                 $c4gNotify->setTokenValue('price', $price);
                             }
                         }
