@@ -379,7 +379,7 @@ class C4gReservationHandler
 
             if ($withoutTime) {
                 $begin = date($GLOBALS['TL_CONFIG']['dateFormat'], $obj['mergedTime']);
-                $end = date($GLOBALS['TL_CONFIG']['dateFormat'], $obj['mergedEndTime']);
+                $end = date($GLOBALS['TL_CONFIG']['dateFormat'], $obj['mergedEndTime']+86400);
             } else {
                 $begin = date($GLOBALS['TL_CONFIG']['datimFormat'], $obj['mergedTime']).$clock;
                 $end = date($GLOBALS['TL_CONFIG']['datimFormat'], $obj['mergedEndTime']).$clock;
