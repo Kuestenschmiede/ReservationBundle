@@ -24,6 +24,7 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationLocation'] = array('Event locations', 
 $GLOBALS['TL_LANG']['MOD']['C4gReservationLocation'] = array('Event organizers/locations', 'Here you can maintain the event organizers and locations.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservation types', 'Define the selection of reservation types.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationParams'] = array('Services & Options', 'Entry of various booking options (optional).');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationTeamRole'] = array('Role', 'Entry of various booking Roles (optional).');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEvent']  = array('Event <=> Reservation', 'Events and reservations can be linked here.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventAudience'] = array('Target audience', 'Here you can store target groups.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Speaker', 'Here you can maintain the speakers.');

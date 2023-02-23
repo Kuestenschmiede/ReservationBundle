@@ -54,6 +54,12 @@ $GLOBALS['BE_MOD']['con4gis'] = array_merge($GLOBALS['BE_MOD']['con4gis'], [
         'tables'    => array('tl_c4g_reservation_params'),
         'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_params.svg'
     ),
+    'C4gReservationTeamRole' => array
+    (
+        'brick' => 'reservation',
+        'tables'    => array('tl_c4g_reservation_team_role'),
+        'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_params.svg'
+    ),
 
     'C4gReservationEventAudience' => array
     (
@@ -168,6 +174,7 @@ $GLOBALS['TL_MODELS']['tl_c4g_reservation_object'] = \con4gis\ReservationBundle\
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_type'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_settings'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_params'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel::class;
+$GLOBALS['TL_MODELS']['tl_c4g_reservation_team_role'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationTeamRoleModelModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_event'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_location'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_event_speaker'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationEventSpeakerModel::class;

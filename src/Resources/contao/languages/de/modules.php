@@ -23,6 +23,7 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationObject'] = array('Reservierungsobjekte
 $GLOBALS['TL_LANG']['MOD']['C4gReservationLocation'] = array('Veranstalter und Orte', 'Veranstalter und Veranstaltungsorte erfassen.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservierungsarten', 'Definition der Reservierungsarten (z.B. Tischreservierung, Raumreservierung)');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationParams'] = array('Optionen (Leistungen)', 'Erfassung verschiedener Buchungsoptionen (optional).');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationTeamRole'] = array('Rollen', 'Erfassung verschiedener Mitgliedsrollen (rolle).');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEvent']  = array('Event <=> Reservierung', 'Hier können Veranstaltungen und Reservierungen verknüpft werden.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventAudience'] = array('Zielpublikum', 'Hier können Sie Zielgruppen hinterlegen.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Referent*innen', 'Hier können Sie die Referenten pflegen.');
