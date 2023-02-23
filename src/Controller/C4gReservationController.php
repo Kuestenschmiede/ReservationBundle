@@ -1769,7 +1769,7 @@ class C4gReservationController extends C4GBaseController
                     $endTime = C4gReservationHandler::getEndTimeForMultipleDays($reservationObject, $wd, ($reservationType->periodType == 'overnight'));
 
                     //ToDo test
-                    if ($endTime <= $beginTime) {
+                    if (($endTime <= $beginTime) || ($reservationType->periodType == 'overnight')) {
                         $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay+86400);
                     }
                     $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], intvaL($endTime)) : intval($beginTime);

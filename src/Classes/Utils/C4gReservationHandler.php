@@ -883,6 +883,9 @@ class C4gReservationHandler
 
                     $timeParams['result'] = self::getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj);
                 }
+                if ($timeParams['type']['periodType'] == 'overnight') {
+                    break;
+                }
 
                 $time = $time + $timeObjectParams['defaultInterval'];
             }
@@ -1124,7 +1127,7 @@ class C4gReservationHandler
                                         break;
                                     }
 //                                    $day[0]['time_end'] = $day[0]['time_end'];
-                                    $period['time_end'] = $dayPeriods[1]['time_end'] < $period['time_end'] ? $dayPeriods[1]['time_end']+86400 : $dayPeriods[1]['time_end'];
+                                    $period['time_end'] = $dayPeriods[1]['time_end']+86400;
                                 }
                                 if ($timeParams['date'] !== -1) {
                                     $periodValid = C4gReservationHandler::checkValidPeriod($timeParams['tsdate'], $period);
@@ -1209,7 +1212,6 @@ class C4gReservationHandler
         } else if ($timeParams['date'] === -1) {
             $timeParams['result'] = self::addTime($timeParams, $time, $timeObj, $endTimeInterval, 0, $nxtDay);
         }
-
 
         return $timeParams['result'];
     }
@@ -1765,7 +1767,6 @@ class C4gReservationHandler
                     $opening_hours[$day][$timeBeginKey]['time_end_org'] = $opening_hours[$day][$timeBeginKey]['time_end'];
                     $opening_hours[$day][$timeBeginKey]['time_end'] = $opening_hours[$day][$timeEndKey]['time_end'] < $opening_hours[$day][$timeBeginKey]['time_end'] ? $opening_hours[$day][$timeEndKey]['time_end'] + 86400 : $opening_hours[$day][$timeEndKey]['time_end'];
                 }
-
                 $weekdays[C4gReservationDateChecker::getWeekdayNumber($day)] = true;
             }
         }
