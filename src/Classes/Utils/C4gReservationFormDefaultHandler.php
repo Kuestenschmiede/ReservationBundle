@@ -40,6 +40,7 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationEventSpeakerModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventTopicModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationTeamRoleModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
