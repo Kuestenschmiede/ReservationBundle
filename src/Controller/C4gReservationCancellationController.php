@@ -145,6 +145,7 @@ class C4gReservationCancellationController extends C4GBaseController
         $reservation = C4gReservationModel::findOneBy('reservation_id',$key);
         if ($reservation) {
             $putVars['email'] = $reservation->email;
+            $putVars['firstname'] = $reservation->firstname;
             $putVars['beginDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$reservation->beginDate);
             $putVars['beginTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$reservation->beginTime);
             $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$reservation->endDate);
