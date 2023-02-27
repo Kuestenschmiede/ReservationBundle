@@ -44,6 +44,7 @@ $GLOBALS['TL_LANG'][$str]['time_end'] = array("Ende", "");
 $GLOBALS['TL_LANG'][$str]['date_from'] = array("Gültig ab (optional)", "");
 $GLOBALS['TL_LANG'][$str]['date_to'] = array("Gültig bis (optional)", "");
 $GLOBALS['TL_LANG'][$str]['days_exclusion'] = array("Zeitraum ausschließen von - bis", "Hierüber können Sie Zeiträume von der Reservierung ausschließen (z.B. Betriebsurlaub).");
+$GLOBALS['TL_LANG'][$str]['team_role'] = array("Mitgliederrollen zuweisen", "Hier können Sie ein Mitglied auswählen und eine Rolle zuweisen.");
 $GLOBALS['TL_LANG'][$str]['date_exclusion'] = array("", "");
 $GLOBALS['TL_LANG'][$str]['date_exclusion_end'] = array("", "");
 $GLOBALS['TL_LANG'][$str]['min_reservation_day'] = array("Frühester Reservierungstermin (in Tagen)", "Heute + wie viele Tage?");
@@ -88,7 +89,10 @@ $GLOBALS['TL_LANG'][$str]['references']['pReservation'] = array("Preis pro Reser
 $GLOBALS['TL_LANG'][$str]['references']['pPerson'] = array("Preis pro Person");
 $GLOBALS['TL_LANG'][$str]['references']['pAmount'] = array("Sicherheitsbetrag (Pfand)");
 
-$GLOBALS['TL_LANG'][$str]['noMember'] = 'kein Mitglied zugeordnet';
+$GLOBALS['TL_LANG'][$str]['defaultMember'] = 'Mitglied';
+$GLOBALS['TL_LANG'][$str]['defaultRole'] = 'Rolle';
+$GLOBALS['TL_LANG'][$str]['noMember'] = 'Kein Mitglied zugeordnet';
+$GLOBALS['TL_LANG'][$str]['noRole'] = 'Keine Rolle zugeordnet';
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['type_legend'] = "Reservierungsobjekte";
@@ -115,6 +119,7 @@ $GLOBALS['TL_LANG'][$str]['booking_wd_legend'] = "Mögliche Buchungszeiträume b
 $GLOBALS['TL_LANG'][$str]['location_legend'] = 'Einstellungen zum Ort';
 $GLOBALS['TL_LANG'][$str]['event_legend'] = 'Einstellungen für Veranstaltungsobjekte';
 $GLOBALS['TL_LANG'][$str]['price_legend'] = 'Einstellungen zum Preis';
+$GLOBALS['TL_LANG'][$str]['team_legend'] = 'Einstellungen zum Team-Rollen';
 $GLOBALS['TL_LANG'][$str]['expert_legend'] = 'Experteneinstellungen';
 
 /** OPERATIONS **/

@@ -35,6 +35,13 @@ $GLOBALS['TL_LANG'][$str]['references']['pReservation'] = array("Price per reser
 $GLOBALS['TL_LANG'][$str]['references']['pPerson'] = array("Price per person");
 $GLOBALS['TL_LANG'][$str]['references']['pAmount'] = array("Security amount (pledge)");
 
+$GLOBALS['TL_LANG'][$str]['defaultMember'] = 'Member';
+$GLOBALS['TL_LANG'][$str]['defaultRole'] = 'Role';
+$GLOBALS['TL_LANG'][$str]['noMember'] = 'No member selected';
+$GLOBALS['TL_LANG'][$str]['noRole'] = 'No role selected';
+
+$GLOBALS['TL_LANG'][$str]['team_legend'] = 'Team Role Settings';
+
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['event_legend'] = "Event data";
 $GLOBALS['TL_LANG'][$str]['reservation_legend'] = "Reservation data";

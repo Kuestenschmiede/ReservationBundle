@@ -35,9 +35,19 @@ $GLOBALS['TL_LANG'][$str]['references']['pReservation'] = array("Preis pro Reser
 $GLOBALS['TL_LANG'][$str]['references']['pPerson'] = array("Preis pro Person");
 $GLOBALS['TL_LANG'][$str]['references']['pAmount'] = array("Sicherheitsbetrag (Pfand)");
 
+$GLOBALS['TL_LANG'][$str]['defaultMember'] = 'Mitglied';
+$GLOBALS['TL_LANG'][$str]['defaultRole'] = 'Rolle';
+$GLOBALS['TL_LANG'][$str]['noMember'] = 'Kein Mitglied zugeordnet';
+$GLOBALS['TL_LANG'][$str]['noRole'] = 'Keine Rolle zugeordnet';
+
+$GLOBALS['TL_LANG'][$str]['team_role'] = array("Mitgliederrollen zuweisen", "Hier können Sie ein Mitglied auswählen und eine Rolle zuweisen.");
+
+
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['event_legend'] = "Daten zur Veranstaltung";
 $GLOBALS['TL_LANG'][$str]['reservation_legend'] = "Daten zur Reservierung";
+$GLOBALS['TL_LANG'][$str]['team_legend'] = 'Einstellungen der Mitglieder';
+
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG'][$str]['new'] = array("Event hinzufügen","Event hinzufügen");

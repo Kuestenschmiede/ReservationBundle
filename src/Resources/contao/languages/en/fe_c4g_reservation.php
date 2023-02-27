@@ -135,9 +135,16 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params'] = 'Participant s
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['emptyOptionLabel'] = '- Please select -';
 
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['defaultMember'] = 'Mitglied';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['defaultRole'] = 'Rolle';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['noMember'] = 'Kein Mitglied zugeordnet';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['noRole'] = 'Keine Rolle zugeordnet';
+
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'reservation form';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['person_data'] = 'your data';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['team_role'] = array("Mitgliederrollen zuweisen", "Hier können Sie ein Mitglied auswählen und eine Rolle zuweisen.");
+
 
 /** MESSAGES */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['min_max_failed'] = 'We cannot process your reservation. The date is outside the bookable range.';

@@ -134,9 +134,16 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeClearGroupText'] = 'Keine Ze
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['emptyOptionLabel'] = '- Bitte auswählen -';
 
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['defaultMember'] = 'Mitglied';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['defaultRole'] = 'Rolle';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['noMember'] = 'Kein Mitglied zugeordnet';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['noRole'] = 'Keine Rolle zugeordnet';
+
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'Reservierungsformular';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['person_data'] = 'Ihre Daten';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['team_role'] = array("Mitgliederrollen zuweisen", "Hier können Sie ein Mitglied auswählen und eine Rolle zuweisen.");
+
 
 /** MESSAGES */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none'] = 'Derzeit sind keine Reservierungen möglich.';

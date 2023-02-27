@@ -20,7 +20,7 @@ use Contao\CalendarBundle\Security\ContaoCalendarPermissions;
 
 
 
-$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id';
+$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{team_legend:hide}, team;{publish_legend}, published, member_id';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -125,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'exclude'           => true,
-            'options_callback'  => array('tl_c4g_reservation_object', 'loadMemberOptions'),
+            'options_callback'  => array(\con4gis\ReservationBundle\Classes\Callbacks\ReservationsLoadMemberOptions::class, 'loadMemberOptions'),
             'eval'              => array('mandatory'=>false, 'disabled' => true, 'tl_class' => 'clr long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['noMember']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
@@ -821,6 +821,41 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'sql'                     => "varchar(50) NOT NULL default ''"
         ),
 
+        'team' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['team_role'],
+            'default'                 => '',
+            'exclude'                 => true,
+            'inputType'               => 'multiColumnWizard',
+            'eval'                    => array('mandatory'=>false, 'columnFields'	=> array
+            (
+                'team_member' => array
+                (
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['defaultMember'],
+                    'default'                 => 0,
+                    'inputType'               => 'select',
+                    //'foreignKey'              => 'tl_member.member_id',
+                    'options_callback'        => array(\con4gis\ReservationBundle\Classes\Callbacks\ReservationsLoadMemberOptions::class, 'loadMemberOptions'),
+                    'eval'                    => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'w50', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['noMember']),
+                    //'filter'                  => true,
+                    'sql'                     => "int(10) unsigned NOT NULL default 0"
+                ),
+
+                'team_role' => array
+                (
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['defaultRole'],
+                    'default'                 => 0,
+                    'inputType'               => 'select',
+                    'foreignKey'              => 'tl_c4g_reservation_team_role.caption',
+                    'eval'                    => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'w50', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['noRole']),
+                    //'filter'                  => false,
+                    'sql'                     => "int(10) unsigned NOT NULL default 0"
+                )
+
+            )),
+            'sql'                     => "blob NULL"
+        ),
+
         'published' => array(
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['published'],
             'exclude'           => true,
@@ -950,23 +985,6 @@ class tl_c4g_reservation_object extends Backend
 
         asort($return);
         return $return;
-    }
-
-    /**
-     * @param $dc
-     * @return array
-     */
-    public function loadMemberOptions($dc) {
-        $options = [];
-        $options[$dc->activeRecord->id] = '';
-
-        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
-        $result = $stmt->execute()->fetchAllAssoc();
-
-        foreach ($result as $row) {
-            $options[$row['id']] = $row['lastname'] . ', ' . $row['firstname'];
-        }
-        return $options;
     }
 
     /**

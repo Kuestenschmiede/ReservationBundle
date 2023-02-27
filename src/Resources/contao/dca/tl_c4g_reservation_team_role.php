@@ -136,19 +136,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_team_role'] = array
             'sql'                   => "char(5) NOT NULL default ''"
         ),
 
-        'default' => array(
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_team_role']['default'],
-            'exclude'                 => true,
-            'search'                  => false,
-            'inputType'               => 'checkbox',
-            'default'                 => '',
-//            'foreignKey'              => 'tl_c4g_reservation.team_role',
-//            'eval'                    => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
-//            'relation'                => array('type' => 'hasOne', 'load' => 'lazy'),
-//            'sql'                     => "blob NULL"
-
-        ),
-
         'published' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['published'],
             'exclude'                 => true,

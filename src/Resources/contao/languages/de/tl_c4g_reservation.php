@@ -87,6 +87,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmationEmail'] = 'Bestätigung v
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['noMember'] = 'kein Mitglied zugeordnet';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['noGroup'] = 'keine Gruppe zugeordnet';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['noRole'] = 'keine Rolle zugeordnet';
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend'] = "Reservierungsdaten";

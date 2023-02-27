@@ -136,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     'palettes' => array
     (
         '__selector__' => ['reservationObjectType'/*, 'confirmed'*/],
-        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {additional_legend:hide}, additional1, additional2, additional3; {comment_legend}, comment, fileUpload; {notification_legend}, confirmed, internal_comment, specialNotification, emailConfirmationSend; {state_legend}, cancellation, agreed, member_id, group_id, tstamp, bookedAt;',
+        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {additional_legend:hide}, additional1, additional2, additional3; {comment_legend}, comment, fileUpload; {notification_legend}, confirmed, internal_comment, specialNotification, emailConfirmationSend;{team_legend}, team;{state_legend}, cancellation, agreed, member_id, group_id, tstamp, bookedAt;',
     ),
 
     // Subpalettes
@@ -164,7 +164,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'exclude'           => true,
-            'options_callback'  => array('tl_c4g_reservation', 'loadMemberOptions'),
+            'options_callback'  => array(\con4gis\ReservationBundle\Classes\Callbacks\ReservationsLoadMemberOptions::class, 'loadMemberOptions'),
             'eval'              => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'clr long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['noMember']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
@@ -628,6 +628,37 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'eval'                    => ['preserve_tags'=>true, 'style'=>'width: calc(100% - 50px); max-height: 480px'],
             'sql'                     => "text NULL"
         ),
+        'team' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['team_role'],
+            'default'                 => '',
+            'exclude'                 => true,
+            'inputType'               => 'multiColumnWizard',
+            'eval'                    => array('mandatory'=>false,'tl_class' => 'w50 long', 'columnFields'	=> array
+            (
+                'team_member' => array
+                (
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['defaultMember'],
+                    'default'                 => 0,
+                    'inputType'               => 'select',
+                    'options_callback'        => array(\con4gis\ReservationBundle\Classes\Callbacks\ReservationsLoadMemberOptions::class, 'loadMemberOptions'),
+                    'eval'                    => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'w50 long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['noMember']),
+                    'sql'                     => "int(10) unsigned NOT NULL default 0"
+                ),
+
+                'team_role' => array
+                (
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['defaultRole'],
+                    'default'                 => 0,
+                    'inputType'               => 'select',
+                    'foreignKey'              => 'tl_c4g_reservation_team_role.caption',
+                    'eval'                    => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'w50 long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['noRole']),
+                    'sql'                     => "int(10) unsigned NOT NULL default 0"
+                )
+
+            )),
+            'sql'                     => "blob NULL"
+        ),
 
         'cancellation' => array(
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'],
@@ -707,9 +738,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'flag'              => 12,
             'default'           => time(),
             'eval' => array('rgxp'=>'datim', 'doNotCopy'=>true, 'tl_class'=>'w50', 'disabled'=>true)
-        )
-
-    )
+        ),
+    ),
 );
 
 
@@ -871,6 +901,7 @@ class tl_c4g_reservation extends Backend
         return $return;
     }
 
+
     /**
      * @param DataContainer $dc
      */
@@ -913,23 +944,6 @@ class tl_c4g_reservation extends Backend
             //delete key per redirect
             Controller::redirect(str_replace('&key='.$key, '', \Environment::get('request')));
         }
-    }
-
-    /**
-     * @param $dc
-     * @return array
-     */
-    public function loadMemberOptions($dc) {
-        $options = [];
-        $options[$dc->activeRecord->id] = '';
-
-        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
-        $result = $stmt->execute()->fetchAllAssoc();
-
-        foreach ($result as $row) {
-            $options[$row['id']] = $row['lastname'] . ', ' . $row['firstname'];
-        }
-        return $options;
     }
 
     /**

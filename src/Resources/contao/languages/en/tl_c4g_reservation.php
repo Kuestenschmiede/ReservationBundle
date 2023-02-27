@@ -87,8 +87,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['participants'] = 'Participants';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmationEmail'] = 'Send confirmation';
 
 
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['noMember'] = 'No member';
-$GLOBALS['TL_LANG']['tl_c4g_reservation']['noGroup'] = 'No group';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['noMember'] = 'No member selected';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['noMember'] = 'No member selected';
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['noRole'] = 'No role selected';
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_legend']  = "Reservation data";

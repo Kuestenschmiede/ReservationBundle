@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, price, priceoption;',
+        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, price, priceoption; {team_legend}, team;',
     ),
 
 
@@ -250,6 +250,38 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'inputType'         => 'select',
             'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'doNotCopy' => true),
             'sql'               => "char(1) NOT NULL default '0'"
+        ),
+
+        'team' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['team_role'],
+            'default'                 => '',
+            'exclude'                 => true,
+            'inputType'               => 'multiColumnWizard',
+            'eval'                    => array('mandatory'=>false,'tl_class' => 'w50 long', 'columnFields'	=> array
+            (
+                'team_member' => array
+                (
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['defaultMember'],
+                    'default'                 => 0,
+                    'inputType'               => 'select',
+                    'options_callback'        => array(\con4gis\ReservationBundle\Classes\Callbacks\ReservationsLoadMemberOptions::class, 'loadMemberOptions'),
+                    'eval'                    => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'w50 long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['noMember']),
+                    'sql'                     => "int(10) unsigned NOT NULL default 0"
+                ),
+
+                'team_role' => array
+                (
+                    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['defaultRole'],
+                    'default'                 => 0,
+                    'inputType'               => 'select',
+                    'foreignKey'              => 'tl_c4g_reservation_team_role.caption',
+                    'eval'                    => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'w50 long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['noRole']),
+                    'sql'                     => "int(10) unsigned NOT NULL default 0"
+                )
+
+            )),
+            'sql'                     => "blob NULL"
         )
     )
 );
