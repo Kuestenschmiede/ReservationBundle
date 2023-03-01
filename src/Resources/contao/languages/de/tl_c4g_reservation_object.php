@@ -38,7 +38,8 @@ $GLOBALS['TL_LANG'][$str]['oh_wednesday'] = array("Mittwoch", "");
 $GLOBALS['TL_LANG'][$str]['oh_thursday'] = array("Donnerstag", "");
 $GLOBALS['TL_LANG'][$str]['oh_friday'] = array("Freitag", "");
 $GLOBALS['TL_LANG'][$str]['oh_saturday'] = array("Samstag", "");
-$GLOBALS['TL_LANG'][$str]['oh_sunday'] = array("Sonntag", "Wichtig! Bei der Intervallart Übernachtung müssen zwei Zeiten definiert sein (CheckIn und CheckOut)");
+$GLOBALS['TL_LANG'][$str]['oh_sunday'] = array("Sonntag", "Wichtig! Bei der Intervallart Übernachtung müssen pro Wochentag zwei Zeiträume definiert sein (Anreise- und Abreisezeitraum). ".
+    "Die Zeiten können über die Checkbox 'Ankunfts- und Abfahrtszeiten anzeigen' in den Formulareinstellungen automatisiert im Formular dargestellt werden.");
 $GLOBALS['TL_LANG'][$str]['time_begin'] = array("Beginn", "");
 $GLOBALS['TL_LANG'][$str]['time_end'] = array("Ende", "");
 $GLOBALS['TL_LANG'][$str]['date_from'] = array("Gültig ab (optional)", "");
