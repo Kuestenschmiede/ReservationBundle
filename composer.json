@@ -15,8 +15,8 @@
         "php": "^7.4 || ^8.0",
         "contao/core-bundle": "^4.9",
         "contao/calendar-bundle": "^4.9",
-        "con4gis/projects": "^4.0.34",
-        "con4gis/documents": "^1.5.3",
+        "con4gis/projects": "^4.0.37",
+        "con4gis/documents": "^1.5.5",
         "con4gis/groups": "^2.8.5"
     },
     "require-dev": {
@@ -53,27 +53,18 @@
     },
     "config": {
         "allow-plugins": {
-            "bamarni/composer-bin-plugin": true,
             "contao-components/installer": true,
             "contao/manager-plugin": true,
             "preferred-install": "dist"
         }
     },
     "extra": {
-        "bamarni-bin": {
-            "bin-links": false,
-            "target-directory": "tools"
-        },
         "contao-manager-plugin": "con4gis\\ReservationBundle\\ContaoManager\\Plugin"
     },
     "scripts": {
         "all": [
-            "@unit-tests",
-            "@ecs",
-            "@phpstan"
+            "@unit-tests"
         ],
-        "ecs": "@php tools/ecs/vendor/bin/ecs check src tests --config ecs.php --fix --ansi",
-        "phpstan": "@php tools/phpstan/vendor/bin/phpstan analyze --ansi",
         "unit-tests": "@php vendor/bin/phpunit --colors=always"
     }
 }
