@@ -447,6 +447,14 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $priceDBField->setNotificationField(true);
         $this->fieldList[] = $priceDBField;
 
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceSum');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
         $includedParams = $listType['includedParams'];
         $includedParamsArr = [];
 

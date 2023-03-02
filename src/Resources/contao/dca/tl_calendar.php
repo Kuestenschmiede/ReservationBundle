@@ -149,7 +149,7 @@ $GLOBALS['TL_DCA'][$str]['fields']['reservationPriceOption'] = [
     'label'                   => &$GLOBALS['TL_LANG'][$str]['priceoption'],
     'exclude'                 => true,
     'inputType'               => 'radio',
-    'options'                 => array('pReservation','pPerson','pDay','pHour','pMin','pAmount'),
+    'options'                 => array('pReservation','pPerson','pDay','pNight','pNightPerson','pHour','pMin','pAmount'),
     'default'                 => '',
     'reference'               => &$GLOBALS['TL_LANG'][$str]['references'],
     'eval'                    => array('mandatory'=>false, 'tl_class' => 'long clr'),

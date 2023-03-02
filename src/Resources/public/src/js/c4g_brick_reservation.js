@@ -621,6 +621,7 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         c4gFormCheckInput.setAttribute('data-object', objstr);
         c4gFormCheckInput.setAttribute("value", time+'#'+interval);
         c4gFormCheckInput.setAttribute("data-stamp", begin);
+        c4gFormCheckInput.setAttribute("data-desc", description);
         c4gFormCheckInput.style = "display: block;";
 
         if (disabled) {
