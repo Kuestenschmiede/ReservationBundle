@@ -1612,11 +1612,15 @@ class C4gReservationController extends C4GBaseController
                 $price = C4gReservationHandler::formatPrice($reservationEventObject->price);
                 $putVars['price'] = $price;
 
-                if ($desiredCapacity && $reservationEventObject->priceoption && $reservationEventObject->priceoption['pPerson']) {
+                if ($this->reservationSettings->withCapacity) {
+                    $desiredCapacity = $putVars['desiredCapacity_'.$type];
+                }
+
+                if ($desiredCapacity && $reservationEventObject->priceoption && $reservationEventObject->priceoption == 'pPerson') {
                     $priceSum = $desiredCapacity * $reservationEventObject->price;
                     if ($priceSum) {
                         $priceSum = C4gReservationHandler::formatPrice($priceSum);
-                        $putVars['price'] = $priceSum;
+                        $putVars['priceSum'] = $priceSum;
                     }
                 } else {
                     $putVars['priceSum'] = $price;
@@ -1797,15 +1801,20 @@ class C4gReservationController extends C4GBaseController
             }
 
             //just notification
-            if ($reservationEventObject->price) {
-                $price = C4gReservationHandler::formatPrice($reservationEventObject->price);
+            $factor = 1;
+            $desiredCapacity =  $reservationObject && $reservationObject->maxParticipants ? ($reservationObject->maxParticipants * $factor) : 0;
+            if ($reservationObject->price) {
+                $price = C4gReservationHandler::formatPrice($reservationObject->price);
                 $putVars['price'] = $price;
+                if ($this->reservationSettings->withCapacity) {
+                    $desiredCapacity = $putVars['desiredCapacity_'.$type];
+                }
 
-                if ($desiredCapacity && $reservationEventObject->priceoption && $reservationEventObject->priceoption['pPerson']) {
-                    $priceSum = $desiredCapacity * $reservationEventObject->price;
+                if ($desiredCapacity && $reservationObject->priceoption && $reservationObject->priceoption == 'pPerson') {
+                    $priceSum = $desiredCapacity * $reservationObject->price;
                     if ($priceSum) {
                         $priceSum = C4gReservationHandler::formatPrice($priceSum);
-                        $putVars['price'] = $priceSum;
+                        $putVars['priceSum'] = $priceSum;
                     }
                 } else {
                     $putVars['priceSum'] = $price;

@@ -380,6 +380,12 @@ class C4gReservationHandler
             $format = $withoutTime ? $GLOBALS['TL_CONFIG']['dateFormat'] : $GLOBALS['TL_CONFIG']['datimFormat'];
             $begin = date($format, $obj['mergedTime']).$clockEx;
             $end = date($format, $obj['mergedEndTime']).$clockEx;
+            if ($begin == $end){
+                $end = $obj['mergedEndTime'] + 86400;
+                $end = date($format,$end).$clockEx;
+            } else {
+                $end = date($format, $obj['mergedEndTime']).$clockEx;
+            }
 
             $mergedTime = true;
         }
@@ -1511,6 +1517,12 @@ class C4gReservationHandler
     private static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '') {
         $price = 0;
         if ($object) {
+
+            //ToDo Test!!!
+            if (!$duration) {
+                $duration = $type['min_residence_time'];
+            }
+
             if ($langCookie) {
                 \System::loadLanguageFile('fe_c4g_reservation', $langCookie);
             }
@@ -1583,6 +1595,27 @@ class C4gReservationHandler
                         $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
                     }
                     $price = $price + (intval($object['price']) * $days);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'];
+                    break;
+                case 'pNight':
+                    $days = $duration ?: 0;
+                    if ($isEvent && $object['startDate'] && $object['endDate']) {
+                        $days = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24));
+                    } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
+                        $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
+                    }
+                    $price = $price + (intval($object['price']) * $days);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNight'];
+                    break;
+                case 'pNightPerson':
+                    $days = $duration ?: 0;
+                    if ($isEvent && $object['startDate'] && $object['endDate']) {
+                        $days = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24));
+                    } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
+                        $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
+                    }
+                    $price += (intval($object['price']) * $days * $countPersons);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNightPerson'];
                     break;
                 case 'pWeek':
                     $weeks = $duration ?: 0;
@@ -1700,7 +1733,7 @@ class C4gReservationHandler
                 foreach ($calendarObject as $calendar) {
                     $allEvents = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($calendar['iid'])->fetchAllAssoc();
                     foreach ($allEvents as $eventObject) {
-                        $reservationEvent = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `id` = ? AND `reservationType` IN $idString")->execute($event['id'])->fetchAssoc();
+                        $reservationEvent = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `id` = ? AND `reservationType` IN $idString")->execute($eventObject['id'])->fetchAssoc();
 
                         $targetAudience = $reservationEvent['targetAudience'] ? \Contao\StringUtil::deserialize($reservationEvent['targetAudience']) : [];
                         $reservationTargetAudience = $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience']) : [];
