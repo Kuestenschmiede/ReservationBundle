@@ -174,7 +174,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'flag'              => 1,
             'search'            => false,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50', 'doNotCopy' => true),
+            'eval'              => array('mandatory'=>false, 'rgxp'=>'digit', 'minval' => 1, 'tl_class'=>'w50', 'doNotCopy' => true),
             'sql'               => "smallint(3) NOT NULL default 1"
         ),
 

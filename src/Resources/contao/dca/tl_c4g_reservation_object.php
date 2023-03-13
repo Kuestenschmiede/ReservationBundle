@@ -335,7 +335,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['time_interval'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>true, 'tl_class'=>'w50'),
+            'eval'              => array('rgxp'=>'digit', 'minval'=>1, 'mandatory'=>true, 'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NOT NULL default 1"
         ),
 
