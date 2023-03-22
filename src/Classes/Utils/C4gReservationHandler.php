@@ -1355,7 +1355,21 @@ class C4gReservationHandler
         }
         return self::addTime([], $object->getBeginTime(), $timeObj, 0, $endTime);
     }
+    public static function getMaxParticipentsForObject($objectId,$maxParticipents){
+        $id = $objectId;
+        $database = Database::getInstance();
+        $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
+            ->execute($id,'2','1')->fetchAllAssoc();
 
+        $actPersons = 0;
+        if ($reservations) {
+            foreach ($reservations as $reservation) {
+                $actPersons = $actPersons + intval($reservation['desiredCapacity']);
+            }
+        }
+
+        return $maxParticipents-$actPersons;
+    }
     /**
      * @param $object
      * @param false $withEndTimes
@@ -1691,6 +1705,9 @@ class C4gReservationHandler
                 $topic = $event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : [];
                 $reservationTopic = $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic']) : [];
 
+                $maxParticipants = $event['maxParticipants'] ?: $calendarObject['reservationMaxParticipants'];
+                $maxParticipants = self::getMaxParticipentsForObject($objectId, $maxParticipants);
+
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject['id']);
@@ -1698,7 +1715,7 @@ class C4gReservationHandler
                 $eventObject['priceoption'] = $event['priceoption'] ?: $calendarObject['reservationPriceOption'];
                 $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                 $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
-                $frontendObject->setDesiredCapacity([$event['minParticipants'] ?:  $calendarObject['reservationMinParticipants'], $event['maxParticipants'] ?:  $calendarObject['reservationMaxParticipants']]);
+                $frontendObject->setDesiredCapacity([$event['minParticipants'] ?:  $calendarObject['reservationMinParticipants'], $maxParticipants]);
                 $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                 $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                 $frontendObject->setEndDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
@@ -1745,6 +1762,9 @@ class C4gReservationHandler
                         $reservationTopic = $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic']) : [];
 
                         if ($eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > $startTime)) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= $startTime))) {
+                            $maxParticipants = $reservationEvent['maxParticipants'] ?: $calendarObject['reservationMaxParticipants'];
+                            $maxParticipants = self::getMaxParticipentsForObject($objectId, $maxParticipants);
+
                             $frontendObject = new C4gReservationFrontendObject();
                             $frontendObject->setType(2);
                             $frontendObject->setId($eventObject['id']);
@@ -1752,7 +1772,7 @@ class C4gReservationHandler
                             $eventObject['priceoption'] = $reservationEvent['priceoption'] ?: $calendarObject['reservationPriceOption'];
                             $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
                             $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title']) . "<span class='price'>&nbsp;(" . $price . ")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
-                            $frontendObject->setDesiredCapacity([$reservationEvent['minParticipants'] ?: $calendarObject['reservationMinParticipants'], $reservationEvent['maxParticipants'] ?: $calendarObject['reservationMaxParticipants']]);
+                            $frontendObject->setDesiredCapacity([$reservationEvent['minParticipants'] ?: $calendarObject['reservationMinParticipants'], $maxParticipants]);
                             $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'], $eventObject['startTime']));
                             $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'], $eventObject['startTime']));
                             $frontendObject->setEndDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'], $eventObject['endTime']));
