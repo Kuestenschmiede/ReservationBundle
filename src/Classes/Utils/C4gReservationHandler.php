@@ -341,6 +341,7 @@ class C4gReservationHandler
 
         $langCookie = $list['langCookie'];
         $withEndTimes = $list['withEndTimes'];
+        $departureTimeEndStamp = 0;
 
         if ($langCookie) {
             \Contao\System::loadLanguageFile('fe_c4g_reservation',$langCookie);
@@ -359,7 +360,15 @@ class C4gReservationHandler
             $arrivalTimeBegin =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][0]['time_begin']);
             $arrivalTimeEnd =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][0]['time_end_org']);
             $departureTimeBegin =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][1]['time_begin']);
-            $departureTimeEnd =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][1]['time_end']);
+
+            $departureTimeEnd = $list['showArrivalAndDeparture'][$weekday][1]['time_end'];
+
+            if (($list['type']['periodType'] == 'overnight') || ($departureTimeEnd < 86400)){
+                $departureTimeEndStamp = $departureTimeEnd;
+                $departureTimeEnd = date($GLOBALS['TL_CONFIG']['timeFormat'],$departureTimeEndStamp);
+            } else {
+                $departureTimeEnd = date($GLOBALS['TL_CONFIG']['timeFormat'],$departureTimeEnd);
+            }
 
             $description = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_arrivalTime'] . $arrivalTimeBegin . '-' . $arrivalTimeEnd.$clock.", " . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_departureTime'] . $departureTimeBegin . '-' . $departureTimeEnd.$clock;
             $withoutTime = true;
@@ -379,11 +388,12 @@ class C4gReservationHandler
             $clockEx = $withoutTime ? '' : $clock;
             $format = $withoutTime ? $GLOBALS['TL_CONFIG']['dateFormat'] : $GLOBALS['TL_CONFIG']['datimFormat'];
             $begin = date($format, $obj['mergedTime']).$clockEx;
-            $end = date($format, $obj['mergedEndTime']).$clockEx;
-            if ($begin == $end){
-                $end = $obj['mergedEndTime'] + 86400;
-                $end = date($format,$end).$clockEx;
-            } else {
+
+            if ($list['type']['periodType'] == 'overnight'){
+                $actDurationStamp = 86400 * $list['actDuration'];
+                $end = date($format, $list['tsdate'] + $departureTimeEndStamp + $actDurationStamp).$clockEx;
+
+            }else{
                 $end = date($format, $obj['mergedEndTime']).$clockEx;
             }
 
