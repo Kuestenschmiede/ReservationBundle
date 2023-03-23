@@ -1,7 +1,7 @@
 {
     "name": "con4gis/reservation",
     "description": "Contao module for creating reservation forms. For example for tables, rooms or other objects.",
-    "keywords": ["con4gis", "reservation", "room", "table", "practice", "event", "seminar", "contao", "c4g"],
+    "keywords": ["con4gis", "reservation", "room", "table", "practice", "event", "seminar", "contao", "c4g", "events", "calendar"],
     "type": "contao-bundle",
     "homepage": "https://con4gis.org",
     "license": "LGPL-3.0+",
@@ -15,7 +15,7 @@
         "php": "^7.4 || ^8.0",
         "contao/core-bundle": "^4.9",
         "contao/calendar-bundle": "^4.9",
-        "con4gis/projects": "^4.0.37",
+        "con4gis/projects": "^4.0.38",
         "con4gis/documents": "^1.5.5",
         "con4gis/groups": "^2.8.5"
     },
