@@ -482,6 +482,9 @@ class C4gReservationController extends C4GBaseController
                 $reservationDesiredCapacity = new C4GNumberField();
                 $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
+                if ($maxCapacity) {
+                    $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
+                }
                 if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity)) {
                     $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
                 } else {

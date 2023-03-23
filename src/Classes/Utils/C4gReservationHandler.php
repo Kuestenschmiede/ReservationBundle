@@ -392,7 +392,6 @@ class C4gReservationHandler
             if ($list['type']['periodType'] == 'overnight'){
                 $actDurationStamp = 86400 * $list['actDuration'];
                 $end = date($format, $list['tsdate'] + $departureTimeEndStamp + $actDurationStamp).$clockEx;
-
             }else{
                 $end = date($format, $obj['mergedEndTime']).$clockEx;
             }
