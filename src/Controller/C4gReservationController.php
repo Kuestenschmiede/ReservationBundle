@@ -1618,13 +1618,8 @@ class C4gReservationController extends C4GBaseController
                 if ($this->reservationSettings->withCapacity) {
                     $desiredCapacity = $putVars['desiredCapacity_'.$type];
                 }
-
-                if ($desiredCapacity && $reservationEventObject->priceoption && $reservationEventObject->priceoption == 'pPerson') {
-                    $priceSum = $desiredCapacity * $reservationEventObject->price;
-                    if ($priceSum) {
-                        $priceSum = C4gReservationHandler::formatPrice($priceSum);
-                        $putVars['priceSum'] = $priceSum;
-                    }
+                if ($desiredCapacity && $reservationEventObject->priceoption) {
+                    $putVars['priceSum'] = self::calcPrices($putVars, $reservationObject, $reservationType, $reservationEventObject);
                 } else {
                     $putVars['priceSum'] = $price;
                 }
@@ -1812,13 +1807,8 @@ class C4gReservationController extends C4GBaseController
                 if ($this->reservationSettings->withCapacity) {
                     $desiredCapacity = $putVars['desiredCapacity_'.$type];
                 }
-
-                if ($desiredCapacity && $reservationObject->priceoption && $reservationObject->priceoption == 'pPerson') {
-                    $priceSum = $desiredCapacity * $reservationObject->price;
-                    if ($priceSum) {
-                        $priceSum = C4gReservationHandler::formatPrice($priceSum);
-                        $putVars['priceSum'] = $priceSum;
-                    }
+                if ($desiredCapacity && $reservationObject->priceoption) {
+                    $putVars['priceSum']  = self::calcPrices($putVars, $reservationObject, $reservationType, $reservationEventObject = "");
                 } else {
                     $putVars['priceSum'] = $price;
                 }
@@ -2190,6 +2180,134 @@ class C4gReservationController extends C4GBaseController
     public function setReservationSettings($reservationSettings): void
     {
         $this->reservationSettings = $reservationSettings;
+    }
+
+    public function calcPrices($putVars, $reservationObject, $reservationType, $reservationEventObject = ""): string
+    {
+        $price = 0;
+        $priceSum = 0;
+        $objectTypeId = $putVars['reservationObjectType'];
+        $isEvent = $objectTypeId === '2';
+        $object = $isEvent ? $reservationEventObject : $reservationObject;
+
+        if ($object) {
+
+            $type = $putVars['reservation_type'];
+            $periodType = $reservationType->periodType;
+            $priceOption = $object->priceoption?: '';
+            $price = $object->price;
+
+            if (!$isEvent){
+                if ($objectTypeId === "3"){
+                    $objectId = $putVars['reservation_object_'.$type];
+                    $additionalId = "-33$objectId";
+                }
+                $beginDate = ($objectTypeId === "3") ? $putVars['beginDate_'.$type.$additionalId] : $putVars['beginDate_'.$type];
+                $beginTime = ($objectTypeId === "3") ? $putVars['beginTime_'.$type.$additionalId] : $putVars['beginTime_'.$type];
+            } else {
+                $beginDate = $putVars['beginDate'];
+                $beginTime = $putVars['beginTime'];
+            }
+            $endDate = $putVars['endDate'];
+            $endTime = $putVars['endTime'];
+            $interval = $object->time_interval;
+            $duration = $putVars['duration_'.$type];
+            $countPersons = $putVars['desiredCapacity_'.$type];
+            $timeSpan = max($duration, $interval);
+            switch ($priceOption) {
+                case 'pMin':
+                    if ($isEvent && $beginTime && $endTime) {
+                        $diff = $endTime - $beginTime;
+                        if ($diff > 0) {
+                            $minutes = $diff / 60;
+                        }
+                    } else if (!$isEvent && $periodType && $interval) {
+                        switch ($periodType) {
+                            case 'minute':
+                                $minutes = $timeSpan;
+                                break;
+                            case 'hour':
+                                $minutes = $timeSpan * 60;
+                                break;
+                            case 'overnight':
+                            case 'day':
+                                $minutes = $timeSpan * 60 * 24;
+                                break;
+                            case 'week':
+                                $minutes = $timeSpan * 60 * 24 * 7;
+                                break;
+                            default:
+                                '';
+                        }
+                    }
+                    $priceSum = intval($price) * $minutes;
+                    break;
+                case 'pHour':
+                    if ($isEvent && $beginTime && $endTime) {
+                        $diff = $endTime - $beginTime;
+                        if ($diff > 0) {
+                            $hours = $diff / 3600;
+                        }
+                    } else if (!$isEvent && $periodType && $interval) {
+                        switch ($periodType) {
+                            case 'minute':
+                                $hours = $timeSpan / 60;
+                                break;
+                            case 'hour':
+                                $hours = $timeSpan;
+                                break;
+                            case 'overnight':
+                            case 'day':
+                                $hours = $timeSpan * 24;
+                                break;
+                            case 'week':
+                                $hours = $timeSpan * 24 * 7;
+                                break;
+                            default:
+                                '';
+                        }
+                    }
+                    $priceSum = intval($price) * $hours;
+                    break;
+                case 'pNight':
+                case 'pDay':
+                    $days = $timeSpan ?: 0;
+                    if ($isEvent && $beginDate && $endDate) {
+                        $days = round(abs($endDate - $beginDate) / (60 * 60 * 24));
+                    } else if (!$days && !$isEvent && $beginDate && $endDate) {
+                        $days = round(abs($endDate - $beginDate) / (60 * 60 * 24));
+                    }
+                    $price = intval($price) * $days;
+                    break;
+                case 'pNightPerson':
+                    $days = $timeSpan ?: 0;
+                    if ($isEvent && $beginDate && $endDate) {
+                        $days = round(abs($endDate - $beginDate) / (60 * 60 * 24));
+                    } else if (!$days && !$isEvent && $beginDate && $endDate) {
+                        $days = round(abs($endDate - $beginDate) / (60 * 60 * 24));
+                    }
+                    $priceSum += intval($price) * $days * $countPersons;
+                    break;
+                case 'pWeek':
+                    $weeks = $timeSpan ?: 0;
+                    if ($isEvent && $beginDate && $endDate) {
+                        $weeks = round(abs($endDate - $beginDate) / (60 * 60 * 24 * 7));
+                    } else if (!$weeks && !$isEvent && $beginDate && $endDate) {
+                        $weeks = round(abs($endDate - $beginDate) / (60 * 60 * 24 * 7));
+                    }
+                    $priceSum = intval($price) * $weeks;
+                    break;
+                case 'pReservation':
+                    $priceSum = intval($price);
+                    break;
+                case 'pPerson':
+                    $priceSum = intval($price) * $countPersons;
+                    break;
+                case 'pAmount':
+                    break;
+            }
+        }
+        return $price ? C4gReservationHandler::formatPrice($priceSum) :  C4gReservationHandler::formatPrice($price);
     }
 }
 

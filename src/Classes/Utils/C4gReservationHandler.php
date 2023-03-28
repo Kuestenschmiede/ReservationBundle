@@ -300,15 +300,6 @@ class C4gReservationHandler
     }
 
     /**
-     * @param $object
-     * @return bool
-     */
-//    public static function isEventObject($object) {
-//        //ToDo ???
-//    }
-
-
-    /**
      * @param $day
      * @param $date
      * @return bool
@@ -1541,7 +1532,6 @@ class C4gReservationHandler
         $price = 0;
         if ($object) {
 
-            //ToDo Test!!!
             if (!$duration) {
                 $duration = $type['min_residence_time'];
             }
@@ -1551,6 +1541,8 @@ class C4gReservationHandler
             }
             $priceOption = key_exists('priceoption',$object) ? $object['priceoption'] : '';
             $priceInfo = '';
+            $interval = $object['time_interval'];
+            $timeSpan = max($duration, $interval);
             switch ($priceOption) {
                 case 'pMin':
                     if ($isEvent && $object['startTime'] && $object['endTime']) {
@@ -1558,28 +1550,28 @@ class C4gReservationHandler
                         if ($diff > 0) {
                             $minutes = $diff / 60;
                         }
-                    } else if (!$isEvent && $type['periodType'] && $object['time_interval']) {
+                    } else if (!$isEvent && $type['periodType'] && $interval) {
                         switch ($type['periodType']) {
                             case 'minute':
-                                $minutes = $object['time_interval'];
+                                $minutes = $timeSpan;
                                 break;
                             case 'hour':
-                                $minutes = $object['time_interval'] * 60;
-                                break;
-                            case 'day':
-                                $minutes = $object['time_interval'] * 60 * 24;
+                                $minutes = $timeSpan * 60;
                                 break;
                             case 'overnight':
-                                $minutes = $object['time_interval'] * 60 * 24;
+                            case 'day':
+                                $minutes = $timeSpan * 60 * 24;
                                 break;
                             case 'week':
-                                $minutes = $object['time_interval'] * 60 * 24 * 7;
+                                $minutes = $timeSpan * 60 * 24 * 7;
                                 break;
                             default:
                                 '';
                         }
                     }
-                    $price = $price + (intval($object['price']) * $minutes);
+                    $price = $price + intval($object['price']);
+                    $price = $price + intval($object['price']);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'];
                     break;
                 case 'pHour':
                     if ($isEvent && $object['startTime'] && $object['endTime']) {
@@ -1587,29 +1579,30 @@ class C4gReservationHandler
                         if ($diff > 0) {
                             $hours = $diff / 3600;
                         }
-                    } else if (!$isEvent && $type['periodType'] && $object['time_interval']) {
+                    } else if (!$isEvent && $type['periodType'] && $timeSpan) {
                         switch ($type['periodType']) {
                             case 'minute':
-                                $hours = $object['time_interval'] / 60;
+                                $hours = $timeSpan / 60;
                                 break;
                             case 'hour':
-                                $hours = $object['time_interval'];
-                                break;
-                            case 'day':
-                                $hours = $object['time_interval'] * 24;
+                                $hours = $timeSpan;
                                 break;
                             case 'overnight':
-                                $hours = $object['time_interval'] * 24;
+                            case 'day':
+                                $hours = $timeSpan * 24;
                                 break;
                             case 'week':
-                                $hours = $object['time_interval'] * 24 * 7;
+                                $hours = $timeSpan * 24 * 7;
                                 break;
                             default:
                                 '';
                         }
                     }
-                    $price = $price + (intval($object['price']) * $hours);
+//                    $price = $price + (intval($object['price'])*$hours); Only for sum prices
+                    $price = $price + (intval($object['price']));
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pHour'];
                     break;
+                case 'pNight':
                 case 'pDay':
                     $days = $duration ?: 0;
                     if ($isEvent && $object['startDate'] && $object['endDate']) {
@@ -1617,18 +1610,9 @@ class C4gReservationHandler
                     } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
                         $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
                     }
-                    $price = $price + (intval($object['price']) * $days);
-                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'];
-                    break;
-                case 'pNight':
-                    $days = $duration ?: 0;
-                    if ($isEvent && $object['startDate'] && $object['endDate']) {
-                        $days = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24));
-                    } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
-                        $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
-                    }
-                    $price = $price + (intval($object['price']) * $days);
-                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNight'];
+//                    $price = $price + (intval($object['price']) * $days); Only for sum prices
+                    $price = $price + (intval($object['price']));
+                    $priceInfo = ($type['periodType'] === 'day') ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNight'];
                     break;
                 case 'pNightPerson':
                     $days = $duration ?: 0;
@@ -1637,7 +1621,8 @@ class C4gReservationHandler
                     } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
                         $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
                     }
-                    $price += (intval($object['price']) * $days * $countPersons);
+//                    $price += (intval($object['price']) * $days * $countPersons); Only for sum prices
+                    $price += (intval($object['price']));
                     $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNightPerson'];
                     break;
                 case 'pWeek':
@@ -1647,10 +1632,13 @@ class C4gReservationHandler
                     } else if (!$weeks && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
                         $weeks = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24 * 7));
                     }
-                    $price = $price + (intval($object['price']) * $weeks);
+//                    $price = $price + (intval($object['price']) * $weeks); Only for sum prices
+                    $price = $price + (intval($object['price']));
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pWeek'];
                     break;
                 case 'pReservation':
                     $price = $price + intval($object['price']);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pEvent'];
                     break;
                 case 'pPerson':
                     $price = ($price + intval($object['price']));
@@ -1658,7 +1646,6 @@ class C4gReservationHandler
                     break;
                 case 'pAmount':
                     $price = $price + intval($object['price']);
-                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pAmount'];
                     break;
             }
 
