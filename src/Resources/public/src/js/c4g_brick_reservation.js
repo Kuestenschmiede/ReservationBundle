@@ -52,6 +52,15 @@ function setObjectId(object, typeid, showDateTime = 0) {
     }
 
     hideOptions(typeId, values, showDateTime);
+    if (object) {
+        let desc = object.getAttribute('data-desc');
+        if (desc) {
+            let descElement = object.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.c4g__form-description');
+            if (descElement) {
+                descElement.innerHTML = desc;
+            }
+        }
+    }
 
     if (oldValue) {
        for (i = 0; i < selectField.options.length; i++) {
