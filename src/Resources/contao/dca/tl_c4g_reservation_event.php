@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, price, priceoption;',
+        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, min_reservation_day, price, priceoption; {team_legend}, team;',
     ),
 
 
@@ -185,8 +185,19 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'flag'              => 1,
             'search'            => false,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50', 'doNotCopy' => true),
+            'eval'              => array('mandatory'=>false, 'rgxp'=>'digit', 'minval' => 0, 'tl_class'=>'w50', 'doNotCopy' => true),
             'sql'               => "smallint(3) NOT NULL default 0"
+        ),
+
+        'min_reservation_day' => array(
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_reservation_day'],
+            'exclude'                 => true,
+            'sorting'                 => false,
+            'flag'                    => 1,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50 clr'),
+            'sql'                     => "smallint(3) NOT NULL default 1"
         ),
 
         'speaker' => array
