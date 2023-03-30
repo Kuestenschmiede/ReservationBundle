@@ -75,7 +75,7 @@ class C4gReservationDateChecker
      */
     public static function getCESDiffToGMT($stamp) {
         $timezone = timezone_open('GMT');
-        $datetime = date_create(\Safe\date($GLOBALS['TL_CONFIG']['datimFormat'], $time), timezone_open($GLOBALS['TL_CONFIG']['timeZone']));
+        $datetime = date_create(\Safe\date($GLOBALS['TL_CONFIG']['datimFormat'], $stamp), timezone_open($GLOBALS['TL_CONFIG']['timeZone']));
         return timezone_offset_get($timezone, $datetime);
     }
 
@@ -84,7 +84,7 @@ class C4gReservationDateChecker
      */
     public static function getCESDiffToLocale($stamp) {
         $timezone = timezone_open($GLOBALS['TL_CONFIG']['timeZone']);
-        $datetime = date_create(\Safe\date($GLOBALS['TL_CONFIG']['datimFormat'], $time), timezone_open('GMT'));
+        $datetime = date_create(\Safe\date($GLOBALS['TL_CONFIG']['datimFormat'], $stamp), timezone_open('GMT'));
         return timezone_offset_get($timezone, $datetime);
     }
 

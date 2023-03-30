@@ -73,21 +73,12 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
 
             switch($listType['periodType']) {
                 case 'minute':
-                    $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'];
-                    $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'];
-                    break;
                 case 'hour':
                     $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'];
                     $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'];
                     break;
                 case 'day':
-                    $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
-                    $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'];
-                    break;
                 case 'overnight':
-                    $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
-                    $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'];
-                    break;
                 case 'week':
                     $titleDate = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateMultipleDays'];
                     $titleBeginTime = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeMultipleDays'];

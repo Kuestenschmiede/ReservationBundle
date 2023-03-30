@@ -378,13 +378,15 @@ class C4gReservationHandler
         if ($obj['mergedTime'] && $obj['mergedEndTime']) {
             $clockEx = $withoutTime ? '' : $clock;
             $format = $withoutTime ? $GLOBALS['TL_CONFIG']['dateFormat'] : $GLOBALS['TL_CONFIG']['datimFormat'];
-            $begin = date($format, $obj['mergedTime']).$clockEx;
+            $begin = date('I', $obj['mergedTime']) ? date($format, $obj['mergedTime']-3600).$clockEx : date($format, $obj['mergedTime']).$clockEx ;
+//            $begin = date($format, $obj['mergedTime']).$clockEx; Todo buttons displayed incorrectly due to summer and winter times
 
             if ($list['type']['periodType'] == 'overnight'){
                 $actDurationStamp = 86400 * $list['actDuration'];
                 $end = date($format, $list['tsdate'] + $departureTimeEndStamp + $actDurationStamp).$clockEx;
             }else{
-                $end = date($format, $obj['mergedEndTime']).$clockEx;
+                $end = date('I', $obj['mergedEndTime']) ? date($format, $obj['mergedEndTime']-3600).$clockEx : date($format, $obj['mergedEndTime']).$clockEx ;
+//                $end = date($format, $obj['mergedEndTime']).$clockEx; Todo
             }
 
             $mergedTime = true;
@@ -410,7 +412,7 @@ class C4gReservationHandler
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else {
                 $key = $time.'#'.$interval;
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj], 'description' => $description);
             }
         } else {
             if ($withEndTimes && $interval) {
@@ -969,11 +971,9 @@ class C4gReservationHandler
             $maxResidenceTime = $timeParams['type']['max_residence_time'];
             switch ($periodType) {
                 case 'day':
-                    $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 : 86400;
-                    break;
                 case 'overnight':
                     $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 : 86400;
-                     break;
+                    break;
                 case 'week':
                     $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 * 7 : 86400 * 7;
                     break;
