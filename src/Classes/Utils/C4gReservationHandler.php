@@ -379,14 +379,15 @@ class C4gReservationHandler
             $clockEx = $withoutTime ? '' : $clock;
             $format = $withoutTime ? $GLOBALS['TL_CONFIG']['dateFormat'] : $GLOBALS['TL_CONFIG']['datimFormat'];
             $begin = date('I', $obj['mergedTime']) ? date($format, $obj['mergedTime']-3600).$clockEx : date($format, $obj['mergedTime']).$clockEx ;
-//            $begin = date($format, $obj['mergedTime']).$clockEx; Todo buttons displayed incorrectly due to summer and winter times
+//            $begin = date($format, $obj['mergedTime']).$clockEx; //Todo buttons displayed incorrectly due to summer and winter times
 
             if ($list['type']['periodType'] == 'overnight'){
-                $actDurationStamp = 86400 * $list['actDuration'];
+//                $actDurationStamp = 86400 * $list['actDuration'];
+                $actDurationStamp = $list['actDuration'] == '-1' ? ($list['actDuration']  * $interval) * -1 : $list['actDuration'] * 86400;
                 $end = date($format, $list['tsdate'] + $departureTimeEndStamp + $actDurationStamp).$clockEx;
             }else{
                 $end = date('I', $obj['mergedEndTime']) ? date($format, $obj['mergedEndTime']-3600).$clockEx : date($format, $obj['mergedEndTime']).$clockEx ;
-//                $end = date($format, $obj['mergedEndTime']).$clockEx; Todo
+//                $end = date($format, $obj['mergedEndTime']).$clockEx; //Todo
             }
 
             $mergedTime = true;
@@ -1094,10 +1095,6 @@ class C4gReservationHandler
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 3600 : 0;
                         break;
                     case 'day':
-                        $timeObjectParams['defaultInterval'] = $defaultInterval * 86400;
-                        $timeObjectParams['interval'] = $timeInterval * 86400;
-                        $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 86400 : 0;
-                        break;
                     case 'overnight':
                         $timeObjectParams['defaultInterval'] = $defaultInterval * 86400;
                         $timeObjectParams['interval'] = $timeInterval * 86400;

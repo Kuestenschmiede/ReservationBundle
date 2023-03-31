@@ -246,11 +246,22 @@ function hideOptions(typeId, values, showDateTime) {
                             text = text.substr(0 , pos);
                         }
 
-                        //ToDo other currencies
-                        if (priceText && priceText.search(/€/) !== -1) {
-                            option.textContent = text + '\u00A0('+priceText+';\u00A0'+date+'\u00A0'+time+')';
+                        var pos_date = time.indexOf(date);
+                        if (pos_date != -1) {
+                            //ToDo other currencies
+                            if (priceText && priceText.search(/€/) !== -1) {
+                                option.textContent = text + '\u00A0('+priceText+';\u00A0'+time+')';
+                            } else {
+                                option.textContent = text + '\u00A0('+time+')';
+                            }
                         } else {
-                            option.textContent = text + '\u00A0('+date+'\u00A0'+time+')';
+                            //ToDo other currencies
+                            if (priceText && priceText.search(/€/) !== -1) {
+                                option.textContent = text + '\u00A0('+priceText+';\u00A0'+date+'\u00A0'+time+')';
+                            } else {
+                                option.textContent = text + '\u00A0('+date+'\u00A0'+time+')';
+                            }
+
                         }
                     }
                 }
