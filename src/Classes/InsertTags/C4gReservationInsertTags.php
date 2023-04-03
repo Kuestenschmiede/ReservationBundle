@@ -462,19 +462,19 @@ class C4gReservationInsertTags
                                     case '1':
                                         return $this->getHtmlSkeleton(
                                             'state',
-                                            $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
+                                            $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'],
                                             '<img class="c4g_reservation_state c4g_reservation_state_green img-fluid" loading="lazy" height="32px" width="32px" src="bundles/con4gisreservation/images/circle_green.svg" alt="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'] . '" title="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_green'] . '">'
                                         );
                                     case '2':
                                         return $this->getHtmlSkeleton(
                                             'state',
-                                            $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
+                                            $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'],
                                             '<img class="c4g_reservation_state c4g_reservation_state_orange img-fluid" loading="lazy" height="32px" width="32px" src="bundles/con4gisreservation/images/circle_orange.svg" alt="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'] . '" title="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_orange'] . '">'
                                         );
                                     case '3':
                                         return $this->getHtmlSkeleton(
                                             'state',
-                                            $GLOBALS['TL_LANG']['fe_c4g_reservation']['state'],
+                                            $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'],
                                             '<img class="c4g_reservation_state c4g_reservation_state_red img-fluid" loading="lazy" height="32px" width="32px" src="bundles/con4gisreservation/images/circle_red.svg" alt="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'] . '" title="' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['state_red'] . '">'
                                         );
                                 }

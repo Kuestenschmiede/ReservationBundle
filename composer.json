@@ -20,7 +20,7 @@
         "con4gis/groups": "^2.8.5"
     },
     "require-dev": {
-        "contao/test-case": "^4.9",
+        "contao/test-case": "^4.9 || ^5.1",
         "phpunit/phpunit": "^9.5",
         "symfony/phpunit-bridge": "^5.4 || ^6.0"
     },
