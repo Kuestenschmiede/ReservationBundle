@@ -737,11 +737,11 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['min_reservation_day'],
             'exclude'                 => true,
             'sorting'                 => false,
-            'flag'                    => 1,
+            'flag'                    => 0,
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50 clr'),
-            'sql'                     => "smallint(3) NOT NULL default 1"
+            'sql'                     => "smallint(3) NOT NULL default 0"
         ),
 
         'max_reservation_day' => array(

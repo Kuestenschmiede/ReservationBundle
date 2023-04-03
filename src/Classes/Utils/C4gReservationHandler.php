@@ -136,8 +136,6 @@ class C4gReservationHandler
                         $toSecond = 3600;
                         break;
                     case 'day':
-                        $toSecond = 86400;
-                        break;
                     case 'overnight':
                         $toSecond = 86400;
                         break;
@@ -1713,6 +1711,7 @@ class C4gReservationHandler
                 $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                 $frontendObject->setEndDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
                 $frontendObject->setEndTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
+                $frontendObject->setMinReservationDay($event['min_reservation_day']);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                 $frontendObject->setNumber($event['number'] ?: '');
                 $frontendObject->setEventDuration('');

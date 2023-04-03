@@ -72,7 +72,7 @@ class C4gReservationInsertTags
      * @param $reservationEventObject
      * @param $calendarEvent
      */
-    private function getState($id, $max, $reservationType, $calendarEvent)
+    private function getState($id, $max, $minReservationDay, $reservationType, $calendarEvent)
     {
         $result = 0;
 //        $id = $reservationEventObject->pid;
@@ -80,6 +80,7 @@ class C4gReservationInsertTags
 
         $today = date('Y.m.d', time());
         $startdate = $calendarEvent->startDate ? date('Y.m.d', $calendarEvent->startDate) : false;
+        $minReservationDates =  date('Y.m.d', time() + ($minReservationDay * 86400));
         if (!$reservationType || ($startdate && $startdate < $today) || (($calendarEvent->startTime &&
                     ($calendarEvent->startTime < time())) && ($startdate && $startdate == $today))) {
             $result = 3;
@@ -99,16 +100,19 @@ class C4gReservationInsertTags
                 $reservationType = $this->db->prepare("SELECT almostFullyBookedAt FROM $tableReservationType WHERE `id`=?")
                     ->limit(1)
                     ->execute($reservationType);
-
                 $almostFullyBookedAt = $reservationType && $reservationType->almostFullyBookedAt ? $reservationType->almostFullyBookedAt : 0;
 
-                $percent = number_format($capacitySum ? ($capacitySum / $max) * 100 : 0,0);
-                if ($percent >= 100) {
+                if ($minReservationDay && ($minReservationDates >= $startdate)){
                     $result = 3;
-                } elseif ($almostFullyBookedAt && ($percent >= $almostFullyBookedAt)) {
-                    $result = 2;
-                } else {
-                    $result = 1;
+                }else{
+                    $percent = number_format($capacitySum ? ($capacitySum / $max) * 100 : 0,0);
+                    if ($percent >= 100) {
+                        $result = 3;
+                    } elseif ($almostFullyBookedAt && ($percent >= $almostFullyBookedAt)) {
+                        $result = 2;
+                    } else {
+                        $result = 1;
+                    }
                 }
             }
         } elseif ($id && !$max) {
@@ -402,6 +406,7 @@ class C4gReservationInsertTags
                     $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
 
                     $maxParticipants = $reservationObject ? $reservationObject->maxParticipants : $calendarObject->maxParticipants;
+                    $minReservationDay = $reservationObject ? $reservationObject->min_reservation_day : $calendarObject->min_reservation_day;
                     $reservationType = $reservationObject ? $reservationObject->reservationType : $calendarObject->reservationType;
 
                     $clock = '';
@@ -409,7 +414,7 @@ class C4gReservationInsertTags
                         $clock = '&nbsp;' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
                     }
 
-                    $state = $this->getState($pid, $maxParticipants, $reservationType, $calendarEvent);
+                    $state = $this->getState($pid, $maxParticipants, $minReservationDay, $reservationType, $calendarEvent);
 
                     switch ($key) {
                         case 'check':
