@@ -290,7 +290,13 @@ class C4gReservationController extends C4GBaseController
                         return [$info];
                     }
                 }
-
+                if ($minReservationDates >= $startDate){
+                    $info = new C4GInfoTextField();
+                    $info->setFieldName('info');
+                    $info->setEditable(false);
+                    $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none_date']);
+                    return [$info];
+                }
                 $this->session->setSessionValue('reservationInitialDateCookie_'.$eventId, $initialDate);
 
             }
@@ -575,7 +581,7 @@ class C4gReservationController extends C4GBaseController
             $reservationObjectTypeField->setDatabaseField(true);
             $reservationObjectTypeField->setFormField(false);
             $fieldList[] = $reservationObjectTypeField;
-            if ($maxCapacity < $maxParticipants) {
+            if ($maxCapacity <= 0) {
                 $listType['objectType'] = 'default';
             }
             switch($listType['objectType']) {
