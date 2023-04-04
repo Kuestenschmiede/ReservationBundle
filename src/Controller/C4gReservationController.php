@@ -708,6 +708,7 @@ class C4gReservationController extends C4GBaseController
         }
 
         $specialParticipantMechanism = $this->reservationSettings->specialParticipantMechanism;
+        $hideParticipantsEmail = $this->reservationSettings->hideParticipantsEmail;
         foreach ($additionaldatas as $rowdata) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
@@ -1058,15 +1059,17 @@ class C4gReservationController extends C4GBaseController
                 $lastnameField->setNotificationField(false);
                 $participants[] = $lastnameField;
 
-                $emailField = new C4GEmailField();
-                $emailField->setFieldName('email');
-                $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
-                $emailField->setColumnWidth(10);
-                $emailField->setSortColumn(false);
-                $emailField->setTableColumn(false);
-                $emailField->setMandatory($rowMandatory);
-                $emailField->setNotificationField(false);
-                $participants[] = $emailField;
+                if (!$hideParticipantsEmail && $specialParticipantMechanism){
+                    $emailField = new C4GEmailField();
+                    $emailField->setFieldName('email');
+                    $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
+                    $emailField->setColumnWidth(10);
+                    $emailField->setSortColumn(false);
+                    $emailField->setTableColumn(false);
+                    $emailField->setMandatory($rowMandatory);
+                    $emailField->setNotificationField(false);
+                    $participants[] = $emailField;
+                }
 
                 foreach ($typelist as $type) {
                     $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $type['id']);
