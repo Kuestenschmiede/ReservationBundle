@@ -709,6 +709,7 @@ class C4gReservationController extends C4GBaseController
 
         $specialParticipantMechanism = $this->reservationSettings->specialParticipantMechanism;
         $hideParticipantsEmail = $this->reservationSettings->hideParticipantsEmail;
+        $hideReservationKey = $this->reservationSettings->hideReservationKey;
         foreach ($additionaldatas as $rowdata) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
@@ -1219,6 +1220,7 @@ class C4gReservationController extends C4GBaseController
             }
         }
 
+        $hidden = $hideReservationKey?:true;
         $reservationIdField = new C4GTextField();
         $reservationIdField->setFieldName('reservation_id');
         $reservationIdField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id']);
@@ -1237,6 +1239,7 @@ class C4gReservationController extends C4GBaseController
         $reservationIdField->setDatabaseField(true);
         $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']);
         $reservationIdField->setStyleClass('reservation-id');
+        $reservationIdField->setHidden($hidden);
         $fieldList[] = $reservationIdField;
 
         if ($this->reservationSettings->privacy_policy_text) {

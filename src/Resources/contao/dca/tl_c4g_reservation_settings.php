@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         '{type_legend:hide}, reservation_types, typeDefault, typeHide, typeWithEmptyOption;'.
                         '{notification_legend:hide}, notification_type;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
-                        '{expert_legend:hide}, specialParticipantMechanism, hideParticipantsEmail, showMemberData, postals;'
+                        '{expert_legend:hide}, specialParticipantMechanism, hideParticipantsEmail, hideReservationKey, showMemberData, postals;'
     ),
 
 
@@ -207,6 +207,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
         ),
         'hideParticipantsEmail' => array
         (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['hideParticipantsEmail'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
+        'hideReservationKey' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['hideReservationKey'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',

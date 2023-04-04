@@ -45,6 +45,7 @@ $GLOBALS['TL_LANG'][$str]['showInlineDatepicker'] = array("Display date picker o
 $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text empty object list (optional)", "The text of the selectbox can optionally be overwritten.");
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Participant mechanism (optional)", "If this mechanism is enabled, the participant fields are generated based on the number of people.");
 $GLOBALS['TL_LANG'][$str]['hideParticipantsEmail'] = array("Hide Participants E-Mail", "If this mechanism is enabled, the participant fields are generated with only one E-Mail field.");
+$GLOBALS['TL_LANG'][$str]['hideReservationKey'] = array("Hide Reservationkey", "If enabled, the reservation key will not be visible in the frontend.");
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Restrict zip codes", "Here you can enable that reservations are only possible via certain zip codes (comma separated list).");
 
 $GLOBALS['TL_LANG'][$str]['typeWithEmptyOption'] = array('Make reservation type selection', 'If this switch is set, the reservation type is not preset and must be selected.');
