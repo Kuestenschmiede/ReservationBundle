@@ -581,7 +581,7 @@ class C4gReservationController extends C4GBaseController
             $reservationObjectTypeField->setDatabaseField(true);
             $reservationObjectTypeField->setFormField(false);
             $fieldList[] = $reservationObjectTypeField;
-            if ($maxCapacity <= 0) {
+            if (($maxCapacity <= 0) && ($listType['objectType'] == '2')) {
                 $listType['objectType'] = 'default';
             }
             switch($listType['objectType']) {
