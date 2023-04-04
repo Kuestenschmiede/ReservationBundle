@@ -483,7 +483,14 @@ class C4gReservationController extends C4GBaseController
         foreach ($typelist as $listType) {
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
 
-            $maxParticipants = ($listType['objectType'] == '2') ?  $eventObj->maxParticipants : $listType['maxParticipantsPerBooking'];
+            if ($listType['maxParticipantsPerBooking'] && $eventObj && !$eventObj->maxParticipants) {
+                $maxParticipants = $listType['maxParticipantsPerBooking'];
+            } else if ($eventObj && $eventObj->maxParticipants) {
+                $maxParticipants = $eventObj->maxParticipants;
+            } else {
+                $maxParticipants = 0;
+            }
+
             $maxCapacity = $maxParticipants ?: 0;
             $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
             $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
@@ -495,6 +502,15 @@ class C4gReservationController extends C4GBaseController
                 if ($maxCapacity) {
                     $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
                 }
+
+                if (($maxCapacity <= 0) && ($listType['objectType'] == '2')) {
+                    $info = new C4GInfoTextField();
+                    $info->setFieldName('info');
+                    $info->setEditable(false);
+                    $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
+                    return [$info];
+                }
+
                 if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity)) {
                     $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
                 } else {
@@ -581,9 +597,7 @@ class C4gReservationController extends C4GBaseController
             $reservationObjectTypeField->setDatabaseField(true);
             $reservationObjectTypeField->setFormField(false);
             $fieldList[] = $reservationObjectTypeField;
-            if (($maxCapacity <= 0) && ($listType['objectType'] == '2')) {
-                $listType['objectType'] = 'default';
-            }
+
             switch($listType['objectType']) {
                 case '1':
                     $formHandler = new C4gReservationFormDefaultHandler($this,$fieldList,$listType,$this->getDialogParams(), $initialValues);
