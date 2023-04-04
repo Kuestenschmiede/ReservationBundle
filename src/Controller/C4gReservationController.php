@@ -1059,7 +1059,7 @@ class C4gReservationController extends C4GBaseController
                 $lastnameField->setNotificationField(false);
                 $participants[] = $lastnameField;
 
-                if (!$hideParticipantsEmail && $specialParticipantMechanism){
+                if (!$hideParticipantsEmail){
                     $emailField = new C4GEmailField();
                     $emailField->setFieldName('email');
                     $emailField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['email']);
