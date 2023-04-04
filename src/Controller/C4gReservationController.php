@@ -240,6 +240,9 @@ class C4gReservationController extends C4GBaseController
                 $recurring = $event->recurring;
                 $startDate = C4gReservationDateChecker::getBeginOfDate($event->startDate);
                 $actDate = C4gReservationDateChecker::getBeginOfDate($initialDate);
+                $minReservationDay = $eventObj->min_reservation_day;
+                $currentTimeStamp = time();
+                $minReservationDates =  $currentTimeStamp + ($minReservationDay * 86400);
                 if ($recurring && !($startDate == $actDate)) {
                     $repeatEach = StringUtil::deserialize($event->repeatEach);
                     $goodDay = false;
@@ -474,7 +477,8 @@ class C4gReservationController extends C4GBaseController
         foreach ($typelist as $listType) {
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
 
-            $maxCapacity = $listType['maxParticipantsPerBooking'] ?: 0;
+            $maxParticipants = $listType['maxParticipantsPerBooking'] ?: 0;
+            $maxCapacity = $maxParticipants ?: 0;
             $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
             $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
 
@@ -571,7 +575,9 @@ class C4gReservationController extends C4GBaseController
             $reservationObjectTypeField->setDatabaseField(true);
             $reservationObjectTypeField->setFormField(false);
             $fieldList[] = $reservationObjectTypeField;
-
+            if ($maxCapacity < $maxParticipants) {
+                $listType['objectType'] = 'default';
+            }
             switch($listType['objectType']) {
                 case '1':
                     $formHandler = new C4gReservationFormDefaultHandler($this,$fieldList,$listType,$this->getDialogParams(), $initialValues);
