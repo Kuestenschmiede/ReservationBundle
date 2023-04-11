@@ -1220,7 +1220,7 @@ class C4gReservationController extends C4GBaseController
             }
         }
 
-        $hidden = $hideReservationKey?:true;
+        $hidden = (bool)$hideReservationKey;
         $reservationIdField = new C4GTextField();
         $reservationIdField->setFieldName('reservation_id');
         $reservationIdField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id']);
