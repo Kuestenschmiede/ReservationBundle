@@ -708,8 +708,8 @@ class C4gReservationController extends C4GBaseController
         }
 
         $specialParticipantMechanism = $this->reservationSettings->specialParticipantMechanism;
-        $hideParticipantsEmail = $this->reservationSettings->hideParticipantsEmail;
-        $hideReservationKey = $this->reservationSettings->hideReservationKey;
+        $hideParticipantsEmail = $this->reservationSettings->hideParticipantsEmail ?: false;
+        $hideReservationKey = $this->reservationSettings->hideReservationKey ?: false;
         foreach ($additionaldatas as $rowdata) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
@@ -1219,8 +1219,6 @@ class C4gReservationController extends C4GBaseController
                 $fieldList[] = $reservationParticipantList;
             }
         }
-
-        $hidden = (bool)$hideReservationKey;
         $reservationIdField = new C4GTextField();
         $reservationIdField->setFieldName('reservation_id');
         $reservationIdField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id']);
@@ -1239,7 +1237,7 @@ class C4gReservationController extends C4GBaseController
         $reservationIdField->setDatabaseField(true);
         $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']);
         $reservationIdField->setStyleClass('reservation-id');
-        $reservationIdField->setHidden($hidden);
+        $reservationIdField->setHidden($hideReservationKey);
         $fieldList[] = $reservationIdField;
 
         if ($this->reservationSettings->privacy_policy_text) {

@@ -929,6 +929,10 @@ class C4gReservationHandler
           'result' => []
         ];
 
+        if (!is_array($timeParams['objectList'])) {
+            $timeParams['objectList'] = array($timeParams['objectList']);
+        }
+
         if ($timeParams['objectList']) {
             shuffle($timeParams['objectList']);
 
