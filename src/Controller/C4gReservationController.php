@@ -710,6 +710,7 @@ class C4gReservationController extends C4GBaseController
         $specialParticipantMechanism = $this->reservationSettings->specialParticipantMechanism;
         $hideParticipantsEmail = $this->reservationSettings->hideParticipantsEmail ?: false;
         $hideReservationKey = $this->reservationSettings->hideReservationKey ?: false;
+        $showPricesWithTaxes = $this->reservationSettings->showPricesWithTaxes ?: false;
         foreach ($additionaldatas as $rowdata) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];

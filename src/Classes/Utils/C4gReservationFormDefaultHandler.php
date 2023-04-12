@@ -222,6 +222,14 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $priceDBField->setNotificationField(true);
         $this->fieldList[] = $priceDBField;
 
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceSumTax');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
         $reservationObjectField = new C4GSelectField();
         $reservationObjectField->setChosen(false);
         $reservationObjectField->setFieldName('reservation_object');

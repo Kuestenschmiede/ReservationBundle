@@ -50,6 +50,7 @@ class C4gReservationFrontendObject
     private $description = '';
     private $image = null;
     private $price = 0.00;
+    private $taxOptions = ['tNone', 'tStandard', 'tReduced'];
     private $priceOption = 'pReservation';
     private $allTypesEvents = null;
 
@@ -589,6 +590,22 @@ class C4gReservationFrontendObject
     }
 
     /**
+    * @return string
+    */
+    public function getTaxOptions(): string
+    {
+        return $this->taxOptions;
+    }
+
+    /**
+     * @param string $taxOptions
+     */
+    public function setTaxOptions(string $taxOptions): void
+    {
+        $this->taxOptions = $taxOptions;
+    }
+
+    /**
      * @return string
      */
     public function getPriceOption(): string
@@ -597,11 +614,11 @@ class C4gReservationFrontendObject
     }
 
     /**
-     * @param string $priceOption
+     * @param string $priceOptions
      */
-    public function setPriceOption(string $priceOption): void
+    public function setPriceOption(string $priceOptions): void
     {
-        $this->priceOption = $priceOption;
+        $this->priceOption = $priceOptions;
     }
 
     /**

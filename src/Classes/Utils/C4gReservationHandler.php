@@ -934,7 +934,9 @@ class C4gReservationHandler
         }
 
         if ($timeParams['objectList']) {
-            shuffle($timeParams['objectList']);
+            if (is_array($timeParams['objectList'])){
+                shuffle($timeParams['objectList']);
+            }
 
             if ($timeParams['nowDate']) {
                 $format = $GLOBALS['TL_CONFIG']['dateFormat'];
@@ -1727,6 +1729,7 @@ class C4gReservationHandler
                 $frontendObject->setDescription($eventObject['teaser'] ?: '');
                 $frontendObject->setImage($eventObject['singleSRC']);
                 $frontendObject->setPrice($event['price'] ?: $calendarObject['reservationPrice'] ?: 0.00);
+                $frontendObject->setTaxOptions($event['taxOptions'] ?: $calendarObject['taxOptions'] ?: '');
                 $frontendObject->setPriceOption($event['priceoption'] ?: $calendarObject['reservationPriceOption']);
                 $objectList[] = $frontendObject;
             }
@@ -1784,6 +1787,7 @@ class C4gReservationHandler
                             $frontendObject->setDescription($eventObject['teaser'] ?: '');
                             $frontendObject->setImage($eventObject['singleSRC']);
                             $frontendObject->setPrice($reservationEvent['price'] ?: $calendarObject['reservationPrice'] ?: 0.00);
+                            $frontendObject->setTaxOptions($reservationEvent['taxOptions'] ?: $calendarObject['taxOptions'] ?: '');
                             $frontendObject->setPriceOption($reservationEvent['priceoption'] ?: $calendarObject['reservationPriceOption']);
                             $objectList[] = $frontendObject;
                         }
@@ -1902,6 +1906,7 @@ class C4gReservationHandler
                 $frontendObject->setSpeaker($object['speaker'] ? \Contao\StringUtil::deserialize($object['speaker']) : []);
                 $frontendObject->setTopic($object['topic'] ? \Contao\StringUtil::deserialize($object['topic']) : []);
                 $frontendObject->setPrice($object['price'] ?: 0.00);
+                $frontendObject->setTaxOptions($object['taxOptions'] ?: '');
                 $frontendObject->setPriceOption($object['priceoption']);
 
                 if ($cloneObject) {
