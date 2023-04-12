@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, min_reservation_day, price, priceoption; {team_legend}, team;',
+        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, min_reservation_day, price, taxOptions, priceoption; {team_legend}, team;',
     ),
 
 
@@ -241,7 +241,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>10, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
             'sql'                     => "double(7,2) unsigned default '0'"
         ),
-
+        'taxOptions' => array(
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['taxOptions'],
+            'exclude'                 => true,
+            'inputType'               => 'radio',
+            'default'                 => 'tNone',
+            'options'                 => array( 'tNone', 'tStandard', 'tReduced',),
+            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['references'],
+            'eval'                    => array('submitOnChange' => true, 'tl_class' => 'long clr', 'fieldType'=>'radio'),
+            'sql'                     => "varchar(50) NOT NULL default 'tNone'"
+        ),
         'priceoption' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['priceoption'],

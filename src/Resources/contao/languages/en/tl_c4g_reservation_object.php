@@ -79,7 +79,12 @@ $GLOBALS['TL_LANG'][$str]['memberId'] = array("Who owns the object?", "Only impo
 $GLOBALS['TL_LANG'][$str]['notification_type'] = array('Automatic confirmation message (optional)', 'Select notification. This setting overrides the module settings and also the setting at the reservation type.');
 
 $GLOBALS['TL_LANG'][$str]['price'] = array("Price", "Specify the price for the booking (for example: 50.00).");
+$GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Select Tax Rate option", "Select a tax option for all prices."];
 $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Price setting", "What should the price be calculated by.");
+
+$GLOBALS['TL_LANG'][$str]['references']['tNone'] = "Without Tax";
+$GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard: 19%";
+$GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Reduced: 7%";
 
 $GLOBALS['TL_LANG'][$str]['references']['pMin'] = array("Price per minute");
 $GLOBALS['TL_LANG'][$str]['references']['pHour'] = array("Price per hour");

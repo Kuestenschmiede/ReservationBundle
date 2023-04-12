@@ -79,7 +79,12 @@ $GLOBALS['TL_LANG'][$str]['notification_type'] = array('Automatische Bestätigun
 $GLOBALS['TL_LANG'][$str]['memberId'] = array("Wem gehört das Objekt?", "Nur wichtig, wenn Objekte über das Frontendmodul erstellt werden.");
 
 $GLOBALS['TL_LANG'][$str]['price'] = array("Preis", "Bestimmen sie den Preis für die Buchung (bspw.: 50.00)");
+$GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Steuersatz auswählen", "Wählen Sie eine Steueroption für alle Preise."];
 $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Preiseinstellung", "Wonach soll der Preis berechnet werden");
+
+$GLOBALS['TL_LANG'][$str]['references']['tNone'] = "Keine MwSt";
+$GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard: 19%";
+$GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Ermäßigt: 7%";
 
 $GLOBALS['TL_LANG'][$str]['references']['pMin'] = array("Preis pro Minute");
 $GLOBALS['TL_LANG'][$str]['references']['pHour'] = array("Preis pro Stunde");

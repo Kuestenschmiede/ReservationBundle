@@ -20,7 +20,7 @@ use Contao\CalendarBundle\Security\ContaoCalendarPermissions;
 
 
 
-$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id';
+$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -820,7 +820,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'eval'                    => array('mandatory'=>false, 'tl_class' => 'long clr'),
             'sql'                     => "varchar(50) NOT NULL default ''"
         ),
-
+        'taxOptions' => array(
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['taxOptions'],
+            'exclude'                 => true,
+            'inputType'               => 'radio',
+            'default'                 => 'tNone',
+            'options'                 => array( 'tNone', 'tStandard', 'tReduced',),
+            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references'],
+            'eval'                    => array('submitOnChange' => true, 'tl_class' => 'long clr', 'fieldType'=>'radio'),
+            'sql'                     => "varchar(50) NOT NULL default 'tNone'"
+        ),
         'published' => array(
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['published'],
             'exclude'           => true,
