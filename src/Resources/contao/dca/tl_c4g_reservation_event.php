@@ -322,6 +322,7 @@ class tl_c4g_reservation_event extends Backend
             $dc->topic = $calendarRow['reservationTopic'];
             $dc->targetAudience = $calendarRow['reservationtargetAudience'];
             $dc->price = $calendarRow['reservationPrice'];
+//            $dc->taxOptions = $calendarRow['reservationTaxOptions'];
             $dc->priceoption = $calendarRow['reservationPriceOption'];
 
             $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['location']['default'] = $calendarRow['reservationLocation'];

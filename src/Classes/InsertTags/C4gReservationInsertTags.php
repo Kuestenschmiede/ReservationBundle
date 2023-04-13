@@ -15,6 +15,7 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Controller;
 use Contao\Database;
+use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
 
@@ -153,10 +154,16 @@ class C4gReservationInsertTags
         if (($isEvent || $isObject) && isset($arrSplit[1])) {
             if (count($arrSplit) == 2) {
                 $key = $arrSplit[1];
+                $eventId = Input::get('event') ?: 0;
 
                 if ($isEvent) {
-                    $reservationObject = $this->db->prepare("SELECT * FROM $tableEventObject")
-                        ->execute()->fetchAllAssoc();
+                    if ($eventId) {
+                        $reservationObject = $this->db->prepare("SELECT * FROM $tableEventObject WHERE pid = ?")
+                            ->execute($eventId)->fetchAllAssoc();
+                    } else {
+                        $reservationObject = $this->db->prepare("SELECT * FROM $tableEventObject")
+                            ->execute()->fetchAllAssoc();
+                    }
                 } else {
                     $reservationObject = $this->db->prepare("SELECT * FROM $tableObject")
                         ->execute()->fetchAllAssoc();
@@ -168,6 +175,16 @@ class C4gReservationInsertTags
                     switch ($key) {
                         case 'check':
                             return true;
+                        case 'title':
+                            $result = '';
+                            if ($eventId) {
+                                $calendarEvent = $this->db->prepare("SELECT title FROM $tableCalendarEvent WHERE id = ?")
+                                    ->execute($eventId)->fetchAssoc();
+                                if ($calendarEvent) {
+                                    $result = $calendarEvent['title'];
+                                }
+                            }
+                            return $result;
                         case 'audience_raw':
 
                             $audienceIds = [];
@@ -419,6 +436,8 @@ class C4gReservationInsertTags
                     switch ($key) {
                         case 'check':
                             return true;
+                        case 'title':
+                            return $calendarEvent ? $calendarEvent->title : $reservationObject->caption; //ToDo check
                         case 'tlState':
                             if ($state) {
                                 switch ($state) {
@@ -486,7 +505,7 @@ class C4gReservationInsertTags
                         case 'headline':
                             return '<div class="c4g_reservation_details_headline">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] . '</div>';
                         case 'headline_raw':
-                            return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'];
+                            return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeadline'];
                         case 'button':
                             if ($state !== 3) {
                                 $calendarId = $calendarEvent->pid;

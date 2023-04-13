@@ -1465,7 +1465,7 @@ class C4gReservationHandler
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectList($moduleTypes = null, $objectId = 0, $showPrices = false, $getAllTypes = false, $duration = 0, $date = 0, $langCookie = '')
+    public static function getReservationObjectList($moduleTypes = null, $objectId = 0, $showPrices = false, $showPricesWithTaxes = false, $getAllTypes = false, $duration = 0, $date = 0, $langCookie = '')
     {
         \Contao\System::loadLanguageFile('fe_c4g_reservation',$langCookie ?: $GLOBALS['TL_LANGUAGE']);
         $objectlist = array();
@@ -1485,7 +1485,7 @@ class C4gReservationHandler
 
 
                 if ($type && $type['reservationObjectType'] === '2') {
-                    $objectlist = C4gReservationHandler::getReservationObjectEventList($typeArr, $objectId, $type, $showPrices, $langCookie);
+                    $objectlist = C4gReservationHandler::getReservationObjectEventList($typeArr, $objectId, $type, $showPrices, $showPricesWithTaxes, $langCookie);
 
                     if ($getAllTypes) {
                         foreach($objectlist as $key=>$object) {
@@ -1496,7 +1496,7 @@ class C4gReservationHandler
                     }
 
                 } else {
-                    $objectlist = C4gReservationHandler::getReservationObjectDefaultList($typeArr, $objectId, $type, $showPrices, $duration, $date, $langCookie);
+                    $objectlist = C4gReservationHandler::getReservationObjectDefaultList($typeArr, $objectId, $type, $showPrices, $showPricesWithTaxes, $duration, $date, $langCookie);
 
                     if ($getAllTypes) {
                         foreach($objectlist as $key=>$object) {
@@ -1529,7 +1529,7 @@ class C4gReservationHandler
     /**
      * @param $object
      */
-    private static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '') {
+    private static function calcPrices($showPricesWithTaxes = false, $object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '') {
         $price = 0;
         if ($object) {
 
@@ -1656,6 +1656,30 @@ class C4gReservationHandler
             $priceInfo = $priceInfo ? "&nbsp;".$priceInfo : '';
             $price = $price ? C4gReservationHandler::formatPrice($price).$priceInfo : '';
         }
+
+        if ($showPricesWithTaxes) {
+            $taxOptions = $object['taxOptions'] ?: '';
+            $taxRate = 0.00;
+            $taxRateString = '';
+            switch ($taxOptions) {
+                case 'tStandard':
+                    $taxRate = 1.19;
+                    $taxRateString = ' inkl. 19% MwSt.'."&nbsp;";
+                    break;
+                case 'tReduced':
+                    $taxRate = 1.07;
+                    $taxRateString = ' inkl. 7% MwSt.'."&nbsp;";
+                    break;
+                default:
+                    '';
+            }
+            $priceInfo = $priceInfo ? "&nbsp;".$priceInfo : '';
+            $price = $price ? C4gReservationHandler::formatPrice($price * $taxRate).$priceInfo.$taxRateString : '';
+        }elseif ($price) {
+            $priceInfo = $priceInfo ? "&nbsp;".$priceInfo : '';
+            $price = $price ? C4gReservationHandler::formatPrice($price).$priceInfo : '';
+        }
+
         return $price;
     }
 
@@ -1664,14 +1688,13 @@ class C4gReservationHandler
      * @param int $objectId
      * @return array
      */
-    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0, $type, $showPrices = false, $langCookie = '', $startTime = 0)
+    public static function getReservationObjectEventList($moduleTypes = null, $objectId = 0, $type, $showPrices = false, $showPricesWithTaxes = false, $langCookie = '', $startTime = 0)
     {
         $objectList = array();
         $database = Database::getInstance();
         $almostFullyBookedAt = $type['almostFullyBookedAt'];
         if ($objectId) {
             $events = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `pid` = ?")->execute($objectId)->fetchAllAssoc();
-            //$events = C4gReservationEventModel::findBy('pid',$objectId);
             if ($events) {
                 if (count($events) > 1) {
                     C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '.$objectId);
@@ -1710,8 +1733,10 @@ class C4gReservationHandler
                 $frontendObject->setId($eventObject['id']);
                 $eventObject['price'] = $event['price'] ?: $calendarObject['reservationPrice'];
                 $eventObject['priceoption'] = $event['priceoption'] ?: $calendarObject['reservationPriceOption'];
-                $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
-                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
+                $eventObject['taxOptions'] = $event['taxOptions'] ?: $calendarObject['taxOptions'] ?: '';
+//                $eventObject['taxOptions'] = $event['taxOptions'];
+                $price = $showPrices ? static::calcPrices($showPricesWithTaxes, $eventObject, $type, true, 1) : 0;
+                $frontendObject->setCaption($price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                 $frontendObject->setDesiredCapacity([$event['minParticipants'] ?:  $calendarObject['reservationMinParticipants'], $maxParticipants]);
                 $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                 $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
@@ -1730,6 +1755,7 @@ class C4gReservationHandler
                 $frontendObject->setImage($eventObject['singleSRC']);
                 $frontendObject->setPrice($event['price'] ?: $calendarObject['reservationPrice'] ?: 0.00);
                 $frontendObject->setTaxOptions($event['taxOptions'] ?: $calendarObject['taxOptions'] ?: '');
+//                $frontendObject->setTaxOptions($event['taxOptions']);
                 $frontendObject->setPriceOption($event['priceoption'] ?: $calendarObject['reservationPriceOption']);
                 $objectList[] = $frontendObject;
             }
@@ -1769,7 +1795,7 @@ class C4gReservationHandler
                             $frontendObject->setId($eventObject['id']);
                             $eventObject['price'] = $reservationEvent['price'] ?: $calendarObject['reservationPrice'];
                             $eventObject['priceoption'] = $reservationEvent['priceoption'] ?: $calendarObject['reservationPriceOption'];
-                            $price = $showPrices ? static::calcPrices($eventObject, $type, true, 1) : 0;
+                            $price = $showPrices ? static::calcPrices($showPricesWithTaxes, $eventObject, $type, true, 1) : 0;
                             $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title']) . "<span class='price'>&nbsp;(" . $price . ")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                             $frontendObject->setDesiredCapacity([$reservationEvent['minParticipants'] ?: $calendarObject['reservationMinParticipants'], $maxParticipants]);
                             $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'], $eventObject['startTime']));
@@ -1788,6 +1814,7 @@ class C4gReservationHandler
                             $frontendObject->setImage($eventObject['singleSRC']);
                             $frontendObject->setPrice($reservationEvent['price'] ?: $calendarObject['reservationPrice'] ?: 0.00);
                             $frontendObject->setTaxOptions($reservationEvent['taxOptions'] ?: $calendarObject['taxOptions'] ?: '');
+//                            $frontendObject->setTaxOptions($reservationEvent['taxOptions']);
                             $frontendObject->setPriceOption($reservationEvent['priceoption'] ?: $calendarObject['reservationPriceOption']);
                             $objectList[] = $frontendObject;
                         }
@@ -1831,7 +1858,7 @@ class C4gReservationHandler
      * @param false $showPrices
      * @return array
      */
-    public static function getReservationObjectDefaultList($moduleTypes = null, $objectId = 0, $type, $showPrices = false, $duration = 0, $date = 0, $langCookie = '')
+    public static function getReservationObjectDefaultList($moduleTypes = null, $objectId = 0, $type, $showPrices = false, $showPricesWithTaxes = false, $duration = 0, $date = 0, $langCookie = '')
     {
         $objectList = array();
 
@@ -1890,7 +1917,7 @@ class C4gReservationHandler
                     }
                 }
 
-                $price = $showPrices ? static::calcPrices($object, $type, false, 1, $duration, $date) : 0;
+                $price = $showPrices ? static::calcPrices($showPricesWithTaxes, $object, $type, false, 1, $duration, $date) : 0;
                 $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
 
                 $frontendObject->setPeriodType($type['periodType']);

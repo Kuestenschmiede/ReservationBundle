@@ -334,7 +334,7 @@ class C4gReservationListController extends C4GBaseController
             $fieldList[] = $reservationTypeField;
 
             $startTime = time() - (($this->past_day_number ?: 1) * 86400);
-            $reservationObjects = C4gReservationHandler::getReservationObjectList($selectTypes, 0,$this->showPrices, true, 0, 0, '', $startTime);
+            $reservationObjects = C4gReservationHandler::getReservationObjectList($selectTypes, 0,$this->showPrices, this->showPricesWithTaxes,true, 0, 0, '', $startTime);
             $objects = [];
 
             foreach ($reservationObjects as $objectType=>$objList) {
