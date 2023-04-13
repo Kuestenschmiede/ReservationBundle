@@ -50,7 +50,7 @@ class C4gReservationFrontendObject
     private $description = '';
     private $image = null;
     private $price = 0.00;
-    private $taxOptions = ['tNone', 'tStandard', 'tReduced'];
+    private $taxOptions = 'tNone';
     private $priceOption = 'pReservation';
     private $allTypesEvents = null;
 

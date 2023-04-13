@@ -1645,6 +1645,19 @@ class C4gReservationController extends C4GBaseController
             if ($reservationEventObject->price) {
                 $price = C4gReservationHandler::formatPrice($reservationEventObject->price);
                 $putVars['price'] = $price;
+                $taxOptions = $reservationEventObject->taxOptions?: '';
+                $taxRate = 0.00;
+                switch ($taxOptions){
+                    case 'tStandard':
+                        $taxRate = 1.19;
+                        break;
+                    case 'tReduced':
+                        $taxRate = 1.07;
+                        break;
+                    default:
+                        '';
+                }
+                $putVars['$taxRate'] = $taxRate;
 
                 if ($this->reservationSettings->withCapacity) {
                     $desiredCapacity = $putVars['desiredCapacity_'.$type];
@@ -1654,6 +1667,9 @@ class C4gReservationController extends C4GBaseController
                 } else {
                     $putVars['priceSum'] = $price;
                 }
+                $putVars['priceTax'] = C4gReservationHandler::formatPrice(floatval($price) * $taxRate);
+                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice(floatval($putVars['priceSum']) * $taxRate);
+                $showPricesWithTaxes = $this->reservationSettings->showPricesWithTaxes ?: false;
             }
        } else {
             $putVars['reservationObjectType'] = $reservationType->reservationObjectType;
@@ -1835,6 +1851,20 @@ class C4gReservationController extends C4GBaseController
             if ($reservationObject->price) {
                 $price = C4gReservationHandler::formatPrice($reservationObject->price);
                 $putVars['price'] = $price;
+                $taxOptions = $reservationObject->taxOptions?: '';
+                $taxRate = 0.00;
+                switch ($taxOptions){
+                    case 'tStandard':
+                        $taxRate = 1.19;
+                        break;
+                    case 'tReduced':
+                        $taxRate = 1.07;
+                        break;
+                    default:
+                        '';
+                }
+                $putVars['$taxRate'] = $taxRate;
+
                 if ($this->reservationSettings->withCapacity) {
                     $desiredCapacity = $putVars['desiredCapacity_'.$type];
                 }
@@ -1843,6 +1873,9 @@ class C4gReservationController extends C4GBaseController
                 } else {
                     $putVars['priceSum'] = $price;
                 }
+                $putVars['priceTax'] = C4gReservationHandler::formatPrice(floatval($price) * $taxRate);
+                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice(floatval($putVars['priceSum']) * $taxRate);
+                $showPricesWithTaxes = $this->reservationSettings->showPricesWithTaxes ?: false;
             }
         }
 
@@ -2338,7 +2371,7 @@ class C4gReservationController extends C4GBaseController
                     break;
             }
         }
-        return $price ? C4gReservationHandler::formatPrice($priceSum) :  C4gReservationHandler::formatPrice($price);
+        return $price && $priceSum ? C4gReservationHandler::formatPrice($priceSum) : C4gReservationHandler::formatPrice($price);
     }
 }
 
