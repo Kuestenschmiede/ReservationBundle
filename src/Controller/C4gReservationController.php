@@ -359,7 +359,7 @@ class C4gReservationController extends C4GBaseController
                 }
 
                 $defaultObject = $eventId ?: $objectId;
-                $objects = C4gReservationHandler::getReservationObjectList(array($type), $defaultObject, $this->reservationSettings->showPrices);
+                $objects = C4gReservationHandler::getReservationObjectList(array($type), $defaultObject, $this->reservationSettings->showPrices, $this->reservationSettings->showPricesWithTaxes ?: false,);
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
@@ -710,7 +710,6 @@ class C4gReservationController extends C4GBaseController
         $specialParticipantMechanism = $this->reservationSettings->specialParticipantMechanism;
         $hideParticipantsEmail = $this->reservationSettings->hideParticipantsEmail ?: false;
         $hideReservationKey = $this->reservationSettings->hideReservationKey ?: false;
-        $showPricesWithTaxes = $this->reservationSettings->showPricesWithTaxes ?: false;
         foreach ($additionaldatas as $rowdata) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
@@ -1669,7 +1668,7 @@ class C4gReservationController extends C4GBaseController
                 }
                 $putVars['priceTax'] = C4gReservationHandler::formatPrice(floatval($price) * $taxRate);
                 $putVars['priceSumTax'] = C4gReservationHandler::formatPrice(floatval($putVars['priceSum']) * $taxRate);
-                $showPricesWithTaxes = $this->reservationSettings->showPricesWithTaxes ?: false;
+
             }
        } else {
             $putVars['reservationObjectType'] = $reservationType->reservationObjectType;
@@ -1875,7 +1874,6 @@ class C4gReservationController extends C4GBaseController
                 }
                 $putVars['priceTax'] = C4gReservationHandler::formatPrice(floatval($price) * $taxRate);
                 $putVars['priceSumTax'] = C4gReservationHandler::formatPrice(floatval($putVars['priceSum']) * $taxRate);
-                $showPricesWithTaxes = $this->reservationSettings->showPricesWithTaxes ?: false;
             }
         }
 
@@ -2203,8 +2201,7 @@ class C4gReservationController extends C4GBaseController
             if ($this->session->getSessionValue('reservationSettings')) {
                 $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->session->getSessionValue('reservationSettings'));
             }
-
-            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices, false, $duration, $date, $langCookie);
+            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices, $this->reservationSettings->showPricesWithTaxes ?: false,false, $duration, $date, $langCookie);
             $withEndTimes = $this->reservationSettings->showEndTime;
             $withFreeSeats = $this->reservationSettings->showFreeSeats;
             $showArrivalAndDeparture = $this->reservationSettings->showArrivalAndDeparture;
