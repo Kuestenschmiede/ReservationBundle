@@ -109,9 +109,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     //Subpalettes
    'subpalettes' => array(
         'auto_del_daily'                => 'del_time;',
-        'reservationObjectType_1'       => 'cloneObject,periodType,objectCount,min_residence_time,max_residence_time,severalBookings,directBooking',
+        'reservationObjectType_1'       => 'cloneObject,periodType,objectCount,min_residence_time,max_residence_time,default_residence_time,severalBookings,directBooking',
         'reservationObjectType_2'       => '',
-        'reservationObjectType_3'       => 'cloneObject,periodType,objectCount,min_residence_time,max_residence_time,severalBookings,directBooking',
+        'reservationObjectType_3'       => 'cloneObject,periodType,objectCount,min_residence_time,max_residence_time,default_residence_time,severalBookings,directBooking',
     ),
 
     //Fields
@@ -247,6 +247,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'max_residence_time' => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['max_residence_time'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'default'           => '0',
+            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'               => "smallint(5) unsigned NOT NULL default 0"
+        ),
+        'default_residence_time' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['default_residence_time'],
             'exclude'           => true,
             'inputType'         => 'text',
             'default'           => '0',

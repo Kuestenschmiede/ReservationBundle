@@ -389,7 +389,8 @@ class C4gReservationController extends C4GBaseController
                                 'type' => $type['reservationObjectType'],
                                 'directBooking' => $type['directBooking'],
                                 'min_residence_time' => $type['min_residence_time'],
-                                'max_residence_time' => $type['max_residence_time']
+                                'max_residence_time' => $type['max_residence_time'],
+                                'default_residence_time' => $type['default_residence_time']
                             );
                             $foundCaption = true;
                             break;
@@ -418,7 +419,8 @@ class C4gReservationController extends C4GBaseController
                         'type' => $type['reservationObjectType'],
                         'directBooking' => $type['directBooking'],
                         'min_residence_time' => $type['min_residence_time'],
-                        'max_residence_time' => $type['max_residence_time']
+                        'max_residence_time' => $type['max_residence_time'],
+                        'default_residence_time' => $type['default_residence_time']
                     );
                 }
             }
@@ -581,7 +583,7 @@ class C4gReservationController extends C4GBaseController
                 $durationField->setStyleClass('duration');
                 $durationField->setMin($listType['min_residence_time']);
                 $durationField->setMax($listType['max_residence_time']);
-                $durationField->setInitialValue($listType['min_residence_time']);
+                $durationField->setInitialValue($listType['default_residence_time'] ?: $listType['min_residence_time']);
                 $durationField->setMaxLength(3);
                 $durationField->setStep(1);
                 $durationField->setAdditionalID($listType['id']);
