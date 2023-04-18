@@ -246,7 +246,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'exclude'                 => true,
             'inputType'               => 'radio',
             'default'                 => 'tNone',
-            'options'                 => array( 'tNone', 'tStandard', 'tReduced',),
+            'options'                 => array( 'tNone', 'tStandard', 'tReduced'),
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['references'],
             'eval'                    => array('submitOnChange' => true, 'tl_class' => 'long clr', 'fieldType'=>'radio'),
             'sql'                     => "varchar(50) NOT NULL default 'tNone'"
