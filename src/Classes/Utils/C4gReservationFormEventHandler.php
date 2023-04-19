@@ -176,6 +176,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationObjectField->setCallOnChange(true);
         $reservationObjectField->setCallOnChangeFunction("checkEventFields(this)");
         $reservationObjectField->setAdditionalID($listType["id"]);
+        $reservationObjectField->setHidden($reservationSettings->typeHide);
+
         $this->fieldList[] = $reservationObjectField;
 
         foreach ($reservationObjects as $reservationObject) {

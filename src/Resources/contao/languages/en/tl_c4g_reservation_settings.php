@@ -17,6 +17,7 @@ $GLOBALS['TL_LANG'][$str]['caption'] = array("Designation", "For selection on th
 $GLOBALS['TL_LANG'][$str]['reservation_types'] = array('Reservation types', 'Select the reservation types (rooms, tables, ...) to be taken into account when making reservations in the frontend. If no selection is made, all reservation objects will be loaded. You should not assign too many types (max. 10).');
 $GLOBALS['TL_LANG'][$str]['typeDefault'] = array('Preselect reservation type', 'Here you can specify which type is to be preselected as in the selection box. If no type is selected here, then the default takes effect.');
 $GLOBALS['TL_LANG'][$str]['typeHide'] = array('Hide reservation type', 'if only one reservation type is available for selection, then the field can be hidden via this.');
+$GLOBALS['TL_LANG'][$str]['objectHide'] = array('Hide reservation object', 'Important!! Only useful when using insert tags. For example, "{{c4gevent::title}}" . If this option is enabled, the reservation name will not be displayed in the frontend.');
 $GLOBALS['TL_LANG'][$str]['reservationButtonCaption'] = array('Button label','Allows you to change the button text. For example, "Reserve with payment".');
 $GLOBALS['TL_LANG'][$str]['redirect_site'] = array('Forwarding page', 'After booking will be forwarded here.');
 $GLOBALS['TL_LANG'][$str]['speaker_redirect_site'] = array('Speaker forwarding', 'If you want to link the speakers, you can set the forwarding here.');
