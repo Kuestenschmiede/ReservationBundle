@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
         'default'   =>  '{settings_legend}, caption;'.
                         '{form_legend:hide}, withCapacity, fieldSelection, privacy_policy_text, privacy_policy_site, reservationButtonCaption, showDetails, showPrices, showPricesWithTaxes, showEndTime, showInlineDatepicker, removeBookedDays,showArrivalAndDeparture;'.
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
-                        '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, reservationKeyHide, typeWithEmptyOption;'.
+                        '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, hideReservationKey, typeWithEmptyOption;'.
                         '{notification_legend:hide}, notification_type;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
                         '{expert_legend:hide}, specialParticipantMechanism, hideParticipantsEmail, showMemberData, postals;'
@@ -219,8 +219,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'inputType'         => 'checkbox',
             'sql'               => "int(1) unsigned NULL default 0"
         ),
-        'reservationKeyHide' => array
-        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['reservationKeyHide'],
+        'hideReservationKey' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['hideReservationKey'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
