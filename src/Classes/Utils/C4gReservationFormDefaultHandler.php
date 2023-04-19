@@ -259,7 +259,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationObjectField->setRemoveWithEmptyCondition(true);
         $reservationObjectField->setCallOnChange(true);
         $reservationObjectField->setAdditionalID($listType["id"]);
-        $reservationObjectField->setHidden($reservationSettings->typeHide);
+        $reservationObjectField->setHidden($reservationSettings->objectHide);
         $this->fieldList[] = $reservationObjectField;
 
         if ($reservationSettings->showDetails) {
