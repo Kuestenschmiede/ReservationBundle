@@ -104,7 +104,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $reservationObjectField->setInitialCallOnChange(true);
         $reservationObjectField->setCallOnChange(true);
         $reservationObjectField->setAdditionalID($listType["id"]);
-        $reservationObjectField->setHidden($reservationSettings->typeHide);
+        $reservationObjectField->setHidden($reservationSettings->objectHide);
         $this->fieldList[] = $reservationObjectField;
 
         foreach ($reservationObjects as $reservationObject) {
