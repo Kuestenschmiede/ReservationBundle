@@ -13,9 +13,8 @@ $GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwarding'] = ["Weiterleitun
 $GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwardingButtonCaption'] = ["Buttonbeschriftung Weiterleitung", "Beschriftung des Weiterleitungsbutton zur Reservierung. Standard: leer. Es greifen die Einträge aus den Sprachdateien."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['exportSelection'] = ["Export auswählen", "Wählen Sie den Export aus, der an den Events vorausgewählt sein soll."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['c4g_reservation_legend'] = "Einstellungen zu den Reservierungen";
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxOptions'] = ["Steuersatz auswählen", "Wählen Sie eine Steueroption für alle Preise."];
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateStandard'] = ['Standard:', 'Damit werden alle "Standard:" Steuersätze für alle Preise festgelegt.'];
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateReduced'] = ['Ermäßigt:', 'Damit werden alle Damit werden alle "Ermäßigten:" Steuersätze für alle Preise festgelegt.'];
+$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateStandard'] = ['Normaler Steuersatz (MwSt.)', 'Damit wird der normale Steuersatz für die Preisberechnung festgelegt.'];
+$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateReduced'] = ['Ermäßigter Steuersatz (MwSt.)', 'Damit wird der ermäßigte Steuersatz für die Preisberechnung festgelegt.'];
 
 $GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tNone'] = "Keine MwSt.";
 $GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tStandard'] = "Standard: 19%";

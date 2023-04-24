@@ -13,9 +13,5 @@ $GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwarding'] = ["Continue to 
 $GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwardingButtonCaption'] = ["Button Labeled Forwarding", "Labeled Forwarding Button to Reservation. Default: empty. The entries from the language files take effect."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['exportSelection'] = ["Export selection", "Select the export that should be preselected at the events."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['c4g_reservation_legend'] = "Reservation settings";
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxOptions'] = ["Select Tax Rate option", "Select a tax option for all prices."];
-
-
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tNone'] = "Without Tax";
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tStandard'] = "Standard: 19%";
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tReduced'] = "Reduced: 7%";
+$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateStandard'] = ['Normal tax rate (VAT)', 'This sets the normal tax rate for the price calculation'];
+$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateReduced'] = ['Reduced tax rate (VAT)', 'This sets the reduced tax rate for the price calculation.'];
