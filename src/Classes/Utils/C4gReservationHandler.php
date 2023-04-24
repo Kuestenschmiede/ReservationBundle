@@ -6,6 +6,7 @@ namespace con4gis\ReservationBundle\Classes\Utils;
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
+use con4gis\CoreBundle\Resources\contao\models\C4gSettingsModel;
 use con4gis\ExportBundle\Classes\Events\ExportLoadDataEvent;
 use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
@@ -1658,23 +1659,20 @@ class C4gReservationHandler
         }
 
         if ($showPricesWithTaxes) {
-            $taxOptions = $object['taxOptions'] ?: '';
-            $taxRate = 0.00;
+            $taxOptions = $object['taxOptions'] ?? '';
+            $settings = C4gSettingsModel::findSettings();
             $taxRateString = '';
-            switch ($taxOptions) {
-                case 'tStandard':
-                    $taxRate = 1.19;
-                    $taxRateString = ' inkl. 19% MwSt.'."&nbsp;";
-                    break;
-                case 'tReduced':
-                    $taxRate = 1.07;
-                    $taxRateString = ' inkl. 7% MwSt.'."&nbsp;";
-                    break;
-                default:
-                    '';
+
+            if ($taxOptions === 'tStandard') {
+                $taxRate = ($settings->taxRateStandard ?? 0);
+            } elseif ($taxOptions === 'tReduced') {
+                $taxRate = ($settings->taxRateReduced ?? 0);
+            } else {
+                $taxRate = 0;
             }
+
             $priceInfo = $priceInfo ? "&nbsp;".$priceInfo : '';
-            $price = $price ? C4gReservationHandler::formatPrice($price * $taxRate).$priceInfo.$taxRateString : '';
+            $price = $price ? C4gReservationHandler::formatPrice ($price * (1 + ($taxRate)/100)).$priceInfo.$taxRateString : '';
         }elseif ($price) {
             $priceInfo = $priceInfo ? "&nbsp;".$priceInfo : '';
             $price = $price ? C4gReservationHandler::formatPrice($price).$priceInfo : '';
@@ -1754,7 +1752,7 @@ class C4gReservationHandler
                 $frontendObject->setDescription($eventObject['teaser'] ?: '');
                 $frontendObject->setImage($eventObject['singleSRC']);
                 $frontendObject->setPrice($event['price'] ?: $calendarObject['reservationPrice'] ?: 0.00);
-                $frontendObject->setTaxOptions($event['taxOptions'] ?: $calendarObject['taxOptions'] ?: '');
+                $frontendObject->setTaxOptions($event['taxOptions'] ?: '');
 //                $frontendObject->setTaxOptions($event['taxOptions']);
                 $frontendObject->setPriceOption($event['priceoption'] ?: $calendarObject['reservationPriceOption']);
                 $objectList[] = $frontendObject;
@@ -1813,7 +1811,7 @@ class C4gReservationHandler
                             $frontendObject->setDescription($eventObject['teaser'] ?: '');
                             $frontendObject->setImage($eventObject['singleSRC']);
                             $frontendObject->setPrice($reservationEvent['price'] ?: $calendarObject['reservationPrice'] ?: 0.00);
-                            $frontendObject->setTaxOptions($reservationEvent['taxOptions'] ?: $calendarObject['taxOptions'] ?: '');
+                            $frontendObject->setTaxOptions($reservationEvent['taxOptions'] ?: '');
 //                            $frontendObject->setTaxOptions($reservationEvent['taxOptions']);
                             $frontendObject->setPriceOption($reservationEvent['priceoption'] ?: $calendarObject['reservationPriceOption']);
                             $objectList[] = $frontendObject;

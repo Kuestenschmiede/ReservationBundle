@@ -55,6 +55,7 @@ use con4gis\ReservationBundle\Classes\Utils\C4gReservationFormEventHandler;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationFormObjectFirstHandler;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationInitialValues;
+use con4gis\CoreBundle\Resources\contao\models\C4gSettingsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
@@ -1646,20 +1647,18 @@ class C4gReservationController extends C4GBaseController
             //just notification
             if ($reservationEventObject->price) {
                 $price = C4gReservationHandler::formatPrice($reservationEventObject->price);
+                $settings = C4gSettingsModel::findSettings();
                 $putVars['price'] = $price;
+                //ToDo dashboard tax rate
                 $taxOptions = $reservationEventObject->taxOptions?: '';
-                $taxRate = 0.00;
-                switch ($taxOptions){
-                    case 'tStandard':
-                        $taxRate = 1.19;
-                        break;
-                    case 'tReduced':
-                        $taxRate = 1.07;
-                        break;
-                    default:
-                        '';
+                if ($taxOptions === 'tStandard') {
+                    $taxRate = ($settings->taxRateStandard ?? 0);
+                } elseif ($taxOptions === 'tReduced') {
+                    $taxRate = ($settings->taxRateReduced ?? 0);
+                } else {
+                    $taxRate = 0;
                 }
-                $putVars['$taxRate'] = $taxRate;
+                $putVars['$taxRate'] = ($taxRate)/100;
 
                 if ($this->reservationSettings->withCapacity) {
                     $desiredCapacity = $putVars['desiredCapacity_'.$type];
@@ -1669,8 +1668,8 @@ class C4gReservationController extends C4GBaseController
                 } else {
                     $putVars['priceSum'] = $price;
                 }
-                $putVars['priceTax'] = C4gReservationHandler::formatPrice(floatval($price) * $taxRate);
-                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice(floatval($putVars['priceSum']) * $taxRate);
+                $putVars['priceTax'] = C4gReservationHandler::formatPrice($price * (1 + $putVars['$taxRate']));
+                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice(floatval($putVars['priceSum'] * (1 + $putVars['$taxRate'])));
 
             }
        } else {
@@ -1852,20 +1851,17 @@ class C4gReservationController extends C4GBaseController
             $desiredCapacity =  $reservationObject && $reservationObject->maxParticipants ? ($reservationObject->maxParticipants * $factor) : 0;
             if ($reservationObject->price) {
                 $price = C4gReservationHandler::formatPrice($reservationObject->price);
+                $settings = C4gSettingsModel::findSettings();
                 $putVars['price'] = $price;
                 $taxOptions = $reservationObject->taxOptions?: '';
-                $taxRate = 0.00;
-                switch ($taxOptions){
-                    case 'tStandard':
-                        $taxRate = 1.19;
-                        break;
-                    case 'tReduced':
-                        $taxRate = 1.07;
-                        break;
-                    default:
-                        '';
+                if ($taxOptions === 'tStandard') {
+                    $taxRate = ($settings->taxRateStandard ?? 0);
+                } elseif ($taxOptions === 'tReduced') {
+                    $taxRate = ($settings->taxRateReduced ?? 0);
+                } else {
+                    $taxRate = 0;
                 }
-                $putVars['$taxRate'] = $taxRate;
+                $putVars['$taxRate'] = ($taxRate)/100;
 
                 if ($this->reservationSettings->withCapacity) {
                     $desiredCapacity = $putVars['desiredCapacity_'.$type];
@@ -1875,8 +1871,8 @@ class C4gReservationController extends C4GBaseController
                 } else {
                     $putVars['priceSum'] = $price;
                 }
-                $putVars['priceTax'] = C4gReservationHandler::formatPrice(floatval($price) * $taxRate);
-                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice(floatval($putVars['priceSum']) * $taxRate);
+                $putVars['priceTax'] = C4gReservationHandler::formatPrice(floatval($price * (1 + $putVars['$taxRate'])));
+                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice(floatval($putVars['priceSum'] * (1 + $putVars['$taxRate'])));
             }
         }
 

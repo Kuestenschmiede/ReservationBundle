@@ -51,6 +51,8 @@ class C4gReservationFrontendObject
     private $image = null;
     private $price = 0.00;
     private $taxOptions = 'tNone';
+    private $standardTaxRate = 0.00;
+    private $reducedTaxRate = 0.00;
     private $priceOption = 'pReservation';
     private $allTypesEvents = null;
 
@@ -603,6 +605,38 @@ class C4gReservationFrontendObject
     public function setTaxOptions(string $taxOptions): void
     {
         $this->taxOptions = $taxOptions;
+    }
+
+    /**
+     * @return float
+     */
+    public function getStandardTaxRate(): float
+    {
+        return $this->standardTaxRate;
+    }
+
+    /**
+     * @param float $standardTaxRate
+     */
+    public function setStandardTaxRate(float $standardTaxRate): void
+    {
+        $this->standardTaxRate = $standardTaxRate;
+    }
+
+    /**
+     * @return float
+     */
+    public function getReducedTaxRate(): float
+    {
+        return $this->reducedTaxRate;
+    }
+
+    /**
+     * @param float $reducedTaxRate
+     */
+    public function setReducedTaxRate(float $reducedTaxRate): void
+    {
+        $this->reducedTaxRate = $reducedTaxRate;
     }
 
     /**

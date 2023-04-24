@@ -65,6 +65,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             $objects[] = array(
                 'id' => $reservationObject->getId(),
                 'name' => $reservationObject->getNumber() ? '[' . $reservationObject->getNumber() . ']&nbsp;' . $reservationObject->getCaption() : $reservationObject->getCaption(),
+//                'title' => $reservationObject->getTitle(),
                 'min' => $reservationObject->getDesiredCapacity()[0] ?: 1,
                 'max' => $reservationObject->getDesiredCapacity()[1] ?: 0 //ToDo check
             );
@@ -177,8 +178,16 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationObjectField->setCallOnChangeFunction("checkEventFields(this)");
         $reservationObjectField->setAdditionalID($listType["id"]);
         $reservationObjectField->setHidden($reservationSettings->objectHide);
-
         $this->fieldList[] = $reservationObjectField;
+
+        $reservationObjectName = new C4GTextField();
+        $reservationObjectName->setFieldName('reservation_title');
+        $reservationObjectName->setDatabaseField(false);
+        $reservationObjectName->setFormField(false);
+        $reservationObjectDBField->setOptions($objects);
+        $reservationObjectName->setMax(9999999999999);
+        $reservationObjectName->setNotificationField(true);
+        $this->fieldList[] = $reservationObjectName;
 
         foreach ($reservationObjects as $reservationObject) {
             $obj_condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_event_' . $listType['id'], $reservationObject->getId());
