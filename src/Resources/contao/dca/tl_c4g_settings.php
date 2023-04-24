@@ -62,16 +62,16 @@ $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['taxRateStandard'] = array(
         'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateStandard'],
         'exclude'                 => true,
         'inputType'               => 'text',
-        'default'                 => '0.00',
-        'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>10, 'feEditable'=>true, 'feViewable'=>true, 'tl_class' => 'w50'),
-        'sql'                     => "double(7,2) unsigned default '0.00'"
+        'default'                 => 19.0,
+        'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>10, 'default'=> 19.0, 'feEditable'=>true, 'feViewable'=>true, 'tl_class' => 'w50'),
+        'sql'                     => "double(7,2) unsigned NOT NULL default 19.0"
 );
 $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['taxRateReduced'] = array(
         'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateReduced'],
         'exclude'                 => true,
         'inputType'               => 'text',
-        'default'                 => '0.00',
-        'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>10, 'feEditable'=>true, 'feViewable'=>true, 'tl_class' => 'w50'),
-        'sql'                     => "double(7,2) unsigned default '0.00'"
+        'default'                 => 7.0,
+        'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>10, 'default'=> 7.0, 'feEditable'=>true, 'feViewable'=>true, 'tl_class' => 'w50'),
+        'sql'                     => "double(7,2) unsigned NOT NULL default 7.0"
 );
 }
