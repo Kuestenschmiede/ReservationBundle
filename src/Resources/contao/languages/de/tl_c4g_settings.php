@@ -17,6 +17,3 @@ $GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxOptions'] = ["Steuersatz au
 $GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateStandard'] = ['Standard:', 'Damit werden alle "Standard:" Steuersätze für alle Preise festgelegt.'];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateReduced'] = ['Ermäßigt:', 'Damit werden alle Damit werden alle "Ermäßigten:" Steuersätze für alle Preise festgelegt.'];
 
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tNone'] = "Keine MwSt.";
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tStandard'] = "Standard: 19%";
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tReduced'] = "Ermäßigt: 7%";

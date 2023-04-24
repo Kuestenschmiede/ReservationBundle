@@ -81,8 +81,8 @@ $GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Steuersatz auswählen", "Wählen Sie
 $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Preiseinstellung", "Wonach soll der Preis berechnet werden");
 
 $GLOBALS['TL_LANG'][$str]['references']['tNone'] = "Keine MwSt";
-$GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard: 19%";
-$GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Ermäßigt: 7%";
+$GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard";
+$GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Ermäßigt";
 
 $GLOBALS['TL_LANG'][$str]['references']['pMin'] = array("Preis pro Minute");
 $GLOBALS['TL_LANG'][$str]['references']['pHour'] = array("Preis pro Stunde");

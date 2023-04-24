@@ -14,8 +14,3 @@ $GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwardingButtonCaption'] = [
 $GLOBALS['TL_LANG']['tl_c4g_settings']['exportSelection'] = ["Export selection", "Select the export that should be preselected at the events."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['c4g_reservation_legend'] = "Reservation settings";
 $GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxOptions'] = ["Select Tax Rate option", "Select a tax option for all prices."];
-
-
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tNone'] = "Without Tax";
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tStandard'] = "Standard: 19%";
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tReduced'] = "Reduced: 7%";
