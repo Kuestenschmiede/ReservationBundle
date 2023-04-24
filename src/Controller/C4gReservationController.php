@@ -582,9 +582,9 @@ class C4gReservationController extends C4GBaseController
                 $durationField->setCondition(array($condition));
                 $durationField->setNotificationField(true);
                 $durationField->setStyleClass('duration');
-                $durationField->setMin($listType['min_residence_time']);
+                $durationField->setMin($listType['min_residence_time'] ?: 1);
                 $durationField->setMax($listType['max_residence_time']);
-                $durationField->setInitialValue($listType['default_residence_time'] ?: $listType['min_residence_time']);
+                $durationField->setInitialValue($listType['default_residence_time'] ?: $durationField->getMin());
                 $durationField->setMaxLength(3);
                 $durationField->setStep(1);
                 $durationField->setAdditionalID($listType['id']);
