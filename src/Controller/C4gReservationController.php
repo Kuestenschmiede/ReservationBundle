@@ -1642,6 +1642,7 @@ class C4gReservationController extends C4GBaseController
             $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate']; //ToDO Check
             $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
 
+            $isEvent ? $putVars['reservation_title'] = $reservationObject->title : $putVars['reservation_title'] = $reservationObject->caption;
             //just notification
             if ($reservationEventObject->price) {
                 $price = C4gReservationHandler::formatPrice($reservationEventObject->price);
