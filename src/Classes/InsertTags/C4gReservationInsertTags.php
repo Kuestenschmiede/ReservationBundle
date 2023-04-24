@@ -505,7 +505,7 @@ class C4gReservationInsertTags
                         case 'headline':
                             return '<div class="c4g_reservation_details_headline">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'] . '</div>';
                         case 'headline_raw':
-                            return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeadline'];
+                            return $GLOBALS['TL_LANG']['fe_c4g_reservation']['detailsHeaadline'];
                         case 'button':
                             if ($state !== 3) {
                                 $calendarId = $calendarEvent->pid;
