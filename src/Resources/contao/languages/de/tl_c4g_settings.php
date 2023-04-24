@@ -16,6 +16,3 @@ $GLOBALS['TL_LANG']['tl_c4g_settings']['c4g_reservation_legend'] = "Einstellunge
 $GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateStandard'] = ['Normaler Steuersatz (MwSt.)', 'Damit wird der normale Steuersatz für die Preisberechnung festgelegt.'];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateReduced'] = ['Ermäßigter Steuersatz (MwSt.)', 'Damit wird der ermäßigte Steuersatz für die Preisberechnung festgelegt.'];
 
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tNone'] = "Keine MwSt.";
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tStandard'] = "Standard: 19%";
-$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['tReduced'] = "Ermäßigt: 7%";

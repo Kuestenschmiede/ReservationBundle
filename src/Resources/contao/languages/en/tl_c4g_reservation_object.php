@@ -83,8 +83,8 @@ $GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Select Tax Rate option", "Select a t
 $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Price setting", "What should the price be calculated by.");
 
 $GLOBALS['TL_LANG'][$str]['references']['tNone'] = "Without Tax";
-$GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard: 19%";
-$GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Reduced: 7%";
+$GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard";
+$GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Reduced";
 
 $GLOBALS['TL_LANG'][$str]['references']['pMin'] = array("Price per minute");
 $GLOBALS['TL_LANG'][$str]['references']['pHour'] = array("Price per hour");
