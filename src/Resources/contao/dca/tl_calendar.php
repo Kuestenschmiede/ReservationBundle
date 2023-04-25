@@ -80,7 +80,7 @@ $GLOBALS['TL_DCA'][$str]['fields']['reservationType'] = [
     'exclude'           => true,
     'inputType'         => 'select',
     'options_callback'  => [ReservationCalendarEvents::class, 'getReservationTypes'],
-    'eval'              => ['mandatory' => true, 'tl_class' => 'long clr', 'doNotCopy' => true],
+    'eval'              => ['mandatory' => false, 'tl_class' => 'long clr', 'doNotCopy' => true],
     'sql'               => "int(10) unsigned NOT NULL default 0"
 ];
 
