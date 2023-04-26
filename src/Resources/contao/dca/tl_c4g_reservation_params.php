@@ -32,14 +32,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
         'sorting' => array
         (
             'mode'              => 2,
-            'fields'            => array('caption','language','price'),
+            'fields'            => array('caption','language','price', 'taxOptions'),
             'panelLayout'       => 'filter;sort,search,limit',
 //            'headerFields'      => array('lastname','firstname'),
         ),
 
         'label' => array
         (
-            'fields'            => array('caption','language','price'),
+            'fields'            => array('caption','language','price', 'taxOptions'),
             //'format'            => '<span class="reservation_date" style="color:#E30518">%s</span><span class="reservation_time" style="color:#E30518">%s</span><span class="reservation_id" style="color:#E30518">%s</span><span class="lastname" style="color:#E30518">%s</span><span class="firstname" style="color:#E30518">%s</span>',
             //'label_callback'    => array('tl_c4g_reservation', 'listDates'),
             'showColumns'       => true,
@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  'caption, language, price, published;'
+        'default'   =>  'caption, language, price, taxOptions, published;'
     ),
 
 
@@ -135,7 +135,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'eval'                  => array('chosen' => false, 'tl_class' => "w50"),
             'sql'                   => "char(5) NOT NULL default ''"
         ),
-
+        'taxOptions' => array(
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['taxOptions'],
+            'exclude'                 => true,
+            'inputType'               => 'radio',
+            'default'                 => 'tNone',
+            'options'                 => array( 'tNone' => $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['tNone'],
+                                                'tStandard' => $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['tStandard'],
+                                                'tReduced' => $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['tReduced'],),
+            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references'],
+            'eval'                    => array('submitOnChange' => true, 'tl_class' => 'long clr', 'fieldType'=>'radio', 'tl_class'=>'w50 clr'),
+            'sql'                     => "varchar(50) NOT NULL default 'tNone'"
+        ),
         'price' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['price'],
             'exclude'                 => true,
