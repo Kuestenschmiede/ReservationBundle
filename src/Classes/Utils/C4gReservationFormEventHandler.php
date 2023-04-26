@@ -197,7 +197,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
 
             $reservationBeginDateField = new C4gDateField();
             //$reservationBeginDateField->setFlipButtonPosition(true);
-            //$reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate($reservationObject, $listType));
+            $reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate($reservationObject, $listType));
             $reservationBeginDateField->setFieldName('beginDateEvent');
             $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
