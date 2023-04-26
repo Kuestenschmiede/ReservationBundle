@@ -25,6 +25,7 @@ $GLOBALS['TL_LANG'][$str]['maxParticipants'] = array("Maximum number of particip
 $GLOBALS['TL_LANG'][$str]['min_reservation_day'] = array("Earliest reservation date (in days)", "Today + how many days?");
 $GLOBALS['TL_LANG'][$str]['state'] = array("Current status", "green, orange, red");
 
+$GLOBALS['TL_LANG'][$str]['participant_params'] = array("Participant options inc. tax rate", "Select participants options");
 $GLOBALS['TL_LANG'][$str]['price'] = array("Price", "Specify the price for the booking (for example: 50.00).");
 $GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Select Tax Rate option", "Select a tax option for all prices."];
 $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Price setting", "What should the price be calculated by.");
