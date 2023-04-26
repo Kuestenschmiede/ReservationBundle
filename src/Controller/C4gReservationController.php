@@ -491,7 +491,7 @@ class C4gReservationController extends C4GBaseController
             } else if ($eventObj && $eventObj->maxParticipants) {
                 $maxParticipants = $eventObj->maxParticipants;
             } else {
-                $maxParticipants = 0;
+                $maxParticipants = $listType['maxParticipantsPerBooking'];
             }
 
             $maxCapacity = $maxParticipants ?: 0;
