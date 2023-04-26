@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, min_reservation_day, price, taxOptions, priceoption; {team_legend}, team;',
+        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, min_reservation_day, participant_params, price, taxOptions, priceoption; {team_legend}, team;',
     ),
 
 
@@ -196,7 +196,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'flag'                    => 0,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50 clr'),
+            'eval'                    => array('mandatory'=>false, 'rgxp'=>'digit', 'tl_class'=>'w50'),
             'sql'                     => "smallint(3) NOT NULL default 0"
         ),
 
@@ -241,6 +241,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>10, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
             'sql'                     => "double(7,2) unsigned default '0'"
         ),
+        'participant_params' => array(
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['participant_params'],
+            'inputType'         => 'select',
+            'default'           => '-',
+            'exclude'           => true,
+            'foreignKey'        => 'tl_c4g_reservation_params.caption',
+            'eval'              => array('chosen'=>true,'mandatory'=>false,'multiple'=>true,'tl_class'=>'w50 clr','alwaysSave'=> true, 'default' => '-'),
+            'sql'               => "blob NULL",
+        ),
         'taxOptions' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['taxOptions'],
             'exclude'                 => true,
@@ -259,7 +268,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'options'                 => array('pReservation','pPerson','pDay','pNight','pNightPerson','pHour','pMin','pAmount'),
             'default'                 => '',
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['references'],
-            'eval'                    => array('mandatory'=>false, 'tl_class' => 'long clr'),
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50 clr'),
             'sql'                     => "varchar(50) NOT NULL default ''"
         ),
 
