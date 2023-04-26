@@ -140,10 +140,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'exclude'                 => true,
             'inputType'               => 'radio',
             'default'                 => 'tNone',
-            'options'                 => array( 'tNone' => $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['tNone'],
-                                                'tStandard' => $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['tStandard'],
-                                                'tReduced' => $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['tReduced'],),
-            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references'],
+            'options'                 => array( 'tNone', 'tStandard', 'tReduced'),
+            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['references'],
             'eval'                    => array('submitOnChange' => true, 'tl_class' => 'long clr', 'fieldType'=>'radio', 'tl_class'=>'w50 clr'),
             'sql'                     => "varchar(50) NOT NULL default 'tNone'"
         ),

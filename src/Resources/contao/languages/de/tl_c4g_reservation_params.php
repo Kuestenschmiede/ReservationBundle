@@ -16,9 +16,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['caption'] = array("Beschriftun
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['language'] = array("Sprache", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['published'] = array("Veröffentlichen.","Soll dieses Objekt im Frontend angezeigt werden?");
 
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['tNone'] = "Keine MwSt";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['tStandard'] = "Standard";
-$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['tReduced'] = "Ermäßigt";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['references']['tNone'] = "Keine MwSt";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['references']['tStandard'] = "Standard";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['references']['tReduced'] = "Ermäßigt";
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['bookingparams_legend'] = "Zusatz für Reservierungen";
