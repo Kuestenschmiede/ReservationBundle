@@ -65,8 +65,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocationUrl'] = 'Ort und Kontak
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocation'] = 'Ort';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectspeaker'] = 'Personen';
 
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['taxInc'] = 'inkl.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['withTax'] = "Mwst.";
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'] = 'inkl. &nbsp; MwSt.';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object'] = 'Reservierungsmöglichkeit';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_short'] = 'Reservierung';

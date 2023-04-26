@@ -1085,23 +1085,20 @@ class C4gReservationController extends C4GBaseController
                     $params = $participantParam ?: $type['participantParams'];
                     $participantParamsArr = [];
 
-                    $taxInc = $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxInc'];
-
                     if (!$specialParticipantMechanism ||
                         ($specialParticipantMechanism && $this->reservationSettings->withCapacity) || ($specialParticipantMechanism && $maxCapacity > 1)) {
                         if ($params) {
                             foreach ($params as $paramId) {
                                 if ($paramId) {
-                                    $taxOption = $participantParam->taxOptions;
-                                    if ($taxOption == 'tNone'){
-                                        $taxOption = '';
-                                    } else {
-                                        $taxOption = $GLOBALS['TL_LANG']['fe_c4g_reservation']['withTax'];
-                                    }
-
                                     $participantParam = C4gReservationParamsModel::findByPk($paramId);
                                     if ($participantParam && $participantParam->caption && $participantParam->published && ($participantParam->price && $this->reservationSettings->showPrices)) {
-                                        $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption . "<span class='price'>&nbsp;(+" . C4gReservationHandler::formatPrice($participantParam->price).")&nbsp;$taxInc&nbsp;$taxOption</span>"];
+                                        $taxOption = $participantParam->taxOptions;
+                                        if ($taxOption == 'tNone'){
+                                            $taxIncl = '';
+                                        } else {
+                                            $taxIncl = $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'];
+                                        }
+                                        $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption . "<span class='price'>&nbsp;(+" . C4gReservationHandler::formatPrice($participantParam->price).")&nbsp;$taxIncl&nbsp;</span>"];
                                     } else if ($participantParam && $participantParam->caption && $participantParam->published) {
                                         $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption];
                                     }

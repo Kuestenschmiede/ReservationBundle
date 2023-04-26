@@ -1668,7 +1668,7 @@ class C4gReservationHandler
         if ($showPricesWithTaxes) {
             $taxOptions = $object['taxOptions'] ?? '';
             $settings = C4gSettingsModel::findSettings();
-            $taxRateString = '';
+            $taxIncl = $taxOptions != 'tNone' ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'] : '';
 
             if ($taxOptions === 'tStandard') {
                 $taxRate = ($settings->taxRateStandard ?? 0);
@@ -1678,10 +1678,10 @@ class C4gReservationHandler
                 $taxRate = 0;
             }
 
-            $priceInfo = $priceInfo ? "&nbsp;".$priceInfo : '';
-            $price = $price ? C4gReservationHandler::formatPrice ($price * (1 + ($taxRate)/100)).$priceInfo.$taxRateString : '';
+            $priceInfo = $priceInfo ? "&nbsp;".$priceInfo."&nbsp;".$taxIncl : '';
+//            $price = $price ? C4gReservationHandler::formatPrice ($price * (1 + ($taxRate)/100)).$priceInfo : ''; // calculate tax for FE
+            $price = $price ? C4gReservationHandler::formatPrice ($price).$priceInfo: '';
         }elseif ($price) {
-            $priceInfo = $priceInfo ? "&nbsp;".$priceInfo : '';
             $price = $price ? C4gReservationHandler::formatPrice($price).$priceInfo : '';
         }
 
