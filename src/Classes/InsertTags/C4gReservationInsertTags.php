@@ -175,7 +175,7 @@ class C4gReservationInsertTags
                     switch ($key) {
                         case 'check':
                             return true;
-                        case 'title':
+                        case 'caption':
                             $result = '';
                             if ($eventId) {
                                 $calendarEvent = $this->db->prepare("SELECT title FROM $tableCalendarEvent WHERE id = ?")
@@ -436,7 +436,7 @@ class C4gReservationInsertTags
                     switch ($key) {
                         case 'check':
                             return true;
-                        case 'title':
+                        case 'caption':
                             return $calendarEvent ? $calendarEvent->title : $reservationObject->caption; //ToDo check
                         case 'tlState':
                             if ($state) {
