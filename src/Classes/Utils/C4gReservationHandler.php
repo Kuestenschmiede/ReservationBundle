@@ -1670,13 +1670,14 @@ class C4gReservationHandler
             $settings = C4gSettingsModel::findSettings();
             $taxIncl = $taxOptions != 'tNone' ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'] : '';
 
-            if ($taxOptions === 'tStandard') {
-                $taxRate = ($settings->taxRateStandard ?? 0);
-            } elseif ($taxOptions === 'tReduced') {
-                $taxRate = ($settings->taxRateReduced ?? 0);
-            } else {
-                $taxRate = 0;
-            }
+//            Would allow to display the saved taxrates from dashboard
+//            if ($taxOptions === 'tStandard') {
+//                $taxRate = ($settings->taxRateStandard ?? 0);
+//            } elseif ($taxOptions === 'tReduced') {
+//                $taxRate = ($settings->taxRateReduced ?? 0);
+//            } else {
+//                $taxRate = '';
+//            }
 
             $priceInfo = $priceInfo ? "&nbsp;".$priceInfo."&nbsp;".$taxIncl : '';
 //            $price = $price ? C4gReservationHandler::formatPrice ($price * (1 + ($taxRate)/100)).$priceInfo : ''; // calculate tax for FE
