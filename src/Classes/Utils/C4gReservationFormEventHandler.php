@@ -529,8 +529,14 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         if ($includedParams) {
             foreach ($includedParams as $paramId) {
                 $includedParam = C4gReservationParamsModel::findByPk($paramId);
+                $taxOption = $includedParam->taxOptions;
+                if ($taxOption == 'tNone'){
+                    $taxIncl = '';
+                } else {
+                    $taxIncl = $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'];
+                }
                 if ($includedParam && $includedParam->caption && $includedParam->published && ($includedParam->price && $reservationSettings->showPrices)) {
-                    $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption . "<span class='price'>&nbsp;(+" . C4gReservationHandler::formatPrice($includedParam->price).")</span>"];
+                    $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption . "<span class='price'>&nbsp;(+" . C4gReservationHandler::formatPrice($includedParam->price).")&nbsp;$taxIncl&nbsp;</span>"];
                 } else if ($includedParam && $includedParam->caption && $includedParam->published) {
                     $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption];
                 }
