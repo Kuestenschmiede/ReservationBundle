@@ -1107,7 +1107,7 @@ class C4gReservationController extends C4GBaseController
                         }
 
                         if (count($participantParamsArr) > 0) {
-                            if ($listType['participantParamsFieldType'] == 'radio' || $eventObj->participantParamsFieldType == 'radio') {
+                            if ($eventObj->participantParamsFieldType == 'radio' || $listType['participantParamsFieldType'] == 'radio') {
                                 $participantParamField = new C4GRadioGroupField();
                                 $participantParamField->setInitialValue($participantParamsArr[0]['id']);
                                 $participantParamField->setSaveAsArray(true);
@@ -2093,7 +2093,7 @@ class C4gReservationController extends C4GBaseController
             foreach ($participantsArr as $key => $valueArray) {
                 if (strpos($key,'|') === false) {
                     $pCount++;
-                    $participants .= $participants ? '; '.$pCount.': '.trim(implode(', ',$valueArray)) : $pCount.': '.trim(implode(', ',$valueArray));
+                    $participants .= $participants ? '; '.trim(implode(', ',$valueArray)) : trim(implode(', ',$valueArray));
                 }
             }
 
