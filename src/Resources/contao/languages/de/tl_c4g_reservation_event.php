@@ -27,9 +27,12 @@ $GLOBALS['TL_LANG'][$str]['state'] = array("Aktueller Status", "grün, orange, r
 
 $GLOBALS['TL_LANG'][$str]['price'] = array("Preis", "Bestimmen sie den Preis für die Buchung (bspw.: 50.00)");
 $GLOBALS['TL_LANG'][$str]['participant_params'] = array("Teilnehmeroptionen inkl. Steuersatz", "Bestimmen Sie die Teilnehmeroptionen");
+$GLOBALS['TL_LANG'][$str]['participantParamsFieldType'] = array("Feldtyp", "Wählen sie den Feldtyp für die Teilnehmer Leistungen im Reservierungsformular.");
 $GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Steuersatz auswählen", "Wählen Sie eine Steueroption für alle Preise."];
 $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Preiseinstellung", "Wonach soll der Preis berechnet werden");
 
+$GLOBALS['TL_LANG'][$str]['multi'] = 'Mehrfachauswahl (Multi-Checkbox)';
+$GLOBALS['TL_LANG'][$str]['radio'] = 'Einfachauswahl (Radiogruppe)';
 $GLOBALS['TL_LANG'][$str]['references']['tNone'] = "Keine MwSt";
 $GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard";
 $GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Ermäßigt";

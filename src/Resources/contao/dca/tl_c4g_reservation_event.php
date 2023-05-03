@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, min_reservation_day, participant_params, price, taxOptions, priceoption; {team_legend}, team;',
+        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, min_reservation_day, participant_params, participantParamsFieldType, price, taxOptions, priceoption; {team_legend}, team;',
     ),
 
 
@@ -249,6 +249,17 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'foreignKey'        => 'tl_c4g_reservation_params.caption',
             'eval'              => array('chosen'=>true,'mandatory'=>false,'multiple'=>true,'tl_class'=>'w50 clr','alwaysSave'=> true, 'default' => '-'),
             'sql'               => "blob NULL",
+        ),
+        'participantParamsFieldType' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['participantParamsFieldType'],
+            'exclude'                 => true,
+            'inputType'               => 'select',
+            'default'                 => 'multi',
+            'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event'],
+            'options'                 => array('multi','radio'),
+            'eval'                    => array('tl_class'=>'w50','feViewable'=>true, 'mandatory'=>false),
+            'sql'                     => "char(25) NOT NULL default 'multi'"
         ),
         'taxOptions' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['taxOptions'],
