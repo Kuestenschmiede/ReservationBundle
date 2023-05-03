@@ -2093,6 +2093,8 @@ class C4gReservationController extends C4GBaseController
             foreach ($participantsArr as $key => $valueArray) {
                 if (strpos($key,'|') === false) {
                     $pCount++;
+                    $paramObj = C4gReservationParamsModel::findByPk($valueArray['participant_params']);
+                    $valueArray['participant_params'] = $paramObj->caption;
                     $participants .= $participants ? '; '.trim(implode(', ',$valueArray)) : trim(implode(', ',$valueArray));
                 }
             }
