@@ -169,6 +169,30 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $priceDBField->setNotificationField(true);
         $this->fieldList[] = $priceDBField;
 
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceOptionSum');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceOptionSumTax');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('reservationTaxRate');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
         //$dateCondition = new C4GBrickCondition(C4GBrickConditionType::BOOLSWITCH, 'beginDate_'.$listType['id']);
 
         $reservationObjectField = new C4GSelectField();
