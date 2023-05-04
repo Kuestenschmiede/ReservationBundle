@@ -48,6 +48,7 @@ $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text leere Objektliste","
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Teilnehmermechanismus (optional)","Ist dieser Mechanismus aktiviert, dann werden Teilnehmerfelder (Titel, Name, Vorname, E-Mail, ggf. Leistungen) anhand der Personenzahl generiert. Wichtig! Das Teilnehmer-Feld muss dafür ins Formular gebracht werden. Außerdem sollten Sie die maximale Teilnehmerzahl an der Art aufgrund der Ladezeiten stark eingrenzen. Für die Teilnehmerfelder darf aktuell nur eine Reservierungsart im Formular verknüpft sein.");
 $GLOBALS['TL_LANG'][$str]['hideParticipantsEmail'] = array("Teilnehmer E-Mail ausblenden", "Nur ein E-Mail-Feld wird generiert.");
 $GLOBALS['TL_LANG'][$str]['hideReservationKey'] = array("Reservierungsschlüssel verstecken", "Wenn diese Option aktiviert ist, wird der Reservierungsschlüssel im Frontend nicht angezeigt.");
+$GLOBALS['TL_LANG'][$str]['onlyParticipants'] = array("Nur Teilnehmer berücksichtigen", "Wenn dieser Mechanismus aktiviert ist, werden nur die Teilnehmer bei der Preisberechnung berücksichtigt.");
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Postleitzahlen einschränken","Hierüber können Sie ermöglichen, dass Reservierungen nur über bestimmte Postleitzahlen möglich sind (kommagetrennte Liste).");
 
 $GLOBALS['TL_LANG'][$str]['typeWithEmptyOption'] = array('Reservierungsart Auswahl treffen', 'Wenn dieser Schalter gesetzt ist, wird die Reservierungsart nicht vorbelegt und muss ausgewählt werden.');
