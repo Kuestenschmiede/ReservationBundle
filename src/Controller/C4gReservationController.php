@@ -1130,8 +1130,10 @@ class C4gReservationController extends C4GBaseController
                     $params = $participantParam ?: $type['participantParams'];
                     $participantParamsArr = [];
 
+                    $maxCapacityCheck = $onlyParticipants ? $maxCapacity > 0 : $maxCapacity > 1;
+
                     if (!$specialParticipantMechanism ||
-                        ($specialParticipantMechanism && $this->reservationSettings->withCapacity) || ($specialParticipantMechanism && $maxCapacity > 1)) {
+                        ($specialParticipantMechanism && $this->reservationSettings->withCapacity) || ($specialParticipantMechanism && $maxCapacityCheck)) {
                         if ($params) {
                             foreach ($params as $paramId) {
                                 if ($paramId) {
@@ -2055,14 +2057,14 @@ class C4gReservationController extends C4GBaseController
                     $extId = $this->reservationSettings->onlyParticipants ? $desiredCapacity : $desiredCapacity-1;
                     if (strpos($key,"participants_".$type."-".$extId."§") !== false) {
                         $keyArr = explode("§", $key);
-                        if (trim($keyArr[0]) && trim($keyArr[1]) && trim($value)) {
+                        if (trim($keyArr[0]) && trim($keyArr[1])) {
                             $keyPos = strpos(trim($keyArr[0]), "-".$extId);
                             if ($keyPos) {
                                 $keyArr[0] = substr(trim($keyArr[0]),0, $keyPos);
                                 //$putVars[$keyArr[0].'~'.$keyArr[1].'~'.$keyArr[2]] = $value;
                             }
                             $pos = $keyArr[2] && strpos($keyArr[2],'|');
-                            if ($pos && $value && $value !== 'false') {
+                            if ($pos && $value !== 'false') {
                                 $keyValue = $keyArr[2];
                                 $keyArr[2] = substr($keyValue,0, $pos);
                                 $paramId = substr($keyValue,$pos+1);
@@ -2077,7 +2079,7 @@ class C4gReservationController extends C4GBaseController
                                 }
                             }
 
-                            if ($value && $value !== 'false') {
+                            if ($value !== 'false') {
                                 $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
                             }
                         }
@@ -2100,9 +2102,9 @@ class C4gReservationController extends C4GBaseController
             } else {
                 if (strpos($key,"participants_".$type."§") !== false) {
                     $keyArr = explode("§", $key);
-                    if (trim($keyArr[0]) && trim($keyArr[1]) && trim($value)) {
+                    if (trim($keyArr[0]) && trim($keyArr[1])) {
                         $pos = $keyArr[2] && strpos($keyArr[2],'|');
-                        if ($pos && $value && $value !== 'false') {
+                        if ($pos && $value !== 'false') {
                             $keyValue = $keyArr[2];
                             $keyArr[2] = substr($keyValue,0, $pos);
                             $paramId = substr($keyValue,$pos+1);
@@ -2117,7 +2119,7 @@ class C4gReservationController extends C4GBaseController
                             }
                         }
 
-                        if ($value && $value !== 'false') {
+                        if ($value !== 'false') {
                             $participantsArr[$keyArr[2]][$keyArr[1]] = $value;
                         }
 
@@ -2140,7 +2142,7 @@ class C4gReservationController extends C4GBaseController
             foreach ($participantsArr as $key => $valueArray) {
                 if (strpos($key,'|') === false) {
                     $pCount++;
-                    if ($valueArray['participant_params'] && is_integer($valueArray['participant_params'])) {
+                    if ($valueArray['participant_params'] && is_numeric($valueArray['participant_params'])) {
                         $paramObj = C4gReservationParamsModel::findByPk($valueArray['participant_params']);
                         $valueArray['participant_params'] = $paramObj->caption;
                     }
