@@ -2052,7 +2052,7 @@ class C4gReservationController extends C4GBaseController
             if ($this->reservationSettings->specialParticipantMechanism) {
                 $desiredCapacity = $putVars['desiredCapacity_'.$reservationType->id];
                 if ($desiredCapacity) {
-                    $extId = $desiredCapacity-1;
+                    $extId = $this->reservationSettings->onlyParticipants ? $desiredCapacity : $desiredCapacity-1;
                     if (strpos($key,"participants_".$type."-".$extId."§") !== false) {
                         $keyArr = explode("§", $key);
                         if (trim($keyArr[0]) && trim($keyArr[1]) && trim($value)) {
@@ -2087,7 +2087,7 @@ class C4gReservationController extends C4GBaseController
                 foreach ($putVars as $key => $value) {
                     $desiredCapacity = $putVars['desiredCapacity_'.$reservationType->id];
                     if ($desiredCapacity) {
-                        $extId = ($desiredCapacity - 1);
+                        $extId = $this->reservationSettings->onlyParticipants ? $desiredCapacity : ($desiredCapacity - 1);
                         for ($i = 0; $i <= 100; $i++) {
                             if ((strpos($key, "participants_" . $type . "-" . $i . "§") !== false) && ($i !== $extId)) {
                                 unset($putVars[$key]);
@@ -2136,11 +2136,11 @@ class C4gReservationController extends C4GBaseController
 
         $participants = '';
         if ($participantsArr && count($participantsArr) > 0) {
-            $pCount = 1;
+            $pCount = $this->reservationSettings->onlyParticipants ? 0 : 1;
             foreach ($participantsArr as $key => $valueArray) {
                 if (strpos($key,'|') === false) {
                     $pCount++;
-                    if ($valueArray['participant_params'] && intval($valueArray['participant_params'])) {
+                    if ($valueArray['participant_params'] && is_integer($valueArray['participant_params'])) {
                         $paramObj = C4gReservationParamsModel::findByPk($valueArray['participant_params']);
                         $valueArray['participant_params'] = $paramObj->caption;
                     }
