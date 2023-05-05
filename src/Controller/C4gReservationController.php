@@ -2091,7 +2091,7 @@ class C4gReservationController extends C4GBaseController
                     if ($desiredCapacity) {
                         $extId = $this->reservationSettings->onlyParticipants ? $desiredCapacity : ($desiredCapacity - 1);
                         for ($i = 0; $i <= 100; $i++) {
-                            if ((strpos($key, "participants_" . $type . "-" . $i . "§") !== false) && ($i !== $extId)) {
+                            if ((strpos($key, "participants_" . $type . "-" . $i . "§") !== false) && ($i !== intval($extId))) {
                                 unset($putVars[$key]);
                             }
                         }
