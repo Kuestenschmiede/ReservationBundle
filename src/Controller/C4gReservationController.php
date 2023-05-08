@@ -2608,7 +2608,7 @@ class C4gReservationController extends C4GBaseController
                                 }
                             }
                             //individual participant option tax
-                            if ($calcTaxes || $chosenParticipantOptions){
+                            if ($calcTaxes && $chosenParticipantOptions == 'true'){
                                 $priceOptionsSumNet += $value['priceOptionNet'];
                                 $participantsOptionsSumTax += $value['price'] - $value['priceOptionNet'];
                             }
