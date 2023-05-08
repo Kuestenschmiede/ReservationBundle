@@ -1417,6 +1417,13 @@ class C4gReservationController extends C4GBaseController
         $memberId->setNotificationField(false);
         $fieldList[] = $memberId;
 
+        $dbkey = new C4GTextField();
+        $dbkey->setFieldName('dbkey');
+        $dbkey->setTableColumn(false);
+        $dbkey->setFormField(false);
+        $dbkey->setNotificationField(true);
+        $fieldList[] = $dbkey;
+
         $memberEmail = new C4GTextField();
         $memberEmail->setFieldName('member_email');
         $memberEmail->setTableColumn(false);
@@ -2176,6 +2183,13 @@ class C4gReservationController extends C4GBaseController
         }
 
         $putVars['bookedAt'] = time();
+
+        $nextElement = $database->prepare("SELECT id FROM tl_c4g_reservation order by id DESC")
+            ->execute($type)->fetchAssoc();
+        if ($nextElement && $nextElement['id']) {
+            $nextId = $nextElement['id']++;
+            $putVars['dbkey'] = $nextId;
+        }
 
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
