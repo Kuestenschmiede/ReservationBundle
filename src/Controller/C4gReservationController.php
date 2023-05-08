@@ -2395,7 +2395,17 @@ class C4gReservationController extends C4GBaseController
         }
 
         if ($object) {
-            $allPrices = array();
+            $allPrices = [
+                'taxRate' => $taxRateStandardToken,
+                'price' => '',
+                'priceSum' => '',
+                'priceTax' => '',
+                'priceSumTax' => '',
+                'priceNet' => '',
+                'priceSumNet' => '',
+                'priceOptionsSum' => '',
+                'priceOptionsSumTax' => '',
+            ];
             $type = $putVars['reservation_type'];
             $periodType = $reservationType->periodType;
 
@@ -2612,7 +2622,6 @@ class C4gReservationController extends C4GBaseController
                             }
                         }
                     }
-
                     if ($participantOptionsPrice){
                         $putVars['participantOptionsPrice'] = $participantOptionsPrice;
                         $priceSum += $participantOptionsPrice;
@@ -2626,8 +2635,7 @@ class C4gReservationController extends C4GBaseController
                     }
                 }
             }
-        $allPrices = array(
-            'taxRate' => $taxRateStandardToken,
+        $allPrices = [
             'price' => C4gReservationHandler::formatPrice($price),
             'priceSum' => C4gReservationHandler::formatPrice($priceSum),
             'priceTax' => C4gReservationHandler::formatPrice($priceTax),
@@ -2635,14 +2643,14 @@ class C4gReservationController extends C4GBaseController
             'priceNet' => C4gReservationHandler::formatPrice($priceNet),
             'priceSumNet' => C4gReservationHandler::formatPrice($priceSumNet),
             'priceOptionsSum' => C4gReservationHandler::formatPrice(($includedOptionsPrice + $additionalOptionsPrice + $participantOptionsPrice)),
-            'priceOptionsSumTax' => C4gReservationHandler::formatPrice(($priceOptionsSumTax + $participantsOptionsSumTax)),
-            );
+            'priceOptionsSumTax' => C4gReservationHandler::formatPrice(($priceOptionsSumTax + $participantsOptionsSumTax))
+            ];
         } else {
             //All prices with taxs additional and participant options
-            $allPrices = array(
+            $allPrices = [
                 'price' => C4gReservationHandler::formatPrice($price),
-                'priceSum' => C4gReservationHandler::formatPrice($priceSum),
-            );
+                'priceSum' => C4gReservationHandler::formatPrice($priceSum)
+            ];
         }
         if ($allPrices) {
             return $allPrices;
