@@ -209,6 +209,8 @@ class C4gReservationConfirmation
                                 $price = C4gReservationHandler::formatPrice($eventObject && $eventObject['price'] ? $eventObject['price'] : $calendarObject['reservationPrice']);
                                 $c4gNotify->setTokenValue('price', $price);
                             }
+
+                            //ToDo set dbkey and all price tokens
                         }
 
                         $salutation = [
@@ -284,7 +286,8 @@ class C4gReservationConfirmation
                                 'audience', 'salutation', 'title', 'organisation', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
                                 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment', 'location', 'contact_name',
                                 'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'agreed',
-                                'description', 'additional1', 'additional2', 'additional3','member_email','price','priceTax','priceSum','priceSumTax','priceNet','priceSumNet'
+                                'description', 'additional1', 'additional2', 'additional3','member_email',
+                                'price','priceTax','priceSum','priceSumTax','priceNet','priceSumNet', 'priceOptionSum', 'priceOptionSumTax', 'reservationTaxRate', 'dbkey'
                             ]
                         );
 
