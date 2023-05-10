@@ -1712,7 +1712,6 @@ class C4gReservationController extends C4GBaseController
             $showPrices = $this->reservationSettings->showPrices;
             if ($reservationEventObject->price|| $calcTaxes || $showPrices) {
                 $price = C4gReservationHandler::formatPrice($reservationEventObject->price);
-                $settings = C4gSettingsModel::findSettings();
                 $putVars['price'] = $price;
                 if ($this->reservationSettings->withCapacity) {
                     $desiredCapacity = $putVars['desiredCapacity_'.$type];
@@ -2626,6 +2625,9 @@ class C4gReservationController extends C4GBaseController
                                 $chosenParticipantOptions = $putVars['participants_' . $type . '-' . ($counter) . '§participant_params§' . $i];
                                 if ($chosenParticipantOptions === $value['id']){
                                     $participantOptionsPrice += $value['price'];
+                                    $chosenParticipantOptions = true;
+                                } else {
+                                    $chosenParticipantOptions = false;
                                 }
                             } else {
                                 $chosenParticipantOptions = $putVars['participants_' . $type . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']];
