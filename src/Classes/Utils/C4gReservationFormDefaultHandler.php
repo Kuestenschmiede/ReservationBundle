@@ -238,6 +238,54 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $priceDBField->setNotificationField(true);
         $this->fieldList[] = $priceDBField;
 
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceNet');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceSumNet');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceOptionSum');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceOptionSumTax');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceOptionSumNet');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('reservationTaxRate');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $this->fieldList[] = $priceDBField;
+
         $reservationObjectField = new C4GSelectField();
         $reservationObjectField->setChosen(false);
         $reservationObjectField->setFieldName('reservation_object');
