@@ -1444,6 +1444,88 @@ class C4gReservationController extends C4GBaseController
         $bookedAt->setFormField(false);
         $bookedAt->setNotificationField(false);
         $fieldList[] = $bookedAt;
+
+        //price for notification
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('price');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceTax');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceSum');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceSumTax');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceNet');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceSumNet');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceOptionSum');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceOptionSumTax');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceOptionSumNet');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('reservationTaxRate');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(9999999999999);
+        $priceDBField->setNotificationField(true);
+        $fieldList[] = $priceDBField;
+
         return $fieldList;
     }
 
@@ -2147,13 +2229,33 @@ class C4gReservationController extends C4GBaseController
         if ($participantsArr && count($participantsArr) > 0) {
             $pCount = $this->reservationSettings->onlyParticipants ? 0 : 1;
             foreach ($participantsArr as $key => $valueArray) {
-                if (strpos($key,'|') === false) {
+                if (strpos($key, '|') === false) {
                     $pCount++;
                     if ($valueArray['participant_params'] && is_numeric($valueArray['participant_params'])) {
                         $paramObj = C4gReservationParamsModel::findByPk($valueArray['participant_params']);
                         $valueArray['participant_params'] = $paramObj->caption;
                     }
-                    $participants .= $participants ? '; '.trim(implode(', ',$valueArray)) : trim(implode(', ',$valueArray));
+
+                    $firstname = $valueArray['firstname'] ?: '';
+                    $lastname  = $valueArray['lastname'] ?: '';
+                    $email     = $valueArray['email'] ?: '';
+                    $options   = $valueArray['participant_params'] ?: '';
+
+                    if ($firstname && $lastname) {
+                        $newParticipant = $firstname.' '.$lastname;
+                    } else if ($firstname || $lastname) {
+                        $newParticipant = $firstname.$lastname;
+                    } else {
+                        $newParticipant = '-';
+                    }
+                    if ($email) {
+                        $newParticipant .= ', '.$email;
+                    }
+                    if ($options) {
+                        $newParticipant .= ', '.$options;
+                    }
+
+                    $participants .= $participants ? "\n" . $newParticipant : $newParticipant;
                 }
             }
 
