@@ -1709,7 +1709,8 @@ class C4gReservationController extends C4GBaseController
             $isEvent ? $putVars['reservation_title'] = $reservationObject->title : $putVars['reservation_title'] = $reservationObject->caption;
             //just notification
             $calcTaxes = $this->reservationSettings->showPricesWithTaxes;
-            if ($reservationEventObject->price|| $calcTaxes) {
+            $showPrices = $this->reservationSettings->showPrices;
+            if ($reservationEventObject->price|| $calcTaxes || $showPrices) {
                 $price = C4gReservationHandler::formatPrice($reservationEventObject->price);
                 $settings = C4gSettingsModel::findSettings();
                 $putVars['price'] = $price;
@@ -1724,7 +1725,7 @@ class C4gReservationController extends C4GBaseController
                 if ($this->reservationSettings->withCapacity) {
                     $desiredCapacity = $putVars['desiredCapacity_'.$type];
                 }
-                if ($reservationEventObject->price || $calcTaxes) {
+                if ($reservationEventObject->price || $calcTaxes || $showPrices) {
                     $allPrices = self::calcPrices($putVars, $reservationObject, $reservationType, $reservationEventObject);
 
                     if ($allPrices) {
@@ -1928,16 +1929,16 @@ class C4gReservationController extends C4GBaseController
             //just notification
             $factor = 1;
             $desiredCapacity =  $reservationObject && $reservationObject->maxParticipants ? ($reservationObject->maxParticipants * $factor) : 0;
-            $calcTaxes = $this->reservationSettings->showPricesWithTaxes;
-            $showPrices = $this->reservationSettings->showPrices;
+            $settings = $this->reservationSettings;
+            $calcTaxes = $settings->showPricesWithTaxes;
+            $showPrices = $settings->showPrices;
             if ($reservationObject->price || $calcTaxes || $showPrices) {
                 $price = C4gReservationHandler::formatPrice($reservationObject->price);
-                $settings = C4gSettingsModel::findSettings();
                 $putVars['price'] = $price;
                 if ($this->reservationSettings->withCapacity) {
                     $desiredCapacity = $putVars['desiredCapacity_'.$type];
                 }
-                if ($desiredCapacity && $reservationObject->priceoption) {
+                if ($desiredCapacity && $reservationObject->priceoption || $showPrices) {
                     $allPrices = self::calcPrices($putVars, $reservationObject, $reservationType, $reservationEventObject = '');
 
                     if ($allPrices) {
