@@ -512,16 +512,27 @@ class C4gReservationInsertTags
                                 $utl = '';
                                 $buttonCaption = '';
 
-                                if ($calendarId) {
+                                if ($reservationObject->reservationForwarding) {
+                                    $url = Controller::replaceInsertTags('{{link_url::' . $reservationObject->reservationForwarding . '}}');
+                                }
+
+                                if ($reservationObject->reservationForwardingButtonCaption) {
+                                    $buttonCaption = $reservationObject->reservationForwardingButtonCaption;
+                                }
+
+                                if ($calendarId && (!$url || !$buttonCaption)) {
                                     $calendar = $this->db->prepare("SELECT reservationForwarding, reservationForwardingButtonCaption FROM tl_calendar WHERE id=?")
                                         ->limit(1)
                                         ->execute($calendarId);
                                     if ($calendar) {
                                         if ($calendar->numRows) {
-                                            if ($calendar->reservationForwarding) {
+                                            if (!$url && $calendar->reservationForwarding) {
                                                 $url = Controller::replaceInsertTags('{{link_url::' . $calendar->reservationForwarding . '}}');
                                             }
-                                            $buttonCaption = $calendar->reservationForwardingButtonCaption;
+
+                                            if (!$buttonCaption) {
+                                                $buttonCaption = $calendar->reservationForwardingButtonCaption;
+                                            }
                                         }
                                     }
                                 }

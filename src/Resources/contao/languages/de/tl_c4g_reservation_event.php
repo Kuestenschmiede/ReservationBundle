@@ -31,6 +31,9 @@ $GLOBALS['TL_LANG'][$str]['participantParamsFieldType'] = array("Feldtyp", "Wäh
 $GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Steuersatz auswählen", "Wählen Sie eine Steueroption für alle Preise."];
 $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Preiseinstellung", "Wonach soll der Preis berechnet werden");
 
+$GLOBALS['TL_LANG'][$str]['reservationForwarding'] = ["Weiterleitung zum Modul", "Wählen Sie die Seite aus, auf der sich das Reservierungsmodul befindet. Kann auch am Kalender und in den Dashboard/Einstellungen global gesetzt werden."];
+$GLOBALS['TL_LANG'][$str]['reservationForwardingButtonCaption'] = ["Buttonbeschriftung Weiterleitung", "Beschriftung des Weiterleitungsbutton zur Reservierung. Standard: leer. Es greifen die Einträge aus den Sprachdateien."];
+
 $GLOBALS['TL_LANG'][$str]['multi'] = 'Mehrfachauswahl (Multi-Checkbox)';
 $GLOBALS['TL_LANG'][$str]['radio'] = 'Einfachauswahl (Radiogruppe)';
 $GLOBALS['TL_LANG'][$str]['references']['tNone'] = "Keine MwSt";

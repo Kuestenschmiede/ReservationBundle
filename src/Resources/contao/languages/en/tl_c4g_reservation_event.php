@@ -31,6 +31,10 @@ $GLOBALS['TL_LANG'][$str]['price'] = array("Price", "Specify the price for the b
 $GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Select Tax Rate option", "Select a tax option for all prices."];
 $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Price setting", "What should the price be calculated by.");
 
+$GLOBALS['TL_LANG'][$str]['reservationForwarding'] = ["Redirect to module", "Select the page where the reservation module is located. Can also be set globally on the calendar and in the dashboard/settings."];
+$GLOBALS['TL_LANG'][$str]['reservationForwardingButtonCaption'] = ["Button label forwarding", "Labeling of the forwarding button to the reservation. Default: empty. The entries from the language files apply."];
+
+
 $GLOBALS['TL_LANG'][$str]['multi'] = 'Multiple selection (multi-checkbox)';
 $GLOBALS['TL_LANG'][$str]['radio'] = 'Single selection (radio group)';
 $GLOBALS['TL_LANG'][$str]['references']['tNone'] = "Without Tax";

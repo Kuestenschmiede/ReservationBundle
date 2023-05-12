@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, min_reservation_day, price, taxOptions, priceoption, participant_params, participantParamsFieldType; {team_legend}, team;',
+        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants, min_reservation_day, price, taxOptions, priceoption, participant_params, participantParamsFieldType,reservationForwarding,reservationForwardingButtonCaption; {team_legend}, team;',
     ),
 
 
@@ -282,6 +282,27 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50 clr'),
             'sql'                     => "varchar(50) NOT NULL default ''"
         ),
+
+        'reservationForwarding' => [
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['reservationForwarding'],
+            'exclude'                 => true,
+            'inputType'               => 'pageTree',
+            'foreignKey'              => 'tl_page.title',
+            'eval'                    => array('tl_class'=>'w50 clr wizard','mandatory'=>false, 'fieldType'=>'radio'),
+            'sql'                     => "int(10) unsigned NOT NULL default '0'",
+            'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+        ],
+
+        'reservationForwardingButtonCaption' => [
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['reservationForwardingButtonCaption'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(254) NOT NULL default ''"
+        ],
 
         'state' => array(
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['state'],
