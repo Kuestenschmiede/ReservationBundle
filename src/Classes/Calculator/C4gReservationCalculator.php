@@ -434,17 +434,13 @@ class C4gReservationCalculator
      * @param $putVars
      * @param $object
      * @param $type
-     * @param $taxRateStandard
-     * @param $taxRateReduced
      * @param $calcTaxes
      * @return int|array
      */
-  public static function calcOptionPrices ($putVars, $object, $type, $taxRateStandard, $taxRateReduced, $calcTaxes) {
+  public static function calcOptionPrices ($putVars, $object, $type, $calcTaxes) {
 
     $incParamSum = 0;
-
     $addParamSum = 0;
-
     $priceOptionSum = 0;
 
     if ($calcTaxes){
@@ -453,23 +449,15 @@ class C4gReservationCalculator
 
         $addParamSumTax = 0;
         $addParamSumNet = 0;
-
-        $priceOptionTax = 0;
-        $priceOptionNet = 0;
     }
-
-    $priceSumNet = 0;
 
       //Reservation included options
       $includedParams = $type['included_params'] ?: false;
 
       if ($includedParams) {
 
-//          $incParamSum = self::
-
           $optionList = unserialize($includedParams);
           $incParamArr = isset($optionList) ? self::getReservationOptions($optionList, [], $calcTaxes) : false;
-//        $incParamArr = isset($object->included_params) ? unserialize($object->included_params) : (isset($reservationType['included_params']) ? unserialize($reservationType->['included_params']) : false);
           foreach ($incParamArr as $key => $value) {
               $incParamSum += $value['price'];
               if ($calcTaxes) {
@@ -479,18 +467,6 @@ class C4gReservationCalculator
               }
           }
       }
-//                       $optionList = unserialize($includedParams);
-
-//    if ($incParamSum) {
-//        $priceOptionSum += $incParamSum;
-//        if ($calcTaxes) {
-//            if ($putVars['taxOption'] == 'tNone') {
-//                $priceSumNet += $value['price'];
-//            } else {
-//                $priceSumNet += $incParamSumNet;
-//            }
-//        }
-//    }
 
         // Additional reservation options
       $additionalParams = $type['additional_params'] ?: false;
@@ -499,18 +475,22 @@ class C4gReservationCalculator
           $additionalParamArr = isset($optionList) ? self::getReservationOptions($optionList, [], $calcTaxes) : false;
           $objectPid = $object['pid'];
           foreach ($additionalParamArr as $key => $value) {
+
               if ($type['additionalParamsFieldType'] == 'radio') {
                   $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectPid];
                   if ($value['id'] == $chosenAdditionalOptions) {
                       $addParamSum += $value['price'];
                   }
+
               } else {
+
                   $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectPid . '|' . $value['id']];
                   if ($chosenAdditionalOptions === 'true') {
                       $chosenAdditionalOptions = true;
                   } else {
                       $chosenAdditionalOptions = false;
                   }
+
                   if ($chosenAdditionalOptions) {
                       $addParamSum += $value['price'];
                       if ($calcTaxes) {
@@ -526,16 +506,87 @@ class C4gReservationCalculator
     $priceOptionSum = $incParamSum + $addParamSum;
 
     if ($calcTaxes) {
+
         $priceOptionTax = $incParamSumTax + $addParamSumTax;
         $priceOptionNet = $incParamSumNet + $addParamSumNet;
-        return array('priceOptionSum' => $priceOptionSum, 'priceOptionTax' => $priceOptionTax, 'priceOptionNet' => $priceOptionNet);
+
+        return array(   'priceOptionSum' => $priceOptionSum,
+                        'priceOptionNet' => $priceOptionNet,
+                        'priceOptionTax' => $priceOptionTax);
     } else {
+
         return array('priceOptionSum' => $priceOptionSum);
+
     }
-}
-//private static function calcIncludedOptions () {
-//
-//}
+  }
+
+    /**
+     * @param $desiredCapacity
+     * @param $putVars
+     * @param $object
+     * @param $type
+     * @param $calcTaxes
+     * @param $onlyParticipants
+     * @return array
+     */
+  public static function calcParticipantOptionPrices ($desiredCapacity, $putVars, $object, $type, $calcTaxes, $onlyParticipants) {
+
+      $participantParams = $object['participant_params'] ?: ($type['participant_params'] ?: false);
+
+      if ($participantParams) {
+          $optionList = unserialize($participantParams);
+          $participantParamArr = isset($optionList) ? self::getReservationOptions($optionList, [], $calcTaxes) : false;
+
+          $counter = $onlyParticipants ? $desiredCapacity : $desiredCapacity - 1;
+          $priceParticipantOptionSum = 0;
+          if ($calcTaxes) {
+              $priceParticipantOptionSumNet = 0;
+              $priceParticipantOptionSumTax = 0;
+          }
+
+          for ($i = 0; $i < ($counter); $i++) {
+
+              foreach ($participantParamArr as $key => $value){
+
+                  if ($object['participantParamsFieldType'] == 'radio'){
+                      $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i];
+                      if ($chosenParticipantOptions === $value['id']){
+                          $priceParticipantOptionSum += $value['price'];
+                          $chosenParticipantOptions = true;
+                      } else {
+                          $chosenParticipantOptions = false;
+                      }
+
+                  } else {
+
+                      $chosenParticipantOptions = $putVars['participants_' . $type['id']  . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']];
+                      if ($chosenParticipantOptions === 'true') {
+                          $chosenParticipantOptions = true;
+                      } else {
+                          $chosenParticipantOptions = false;
+                      }
+                      if ($chosenParticipantOptions){
+                          $priceParticipantOptionSum += $value['price'];
+                      }
+                  }
+                  //individual participant option tax
+                  if ($calcTaxes && $chosenParticipantOptions) {
+                      $priceParticipantOptionSumNet += $value['priceOptionNet'];
+                      $priceParticipantOptionSumTax += $value['price'] - $value['priceOptionNet'];
+                  }
+              }
+          }
+      }
+
+      if ($calcTaxes) {
+          return array( 'priceParticipantOptionSum' => $priceParticipantOptionSum,
+                        'priceParticipantOptionNet' => $priceParticipantOptionSumNet,
+                        'priceParticipantOptionSumTax' => $priceParticipantOptionSumTax);
+      } else {
+          return array('priceParticipantOptionSum' => $priceParticipantOptionSum);
+      }
+  }
+
     /**
      * @param $optionsId
      * @param $paramArr
@@ -544,14 +595,13 @@ class C4gReservationCalculator
 //, $calcTaxes
     public static function getReservationOptions($optionsId, $paramArr, $calcTaxes): mixed {
         if ($optionsId) {
-            $settings = C4gSettingsModel::findSettings();
+//            $settings = C4gSettingsModel::findSettings(); for taxs?
             foreach ($optionsId as $paramId) {
                 if ($paramId) {
                     $param = C4gReservationParamsModel::findByPk($paramId);
                     if ($param && $param->caption && $param->published && ($param->price && $calcTaxes)) {
                         $taxOption = $param->taxOptions;
                         $optionTaxRate = self::setTaxRates($taxOption);
-//                        $priceOptionNet = $taxOption == 'tNone' ?: $param->price / (1 + $optionTaxRate/100);
                         $paramData = [
                             'id' => $paramId,
                             'name' => $param->caption,
