@@ -2405,7 +2405,7 @@ class C4gReservationController extends C4GBaseController
 
             // Reservation price
             if ($showPrices) {
-                $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, true, $desiredCapacity, 1, '', '', $calcTaxes);
+                $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, $isEvent, $desiredCapacity, 1, '', '', $calcTaxes);
             }
 
             // All reservation options
