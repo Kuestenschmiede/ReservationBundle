@@ -1592,7 +1592,8 @@ class C4gReservationHandler
                 $eventObject['participantOptionSum'] = $event['participantOptionSum'] ?: $calendarObject['participantOptionSum'] ?: '';
                 $settings = C4gSettingsModel::findSettings();
                 $priceArray = $showPrices ? C4gReservationCalculator::calcPrices($eventObject, $type, true, 1) : array('price' => 0, 'priceSum' => 0);
-                $price = $priceArray['price'];
+                $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']);
+
 //                $priceSum = $priceArray['priceSum'];
 //                $price = $showPrices ? self::calcPrices($eventObject, $type, true, 1) : 0;
                 $frontendObject->setCaption($price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
@@ -1655,7 +1656,7 @@ class C4gReservationHandler
                             $eventObject['price'] = $reservationEvent['price'] ?: $calendarObject['reservationPrice'];
                             $eventObject['priceoption'] = $reservationEvent['priceoption'] ?: $calendarObject['reservationPriceOption'];
                             $priceArray = $showPrices ? C4gReservationCalculator::calcPrice($eventObject, $type, true, 1) : array('price' => 0, 'priceSum' => 0);
-                            $price = $priceArray['price'];
+                            $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']);
                             $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title']) . "<span class='price'>&nbsp;(" . $price . ")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                             $frontendObject->setDesiredCapacity([$reservationEvent['minParticipants'] ?: $calendarObject['reservationMinParticipants'], $maxParticipants]);
                             $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'], $eventObject['startTime']));
@@ -1777,8 +1778,9 @@ class C4gReservationHandler
                     }
                 }
 
-                $priceArray = $showPrices ? C4gReservationCalculator::calcPrices($object, $type, false, 1, $duration, $date,'') : 0;
-                $price = $priceArray['price'];
+                $priceArray = $showPrices ? C4gReservationCalculator::calcPrices($object, $type, false, 1, $duration, $date,'') : array('price' => 0, 'priceSum' => 0);
+                $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']);
+
                 $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
 
                 $frontendObject->setPeriodType($type['periodType']);
