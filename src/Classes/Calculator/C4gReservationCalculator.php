@@ -299,6 +299,19 @@ class C4gReservationCalculator
         $priceSum = 0;
         $priceInfo = '';
 
+//        //makes sure that the object in this case gets treated like an array
+//        $object = (is_array($object) && $isEvent) ? $object : ($object[0] ?? $object[3][0] ?? $object);
+        if (is_array($object) && $isEvent) {
+            // Do nothing since $object is already an array and $isEvent is true
+        } elseif (!is_array($object)) {
+            $object = (array) $object;
+            if ($object[0] !== null) {
+                $object = $object[0];
+            } elseif (isset($object[2][0]) && $object[2][0] !== null) {
+                $object = $object[2][0];
+            }
+        }
+
         if ($object) {
 
             if (!$duration) {
@@ -308,6 +321,7 @@ class C4gReservationCalculator
             if ($langCookie) {
                 \System::loadLanguageFile('fe_c4g_reservation', $langCookie);
             }
+
             $priceOption = key_exists('priceoption',$object) ? $object['priceoption'] : '';
             $interval = $object['time_interval'];
             $timeSpan = max($duration, $interval);
