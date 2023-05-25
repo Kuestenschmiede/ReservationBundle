@@ -546,6 +546,9 @@ class C4gReservationCalculator
      * @return array
      */
   public static function calcParticipantOptionPrices ($desiredCapacity, $putVars, $object, $type, $calcTaxes, $onlyParticipants) {
+      $priceParticipantOptionSum = 0;
+      $priceParticipantOptionSumNet = 0;
+      $priceParticipantOptionSumTax = 0;
 
       $participantParams = $object['participant_params'] ?: ($type['participant_params'] ?: false);
 
@@ -597,9 +600,6 @@ class C4gReservationCalculator
           }
       }
 
-      $priceParticipantOptionSum = 0;
-      $priceParticipantOptionSumNet = 0;
-      $priceParticipantOptionSumTax = 0;
       if ($calcTaxes) {
 
           return array( 'priceParticipantOptionSum' => $priceParticipantOptionSum,

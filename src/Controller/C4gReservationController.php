@@ -1800,12 +1800,13 @@ class C4gReservationController extends C4GBaseController
             if ($this->reservationSettings->withCapacity) {
                 $desiredCapacity = $putVars['desiredCapacity_'.$type];
             }
-
+//            $object = $objArray;
+//            $type = $typeArray
             if ($price || $calcTaxes || $showPrices) {
                 $objectArr = is_array($reservationEventObject) ? $reservationEventObject : (array) $reservationEventObject;
                 $typeArr = is_array($reservationType) ? $reservationType : (array) $reservationType;
-                $object = is_array($reservationEventObject) && $isEvent ? $reservationEventObject : (array_values($objectArr)[0] ?? $reservationEventObject);
-                $type = is_array($reservationType) && $isEvent ? $type : (array_values($typeArr)[2][0] ?? $reservationType);
+                $objArray = is_array($reservationEventObject) && $isEvent ? $reservationEventObject : (array_values($objectArr)[0] ?? $reservationEventObject);
+                $typeArray = is_array($reservationType) && $isEvent ? $reservationType : (array_values($typeArr)[2][0] ?? $reservationType);
 
                 $priceArray = false;
                 $priceOptionSum = false;
@@ -1816,14 +1817,14 @@ class C4gReservationController extends C4GBaseController
 
                 // Reservation price
                 if ($showPrices) {
-                    $priceArray = C4gReservationCalculator::calcPrices($object, $type, true, $desiredCapacity, 1, '', '', $calcTaxes);
+                    $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, true, $desiredCapacity, 1, '', '', $calcTaxes);
                 }
 
                 // All reservation options
                 $includedParams = $reservationType->included_params ?: false;
                 $additionalParams = $reservationType->additional_params ?: false;
                 if ($includedParams || $additionalParams) {
-                    $priceOptionSum = C4gReservationCalculator::calcOptionPrices($putVars, $object, $type, $calcTaxes);
+                    $priceOptionSum = C4gReservationCalculator::calcOptionPrices($putVars, $objArray, $typeArray, $calcTaxes);
 
                     if ($priceOptionSum) {
                         $putVars['optionsPriceSum'] = $priceOptionSum['priceOptionSum'];
@@ -1837,7 +1838,7 @@ class C4gReservationController extends C4GBaseController
                 $onlyParticipants = $settings->onlyParticipants ?: false;
 
                 if ($participantParams && $specialParticipantMechanism) {
-                    $priceParticipantOptionSum = C4gReservationCalculator::calcParticipantOptionPrices(intval($desiredCapacity), $putVars, $object, $type, $calcTaxes, $onlyParticipants);
+                    $priceParticipantOptionSum = C4gReservationCalculator::calcParticipantOptionPrices(intval($desiredCapacity), $putVars, $objArray, $typeArray, $calcTaxes, $onlyParticipants);
 
 //                    $putVars['optionsPriceSum'] = $priceOptionSum['priceOptionSum'] + $priceParticipantOptionSum['priceParticipantOptionSum'];
                     $optionsPriceSum = $priceOptionSum['priceOptionSum'] + $priceParticipantOptionSum['priceParticipantOptionSum'];
