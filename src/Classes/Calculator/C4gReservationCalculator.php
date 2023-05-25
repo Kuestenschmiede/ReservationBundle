@@ -294,8 +294,10 @@ class C4gReservationCalculator
      * @param $langCookie
      * @return int|array
      */
-    public static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '') {
+    public static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '', $calcTaxes) {
         $price = 0;
+        $priceSum = 0;
+        $priceInfo = '';
 
         if ($object) {
 
@@ -307,11 +309,11 @@ class C4gReservationCalculator
                 \System::loadLanguageFile('fe_c4g_reservation', $langCookie);
             }
             $priceOption = key_exists('priceoption',$object) ? $object['priceoption'] : '';
-            $priceInfo = '';
             $interval = $object['time_interval'];
             $timeSpan = max($duration, $interval);
             switch ($priceOption) {
                 case 'pMin':
+                    $minutes = 0;
                     if ($isEvent && $object['startTime'] && $object['endTime']) {
                         $diff = $object['endTime'] - $object['startTime'];
                         if ($diff > 0) {
@@ -341,6 +343,7 @@ class C4gReservationCalculator
                     $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'];
                     break;
                 case 'pHour':
+                    $hours = 0;
                     if ($isEvent && $object['startTime'] && $object['endTime']) {
                         $diff = $object['endTime'] - $object['startTime'];
                         if ($diff > 0) {
@@ -419,18 +422,31 @@ class C4gReservationCalculator
                     break;
             }
         }
-
         if ($price) {
             $priceInfo = $priceInfo ? "&nbsp;" . $priceInfo : '';
 //            $price = $price ? C4gReservationHandler::formatPrice($price) . $priceInfo : '';
             $priceSum = $priceSum ? $priceSum : '';
         }
 
-        return array('price' => $price, 'priceSum' => $priceSum, 'priceInfo' => $priceInfo);
+        if ($calcTaxes) {
+            $taxOption = $object['taxOptions'];
+            $reservationTaxRate = self::setTaxRates($taxOption);
+
+            if ($taxOption !== 'tNone') {
+                $priceNet = $priceSum / (1 + $reservationTaxRate/100);
+                $priceTax = $priceSum - $priceNet;
+            } else {
+                $priceNet = $priceSum;
+                $priceTax = 0;
+            }
+
+            return array('price' => $price, 'priceSum' => $priceSum, 'priceInfo' => $priceInfo, 'priceNet' => $priceNet, 'priceTax' => $priceTax , 'reservationTaxRate' => $reservationTaxRate);
+        } else {
+            return array('price' => $price, 'priceSum' => $priceSum, 'priceInfo' => $priceInfo);
+        }
     }
 
     /**
-     * @param $optionList
      * @param $putVars
      * @param $object
      * @param $type
@@ -441,7 +457,7 @@ class C4gReservationCalculator
 
     $incParamSum = 0;
     $addParamSum = 0;
-    $priceOptionSum = 0;
+
 
     if ($calcTaxes){
         $incParamSumTax = 0;
@@ -572,15 +588,22 @@ class C4gReservationCalculator
                   //individual participant option tax
                   if ($calcTaxes && $chosenParticipantOptions) {
                       $priceParticipantOptionSumNet += $value['priceOptionNet'];
+                      if ($value['taxOptions'] == 'tNone') {
+                          $value['priceOptionNet'] = $value['price'];
+                      }
                       $priceParticipantOptionSumTax += $value['price'] - $value['priceOptionNet'];
                   }
               }
           }
       }
 
+      $priceParticipantOptionSum = 0;
+      $priceParticipantOptionSumNet = 0;
+      $priceParticipantOptionSumTax = 0;
       if ($calcTaxes) {
+
           return array( 'priceParticipantOptionSum' => $priceParticipantOptionSum,
-                        'priceParticipantOptionNet' => $priceParticipantOptionSumNet,
+                        'priceParticipantOptionSumNet' => $priceParticipantOptionSumNet,
                         'priceParticipantOptionSumTax' => $priceParticipantOptionSumTax);
       } else {
           return array('priceParticipantOptionSum' => $priceParticipantOptionSum);
@@ -590,12 +613,11 @@ class C4gReservationCalculator
     /**
      * @param $optionsId
      * @param $paramArr
+     * @param $calcTaxes
      * @return mixed
      */
-//, $calcTaxes
     public static function getReservationOptions($optionsId, $paramArr, $calcTaxes): mixed {
         if ($optionsId) {
-//            $settings = C4gSettingsModel::findSettings(); for taxs?
             foreach ($optionsId as $paramId) {
                 if ($paramId) {
                     $param = C4gReservationParamsModel::findByPk($paramId);
