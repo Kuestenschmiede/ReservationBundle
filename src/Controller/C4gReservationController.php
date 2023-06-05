@@ -2386,7 +2386,6 @@ class C4gReservationController extends C4GBaseController
             $resObject = $reservationObject;
         }
 
-
         if ($price || $calcTaxes || $showPrices) {
 
             $objectArr = is_array($resObject) ? $resObject : (array)$resObject;
@@ -2402,27 +2401,28 @@ class C4gReservationController extends C4GBaseController
                 $objArray = is_array($reservationObject) ? $reservationObject : (array_values($objectArr)[2][0] ?? $reservationObject);
             }
 
+            $duration = $putVars['duration_'.$typeArray['id']];
+
             $priceArray = false;
             $priceOptionSum = false;
             $priceParticipantOptionSum = false;
 
-            $priceSum = 0;
-            $optionsPriceSum = 0;
-
             // Reservation price
             if ($showPrices) {
-                $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, $isEvent, $desiredCapacity, 1, '', '', $calcTaxes);
+                $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, $isEvent, $desiredCapacity, $duration, '', '', $calcTaxes);
+                $priceSum = $priceArray['priceSum'];
             }
 
             // All reservation options
             $includedParams = $reservationType->included_params ?: false;
             $additionalParams = $reservationType->additional_params ?: false;
             if ($includedParams || $additionalParams) {
+                $optionsPriceSum = 0;
                 $priceOptionSum = C4gReservationCalculator::calcOptionPrices($putVars, $objArray, $typeArray, $calcTaxes);
 
                 if ($priceOptionSum) {
                     $putVars['optionsPriceSum'] = $priceOptionSum['priceOptionSum'];
-                    $priceSum = $priceArray['priceSum'] + $priceOptionSum['priceOptionSum'];
+                    $priceSum += $priceOptionSum['priceOptionSum'];
                 }
             }
 
@@ -2473,9 +2473,8 @@ class C4gReservationController extends C4GBaseController
         } else {
             $putVars['price'] = C4gReservationHandler::formatPrice($price);
             $putVars['priceSum'] = C4gReservationHandler::formatPrice($price ?? '');
-            $putVars['optionsPriceSum'] =  C4gReservationHandler::formatPrice($putVars['optionsPriceSum']);
+//            $putVars['optionsPriceSum'] =  C4gReservationHandler::formatPrice($putVars['optionsPriceSum']);
         }
     }
-
 }
 
