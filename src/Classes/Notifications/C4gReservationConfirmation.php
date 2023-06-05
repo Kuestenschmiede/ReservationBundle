@@ -144,7 +144,7 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('participantList', $participants);
 
                         if ($reservationObjectType == '2') {
-                            $calendarObject =  $database->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($reservationObject['pid'])->fetchAssoc();
+                            $calendarObject = $database->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($reservationObject['pid'])->fetchAssoc();
                             $eventObject = $database->prepare('SELECT * FROM tl_c4g_reservation_event WHERE `pid`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
                             if ($eventObject || $calendarObject) {
                                 $speaker = '';
@@ -156,7 +156,7 @@ class C4gReservationConfirmation
                                         $speakerObject = C4gReservationEventSpeakerModel::findByPk($speakerId);
                                         if ($speakerObject) {
                                             if ($speaker) {
-                                                $speaker .= ', '.$speakerObject->title ? $speakerObject->title . ' ' . $speakerObject->firstname . ' ' . $speakerObject->lastname : $speakerObject->firstname . ' ' . $speakerObject->lastname;
+                                                $speaker .= ', ' . $speakerObject->title ? $speakerObject->title . ' ' . $speakerObject->firstname . ' ' . $speakerObject->lastname : $speakerObject->firstname . ' ' . $speakerObject->lastname;
 
                                             } else {
                                                 $speaker = $speakerObject->title ? $speakerObject->title . ' ' . $speakerObject->firstname . ' ' . $speakerObject->lastname : $speakerObject->firstname . ' ' . $speakerObject->lastname;
@@ -207,10 +207,27 @@ class C4gReservationConfirmation
 
                             if (($eventObject && $eventObject['price']) || ($calendarObject && $calendarObject['reservationPrice'])) {
                                 $price = C4gReservationHandler::formatPrice($eventObject && $eventObject['price'] ? $eventObject['price'] : $calendarObject['reservationPrice']);
+                                $priceOptionSum = C4gReservationHandler::formatPrice($eventObject && $eventObject['priceOptionSum']);
+                                $priceSum = C4gReservationHandler::formatPrice($eventObject && $eventObject['priceSum']);
                                 $c4gNotify->setTokenValue('price', $price);
+                                $c4gNotify->setTokenValue('priceOptionSum', $priceOptionSum);
+                                $c4gNotify->setTokenValue('priceSum', $priceSum);
                             }
-
                             //ToDo set dbkey and all price tokens
+                            $c4gNotify->setTokenValue('dbkey', $reservation['id'] ? $reservation['dbkey'] : '');
+
+                            if ($eventObject && $eventObject['priceSumTax']) {
+                                $c4gNotify->setTokenValue('priceTax', $reservation['priceTax'] ? $reservation['priceTax'] : '');
+                                $c4gNotify->setTokenValue('priceNet', $reservation['priceNet'] ? $reservation['priceNet'] : '');
+
+                                $c4gNotify->setTokenValue('priceOptionSumTax', $reservation['priceOptionSumTax'] ? $reservation['priceOptionSumTax'] : '');
+                                $c4gNotify->setTokenValue('priceOptionSumNet', $reservation['priceOptionSumNet'] ? $reservation['priceOptionSumNet'] : '');
+
+                                $c4gNotify->setTokenValue('priceSumNet', $reservation['priceSumNet'] ? $reservation['priceSumNet'] : '');
+                                $c4gNotify->setTokenValue('priceSumTax', $reservation['priceSumTax'] ? $reservation['priceSumTax'] : '');
+
+                                $c4gNotify->setTokenValue('reservationTaxRate', $reservation['reservationTaxRate'] ? $reservation['reservationTaxRate'] : '');
+                            }
                         }
 
                         $salutation = [
@@ -258,7 +275,23 @@ class C4gReservationConfirmation
 
                         if ($reservationObject['price']) {
                             $price = C4gReservationHandler::formatPrice($reservationObject['price']);
+                            $priceOptionSum = C4gReservationHandler::formatPrice($reservationObject['priceOptionSum']);
+                            $priceSum = C4gReservationHandler::formatPrice($reservationObject['priceSum']);
                             $c4gNotify->setTokenValue('price', $price);
+                            $c4gNotify->setTokenValue('priceOptionSum', $priceOptionSum);
+                            $c4gNotify->setTokenValue('priceSum', $priceSum);
+                        }
+                        if ($reservationObject && $reservationObject['priceSumTax']) {
+                            $c4gNotify->setTokenValue('priceTax', $reservation['priceTax'] ? $reservation['priceTax'] : '');
+                            $c4gNotify->setTokenValue('priceNet', $reservation['priceNet'] ? $reservation['priceNet'] : '');
+
+                            $c4gNotify->setTokenValue('priceOptionSumTax', $reservation['priceOptionSumTax'] ? $reservation['priceOptionSumTax'] : '');
+                            $c4gNotify->setTokenValue('priceOptionSumNet', $reservation['priceOptionSumNet'] ? $reservation['priceOptionSumNet'] : '');
+
+                            $c4gNotify->setTokenValue('priceSumNet', $reservation['priceSumNet'] ? $reservation['priceSumNet'] : '');
+                            $c4gNotify->setTokenValue('priceSumTax', $reservation['priceSumTax'] ? $reservation['priceSumTax'] : '');
+
+                            $c4gNotify->setTokenValue('reservationTaxRate', $reservation['reservationTaxRate'] ? $reservation['reservationTaxRate'] : '');
                         }
 
                         $binFileUuid = $reservation['fileUpload'];

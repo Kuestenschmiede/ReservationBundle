@@ -42,6 +42,8 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBaseController;
 use con4gis\ProjectsBundle\Classes\Framework\C4GController;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
+use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
+use con4gis\ReservationBundle\Classes\Callbacks\ReservationType;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
@@ -1789,50 +1791,10 @@ class C4gReservationController extends C4GBaseController
             $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
 
             $isEvent ? $putVars['reservation_title'] = $reservationObject->title : $putVars['reservation_title'] = $reservationObject->caption;
-            //just notification
-            $calcTaxes = $this->reservationSettings->showPricesWithTaxes;
-            $showPrices = $this->reservationSettings->showPrices;
-            if ($reservationEventObject->price|| $calcTaxes || $showPrices) {
-                $price = C4gReservationHandler::formatPrice($reservationEventObject->price);
-                $putVars['price'] = $price;
-                if ($this->reservationSettings->withCapacity) {
-                    $desiredCapacity = $putVars['desiredCapacity_'.$type];
-                }
-                $price = C4gReservationHandler::formatPrice($reservationEventObject->price);
-                if ($reservationEventObject->price) {
-                    $putVars['price'] = $price;
-                }
 
-                if ($this->reservationSettings->withCapacity) {
-                    $desiredCapacity = $putVars['desiredCapacity_'.$type];
-                }
-                if ($reservationEventObject->price || $calcTaxes || $showPrices) {
-                    $allPrices = self::calcPrices($putVars, $reservationObject, $reservationType, $reservationEventObject);
-
-                    if ($allPrices) {
-
-                        $putVars['price'] = $allPrices['price'];
-                        $putVars['priceSum'] = $allPrices['priceSum'];
-                        $putVars['priceOptionSum'] = $allPrices['priceOptionsSum'];
-
-                        if ($calcTaxes) {
-
-                            $putVars['priceTax'] = $allPrices['priceTax'];
-                            $putVars['priceNet'] = $allPrices['priceNet'];
-
-                            $putVars['priceSumTax'] = $allPrices['priceSumTax'];
-                            $putVars['priceSumNet'] = $allPrices['priceSumNet'];
-
-                            $putVars['priceOptionSumTax'] = $allPrices['priceOptionsSumTax'];
-                            $putVars['priceOptionSumNet'] = $allPrices['priceOptionsSumNet'];
-
-                            $putVars['reservationTaxRate'] = $allPrices['reservationTaxRate'];
-                        }
-                    }
-                } else {
-                    $putVars['priceSum'] = $price;
-                }
-            }
+            // Just notification
+            $settings = $this->reservationSettings;
+            self::allPrices($settings, $putVars, $reservationObject, $reservationEventObject, $reservationType, $isEvent, $desiredCapacity);
        } else {
             $putVars['reservationObjectType'] = $reservationType->reservationObjectType;
             $objectId = $reservationObject ? $reservationObject->id : 0;
@@ -2009,43 +1971,11 @@ class C4gReservationController extends C4GBaseController
 
             //just notification
             $factor = 1;
-            $desiredCapacity =  $reservationObject && $reservationObject->maxParticipants ? ($reservationObject->maxParticipants * $factor) : 0;
+            $countPersons = intval($putVars['desiredCapacity_' . $type]);
             $settings = $this->reservationSettings;
-            $calcTaxes = $settings->showPricesWithTaxes;
-            $showPrices = $settings->showPrices;
-            if ($reservationObject->price || $calcTaxes || $showPrices) {
-                $price = C4gReservationHandler::formatPrice($reservationObject->price);
-                $putVars['price'] = $price;
-                if ($this->reservationSettings->withCapacity) {
-                    $desiredCapacity = $putVars['desiredCapacity_'.$type];
-                }
-                if ($desiredCapacity && $reservationObject->priceoption || $showPrices) {
-                    $allPrices = self::calcPrices($putVars, $reservationObject, $reservationType, $reservationEventObject = '');
 
-                    if ($allPrices) {
+            self::allPrices($settings, $putVars, $reservationObject, '', $reservationType, $isEvent, $countPersons);
 
-                        $putVars['price'] = $allPrices['price'];
-                        $putVars['priceSum'] = $allPrices['priceSum'];
-                        $putVars['priceOptionSum'] = $allPrices['priceOptionsSum'];
-
-                        if ($calcTaxes) {
-
-                            $putVars['priceTax'] = $allPrices['priceTax'];
-                            $putVars['priceNet'] = $allPrices['priceNet'];
-
-                            $putVars['priceSumTax'] = $allPrices['priceSumTax'];
-                            $putVars['priceSumNet'] = $allPrices['priceSumNet'];
-
-                            $putVars['priceOptionSumTax'] = $allPrices['priceOptionsSumTax'];
-                            $putVars['priceOptionSumNet'] = $allPrices['priceOptionsSumNet'];
-
-                            $putVars['reservationTaxRate'] = $allPrices['reservationTaxRate'];
-                        }
-                    }
-                } else {
-                    $putVars['priceSum'] = $price;
-                }
-            }
         }
 
         $locationId = 0;
@@ -2287,7 +2217,7 @@ class C4gReservationController extends C4GBaseController
         $nextElement = $database->prepare("SELECT id FROM tl_c4g_reservation order by id DESC")
             ->execute($type)->fetchAssoc();
         if ($nextElement && $nextElement['id']) {
-            $nextId = $nextElement['id']++;
+            $nextId = $nextElement['id'] + 1;
             $putVars['dbkey'] = $nextId;
         }
 
@@ -2444,349 +2374,106 @@ class C4gReservationController extends C4GBaseController
     {
         $this->reservationSettings = $reservationSettings;
     }
-
-    /**
-     * @param $taxOption
-     * @param $taxRateStandard
-     * @param $taxRateReduced
-     * @return int
-     */
-    public function setTaxRates($taxOption, $taxRateStandard, $taxRateReduced)
-    {
-        if ($taxOption === 'tStandard') {
-            return $taxRateStandard;
-        } elseif ($taxOption === 'tReduced') {
-            return $taxRateReduced;
+    public static function allPrices ($settings, &$putVars, $reservationObject, $reservationEventObject, $reservationType, $isEvent, $desiredCapacity) {
+        $calcTaxes = $settings->showPricesWithTaxes ?: false;
+        $showPrices = $settings->showPrices ?: false;
+        if ($isEvent) {
+            $desiredCapacity = $reservationEventObject->minParticipants;
+            $resObject = $reservationEventObject;
+            $price = $reservationEventObject->price;
         } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @param $optionsId
-     * @param $paramArr
-     * @param $taxRateStandard
-     * @param $taxRateReduced
-     * @return mixed
-     */
-    public function getReservationOptions($optionsId, $paramArr, $taxRateStandard, $taxRateReduced): mixed
-    {
-        if ($optionsId) {
-            foreach ($optionsId as $paramId) {
-                if ($paramId) {
-                    $param = C4gReservationParamsModel::findByPk($paramId);
-                    if ($param && $param->caption && $param->published && ($param->price && $this->reservationSettings->showPrices)) {
-                        $taxOption = $param->taxOptions;
-                        $includedTaxRate = self::setTaxRates($taxOption, $taxRateStandard, $taxRateReduced);
-                        $priceOptionNet = $taxOption == 'tNone' ? $param->price : $param->price / (1 + $includedTaxRate);
-                        $paramArr[] = ['id' => $paramId, 'name' => $param->caption, 'price' => $param->price, 'priceOptionNet' => $priceOptionNet, 'taxOptions' => $param->taxOptions];
-                    } else if ($param && $param->caption && $param->published) {
-                        $paramArr[] = ['id' => $paramId, 'name' => $param->caption];
-                    }
-                }
-            }
-        }
-        return $paramArr;
-    }
-
-    public function calcPrices($putVars, $reservationObject, $reservationType, $reservationEventObject = ""): array
-    {
-        $priceSum = 0;
-        $objectTypeId = $putVars['reservationObjectType'];
-        $isEvent = $objectTypeId === '2';
-        $object = $isEvent ? $reservationEventObject : $reservationObject;
-        $priceOption = $object->priceoption ?: '';
-        $price = $object->price;
-        //if calc taxes is active
-        $calcTaxes = $this->reservationSettings->showPricesWithTaxes;
-        if ($calcTaxes){
-            $settings = C4gSettingsModel::findSettings();
-            //Dashboard taxrates
-            $taxRateStandardToken = ($settings->taxRateStandard ?? 0);
-            $taxRateReducedToken = ($settings->taxRateReduced ?? 0);
-            $taxRateStandard = $taxRateStandardToken / 100;
-            $taxRateReduced = $taxRateReducedToken / 100;
+            $price = $reservationObject->price;
+            $resObject = $reservationObject;
         }
 
-        if ($object) {
-            $allPrices = [
-                'taxRate' => '',
-                'price' => '',
-                'priceSum' => '',
-                'priceTax' => '',
-                'priceSumTax' => '',
-                'priceNet' => '',
-                'priceSumNet' => '',
-                'priceOptionsSum' => '',
-                'priceOptionsSumNet' => '',
-                'priceOptionsSumTax' => '',
-            ];
-            $type = $putVars['reservation_type'];
-            $periodType = $reservationType->periodType;
+        if ($price || $calcTaxes || $showPrices) {
 
-            if (!$isEvent) {
-                if ($objectTypeId === "3") {
-                    $objectId = $putVars['reservation_object_' . $type];
-                    $additionalId = "-33$objectId";
-                }
-                $beginDate = ($objectTypeId === "3") ? $putVars['beginDate_' . $type . $additionalId] : $putVars['beginDate_' . $type];
-                $beginTime = ($objectTypeId === "3") ? $putVars['beginTime_' . $type . $additionalId] : $putVars['beginTime_' . $type];
+            $objectArr = is_array($resObject) ? $resObject : (array)$resObject;
+            $typeArr = is_array($reservationType) ? $reservationType : (array)$reservationType;
+
+            $typeArray = is_array($reservationType) ? $reservationType : (array_values($typeArr)[2][0] ?? $reservationType);
+
+            if ($isEvent) {
+                $objArray = is_array($reservationObject) ? $reservationObject : (array_values($objectArr)[0] ?? $reservationObject);
+                $countPersons = intval($putVars['desiredCapacity_' . $objArray['reservationType']]);
+                $desiredCapacity = $countPersons;
             } else {
-                $beginDate = $putVars['beginDate'];
-                $beginTime = $putVars['beginTime'];
+                $objArray = is_array($reservationObject) ? $reservationObject : (array_values($objectArr)[2][0] ?? $reservationObject);
             }
-            $endDate = $putVars['endDate'];
-            $endTime = $putVars['endTime'];
-            $interval = $object->time_interval;
-            $duration = $putVars['duration_' . $type];
-            $countPersons = $putVars['desiredCapacity_' . $type];
-            $timeSpan = max($duration, $interval);
-            switch ($priceOption) {
-                case 'pMin':
-                    if ($isEvent && $beginTime && $endTime) {
-                        $diff = $endTime - $beginTime;
-                        if ($diff > 0) {
-                            $minutes = $diff / 60;
-                        }
-                    } else if (!$isEvent && $periodType && $interval) {
-                        switch ($periodType) {
-                            case 'minute':
-                                $minutes = $timeSpan;
-                                break;
-                            case 'hour':
-                                $minutes = $timeSpan * 60;
-                                break;
-                            case 'overnight':
-                            case 'day':
-                                $minutes = $timeSpan * 60 * 24;
-                                break;
-                            case 'week':
-                                $minutes = $timeSpan * 60 * 24 * 7;
-                                break;
-                            default:
-                                '';
-                        }
-                    }
-                    $priceSum = intval($price) * $minutes;
-                    break;
-                case 'pHour':
-                    if ($isEvent && $beginTime && $endTime) {
-                        $diff = $endTime - $beginTime;
-                        if ($diff > 0) {
-                            $hours = $diff / 3600;
-                        }
-                    } else if (!$isEvent && $periodType && $interval) {
-                        switch ($periodType) {
-                            case 'minute':
-                                $hours = $timeSpan / 60;
-                                break;
-                            case 'hour':
-                                $hours = $timeSpan;
-                                break;
-                            case 'overnight':
-                            case 'day':
-                                $hours = $timeSpan * 24;
-                                break;
-                            case 'week':
-                                $hours = $timeSpan * 24 * 7;
-                                break;
-                            default:
-                                '';
-                        }
-                    }
-                    $priceSum = intval($price) * $hours;
-                    break;
-                case 'pNight':
-                case 'pDay':
-                    $days = $timeSpan ?: 0;
-                    if ($isEvent && $beginDate && $endDate) {
-                        $days = round(abs($endDate - $beginDate) / (60 * 60 * 24));
-                    } else if (!$days && !$isEvent && $beginDate && $endDate) {
-                        $days = round(abs($endDate - $beginDate) / (60 * 60 * 24));
-                    }
-                    $price = intval($price) * $days;
-                    break;
-                case 'pNightPerson':
-                    $days = $timeSpan ?: 0;
-                    if ($isEvent && $beginDate && $endDate) {
-                        $days = round(abs($endDate - $beginDate) / (60 * 60 * 24));
-                    } else if (!$days && !$isEvent && $beginDate && $endDate) {
-                        $days = round(abs($endDate - $beginDate) / (60 * 60 * 24));
-                    }
-                    $priceSum += intval($price) * $days * $countPersons;
-                    break;
-                case 'pWeek':
-                    $weeks = $timeSpan ?: 0;
-                    if ($isEvent && $beginDate && $endDate) {
-                        $weeks = round(abs($endDate - $beginDate) / (60 * 60 * 24 * 7));
-                    } else if (!$weeks && !$isEvent && $beginDate && $endDate) {
-                        $weeks = round(abs($endDate - $beginDate) / (60 * 60 * 24 * 7));
-                    }
-                    $priceSum = intval($price) * $weeks;
-                    break;
-                case 'pReservation':
-                    $priceSum = intval($price);
-                    break;
-                case 'pPerson':
-                    $priceSum = intval($price) * $countPersons;
-                    break;
-                case 'pAmount':
-                    break;
-            }
-            $priceSumNet = 0;
-            //Reservation included options
-            $includedParamArr = self::getReservationOptions(unserialize($reservationType->included_params), [], $taxRateStandard, $taxRateReduced);
-            $includedOptionsPrice = 0;
-            foreach ($includedParamArr as $key => $value) {
-                $includedOptionsPrice += $value['price'];
-                if ($calcTaxes){
-                    //individual included option tax
-                    $priceOptionsSumNet += $value['priceOptionNet'];
-                    $priceOptionsSumTax += $value['price'] - $value['priceOptionNet'];
-                }
-            }
-            if ($includedOptionsPrice){
-                $putVars['optionsPriceSum'] += $includedOptionsPrice;
-                $priceSum += $includedOptionsPrice;
-                if ($calcTaxes){
-                    if ($putVars['taxOption'] == 'tNone') {
-                        $priceSumNet += $value['price'];
-                    } else {
-                        $priceSumNet += $priceOptionsSumNet;
-                    }
-                }
-            }
-            // Additional reservation options
-            $additionalParamArr = self::getReservationOptions(unserialize($reservationType->additional_params), [], $taxRateStandard, $taxRateReduced);
-            $objectPid = $object->pid;
-            foreach ($additionalParamArr as $key => $value) {
-                if ($reservationType->additionalParamsFieldType == 'radio'){
-                    $chosenAdditionalOptions = $putVars['additional_params_' . $type . '-00' . $objectPid];
-                    if ($value['id'] == $chosenAdditionalOptions){
-                        $chosenAdditionalOptions += $value['price'];
-                    }
-                } else {
-                    $chosenAdditionalOptions = $putVars['additional_params_' . $type . '-00' . $objectPid . '|' . $value['id']];
-                    if ($chosenAdditionalOptions === 'true') {
-                        $chosenAdditionalOptions = true;
-                    } else {
-                        $chosenAdditionalOptions = false;
-                    }
-                    if ($chosenAdditionalOptions){
-                        $additionalOptionsPrice += $value['price'];
-                        if ($calcTaxes){
-                            //individual additional option tax
-                            $priceOptionsSumNet += $value['priceOptionNet'];
-                            $priceOptionsSumTax += $value['price'] - $value['priceOptionNet'];
-                        }
-                    }
-                }
-            }
-            if ($additionalOptionsPrice){
-                $putVars['optionsPriceSum'] += $additionalOptionsPrice;
-                $priceSum += $additionalOptionsPrice;
-                if ($calcTaxes){
-                    if ($putVars['taxOption'] == 'tNone') {
-                        $priceSumNet += $value['price'];
-                    } else {
-                        $priceSumNet += $priceOptionsSumNet;
-                    }
-                }
-            }
-            if ($this->reservationSettings->specialParticipantMechanism) {
-                if ($calcTaxes){
-                    //Set dashboard tax rate for object
-                    $taxOption = $object->taxOptions ?: '';
-                    $taxRate = self::setTaxRates($taxOption, $taxRateStandard, $taxRateReduced);
-                    //PriceNet
-                    if ($taxOption == 'tNone') {
-                        $priceNet = $price;
-                    } else {
-                        $priceNet = $price / (1 + $taxRate);
-                    }
-                    //PriceSumNet
-                    if ($taxOption == 'tNone') {
-                        $priceSumNet = $priceSum;
-                    } else {
-                        $priceSumNet += $priceSum / (1 + $taxRate);
-                    }
-                    $priceTax = $price - $priceNet;
-                }
 
-                // Participant options
-                $specialParticipantMechanism = $this->reservationSettings->specialParticipantMechanism;
-                if ($specialParticipantMechanism){
-                    $participantParamArr = [];
-                    $participantOptionsId = unserialize($object->participant_params);
-                    $participantParamArr = self::getReservationOptions($participantOptionsId, $participantParamArr, $taxRateStandard, $taxRateReduced);
-                    $onlyParticipants = $this->reservationSettings->onlyParticipants;
-                    $counter = $onlyParticipants ? $countPersons : $countPersons - 1;
-                    for ($i = 0; $i < ($counter); $i++) {
-                        foreach ($participantParamArr as $key => $value){
-                            if ($object->participantParamsFieldType == 'radio'){
-                                $chosenParticipantOptions = $putVars['participants_' . $type . '-' . ($counter) . '§participant_params§' . $i];
-                                if ($chosenParticipantOptions === $value['id']){
-                                    $participantOptionsPrice += $value['price'];
-                                    $chosenParticipantOptions = true;
-                                } else {
-                                    $chosenParticipantOptions = false;
-                                }
-                            } else {
-                                $chosenParticipantOptions = $putVars['participants_' . $type . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']];
-                                if ($chosenParticipantOptions === 'true') {
-                                    $chosenParticipantOptions = true;
-                                } else {
-                                    $chosenParticipantOptions = false;
-                                }
-                                if ($chosenParticipantOptions){
-                                    $participantOptionsPrice += $value['price'];
-                                }
-                            }
-                            //individual participant option tax
-                            if ($calcTaxes && $chosenParticipantOptions) {
-                                $participantsOptionsSumTax += $value['price'] - $value['priceOptionNet'];
-                                $priceParticipantsOptionsSumNet += $value['priceOptionNet'];
-                            }
-                        }
-                    }
-                    if ($participantOptionsPrice){
-                        $putVars['participantOptionsPrice'] = $participantOptionsPrice;
-                        $priceSum += $participantOptionsPrice;
-                        if ($calcTaxes){
-                            if ($putVars['taxOption'] == 'tNone') {
-                                $priceSumNet += $value['price'];
-                            } else {
-                                $priceOptionsSumNet+= $priceOptionsSumNet + $priceParticipantsOptionsSumNet;
-                            }
-                        }
-                    }
+            $duration = $putVars['duration_'.$typeArray['id']];
+
+            $priceArray = false;
+            $priceOptionSum = false;
+            $priceParticipantOptionSum = false;
+
+            // Reservation price
+            if ($showPrices) {
+                $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, $isEvent, $desiredCapacity, $duration, '', '', $calcTaxes);
+                $priceSum = $priceArray['priceSum'];
+            }
+
+            // All reservation options
+            $includedParams = $reservationType->included_params ?: false;
+            $additionalParams = $reservationType->additional_params ?: false;
+            if ($includedParams || $additionalParams) {
+                $optionsPriceSum = 0;
+                $priceOptionSum = C4gReservationCalculator::calcOptionPrices($putVars, $objArray, $typeArray, $calcTaxes);
+
+                if ($priceOptionSum) {
+                    $putVars['optionsPriceSum'] = $priceOptionSum['priceOptionSum'];
+                    $priceSum += $priceOptionSum['priceOptionSum'];
                 }
             }
 
-            $allPrices = [
-                'reservationTaxRate' => $taxRateStandardToken,
-                'price' => C4gReservationHandler::formatPrice($price),
-                'priceNet' => C4gReservationHandler::formatPrice($priceNet),
-                'priceTax' => C4gReservationHandler::formatPrice($priceTax),
-                'priceSum' => C4gReservationHandler::formatPrice($priceSum),
-                'priceSumNet' => C4gReservationHandler::formatPrice($priceSumNet),
-                'priceSumTax' => C4gReservationHandler::formatPrice($priceTax + $priceOptionsSumTax + $participantsOptionsSumTax),
-                'priceOptionsSum' => C4gReservationHandler::formatPrice(($includedOptionsPrice + $additionalOptionsPrice + $participantOptionsPrice)),
-//                'priceOptionsSumNet' => C4gReservationHandler::formatPrice(($includedOptionsPrice + $additionalOptionsPrice + $participantOptionsPrice) - ($priceOptionsSumTax + $participantsOptionsSumTax)),
-                'priceOptionsSumNet' => C4gReservationHandler::formatPrice($priceOptionsSumNet),
-                'priceOptionsSumTax' => C4gReservationHandler::formatPrice(($priceOptionsSumTax + $participantsOptionsSumTax))
-            ];
+            // Participant options
+            $participantParams = $resObject->participant_params ?: false;
+            $specialParticipantMechanism = $settings->specialParticipantMechanism ?: false;
+            $onlyParticipants = $settings->onlyParticipants ?: false;
+
+            if ($participantParams && $specialParticipantMechanism) {
+                $priceParticipantOptionSum = C4gReservationCalculator::calcParticipantOptionPrices(intval($desiredCapacity), $putVars, $objArray, $typeArray, $calcTaxes, $onlyParticipants);
+
+//                    $putVars['optionsPriceSum'] = $priceOptionSum['priceOptionSum'] + $priceParticipantOptionSum['priceParticipantOptionSum'];
+                $optionsPriceSum = $priceOptionSum['priceOptionSum'] + $priceParticipantOptionSum['priceParticipantOptionSum'];
+//                    $putVars['priceParticipantOptionSum'] = C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSum']);
+                $priceSum += $priceParticipantOptionSum['priceParticipantOptionSum'];
+
+                // for the additional token 'participant net and tax prices'
+//                    if ($calcTaxes) {
+//                        $putVars['priceParticipantOptionNet'] =  $priceParticipantOptionSum['priceParticipantOptionSumNet'];
+//                        $putVars['priceParticipantOptionTax'] =  $priceParticipantOptionSum['priceParticipantOptionSumTax'];
+//                    }
+            }
+
+            if ($priceArray['price'] || $priceSum) {
+                $putVars['price'] = C4gReservationHandler::formatPrice($priceArray['price']) . $priceArray['priceInfo'];
+                $putVars['priceSum'] = C4gReservationHandler::formatPrice($priceSum);
+            } else {
+                $putVars['priceSum'] = C4gReservationHandler::formatPrice($price) . $priceArray['priceInfo'];
+            }
+//                $putVars['optionsPriceSum'] = C4gReservationHandler::formatPrice($putVars['optionsPriceSum']);
+            $putVars['priceOptionSum'] = C4gReservationHandler::formatPrice($optionsPriceSum);
+
+            if ($calcTaxes) {
+                $priceNet = $priceArray['priceNet'] ?: 0;
+                $priceTax = $priceArray['priceTax'] ?: 0;
+
+                $putVars['reservationTaxRate'] = $priceArray['reservationTaxRate'];
+
+                $putVars['priceNet'] = C4gReservationHandler::formatPrice($priceArray['priceNet']);
+                $putVars['priceTax'] = C4gReservationHandler::formatPrice($priceArray['priceTax']);
+
+                $putVars['priceOptionSumNet'] = C4gReservationHandler::formatPrice($priceOptionSum['priceOptionNet'] + $priceParticipantOptionSum['priceParticipantOptionSumNet']);
+                $putVars['priceOptionSumTax'] = C4gReservationHandler::formatPrice($priceOptionSum['priceOptionTax'] + $priceParticipantOptionSum['priceParticipantOptionSumTax']);
+
+                $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($priceNet + $priceOptionSum['priceOptionNet'] + $priceParticipantOptionSum['priceParticipantOptionSumNet']);
+                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($priceTax + $priceOptionSum['priceOptionTax'] + $priceParticipantOptionSum['priceParticipantOptionSumTax']);
+            }
         } else {
-            //All prices with taxs additional and participant options
-            $allPrices = [
-                'price' => C4gReservationHandler::formatPrice($price),
-                'priceSum' => C4gReservationHandler::formatPrice($priceSum)
-            ];
-        }
-        if ($allPrices) {
-            return $allPrices;
-        } else {
-            return [C4gReservationHandler::formatPrice($price)];
+            $putVars['price'] = C4gReservationHandler::formatPrice($price);
+            $putVars['priceSum'] = C4gReservationHandler::formatPrice($price ?? '');
+//            $putVars['optionsPriceSum'] =  C4gReservationHandler::formatPrice($putVars['optionsPriceSum']);
         }
     }
 }

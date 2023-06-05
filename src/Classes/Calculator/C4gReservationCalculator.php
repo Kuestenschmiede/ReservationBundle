@@ -11,6 +11,8 @@
 
 namespace con4gis\ReservationBundle\Classes\Calculator;
 
+use con4gis\CoreBundle\Resources\contao\models\C4gSettingsModel;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Database;
@@ -281,4 +283,383 @@ class C4gReservationCalculator
     {
         return $this->calculatorResult;
     }
+
+    /**
+     * @param $object
+     * @param $type
+     * @param $isEvent
+     * @param $countPersons
+     * @param $duration
+     * @param $date
+     * @param $langCookie
+     * @return int|array
+     */
+    public static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '', $calcTaxes) {
+        $price = intval($object['price']) ?? 0;
+        $priceSum = 0;
+        $priceInfo = '';
+        $countPersons = intval($countPersons);
+
+        if ($object) {
+
+            if (!$duration) {
+                $duration = $type['min_residence_time'];
+            }
+
+            if ($langCookie) {
+                \System::loadLanguageFile('fe_c4g_reservation', $langCookie);
+            }
+
+            $priceOption = key_exists('priceoption',$object) ? $object['priceoption'] : '';
+            $interval = $object['time_interval'];
+            $timeSpan = max(intval($duration), intval($interval));
+            switch ($priceOption) {
+                case 'pMin':
+                    $minutes = 0;
+                    if ($isEvent && $object['startTime'] && $object['endTime']) {
+                        $diff = $object['endTime'] - $object['startTime'];
+                        if ($diff > 0) {
+                            $minutes = $diff / 60;
+                        }
+                    } else if (!$isEvent && $type['periodType'] && $interval) {
+                        switch ($type['periodType']) {
+                            case 'minute':
+                                $minutes = $timeSpan;
+                                break;
+                            case 'hour':
+                                $minutes = $timeSpan * 60;
+                                break;
+                            case 'overnight':
+                            case 'day':
+                                $minutes = $timeSpan * 60 * 24;
+                                break;
+                            case 'week':
+                                $minutes = $timeSpan * 60 * 24 * 7;
+                                break;
+                            default:
+                                '';
+                        }
+                    }
+                    $priceSum = intval($price * $minutes);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'];
+                    break;
+                case 'pHour':
+                    $hours = 0;
+                    if ($isEvent && $object['startTime'] && $object['endTime']) {
+                        $diff = $object['endTime'] - $object['startTime'];
+                        if ($diff > 0) {
+                            $hours = $diff / 3600;
+                        }
+                    } else if (!$isEvent && $type['periodType'] && $timeSpan) {
+                        switch ($type['periodType']) {
+                            case 'minute':
+                                $hours = $timeSpan / 60;
+                                break;
+                            case 'hour':
+                                $hours = $timeSpan;
+                                break;
+                            case 'overnight':
+                            case 'day':
+                                $hours = $timeSpan * 24;
+                                break;
+                            case 'week':
+                                $hours = $timeSpan * 24 * 7;
+                                break;
+                            default:
+                                '';
+                        }
+                    }
+                    $priceSum = intval($price * $hours);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pHour'];
+                    break;
+                case 'pNight':
+                case 'pDay':
+                    $days = $duration ?: 0;
+                    if ($isEvent && $object['startDate'] && $object['endDate']) {
+                        $days = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24));
+                    } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
+                        $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
+                    }
+                    $priceSum = intval($price * $days);
+                    $priceInfo = ($type['periodType'] === 'day') ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNight'];
+                    break;
+                case 'pNightPerson':
+                    $days = $duration ?: 0;
+                    if ($isEvent && $object['startDate'] && $object['endDate']) {
+                        $days = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24));
+                    } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
+                        $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
+                    }
+                    $priceSum = intval($price * $days * $countPersons);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNightPerson'];
+                    break;
+                case 'pWeek':
+                    $weeks = $duration ?: 0;
+                    if ($isEvent && $object['startDate'] && $object['endDate']) {
+                        $weeks = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24 * 7));
+                    } else if (!$weeks && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
+                        $weeks = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24 * 7));
+                    }
+                    $priceSum = intval($price * $weeks);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pWeek'];
+                    break;
+                case 'pReservation':
+                    $price = intval($price);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pEvent'];
+                    break;
+                case 'pPerson':
+                    $priceSum = intval($price * $countPersons);
+                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'];
+                    break;
+
+                case 'pAmount':
+                    $priceSum = $price;
+                    break;
+            }
+        }
+        if ($price) {
+            $priceInfo = $priceInfo ? "&nbsp;" . $priceInfo : '';
+        }
+
+        if ($calcTaxes) {
+            $taxOption = $object['taxOptions'];
+            $reservationTaxRate = self::setTaxRates($taxOption);
+
+            if ($taxOption !== 'tNone') {
+                $priceNet = $priceSum / (1 + $reservationTaxRate/100);
+                $priceTax = $priceSum - $priceNet;
+            } else {
+                $priceNet = $priceSum;
+                $priceTax = 0;
+            }
+
+            return array('price' => $price, 'priceSum' => $priceSum, 'priceInfo' => $priceInfo, 'priceNet' => $priceNet, 'priceTax' => $priceTax , 'reservationTaxRate' => $reservationTaxRate);
+        } else {
+            return array('price' => $price, 'priceSum' => $priceSum, 'priceInfo' => $priceInfo);
+        }
+    }
+
+    /**
+     * @param $putVars
+     * @param $object
+     * @param $type
+     * @param $calcTaxes
+     * @return int|array
+     */
+  public static function calcOptionPrices ($putVars, $object, $type, $calcTaxes) {
+
+    $incParamSum = 0;
+    $addParamSum = 0;
+
+
+    if ($calcTaxes){
+        $incParamSumTax = 0;
+        $incParamSumNet = 0;
+
+        $addParamSumTax = 0;
+        $addParamSumNet = 0;
+    }
+
+      //Reservation included options
+      $includedParams = $type['included_params'] ?: false;
+
+      if ($includedParams) {
+
+          $optionList = unserialize($includedParams);
+          $incParamArr = isset($optionList) ? self::getReservationOptions($optionList, [], $calcTaxes) : false;
+          foreach ($incParamArr as $key => $value) {
+              $incParamSum += $value['price'];
+              if ($calcTaxes) {
+                  //individual included option tax
+                  $incParamSumNet += $value['priceOptionNet'];
+                  $incParamSumTax += $value['price'] - $value['priceOptionNet'];
+              }
+          }
+      }
+
+        // Additional reservation options
+      $additionalParams = $type['additional_params'] ?: false;
+      if ($additionalParams) {
+          $optionList = unserialize($additionalParams);
+          $additionalParamArr = isset($optionList) ? self::getReservationOptions($optionList, [], $calcTaxes) : false;
+          $objectPid = $object['pid'];
+          foreach ($additionalParamArr as $key => $value) {
+
+              if ($type['additionalParamsFieldType'] == 'radio') {
+                  $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectPid];
+                  if ($value['id'] == $chosenAdditionalOptions) {
+                      $addParamSum += $value['price'];
+                  }
+
+              } else {
+
+                  $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectPid . '|' . $value['id']];
+                  if ($chosenAdditionalOptions === 'true') {
+                      $chosenAdditionalOptions = true;
+                  } else {
+                      $chosenAdditionalOptions = false;
+                  }
+
+                  if ($chosenAdditionalOptions) {
+                      $addParamSum += $value['price'];
+                      if ($calcTaxes) {
+                          //individual additional option tax
+                          $addParamSumNet += $value['priceOptionNet'];
+                          $addParamSumTax += $value['price'] - $value['priceOptionNet'];
+                      }
+                  }
+              }
+          }
+      }
+
+    $priceOptionSum = $incParamSum + $addParamSum;
+
+    if ($calcTaxes) {
+
+        $priceOptionTax = $incParamSumTax + $addParamSumTax;
+        $priceOptionNet = $incParamSumNet + $addParamSumNet;
+
+        return array(   'priceOptionSum' => $priceOptionSum,
+                        'priceOptionNet' => $priceOptionNet,
+                        'priceOptionTax' => $priceOptionTax);
+    } else {
+
+        return array('priceOptionSum' => $priceOptionSum);
+
+    }
+  }
+
+    /**
+     * @param $desiredCapacity
+     * @param $putVars
+     * @param $object
+     * @param $type
+     * @param $calcTaxes
+     * @param $onlyParticipants
+     * @return array
+     */
+  public static function calcParticipantOptionPrices ($desiredCapacity, $putVars, $object, $type, $calcTaxes, $onlyParticipants) {
+      $priceParticipantOptionSum = 0;
+      $priceParticipantOptionSumNet = 0;
+      $priceParticipantOptionSumTax = 0;
+
+      $participantParams = $object['participant_params'] ?: ($type['participant_params'] ?: false);
+
+      if ($participantParams) {
+          $optionList = unserialize($participantParams);
+          $participantParamArr = isset($optionList) ? self::getReservationOptions($optionList, [], $calcTaxes) : false;
+
+          $counter = $onlyParticipants ? $desiredCapacity : $desiredCapacity - 1;
+          $priceParticipantOptionSum = 0;
+          if ($calcTaxes) {
+              $priceParticipantOptionSumNet = 0;
+              $priceParticipantOptionSumTax = 0;
+          }
+
+          for ($i = 0; $i < ($counter); $i++) {
+
+              foreach ($participantParamArr as $key => $value){
+
+                  if ($object['participantParamsFieldType'] == 'radio'){
+                      $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i];
+                      if ($chosenParticipantOptions === $value['id']){
+                          $priceParticipantOptionSum += $value['price'];
+                          $chosenParticipantOptions = true;
+                      } else {
+                          $chosenParticipantOptions = false;
+                      }
+
+                  } else {
+
+                      $chosenParticipantOptions = $putVars['participants_' . $type['id']  . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']];
+                      if ($chosenParticipantOptions === 'true') {
+                          $chosenParticipantOptions = true;
+                      } else {
+                          $chosenParticipantOptions = false;
+                      }
+                      if ($chosenParticipantOptions){
+                          $priceParticipantOptionSum += $value['price'];
+                      }
+                  }
+                  //individual participant option tax
+                  if ($calcTaxes && $chosenParticipantOptions) {
+                      $priceParticipantOptionSumNet += $value['priceOptionNet'];
+                      if ($value['taxOptions'] == 'tNone') {
+                          $value['priceOptionNet'] = $value['price'];
+                      }
+                      $priceParticipantOptionSumTax += $value['price'] - $value['priceOptionNet'];
+                  }
+              }
+          }
+      }
+
+      if ($calcTaxes) {
+
+          return array( 'priceParticipantOptionSum' => $priceParticipantOptionSum,
+                        'priceParticipantOptionSumNet' => $priceParticipantOptionSumNet,
+                        'priceParticipantOptionSumTax' => $priceParticipantOptionSumTax);
+      } else {
+          return array('priceParticipantOptionSum' => $priceParticipantOptionSum);
+      }
+  }
+
+    /**
+     * @param $optionsId
+     * @param $paramArr
+     * @param $calcTaxes
+     * @return mixed
+     */
+    public static function getReservationOptions($optionsId, $paramArr, $calcTaxes): mixed {
+        if ($optionsId) {
+            foreach ($optionsId as $paramId) {
+                if ($paramId) {
+                    $param = C4gReservationParamsModel::findByPk($paramId);
+                    if ($param && $param->caption && $param->published && ($param->price && $calcTaxes)) {
+                        $taxOption = $param->taxOptions;
+                        $optionTaxRate = self::setTaxRates($taxOption);
+                        $paramData = [
+                            'id' => $paramId,
+                            'name' => $param->caption,
+                            'price' => $param->price,
+                            'taxOptions' => $param->taxOptions,
+                        ];
+
+                        if ($taxOption !== 'tNone') {
+                            $priceOptionNet = $param->price / (1 + $optionTaxRate/100);
+                            $paramData['priceOptionNet'] = $priceOptionNet;
+                        }
+
+                        $paramArr[] = $paramData;
+
+                    } else if ($param && $param->caption && $param->published) {
+                        $paramArr[] = ['id' => $paramId, 'name' => $param->caption];
+                    }
+                }
+            }
+        }
+        return $paramArr;
+    }
+
+    /**
+     * @param $taxOption
+     * @return int
+     */
+    public static function setTaxRates($taxOption) {
+//this should be called when calc taxs is true butt only once
+        $settings = C4gSettingsModel::findSettings();
+        //Dashboard taxrates
+        $taxRateStandard = ($settings->taxRateStandard ?? 0);
+        $taxRateReduced = ($settings->taxRateReduced ?? 0);
+//            $taxRateStandard = $taxRateStandardToken / 100;
+//            $taxRateReduced = $taxRateReducedToken / 100;
+
+        if ($taxOption === 'tStandard') {
+            return $taxRateStandard;
+        } elseif ($taxOption === 'tReduced') {
+            return $taxRateReduced;
+        } else {
+            return 0;
+        }
+    }
+
 }

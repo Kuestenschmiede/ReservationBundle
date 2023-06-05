@@ -13,6 +13,7 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectPricesModel;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
 use con4gis\ReservationBundle\con4gisReservationBundle;
@@ -1535,161 +1536,6 @@ class C4gReservationHandler
     }
 
     /**
-     * @param $object
-     */
-    private static function calcPrices($showPricesWithTaxes = false, $object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '') {
-        $price = 0;
-        if ($object) {
-
-            if (!$duration) {
-                $duration = $type['min_residence_time'];
-            }
-
-            if ($langCookie) {
-                \System::loadLanguageFile('fe_c4g_reservation', $langCookie);
-            }
-            $priceOption = key_exists('priceoption',$object) ? $object['priceoption'] : '';
-            $priceInfo = '';
-            $interval = $object['time_interval'];
-            $timeSpan = max($duration, $interval);
-            switch ($priceOption) {
-                case 'pMin':
-                    if ($isEvent && $object['startTime'] && $object['endTime']) {
-                        $diff = $object['endTime'] - $object['startTime'];
-                        if ($diff > 0) {
-                            $minutes = $diff / 60;
-                        }
-                    } else if (!$isEvent && $type['periodType'] && $interval) {
-                        switch ($type['periodType']) {
-                            case 'minute':
-                                $minutes = $timeSpan;
-                                break;
-                            case 'hour':
-                                $minutes = $timeSpan * 60;
-                                break;
-                            case 'overnight':
-                            case 'day':
-                                $minutes = $timeSpan * 60 * 24;
-                                break;
-                            case 'week':
-                                $minutes = $timeSpan * 60 * 24 * 7;
-                                break;
-                            default:
-                                '';
-                        }
-                    }
-                    $price = $price + intval($object['price']);
-                    $price = $price + intval($object['price']);
-                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'];
-                    break;
-                case 'pHour':
-                    if ($isEvent && $object['startTime'] && $object['endTime']) {
-                        $diff = $object['endTime'] - $object['startTime'];
-                        if ($diff > 0) {
-                            $hours = $diff / 3600;
-                        }
-                    } else if (!$isEvent && $type['periodType'] && $timeSpan) {
-                        switch ($type['periodType']) {
-                            case 'minute':
-                                $hours = $timeSpan / 60;
-                                break;
-                            case 'hour':
-                                $hours = $timeSpan;
-                                break;
-                            case 'overnight':
-                            case 'day':
-                                $hours = $timeSpan * 24;
-                                break;
-                            case 'week':
-                                $hours = $timeSpan * 24 * 7;
-                                break;
-                            default:
-                                '';
-                        }
-                    }
-//                    $price = $price + (intval($object['price'])*$hours); Only for sum prices
-                    $price = $price + (intval($object['price']));
-                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pHour'];
-                    break;
-                case 'pNight':
-                case 'pDay':
-                    $days = $duration ?: 0;
-                    if ($isEvent && $object['startDate'] && $object['endDate']) {
-                        $days = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24));
-                    } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
-                        $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
-                    }
-//                    $price = $price + (intval($object['price']) * $days); Only for sum prices
-                    $price = $price + (intval($object['price']));
-                    $priceInfo = ($type['periodType'] === 'day') ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNight'];
-                    break;
-                case 'pNightPerson':
-                    $days = $duration ?: 0;
-                    if ($isEvent && $object['startDate'] && $object['endDate']) {
-                        $days = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24));
-                    } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
-                        $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
-                    }
-//                    $price += (intval($object['price']) * $days * $countPersons); Only for sum prices
-                    $price += (intval($object['price']));
-                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNightPerson'];
-                    break;
-                case 'pWeek':
-                    $weeks = $duration ?: 0;
-                    if ($isEvent && $object['startDate'] && $object['endDate']) {
-                        $weeks = round(abs($object['endDate'] - $object['startDate']) / (60 * 60 * 24 * 7));
-                    } else if (!$weeks && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
-                        $weeks = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24 * 7));
-                    }
-//                    $price = $price + (intval($object['price']) * $weeks); Only for sum prices
-                    $price = $price + (intval($object['price']));
-                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pWeek'];
-                    break;
-                case 'pReservation':
-                    $price = $price + intval($object['price']);
-                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pEvent'];
-                    break;
-                case 'pPerson':
-                    $price = ($price + intval($object['price']));
-                    $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'];
-                    break;
-                case 'pAmount':
-                    $price = $price + intval($object['price']);
-                    break;
-            }
-
-        }
-
-        if ($price) {
-            $priceInfo = $priceInfo ? "&nbsp;".$priceInfo : '';
-            $price = $price ? C4gReservationHandler::formatPrice($price).$priceInfo : '';
-        }
-
-        if ($showPricesWithTaxes) {
-            $taxOptions = $object['taxOptions'] ?? '';
-            $settings = C4gSettingsModel::findSettings();
-            $taxIncl = $taxOptions != 'tNone' ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'] : '';
-
-//            Would allow to display the saved taxrates from dashboard
-//            if ($taxOptions === 'tStandard') {
-//                $taxRate = ($settings->taxRateStandard ?? 0);
-//            } elseif ($taxOptions === 'tReduced') {
-//                $taxRate = ($settings->taxRateReduced ?? 0);
-//            } else {
-//                $taxRate = '';
-//            }
-
-            $priceInfo = $priceInfo ? "&nbsp;".$priceInfo."&nbsp;".$taxIncl : '';
-//            $price = $price ? C4gReservationHandler::formatPrice ($price * (1 + ($taxRate)/100)).$priceInfo : ''; // calculate tax for FE
-            $price = $price ? C4gReservationHandler::formatPrice ($price).$priceInfo: '';
-        }elseif ($price) {
-            $price = $price ? C4gReservationHandler::formatPrice($price).$priceInfo : '';
-        }
-
-        return $price;
-    }
-
-    /**
      * @param null $moduleTypes
      * @param int $objectId
      * @return array
@@ -1740,8 +1586,14 @@ class C4gReservationHandler
                 $eventObject['price'] = $event['price'] ?: $calendarObject['reservationPrice'];
                 $eventObject['priceoption'] = $event['priceoption'] ?: $calendarObject['reservationPriceOption'];
                 $eventObject['taxOptions'] = $event['taxOptions'] ?: $calendarObject['taxOptions'] ?: '';
-//                $eventObject['taxOptions'] = $event['taxOptions'];
-                $price = $showPrices ? static::calcPrices($showPricesWithTaxes, $eventObject, $type, true, 1) : 0;
+
+                $eventObject['reservationOptionSum'] = $event['reservationOptionSum'] ?: $calendarObject['reservationOptionSum'] ?: '';
+                $eventObject['participantOptionSum'] = $event['participantOptionSum'] ?: $calendarObject['participantOptionSum'] ?: '';
+
+//                $settings = C4gSettingsModel::findSettings();
+                $priceArray = $showPrices ? C4gReservationCalculator::calcPrices($eventObject, $type, true, 1, '', '','','') : array('price' => 0, 'priceSum' => 0);
+                $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']).$priceArray['priceInfo'];
+
                 $frontendObject->setCaption($price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                 $frontendObject->setDesiredCapacity([$event['minParticipants'] ?:  $calendarObject['reservationMinParticipants'], $maxParticipants]);
                 $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
@@ -1801,7 +1653,8 @@ class C4gReservationHandler
                             $frontendObject->setId($eventObject['id']);
                             $eventObject['price'] = $reservationEvent['price'] ?: $calendarObject['reservationPrice'];
                             $eventObject['priceoption'] = $reservationEvent['priceoption'] ?: $calendarObject['reservationPriceOption'];
-                            $price = $showPrices ? static::calcPrices($showPricesWithTaxes, $eventObject, $type, true, 1) : 0;
+                            $priceArray = $showPrices ? C4gReservationCalculator::calcPrices($eventObject, $type, true, 1,'','','','') : array('price' => 0, 'priceSum' => 0);
+                            $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']);
                             $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title']) . "<span class='price'>&nbsp;(" . $price . ")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
                             $frontendObject->setDesiredCapacity([$reservationEvent['minParticipants'] ?: $calendarObject['reservationMinParticipants'], $maxParticipants]);
                             $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'], $eventObject['startTime']));
@@ -1923,7 +1776,9 @@ class C4gReservationHandler
                     }
                 }
 
-                $price = $showPrices ? static::calcPrices($showPricesWithTaxes, $object, $type, false, 1, $duration, $date) : 0;
+                $priceArray = $showPrices ? C4gReservationCalculator::calcPrices($object, $type, false, 1, $duration, $date,'','' ) : array('price' => 0, 'priceSum' => 0);
+                $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']).$priceArray['priceInfo'];
+
                 $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
 
                 $frontendObject->setPeriodType($type['periodType']);
