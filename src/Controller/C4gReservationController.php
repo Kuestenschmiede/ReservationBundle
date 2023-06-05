@@ -1971,9 +1971,10 @@ class C4gReservationController extends C4GBaseController
 
             //just notification
             $factor = 1;
-            $desiredCapacity =  $reservationObject && $reservationObject->maxParticipants ? ($reservationObject->maxParticipants * $factor) : 0;
+            $countPersons = intval($putVars['desiredCapacity_' . $type]);
             $settings = $this->reservationSettings;
-            self::allPrices($settings, $putVars, $reservationObject, '', $reservationType, $isEvent, $desiredCapacity);
+
+            self::allPrices($settings, $putVars, $reservationObject, '', $reservationType, $isEvent, $countPersons);
 
         }
 
@@ -2377,6 +2378,7 @@ class C4gReservationController extends C4GBaseController
         $calcTaxes = $settings->showPricesWithTaxes ?: false;
         $showPrices = $settings->showPrices ?: false;
         if ($isEvent) {
+            $desiredCapacity = $reservationEventObject->minParticipants;
             $resObject = $reservationEventObject;
             $price = $reservationEventObject->price;
         } else {
@@ -2386,15 +2388,19 @@ class C4gReservationController extends C4GBaseController
 
 
         if ($price || $calcTaxes || $showPrices) {
-            $objectArr = is_array($resObject) ? $resObject : (array) $resObject;
-            $typeArr = is_array($reservationType) ? $reservationType : (array) $reservationType;
-            if (is_array($resObject) && $isEvent) {
-                $objArray = $resObject;
-            } else {
-                $objArray = array_values($objectArr)[0] ?? (array_values($objectArr)[3][0] ?? $resObject);
-            }
-            $typeArray = is_array($reservationType) && $isEvent ? $reservationType : (array_values($typeArr)[2][0] ?? $reservationType);
 
+            $objectArr = is_array($resObject) ? $resObject : (array)$resObject;
+            $typeArr = is_array($reservationType) ? $reservationType : (array)$reservationType;
+
+            $typeArray = is_array($reservationType) ? $reservationType : (array_values($typeArr)[2][0] ?? $reservationType);
+
+            if ($isEvent) {
+                $objArray = is_array($reservationObject) ? $reservationObject : (array_values($objectArr)[0] ?? $reservationObject);
+                $countPersons = intval($putVars['desiredCapacity_' . $objArray['reservationType']]);
+                $desiredCapacity = $countPersons;
+            } else {
+                $objArray = is_array($reservationObject) ? $reservationObject : (array_values($objectArr)[2][0] ?? $reservationObject);
+            }
 
             $priceArray = false;
             $priceOptionSum = false;
@@ -2466,7 +2472,7 @@ class C4gReservationController extends C4GBaseController
             }
         } else {
             $putVars['price'] = C4gReservationHandler::formatPrice($price);
-            $putVars['priceSum'] = C4gReservationHandler::formatPrice($price);
+            $putVars['priceSum'] = C4gReservationHandler::formatPrice($price ?? '');
             $putVars['optionsPriceSum'] =  C4gReservationHandler::formatPrice($putVars['optionsPriceSum']);
         }
     }
