@@ -20,7 +20,7 @@ use Contao\CalendarBundle\Security\ContaoCalendarPermissions;
 
 
 
-$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id';
+//$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id';
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 (
@@ -106,10 +106,17 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
     ),
 
     //Palettes
-    'palettes' => array
-    (
-        'default'   =>  $default,
+    'palettes' => array(
+        '__selector__' => ['typeOfObject'],
+        'default'   =>  '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, typeOfObject, min_reservation_day, max_reservation_day, maxBeginTime;,{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id;',
+        'fixed_date' => '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, typeOfObject, min_reservation_day, max_reservation_day, maxBeginTime;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id;',
     ),
+
+    //Subpalettes
+    'subpalettes' => [
+        'typeOfObject_standard' => 'default',
+        'typeOfObject_fixed_date' => 'dateTimeBegin, typeOfObjectDuration',
+    ],
 
     //Fields
     'fields' => array
@@ -328,6 +335,36 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'options_callback'  => ['tl_c4g_reservation_object', 'getTypes'],
             'eval'              => array('mandatory'=>true,'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'qualifications','multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'               => "blob NULL "
+        ),
+
+        'typeOfObject' => array(
+            'label'       => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['typeOfObject'],
+            'exclude'     => true,
+            'default'     => 'standard',
+            'inputType'   => 'select',
+            'options'     => array('standard', 'fixed_date'),
+            'reference'   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references'],
+            'eval'        => array('chosen' => true, 'mandatory' => true, 'tl_class' => 'long', 'submitOnChange' => true),
+            'sql'         => "varchar(10) NOT NULL default ''",
+
+        ),
+
+        'dateTimeBegin' => array(
+            'label'     => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['dateTimeBegin'],
+            'default'   => time(),
+            'exclude'   => true,
+            'inputType' => 'text',
+            'eval'      => array('rgxp' => 'datim', 'mandatory' => true, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
+            'sql'       => "varchar(10)",
+        ),
+
+        'typeOfObjectDuration' => array(
+            'label'     => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['typeOfObjectDuration'],
+            'default'   => '',
+            'exclude'   => true,
+            'inputType' => 'text',
+            'eval'      => array('rgxp' => 'digit', 'mandatory' => true, 'doNotCopy' => true, 'tl_class' => 'w50'),
+            'sql'       => "int(10) unsigned NOT NULL default '0'",
         ),
 
         'time_interval' => array

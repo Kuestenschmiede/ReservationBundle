@@ -26,6 +26,9 @@ $GLOBALS['TL_LANG'][$str]['speaker'] = array("Referent(en)", "Wer leitet die Ver
 $GLOBALS['TL_LANG'][$str]['topic'] = array("Thema/Themen", "Hier können Sie Veranstaltungsthemen verknüpfen.");
 $GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Zielgruppe(n)", "Wählen Sie das Zielpublikum.");
 $GLOBALS['TL_LANG'][$str]['viewableTypes'] = array("Reservierungsarten","Ordnen Sie das Reservierungsobjekt zu den Reservierungsarten zu.");
+$GLOBALS['TL_LANG'][$str]['typeOfObject'] = array("Art des Objektes", "Ordnen Sie das Reservierungsobjekt einer Objektart zu.");
+$GLOBALS['TL_LANG'][$str]['dateTimeBegin'] = array("Datum und Uhrzeit", "Datum und Uhrzeit des festen Termins.");
+$GLOBALS['TL_LANG'][$str]['typeOfObjectDuration'] = array("Dauer", "Dauer des festen Termins.");
 $GLOBALS['TL_LANG'][$str]['option'] = array("Name","");
 $GLOBALS['TL_LANG'][$str]['language'] = array("Sprache","");
 $GLOBALS['TL_LANG'][$str]['minute_interval'] = array("Minutenintervall", "Alle wie viele Minuten kann das Reservierungsobjekt während der Öffnungszeiten gebucht werden.");
@@ -82,7 +85,10 @@ $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Preiseinstellung", "Wonach sol
 
 $GLOBALS['TL_LANG'][$str]['references']['tNone'] = "Keine MwSt";
 $GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard";
-$GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Ermäßigt";
+$GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Fester Termin";
+
+$GLOBALS['TL_LANG'][$str]['references']['standard'] = "Standard";
+$GLOBALS['TL_LANG'][$str]['references']['fixed_date'] = "Fester Termin";
 
 $GLOBALS['TL_LANG'][$str]['references']['pMin'] = array("Preis pro Minute");
 $GLOBALS['TL_LANG'][$str]['references']['pHour'] = array("Preis pro Stunde");

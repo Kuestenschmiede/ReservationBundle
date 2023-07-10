@@ -22,6 +22,9 @@ $GLOBALS['TL_LANG'][$str]['allTypesEvents'] = array("Contao events block objects
 $GLOBALS['TL_LANG'][$str]['switchAllTypes'] = array("Applies only to the following reservation types", "Allows you to reduce the validity of the previous checkboxes to specific reservation types (optional).");
 $GLOBALS['TL_LANG'][$str]['priority'] = array("Should be offered with priority", "If this switch is active, then the object will be preselected if several objects fit into the time.");
 $GLOBALS['TL_LANG'][$str]['viewableTypes'] = array("Reservation types", "Assign the reservation object to the reservation types.");
+$GLOBALS['TL_LANG'][$str]['typeOfObject'] = array("Type of Object", "Assign the reservation object to an object type.");
+$GLOBALS['TL_LANG'][$str]['dateTimeBegin'] = array("Date and Time", "Date and time of the 'fixed date' object type.");
+$GLOBALS['TL_LANG'][$str]['typeOfObjectDuration'] = array("Duration", "Duration of the 'fixed date' object type.");
 $GLOBALS['TL_LANG'][$str]['option'] = array("Name","");
 $GLOBALS['TL_LANG'][$str]['location'] = array("Event location", "Where will the event take place?");
 $GLOBALS['TL_LANG'][$str]['speaker'] = array("Speaker", "Who leads the event?");
@@ -85,6 +88,9 @@ $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Price setting", "What should t
 $GLOBALS['TL_LANG'][$str]['references']['tNone'] = "Without Tax";
 $GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard";
 $GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Reduced";
+
+$GLOBALS['TL_LANG'][$str]['references']['standard'] = "Standard";
+$GLOBALS['TL_LANG'][$str]['references']['fixed_date'] = array("Fixed Date");
 
 $GLOBALS['TL_LANG'][$str]['references']['pMin'] = array("Price per minute");
 $GLOBALS['TL_LANG'][$str]['references']['pHour'] = array("Price per hour");
