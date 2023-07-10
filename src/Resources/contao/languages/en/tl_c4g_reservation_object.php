@@ -90,7 +90,7 @@ $GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard";
 $GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Reduced";
 
 $GLOBALS['TL_LANG'][$str]['references']['standard'] = "Standard";
-$GLOBALS['TL_LANG'][$str]['references']['fixed_date'] = array("Fixed Date");
+$GLOBALS['TL_LANG'][$str]['references']['fixed_date'] = "Fixed Date";
 
 $GLOBALS['TL_LANG'][$str]['references']['pMin'] = array("Price per minute");
 $GLOBALS['TL_LANG'][$str]['references']['pHour'] = array("Price per hour");

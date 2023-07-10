@@ -85,7 +85,7 @@ $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Preiseinstellung", "Wonach sol
 
 $GLOBALS['TL_LANG'][$str]['references']['tNone'] = "Keine MwSt";
 $GLOBALS['TL_LANG'][$str]['references']['tStandard'] = "Standard";
-$GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Fester Termin";
+$GLOBALS['TL_LANG'][$str]['references']['tReduced'] = "Ermäßigt";
 
 $GLOBALS['TL_LANG'][$str]['references']['standard'] = "Standard";
 $GLOBALS['TL_LANG'][$str]['references']['fixed_date'] = "Fester Termin";
