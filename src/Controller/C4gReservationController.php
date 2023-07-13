@@ -363,6 +363,24 @@ class C4gReservationController extends C4GBaseController
 
                 $defaultObject = $eventId ?: $objectId;
                 $objects = C4gReservationHandler::getReservationObjectList(array($type), $defaultObject, $this->reservationSettings->showPrices, $this->reservationSettings->showPricesWithTaxes ?: false,);
+                foreach ($objects as $object) {
+                    $typeOfObject = $object->getTypeOfObject();
+                    if ($typeOfObject == 'fixed_date') {
+                        $beginDateTime = $object->getDateTimeBegin();
+                        $beginDate = C4gReservationDateChecker::getBeginOfDate($beginDateTime);
+                        $sommerDiff =C4gReservationDateChecker::getCESDiffToLocale($beginDateTime);
+
+                        $beginTime = $beginDateTime - $beginDate;
+                        if ($sommerDiff == 7200) {
+                            $beginTime -= 3600;
+                        }
+
+                        $initialDate = $beginDate;
+                        $initialTime = $beginTime;
+
+                    }
+                }
+
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
@@ -1834,7 +1852,6 @@ class C4gReservationController extends C4GBaseController
                     }
                 } else {
                     $beginDate = $putVars['beginDate_'.$type];
-
                     if (strpos($key, "beginTime_".$type) !== false) {
                         if ($value) {
                             if (strpos($value, '#') !== false) {
@@ -1909,6 +1926,9 @@ class C4gReservationController extends C4GBaseController
                     $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                     $putVars['beginDate_'.$type] = $beginDate;
                     $putVars[$timeKey] = ($beginTime-86400);
+
+                    $putVars['beginDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['beginDate_'.$type]);
+                    $putVars['endDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['beginDate_'.$type]);
                 } else {
                     $putVars[$timeKey] = $beginTime;
                 }

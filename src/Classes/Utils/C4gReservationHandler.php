@@ -14,8 +14,10 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectPricesModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
 use con4gis\ReservationBundle\con4gisReservationBundle;
 use Contao\CalendarEventsModel;
 use Contao\Database;
@@ -476,6 +478,7 @@ class C4gReservationHandler
             $allObjectDates = [];
             $excludePeriodArr = [];
             foreach ($list as $object) {
+                $isFixedDate = $object->getTypeOfObject() == 'fixed_date';
                 if (!$object instanceof C4gReservationFrontendObject) {
                     break;
                 }
@@ -787,6 +790,13 @@ class C4gReservationHandler
 
                     //$realTime += C4gReservationDateChecker::getCESDiffToGMT($realTime);
 
+                    $typeOfObject = $timeObjectParams['object']->getTypeOfObject;
+                    if ($typeOfObject == 'fixed_date') {
+                        $realTime = $period['date_begin'];
+                        $timeObjectParams['tsdate'] = $period['date_from'];
+                        $timeObjectParams['date'] = $period['date_from'];
+                    }
+
                     $timeParams['result'] = self::getTimeResult($realTime, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj, $nxtDay);
                 }
 
@@ -991,28 +1001,59 @@ class C4gReservationHandler
                 $showArrivalAndDeparture = $showArrivalAndDeparture ? [] : false;
             }
 
+
             $beginDate = $timeParams['tsdate'];
             $endDate = $timeParams['tsdate']+$maxDuration;
 
             foreach ($timeParams['objectList'] as $object) {
-                foreach ($object->getOpeningHours() as $key => $day) {
-                    if (($day != -1) && ($key == $weekdayStr)) {
-                        foreach ($day as $period) {
-                            if ($timeParams['date'] !== -1) {
+                $typeOfObject = $object->getTypeOfObject();
+                if ($typeOfObject == 'standard') {
+                    foreach ($object->getOpeningHours() as $key => $day) {
+                        if (($day != -1) && ($key == $weekdayStr)) {
+                            foreach ($day as $period) {
+                                if ($timeParams['date'] !== -1) {
 
-                                $timeBegin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
-                                $timeEnd = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
+                                    $timeBegin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
+                                    $timeEnd = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
 
-                                if (($timeEnd !== false) && ($timeBegin !== false)) {
-                                    $periodEnd = $timeEnd;
-                                    if ($periodEnd <= $timeBegin) {
-                                        $periodEnd += 86400;
+                                    if (($timeEnd !== false) && ($timeBegin !== false)) {
+                                        $periodEnd = $timeEnd;
+                                        if ($periodEnd <= $timeBegin) {
+                                            $periodEnd += 86400;
+                                        }
+                                        $endDate = (($beginDate + $periodEnd) > $endDate) ? $beginDate + $periodEnd : $endDate;
                                     }
-                                    $endDate = (($beginDate + $periodEnd) > $endDate) ? $beginDate + $periodEnd : $endDate;
                                 }
                             }
                         }
                     }
+                } elseif ($typeOfObject == 'fixed_date') {
+
+                    $timestamp = $object->getDateTimeBegin();
+                    $typeOfObjectDuration = 3600 * $object->getTypeOfObjectDuration(); // Todo different periodtypes rn only hourly
+
+//                    $beginDateTime = $object->getDateTimeBegin();
+                    $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
+                    $beginTime = $timestamp - $beginDate;
+                    $object->setBeginDate($beginDate);
+                    $object->setBeginTime($beginTime);
+
+                    $object->setEndTime($object->getBeginTime() + $typeOfObjectDuration);
+                    $object->setEndDate($timestamp + $object->getEndTime());
+//                    $object->setTimeinterval('');
+                    //ToDo check if this is the right spot(different interval/period type)
+//                    $dateTimeBegin = $object->getDateTimeBegin();
+//                    $tstamp = C4gReservationDateChecker::getBeginOfDate($dateTimeBegin);
+//                    $duration = $object->getTypeOfObjectDuration();
+//
+//                    $timeBegin = $dateTimeBegin - $tstamp;
+//                    $timeEnd = $timeBegin + ($duration * 3600); //only hours
+//
+//                    $timeBegin = is_numeric($timeBegin) ? intval($timeBegin) : false;
+//                    $timeEnd = is_numeric($timeEnd) ? intval($timeEnd) : false;
+//                    if ($duration > 1) {
+//                        $endDate = (($beginDate + $timeEnd) > $endDate) ? $beginDate + $periodEnd : $endDate;
+//                    }
                 }
             }
 
@@ -1117,7 +1158,9 @@ class C4gReservationHandler
                 $timeObjectParams['severalBookings'] = !$timeParams['type']['severalBookings'] ? 1 : 0;
                 $timeObjectParams['maxObjects'] = $timeObjectParams['quantity'] ?: $timeObjectParams['severalBookings'];
 
-                if ($timeObjectParams['defaultInterval'] && ($timeObjectParams['defaultInterval'] > 0)) {
+                $typeOfObject = $timeObjectParams['object']->getTypeOfObject();
+
+                if ($timeObjectParams['defaultInterval'] && ($timeObjectParams['defaultInterval'] > 0) && $typeOfObject == 'standard') {
                     foreach ($timeObjectParams['object']->getOpeningHours() as $key => $dayPeriods) {
 
                         if (($dayPeriods != -1) && ($key == $weekdayStr)) {
@@ -1158,6 +1201,26 @@ class C4gReservationHandler
                             }
                         }
                     }
+                } elseif ($typeOfObject == 'fixed_date') {
+
+//                    $dateTimeBegin = $object->getDateTimeBegin();
+//                    $tstamp = C4gReservationDateChecker::getBeginOfDate($dateTimeBegin);
+//                    $duration = $object->getTypeOfObjectDuration();
+//                    $sommerDiff =C4gReservationDateChecker::getCESDiffToLocale($tstamp);
+                    $beginDate = $object->getBeginDate();
+                    $beginTime = $object->getBeginTime();
+                    $endTime = $object->getEndTime();
+
+                    $period['time_begin'] = is_numeric($beginTime) ? intval($beginTime) : false;
+                    $period['time_end'] = is_numeric($endTime) ? intval($endTime) : false;
+                    $period['date_from'] = is_numeric($beginDate) ? intval($beginDate) : false;
+                    $period['date_to'] = is_numeric($beginDate+$endTime) ? intval($beginDate+$endTime) : false;
+
+//                    $timeObjectParams['defaultInterval'] = 0;
+//                    $timeObjectParams['interval'] = 0;
+//                    $timeObjectParams['durationDiff'] = 0;
+
+                    $timeParams['result'] = self::getReservationTimesDefault($timeParams, $timeObjectParams, $period);
                 }
             }
 
@@ -1166,7 +1229,6 @@ class C4gReservationHandler
             } else {
                 return [];
             }
-
         }
     }
 
@@ -1796,6 +1858,9 @@ class C4gReservationHandler
                 $frontendObject->setPrice($object['price'] ?: 0.00);
                 $frontendObject->setTaxOptions($object['taxOptions'] ?: '');
                 $frontendObject->setPriceOption($object['priceoption']);
+                $frontendObject->setTypeOfObject($object['typeOfObject']);
+                $frontendObject->setDateTimeBegin($object['dateTimeBegin']);
+                $frontendObject->setTypeOfObjectDuration($object['typeOfObjectDuration']);
 
                 if ($cloneObject) {
                     $frontendObject->setTimeinterval($object['time_interval'] ?: $cloneObject['time_interval']);

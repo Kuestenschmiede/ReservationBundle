@@ -37,6 +37,9 @@ class C4gReservationFrontendObject
     private $beginTime = 0;
     private $endDate = 0;
     private $endTime = 0;
+    private $typeOfObject = '';
+    private $dateTimeBegin = 0;
+    private $typeOfObjectDuration = 0;
     private $almostFullyBookedAt = 0;
     private $number = '';
     private $topic = [];
@@ -141,6 +144,54 @@ class C4gReservationFrontendObject
     public function setAllTypesValidity(int $allTypesValidity): void
     {
         $this->allTypesValidity = $allTypesValidity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTypeOfObject(): string
+    {
+        return $this->typeOfObject;
+    }
+
+    /**
+     * @param string $typeOfObject
+     */
+    public function setTypeOfObject(string $typeOfObject): void
+    {
+        $this->typeOfObject = $typeOfObject;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDateTimeBegin(): int
+    {
+        return $this->dateTimeBegin;
+    }
+
+    /**
+     * @param int $dateTimeBegin
+     */
+    public function setDateTimeBegin(int $dateTimeBegin): void
+    {
+        $this->dateTimeBegin = $dateTimeBegin;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTypeOfObjectDuration(): int
+    {
+        return $this->typeOfObjectDuration;
+    }
+
+    /**
+     * @param int $typeOfObjectDuration
+     */
+    public function setTypeOfObjectDuration(int $typeOfObjectDuration): void
+    {
+        $this->typeOfObjectDuration = $typeOfObjectDuration;
     }
 
     /**
