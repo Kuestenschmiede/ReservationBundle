@@ -1814,6 +1814,7 @@ class C4gReservationController extends C4GBaseController
             $settings = $this->reservationSettings;
             self::allPrices($settings, $putVars, $reservationObject, $reservationEventObject, $reservationType, $isEvent, $desiredCapacity);
        } else {
+            $typeOfObject = $reservationObject->typeOfObject;
             $putVars['reservationObjectType'] = $reservationType->reservationObjectType;
             $objectId = $reservationObject ? $reservationObject->id : 0;
             //check duplicate reservation id
@@ -1893,8 +1894,16 @@ class C4gReservationController extends C4GBaseController
                 $putVars['duration_'.$type] = $reservationObject->duration ?: $duration;
             }
 
-            $duration = $duration * $interval;
-            $endTime = $beginTime + intval($duration);
+            if ($typeOfObject == 'fixed_date') {
+                $duration = $reservationObject->typeOfObjectDuration * $interval;
+                $endTime = $beginTime + intval($duration);
+                $putVars['duration'] = $duration;
+                $putVars['duration_'.$type] = $duration;
+            } elseif ($typeOfObject == '' || $typeOfObject == 'standard') {
+                $duration = $duration * $interval;
+                $endTime = $beginTime + intval($duration);
+            }
+
             $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$endTime);
 
             if ($reservationType->reservationObjectType === '3' && $timeKey) {

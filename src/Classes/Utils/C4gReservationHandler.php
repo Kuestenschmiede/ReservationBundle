@@ -1028,32 +1028,42 @@ class C4gReservationHandler
                         }
                     }
                 } elseif ($typeOfObject == 'fixed_date') {
-
                     $timestamp = $object->getDateTimeBegin();
-                    $typeOfObjectDuration = 3600 * $object->getTypeOfObjectDuration(); // Todo different periodtypes rn only hourly
 
-//                    $beginDateTime = $object->getDateTimeBegin();
                     $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
+                    $summerDiff = C4gReservationDateChecker::getCESDiffToLocale($timestamp);
+
                     $beginTime = $timestamp - $beginDate;
+                    if ($summerDiff == 7200) {
+                        $beginTime -= 3600;
+                    }
+
                     $object->setBeginDate($beginDate);
                     $object->setBeginTime($beginTime);
+//                    $object->setDuration(intval($object->getTypeOfObjectDuration()));
+                    $object->setTimeinterval($object->getTypeOfObjectDuration());
 
-                    $object->setEndTime($object->getBeginTime() + $typeOfObjectDuration);
-                    $object->setEndDate($timestamp + $object->getEndTime());
-//                    $object->setTimeinterval('');
-                    //ToDo check if this is the right spot(different interval/period type)
-//                    $dateTimeBegin = $object->getDateTimeBegin();
-//                    $tstamp = C4gReservationDateChecker::getBeginOfDate($dateTimeBegin);
-//                    $duration = $object->getTypeOfObjectDuration();
-//
-//                    $timeBegin = $dateTimeBegin - $tstamp;
-//                    $timeEnd = $timeBegin + ($duration * 3600); //only hours
-//
-//                    $timeBegin = is_numeric($timeBegin) ? intval($timeBegin) : false;
-//                    $timeEnd = is_numeric($timeEnd) ? intval($timeEnd) : false;
-//                    if ($duration > 1) {
-//                        $endDate = (($beginDate + $timeEnd) > $endDate) ? $beginDate + $periodEnd : $endDate;
-//                    }
+                    $duration = $object->getTypeOfObjectDuration();
+
+                    switch ($periodType) {
+                        case 'minute':
+                            $periodType = 60 * $duration;
+                            break;
+                        case 'hour':
+                            $periodType = 3600 * $duration;
+                            break;
+                        case 'day':
+                        case 'overnight':
+                        case 'week':
+                            $periodType = 86400 * $duration;
+                            break;
+                    }
+
+                    $EndTime = $beginTime + $periodType;
+                    $EndDate = $beginDate + $EndTime;
+
+                    $object->setEndTime($EndTime);
+                    $object->setEndDate($EndDate);
                 }
             }
 
@@ -1859,7 +1869,7 @@ class C4gReservationHandler
                 $frontendObject->setTaxOptions($object['taxOptions'] ?: '');
                 $frontendObject->setPriceOption($object['priceoption']);
                 $frontendObject->setTypeOfObject($object['typeOfObject']);
-                $frontendObject->setDateTimeBegin($object['dateTimeBegin']);
+                $frontendObject->setDateTimeBegin($object['dateTimeBegin'] ?: 0);
                 $frontendObject->setTypeOfObjectDuration($object['typeOfObjectDuration']);
 
                 if ($cloneObject) {

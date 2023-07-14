@@ -87,26 +87,41 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 if ($typeOfObject == 'fixed_date') {
                     $timestamp = $reservationObject->getDateTimeBegin();
                     $object['typeOfObject'] = $reservationObject->getTypeOfObject();
-//                    $object['beginDate'] = strtotime(date("Y-m-d", $timestamp));
-//                    $object['beginTime'] =  $object['beginDate'] - strtotime(date("H:i", $timestamp));
-//                    $object['timestamp'] =  $timestamp;
-//                    $object['typeOfObjectDuration'] = $reservationObject->getTypeOfObjectDuration();
-
-//                    $beginDateTime = $object->getDateTimeBegin();
                     $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
                     $summerDiff = C4gReservationDateChecker::getCESDiffToLocale($timestamp);
 
                     $beginTime = $timestamp - $beginDate;
-//                    if ($summerDiff == 7200) {
-//                        $beginTime -= 3600;
-//                    }
+                    if ($summerDiff == 7200) {
+                        $beginTime -= 3600;
+                    }
 
                     $reservationObject->setBeginDate($beginDate);
                     $reservationObject->setBeginTime($beginTime);
-                    $reservationObject->setDuration($reservationObject->getTypeOfObjectDuration());
-                    $reservationObject->setTimeinterval('');
-//                    $reservationObject->setEndDate($EndDate);
-//                    $reservationObject->setEndTime($beginDate);
+//                    $reservationObject->setDuration($reservationObject->getTypeOfObjectDuration());
+                    $reservationObject->setTimeinterval($reservationObject->getTypeOfObjectDuration());
+
+                    $periodType = $listType['periodType'];
+                    $duration = $reservationObject->getTypeOfObjectDuration();
+
+                    switch ($periodType) {
+                        case 'minute':
+                            $periodType = 60 * $duration;
+                            break;
+                        case 'hour':
+                            $periodType = 3600 * $duration;
+                            break;
+                        case 'day':
+                        case 'overnight':
+                        case 'week':
+                            $periodType = 86400 * $duration;
+                            break;
+                    }
+
+                    $EndTime = $beginTime + $periodType;
+                    $EndDate = $beginDate + $EndTime;
+
+                    $reservationObject->setEndTime($EndTime);
+                    $reservationObject->setEndDate($EndDate);
 
                     $initialBookingDate = $beginDate;
                     $initialBookingTime = $beginTime;
@@ -235,12 +250,10 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setCallOnChangeFunction('setObjectId(this,' . $listType['id'] . ',' . $reservationSettings->showDateTime . ')');
         $reservationBeginTimeField->setMandatory(false);
         if ($typeOfObject == 'fixed_date'){
-            $reservationBeginTimeField->setInitialValue($object['$timestamp']);
-            $reservationBeginTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent']);
+            $reservationBeginTimeField->setInitialValue($reservationObject->getDateTimeBegin());
         } else {
             $reservationBeginTimeField->setInitialValue($initialBookingTime);
         }
-
         $reservationBeginTimeField->setSort(false);
         $reservationBeginTimeField->setCondition(array($condition));
         $reservationBeginTimeField->setAdditionalID($listType['id']);
