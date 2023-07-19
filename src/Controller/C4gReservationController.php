@@ -1831,6 +1831,27 @@ class C4gReservationController extends C4GBaseController
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking']];
             }
 
+            $time_interval = $reservationObject->time_interval;
+            $interval = '';
+            switch ($reservationType->periodType) {
+                case 'minute':
+                    $interval = 60;
+                    break;
+                case 'hour':
+                    $interval = 3600;
+                    break;
+                case 'day':
+                    $interval = 86400;
+                    break;
+                case 'overnight':
+                    $interval = 86400;
+                    break;
+                case 'week':
+                    $interval = 604800;
+                    break;
+                default: '';
+            }
+
             if (!$reservationObject || !$reservationObject->id) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']];
             }
@@ -1867,39 +1888,13 @@ class C4gReservationController extends C4GBaseController
                 }
             }
 
-            $time_interval = $reservationObject->time_interval;
-
-            switch ($reservationType->periodType) {
-                case 'minute':
-                    $interval = 60;
-                    break;
-                case 'hour':
-                    $interval = 3600;
-                    break;
-                case 'day':
-                    $interval = 86400;
-                    break;
-                case 'overnight':
-                    $interval = 86400;
-                    break;
-                case 'week':
-                    $interval = 604800;
-                    break;
-                default: '';
-            }
-
             $duration = $putVars['duration_'.$type];
             if (!$duration) {
                 $duration = $time_interval;
                 $putVars['duration_'.$type] = $reservationObject->duration ?: $duration;
             }
 
-            if ($typeOfObject == 'fixed_date') {
-                $duration = $reservationObject->typeOfObjectDuration * $interval;
-                $endTime = $beginTime + intval($duration);
-                $putVars['duration'] = $duration;
-                $putVars['duration_'.$type] = $duration;
-            } elseif ($typeOfObject == '' || $typeOfObject == 'standard') {
+            if ($typeOfObject == '' || $typeOfObject == 'standard') {
                 $duration = $duration * $interval;
                 $endTime = $beginTime + intval($duration);
             }
@@ -1931,7 +1926,7 @@ class C4gReservationController extends C4GBaseController
                 $putVars['endDate'] = $putVars['beginDate_'.$type];
                 $bday = $putVars['beginDate_'.$type];
                 $nextDay = strtotime("+1 day", strtotime($bday));
-                if (!$reservationType->directBooking && $beginTime >= 86400) {
+                if (!$reservationType->directBooking && $beginTime >= 86400 && $typeOfObject == 'stadard') {
                     $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                     $putVars['beginDate_'.$type] = $beginDate;
                     $putVars[$timeKey] = ($beginTime-86400);
@@ -1950,6 +1945,41 @@ class C4gReservationController extends C4GBaseController
             } else if (!$reservationType->directBooking && ($endTime == 86400)) {
                 //$putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime-1);
                 $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
+            }
+
+            if ($typeOfObject == 'fixed_date') {
+                $timestamp = $reservationObject->dateTimeBegin;
+//                $object['typeOfObject'] = $reservationObject->getTypeOfObject();
+                $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
+                $summerDiff = C4gReservationDateChecker::getCESDiffToLocale($timestamp);
+                $duration = $reservationObject->typeOfObjectDuration * $interval;
+
+                $beginTime = $timestamp - $beginDate;
+                if ($summerDiff == 7200) {
+                    $beginTime -= 3600;
+                }
+
+                $endTime = $beginTime + $duration;
+                $endDate = $beginDate + $endTime;
+
+                $endTime = $beginTime + intval($duration);
+                $putVars['duration'] = $duration;
+                $putVars['duration_'.$type] = $duration;
+
+                if ($putVars['reservationObjectType'] == '3') {
+                    $objectId = $reservationObject ? $reservationObject->id : 0;
+                    $putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $timestamp) : $timestamp;
+                    $putVars['beginTime_'.$type.'-33'.$objectId] = $beginTime;
+                    $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
+                    $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
+                } elseif ($putVars['reservationObjectType'] == '2') {
+                    $putVars['beginDate_'.$type] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
+                    $putVars['beginTime'.$type] = $beginTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime) : $beginTime;
+                    $putVars['endDate_'.$type] = $endDate ? date($GLOBALS['TL_CONFIG']['da teFormat'], $endDate) : $endDate; //ToDO Check
+                    $putVars['endTime_'.$type] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
+                }
+//                $putVars['beginDate'] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
+//                $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate']; //ToDO Check
             }
 
             //ToDo check
@@ -1984,8 +2014,39 @@ class C4gReservationController extends C4GBaseController
                     if (($endTime <= $beginTime) || ($reservationType->periodType == 'overnight')) {
                         $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay+86400);
                     }
+
+
                     $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], intvaL($endTime)) : intval($beginTime);
                 }
+            }
+            if ($typeOfObject == 'fixed_date') {
+                $timestamp = $reservationObject->dateTimeBegin;
+                $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
+                $summerDiff = C4gReservationDateChecker::getCESDiffToLocale($timestamp);
+                $duration = $reservationObject->typeOfObjectDuration * $interval;
+
+                $beginTime = $timestamp - $beginDate;
+                if ($summerDiff == 7200) {
+                    $beginTime -= 3600;
+                }
+
+                $endTime = $beginTime + $duration;
+                $endDate = $beginDate + $endTime;
+
+                $endTime = $beginTime + intval($duration);
+                $putVars['duration'] = $duration;
+                $putVars['duration_'.$type] = $duration;
+
+                if ($putVars['reservationObjectType'] == '3') {
+                    $objectId = $reservationObject ? $reservationObject->id : 0;
+                    $putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
+                    $putVars['beginTime_'.$type.'-33'.$objectId] = $beginTime;
+                    $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
+                    $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
+                }
+                //ToDO Check
+                $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate'];
+                $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
             }
 
             if ($reservationType->directBooking && $timeKey) {
