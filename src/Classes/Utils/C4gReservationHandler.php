@@ -721,6 +721,7 @@ class C4gReservationHandler
     private static function getReservationTimesDefault($timeParams, $timeObjectParams, $period) {
         $time_begin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
         $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
+        $typeOfObject = $timeObjectParams['object']->getTypeOfObject;
 
         if (($time_begin !== false) && ($time_end !== false)) {
             $time = $time_begin;
@@ -790,7 +791,6 @@ class C4gReservationHandler
 
                     //$realTime += C4gReservationDateChecker::getCESDiffToGMT($realTime);
 
-                    $typeOfObject = $timeObjectParams['object']->getTypeOfObject;
                     if ($typeOfObject == 'fixed_date') {
                         $realTime = $period['date_begin'];
                         $timeObjectParams['tsdate'] = $period['date_from'];

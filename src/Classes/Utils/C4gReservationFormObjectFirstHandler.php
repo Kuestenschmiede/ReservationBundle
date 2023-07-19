@@ -122,6 +122,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $this->fieldList[] = $reservationObjectField;
 
         foreach ($reservationObjects as $reservationObject) {
+            $typeOfObject = $reservationObject->getTypeOfObject();
             $object_condition = [
                 new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
                 $condition
@@ -364,16 +365,21 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
             $reservationBeginDateField->setTitle($titleDate);
+
+            $reservationBeginDateField->setStyleClass('begin-date');
+            $reservationBeginDateField->setMandatory(true);
+            $reservationBeginDateField->setEditable(true);
+
             if ($typeOfObject == 'fixed_date') {
                 $reservationBeginDateField->setInitialValue($reservationObject->getBeginDate());
-                $reservationBeginDateField->setEditable(false);
-                $reservationBeginDateField->setMandatory(false);
-                $reservationBeginDateField->setStyleClass('begindate-event');
+//                $reservationBeginDateField->setEditable(false);
+//                $reservationBeginDateField->setMandatory(false);
+//                $reservationBeginDateField->setStyleClass('begin-date begindate-fixed');
             } else {
                 $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
-                $reservationBeginDateField->setMandatory(true);
-                $reservationBeginDateField->setEditable(true);
-                $reservationBeginDateField->setStyleClass('begin-date');
+//                $reservationBeginDateField->setMandatory(true);
+//                $reservationBeginDateField->setEditable(true);
+//                $reservationBeginDateField->setStyleClass('begin-date');
             }
             $reservationBeginDateField->setComparable(false);
             $reservationBeginDateField->setSortColumn(true);

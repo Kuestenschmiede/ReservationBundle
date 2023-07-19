@@ -180,6 +180,20 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
             $reservationBeginDateField->setTitle($titleDate);
+            if ($typeOfObject == 'fixed_date') {
+                $reservationBeginDateField->setEditable(false);
+                $reservationBeginDateField->setInitialValue($initialBookingDate);
+//                $reservationBeginDateField->setMinDate($initialBookingDate);
+                $reservationBeginDateField->setMandatory(false);
+                $reservationBeginDateField->setTableColumn(false);
+                $reservationBeginDateField->setStyleClass('begindate-event');
+            } elseif ($typeOfObject == 'standard') {
+                $reservationBeginDateField->setEditable(true);
+                $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
+                $reservationBeginDateField->setMandatory(false);
+                $reservationBeginDateField->setTableColumn(true);
+                $reservationBeginDateField->setStyleClass('begin-date');
+            }
             $reservationBeginDateField->setComparable(false);
             $reservationBeginDateField->setSortColumn(true);
             $reservationBeginDateField->setSortSequence('de_datetime');
@@ -194,20 +208,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
             $reservationBeginDateField->setInitInvisible(false);
 
-            if ($typeOfObject == 'fixed_date') {
-                $reservationBeginDateField->setEditable(false);
-                $reservationBeginDateField->setInitialValue($initialBookingDate);
-                $reservationBeginDateField->setMinDate($initialBookingDate);
-                $reservationBeginDateField->setMandatory(false);
-                $reservationBeginDateField->setTableColumn(false);
-                $reservationBeginDateField->setStyleClass('begindate-event');
-            } elseif ($typeOfObject == 'standard') {
-                $reservationBeginDateField->setEditable(true);
-                $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
-                $reservationBeginDateField->setMandatory(false);
-                $reservationBeginDateField->setTableColumn(true);
-                $reservationBeginDateField->setStyleClass('begin-date');
-            }
+
 
             $this->fieldList[] = $reservationBeginDateField;
         }
