@@ -91,14 +91,14 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                     $summerDiff = C4gReservationDateChecker::getCESDiffToLocale($timestamp);
 
                     $beginTime = $timestamp - $beginDate;
-                    if ($summerDiff == 7200) {
-                        $beginTime -= 3600;
+                    if ($summerDiff) {
+                        $beginTime -= $summerDiff;
                     }
 
                     $reservationObject->setBeginDate($beginDate);
                     $reservationObject->setBeginTime($beginTime);
-//                    $reservationObject->setDuration($reservationObject->getTypeOfObjectDuration());
-                    $reservationObject->setTimeinterval($reservationObject->getTypeOfObjectDuration());
+                    $reservationObject->setDuration($reservationObject->getTypeOfObjectDuration());
+                    $reservationObject->setTimeinterval('0');
 
                     $periodType = $listType['periodType'];
                     $duration = $reservationObject->getTypeOfObjectDuration();
@@ -159,16 +159,21 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             }
 
             $reservationBeginDateField = new C4GDateField();
+
+            $reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
+            $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
+            $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
             //$reservationBeginDateField->setFlipButtonPosbition(false);
-            if ($typeOfObject !== 'fixed_date') {
-                $reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
-                $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
-                $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
-            } else {
-                $reservationBeginDateField->setMinDate($initialBookingDate);
-                $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
-                $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
-            }
+//            if ($typeOfObject !== 'fixed_date') {
+//                $reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
+//                $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
+//                $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
+//            }
+//            else {
+//                $reservationBeginDateField->setMinDate($initialBookingDate);
+//                $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
+//                $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
+//            }
 
             $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
 
@@ -180,19 +185,17 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
             $reservationBeginDateField->setTitle($titleDate);
+            $reservationBeginDateField->setStyleClass('begin-date');
+            $reservationBeginDateField->setEditable($typeOfObject !== 'fixed_date');
+
             if ($typeOfObject == 'fixed_date') {
-                $reservationBeginDateField->setEditable(false);
                 $reservationBeginDateField->setInitialValue($initialBookingDate);
 //                $reservationBeginDateField->setMinDate($initialBookingDate);
                 $reservationBeginDateField->setMandatory(false);
                 $reservationBeginDateField->setTableColumn(false);
-                $reservationBeginDateField->setStyleClass('begindate-event');
             } else {
-                $reservationBeginDateField->setEditable(true);
-                $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
                 $reservationBeginDateField->setMandatory(false);
                 $reservationBeginDateField->setTableColumn(true);
-                $reservationBeginDateField->setStyleClass('begin-date');
             }
             $reservationBeginDateField->setComparable(false);
             $reservationBeginDateField->setSortColumn(true);
@@ -205,7 +208,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",0);");
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id']);
-            $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
+            $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker && !$typeOfObject == 'fixed_date' ? true : false);
             $reservationBeginDateField->setInitInvisible(false);
 
 
