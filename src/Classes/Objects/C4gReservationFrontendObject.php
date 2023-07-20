@@ -37,7 +37,7 @@ class C4gReservationFrontendObject
     private $beginTime = 0;
     private $endDate = 0;
     private $endTime = 0;
-    private $typeOfObject = '';
+    private $typeOfObject = 'standard';
     private $dateTimeBegin = 0;
     private $typeOfObjectDuration = 0;
     private $almostFullyBookedAt = 0;

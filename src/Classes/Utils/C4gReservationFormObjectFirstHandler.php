@@ -69,7 +69,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $initialBookingTime = '';
         foreach ($reservationObjects as $reservationObject) {
             $typeOfObject = $reservationObject->getTypeOfObject();
-            if ($typeOfObject == 'standard') {
+//            if ($typeOfObject !== 'fixed_date') {
                 $objects[] = array(
                     'id' => $reservationObject->getId(),
                     'name' => $reservationObject->getCaption(),
@@ -78,15 +78,15 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
                     'openingHours' => $reservationObject->getOpeningHours()
                 );
-            } elseif ($typeOfObject == 'fixed_date') {
-                $objects[] = array(
-                    'id' => $reservationObject->getId(),
-                    'name' => $reservationObject->getCaption(),
-                    'min' => $reservationObject->getDesiredCapacity()[0] ?: 1,
-                    'max' => $reservationObject->getDesiredCapacity()[1] ?: 0,
-                    'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
-                );
-            }
+//            } else {
+//                $objects[] = array(
+//                    'id' => $reservationObject->getId(),
+//                    'name' => $reservationObject->getCaption(),
+//                    'min' => $reservationObject->getDesiredCapacity()[0] ?: 1,
+//                    'max' => $reservationObject->getDesiredCapacity()[1] ?: 0,
+//                    'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
+//                );
+//            }
 
             if ($reservationObject->getPriority()) {
                 $initialIndex = $index;
@@ -317,11 +317,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $initialBookingDate = false;
             }
 
-            if ($typeOfObject == 'fixed_date') {
-//                $reservationObject = $typeOfObject->date;
-            }
-
-            if ($this->initialValues->getDate() || $initialBookingDate) {
+            if ($this->initialValues->getDate() || $initialBookingDate/* || $typeOfObject == 'fixed_date'*/) {
                 $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+document.getElementById('c4g_reservation_object_".$listType['id']."').value).value,".$listType['id'].",".$showDateTime.",document.getElementById('c4g_reservation_object_".$listType['id']."').value);handleBrickConditions();)";
                 $this->getDialogParams()->setOnloadScript($script);
             }
@@ -331,7 +327,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             if ($typeOfObject == 'fixed_date') {
                 $titleDateHour = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'];
                 $titleBeginTimeHour = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'];
-            } elseif ($typeOfObject == 'standard') {
+            } else {
                 $titleDateHour = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDate'];
                 $titleBeginTimeHour = $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTime'];
             }
@@ -368,7 +364,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
 
             $reservationBeginDateField->setStyleClass('begin-date');
             $reservationBeginDateField->setMandatory(true);
-            $reservationBeginDateField->setEditable(true);
+            $reservationBeginDateField->setEditable($typeOfObject !== 'fixed_date');
 
             if ($typeOfObject == 'fixed_date') {
                 $reservationBeginDateField->setInitialValue($reservationObject->getBeginDate());
@@ -395,7 +391,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",". $reservationObject->getId().");");
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
-            $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
+            $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker && !$typeOfObject == 'fixed_date' ? true : false);
             $reservationBeginDateField->setInitInvisible(false);
 
             $this->fieldList[] = $reservationBeginDateField;

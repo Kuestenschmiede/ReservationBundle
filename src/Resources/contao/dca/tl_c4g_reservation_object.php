@@ -345,7 +345,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'options'     => array('standard', 'fixed_date'),
             'reference'   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references'],
             'eval'        => array('chosen' => true, 'mandatory' => true, 'tl_class' => 'long', 'submitOnChange' => true),
-            'sql'         => "varchar(10) NOT NULL default ''",
+            'sql'         => "varchar(10) NOT NULL default 'standard'",
 
         ),
 
@@ -360,7 +360,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'typeOfObjectDuration' => array(
             'label'     => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['typeOfObjectDuration'],
-            'default'   => '',
+            'default'   => '0',
             'exclude'   => true,
             'inputType' => 'text',
             'eval'      => array('rgxp' => 'digit', 'mandatory' => true, 'doNotCopy' => true, 'tl_class' => 'w50'),

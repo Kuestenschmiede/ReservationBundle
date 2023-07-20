@@ -478,7 +478,6 @@ class C4gReservationHandler
             $allObjectDates = [];
             $excludePeriodArr = [];
             foreach ($list as $object) {
-                $isFixedDate = $object->getTypeOfObject() == 'fixed_date';
                 if (!$object instanceof C4gReservationFrontendObject) {
                     break;
                 }
@@ -1007,7 +1006,7 @@ class C4gReservationHandler
 
             foreach ($timeParams['objectList'] as $object) {
                 $typeOfObject = $object->getTypeOfObject();
-                if ($typeOfObject == 'standard') {
+                if ($typeOfObject !== 'fixed_date') {
                     foreach ($object->getOpeningHours() as $key => $day) {
                         if (($day != -1) && ($key == $weekdayStr)) {
                             foreach ($day as $period) {
@@ -1027,15 +1026,15 @@ class C4gReservationHandler
                             }
                         }
                     }
-                } elseif ($typeOfObject == 'fixed_date') {
+                } else {
                     $timestamp = $object->getDateTimeBegin();
 
                     $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
                     $summerDiff = C4gReservationDateChecker::getCESDiffToLocale($timestamp);
 
                     $beginTime = $timestamp - $beginDate;
-                    if ($summerDiff == 7200) {
-                        $beginTime -= 3600;
+                    if ($summerDiff) {
+                        $beginTime -= $summerDiff;
                     }
 
                     $object->setBeginDate($beginDate);
@@ -1212,11 +1211,6 @@ class C4gReservationHandler
                         }
                     }
                 } elseif ($typeOfObject == 'fixed_date') {
-
-//                    $dateTimeBegin = $object->getDateTimeBegin();
-//                    $tstamp = C4gReservationDateChecker::getBeginOfDate($dateTimeBegin);
-//                    $duration = $object->getTypeOfObjectDuration();
-//                    $sommerDiff =C4gReservationDateChecker::getCESDiffToLocale($tstamp);
                     $beginDate = $object->getBeginDate();
                     $beginTime = $object->getBeginTime();
                     $endTime = $object->getEndTime();
@@ -1225,10 +1219,6 @@ class C4gReservationHandler
                     $period['time_end'] = is_numeric($endTime) ? intval($endTime) : false;
                     $period['date_from'] = is_numeric($beginDate) ? intval($beginDate) : false;
                     $period['date_to'] = is_numeric($beginDate+$endTime) ? intval($beginDate+$endTime) : false;
-
-//                    $timeObjectParams['defaultInterval'] = 0;
-//                    $timeObjectParams['interval'] = 0;
-//                    $timeObjectParams['durationDiff'] = 0;
 
                     $timeParams['result'] = self::getReservationTimesDefault($timeParams, $timeObjectParams, $period);
                 }
@@ -1902,86 +1892,90 @@ class C4gReservationHandler
                 }
 
                 $opening_hours = array();
+                $datesExclusion = array();
 
-                if ($cloneObject) {
-                    $opening_hours['su'] = \Contao\StringUtil::deserialize($cloneObject['oh_sunday']);
-                    $opening_hours['mo'] = \Contao\StringUtil::deserialize($cloneObject['oh_monday']);
-                    $opening_hours['tu'] = \Contao\StringUtil::deserialize($cloneObject['oh_tuesday']);
-                    $opening_hours['we'] = \Contao\StringUtil::deserialize($cloneObject['oh_wednesday']);
-                    $opening_hours['th'] = \Contao\StringUtil::deserialize($cloneObject['oh_thursday']);
-                    $opening_hours['fr'] = \Contao\StringUtil::deserialize($cloneObject['oh_friday']);
-                    $opening_hours['sa'] = \Contao\StringUtil::deserialize($cloneObject['oh_saturday']);
-                } else {
-                    $opening_hours['su'] = \Contao\StringUtil::deserialize($object['oh_sunday']);
-                    $opening_hours['mo'] = \Contao\StringUtil::deserialize($object['oh_monday']);
-                    $opening_hours['tu'] = \Contao\StringUtil::deserialize($object['oh_tuesday']);
-                    $opening_hours['we'] = \Contao\StringUtil::deserialize($object['oh_wednesday']);
-                    $opening_hours['th'] = \Contao\StringUtil::deserialize($object['oh_thursday']);
-                    $opening_hours['fr'] = \Contao\StringUtil::deserialize($object['oh_friday']);
-                    $opening_hours['sa'] = \Contao\StringUtil::deserialize($object['oh_saturday']);
-                }
+                if ($frontendObject->getTypeOfObject() !== 'fixed_date') {
+                    if ($cloneObject) {
+                        $opening_hours['su'] = \Contao\StringUtil::deserialize($cloneObject['oh_sunday']);
+                        $opening_hours['mo'] = \Contao\StringUtil::deserialize($cloneObject['oh_monday']);
+                        $opening_hours['tu'] = \Contao\StringUtil::deserialize($cloneObject['oh_tuesday']);
+                        $opening_hours['we'] = \Contao\StringUtil::deserialize($cloneObject['oh_wednesday']);
+                        $opening_hours['th'] = \Contao\StringUtil::deserialize($cloneObject['oh_thursday']);
+                        $opening_hours['fr'] = \Contao\StringUtil::deserialize($cloneObject['oh_friday']);
+                        $opening_hours['sa'] = \Contao\StringUtil::deserialize($cloneObject['oh_saturday']);
+                    } else {
+                        $opening_hours['su'] = \Contao\StringUtil::deserialize($object['oh_sunday']);
+                        $opening_hours['mo'] = \Contao\StringUtil::deserialize($object['oh_monday']);
+                        $opening_hours['tu'] = \Contao\StringUtil::deserialize($object['oh_tuesday']);
+                        $opening_hours['we'] = \Contao\StringUtil::deserialize($object['oh_wednesday']);
+                        $opening_hours['th'] = \Contao\StringUtil::deserialize($object['oh_thursday']);
+                        $opening_hours['fr'] = \Contao\StringUtil::deserialize($object['oh_friday']);
+                        $opening_hours['sa'] = \Contao\StringUtil::deserialize($object['oh_saturday']);
+                    }
 
-                $weekdays = C4gReservationHandler::checkWeekdays($opening_hours, $type);
-                $frontendObject->setWeekdayExclusion($weekdays);
-                $frontendObject->setOpeningHours($opening_hours);
+                    $weekdays = C4gReservationHandler::checkWeekdays($opening_hours, $type);
+                    $frontendObject->setWeekdayExclusion($weekdays);
+                    $frontendObject->setOpeningHours($opening_hours);
 
-                $datesExclusion = \Contao\StringUtil::deserialize($object['days_exclusion']);
-                $calendars = \Contao\StringUtil::deserialize($object['allTypesEvents']);
+                    $datesExclusion = \Contao\StringUtil::deserialize($object['days_exclusion']);
+                    $calendars = \Contao\StringUtil::deserialize($object['allTypesEvents']);
 
-                foreach ($calendars as $calendarId) {
-                    if ($calendarId) {
-                        $events = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ? AND `published` = '1'")->execute($calendarId)->fetchAllAssoc();
+                    foreach ($calendars as $calendarId) {
+                        if ($calendarId) {
+                            $events = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ? AND `published` = '1'")->execute($calendarId)->fetchAllAssoc();
 
-                        foreach ($events as $event) {
-                            if ($event){
-                                $startDate = $event['startDate'];
-                                $endDate = $event['endDate'] ?: $startDate;
-                                $startTime = $event['startTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate']);
-                                $endTime = $event['endTime'];
-                                if ($startTime != $endTime) {
-                                    $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
-                                } else {
-                                    $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
-                                }
-
-                                $startDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($startDate, $startTime); //+1 ToDo Check Why?
-                                $endDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($endDate, $endTime);
-                                $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
-
-                                if ($event['recurring']) {
-                                    $repeatEach = StringUtil::deserialize($event['repeatEach']);
-                                    $repeatEnd = $event['repeatEnd']; //timestamp
-                                    $recurrences = $event['recurrences'];
-
-                                    switch ($repeatEach['unit']) {
-                                        case 'days':
-                                          $recInterval = 86400*$repeatEach['value'];
-                                          break;
-                                        case 'weeks':
-                                          $recInterval = 86400*7*$repeatEach['value'];
-                                          break;
-                                        case 'months': //ToDo other solution
-                                          $recInterval = 86400*7*4*$repeatEach['value'];
-                                          break;
-                                        case 'years':  //ToDo other solution
-                                          $recInterval = 86400*12*4*7*$repeatEach['value'];
-                                          break;
-                                        default:
-                                            $recInterval = 0;
-                                            break;
+                            foreach ($events as $event) {
+                                if ($event){
+                                    $startDate = $event['startDate'];
+                                    $endDate = $event['endDate'] ?: $startDate;
+                                    $startTime = $event['startTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate']);
+                                    $endTime = $event['endTime'];
+                                    if ($startTime != $endTime) {
+                                        $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
+                                    } else {
+                                        $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
                                     }
 
-                                    for ($i=0;$i<=$recurrences;$i++) {
-                                        $startDateTime = $startDateTime + $recInterval;
-                                        $endDateTime = $endDateTime + $recInterval;
+                                    $startDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($startDate, $startTime); //+1 ToDo Check Why?
+                                    $endDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($endDate, $endTime);
+                                    $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
 
-                                        if ($startDateTime >= $repeatEnd) {
-                                            break;
+                                    if ($event['recurring']) {
+                                        $repeatEach = StringUtil::deserialize($event['repeatEach']);
+                                        $repeatEnd = $event['repeatEnd']; //timestamp
+                                        $recurrences = $event['recurrences'];
+
+                                        switch ($repeatEach['unit']) {
+                                            case 'days':
+                                                $recInterval = 86400*$repeatEach['value'];
+                                                break;
+                                            case 'weeks':
+                                                $recInterval = 86400*7*$repeatEach['value'];
+                                                break;
+                                            case 'months': //ToDo other solution
+                                                $recInterval = 86400*7*4*$repeatEach['value'];
+                                                break;
+                                            case 'years':  //ToDo other solution
+                                                $recInterval = 86400*12*4*7*$repeatEach['value'];
+                                                break;
+                                            default:
+                                                $recInterval = 0;
+                                                break;
                                         }
 
-                                        $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
+                                        for ($i=0;$i<=$recurrences;$i++) {
+                                            $startDateTime = $startDateTime + $recInterval;
+                                            $endDateTime = $endDateTime + $recInterval;
+
+                                            if ($startDateTime >= $repeatEnd) {
+                                                break;
+                                            }
+
+                                            $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
+                                        }
                                     }
                                 }
+
                             }
                         }
                     }
