@@ -27,7 +27,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = 
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, selectReservationTypes, showReservationType, showReservationObject, showSignatureField, showPrices, past_day_number, cancellation_redirect_site, login_redirect_site, printTpl;';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site, cancellationButtonCaption;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,removeListImage,event_redirect_site,speaker_redirect_site;';
 
@@ -113,6 +113,16 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_redirect_site'] = array
     'eval'                    => array('mandatory'=>true, 'fieldType'=>'radio'),
     'sql'                     => "int(10) unsigned NOT NULL default '0'",
     'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['cancellationButtonCaption'] = array
+(
+    'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['cancellationButtonCaption'],
+    'exclude'           => true,
+    'sorting'           => true,
+    'search'            => true,
+    'inputType'         => 'text',
+    'eval'              => array('mandatory' => false, 'tl_class' => 'long', 'maxlength' => 254),
+    'sql'               => "varchar(100) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservationView'] = array
 (

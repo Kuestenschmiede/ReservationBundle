@@ -123,7 +123,16 @@ class C4gReservationCancellationController extends C4GBaseController
         $reservationIdField->setInitialValue($reservation_id);
         $fieldList[] = $reservationIdField;
 
-        $clickButton = new C4GBrickButton(C4GBrickConst::BUTTON_CLICK, $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['button_cancellation'], $visible=true, $enabled=true, $action = '', $accesskey = '', $defaultByEnter = true);
+
+         $clickButton = new C4GBrickButton(
+             C4GBrickConst::BUTTON_CLICK,
+             $this->cancellationButtonCaption ?  \Contao\Controller::replaceInsertTags($this->cancellationButtonCaption) : $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['button_cancellation'],
+             $visible = true,
+             $enabled = true,
+             $action = '',
+             $accesskey = '',
+             $defaultByEnter = true);
+//        $clickButton = new C4GBrickButton(C4GBrickConst::BUTTON_CLICK, $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['button_cancellation'], $visible=true, $enabled=true, $action = '', $accesskey = '', $defaultByEnter = true);
         $buttonField = new C4GButtonField($clickButton);
         $buttonField->setOnClickType(C4GBrickConst::ONCLICK_TYPE_SERVER);
         $buttonField->setOnClick('clickCancellation');

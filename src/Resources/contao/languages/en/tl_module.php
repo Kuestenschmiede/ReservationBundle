@@ -34,6 +34,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['login_redirect_si
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['event_redirect_site'] = array('Event forwarding', 'Here you can set the forwarding to the event detail page. In case you want to display the events at the referent.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['speaker_redirect_site'] = array('Forward speakers', 'Clicking on the tiles will redirect to another page.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['cancellation_redirect_site'] = array('Redirect to cancellation', 'You can offer a cancellation button directly via this');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['cancellationButtonCaption'] = array('Button label','Allows you to change the button text. For example, "Cancel Reservation".');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_add_member_location'] = array('Automatically set location for member', 'Automatically sets a new location for maintaining members.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas'] = array("Data fields", "The order here corresponds to the appearance shown in the frontend. Except for the heading, each field can be used only once.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['mandatory'] = array("Mandatory?","");
