@@ -373,7 +373,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $reservationBeginDateField->setMandatory(false);
             } else {
                 $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
-                $reservationBeginDateField->setShowInlinePicker->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
+                $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
                 $reservationBeginDateField->setMandatory(true);
                 $reservationBeginDateField->setEditable(true);
             }

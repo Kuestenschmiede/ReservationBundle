@@ -1909,7 +1909,7 @@ class C4gReservationController extends C4GBaseController
                 $putVars['endDate'] = $putVars['beginDate_'.$type];
                 $bday = $putVars['beginDate_'.$type];
                 $nextDay = strtotime("+1 day", strtotime($bday));
-                if (!$reservationType->directBooking && $beginTime >= 86400 && $typeOfObject == 'stadard') {
+                if (!$reservationType->directBooking && $beginTime >= 86400 && $typeOfObject == 'standard') {
                     $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                     $putVars['beginDate_'.$type] = $beginDate;
                     $putVars[$timeKey] = ($beginTime-86400);
@@ -2041,7 +2041,6 @@ class C4gReservationController extends C4GBaseController
             if (!$timeKey) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key']];
             }
-
             //just notification
             $factor = 1;
             $countPersons = intval($putVars['desiredCapacity_' . $type]);

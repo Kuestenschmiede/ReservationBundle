@@ -201,9 +201,6 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id']);
 
-            $test = ($reservationSettings->showInlineDatepicker && !$typeOfObject == 'fixed_date' ? true : false);
-            $test2 = $reservationSettings->showInlineDatepicker;
-
             $this->fieldList[] = $reservationBeginDateField;
         }
 
