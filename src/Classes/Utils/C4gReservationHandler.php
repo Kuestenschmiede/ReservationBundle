@@ -897,11 +897,17 @@ class C4gReservationHandler
 
                     $timeParams['result'] = self::getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj);
                 }
-                if ($timeParams['type']['periodType'] == 'overnight') {
-                    break;
-                }
 
                 $time = $time + $timeObjectParams['defaultInterval'];
+
+                //todo Check
+                if ($timeParams['type']['periodType'] == 'overnight') {
+                    if (!$timeParams['result']) {
+                        $timeParams = [];
+                        //isnt really doing anything
+                    }
+                    break;
+                }
             }
         }
 
@@ -1037,12 +1043,13 @@ class C4gReservationHandler
                         $beginTime -= $summerDiff;
                     }
 
+                    $duration = $object->getTypeOfObjectDuration();
+
                     $object->setBeginDate($beginDate);
                     $object->setBeginTime($beginTime);
-//                    $object->setDuration(intval($object->getTypeOfObjectDuration()));
-                    $object->setTimeinterval($object->getTypeOfObjectDuration());
+                    $object->setDuration($duration);
+                    $object->setTimeinterval($duration);
 
-                    $duration = $object->getTypeOfObjectDuration();
 
                     switch ($periodType) {
                         case 'minute':
@@ -1201,6 +1208,11 @@ class C4gReservationHandler
                                     if (($periodType == 'day') || ($periodType == 'overnight') || ($periodType == 'week')) {
                                         $timeParams['result'] = self::getReservationTimesMultipleDays($timeParams, $timeObjectParams, $period);
                                         if ($periodType == 'overnight') {
+//                                            todo Check
+                                            if (!$timeParams['result']) {
+                                                return [];
+                                                //isnt really doing anything
+                                            }
                                             break;
                                         }
                                     } else {
@@ -1285,6 +1297,9 @@ class C4gReservationHandler
             $timeParams['result'] = self::addTime($timeParams, $time, $timeObj, $endTimeInterval, 0, $nxtDay);
         } else if ($timeParams['date'] === -1) {
             $timeParams['result'] = self::addTime($timeParams, $time, $timeObj, $endTimeInterval, 0, $nxtDay);
+        }
+        if ($timeObj['removeButton'] && $timeParams['type']["periodType"] == "overnight") {
+            $timeParams['result'] = [];
         }
 
         return $timeParams['result'];

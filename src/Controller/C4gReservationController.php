@@ -2411,6 +2411,14 @@ class C4gReservationController extends C4GBaseController
             $showArrivalAndDeparture = $this->reservationSettings->showArrivalAndDeparture;
             $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $capacity, $withEndTimes, $withFreeSeats, true, $langCookie, $showArrivalAndDeparture);
         }
+//        if (!$times || $times == [] || $times == [0]) {
+//            return true;
+//        }
+//        return new JsonResponse([
+//            'reservationId' => C4GBrickCommon::getUUID(),
+//            'times' => [],
+//            'captions' => []
+//        ]);
 
         foreach ($times as $key=>$values) {
             $times[$key]['name'] = str_replace('&nbsp;',' ',$times[$key]['name']);
@@ -2427,7 +2435,7 @@ class C4gReservationController extends C4GBaseController
         return new JsonResponse([
             'reservationId' => C4GBrickCommon::getUUID(),
             'times' => $times,
-            'captions' => $captions
+            'captions' => $times && count($times) > 0 ? $captions : []
         ]);
     }
 
