@@ -98,7 +98,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                     $reservationObject->setBeginDate($beginDate);
                     $reservationObject->setBeginTime($beginTime);
                     $reservationObject->setDuration($reservationObject->getTypeOfObjectDuration());
-                    $reservationObject->setTimeinterval('0');
+                    $reservationObject->setTimeinterval($reservationObject->getTypeOfObjectDuration());
 
                     $periodType = $listType['periodType'];
                     $duration = $reservationObject->getTypeOfObjectDuration();
@@ -194,6 +194,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 $reservationBeginDateField->setMandatory(false);
                 $reservationBeginDateField->setTableColumn(false);
             } else {
+                $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
                 $reservationBeginDateField->setMandatory(false);
                 $reservationBeginDateField->setTableColumn(true);
             }
