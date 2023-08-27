@@ -1909,7 +1909,7 @@ class C4gReservationController extends C4GBaseController
                 $putVars['endDate'] = $putVars['beginDate_'.$type];
                 $bday = $putVars['beginDate_'.$type];
                 $nextDay = strtotime("+1 day", strtotime($bday));
-                if (!$reservationType->directBooking && $beginTime >= 86400 && $typeOfObject == 'stadard') {
+                if (!$reservationType->directBooking && $beginTime >= 86400 && $typeOfObject == 'standard') {
                     $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
                     $putVars['beginDate_'.$type] = $beginDate;
                     $putVars[$timeKey] = ($beginTime-86400);
@@ -2041,7 +2041,6 @@ class C4gReservationController extends C4GBaseController
             if (!$timeKey) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key']];
             }
-
             //just notification
             $factor = 1;
             $countPersons = intval($putVars['desiredCapacity_' . $type]);
@@ -2412,6 +2411,14 @@ class C4gReservationController extends C4GBaseController
             $showArrivalAndDeparture = $this->reservationSettings->showArrivalAndDeparture;
             $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $capacity, $withEndTimes, $withFreeSeats, true, $langCookie, $showArrivalAndDeparture);
         }
+//        if (!$times || $times == [] || $times == [0]) {
+//            return true;
+//        }
+//        return new JsonResponse([
+//            'reservationId' => C4GBrickCommon::getUUID(),
+//            'times' => [],
+//            'captions' => []
+//        ]);
 
         foreach ($times as $key=>$values) {
             $times[$key]['name'] = str_replace('&nbsp;',' ',$times[$key]['name']);
@@ -2428,7 +2435,7 @@ class C4gReservationController extends C4GBaseController
         return new JsonResponse([
             'reservationId' => C4GBrickCommon::getUUID(),
             'times' => $times,
-            'captions' => $captions
+            'captions' => $times && count($times) > 0 ? $captions : []
         ]);
     }
 

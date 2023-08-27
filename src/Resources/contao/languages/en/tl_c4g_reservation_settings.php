@@ -67,7 +67,7 @@ $GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Redirection';
 $GLOBALS['TL_LANG'][$str]['expert_legend'] = 'Expert settings';
 
 /** OPERATIONS **/
-$GLOBALS['TL_LANG'][$str]['new'] = array("Add settings","Add settings");
+$GLOBALS['TL_LANG'][$str]['new'] = array("Create form", "Create new form");
 $GLOBALS['TL_LANG'][$str]['edit'] = array("Edit settings","Edit settings ID %s");
 $GLOBALS['TL_LANG'][$str]['copy'] = array("Copy settings","Copy settings ID %s");
 $GLOBALS['TL_LANG'][$str]['delete'] = array("Delete settings","Delete settings ID %s");
