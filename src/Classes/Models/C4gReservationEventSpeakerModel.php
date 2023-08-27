@@ -32,7 +32,7 @@ class C4gReservationEventSpeakerModel extends Model
      */
     public static function getListItems($listParams = null) {
         $db = \Database::getInstance();
-        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation_event_speaker ORDER BY sorting DESC, id ASC");
+        $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation_event_speaker WHERE published = '1' ORDER BY sorting DESC, id ASC");
         $dbResult = $stmt->execute();
         $dbResult = $dbResult->fetchAllAssoc();
         $result = $dbResult;

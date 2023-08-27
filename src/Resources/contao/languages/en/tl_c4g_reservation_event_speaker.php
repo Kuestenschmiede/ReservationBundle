@@ -26,6 +26,7 @@ $GLOBALS['TL_LANG'][$str]['vita'] = array("Vita", "Vita of the speaker");
 $GLOBALS['TL_LANG'][$str]['photo'] = array("Photo", "Photo of the speaker");
 $GLOBALS['TL_LANG'][$str]['speakerForwarding'] = array("Forwarding", "This page is called up after clicking on the speaker.");
 $GLOBALS['TL_LANG'][$str]['sorting'] = array("Sort value", "The higher the value, the higher the position in the list (frontend).");
+$GLOBALS['TL_LANG'][$str]['published'] = array("Publish", "Do you want the speaker to be displayed in the frontend?");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['speaker_legend'] = "Edit speaker";

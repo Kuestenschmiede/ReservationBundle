@@ -146,7 +146,7 @@ class C4gReservationSpeakerListController extends C4GBaseController
         );
         
         $this->listParams->setRenderMode($this->renderMode ?: C4GBrickRenderMode::TILEBASED);
-
+        $this->listParams->setRemoveUnpublishedElements(true);
         if ($this->speaker_redirect_site) {
             $this->listParams->setWithFunctionCallOnClick(true);
             $this->listParams->setOnClickFunction('redirectOnclick');

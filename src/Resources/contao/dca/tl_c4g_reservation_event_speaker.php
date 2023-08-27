@@ -81,6 +81,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
                 'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['show'],
                 'href'          => 'act=show',
                 'icon'          => 'show.gif',
+            ),
+            'toggle' => array
+            (
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['toggle'],
+                'icon'                => 'visible.gif',
+                'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+                'button_callback'     => array('tl_c4g_reservation_event_speaker', 'toggleIcon')
             )
         )
     ),
@@ -88,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{speaker_legend},title, firstname, lastname, alias, email, phone, address, postal, city, website, vita, photo, speakerForwarding, sorting;'
+        'default'   =>  '{speaker_legend},title, firstname, lastname, alias, email, phone, address, postal, city, website, vita, photo, speakerForwarding, sorting, published;'
     ),
 
 
@@ -267,6 +274,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr'),
             'sql'               => "int(5) unsigned NOT NULL default '0'"
+        ),
+        'published' => array(
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['published'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 1"
         )
 
     )
@@ -325,5 +339,61 @@ class tl_c4g_reservation_event_speaker extends Backend
         }
 
         return $varValue;
+    }
+
+    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
+    {
+        $this->import('BackendUser', 'User');
+
+        if (strlen($this->Input->get('tid'))) {
+            $this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 0));
+            $this->redirect($this->getReferer());
+        }
+
+        // Check permissions AFTER checking the tid, so hacking attempts are logged
+        if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_event_speaker::published', 'alexf')) {
+            return '';
+        }
+
+        $href .= '&amp;id=' . $this->Input->get('id') . '&amp;tid=' . $row['id'] . '&amp;state='.($row['published'] ? '' : 1);
+
+        if (!$row['published']) {
+            $icon = 'invisible.gif';
+        }
+
+        return '<a href="' . $this->addToUrl($href) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+    }
+
+    /**
+     * Disable/enable a user group
+     *
+     * @param integer $intId
+     * @param boolean $blnVisible
+     * @param DataContainer $dc
+     *
+     * @throws Contao\CoreBundle\Exception\AccessDeniedException
+     */
+    public function toggleVisibility($intId, $blnPublished)
+    {
+        // Check permissions to publish
+        if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_event_speaker::published', 'alexf')) {
+            $this->log('Not enough permissions to show/hide record ID "' . $intId . '"', 'tl_c4g_reservation_event_speaker toggleVisibility', TL_ERROR);
+            $this->redirect('contao/main.php?act=error');
+        }
+
+        $this->createInitialVersion('tl_c4g_reservation_object', $intId);
+
+        // Trigger the save_callback
+        if (is_array($GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker']['fields']['published']['save_callback'])) {
+            foreach ($GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker']['fields']['published']['save_callback'] as $callback) {
+                $this->import($callback[0]);
+                $blnPublished = $this->$callback[0]->$callback[1]($blnPublished, $this);
+            }
+        }
+
+        // Update the database
+        $this->Database->prepare("UPDATE tl_c4g_reservation_event_speaker SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE `id`=?")
+            ->execute($intId);
+        $this->createNewVersion('tl_c4g_reservation_event_speaker', $intId);
     }
 }
