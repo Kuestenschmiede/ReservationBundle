@@ -70,7 +70,7 @@ class C4gReservationConfirmation
                             $location = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($locationId)->fetchAssoc();
                         }
 
-                        $organizerId = $reservationObject['organier'];
+                        $organizerId = $reservationObject['organizer'];
                         $organizer = false;
                         if ($organizerId) {
                             $organizer = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($organizerId)->fetchAssoc();
