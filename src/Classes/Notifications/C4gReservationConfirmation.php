@@ -44,7 +44,7 @@ class C4gReservationConfirmation
                         $reservationObject = $database->prepare('SELECT * FROM tl_calendar_events WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
                     }
 
-                    $notificationConifrmationType = StringUtil::deserialize($type['notification_confirmation_type']);
+                    $notificationConfirmationType = StringUtil::deserialize($type['notification_confirmation_type']);
                     $notificationSpecialType = StringUtil::deserialize($type['notification_special_type']);
 
                     $configuration = $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle']['con4gis_reservation_confirmation'];
@@ -53,15 +53,17 @@ class C4gReservationConfirmation
                     $arrNotificationIds = [];
                     if ($reservation['specialNotification'] && $notificationSpecialType && (count($notificationSpecialType) > 0)) {
                         $arrNotificationIds = $notificationSpecialType;
-                    } elseif ($reservation['confirmed'] && $notificationConifrmationType && (count($notificationConifrmationType) > 0)) {
-                        $arrNotificationIds = $notificationConifrmationType;
+                    } elseif ($reservation['confirmed'] && $notificationConfirmationType && (count($notificationConfirmationType) > 0)) {
+                        $arrNotificationIds = $notificationConfirmationType;
                     }
 
                     if ($c4gNotify && is_array($arrNotificationIds) && (count($arrNotificationIds) > 0) && $reservationObject) {
                         if ($reservationObjectType == '2') {
                             $c4gNotify->setTokenValue('reservation_object', $reservationObject['title'] ? $reservationObject['title'] : '');
+                            $c4gNotify->setTokenValue('reservation_title', $reservationObject['title'] ? $reservationObject['title'] : '');
                         } else {
                             $c4gNotify->setTokenValue('reservation_object', $reservationObject['caption'] ? $reservationObject['caption'] : '');
+                            $c4gNotify->setTokenValue('reservation_title', $reservationObject['caption'] ? $reservationObject['caption'] : '');
                         }
 
                         $locationId = $reservationObject['location'] ?: $type['location'];

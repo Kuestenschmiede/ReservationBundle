@@ -737,7 +737,7 @@ class tl_c4g_reservation extends Backend
             $this->redirect($this->getReferer());
         }
 
-        $href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.($row['published'] ? '' : 1);
+        $href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.($row['confirmed'] ? '' : 1);
 
         if ($row['cancellation'])
         {
@@ -826,6 +826,9 @@ class tl_c4g_reservation extends Backend
     public function getActObjects($dc)
     {
         $return = [];
+        if (!$dc->activeRecord) {
+            return $return;
+        }
         if ($dc instanceof DataContainer && $dc->activeRecord->reservationObjectType) {
             $reservationObjectType = $dc->activeRecord->reservationObjectType;
         } elseif (is_array($dc)) {
@@ -921,6 +924,11 @@ class tl_c4g_reservation extends Backend
      */
     public function loadMemberOptions($dc) {
         $options = [];
+
+        if (!$dc->activeRecord) {
+            return $options;
+        }
+
         $options[$dc->activeRecord->id] = '';
 
         $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
@@ -938,6 +946,11 @@ class tl_c4g_reservation extends Backend
      */
     public function loadGroupOptions($dc) {
         $options = [];
+
+        if (!$dc->activeRecord) {
+            return $options;
+        }
+
         $options[$dc->activeRecord->id] = '';
 
         $stmt = $this->Database->prepare("SELECT id, name FROM tl_member_group WHERE `disable` != 1");
