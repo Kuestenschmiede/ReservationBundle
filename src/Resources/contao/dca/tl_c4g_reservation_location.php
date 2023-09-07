@@ -311,6 +311,11 @@ class tl_c4g_reservation_location extends Backend
      */
     public function loadMemberOptions($dc) {
         $options = [];
+
+        if (!$dc->activeRecord) {
+            return $options;
+        }
+
         $options[$dc->activeRecord->id] = '';
 
         $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
