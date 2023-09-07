@@ -833,6 +833,8 @@ class tl_c4g_reservation extends Backend
             $reservationObjectType = $dc->activeRecord->reservationObjectType;
         } elseif (is_array($dc)) {
             $reservationObjectType = $dc['reservationObjectType'];
+        } else {
+            $reservationObjectType = false;
         }
 
         if (!$reservationObjectType) {
