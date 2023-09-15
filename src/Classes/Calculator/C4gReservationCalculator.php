@@ -200,6 +200,12 @@ class C4gReservationCalculator
                     C4gReservationDateChecker::isStampInPeriod($timeEndDb, $timeBegin, $timeEnd, 1)) {
                     $reservationList[] = $reservation;
                 }
+//TODO checking max quantity / all types validity (for all objects of the same type)
+                if ($allTypesValidity && $object->getQuantity() == 1) {
+                    if ($firstDate == $reservation['beginDate']) {
+                        $reservationList[] = $reservation;
+                    }
+                }
             }
         }
 
