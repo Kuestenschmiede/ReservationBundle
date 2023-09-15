@@ -1958,7 +1958,7 @@ class C4gReservationController extends C4GBaseController
                 } elseif ($putVars['reservationObjectType'] == '2') {
                     $putVars['beginDate_'.$type] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
                     $putVars['beginTime'.$type] = $beginTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime) : $beginTime;
-                    $putVars['endDate_'.$type] = $endDate ? date($GLOBALS['TL_CONFIG']['da teFormat'], $endDate) : $endDate; //ToDO Check
+                    $putVars['endDate_'.$type] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
                     $putVars['endTime_'.$type] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
                 }
 //                $putVars['beginDate'] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
