@@ -373,8 +373,8 @@ class C4gReservationHandler
                 return $list['result'];
             }
         }
-
-        $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
+        $format = $GLOBALS['TL_CONFIG']['timeFormat'];
+        $begin = date('I', $list['tsdate']) ? date($format, $time+3600).$clock : date($format, $time).$clock;
 
         $mergedTime = false;
         if ($obj['mergedTime'] && $obj['mergedEndTime']) {
@@ -404,7 +404,8 @@ class C4gReservationHandler
             if ($withEndTimes && $interval) {
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
-                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
+//                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
+                    $end = date('I', $list['tsdate']) ? date($format, $time+$interval+3600).$clock : date($format, $time+$interval).$clock;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
@@ -421,7 +422,8 @@ class C4gReservationHandler
             if ($withEndTimes && $interval) {
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
-                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time + $interval).$clock;
+//                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time + $interval).$clock;
+                    $end = date('I', $list['tsdate']) ? date($format, $time + $interval + 3600).$clock : date($format, $time + $interval).$clock;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
