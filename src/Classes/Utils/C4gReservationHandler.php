@@ -374,7 +374,8 @@ class C4gReservationHandler
             }
         }
         $format = $GLOBALS['TL_CONFIG']['timeFormat'];
-        $begin = date('I', $list['tsdate']) ? date($format, $time+3600).$clock : date($format, $time).$clock;
+        //$begin = date('I', $list['tsdate']) ? date($format, $time+3600).$clock : date($format, $time).$clock; 
+        $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
 
         $mergedTime = false;
         if ($obj['mergedTime'] && $obj['mergedEndTime']) {
