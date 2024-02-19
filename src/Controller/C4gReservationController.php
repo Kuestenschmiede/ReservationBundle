@@ -1854,6 +1854,10 @@ class C4gReservationController extends C4GBaseController
                 default: '';
             }
 
+            if (!$reservationObject->intIndex) {
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']];
+            }
+
             if (!$reservationObject || !$reservationObject->id) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']];
             }
