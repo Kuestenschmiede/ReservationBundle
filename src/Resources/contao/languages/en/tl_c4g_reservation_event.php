@@ -22,6 +22,7 @@ $GLOBALS['TL_LANG'][$str]['topic'] = array("Topics", "Here you can link your eve
 $GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Target audience", "Select your target audience.");
 $GLOBALS['TL_LANG'][$str]['minParticipants'] = array("Minimum number of participants", "Minimum number of participants for the event to take place. Default: 1.");
 $GLOBALS['TL_LANG'][$str]['maxParticipants'] = array("Maximum number of participants", "Maximum number of participants for the event. Default: 0 (unlimited)");
+$GLOBALS['TL_LANG'][$str]['maxParticipantsPerEventBooking'] = array("Maximum number of participants per booking", "Here you can limit the number of participants in the entry per booking.");
 $GLOBALS['TL_LANG'][$str]['min_reservation_day'] = array("Earliest reservation date (in days)", "Today + how many days?");
 $GLOBALS['TL_LANG'][$str]['state'] = array("Current status", "green, orange, red");
 
