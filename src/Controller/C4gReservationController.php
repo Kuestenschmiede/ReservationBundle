@@ -531,8 +531,14 @@ class C4gReservationController extends C4GBaseController
                     } else {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
                     }
-                    if (!$eventObj->maxParticipantsPerEventBooking) {
-                        $maxCapacity = min($maxCapacity, $listType['maxParticipantsPerBooking']);
+//                    Todo: How do we want to display the lable and the cap ( should the standard not show the current capacity?)
+//                    if (!$eventObj->maxParticipantsPerEventBooking && !$eventObj) {
+//                        $maxCapacity = min($maxCapacity, $listType['maxParticipantsPerBooking']);
+//                    }
+                    if ((!$listType['maxParticipantsPerBooking']) &&
+                        (!$eventObj->maxParticipantsPerBooking) &&
+                        (!$eventObj->maxParticipantsPerEventBooking)) {
+                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
                     }
                 } else {
                     $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
