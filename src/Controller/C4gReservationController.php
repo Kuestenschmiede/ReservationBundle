@@ -1854,8 +1854,15 @@ class C4gReservationController extends C4GBaseController
                 default: '';
             }
 
-            if (!$reservationObject->intIndex) {
-                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']];
+            //check overbooking object capacity type standard and object without several bookings
+            if (!$reservationType->serevalBookings) {
+                $objectType = $reservationType->reservationObjectType;
+                if ($reservationType && $objectType != '2') {
+                    if ($reservationObject->desiredCapacityMax < intval($putVars['desiredCapacity_'.$type]) ||
+                        ($objectType == '1' && $reservationObject->intIndex < 0)) {
+                        return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants']];
+                    }
+                }
             }
 
             if (!$reservationObject || !$reservationObject->id) {
