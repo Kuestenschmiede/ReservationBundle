@@ -1102,7 +1102,7 @@ class C4gReservationHandler
                     'interval' => 0, //act interval
                     'durationDiff' => 0, //interval with additional time
                     'timeInterval' => 0, //default interval
-                    'severalBookings' => 0,
+                    'severalBookings' => $timeParams['type']['severalBookings'],
                     'maxObjects' => 0,
                     'exclusionPeriods' => [],
                     'maxBeginTime' => $object->getMaxBeginTime()
@@ -1119,7 +1119,6 @@ class C4gReservationHandler
                                 break;
                             }
                         }
-
                     }
                 }
 
@@ -1174,7 +1173,7 @@ class C4gReservationHandler
                     default: '';
                 }
 
-                $timeObjectParams['severalBookings'] = !$timeParams['type']['severalBookings'] ? 1 : 0;
+//                $timeObjectParams['severalBookings'] = !$timeParams['type']['severalBookings'] ? 1 : 0;
                 $timeObjectParams['maxObjects'] = $timeObjectParams['quantity'] ?: $timeObjectParams['severalBookings'];
 
                 $typeOfObject = $timeObjectParams['object']->getTypeOfObject();
@@ -1348,11 +1347,11 @@ class C4gReservationHandler
                     }
                 }
             }
-
+            $beginDateAsTstamp = strtotime($beginDate);
             $reservationId = $putVars['reservation_id'];
             $database = Database::getInstance();
             $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType` IN (1,3) AND `beginDate`=? AND `beginTime`=? AND NOT `cancellation`=?")
-                ->execute($typeId,$objectId,$beginDate,$beginTime,'1')->fetchAllAssoc();
+                ->execute($typeId,$objectId,$beginDateAsTstamp,$beginTime,'1')->fetchAllAssoc();
 
             $reservationCount = count($reservations);
 
