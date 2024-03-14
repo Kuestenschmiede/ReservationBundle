@@ -499,9 +499,6 @@ class C4gReservationController extends C4GBaseController
                 $maxParticipants = $listType['maxParticipantsPerBooking'];
             }
 
-            if ($eventObj->maxParticipantsPerEventBooking) {
-                $maxParticipants = $eventObj->maxParticipantsPerEventBooking;
-            }
             $maxCapacity = $maxParticipants ?: 0;
             $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
             $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
@@ -509,32 +506,43 @@ class C4gReservationController extends C4GBaseController
             if ($this->reservationSettings->withCapacity && !$onlyParticipants) {
                 $reservationDesiredCapacity = new C4GNumberField();
                 $reservationDesiredCapacity->setFieldName('desiredCapacity');
-
                 if ($maxCapacity) {
                     $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
-                } elseif ($eventObj->maxParticipantsPerEventBooking != 0) {
-                    $maxCapacity = $eventObj->maxParticipantsPerEventBooking;
                 }
 
-//                if (($maxCapacity <= 0) && ($listType['objectType'] == '2')) {
-//                    $info = new C4GInfoTextField();
-//                    $info->setFieldName('info');
-//                    $info->setEditable(false);
-//                    $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
-//                    return [$info];
-//                }
+                if ($eventObj->maxParticipantsPerEventBooking) {
+                    $isPartiPerEvent = $eventObj->maxParticipantsPerEventBooking;
+                } elseif ($listType['maxParticipantsPerBooking']){
+                    $isPartiPerEvent = $listType['maxParticipantsPerBooking'];
+                }
+
+                $reservationDesiredCapacity->setFormField(true);
+                $reservationDesiredCapacity->setEditable(true);
+                $reservationDesiredCapacity->setCondition(array($condition));
+                $reservationDesiredCapacity->setInitialValue($minCapacity);
+                $reservationDesiredCapacity->setMandatory(true);
 
                 //TODO add amount of capacity left in the form
                 if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity)) {
-                    if ($eventObj && $listType['maxParticipantsPerBooking'] && $listType['maxParticipantsPerBooking'] <= $maxCapacity) {
+                    if ($eventObj && $listType['maxParticipantsPerBooking'] && $listType['maxParticipantsPerBooking'] <= $maxCapacity && !$isPartiPerEvent) {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
+                        $reservationDesiredCapacity->setMax($listType['maxParticipantsPerBooking']);
+                    } elseif ($isPartiPerEvent && ($isPartiPerEvent <= $maxCapacity)) {
+                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$isPartiPerEvent.')');
+                        $reservationDesiredCapacity->setMax($isPartiPerEvent);
+                    } elseif (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
+                        $info = new C4GInfoTextField();
+                        $info->setFieldName('info');
+                        $info->setEditable(false);
+                        $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
+                        return [$info];
                     } else {
-                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
+                        //show current capacity option for the title
+//                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
+                        $reservationDesiredCapacity->setMax($maxCapacity);
+                        $reservationDesiredCapacity->setMin($minCapacity);
                     }
-//                    Todo: How do we want to display the lable and the cap ( should the standard not show the current capacity?)
-//                    if (!$eventObj->maxParticipantsPerEventBooking && !$eventObj) {
-//                        $maxCapacity = min($maxCapacity, $listType['maxParticipantsPerBooking']);
-//                    }
+
                     if ((!$listType['maxParticipantsPerBooking']) &&
                         (!$eventObj->maxParticipantsPerBooking) &&
                         (!$eventObj->maxParticipantsPerEventBooking)) {
@@ -542,16 +550,15 @@ class C4gReservationController extends C4GBaseController
                     }
                 } else {
                     $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
-                }
-                $reservationDesiredCapacity->setFormField(true);
-                $reservationDesiredCapacity->setEditable(true);
-                $reservationDesiredCapacity->setCondition(array($condition));
-                $reservationDesiredCapacity->setInitialValue($minCapacity);
-                $reservationDesiredCapacity->setMandatory(true);
 
-                $reservationDesiredCapacity->setMin($minCapacity);
-                if ($maxCapacity) {
-                    $reservationDesiredCapacity->setMax($maxCapacity);
+                }
+
+                if (empty($maxCapacity)) {
+                    $info = new C4GInfoTextField();
+                    $info->setFieldName('info');
+                    $info->setEditable(false);
+                    $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
+                    return [$info];
                 }
 
                 $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
