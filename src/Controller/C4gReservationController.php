@@ -523,14 +523,21 @@ class C4gReservationController extends C4GBaseController
                 $reservationDesiredCapacity->setMandatory(true);
 
                 //TODO add amount of capacity left in the form
-                if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity)) {
+                if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity) || $isPartiPerEvent) {
                     if ($eventObj && $listType['maxParticipantsPerBooking'] && $listType['maxParticipantsPerBooking'] <= $maxCapacity && !$isPartiPerEvent) {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
                         $reservationDesiredCapacity->setMax($listType['maxParticipantsPerBooking']);
-                    } elseif ($isPartiPerEvent && ($isPartiPerEvent <= $maxCapacity)) {
-                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$isPartiPerEvent.')');
+                    } elseif ($isPartiPerEvent <= $maxCapacity) {
+                        if ($isPartiPerEvent == $maxCapacity) {
+                            $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
+                        } else {
+                            $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$isPartiPerEvent.')');
+                        }
                         $reservationDesiredCapacity->setMax($isPartiPerEvent);
                     } elseif (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
+                        $reservationDesiredCapacity->setMin(0);
+                        $reservationDesiredCapacity->setMax(0);
+
                         $info = new C4GInfoTextField();
                         $info->setFieldName('info');
                         $info->setEditable(false);
