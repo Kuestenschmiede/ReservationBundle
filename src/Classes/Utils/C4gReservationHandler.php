@@ -424,9 +424,8 @@ class C4gReservationHandler
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
                     date_default_timezone_set('Europe/Berlin');
-//                    $summertime = date('I',$list['tsdate']) ? 3600 : 0;
-//                    $newEventRow['beginTime'] = $objBeginTime->tstamp + $summertime;
-                    $end = date($format, $time + $interval).$clock;
+                    $summertime = date('I',$obj['mergedEndTime']) ? 3600 : 0;
+                    $end = date($format, $time + $interval+$summertime).$clock;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
@@ -1269,6 +1268,7 @@ class C4gReservationHandler
             $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time;
             $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff'];
         }
+
 //        $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+3600;
 //        $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']+3600; // +1 ToDo Check Why?
         foreach ($timeObjectParams['exclusionPeriods'] as $excludePeriod) {
@@ -1300,6 +1300,7 @@ class C4gReservationHandler
                 $timeObj['id'] = $timeObjectParams['object']->getId();
             }
 
+            $timeObj['mergedBeginTime'] = $beginStamp;
             $timeParams['result'] = self::addTime($timeParams, $time, $timeObj, $endTimeInterval, 0, $nxtDay);
         } else if ($timeParams['date'] === -1) {
             $timeParams['result'] = self::addTime($timeParams, $time, $timeObj, $endTimeInterval, 0, $nxtDay);
