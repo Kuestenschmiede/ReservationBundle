@@ -527,14 +527,15 @@ class C4gReservationController extends C4GBaseController
                     if ($eventObj && $listType['maxParticipantsPerBooking'] && $listType['maxParticipantsPerBooking'] <= $maxCapacity && !$isPartiPerEvent) {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
                         $reservationDesiredCapacity->setMax($listType['maxParticipantsPerBooking']);
-                    } elseif ($isPartiPerEvent <= $maxCapacity) {
+                    } elseif (empty($maxCapacity) && $isPartiPerEvent <= $maxCapacity) {
                         if ($isPartiPerEvent == $maxCapacity) {
                             $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
+                            $reservationDesiredCapacity->setMax($maxCapacity);
                         } else {
                             $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$isPartiPerEvent.')');
                         }
                         $reservationDesiredCapacity->setMax($isPartiPerEvent);
-                    } elseif (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
+                    } elseif (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity) || ($maxCapacity < 0)) {
                         $reservationDesiredCapacity->setMin(0);
                         $reservationDesiredCapacity->setMax(0);
 
@@ -558,14 +559,6 @@ class C4gReservationController extends C4GBaseController
                 } else {
                     $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
 
-                }
-
-                if (empty($maxCapacity)) {
-                    $info = new C4GInfoTextField();
-                    $info->setFieldName('info');
-                    $info->setEditable(false);
-                    $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
-                    return [$info];
                 }
 
                 $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
