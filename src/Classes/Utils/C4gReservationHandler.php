@@ -423,8 +423,10 @@ class C4gReservationHandler
             if ($withEndTimes && $interval) {
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
-//                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time + $interval).$clock;
-                    $end = date('I', $list['tsdate']) ? date($format, $time + $interval + 3600).$clock : date($format, $time + $interval).$clock;
+                    date_default_timezone_set('Europe/Berlin');
+//                    $summertime = date('I',$list['tsdate']) ? 3600 : 0;
+//                    $newEventRow['beginTime'] = $objBeginTime->tstamp + $summertime;
+                    $end = date($format, $time + $interval).$clock;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
@@ -436,6 +438,8 @@ class C4gReservationHandler
             } else {
                 $key = $time.'#'.$interval;
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+//                $end = date('I', $list['tsdate']) ? date($format, $time+$interval+3600).$clock : date($format, $time+$interval).$clock;
+
             }
         }
 
