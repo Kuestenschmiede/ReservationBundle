@@ -487,27 +487,38 @@ class C4gReservationController extends C4GBaseController
         $initialValues->setObject($objectId);
 
         $onlyParticipants = $this->reservationSettings->onlyParticipants ?: false;
+        $isPartiPerEvent = $eventObj->maxParticipantsPerEventBooking ?: 0;
 
         foreach ($typelist as $listType) {
             $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
+
 
             if ($listType['maxParticipantsPerBooking'] && $eventObj && !$eventObj->maxParticipants) {
                 $maxParticipants = $listType['maxParticipantsPerBooking'];
             } else if ($eventObj && $eventObj->maxParticipants) {
                 $maxParticipants = $eventObj->maxParticipants;
-            }  else {
-                $maxParticipants = $listType['maxParticipantsPerBooking'];
             }
 
-            $maxCapacity = $maxParticipants ?: 0;
-            $minCapacity = $listType['minParticipantsPerBooking'] ?: 1;
+            if ($isPartiPerEvent) {
+                $maxParticipants = $isPartiPerEvent;
+            }
+
+            $maxCapacity = $eventObj->maxParticipants ?: 0;
+            if (isset($eventObj->minParticipants)) {
+                $minCapacity = $eventObj->minParticipants;
+            } elseif (isset($listType['minParticipantsPerBooking'])) {
+                $minCapacity = $listType['minParticipantsPerBooking'];
+            } else {
+                $minCapacity = 1;
+            }
+
             $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
 
             if ($this->reservationSettings->withCapacity && !$onlyParticipants) {
                 $reservationDesiredCapacity = new C4GNumberField();
                 $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
-                if ($maxCapacity) {
+                if ($maxCapacity && $eventObj->maxParticipants) {
                     $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
                 }
 
@@ -518,14 +529,7 @@ class C4gReservationController extends C4GBaseController
                 $reservationDesiredCapacity->setMandatory(true);
 
                 //TODO add amount of capacity left in the form
-
-                //Max participant per booking
-                if ($eventObj->maxParticipantsPerEventBooking) {
-                    $isPartiPerEvent = $eventObj->maxParticipantsPerEventBooking;
-                } elseif ($listType['maxParticipantsPerBooking']){
-                    $isPartiPerEvent = $listType['maxParticipantsPerBooking'];
-                }
-
+                $error = 0;
                 if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity) || $isPartiPerEvent) {
                     if ($eventObj && $listType['maxParticipantsPerBooking'] && $listType['maxParticipantsPerBooking'] <= $maxCapacity && !$isPartiPerEvent) {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
@@ -539,14 +543,7 @@ class C4gReservationController extends C4GBaseController
                         }
                         $reservationDesiredCapacity->setMax($isPartiPerEvent);
                     } elseif (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity) || ($maxCapacity < 0)) {
-                        $reservationDesiredCapacity->setMin(0);
-                        $reservationDesiredCapacity->setMax(0);
-
-                        $info = new C4GInfoTextField();
-                        $info->setFieldName('info');
-                        $info->setEditable(false);
-                        $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
-                        return [$info];
+                       $error = 1;
                     } else {
                         if ($isPartiPerEvent) {
                             $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
@@ -557,6 +554,17 @@ class C4gReservationController extends C4GBaseController
                             $reservationDesiredCapacity->setMax($maxCapacity);
                             $reservationDesiredCapacity->setMin($minCapacity);
                         }
+                    }
+
+                    if ($error) {
+                        $reservationDesiredCapacity->setMin(0);
+                        $reservationDesiredCapacity->setMax(0);
+
+                        $info = new C4GInfoTextField();
+                        $info->setFieldName('info');
+                        $info->setEditable(false);
+                        $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
+                        return [$info];
                     }
 
                     if ((!$listType['maxParticipantsPerBooking']) &&
@@ -1072,15 +1080,59 @@ class C4gReservationController extends C4GBaseController
                 $headlineField->setTitle($individualLabel ?: $initialValue);
                 $fieldList[] = $headlineField;
             } else if ($rowField == "participants") {
+
                 if ($this->reservationSettings->withCapacity && $onlyParticipants) {
                     $reservationDesiredCapacity = new C4GNumberField();
+                    $error = 0;
+                    $withEventMaxParti = $eventObj->maxParticipantsPerEventBooking ?:0;
+                    $typeMaxParti = $listType['maxParticipantsPerBooking'] ?: 0;
+                    $noCap = !$maxCapacity && !$isPartiPerEvent && !$typeMaxParti;
+
+                    if ($withEventMaxParti) {
+                        $isPartiPerEvent = $withEventMaxParti;
+                    } else if ($typeMaxParti) {
+                        $isPartiPerEvent = $typeMaxParti;
+                    }
+
                     $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
                     if ($maxCapacity) {
                         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
                     }
 
-                    if (($maxCapacity <= 0) && ($listType['objectType'] == '2') && !$listType['minParticipantsPerBooking']) {
+                    //without max cap for praticipants but max per booking
+                    if ($maxCapacity >= $isPartiPerEvent) {
+                        $maxCapacity = $isPartiPerEvent;
+                    }
+
+                    //Max participant per booking
+                    if ($eventObj->maxParticipantsPerEventBooking) {
+                        $maxParticipants = $eventObj->maxParticipantsPerEventBooking;
+                    } else if ($type['maxParticipantsPerBooking']){
+                        $maxParticipants = $type['maxParticipantsPerBooking'];;
+                    }
+
+                    if (!$noCap && ($maxCapacity <= 0) && ($listType['objectType'] == '2') || !$listType['minParticipantsPerBooking']) {
+                        $error = 1;
+                    }
+
+//                    if ($maxCapacity < $eventObj->maxParticipants) {
+//                        $error = 1;
+//                    }
+
+                    //for unlimited max cap
+                    if ($noCap || (!$maxCapacity && $isPartiPerEvent)) {
+                        $error = 0;
+                        $maxCapacity = $isPartiPerEvent;
+                        $reservationDesiredCapacity->setMin(1);
+                        $reservationDesiredCapacity->setMax(999);
+                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
+                    }
+
+                    if ($error) {
+                        $reservationDesiredCapacity->setMin(0);
+                        $reservationDesiredCapacity->setMax(0);
+
                         $info = new C4GInfoTextField();
                         $info->setFieldName('info');
                         $info->setEditable(false);
@@ -1088,10 +1140,15 @@ class C4gReservationController extends C4GBaseController
                         return [$info];
                     }
 
-                    if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity)) {
+
+                    if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity && !$noCap)) {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
                     } else {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
+                    }
+
+                    if ($isPartiPerEvent){
+                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$isPartiPerEvent.')');
                     }
                     $reservationDesiredCapacity->setFormField(true);
                     $reservationDesiredCapacity->setEditable(true);
@@ -1100,9 +1157,7 @@ class C4gReservationController extends C4GBaseController
                     $reservationDesiredCapacity->setMandatory(true);
 
                     $reservationDesiredCapacity->setMin($minCapacity);
-                    if ($maxCapacity) {
-                        $reservationDesiredCapacity->setMax($maxCapacity);
-                    }
+                    $reservationDesiredCapacity->setMax($maxCapacity);
 
                     $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                     $reservationDesiredCapacity->setCallOnChange(true);
@@ -1161,6 +1216,14 @@ class C4gReservationController extends C4GBaseController
                     $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $type['id']);
                     $maxParticipants = $type['maxParticipantsPerBooking'];
                     $minParticipants = $type['minParticipantsPerBooking'];
+
+                    //Max participant per booking
+                    if ($eventObj->maxParticipantsPerEventBooking) {
+                        $maxParticipants = $eventObj->maxParticipantsPerEventBooking;
+                    } elseif ($type['maxParticipantsPerBooking']){
+                        $maxParticipants = $type['maxParticipantsPerBooking'];;
+                    }
+
                     $maxCapacity = $maxParticipants ?: 0;
                     $minCapacity = $minParticipants ?: 1;
                     $participantParam = unserialize($eventObj->participant_params);
@@ -2307,12 +2370,18 @@ class C4gReservationController extends C4GBaseController
             }
 
             $possible = $desiredCapacity - $reservationCount;
+            $maxParticipantsPerBooking = $reservationEventObject->maxParticipantsPerEventBooking ?:$reservationType->maxParticipants;
+            $isPartiPerEvent = $reservationEventObject->maxParticipantsPerEventBooking;
+//            if ($isPartiPerEvent){
+//                $possible = $isPartiPerEvent;
+//            }
+
             if ($desiredCapacity && $possible < $pCount) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'].$possible];
             }
 
-            if ($reservationType->maxParticipantsPerBooking && ($pCount > $reservationType->maxParticipantsPerBooking)) {
-                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'].$reservationType->maxParticipantsPerBooking];
+            if ($reservationType->maxParticipantsPerBooking && ($pCount > $maxParticipantsPerBooking)) {
+                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'].$maxParticipantsPerBooking];
             }
 
             $putVars['participantList'] = $participants;
