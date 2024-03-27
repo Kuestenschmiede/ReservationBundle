@@ -1080,7 +1080,7 @@ class C4gReservationController extends C4GBaseController
                         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
                     }
 
-                    if (($maxCapacity <= 0) && ($listType['objectType'] == '2')) {
+                    if (($maxCapacity <= 0) && ($listType['objectType'] == '2') && !$listType['minParticipantsPerBooking']) {
                         $info = new C4GInfoTextField();
                         $info->setFieldName('info');
                         $info->setEditable(false);
