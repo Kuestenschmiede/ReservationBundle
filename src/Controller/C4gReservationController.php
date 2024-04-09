@@ -1086,7 +1086,7 @@ class C4gReservationController extends C4GBaseController
                     $error = 0;
                     $withEventMaxParti = $eventObj->maxParticipantsPerEventBooking ?:0;
                     $typeMaxParti = $listType['maxParticipantsPerBooking'] ?: 0;
-                    $noCap = !$maxCapacity && !$isPartiPerEvent && !$typeMaxParti;
+                    $noCap = (!$maxCapacity && !$isPartiPerEvent && !$typeMaxParti) ;
 
                     if ($withEventMaxParti) {
                         $isPartiPerEvent = $withEventMaxParti;
@@ -1098,10 +1098,11 @@ class C4gReservationController extends C4GBaseController
 
                     if ($maxCapacity) {
                         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
+                        $currentMaxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
                     }
 
                     //without max cap for praticipants but max per booking
-                    if ($maxCapacity >= $isPartiPerEvent) {
+                    if ($maxCapacity >= $isPartiPerEvent && $isPartiPerEvent) {
                         $maxCapacity = $isPartiPerEvent;
                     }
 
@@ -1141,7 +1142,7 @@ class C4gReservationController extends C4GBaseController
                     }
 
 
-                    if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity && !$noCap)) {
+                    if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity && !$noCap && $isPartiPerEvent) /*|| $noCap && !$isPartiPerEvent*/) {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
                     } else {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
@@ -1157,7 +1158,9 @@ class C4gReservationController extends C4GBaseController
                     $reservationDesiredCapacity->setMandatory(true);
 
                     $reservationDesiredCapacity->setMin($minCapacity);
-                    $reservationDesiredCapacity->setMax($maxCapacity);
+                    if (!$noCap){
+                        $reservationDesiredCapacity->setMax($maxCapacity);
+                    }
 
                     $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                     $reservationDesiredCapacity->setCallOnChange(true);
@@ -1305,7 +1308,7 @@ class C4gReservationController extends C4GBaseController
                             $fieldList[] = $reservationParticipants;
                         } else {
                             if ($this->reservationSettings->withCapacity) {
-                                $participantCapacity = $maxCapacity && ($maxCapacity < 8) ? $maxCapacity : 8;
+                                $participantCapacity = $maxCapacity && ($maxCapacity < 10) ? $maxCapacity : 10;
                                 if ($participantCapacity > 1) {
                                     $start = $minCapacity ?: 1;
                                     for ($i = $start; $i <= $participantCapacity; $i++) {

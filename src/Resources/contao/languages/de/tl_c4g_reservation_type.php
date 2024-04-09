@@ -72,7 +72,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['participantParamsFieldType'] = a
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['participantParamsMandatory'] = array("Pflichtfeld", "Sollen die Teilnehmer Leistungen ein Pflichtfeld sein?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['description'] = array("Beschreibung");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['minParticipantsPerBooking'] = array("Minimale Teilnehmerzahl pro Buchung", "Hierüber können Sie die Mindestteilnehmerzahl in der Eingabe pro Buchung erhöhen. 1 = Standard.");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = array("Maximale Teilnehmerzahl pro Buchung", "Hierüber können Sie die Teilnehmerzahl in der Eingabe pro Buchung begrenzen. 0 = unbegrenzt. Sollten Sie den Teilnehmermechanismus im Formular nutzen wollen, dann sollten Sie hier die Anzahl stark eingrenzen (max. 8 Personen).");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['maxParticipantsPerBooking'] = array("Maximale Teilnehmerzahl pro Buchung", "Hierüber können Sie die Teilnehmerzahl in der Eingabe pro Buchung begrenzen. 0 = unbegrenzt. Sollten Sie den Teilnehmermechanismus im Formular nutzen wollen, dann sollten Sie hier die Anzahl stark eingrenzen (max. 10 Personen).");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['almostFullyBookedAt'] = array("Fast ausgebucht bei wieviel %", "Hiermit kann der Warnstatus (Orange) festgelegt werden. 0 = kein Orange-Status");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['bookRunning'] = array("Laufende Termine buchbar", "Auch laufende Termine sind noch buchbar.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['memberId'] = array("Mitglied verknüpfen", "Alle Reservierungen dieser Art werden für dieses Mitglied erstellt.");
