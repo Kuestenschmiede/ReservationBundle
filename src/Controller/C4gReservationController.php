@@ -1257,7 +1257,8 @@ class C4gReservationController extends C4GBaseController
                         }
 
                         if (count($participantParamsArr) > 0) {
-                            if ($eventObj->participantParamsFieldType == 'radio' || $listType['participantParamsFieldType'] == 'radio') {
+                            $eventOptionsRadio = $eventObj->participantParamsFieldType == 'radio';
+                            if ($eventOptionsRadio) {
                                 $participantParamField = new C4GRadioGroupField();
                                 $participantParamField->setInitialValue($participantParamsArr[0]['id']);
                                 $participantParamField->setSaveAsArray(true);
@@ -2577,7 +2578,8 @@ class C4gReservationController extends C4GBaseController
         if ($isEvent) {
             $desiredCapacity = $reservationEventObject->minParticipants;
             $resObject = $reservationEventObject;
-            $price = $reservationEventObject->price;
+//            $price = $reservationEventObject->price ?: 0;
+            $price = $reservationEventObject->price ?? 0;
         } else {
             $price = $reservationObject->price;
             $resObject = $reservationObject;
@@ -2631,16 +2633,8 @@ class C4gReservationController extends C4GBaseController
             if ($participantParams && $specialParticipantMechanism) {
                 $priceParticipantOptionSum = C4gReservationCalculator::calcParticipantOptionPrices(intval($desiredCapacity), $putVars, $objArray, $typeArray, $calcTaxes, $onlyParticipants);
 
-//                    $putVars['optionsPriceSum'] = $priceOptionSum['priceOptionSum'] + $priceParticipantOptionSum['priceParticipantOptionSum'];
                 $optionsPriceSum = $priceOptionSum['priceOptionSum'] + $priceParticipantOptionSum['priceParticipantOptionSum'];
-//                    $putVars['priceParticipantOptionSum'] = C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSum']);
                 $priceSum += $priceParticipantOptionSum['priceParticipantOptionSum'];
-
-                // for the additional token 'participant net and tax prices'
-//                    if ($calcTaxes) {
-//                        $putVars['priceParticipantOptionNet'] =  $priceParticipantOptionSum['priceParticipantOptionSumNet'];
-//                        $putVars['priceParticipantOptionTax'] =  $priceParticipantOptionSum['priceParticipantOptionSumTax'];
-//                    }
             }
 
             if ($priceArray['price'] || $priceSum) {

@@ -548,6 +548,7 @@ class C4gReservationCalculator
       $priceParticipantOptionSum = 0;
       $priceParticipantOptionSumNet = 0;
       $priceParticipantOptionSumTax = 0;
+      $isEvent = $putVars['reservationObjectType'] ? 1 : 0;
 
       $participantParams = $object['participant_params'] ?: ($type['participant_params'] ?: false);
 
@@ -567,7 +568,9 @@ class C4gReservationCalculator
               foreach ($participantParamArr as $key => $value){
 
                   if ($object['participantParamsFieldType'] == 'radio'){
+
                       $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i];
+
                       if ($chosenParticipantOptions === $value['id']){
                           $priceParticipantOptionSum += $value['price'];
                           $chosenParticipantOptions = true;
@@ -578,6 +581,7 @@ class C4gReservationCalculator
                   } else {
 
                       $chosenParticipantOptions = $putVars['participants_' . $type['id']  . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']];
+
                       if ($chosenParticipantOptions === 'true') {
                           $chosenParticipantOptions = true;
                       } else {
