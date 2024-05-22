@@ -13,6 +13,8 @@
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['price'] = array("Price", "Determine the price (e.g. 50.00)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['taxOptions'] = array("Tax Rate", "Select a tax option for all prices.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['caption'] = array("Caption", "Caption of the booking option");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['feCaption'] = array("Frontend Caption", "Alternatively displayed in the frontend.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['option'] = array("Name", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['language'] = array("Language", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['published'] = array("Publish.", "Should this object be displayed in the frontend?");
 

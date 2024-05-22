@@ -474,16 +474,18 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $reservationEndTimeDBField->setNotificationField(true);
         $this->fieldList[] = $reservationEndTimeDBField;
 
+//        $captions = StringUtil::deserialize($object['options']);
         $includedParams = $listType['includedParams'];
         $includedParamsArr = [];
 
         if ($includedParams) {
             foreach ($includedParams as $paramId) {
-                $includedParam = C4gReservationParamsModel::findByPk($paramId);
-                if ($includedParam && $includedParam->caption && $includedParam->published && ($includedParam->price && $reservationSettings->showPrices)) {
-                    $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption . "<span class='price'>&nbsp;(+" . C4gReservationHandler::formatPrice($includedParam->price).")</span>"];
-                } else if ($includedParam && $includedParam->caption && $includedParam->published) {
-                    $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption];
+                if ($paramId) {
+                    $includedParam = C4gReservationParamsModel::feParamsCaptions($paramId, $reservationSettings);
+
+                    if ($includedParam !== null) {
+                        $includedParamsArr[] = $includedParam;
+                    }
                 }
             }
         }
@@ -513,11 +515,10 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         if ($params) {
             foreach ($params as $paramId) {
                 if ($paramId) {
-                    $additionalParam = C4gReservationParamsModel::findByPk($paramId);
-                    if ($additionalParam && $additionalParam->caption && $additionalParam->published && ($additionalParam->price && $reservationSettings->showPrices)) {
-                        $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption . "<span class='price'>&nbsp;(+" .C4gReservationHandler::formatPrice($additionalParam->price).")</span>"];
-                    } else if ($additionalParam && $additionalParam->caption && $additionalParam->published) {
-                        $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
+                    $additionalParam = C4gReservationParamsModel::feParamsCaptions($paramId, $reservationSettings);
+
+                    if ($additionalParam !== null) {
+                        $additionalParamsArr[] = $additionalParam;
                     }
                 }
             }

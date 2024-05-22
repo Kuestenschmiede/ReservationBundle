@@ -32,14 +32,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
         'sorting' => array
         (
             'mode'              => 2,
-            'fields'            => array('caption','language','price', 'taxOptions'),
+            'fields'            => array('caption', 'price', 'taxOptions'),
             'panelLayout'       => 'filter;sort,search,limit',
 //            'headerFields'      => array('lastname','firstname'),
         ),
 
         'label' => array
         (
-            'fields'            => array('caption','language','price', 'taxOptions'),
+            'fields'            => array('caption', 'price', 'taxOptions'),
             //'format'            => '<span class="reservation_date" style="color:#E30518">%s</span><span class="reservation_time" style="color:#E30518">%s</span><span class="reservation_id" style="color:#E30518">%s</span><span class="lastname" style="color:#E30518">%s</span><span class="firstname" style="color:#E30518">%s</span>',
             //'label_callback'    => array('tl_c4g_reservation', 'listDates'),
             'showColumns'       => true,
@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  'caption, language, price, taxOptions, published;'
+        'default'   =>  'caption, language, feCaption, price, taxOptions, published;'
     ),
 
 
@@ -108,12 +108,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['id'],
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
         ),
-
         'tstamp' => array
         (
             'sql'               => "int(10) unsigned NOT NULL default '0'"
         ),
-
         'caption' => array (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['caption'],
             'exclude'                 => true,
@@ -125,15 +123,35 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'sql'                     => "varchar(254) NOT NULL default ''"
 
         ),
-
-        'language' => array
+        'feCaption' => array
         (
-            'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['language'],
-            'exclude'               => true,
-            'inputType'             => 'select',
-            'options'               => ['de'=>'Deutsch', 'en'=>'Englisch'],
-            'eval'                  => array('chosen' => false, 'tl_class' => "w50"),
-            'sql'                   => "char(5) NOT NULL default ''"
+            'label'			=> &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['feCaption'],
+            'exclude' 		=> true,
+            'inputType'     => 'multiColumnWizard',
+            'eval' 			=> array
+            (
+                'columnFields' => array
+                (
+                    'caption' => array
+                    (
+                        'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['option'],
+                        'exclude'               => true,
+                        'inputType'             => 'text',
+                        'eval' 			        => array('tl_class'=>'w50')
+                    ),
+                    'language' => array
+                    (
+                        'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['language'],
+                        'exclude'               => true,
+                        'inputType'             => 'select',
+                        'options'               => ['de' => 'Deutsch', 'en' => 'Englisch'],
+                        'eval'                  => array('chosen' => false, 'style'=>'width: 200px')
+                    )
+                ),
+                'tl_class'=>'clr',
+            ),
+
+            'sql' => "blob NULL"
         ),
         'taxOptions' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['taxOptions'],

@@ -479,17 +479,10 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
 
         if ($includedParams) {
             foreach ($includedParams as $paramId) {
-                $includedParam = C4gReservationParamsModel::findByPk($paramId);
-                $taxOption = $includedParam->taxOptions;
-                if ($taxOption == 'tNone'){
-                    $taxIncl = '';
-                } else {
-                    $taxIncl = $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'];
-                }
-                if ($includedParam && $includedParam->caption && $includedParam->published && ($includedParam->price && $reservationSettings->showPrices)) {
-                    $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption . "<span class='price'>&nbsp;(+" . C4gReservationHandler::formatPrice($includedParam->price).")&nbsp;$taxIncl&nbsp;</span>"];
-                } else if ($includedParam && $includedParam->caption && $includedParam->published) {
-                    $includedParamsArr[] = ['id' => $paramId, 'name' => $includedParam->caption];
+                $includedParam = C4gReservationParamsModel::feParamsCaptions($paramId, $reservationSettings);
+
+                if ($includedParam !== null) {
+                    $includedParamsArr[] = $includedParam;
                 }
             }
         }
@@ -521,18 +514,10 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         if ($params) {
             foreach ($params as $paramId) {
                 if ($paramId) {
-                    $additionalParam = C4gReservationParamsModel::findByPk($paramId);
-                    $taxOption = $additionalParam->taxOptions;
-                    if ($taxOption == 'tNone'){
-                        $taxIncl = '';
-                    } else {
-                        $taxIncl = $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'];
-                    }
+                    $additionalParam = C4gReservationParamsModel::feParamsCaptions($paramId, $reservationSettings);
 
-                    if ($additionalParam && $additionalParam->caption && $additionalParam->published && ($additionalParam->price && $reservationSettings->showPrices)) {
-                        $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption . "<span class='price'>&nbsp;(+" . C4gReservationHandler::formatPrice($additionalParam->price).")&nbsp;$taxIncl&nbsp;</span>"];
-                    } else if ($additionalParam && $additionalParam->caption && $additionalParam->published) {
-                        $additionalParamsArr[] = ['id' => $paramId, 'name' => $additionalParam->caption];
+                    if ($additionalParam !== null) {
+                        $additionalParamsArr[] = $additionalParam;
                     }
                 }
             }

@@ -13,6 +13,8 @@
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['price'] = array("Preis", "Bestimmen sie den Preis (bspw.: 50.00)");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['taxOptions'] = array("Steuersatz", "Wählen Sie eine Steueroption für alle Preise.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['caption'] = array("Beschriftung", "Beschriftung der Leistung");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['feCaption'] = array("Frontend Beschriftung", "Wird alternativ im Frontend dargestellt.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['option'] = array("Name", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['language'] = array("Sprache", "");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_params']['published'] = array("Veröffentlichen.","Soll dieses Objekt im Frontend angezeigt werden?");
 

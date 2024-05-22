@@ -12,6 +12,8 @@ namespace con4gis\ReservationBundle\Classes\Models;
 
 
 use Contao\Model;
+use Contao\StringUtil;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 
 /**
  * Class C4geservationParamsModel
@@ -25,5 +27,59 @@ class C4gReservationParamsModel extends Model
      * @var string
      */
     protected static $strTable = 'tl_c4g_reservation_params';
+
+    /**
+     * @param string $paramId
+     * @param object $reservationSettings
+     * @return array|string[]|null
+     */
+    public static function feParamsCaptions(string $paramId, object $reservationSettings): ?array
+    {
+        $param = C4gReservationParamsModel::findByPk($paramId);
+        $published = $param->published;
+        $price = $param->price;
+
+        //Tax rate
+        $taxOption = $param->taxOptions;
+        if ($taxOption == 'tNone'){
+            $taxIncl = '';
+        } else {
+            $taxIncl = $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'];
+        }
+
+        if (!$param) {
+            return null;
+        }
+
+        $feCaptions = StringUtil::deserialize($param->feCaption);
+        $caption = '';
+
+        //Caotion language
+        //Use str_contains for newer versions. strpos still in use for older versions
+        if ($feCaptions) {
+            foreach ($feCaptions as $feCaption) {
+                if (strpos($GLOBALS['TL_LANGUAGE'], $feCaption['language']) !== false && $feCaption['caption']) {
+                    $caption = $feCaption['caption'];
+                    break;
+                }
+            }
+        }
+
+        if (empty($caption)) {
+            $caption = $param->caption ?: '';
+        }
+
+        //Setting FE caption string up
+        if ($published) {
+            if ($param && $caption && $published && ($price && $reservationSettings->showPrices)) {
+                return ['id' => $paramId, 'name' => $caption . "<span class='price'>&nbsp;(+" . C4gReservationHandler::formatPrice($price).")&nbsp;$taxIncl&nbsp;</span>"];
+            } else if ($param && $caption && $published) {
+                return ['id' => $paramId, 'name' => $caption];
+            }
+        }
+
+        return null;
+    }
+
 
 }

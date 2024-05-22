@@ -1240,17 +1240,10 @@ class C4gReservationController extends C4GBaseController
                         if ($params) {
                             foreach ($params as $paramId) {
                                 if ($paramId) {
-                                    $participantParam = C4gReservationParamsModel::findByPk($paramId);
-                                    if ($participantParam && $participantParam->caption && $participantParam->published && ($participantParam->price && $this->reservationSettings->showPrices)) {
-                                        $taxOption = $participantParam->taxOptions;
-                                        if ($taxOption == 'tNone'){
-                                            $taxIncl = '';
-                                        } else {
-                                            $taxIncl = $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'];
-                                        }
-                                        $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption . "<span class='price'>&nbsp;(+" . C4gReservationHandler::formatPrice($participantParam->price).")&nbsp;$taxIncl&nbsp;</span>"];
-                                    } else if ($participantParam && $participantParam->caption && $participantParam->published) {
-                                        $participantParamsArr[] = ['id' => $paramId, 'name' => $participantParam->caption];
+                                    $participantParam = C4gReservationParamsModel::feParamsCaptions($paramId, $reservationSettings);
+
+                                    if ($participantParam !== null) {
+                                        $participantParamsArr[] = $participantParam;
                                     }
                                 }
                             }
