@@ -530,6 +530,7 @@ class C4gReservationController extends C4GBaseController
 
                 //TODO add amount of capacity left in the form
                 $error = 0;
+                if($maxCapacity <= 0) $error = 1;
                 if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity) || $isPartiPerEvent) {
                     if ($eventObj && $listType['maxParticipantsPerBooking'] && $listType['maxParticipantsPerBooking'] <= $maxCapacity && !$isPartiPerEvent) {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
@@ -545,6 +546,16 @@ class C4gReservationController extends C4GBaseController
                     } elseif (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity) || ($maxCapacity < 0)) {
                        $error = 1;
                     } else {
+                    elseif (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
+                        $isPartiPerEvent = $maxCapacity;
+                       # $maxParticipants = $maxCapacity;
+                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
+                        $reservationDesiredCapacity->setMax($maxCapacity);
+                        $reservationDesiredCapacity->setMin($minCapacity);
+                    }else if($maxCapacity <= 0){
+                        $error = 1;
+                    }
+                    else {
                         if ($isPartiPerEvent) {
                             $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
                             $reservationDesiredCapacity->setMax($listType['maxParticipantsPerBooking']);
@@ -1853,6 +1864,11 @@ class C4gReservationController extends C4GBaseController
             }
 
             $reservationCount = $reservations && is_countable($reservations) ? count($reservations) : 0; //ToDo check
+            $reservationCount = 0;
+            if ($reservations && is_countable($reservations))
+            foreach ($reservations as $reservation) {
+                $reservationCount = $reservationCount + intval($reservation->desiredCapacity);
+            }
 
             $reservationEventObjects = C4gReservationEventModel::findBy('pid', $objectId);
 

@@ -1334,6 +1334,15 @@ class C4gReservationHandler
                             if (strpos($value, '#') !== false) {
                                 $newValue = substr($value, 0, strpos($value, '#')); //remove frontend duration
                             }
+                            else{
+                               $begindate_timestamp = strtotime($beginDate); 
+                               if(date('I')){
+                                $beginTime = $value - $begindate_timestamp-3600; 
+                               }else{
+                                $beginTime = $value - $begindate_timestamp; 
+                               } 
+                               break;
+                            }
 
                             $beginTime = $newValue ?: $value;
                             break;
@@ -1357,10 +1366,33 @@ class C4gReservationHandler
             }
             $beginDateAsTstamp = strtotime($beginDate);
             $reservationId = $putVars['reservation_id'];
+            $reservationObjectType_ID = intval($putVars['reservationObjectType']); # Neue Variable
             $database = Database::getInstance();
             $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType` IN (1,3) AND `beginDate`=? AND `beginTime`=? AND NOT `cancellation`=?")
                 ->execute($typeId,$objectId,$beginDateAsTstamp,$beginTime,'1')->fetchAllAssoc();
 
+            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND `beginDate`=? AND `beginTime`=? AND NOT `cancellation`=?")
+            ->execute($typeId,$objectId,$reservationObjectType_ID,$beginDateAsTstamp,$beginTime,'1')->fetchAllAssoc();
+            
+            $chosen_capacity = intval($putVars['desiredCapacity_10']);
+            if($chosen_capacity){
+                $current_reservation = 0;
+                if ($reservations && is_countable($reservations)){
+                    foreach ($reservations as $reservation) {
+                        $current_reservation = $current_reservation + intval($reservation['desiredCapacity']);
+                    }
+                }
+
+                if($current_reservation >= $reservationObject->desiredCapacityMax){
+                    return true;
+                }else{
+                $current_capacity = $reservationObject->desiredCapacityMax - $current_reservation;
+                if($chosen_capacity > $current_capacity){
+                    return true;
+                }
+            }
+            }
+            
             $reservationCount = count($reservations);
 
             if ($reservationType->severalBookings) {
@@ -1377,9 +1409,14 @@ class C4gReservationHandler
                 }
             } else {
                 $maxCount = $reservationType->objectCount && ($reservationType->objectCount < $reservationObject->quantity) ? $reservationType->objectCount : $reservationObject->quantity;
+                
+               if($reservationObject->desiredCapacityMax){
                 if ($maxCount && ($reservationObject->desiredCapacityMax && ($reservationCount >= $maxCount))) {
                     return true;
                 }
+               }elseif($maxCount && ($reservationCount>=$maxCount)){
+                    return true;
+               }
             }
         }
         return $result;
@@ -1682,7 +1719,7 @@ class C4gReservationHandler
                 $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']).$priceArray['priceInfo'];
 
                 $frontendObject->setCaption($price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
-                $frontendObject->setDesiredCapacity([$event['minParticipants'] ?:  $calendarObject['reservationMinParticipants'], $maxParticipants]);
+                $frontendObject->setDesiredCapacity([$event['minParticipants'] ?:  $calendarObject['reservationMinParticipants'], $event['maxParticipants'] ?: $maxParticipants]);
                 $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                 $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                 $frontendObject->setEndDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['endDate'],$eventObject['endTime']));
