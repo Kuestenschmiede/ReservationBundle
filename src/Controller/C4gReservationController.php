@@ -506,7 +506,7 @@ class C4gReservationController extends C4GBaseController
             $maxCapacity = $eventObj->maxParticipants ?: 0;
             if (isset($eventObj->minParticipants)) {
                 $minCapacity = $eventObj->minParticipants;
-            } elseif (isset($listType['minParticipantsPerBooking'])) {
+            } else if (isset($listType['minParticipantsPerBooking'])) {
                 $minCapacity = $listType['minParticipantsPerBooking'];
             } else {
                 $minCapacity = 1;
@@ -535,7 +535,7 @@ class C4gReservationController extends C4GBaseController
                     if ($eventObj && $listType['maxParticipantsPerBooking'] && $listType['maxParticipantsPerBooking'] <= $maxCapacity && !$isPartiPerEvent) {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
                         $reservationDesiredCapacity->setMax($listType['maxParticipantsPerBooking']);
-                    } elseif ($eventObj->maxParticipants == 0 || empty($maxCapacity) || $isPartiPerEvent <= $maxCapacity) {
+                    } else if ($eventObj->maxParticipants == 0 || empty($maxCapacity) || $isPartiPerEvent <= $maxCapacity) {
                         if ($isPartiPerEvent <= $maxCapacity) {
                             $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$isPartiPerEvent.')');
                             $reservationDesiredCapacity->setMax($maxCapacity);
@@ -543,12 +543,10 @@ class C4gReservationController extends C4GBaseController
                             $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
                         }
                         $reservationDesiredCapacity->setMax($isPartiPerEvent);
-                    } elseif (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity) || ($maxCapacity < 0)) {
+                    } else if (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity) || ($maxCapacity < 0)) {
                        $error = 1;
-                    } else {
-                    elseif (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
+                    }else if (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
                         $isPartiPerEvent = $maxCapacity;
-                       # $maxParticipants = $maxCapacity;
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
                         $reservationDesiredCapacity->setMax($maxCapacity);
                         $reservationDesiredCapacity->setMin($minCapacity);
@@ -1234,7 +1232,7 @@ class C4gReservationController extends C4GBaseController
                     //Max participant per booking
                     if ($eventObj->maxParticipantsPerEventBooking) {
                         $maxParticipants = $eventObj->maxParticipantsPerEventBooking;
-                    } elseif ($type['maxParticipantsPerBooking']){
+                    } else if ($type['maxParticipantsPerBooking']){
                         $maxParticipants = $type['maxParticipantsPerBooking'];;
                     }
 
@@ -2076,7 +2074,7 @@ class C4gReservationController extends C4GBaseController
                     $putVars['beginTime_'.$type.'-33'.$objectId] = $beginTime;
                     $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
                     $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
-                } elseif ($putVars['reservationObjectType'] == '2') {
+                } else if ($putVars['reservationObjectType'] == '2') {
                     $putVars['beginDate_'.$type] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
                     $putVars['beginTime'.$type] = $beginTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime) : $beginTime;
                     $putVars['endDate_'.$type] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check

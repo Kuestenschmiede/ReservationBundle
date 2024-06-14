@@ -1230,7 +1230,7 @@ class C4gReservationHandler
                             }
                         }
                     }
-                } elseif ($typeOfObject == 'fixed_date') {
+                } else if ($typeOfObject == 'fixed_date') {
                     $beginDate = $object->getBeginDate();
                     $beginTime = $object->getBeginTime();
                     $endTime = $object->getEndTime();
@@ -1333,14 +1333,13 @@ class C4gReservationHandler
                         if ($value) {
                             if (strpos($value, '#') !== false) {
                                 $newValue = substr($value, 0, strpos($value, '#')); //remove frontend duration
-                            }
-                            else{
+                            } else {
                                $begindate_timestamp = strtotime($beginDate); 
                                if(date('I')){
-                                $beginTime = $value - $begindate_timestamp-3600; 
-                               }else{
-                                $beginTime = $value - $begindate_timestamp; 
-                               } 
+                                    $beginTime = $value - $begindate_timestamp-3600; 
+                               } else {
+                                    $beginTime = $value - $begindate_timestamp; 
+                                }     
                                break;
                             }
 
@@ -1375,7 +1374,7 @@ class C4gReservationHandler
             ->execute($typeId,$objectId,$reservationObjectType_ID,$beginDateAsTstamp,$beginTime,'1')->fetchAllAssoc();
             
             $chosen_capacity = intval($putVars['desiredCapacity_10']);
-            if($chosen_capacity){
+            if ($chosen_capacity){
                 $current_reservation = 0;
                 if ($reservations && is_countable($reservations)){
                     foreach ($reservations as $reservation) {
@@ -1383,14 +1382,14 @@ class C4gReservationHandler
                     }
                 }
 
-                if($current_reservation >= $reservationObject->desiredCapacityMax){
+                if ($current_reservation >= $reservationObject->desiredCapacityMax){
                     return true;
-                }else{
-                $current_capacity = $reservationObject->desiredCapacityMax - $current_reservation;
-                if($chosen_capacity > $current_capacity){
-                    return true;
-                }
-            }
+                } else {
+                    $current_capacity = $reservationObject->desiredCapacityMax - $current_reservation;
+                    if ($chosen_capacity > $current_capacity){
+                        return true;
+                    }
+                }   
             }
             
             $reservationCount = count($reservations);
@@ -1414,7 +1413,7 @@ class C4gReservationHandler
                 if ($maxCount && ($reservationObject->desiredCapacityMax && ($reservationCount >= $maxCount))) {
                     return true;
                 }
-               }elseif($maxCount && ($reservationCount>=$maxCount)){
+               }else if($maxCount && ($reservationCount>=$maxCount)){
                     return true;
                }
             }
