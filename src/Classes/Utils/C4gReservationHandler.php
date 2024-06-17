@@ -1266,7 +1266,7 @@ class C4gReservationHandler
         $reasonLog = '';
         if (date('I')) {
             $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+3600;
-            $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']+3600;
+            $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']; +3600;
         } else {
             $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time;
             $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff'];
@@ -1365,15 +1365,13 @@ class C4gReservationHandler
             }
             $beginDateAsTstamp = strtotime($beginDate);
             $reservationId = $putVars['reservation_id'];
-            $reservationObjectType_ID = intval($putVars['reservationObjectType']); # Neue Variable
+            $reservationObjectType_ID = intval($putVars['reservationObjectType']); 
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType` IN (1,3) AND `beginDate`=? AND `beginTime`=? AND NOT `cancellation`=?")
-                ->execute($typeId,$objectId,$beginDateAsTstamp,$beginTime,'1')->fetchAllAssoc();
 
             $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND `beginDate`=? AND `beginTime`=? AND NOT `cancellation`=?")
             ->execute($typeId,$objectId,$reservationObjectType_ID,$beginDateAsTstamp,$beginTime,'1')->fetchAllAssoc();
             
-            $chosen_capacity = intval($putVars['desiredCapacity_10']);
+            $chosen_capacity = intval($putVars['desiredCapacity_'.$typeId]);
             if ($chosen_capacity){
                 $current_reservation = 0;
                 if ($reservations && is_countable($reservations)){
