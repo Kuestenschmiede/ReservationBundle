@@ -35,6 +35,7 @@ class C4gReservationHandler
      * @param $date
      * @return string|null
      */
+
     private static function addComma($date)
     {
         if ($date != '') {
@@ -376,7 +377,6 @@ class C4gReservationHandler
         $format = $GLOBALS['TL_CONFIG']['timeFormat'];
         //$begin = date('I', $list['tsdate']) ? date($format, $time+3600).$clock : date($format, $time).$clock; 
         $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
-
         $mergedTime = false;
         if ($obj['mergedTime'] && $obj['mergedEndTime']) {
             $clockEx = $withoutTime ? '' : $clock;
@@ -389,7 +389,7 @@ class C4gReservationHandler
                 $actDurationStamp = $list['actDuration'] == '-1' ? ($list['actDuration']  * $interval) * -1 : $list['actDuration'] * 86400;
                 $end = date($format, $list['tsdate'] + $departureTimeEndStamp + $actDurationStamp).$clockEx;
             }else{
-                $end = date('I', $obj['mergedEndTime']) ? date($format, $obj['mergedEndTime']-3600).$clockEx : date($format, $obj['mergedEndTime']).$clockEx ;
+                $end = date('I', $obj['mergedEndTime']) ? date($format, $obj['mergedEndTime']/* -3600 */).$clockEx : date($format, $obj['mergedEndTime']).$clockEx ;
 //                $end = date($format, $obj['mergedEndTime']).$clockEx; //Todo
             }
 
@@ -400,14 +400,14 @@ class C4gReservationHandler
         if ($nxtDay) {
             $beginStamp+=86400;
         }
-
+    
         if ($obj && ($obj['id'] == -1)) {
             if ($withEndTimes && $interval) {
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
                     date_default_timezone_set('Europe/Berlin');
-                    $summertime = date('I',$obj['mergedEndTime']) ? 3600 : 0;
-                    $end = date($format, $time + $interval+$summertime).$clock;
+                    $summertime = C4gReservationDateChecker::getTimeDiff($time);
+                    $end = date($format, $time + $interval + $summertime-3600).$clock;
 //                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
 //                    $end = date('I', $list['tsdate']) ? date($format, $time+$interval+3600).$clock : date($format, $time+$interval).$clock;
                 }
@@ -427,8 +427,8 @@ class C4gReservationHandler
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
                     date_default_timezone_set('Europe/Berlin');
-                    $summertime = date('I',$obj['mergedEndTime']) ? 3600 : 0;
-                    $end = date($format, $time + $interval+$summertime).$clock;
+                    $summertime = C4gReservationDateChecker::getTimeDiff($time);
+                    $end = date($format, $time + $interval+$summertime-3600).$clock;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
@@ -807,7 +807,7 @@ class C4gReservationHandler
 
                     $timeParams['result'] = self::getTimeResult($realTime, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj, $nxtDay);
                 }
-
+                
                 $time = $time + $timeObjectParams['defaultInterval'];
             }
         }
@@ -818,7 +818,6 @@ class C4gReservationHandler
     private static function getReservationTimesMultipleDays($timeParams, $timeObjectParams, $period) {
         $time_begin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
         $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
-
         //ToDo check arrival and departure times
         $durationInterval = $timeObjectParams['interval']+$timeObjectParams['durationDiff'];
         if ($time_end >= $time_begin) {
@@ -1045,13 +1044,9 @@ class C4gReservationHandler
                     $timestamp = $object->getDateTimeBegin();
 
                     $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
-                    $summerDiff = C4gReservationDateChecker::getCESDiffToLocale($timestamp);
-
-                    $beginTime = $timestamp - $beginDate;
-                    if ($summerDiff) {
-                        $beginTime -= $summerDiff;
-                    }
-
+                    $summerDiff = C4gReservationDateChecker::getTimeDiff($timestamp);
+                    $beginTime = $timestamp - $beginDate - $summerDiff;
+                    
                     $duration = $object->getTypeOfObjectDuration();
 
                     $object->setBeginDate($beginDate);
@@ -1077,8 +1072,10 @@ class C4gReservationHandler
                     $EndTime = $beginTime + $periodType;
                     $EndDate = $beginDate + $EndTime;
 
-                    $object->setEndTime($EndTime);
-                    $object->setEndDate($EndDate);
+                    $endTime = $beginTime + $periodType;
+                    $endDate = $beginDate + $endTime;
+                    $object->setEndTime($endTime);
+                    $object->setEndDate($endDate);
                 }
             }
 
@@ -1272,7 +1269,7 @@ class C4gReservationHandler
             $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff'];
         }
 
-//        $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+3600;
+        $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+3600;
 //        $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']+3600; // +1 ToDo Check Why?
         foreach ($timeObjectParams['exclusionPeriods'] as $excludePeriod) {
             if (C4gReservationDateChecker::isStampInPeriod($beginStamp,$excludePeriod['begin'],$excludePeriod['end'],0) ||
@@ -1336,7 +1333,7 @@ class C4gReservationHandler
                             } else {
                                $begindate_timestamp = strtotime($beginDate); 
                                if(date('I')){
-                                    $beginTime = $value - $begindate_timestamp-3600; 
+                                    $beginTime = $value - $begindate_timestamp - 3600; 
                                } else {
                                     $beginTime = $value - $begindate_timestamp; 
                                 }     
@@ -1371,20 +1368,15 @@ class C4gReservationHandler
             $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND `beginDate`=? AND `beginTime`=? AND NOT `cancellation`=?")
             ->execute($typeId,$objectId,$reservationObjectType_ID,$beginDateAsTstamp,$beginTime,'1')->fetchAllAssoc();
             
-            $chosen_capacity = intval($putVars['desiredCapacity_'.$typeId]);
-            if ($chosen_capacity){
-                $current_reservation = 0;
-                if ($reservations && is_countable($reservations)){
-                    foreach ($reservations as $reservation) {
-                        $current_reservation = $current_reservation + intval($reservation['desiredCapacity']);
-                    }
-                }
+            $chosenCapacity = intval($putVars['desiredCapacity_'.$typeId]);
+            if ($chosenCapacity) {
+                $currentReservation = self::countReservations($reservations);
 
-                if ($current_reservation >= $reservationObject->desiredCapacityMax){
+                if ($currentReservation >= $reservationObject->desiredCapacityMax) {
                     return true;
                 } else {
-                    $current_capacity = $reservationObject->desiredCapacityMax - $current_reservation;
-                    if ($chosen_capacity > $current_capacity){
+                    $currentCapacity = $reservationObject->desiredCapacityMax - $currentReservation;
+                    if ($chosenCapacity > $currentCapacity) {
                         return true;
                     }
                 }   
@@ -1433,8 +1425,7 @@ class C4gReservationHandler
                 ->execute($id,'2','1')->fetchAllAssoc();
 
             $percent = $object->getAlmostFullyBookedAt();
-            $reservationCount = count($reservations);
-
+            $reservationCount = self::countReservations($reservations);
             $desiredCapacity = $object->getDesiredCapacity()[1];
 
             if ((($reservationCount / $desiredCapacity) * 100) >= 100) {
@@ -1458,7 +1449,6 @@ class C4gReservationHandler
         $database = Database::getInstance();
         $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
             ->execute($id,'2','1')->fetchAllAssoc();
-
         $actPersons = 0;
         $actPercent = 0;
         $desiredCapacity = $object->getDesiredCapacity()[1] ? $object->getDesiredCapacity()[1] : 1;
@@ -1477,7 +1467,6 @@ class C4gReservationHandler
         } else {
             $actPercent = 0;
         }
-
         $timeObj = ['id'=>$id,'act'=>$actPersons,'percent'=>$actPercent,'max'=>$capacity,'showSeats'=>$showFreeSeats];
 
         $endTime = 0;
@@ -2047,5 +2036,15 @@ class C4gReservationHandler
         }
 
         return $objectList;
+    }
+
+    private static function countReservations($reservations) {
+        $currentReservation = 0;
+        if ($reservations && is_countable($reservations)){
+            foreach ($reservations as $reservation) {
+                $currentReservation = $currentReservation + intval($reservation['desiredCapacity']);
+            }
+        }
+        return $currentReservation;
     }
 }

@@ -530,7 +530,9 @@ class C4gReservationController extends C4GBaseController
 
                 //TODO add amount of capacity left in the form
                 $error = 0;
-                if($maxCapacity <= 0) $error = 1;
+                if($maxCapacity <= 0) {
+                    $error = 1;
+                }
                 if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity) || $isPartiPerEvent) {
                     if ($eventObj && $listType['maxParticipantsPerBooking'] && $listType['maxParticipantsPerBooking'] <= $maxCapacity && !$isPartiPerEvent) {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
@@ -543,9 +545,7 @@ class C4gReservationController extends C4GBaseController
                             $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
                         }
                         $reservationDesiredCapacity->setMax($isPartiPerEvent);
-                    } else if (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity) || ($maxCapacity < 0)) {
-                       $error = 1;
-                    }else if (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
+                     } else if (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
                         $isPartiPerEvent = $maxCapacity;
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
                         $reservationDesiredCapacity->setMax($maxCapacity);
@@ -2053,14 +2053,10 @@ class C4gReservationController extends C4GBaseController
                 $timestamp = $reservationObject->dateTimeBegin;
 //                $object['typeOfObject'] = $reservationObject->getTypeOfObject();
                 $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
-                $summerDiff = C4gReservationDateChecker::getCESDiffToLocale($timestamp);
+                $summerDiff = C4gReservationDateChecker::getTimeDiff($timestamp);
                 $duration = $reservationObject->typeOfObjectDuration * $interval;
-
-                $beginTime = $timestamp - $beginDate;
-                if ($summerDiff == 7200) {
-                    $beginTime -= 3600;
-                }
-
+                
+                $beginTime = $timestamp - $beginDate - $summerDiff;
                 $endTime = $beginTime + $duration;
                 $endDate = $beginDate + $endTime;
 
@@ -2124,14 +2120,10 @@ class C4gReservationController extends C4GBaseController
             if ($typeOfObject == 'fixed_date') {
                 $timestamp = $reservationObject->dateTimeBegin;
                 $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
-                $summerDiff = C4gReservationDateChecker::getCESDiffToLocale($timestamp);
+                $summerDiff = C4gReservationDateChecker::getTimeDiff($timestamp);
                 $duration = $reservationObject->typeOfObjectDuration * $interval;
-
-                $beginTime = $timestamp - $beginDate;
-                if ($summerDiff == 7200) {
-                    $beginTime -= 3600;
-                }
-
+                
+                $beginTime = $timestamp - $beginDate - $summerDiff;
                 $endTime = $beginTime + $duration;
                 $endDate = $beginDate + $endTime;
 

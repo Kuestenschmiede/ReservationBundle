@@ -91,6 +91,7 @@ class C4gReservationDateChecker
     public static function getBeginOfDate($time, $timeZone = false)
     {
         if ($time) {
+            $testingZone = $GLOBALS['TL_CONFIG'];
             $timeZone = $timeZone ?: $GLOBALS['TL_CONFIG']['timeZone'];
             $beginOfDay = strtotime("today ".$timeZone, $time);
             return $beginOfDay;
@@ -113,7 +114,7 @@ class C4gReservationDateChecker
         if ($time) {
             $timeZone = $timeZone ?: $GLOBALS['TL_CONFIG']['timeZone'];
             $beginOfDay = strtotime("today ".$timeZone, $time);
-            $endOfDay   = strtotime("tomorrow ".$timeZone, $beginOfDay) - 1;
+            $endOfDay   = strtotime("tomorrow ".$timeZone, $beginOfDay) - 1; #Problem?
             return $endOfDay;
         }
 
@@ -282,5 +283,48 @@ class C4gReservationDateChecker
 
     public static function isStampInPeriod($stamp, $begin, $end, $reverse = 0) {
         return $reverse ? (($stamp > $begin) && ($stamp <= $end)) : (($stamp >= $begin) && ($stamp < $end));
+    }
+
+    public static function getTimeDiff($stamp) {
+        $timezoneCheckBegin = self::getCESDiffToLocale($stamp);
+        $summerDiff = $timezoneCheckBegin;
+        for ($i = 1; $i <= 365; $i++) {
+            $timezoneCheck = self::getCESDiffToLocale($stamp);
+            $stamp += 86400;
+            if ($timezoneCheck < $timezoneCheckBegin) {
+                $summer = true;
+                $winter = false;
+                $nosummertime = false;
+                break;
+            } else if ($timezoneCheck > $timezoneCheckBegin) {
+                $summer = false;
+                $winter= true;
+                $nosummertime = false;
+                break;
+            } else {
+                $summer = false;
+                $winter = false;
+                $nosummertime = true;
+            }
+        }
+        
+        $timeDiff = 0;
+        if ($summer) {
+            if ($summerDiff == 3600) {
+                $timeDiff = $summerDiff;                         
+            } else {
+                $timeDiff = ($summerDiff-3600);
+            }                        
+        } else if ($winter) {
+            if ($summerDiff == 0) {
+                $timeDiff = 3600;                            
+            } else {
+                $timeDiff = $summerDiff;
+            }
+        } else if ($nosummertime) {
+            $timeDiff = $summerDiff;
+        } 
+        
+        return $timeDiff;
     }
 }
