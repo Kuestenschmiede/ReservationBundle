@@ -2335,8 +2335,8 @@ class C4gReservationController extends C4GBaseController
         if ($reservationType && $reservationType->severalBookings) {
             $factor = $reservationType->objectCount && ($reservationType->objectCount < $reservationObject->quantity) ? $reservationType->objectCount : $reservationObject->quantity;
         }
-
-        $desiredCapacity =  $reservationObject && $reservationObject->maxParticipants ? ($reservationObject->maxParticipants * $factor) : 0;
+   
+        $desiredCapacity =  $reservationObject && $reservationObject->desiredCapacityMax ? ($reservationObject->desiredCapacityMax * $factor) : 0;
 
         $participants = '';
         if ($participantsArr && count($participantsArr) > 0) {
@@ -2373,7 +2373,7 @@ class C4gReservationController extends C4GBaseController
             }
 
             $possible = $desiredCapacity - $reservationCount;
-            $maxParticipantsPerBooking = $reservationEventObject->maxParticipantsPerEventBooking ?:$reservationType->maxParticipants;
+            $maxParticipantsPerBooking = $reservationEventObject->maxParticipantsPerEventBooking ?:$reservationType->maxParticipantsPerBooking;
             $isPartiPerEvent = $reservationEventObject->maxParticipantsPerEventBooking;
 //            if ($isPartiPerEvent){
 //                $possible = $isPartiPerEvent;
