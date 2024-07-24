@@ -75,6 +75,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     'name' => $reservationObject->getCaption(),
                     'min' => $reservationObject->getDesiredCapacity()[0] ?: 1,
                     'max' => $reservationObject->getDesiredCapacity()[1] ?: 0,
+                    'currentReservations' => $reservationObject->getCurrentReservations(),
                     'allmostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
                     'openingHours' => $reservationObject->getOpeningHours()
                 );
@@ -92,7 +93,10 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $initialIndex = $index;
             }
 
-            $index++;
+            
+
+       
+        $index++;
         }
 
         $reservationObjectField = new C4GSelectField();
@@ -121,14 +125,96 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $reservationObjectField->setHidden($reservationSettings->objectHide);
         $this->fieldList[] = $reservationObjectField;
 
+        
+        $arrayCounter = 0;
         foreach ($reservationObjects as $reservationObject) {
             $typeOfObject = $reservationObject->getTypeOfObject();
             $object_condition = [
                 new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
                 $condition
-            ];
+            ]; 
+
+            if ($typeOfObject == 'fixed_date') {
+                $showMinMax = $reservationSettings->showMinMaxWithCapacity ? "1" : "0";
+                $currentReservations = $reservationObject->getCurrentReservations();
+                $severalBookings = $reservationObject->getSeveralBookings();
+                $maxParticiPantsPerBooking = $listType['maxParticipantsPerBooking']; 
+                $objectMaxCapacity = $objects[$arrayCounter]['max'];  
+                $minCapacity = $objects[$arrayCounter]['min'];
+                
+                $freeObjects = 1;
+                if ($objectMaxCapacity) {
+                    $freeObjects = $objectMaxCapacity - $currentReservations;
+                    if ($maxParticiPantsPerBooking > $freeObjects) {
+                        $maxParticiPantsPerBooking = $freeObjects;
+                    }
+                }
+    
+                if ((!$severalBookings && !$currentReservations) || $severalBookings) {
+                    if ($objectMaxCapacity) {
+                        $maxCapacity = $objectMaxCapacity - $currentReservations;
+                    } else {
+                        $maxCapacity = $maxParticiPantsPerBooking;
+                    }
+                     if ($maxParticiPantsPerBooking && $maxCapacity > $maxParticiPantsPerBooking) {
+                        $maxCapacity = $maxParticiPantsPerBooking;
+                    } 
+                    
+                    if ($minCapacity > $maxCapacity) {
+                        $minCapacity = $maxCapacity;
+                    }
+                   
+                } else {
+                    $minCapacity = 0;
+                    $maxCapacity = 0;
+                }
+                
+                $arrayCounter++;
+            
+
+                if ($reservationSettings->withCapacity) { // && !$onlyParticipant
+                    $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
+                    $reservationDesiredCapacity = new C4GNumberField();
+                    $reservationDesiredCapacity->setFieldName('desiredCapacity');
+                    $reservationDesiredCapacity->setFormField(true);
+                    $reservationDesiredCapacity->setCondition($object_condition);
+                    $reservationDesiredCapacity->setInitialValue($minCapacity);
+                    $reservationDesiredCapacity->setMandatory(true);
+                    $reservationDesiredCapacity->setEditable($maxCapacity > 0);
+                    if ($objectMaxCapacity) {
+                        if ($maxCapacity > 0) {
+                            $reservationDesiredCapacity->setTitle(C4gReservationController::withDesiredCapacityTitle($minCapacity,$maxCapacity,$showMinMax)); 
+                        } else {
+                            $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked']);
+                        } 
+                        $reservationDesiredCapacity->setMax($maxCapacity);
+                        $reservationDesiredCapacity->setMin($minCapacity);
+                        
+                    } else if ($objectMaxCapacity <= 0) {
+                        if ($maxParticiPantsPerBooking > 0) {
+                            $reservationDesiredCapacity->setTitle(C4gReservationController::withDesiredCapacityTitle($minCapacity,$maxCapacity,$showMinMax)); 
+                            $reservationDesiredCapacity->setMax($maxCapacity);
+                            $reservationDesiredCapacity->setMin($minCapacity);  
+                        } else {
+                            $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']); 
+                        } 
+                    
+                    }                                                    
+                    $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
+                    $reservationDesiredCapacity->setCallOnChange(true);
+                    $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$listType['id'] . '-33' . $reservationObject->getId(). "," . $showDateTime . ");");
+                    $reservationDesiredCapacity->setNotificationField(true);
+                    $reservationDesiredCapacity->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
+                    $reservationDesiredCapacity->setStyleClass('desired-capacity');
+            
+                    $this->fieldList[] = $reservationDesiredCapacity; 
+                }
+            }    
+            
 
             if ($reservationSettings->showDetails) {
+
+                
                 if ($reservationObject->getDescription()) {
                     $descriptionField = new C4GTrixEditorField();
                     $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
@@ -352,12 +438,26 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate([$reservationObject]));
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString([$reservationObject]));
 
-            $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
-            if ($commaDates) {
-                $commaDates = $commaDates['dates'];
+            $periodType = $listType['periodType'];
+            if ($periodType == 'day' || $periodType  == 'overnight') {
+                $typeId = $listType['id'];
+                $objectId = $reservationObject->getId();
+                $objectQuantity = $reservationObject->getQuantity();
+                $objectType = intval($listType['objectType']);
+            
+                $bookedDays = C4gReservationHandler::getBookedDays($typeId, $objectId,$objectType,$objectQuantity);
+                if ($bookedDays) {
+                    $bookedDays = $bookedDays['dates'];
+                } 
+                $reservationBeginDateField->setExcludeDates($bookedDays);
+            } else {
+                $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
+                if ($commaDates) {
+                    $commaDates = $commaDates['dates'];
+                }
+                $reservationBeginDateField->setExcludeDates($commaDates);
             }
-
-            $reservationBeginDateField->setExcludeDates($commaDates);
+            
             $reservationBeginDateField->setFieldName('beginDate');
             $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
@@ -419,7 +519,13 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $reservationSettings->showEndTime,
                     $reservationSettings->showFreeSeats
                 );
-                $classes = 'reservation_time_button reservation_time_button_' . $listType['id'];
+                
+                if ($typeOfObject == 'fixed_date') {
+                    $classes = 'reservation_time_button reservation_time_button_' . $listType['id'] . '-33' . $reservationObject->getId() . C4gReservationHandler::getButtonStateClass($reservationObject,$listType['objectType']);
+                } else {
+                    $classes = 'reservation_time_button reservation_time_button_' . $listType['id'];
+                }
+                
             }
 
             $reservationBeginTimeField = new C4GRadioGroupField();

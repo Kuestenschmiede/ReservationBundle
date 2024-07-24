@@ -164,9 +164,29 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
 
-            $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
+           /*  $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
             if ($commaDates) {
                 $commaDates = $commaDates['dates'];
+            } */
+
+            $periodType = $listType['periodType'];
+            if ($periodType == 'day' || $periodType  == 'overnight') {
+                $typeId = $listType['id'];
+                $objectId = $reservationObject->getId();
+                $objectQuantity = $reservationObject->getQuantity();
+                $objectType = intval($listType['objectType']);
+            
+                $bookedDays = C4gReservationHandler::getBookedDays($typeId, $objectId,$objectType,$objectQuantity);
+                if ($bookedDays) {
+                    $bookedDays = $bookedDays['dates'];
+                } 
+                $reservationBeginDateField->setExcludeDates($bookedDays);
+            } else {
+                $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
+                if ($commaDates) {
+                    $commaDates = $commaDates['dates'];
+                }
+                $reservationBeginDateField->setExcludeDates($commaDates);
             }
 
             $reservationBeginDateField->setExcludeDates($commaDates);
@@ -217,6 +237,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $options = C4gReservationHandler::getReservationNowTime($objects[0], $reservationSettings->showEndTime, $reservationSettings->showFreeSeats);
             $classes = 'reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id'];
         } else {
+            /* public static function getReservationTimes($objectList, $typeId, $weekday = -1, $date = null, $actDuration=0, $actCapacity=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '', $showArrivalAndDeparture=false) */
             $options = C4gReservationHandler::getReservationTimes(
                         $reservationObjects,
                         $listType['id'],
@@ -228,7 +249,8 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                         $reservationSettings->showFreeSeats
 
         );
-            $classes = 'reservation_time_button reservation_time_button_' . $listType['id'];
+            $classes = 'reservation_time_button reservation_time_button_' . $listType['id']  ;
+            #$classes = 'reservation_time_button reservation_time_button_' . $listType['id'] . C4gReservationHandler::getButtonStateClass($reservationObject,$listType['objectType']) ;
         }
 
         $reservationBeginTimeField = new C4GRadioGroupField();

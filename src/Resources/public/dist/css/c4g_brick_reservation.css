@@ -49,10 +49,12 @@
   font-weight: 700
 }
 .reservation_time_button .radio_object_hurry_up + label,
+.reservation_time_button.radio_object_hurry_up .c4g__form-check input[type=radio] + label,
 .reservation_time_event_button.radio_object_hurry_up .c4g__form-check input[type=radio] + label {
   background-color: #ff8c00
 }
 .reservation_time_button input[type=radio][disabled] + label,
+.reservation_time_button.radio_object_fully_booked .c4g__form-check input[type=radio] + label,
 .reservation_time_event_button.radio_object_fully_booked .c4g__form-check input[type=radio] + label {
   background-color: red;
   opacity: 1;

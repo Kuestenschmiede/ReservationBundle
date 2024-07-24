@@ -46,6 +46,7 @@ $GLOBALS['TL_LANG'][$str]['showArrivalAndDeparture'] = array('Show Arrival and D
 $GLOBALS['TL_LANG'][$str]['showInlineDatepicker'] = array("Display date picker open", "The date picker is displayed as calendar open.");
 $GLOBALS['TL_LANG'][$str]['emptyOptionLabel'] = array("Text empty object list (optional)", "The text of the selectbox can optionally be overwritten.");
 $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Participant mechanism (optional)", "If this mechanism is enabled, the participant fields are generated based on the number of people.");
+$GLOBALS['TL_LANG'][$str]['showMinMaxWithCapacity'] = array("Display Minimum and Maximum","The minimum to maximum permissible entries for specifying the number of persons are displayed");
 $GLOBALS['TL_LANG'][$str]['hideParticipantsEmail'] = array("Hide Participants E-Mail", "Additional participant fields do not include the e-mail field.");
 $GLOBALS['TL_LANG'][$str]['onlyParticipants'] = array("Only take participants into account", "If this mechanism is enabled, only participants will be considered in the price calculation.");
 $GLOBALS['TL_LANG'][$str]['hideReservationKey'] = array("Hide Reservationkey", "If enabled, the reservation key will not be visible in the frontend.");

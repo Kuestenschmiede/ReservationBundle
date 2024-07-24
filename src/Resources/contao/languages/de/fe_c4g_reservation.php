@@ -146,9 +146,9 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['min_max_failed'] = 'Wir können Ihre 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['fully_booked'] = 'Eine Reservierung ist nicht mehr möglich. Der Termin ist bereits ausgebucht.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'] = 'Eine Reservierung ist nicht mehr möglich. Die Anzahl der freien Plätze wird überschritten. Mögliche Anzahl: ';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants_per_booking'] = 'Die Anzahl der Teilnehmer pro Buchung ist begrenzt. Maximale Anzahl: ';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte Seite neu laden.';
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking'] = 'Entschuldigung. Es ist ein Fehler auftreten. Die Reservierung kann nicht durchgeführt werden. Bitte die Seite neu laden und erneut versuchen.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['error'] = 'Es ist ein Fehler aufgetreten. Die Reservierung kann nicht durchgeführt werden.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id'] = 'Entschuldigung. Es ist ein Fehler aufgetreten. Die Reservierung kann nicht durchgeführt werden. Bitte Seite neu laden.';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking'] = 'Entschuldigung. Es ist ein Fehler aufgetreten. Die Reservierung kann nicht durchgeführt werden. Bitte die Seite neu laden und erneut versuchen.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['wrong_postal'] = 'Mit Ihrer Postleitzahl kann keine Reservierung durchgeführt werden.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key'] = 'Die Reservierung kann nicht durchgeführt werden. Wurde ein Zeitraum ausgewählt?';
 

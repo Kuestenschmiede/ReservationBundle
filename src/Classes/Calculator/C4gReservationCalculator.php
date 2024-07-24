@@ -59,6 +59,12 @@ class C4gReservationCalculator
                 $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
                     "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
                     ->execute($set)->fetchAllAssoc();
+                    
+                    #Änderungstest
+                    /* 
+                    $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
+                    "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) AND `reservationObjectType` = (".$objectTypeId.") AND NOT `cancellation`='1'")
+                    ->execute($set)->fetchAllAssoc(); */
             } else {
                 $set = [$beginDate, $endDate, $beginDate, $endDate, $typeId, $objectTypeId];
                 $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
@@ -213,7 +219,7 @@ class C4gReservationCalculator
         $calculatorResult->setDbBookings($this->calculateDbBookingsPerType($reservationList));
         $calculatorResult->setDbBookedObjects($this->calculateDbObjectsPerType($reservationList));
         $calculatorResult->setDbPersons($this->calculateDbPersons($reservationList, $objectId));
-        $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $capacity));
+        $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $object->getDesiredCapacity()[1], $capacity));
         $calculatorResult->setTimeArray($timeArray);
 
         $this->calculatorResult = $calculatorResult;
@@ -253,7 +259,7 @@ class C4gReservationCalculator
         if ($reservations) {
             foreach ($reservations as $reservation) {
                 if ($reservation['reservation_object']) {
-                    if ($reservation['reservation_object'] === $objectId) {
+                    if ($reservation['reservation_object'] == $objectId) {
                         $actPersons = $actPersons + intval($reservation['desiredCapacity']);
                     }
                 }

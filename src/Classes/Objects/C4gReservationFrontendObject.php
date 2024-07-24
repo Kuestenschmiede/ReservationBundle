@@ -59,6 +59,9 @@ class C4gReservationFrontendObject
     private $priceOption = 'pReservation';
     private $allTypesEvents = null;
 
+    private $currentReservations = null;
+    private $severalBookings = null;
+
     /**
      * C4gReservationFrontendObject constructor.
      */
@@ -738,4 +741,23 @@ class C4gReservationFrontendObject
         $this->maxBeginTime = $maxBeginTime;
     }
 
+    public function setCurrentReservations($currentReservations)
+    {
+        $this->currentReservations = $currentReservations;
+    }
+
+    public function getCurrentReservations()
+    {
+        return $this->currentReservations;
+    }
+
+    public function setSeveralBookings($severalBookings)
+    {
+        $this->severalBookings = $severalBookings;
+    }
+
+    public function getSeveralBookings()
+    {
+        return $this->severalBookings;
+    }
 }

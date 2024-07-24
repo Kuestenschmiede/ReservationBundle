@@ -239,7 +239,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 $reservationBeginTimeField->setTurnButton(true);
                 $reservationBeginTimeField->setShowButtons(true);
                 $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
-                $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_' . $listType['id'] . '-22' . $reservationObject->getId() . C4gReservationHandler::getButtonStateClass($reservationObject));
+                $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_' . $listType['id'] . '-22' . $reservationObject->getId() . C4gReservationHandler::getButtonStateClass($reservationObject,$listType['objectType']));
                 $this->fieldList[] = $reservationBeginTimeField;
             }
 
