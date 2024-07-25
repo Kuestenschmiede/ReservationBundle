@@ -1022,9 +1022,7 @@ class C4gReservationHandler
             switch ($periodType) {
                 case 'day':
                 case 'overnight':
-                   # $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 : 86400;
-                    $maxDuration = $minResidenceTime && ($minResidenceTime > 0) ? $minResidenceTime * 86400 : 86400;
-                   # $maxDuration = $actDuration && ($actDuration > 0) ? $actDuration * 86400 : 86400;
+                    $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 : 86400;
                     break;
                 case 'week':
                     $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 * 7 : 86400 * 7;
@@ -2220,6 +2218,7 @@ class C4gReservationHandler
         $objectId = $reservationObject->getId();
         $objectQuantity = $reservationObject->getQuantity();
         $objectType = intval($listType['objectType']);
+        $minDuration =intval($listType['min_residence_time'] ? $listType['min_residence_time'] : $reservationObject->getTimeinterval());
         $maxCapacity = $reservationObject->getDesiredCapacity()[1];
         $currentReservations = $reservationObject->getCurrentReservations();
         $severalBookings = $reservationObject->getSeveralBookings();
@@ -2232,7 +2231,7 @@ class C4gReservationHandler
         if ($currentBookedTimes) {
             $i = 0;
             foreach ($currentBookedTimes as $currentBookedTime) {
-                $bookedBegin = $currentBookedTime['beginDate'];
+                $bookedBegin = $minDuration ? $currentBookedTime['beginDate'] - (($minDuration-1) * 86400) : $currentBookedTime['beginDate'];
                 $bookedEnd = $currentBookedTime['endDate'];
                 do {
                     $bookedDates[$i] = $bookedBegin;
@@ -2251,7 +2250,7 @@ class C4gReservationHandler
                 }   
             }
 
-            if (!$severalBookings || ($severalBookings && $currentReservations >= $maxCapacity)) {
+            if (!$severalBookings || ($severalBookings && !$reservationObject->getAllTypesQuantity() && $currentReservations >= $maxCapacity)) {
                    foreach ($fullyBookedDate as $date) {
                         if ($date) {
                             $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
@@ -2259,7 +2258,6 @@ class C4gReservationHandler
                 } 
             }   
         }
-
         return $result;
     }
 }
