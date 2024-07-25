@@ -171,7 +171,6 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 
                 $arrayCounter++;
             
-
                 if ($reservationSettings->withCapacity) { // && !$onlyParticipant
                     $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
                     $reservationDesiredCapacity = new C4GNumberField();
@@ -210,8 +209,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $this->fieldList[] = $reservationDesiredCapacity; 
                 }
             }    
-            
-
+          
             if ($reservationSettings->showDetails) {
 
                 
@@ -439,13 +437,8 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString([$reservationObject]));
 
             $periodType = $listType['periodType'];
-            if ($periodType == 'day' || $periodType  == 'overnight') {
-                $typeId = $listType['id'];
-                $objectId = $reservationObject->getId();
-                $objectQuantity = $reservationObject->getQuantity();
-                $objectType = intval($listType['objectType']);
-            
-                $bookedDays = C4gReservationHandler::getBookedDays($typeId, $objectId,$objectType,$objectQuantity);
+            if ($periodType == 'day' || $periodType  == 'overnight') {            
+                $bookedDays = C4gReservationHandler::getBookedDays($listType,$reservationObject);
                 if ($bookedDays) {
                     $bookedDays = $bookedDays['dates'];
                 } 
@@ -472,7 +465,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $reservationBeginDateField->setEditable(false);
                 $reservationBeginDateField->setMandatory(false);
             } else {
-                $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
+                $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate([$reservationObject], $listType));
                 $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
                 $reservationBeginDateField->setMandatory(true);
                 $reservationBeginDateField->setEditable(true);
@@ -489,7 +482,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setRemoveWithEmptyCondition(true);
             $reservationBeginDateField->setCallOnChange(true);
             //"var actValue = document.getElementById('c4g_reservation_object_".$listType['id']."').value;setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+actValue).value,".$listType['id'].",".$showDateTime.",actValue);handleBrickConditions();"
-            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",". $reservationObject->getId().");");
+            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",". $reservationObject->getId().",true);");
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
             $reservationBeginDateField->setInitInvisible(false);

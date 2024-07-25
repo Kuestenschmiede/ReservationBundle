@@ -677,7 +677,7 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
     //return objstr;
 }
 
-function setTimeset(date, additionalId, showDateTime, objectId) {
+function setTimeset(date, additionalId, showDateTime, objectId, callReservationForm = false) {
     var elementId = 0;
     var duration = -1;
     var capacity = -1;
@@ -830,6 +830,9 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                 }
             }).finally(function() {
                 document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
+                if (callReservationForm) {
+                    setReservationForm(additionalId, showDateTime)
+                }                
             });
     }
 }

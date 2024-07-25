@@ -1022,8 +1022,8 @@ class C4gReservationHandler
             switch ($periodType) {
                 case 'day':
                 case 'overnight':
-                    $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 : 86400;
-                    $minDuration = $minResidenceTime && ($minResidenceTime > 0) ? $minResidenceTime * 86400 : 86400;
+                   # $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 : 86400;
+                    $maxDuration = $minResidenceTime && ($minResidenceTime > 0) ? $minResidenceTime * 86400 : 86400;
                    # $maxDuration = $actDuration && ($actDuration > 0) ? $actDuration * 86400 : 86400;
                     break;
                 case 'week':
@@ -1947,7 +1947,8 @@ class C4gReservationHandler
                 $frontendObject->setTaxOptions($object['taxOptions'] ?: '');
                 $frontendObject->setPriceOption($object['priceoption']);
                 $frontendObject->setTypeOfObject($object['typeOfObject']);
-                $frontendObject->setDateTimeBegin($object['dateTimeBegin'] ?: 0);
+                $beginDateTimeCheck = $object['dateTimeBegin'];
+                $frontendObject->setDateTimeBegin($object['dateTimeBegin'] ?: 0); #Ändern
                 $frontendObject->setTypeOfObjectDuration($object['typeOfObjectDuration']);
                 $frontendObject->setCurrentReservations($currentReservations);
                 $frontendObject->setSeveralBookings($severalBookings);
@@ -2201,9 +2202,6 @@ class C4gReservationHandler
                     
                     $periodCounterPosition = $beginDateAsTstamp;
                     for ($i = 0; $i < $reservationDuration; $i++) {
-                        /* if ($periodCounterPosition == $currentTimeBegin) {
-                            return true;
-                        } */
                         foreach ($fullyBookedDate as $date) {
                             if ($periodCounterPosition == $date) {
                                 return true;
@@ -2217,10 +2215,18 @@ class C4gReservationHandler
         return $result;
     }
 
-    public static function getBookedDays($typeId,$objectId,$reservationObjectType,$objectQuantity) {
+  public static function getBookedDays($listType,$reservationObject){
+        $typeId = $listType['id'];
+        $objectId = $reservationObject->getId();
+        $objectQuantity = $reservationObject->getQuantity();
+        $objectType = intval($listType['objectType']);
+        $maxCapacity = $reservationObject->getDesiredCapacity()[1];
+        $currentReservations = $reservationObject->getCurrentReservations();
+        $severalBookings = $reservationObject->getSeveralBookings();
+        
         $database = Database::getInstance();
-        $currentBookedTimes = $database->prepare("SELECT beginDate,endDate,id FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
-        ->execute($typeId,$objectId,$reservationObjectType,'1')->fetchAllAssoc(); 
+        $currentBookedTimes = $database->prepare("SELECT beginDate,endDate FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
+        ->execute($typeId,$objectId,$objectType,'1')->fetchAllAssoc(); 
         
         $result = [];
         if ($currentBookedTimes) {
@@ -2244,11 +2250,14 @@ class C4gReservationHandler
                     $i++;
                 }   
             }
-            foreach ($fullyBookedDate as $date) {
-                if ($date) {
-                    $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
-                }
-            } 
+
+            if (!$severalBookings || ($severalBookings && $currentReservations >= $maxCapacity)) {
+                   foreach ($fullyBookedDate as $date) {
+                        if ($date) {
+                            $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
+                        }
+                } 
+            }   
         }
 
         return $result;
