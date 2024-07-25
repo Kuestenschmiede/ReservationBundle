@@ -7,3 +7,4 @@
 - Nina Eilers (https://kuestenschmiede.de)
 - Nils Ulfers (https://kuestenschmiede.de)
 - Marc Zakrzewski (https://kuestenschmiede.de)
+- Stefan Schnell (https://kuestenschmiede.de)
