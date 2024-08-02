@@ -438,6 +438,8 @@ class C4gReservationHandler
             } else {
                 $key = $time.'#'.$periodFaktor;
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'periodFaktor' => 0, 'name' => $begin, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+//                $end = date('I', $list['tsdate']) ? date($format, $time+$periodFaktor+3600).$clock : date($format, $time+$periodFaktor).$clock;
+
             }
         }
 
@@ -875,6 +877,7 @@ class C4gReservationHandler
                         'id'=>-1,
                         'act'=> $calculatorResult ? $calculatorResult->getDbPersons() : 0,
                         'percent'=> $calculatorResult ? $calculatorResult->getDbPercent() : 0,
+                        //'max'=> intval($timeObjectParams['desiredCapacity']), //ToDo check max
                         'max'=> $timeObjMax,
                         'showSeats'=> $timeParams['showFreeSeats'],
                         'priority'=> intval($timeObjectParams['object']->getPriority()),
@@ -1300,8 +1303,6 @@ class C4gReservationHandler
         $periodFaktor = self::getPeriodFaktor($timeObjectParams['object']->getPeriodType());
 
         $bookedDays = self::getBookedDays($timeParams['type'],$timeObjectParams['object']);
-
-      
         $bookedDay = explode(",",$bookedDays['dates']);
         $fullDay = false;
         for ($i = 0; $i < count($bookedDay); $i++) {
@@ -1319,8 +1320,6 @@ class C4gReservationHandler
         } else {
              $severalBookingsCapacity = intval($timeObjectParams['object']->getDesiredCapacity()[1]) * $objectQuantity;
         }
-       
-
       
         if (($timeParams['date'] !== -1) && $timeParams['tsdate'] && $timeParams['nowDate'] &&
             (!$timeParams['checkToday'] || ($timeParams['nowDate'] < $timeParams['tsdate']) ||
@@ -1428,11 +1427,11 @@ class C4gReservationHandler
             } else {
                 $maxCount = $reservationType->objectCount && ($reservationType->objectCount < $reservationObject->quantity) ? $reservationType->objectCount : $reservationObject->quantity;
                 
-               if ($reservationObject->desiredCapacityMax){
+               if($reservationObject->desiredCapacityMax){
                 if ($maxCount && ($reservationObject->desiredCapacityMax && ($reservationCount >= $maxCount))) {
                     return true;
                 }
-               } else if($maxCount && ($reservationCount>=$maxCount)){
+               }else if($maxCount && ($reservationCount>=$maxCount)){
                     return true;
                }
             }
@@ -1954,7 +1953,7 @@ class C4gReservationHandler
                 $frontendObject->setPriceOption($object['priceoption']);
                 $frontendObject->setTypeOfObject($object['typeOfObject']);
                 $beginDateTimeCheck = $object['dateTimeBegin'];
-                $frontendObject->setDateTimeBegin($object['dateTimeBegin'] ?: 0);
+                $frontendObject->setDateTimeBegin($object['dateTimeBegin'] ?: 0); 
                 $frontendObject->setTypeOfObjectDuration($object['typeOfObjectDuration']);
                 $frontendObject->setCurrentReservations($currentReservations);
                 $frontendObject->setSeveralBookings($severalBookings);
@@ -2145,22 +2144,22 @@ class C4gReservationHandler
             }
             $reservationId = $putVars['reservation_id'];
             $objectType = intval($putVars['reservationObjectType']);
-            $reservationDuration = intval($putVars['duration_'.$typeId]); 
+            $reservationDuration = intval($putVars['duration_'.$typeId]);
            
             $database = Database::getInstance();
-            
             $reservationTypeVars = $database->prepare("SELECT periodType,severalBookings, objectCount, min_residence_time FROM `tl_c4g_reservation_type` WHERE `id`=?")
             ->execute($typeId)->fetchAllAssoc();
             $reservationPeriodType = $reservationTypeVars[0]['periodType'];
             $periodFaktor = self::getPeriodFaktor($reservationPeriodType);
             $severalBookings = $reservationsTypeVars[0]['severalBookings'];
             $reservationObjectCount = $reservationTypeVars[0]['objectCount'];
-            $minDuration =intval($reservationTypeVars[0]['min_residence_time'] ? $reservationTypeVars[0]['min_residence_time'] : $reservationObject->getTimeinterval());
+            $minDuration = intval($reservationTypeVars[0]['min_residence_time'] ? $reservationTypeVars[0]['min_residence_time'] : 0);
             
-            $reservationObjectVars = $database->prepare("SELECT quantity, allTypesQuantity FROM `tl_c4g_reservation_object` WHERE `id`=?")
+            $reservationObjectVars = $database->prepare("SELECT quantity, allTypesQuantity, time_interval FROM `tl_c4g_reservation_object` WHERE `id`=?")
             ->execute($objectId)->fetchAllAssoc();
             $objectQuantity = $reservationObjectVars[0]['quantity'];
             $reservationAllTypesQuantity = $reservationObjectVars[0]['allTypesQuantity'];
+            $minDuration = intval($reservationTypeVars[0]['min_residence_time'] ? $reservationTypeVars[0]['min_residence_time'] : $reservationObjectVars['time_interval'] );
 
             $currentBookedTimes = $database->prepare("SELECT beginDate, endDate FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
             ->execute($typeId,$objectId,$objectType,'1')->fetchAllAssoc();  
