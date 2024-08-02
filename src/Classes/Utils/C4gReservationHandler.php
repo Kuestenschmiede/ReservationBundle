@@ -438,8 +438,6 @@ class C4gReservationHandler
             } else {
                 $key = $time.'#'.$periodFaktor;
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'periodFaktor' => 0, 'name' => $begin, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
-//                $end = date('I', $list['tsdate']) ? date($format, $time+$periodFaktor+3600).$clock : date($format, $time+$periodFaktor).$clock;
-
             }
         }
 
@@ -877,7 +875,6 @@ class C4gReservationHandler
                         'id'=>-1,
                         'act'=> $calculatorResult ? $calculatorResult->getDbPersons() : 0,
                         'percent'=> $calculatorResult ? $calculatorResult->getDbPercent() : 0,
-                        #'max'=> intval($timeObjectParams['desiredCapacity']), //ToDo check max
                         'max'=> $timeObjMax,
                         'showSeats'=> $timeParams['showFreeSeats'],
                         'priority'=> intval($timeObjectParams['object']->getPriority()),
@@ -1037,7 +1034,6 @@ class C4gReservationHandler
 
             $beginDate = $timeParams['tsdate'];
             $endDate = $timeParams['tsdate'] + $maxDuration;
-            #$endDate = $timeParams['tsdate'];
 
             foreach ($timeParams['objectList'] as $object) {
                 $typeOfObject = $object->getTypeOfObject();
@@ -1406,7 +1402,6 @@ class C4gReservationHandler
                 }
                 $beginDateAsTstamp = $beginDate;
             }
-            $beginDateAsTstamp = strtotime($beginDate);
             $reservationId = $putVars['reservation_id'];
             $reservationObjectType_ID = intval($putVars['reservationObjectType']);
            
@@ -1416,22 +1411,6 @@ class C4gReservationHandler
             
             $capacityMax = $reservationObject->desiredCapacityMax;
             $chosenCapacity = intval($putVars['desiredCapacity_'.$typeId]);
-            
-            if ($capacityMax) {
-
-           /*  if ($capacityMax) {
-                if ($chosenCapacity) {
-                    $currentReservation = self::countReservations($reservations);                
-                    if ($currentReservation >= $reservationObject->desiredCapacityMax) {
-                        return true;
-                    } else {
-                        $currentCapacity = $reservationObject->desiredCapacityMax - $currentReservation;
-                        if ($chosenCapacity > $currentCapacity) {
-                            return true;
-                        }
-                    }   
-                }
-            } */
             
             $reservationCount = C4gReservationHandler::countReservations($reservations);
             if ($reservationType->severalBookings) {
@@ -1449,11 +1428,11 @@ class C4gReservationHandler
             } else {
                 $maxCount = $reservationType->objectCount && ($reservationType->objectCount < $reservationObject->quantity) ? $reservationType->objectCount : $reservationObject->quantity;
                 
-               if($reservationObject->desiredCapacityMax){
+               if ($reservationObject->desiredCapacityMax){
                 if ($maxCount && ($reservationObject->desiredCapacityMax && ($reservationCount >= $maxCount))) {
                     return true;
                 }
-               }else if($maxCount && ($reservationCount>=$maxCount)){
+               } else if($maxCount && ($reservationCount>=$maxCount)){
                     return true;
                }
             }
@@ -1975,7 +1954,7 @@ class C4gReservationHandler
                 $frontendObject->setPriceOption($object['priceoption']);
                 $frontendObject->setTypeOfObject($object['typeOfObject']);
                 $beginDateTimeCheck = $object['dateTimeBegin'];
-                $frontendObject->setDateTimeBegin($object['dateTimeBegin'] ?: 0); #Ändern
+                $frontendObject->setDateTimeBegin($object['dateTimeBegin'] ?: 0);
                 $frontendObject->setTypeOfObjectDuration($object['typeOfObjectDuration']);
                 $frontendObject->setCurrentReservations($currentReservations);
                 $frontendObject->setSeveralBookings($severalBookings);
