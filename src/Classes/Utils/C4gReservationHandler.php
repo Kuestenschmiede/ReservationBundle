@@ -133,23 +133,8 @@ class C4gReservationHandler
                     $possibleSeconds = intval($timeset['time_end']) - intval($timeset['time_begin']);
                 }
 
-                switch ($periodType) {
-                    case 'minute':
-                        $toSecond = 60;
-                        break;
-                    case 'hour':
-                        $toSecond = 3600;
-                        break;
-                    case 'day':
-                    case 'overnight':
-                        $toSecond = 86400;
-                        break;
-                    case 'week':
-                        $toSecond = 604800;
-                        break;
-                    default: '';
-                }
-
+                $toSecond = self::getPeriodFaktor($periodType);
+               
                 if ($possibleSeconds) {
                     $possibleBookings = $possibleBookings + (($possibleSeconds / $toSecond / $periodFaktor) * $quantity);
                 }
@@ -1019,16 +1004,8 @@ class C4gReservationHandler
             $maxDuration = 0;
             $maxResidenceTime = $timeParams['type']['max_residence_time'];
             $minResidenceTime = $timeParams['type']['min_residence_time']; 
-            switch ($periodType) {
-                case 'day':
-                case 'overnight':
-                    $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 : 86400;
-                    break;
-                case 'week':
-                    $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * 86400 * 7 : 86400 * 7;
-                    break;
-                default: '';
-            }
+            $periodFaktor = self::getPeriodFaktor($periodType);
+            $maxDuration = $maxResidenceTime && ($maxResidenceTime > 0) ? $maxResidenceTime * $periodFaktor : $periodFaktor;
 
             if ($periodType == 'overnight') {
                 $showArrivalAndDeparture = $showArrivalAndDeparture ? [] : false;
@@ -1074,20 +1051,8 @@ class C4gReservationHandler
                     $object->setDuration($duration);
                     $object->setTimeinterval($duration);
 
-
-                    switch ($periodType) {
-                        case 'minute':
-                            $periodType = 60 * $duration;
-                            break;
-                        case 'hour':
-                            $periodType = 3600 * $duration;
-                            break;
-                        case 'day':
-                        case 'overnight':
-                        case 'week':
-                            $periodType = 86400 * $duration;
-                            break;
-                    }
+                    $periodFaktor = self::getPeriodFaktor($periodType);
+                    $periodType = $periodFaktor * $duration;
 
                     $EndTime = $beginTime + $periodType;
                     $EndDate = $beginDate + $EndTime;
@@ -2145,22 +2110,16 @@ class C4gReservationHandler
             $reservationId = $putVars['reservation_id'];
             $objectType = intval($putVars['reservationObjectType']);
             $reservationDuration = intval($putVars['duration_'.$typeId]);
-           
-            $database = Database::getInstance();
-            $reservationTypeVars = $database->prepare("SELECT periodType,severalBookings, objectCount, min_residence_time FROM `tl_c4g_reservation_type` WHERE `id`=?")
-            ->execute($typeId)->fetchAllAssoc();
-            $reservationPeriodType = $reservationTypeVars[0]['periodType'];
+                     
+            $reservationPeriodType = $reservationType->periodType;
             $periodFaktor = self::getPeriodFaktor($reservationPeriodType);
-            $severalBookings = $reservationsTypeVars[0]['severalBookings'];
-            $reservationObjectCount = $reservationTypeVars[0]['objectCount'];
-            $minDuration = intval($reservationTypeVars[0]['min_residence_time'] ? $reservationTypeVars[0]['min_residence_time'] : 0);
-            
-            $reservationObjectVars = $database->prepare("SELECT quantity, allTypesQuantity, time_interval FROM `tl_c4g_reservation_object` WHERE `id`=?")
-            ->execute($objectId)->fetchAllAssoc();
-            $objectQuantity = $reservationObjectVars[0]['quantity'];
-            $reservationAllTypesQuantity = $reservationObjectVars[0]['allTypesQuantity'];
-            $minDuration = intval($reservationTypeVars[0]['min_residence_time'] ? $reservationTypeVars[0]['min_residence_time'] : $reservationObjectVars['time_interval'] );
+            $severalBookings = $reservationType->severalBookings;
+            $reservationObjectCount = $reservationType->objectCount;
+            $minDuration = intval($reservationType->min_residence_time ? $reservationType->min_residence_time : $reservationObject->time_interval);
+            $objectQuantity = $reservationObject->quantity;
+            $reservationAllTypesQuantity = $reservationObject->allTypesQuantity;
 
+            $database = Database::getInstance();
             $currentBookedTimes = $database->prepare("SELECT beginDate, endDate FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
             ->execute($typeId,$objectId,$objectType,'1')->fetchAllAssoc();  
             
@@ -2183,7 +2142,7 @@ class C4gReservationHandler
                     foreach ($currentDates as $currentDate) {
                         $allDates[$i++] = $currentDate;
                     }
-                }         
+                }    
 
                 $allDatesQuantity = array_count_values($allDates);
                 $i = 0;
@@ -2191,7 +2150,7 @@ class C4gReservationHandler
                     if ($bookedQuantity >= $reservationObjectCount) {
                         $allFullyBookedDates[$i] = $bookedKey;
                         $i++;
-                    }   
+                    }
                 }
 
                 if ($fullyBookedDate || $allFullyBookedDates) {
@@ -2207,7 +2166,7 @@ class C4gReservationHandler
                             }
                             $periodCounterPosition += $periodFaktor;
                         }
-                    }  
+                    }
 
                     foreach ($otherObjectsBookedTimes as $currentTimes) {
                         $currentTimeBegin = $currentTimes['beginDate'];
@@ -2221,8 +2180,8 @@ class C4gReservationHandler
                             }
                             $periodCounterPosition += $periodFaktor;
                         }
-                    }  
-                }   
+                    }
+                } 
 
                 foreach ($currentBookedTimes as $currentTimes) {
                     $currentTimeBegin = $currentTimes['beginDate'];
@@ -2236,8 +2195,8 @@ class C4gReservationHandler
                         }
                         $periodCounterPosition += $periodFaktor;
                     }
-                }  
-            }   
+                }
+            }
         }
         return $result;
     }
@@ -2260,9 +2219,15 @@ class C4gReservationHandler
         $allTypesQuantity = $reservationObject->getAllTypesQuantity(); 
         
         $database = Database::getInstance();
-        $reservationObjectCount = $database->prepare("SELECT objectCount FROM `tl_c4g_reservation_type` WHERE `id`=?")
-        ->execute($typeId)->fetchAllAssoc();
-        $reservationObjectCount = $reservationObjectCount[0]['objectCount'];
+
+        if ($listType['objectCount']) {
+            $reservationObjectCount = $listType['objectCount'];
+        } else {
+            $reservationObjectCount = $database->prepare("SELECT objectCount FROM `tl_c4g_reservation_type` WHERE `id`=?")
+            ->execute($typeId)->fetchAllAssoc();
+            $reservationObjectCount = $reservationObjectCount[0]['objectCount']; 
+        }
+        $reservationObjectCount = $reservationObjectCount ? $reservationObjectCount : PHP_INT_MAX;
 
         $currentBookedTimes = $database->prepare("SELECT beginDate,endDate,desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
         ->execute($typeId,$objectId,$objectType,'1')->fetchAllAssoc(); 
@@ -2286,7 +2251,7 @@ class C4gReservationHandler
                 foreach ($currentDates as $currentDate) {
                     $allDates[$i++] = $currentDate;
                 }
-            }         
+            }
 
             $allDatesQuantity = array_count_values($allDates);
             $i = 0;
@@ -2294,7 +2259,7 @@ class C4gReservationHandler
                 if ($bookedQuantity >= $reservationObjectCount) {
                     $allFullyBookedDates[$i] = $bookedKey;
                     $i++;
-                }   
+                }
             }
                       
             if (!$severalBookings || ($severalBookings && !$allTypesQuantity && $currentReservations >= $maxCapacity)) {
@@ -2303,17 +2268,17 @@ class C4gReservationHandler
                         if ($date) {
                             $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
                         }
-                    } 
+                    }
                     foreach ($allFullyBookedDates as $date) {
                         if ($date) {
                             $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
-                        } 
-                    } 
-                }   
+                        }
+                    }
+                }
             } else {
                 $result['dates'] = "";
-            }  
-        } 
+            }
+        }
         return $result;     
     }
 
@@ -2348,7 +2313,7 @@ class C4gReservationHandler
             if ($bookedQuantity >= $objectQuantity) {
                 $fullyBookedDate[$i] = $bookedKey;
                 $i++;
-            }   
+            }
         }
         return $fullyBookedDate;
     }

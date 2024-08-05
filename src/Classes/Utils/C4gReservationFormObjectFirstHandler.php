@@ -437,6 +437,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString([$reservationObject]));
 
             $periodType = $listType['periodType'];
+            $bookedDays = "";
             if ($periodType == 'day' || $periodType  == 'overnight') {            
                 $bookedDays = C4gReservationHandler::getBookedDays($listType,$reservationObject);
                 if ($bookedDays) {
