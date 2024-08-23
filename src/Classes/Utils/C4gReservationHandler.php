@@ -1271,16 +1271,18 @@ class C4gReservationHandler
         }
         $endTimeInterval = $timeObjectParams['interval'];
         $fullDay = false;
-        $periodFaktor = self::getPeriodFaktor($timeObjectParams['object']->getPeriodType());
+
         $periodType = $timeParams['type']["periodType"];
+        $periodFaktor = self::getPeriodFaktor($timeObjectParams['object']->getPeriodType());
+        
         if ($periodType == 'day' || $periodType == 'overnight' || $periodType == 'week') {
             $bookedDays = self::getBookedDays($timeParams['type'],$timeObjectParams['object']);
             $bookedDay = explode(",",$bookedDays['dates']);
             for ($i = 0; $i < count($bookedDay); $i++) {
                 $bookedDay[$i] = strtotime($bookedDay[$i]);
-                if (($bookedDay[$i]+$periodFaktor) >= $beginStamp && ($bookedDay[$i]+$periodFaktor) <= $endStamp) {
+                if (( $bookedDay[$i]+$periodFaktor) >= $beginStamp && ($bookedDay[$i]+$periodFaktor) <= $endStamp) {
                     $fullDay = true;
-                }
+                } 
             }
         }
         
@@ -2075,6 +2077,7 @@ class C4gReservationHandler
         if ($reservationObject and $putVars) {
             $objectId = $reservationObject->id;
             $typeId   = $reservationType->id;
+            $periodType = $reservationType->periodType;
             $beginTime = 0;
             if ($reservationType->reservationObjectType === '3') {
                 $beginDate = $putVars['beginDate_'.$typeId.'-33'.$objectId];
@@ -2118,6 +2121,7 @@ class C4gReservationHandler
             $reservationId = $putVars['reservation_id'];
             $objectType = intval($putVars['reservationObjectType']);
             $reservationDuration = intval($putVars['duration_'.$typeId]);
+            $reservationDuration = $periodType == 'week' ? $reservationDuration * 7 : $reservationDuration;
                      
             $reservationPeriodType = $reservationType->periodType;
             $periodFaktor = self::getPeriodFaktor($reservationPeriodType);
@@ -2223,6 +2227,7 @@ class C4gReservationHandler
         $maxCapacity = $reservationObject->getDesiredCapacity()[1];
         $currentReservations = $reservationObject->getCurrentReservations();
         $severalBookings = $reservationObject->getSeveralBookings();
+    
         $periodFaktor = $listType['periodType'] != 'week' ? self::getPeriodFaktor($listType['periodType']) : self::getPeriodFaktor($listType['periodType']) / 7;
         $allTypesQuantity = $reservationObject->getAllTypesQuantity(); 
         

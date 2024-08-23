@@ -395,6 +395,11 @@ class tl_c4g_reservation_event_participants extends Backend
 
         $additionaldatas = StringUtil::deserialize($fieldSelect[0]['fieldSelection']);
 
+        //Default Labels
+        $firstname = $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['firstname'][0];
+        $lastname = $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['lastname'][0];
+        $email = $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['email'][0];
+
         foreach ($additionaldatas as $rowdata)
         {
             $rowField = $rowdata['additionaldatas'];
@@ -402,11 +407,11 @@ class tl_c4g_reservation_event_participants extends Backend
             switch($rowField) {
                 case "salutation": $salutation = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['salutation'][0];
                     break;
-                case "firstname": $firstname = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['firstname'][0];
+                case "firstname": $firstname = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $firstname;
                     break;
-                case "lastname": $lastname = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['lastname'][0];
+                case "lastname": $lastname = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $lastname;
                     break;
-                case "email": $email = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['email'][0];        
+                case "email": $email = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $email;
                     break;
                 case "dateOfBirth": $dateOfBirth = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['dateOfBirth'][0];
                     break;
