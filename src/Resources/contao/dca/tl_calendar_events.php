@@ -25,7 +25,6 @@ $str = 'tl_calendar_events';
 
 $GLOBALS['TL_DCA'][$str]['config']['ctable'][] = 'tl_c4g_reservation_event';
 $GLOBALS['TL_DCA'][$str]['config']['onload_callback'][] = ['tl_c4g_reservation_event_bridge', 'c4gLoadReservationData'];
-
 $GLOBALS['TL_DCA'][$str]['list']['sorting']['child_record_callback'] = ['tl_c4g_reservation_event_bridge', 'loadChildRecord'];
 
 $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gEditEvent'] = [
@@ -39,6 +38,13 @@ $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gExportReservations'] = [
     'label'               => &$GLOBALS['TL_LANG'][$str]['c4gExportReservations'],
     'icon'                => 'bundles/con4gisexport/images/be-icons/export.svg',
     'button_callback'     => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationEvents::class, 'runExport'],
+    'exclude'             => true
+];
+
+$GLOBALS['TL_DCA'][$str]['list']['operations']['c4g_participant_list'] = [
+    'label'               => &$GLOBALS['TL_LANG'][$str]['c4g_participant_list'],
+    'icon'                => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_audience.svg',
+    'button_callback'     => ['tl_c4g_reservation_event_bridge', 'c4gShowAllParticipants'],
     'exclude'             => true
 ];
 
@@ -261,6 +267,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             } else {
                 $state = InsertTags::replaceInsertTags('{{c4gevent::' . $row['id'] . '::state_raw}}');
             }
+            $stop = 1;
             switch ($state) {
                 case '1':
                     $icon = 'bundles/con4gisreservation/images/circle_green.svg';
@@ -280,6 +287,83 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
         }
     }
 
+    public function c4gShowAllParticipants($row, $href, $label, $title, $icon)
+    {
+        $calendar = Database::getInstance()->prepare("SELECT activateEventReservation FROM tl_calendar WHERE `id`=?")->execute($row['pid'])->fetchAssoc();
 
+        if ($calendar['activateEventReservation']) {
+            $rt = Input::get('rt');
+            $ref = Input::get('ref');
+            $do = Input::get('do');
 
+            $eventReservations = Database::getInstance()->prepare("SELECT id,additional_params,title,lastname,firstname,email,tstamp,phone, postal,address,city,comment,cancellation,formular_id,desiredCapacity,additional1,additional2,additional3,dateOfBirth FROM tl_c4g_reservation WHERE `reservation_object`=?")->execute($row['id'])->fetchAllAssoc();
+            $stop= 1;
+
+            $currentEventParticipantList =  Database::getInstance()->prepare("SELECT reservation_id FROM tl_c4g_reservation_event_participants WHERE reservation_id != 0")->execute()->fetchAllAssoc();
+
+            $i = 0;
+            foreach ($currentEventParticipantList as $cepl) {
+                $cep[$i++] = $cepl['reservation_id'];
+            }
+            if ($cep) {
+                $currentEventReservationId = array_unique($cep);
+                foreach ($currentEventReservationId as $cerId){
+                    $stillExist = Database::getInstance()->prepare("SELECT id FROM tl_c4g_reservation WHERE `id`=?")->execute($cerId)->fetchAllAssoc();
+                    if (!$stillExist) {
+                        Database::getInstance()->prepare("DELETE FROM tl_c4g_reservation_event_participants WHERE `reservation_id`=?")->execute($cerId);
+                    } 
+                }
+            }
+
+            foreach ($eventReservations as $evRes) {
+                $booker = $evRes['firstname'] . ' ' . $evRes['lastname'];
+                $exist = Database::getInstance()->prepare("SELECT reservation_id FROM tl_c4g_reservation_event_participants WHERE `reservation_id`=?")->execute($evRes['id'])->fetchAssoc() ? true : false;
+                $onlyParticipants = Database::getInstance()->prepare("SELECT onlyParticipants FROM tl_c4g_reservation_settings WHERE id=? ")->execute($evRes['formular_id'])->fetchAssoc();
+            
+                $onlyParticipants = $onlyParticipants['onlyParticipants'];
+                if (!intval($evRes['cancellation']) && !$exist && !$onlyParticipants) {
+                    Database::getInstance()->prepare("INSERT INTO `tl_c4g_reservation_event_participants` (`pid`, `reservation_id`, `participant_id`, `tstamp`, `title`, `lastname`, `firstname`, `email`, `phone`, `address`, `postal`, `city`, `comment`, `participant_params`, `booker`,`additional1`,`additional2`,`additional3`, `dateOfBirth`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")->execute($row['id'],$evRes['id'],$evRes['id'],$evRes['tstamp'],$evRes['title'],$evRes['lastname'],$evRes['firstname'],$evRes['email'],$evRes['phone'],$evRes['address'],$evRes['postal'],$evRes['city'],$evRes['comment'],$evRes['additional_params'],$booker,$evRes['additional1'],$evRes['additional2'],$evRes['additional3'],$evRes['dateOfBirth']);
+                    $deleted = false;
+                } else if ($evRes['cancellation'] && $exist) {
+                    Database::getInstance()->prepare("DELETE FROM tl_c4g_reservation_event_participants WHERE `reservation_id`=?")->execute($evRes['id']);
+                    $deleted = true;
+                }      
+              
+                $participantData = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation_participants WHERE `pid`=?")->execute($evRes['id'])->fetchAllAssoc();
+
+                if ($participantData) {
+                    foreach ($participantData as $pd) {
+                            if (!$pd['cancellation'] && !$exist && !$deleted) {
+                                Database::getInstance()->prepare("INSERT INTO `tl_c4g_reservation_event_participants` (`pid`, `reservation_id`, `participant_id`, `tstamp`, `title`, `lastname`, `firstname`, `email`, `phone`, `address`, `postal`, `city`, `comment`, `participant_params`, `cancellation`, `booker`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")->execute($row['id'],$evRes['id'],$pd['id'],$pd['tstamp'],$pd['title'],$pd['lastname'],$pd['firstname'],$pd['email'],$pd['phone'],$pd['address'],$pd['postal'],$pd['city'],$pd['comment'],$pd['participant_params'],$pd['cancellation'], $booker);
+                        } else if ($pd['cancellation']) {
+                            Database::getInstance()->prepare("DELETE FROM tl_c4g_reservation_event_participants WHERE `participant_id`=? AND `reservation_id`!=?")->execute($pd['id'],$pd['id']);
+                        }
+                    }                    
+                }
+                
+                if ($stillExist && !intval($evRes['cancellation'])) {
+                     $currentData = Database::getInstance()->prepare("SELECT reservation_id FROM tl_c4g_reservation_event_participants WHERE `reservation_id`=? AND `pid`=?")->execute($evRes['id'],$row['id'])->fetchAllAssoc();
+                    if($currentData) {
+                        $countBegin = count($currentData);
+                    } else {
+                        $countBegin = 0;
+                    }
+          
+                    $unknown = $GLOBALS['TL_LANG']['tl_calendar_events']['unknown'];
+                    for ($i = $countBegin; $i < intval($evRes['desiredCapacity']); $i++) {
+                        Database::getInstance()->prepare("INSERT INTO `tl_c4g_reservation_event_participants` (`pid`,`reservation_id`,`tstamp`, `lastname`, `firstname`, `booker`) VALUES (?,?,?,?,?,?)")->execute($row['id'],$evRes['id'],$evRes['tstamp'],$unknown,$unknown,$booker);
+                    }
+                }
+            }
+
+            $attributes = 'style="margin-right:3px"';
+            $imgAttributes = 'style="width: 18px; height: 18px"';
+
+            $label_new = 'Label Umbenannt';
+
+            $href = "/contao?do=".$do."&table=tl_c4g_reservation_event_participants&id=" . $row['id'];
+
+            return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a> ';
+        }
+    }
 }

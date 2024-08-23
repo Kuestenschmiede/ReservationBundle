@@ -14,3 +14,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['c4gEditReservations'] = ['Reservation
 $GLOBALS['TL_LANG']['tl_calendar_events']['c4gExportReservations'] = ['Export', 'Export reservations.'];
 
 $GLOBALS['TL_LANG']['tl_calendar_events']['c4g_reservation_number'] = ['Number', 'Identifier of the event. E.g. seminar number.'];
+
+$GLOBALS['TL_LANG']['tl_calendar_events']['c4g_participant_list'] = ['List of participants', 'List of participants'];
+
+$GLOBALS['TL_LANG']['tl_calendar_events']['unknown'] = 'unknown';

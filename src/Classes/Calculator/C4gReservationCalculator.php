@@ -219,7 +219,7 @@ class C4gReservationCalculator
         $calculatorResult->setDbBookings($this->calculateDbBookingsPerType($reservationList));
         $calculatorResult->setDbBookedObjects($this->calculateDbObjectsPerType($reservationList));
         $calculatorResult->setDbPersons($this->calculateDbPersons($reservationList, $objectId));
-        $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $object->getDesiredCapacity()[1], $capacity));
+        $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $object->getDesiredCapacity()[1], $capacity)); //s Für Änderung überprüfen
         $calculatorResult->setTimeArray($timeArray);
 
         $this->calculatorResult = $calculatorResult;

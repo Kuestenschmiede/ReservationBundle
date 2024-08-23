@@ -190,6 +190,8 @@ $GLOBALS['TL_CRON']['minutely']['reservationOnMinutely'] = [\con4gis\Reservation
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_event';
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation';
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_participants';
+$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_event_participants';
+
 
 $exportExists = class_exists('con4gis\ExportBundle\con4gisExportBundle');
 if ($exportExists) {

@@ -63,5 +63,24 @@ $GLOBALS['TL_LANG'][$str]['delete'] = array("Event löschen","Löschen der Veran
 $GLOBALS['TL_LANG'][$str]['show'] = array("Event anzeigen","Anzeigen der Veranstaltung ID %s");
 $GLOBALS['TL_LANG'][$str]['TOGGLE'] = array("Event aktivieren","Aktivieren der Veranstaltung ID %s");
 
+
+$GLOBALS['TL_LANG'][$str]['showParticipantInfoFields'] = array("Felder in Teilnehmerliste anzeigen","Welcher Felder sollen zusätzlich in der Teilnehmerliste angezeigt werden?");
+$GLOBALS['TL_LANG'][$str]['references']['additional1'] = array("Zusatzfeld 1");
+$GLOBALS['TL_LANG'][$str]['references']['additional2'] = array("Zusatzfeld 2");
+$GLOBALS['TL_LANG'][$str]['references']['additional3'] = array("Zusatzfeld 3");
+$GLOBALS['TL_LANG'][$str]['references']['booker'] = array("reserviert von");
+
+$GLOBALS['TL_LANG'][$str]['references']['lastname']  = array("Nachname", "Nachname");
+$GLOBALS['TL_LANG'][$str]['references']['firstname'] = array("Vorname", "Vorname");
+$GLOBALS['TL_LANG'][$str]['references']['email'] = array("E-Mail-Adresse", "E-Mail-Adresse");
+$GLOBALS['TL_LANG'][$str]['references']['phone'] = array("Telefonnummer", "Telefonnummer");
+$GLOBALS['TL_LANG'][$str]['references']['address'] = array("Straße", "Straße");
+$GLOBALS['TL_LANG'][$str]['references']['postal'] = array("Postleitzahl", "Postleitzahl");
+$GLOBALS['TL_LANG'][$str]['references']['city'] = array("Ort", "Ort");
+$GLOBALS['TL_LANG'][$str]['references']['dateOfBirth'] = array("Geburtsdatum", "Geburtsdatum");
+$GLOBALS['TL_LANG'][$str]['references']['comment'] = array("Anmerkung zum Teilnehmer", "Kommentarfeld zur Reservierung.");
+$GLOBALS['TL_LANG'][$str]['references']['reservation_participant_option'] = array("Teilnehmeroptionen", "Ausgewählte Teilnehmerleistungen");
+
+
 /** INFO */
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event']['infoEvent'] = "";

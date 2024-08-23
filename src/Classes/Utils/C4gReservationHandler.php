@@ -97,10 +97,10 @@ class C4gReservationHandler
             $quantity = $objectData['quantity'];
 
             if ($maxPerTime < $quantity) {
-                $quantity = $maxPerTime; //ToDo check max count per periodFaktor for all objects
+                $quantity = $maxPerTime; //ToDo check max count per interval for all objects
             }
 
-            $periodFaktor = $object->getTimeInterval();
+            $interval = $object->getTimeInterval();
 
             if($weekday == 0){
                 $array = \Contao\StringUtil::deserialize($objectData['oh_sunday']);
@@ -136,7 +136,7 @@ class C4gReservationHandler
                 $toSecond = self::getPeriodFaktor($periodType);
                
                 if ($possibleSeconds) {
-                    $possibleBookings = $possibleBookings + (($possibleSeconds / $toSecond / $periodFaktor) * $quantity);
+                    $possibleBookings = $possibleBookings + (($possibleSeconds / $toSecond / $interval) * $quantity);
                 }
             }
 
@@ -225,8 +225,8 @@ class C4gReservationHandler
                                 }
 
                                 //exclude time and check next days
-                                if (($timeElement['time'] + $timeElement['periodFaktor']) > ($i+86400)) {
-                                    $nd = ceil((($timeElement['time'] + $timeElement['periodFaktor']) - ($i+86400)) / 86400);
+                                if (($timeElement['time'] + $timeElement['interval']) > ($i+86400)) {
+                                    $nd = ceil((($timeElement['time'] + $timeElement['interval']) - ($i+86400)) / 86400);
                                     $nextDays = ($nd > $nextDays) ? $nd : $nextDays;
                                 }
                             }
@@ -308,11 +308,11 @@ class C4gReservationHandler
      * @param $list
      * @param $time
      * @param $obj
-     * @param $periodFaktor
+     * @param $interval
      * @param $endTime
      * @return array|mixed
      */
-    private static function addTime($list, $time, $obj, $periodFaktor, $endTime = 0, $nxtDay = false)
+    private static function addTime($list, $time, $obj, $interval, $endTime = 0, $nxtDay = false)
     {
         $clock = '';
 
@@ -352,7 +352,7 @@ class C4gReservationHandler
         }
 
         foreach ($list['result'] as $key => $item) {
-            if ($key === $time || ($periodFaktor && ($key === ($time.'#'.$periodFaktor))) || ($endTime && ($key === ($time.'#'.($endTime-$time))))) {
+            if ($key === $time || ($interval && ($key === ($time.'#'.$interval))) || ($endTime && ($key === ($time.'#'.($endTime-$time))))) {
                 $list['result'][$key]['objects'][] = $obj;
                 return $list['result'];
             }
@@ -369,7 +369,7 @@ class C4gReservationHandler
 
             if ($list['type']['periodType'] == 'overnight'){
 //                $actDurationStamp = 86400 * $list['actDuration'];
-                $actDurationStamp = $list['actDuration'] == '-1' ? ($list['actDuration']  * $periodFaktor) * -1 : $list['actDuration'] * 86400;
+                $actDurationStamp = $list['actDuration'] == '-1' ? ($list['actDuration']  * $interval) * -1 : $list['actDuration'] * 86400;
                 $end = date($format, $list['tsdate'] + $departureTimeEndStamp + $actDurationStamp).$clockEx;
             }else{
                 $end = date('I', $obj['mergedEndTime']) ? date($format, $obj['mergedEndTime']/* -3600 */).$clockEx : date($format, $obj['mergedEndTime']).$clockEx ;
@@ -385,45 +385,45 @@ class C4gReservationHandler
         }
     
         if ($obj && ($obj['id'] == -1)) {
-            if ($withEndTimes && $periodFaktor) {
-                $key = $time.'#'.$periodFaktor;
+            if ($withEndTimes && $interval) {
+                $key = $time.'#'.$interval;
                 if (!$mergedTime) {
                     date_default_timezone_set('Europe/Berlin');
                     $summertime = C4gReservationDateChecker::getTimeDiff($time);
-                    $end = date($format, $time + $periodFaktor + $summertime-3600).$clock;
-//                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$periodFaktor).$clock;
-//                    $end = date('I', $list['tsdate']) ? date($format, $time+$periodFaktor+3600).$clock : date($format, $time+$periodFaktor).$clock;
+                    $end = date($format, $time + $interval + $summertime-3600).$clock;
+//                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
+//                    $end = date('I', $list['tsdate']) ? date($format, $time+$interval+3600).$clock : date($format, $time+$interval).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'periodFaktor' => $periodFaktor, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
                 if (!$mergedTime) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'periodFaktor' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else {
-                $key = $time.'#'.$periodFaktor;
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'periodFaktor' => 0, 'name' => $begin, 'objects' => [$obj], 'description' => $description);
+                $key = $time.'#'.$interval;
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj], 'description' => $description);
             }
         } else {
-            if ($withEndTimes && $periodFaktor) {
-                $key = $time.'#'.$periodFaktor;
+            if ($withEndTimes && $interval) {
+                $key = $time.'#'.$interval;
                 if (!$mergedTime) {
                     date_default_timezone_set('Europe/Berlin');
                     $summertime = C4gReservationDateChecker::getTimeDiff($time);
-                    $end = date($format, $time + $periodFaktor+$summertime-3600).$clock;
+                    $end = date($format, $time + $interval+$summertime-3600).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'periodFaktor' => $periodFaktor, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
                 if (!$mergedTime) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'periodFaktor' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else {
-                $key = $time.'#'.$periodFaktor;
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'periodFaktor' => 0, 'name' => $begin, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
-//                $end = date('I', $list['tsdate']) ? date($format, $time+$periodFaktor+3600).$clock : date($format, $time+$periodFaktor).$clock;
+                $key = $time.'#'.$interval;
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+//                $end = date('I', $list['tsdate']) ? date($format, $time+$interval+3600).$clock : date($format, $time+$interval).$clock;
 
             }
         }
@@ -529,8 +529,8 @@ class C4gReservationHandler
                             }
 
                             //exclude time and check next days
-                            if (($timeElement['time'] + $timeElement['periodFaktor']) > ($i + 86400)) {
-                                $nd = ceil((($timeElement['time'] + $timeElement['periodFaktor']) - ($i + 86400)) / 86400);
+                            if (($timeElement['time'] + $timeElement['interval']) > ($i + 86400)) {
+                                $nd = ceil((($timeElement['time'] + $timeElement['interval']) - ($i + 86400)) / 86400);
                                 $nextDays = ($nd > $nextDays) ? $nd : $nextDays;
                             }
                         }
@@ -717,7 +717,7 @@ class C4gReservationHandler
         if (($time_begin !== false) && ($time_end !== false)) {
             $time = $time_begin;
 
-            $periodEnd = $time_end - $timeObjectParams['periodFaktor'];
+            $periodEnd = $time_end - $timeObjectParams['interval'];
 //            $periodChanged = false;
             if ($time_end <= $time) {
                 $periodEnd += 86400;
@@ -747,7 +747,7 @@ class C4gReservationHandler
                         $realTime = $time - 86400;
                     }
 
-                    $endTime = $realTime + $timeObjectParams['periodFaktor'] + $timeObjectParams['durationDiff'];
+                    $endTime = $realTime + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'];
 
                     if ($timeParams['date'] && $timeParams['tsdate']) {
                         $timeParams['calculator']->calculate(
@@ -820,7 +820,7 @@ class C4gReservationHandler
         $time_begin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
         $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
         //ToDo check arrival and departure times
-        $durationInterval = $timeObjectParams['periodFaktor']+$timeObjectParams['durationDiff'];
+        $durationInterval = $timeObjectParams['interval']+$timeObjectParams['durationDiff'];
         if ($time_end >= $time_begin) {
             $durationInterval = $durationInterval - 86400; //ToDo first day counts
         }
@@ -832,7 +832,7 @@ class C4gReservationHandler
             $timeArray = [];
             while ($time <= $periodEnd) {
                 if ($time && $timeParams['type']) {
-                    $endTime = $time + $timeObjectParams['periodFaktor'] + $timeObjectParams['durationDiff'];
+                    $endTime = $time + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'];
 
                     if ($timeParams['nowDate'] && ($timeParams['nowDate'] == $timeParams['tsdate']) && ($time < $timeParams['nowTime'])) {
                         $time = $time + $timeObjectParams['defaultInterval'];
@@ -846,7 +846,7 @@ class C4gReservationHandler
                     if ($timeParams['date'] && $timeParams['tsdate']) {
                         $timeParams['calculator']->calculate(
                             $timeParams['tsdate'],
-                            $timeParams['tsdate']+$time + $timeObjectParams['periodFaktor'] + $timeObjectParams['durationDiff'],
+                            $timeParams['tsdate']+$time + $timeObjectParams['interval'] + $timeObjectParams['durationDiff'],
                             $time - $timeObjectParams['durationDiff'],
                             $endTime,
                             $timeObjectParams['object'],
@@ -1050,8 +1050,13 @@ class C4gReservationHandler
                     $object->setBeginTime($beginTime);
                     $object->setDuration($duration);
                     $object->setTimeinterval($duration);
-
-                    $periodFaktor = self::getPeriodFaktor($periodType);
+                    
+                    if ($periodType == 'week') {
+                        $periodFaktor = self::getPeriodFaktor($periodType) / 7;
+                    } else {
+                       $periodFaktor = self::getPeriodFaktor($periodType); 
+                    }
+                    
                     $periodType = $periodFaktor * $duration;
 
                     $EndTime = $beginTime + $periodType;
@@ -1087,9 +1092,9 @@ class C4gReservationHandler
                     'timeArray' => [],
                     'quantity' => $object->getQuantity() ? $object->getQuantity() : 1,
                     'capacity' => $capacity,
-                    'periodFaktor' => 0, //act periodFaktor
-                    'durationDiff' => 0, //periodFaktor with additional time
-                    'timeInterval' => 0, //default periodFaktor
+                    'interval' => 0, //act interval
+                    'durationDiff' => 0, //interval with additional time
+                    'timeInterval' => 0, //default interval
                     'severalBookings' => $timeParams['type']['severalBookings'],
                     'maxObjects' => 0,
                     'exclusionPeriods' => [],
@@ -1139,23 +1144,23 @@ class C4gReservationHandler
                 switch ($timeParams['type']['periodType']) {
                     case 'minute':
                         $timeObjectParams['defaultInterval'] = $defaultInterval * 60;
-                        $timeObjectParams['periodFaktor'] = $timeInterval * 60;
+                        $timeObjectParams['interval'] = $timeInterval * 60;
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 60 : 0;
                         break;
                     case 'hour':
                         $timeObjectParams['defaultInterval'] = $defaultInterval * 3600;
-                        $timeObjectParams['periodFaktor'] = $timeInterval * 3600;
+                        $timeObjectParams['interval'] = $timeInterval * 3600;
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 3600 : 0;
                         break;
                     case 'day':
                     case 'overnight':
                         $timeObjectParams['defaultInterval'] = $defaultInterval * 86400;
-                        $timeObjectParams['periodFaktor'] = $timeInterval * 86400;
+                        $timeObjectParams['interval'] = $timeInterval * 86400;
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 86400 : 0;
                         break;
                     case 'week':
                         $timeObjectParams['defaultInterval'] = $defaultInterval * 604800;
-                        $timeObjectParams['periodFaktor'] = $timeInterval * 604800;
+                        $timeObjectParams['interval'] = $timeInterval * 604800;
                         $timeObjectParams['durationDiff'] = $durationDiff ? $durationDiff * 604800 : 0;
                         break;
                     default: '';
@@ -1247,14 +1252,14 @@ class C4gReservationHandler
         $reasonLog = '';
         if (date('I')) {
             $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+3600;
-            $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['periodFaktor']+$timeObjectParams['durationDiff']; //+3600;
+            $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']; //+3600;
         } else {
             $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time;
-            $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['periodFaktor']+$timeObjectParams['durationDiff'];
+            $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff'];
         }
 
         $beginStamp = $timeObj['mergedTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+3600;
-//        $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['periodFaktor']+$timeObjectParams['durationDiff']+3600; // +1 ToDo Check Why?
+//        $endStamp = $timeObj['mergedEndTime'] ?: C4gReservationDateChecker::getBeginOfDate($timeParams['tsdate'])+$time+$timeObjectParams['interval']+$timeObjectParams['durationDiff']+3600; // +1 ToDo Check Why?
         foreach ($timeObjectParams['exclusionPeriods'] as $excludePeriod) {
             if (C4gReservationDateChecker::isStampInPeriod($beginStamp,$excludePeriod['begin'],$excludePeriod['end'],0) ||
                 C4gReservationDateChecker::isStampInPeriod($endStamp,$excludePeriod['begin'],$excludePeriod['end'],1)) {
@@ -1264,18 +1269,21 @@ class C4gReservationHandler
                 $timeObj['removeButton'] = true;
             }
         }
-        $endTimeInterval = $timeObjectParams['periodFaktor'];
-        $periodFaktor = self::getPeriodFaktor($timeObjectParams['object']->getPeriodType());
-
-        $bookedDays = self::getBookedDays($timeParams['type'],$timeObjectParams['object']);
-        $bookedDay = explode(",",$bookedDays['dates']);
+        $endTimeInterval = $timeObjectParams['interval'];
         $fullDay = false;
-        for ($i = 0; $i < count($bookedDay); $i++) {
-            $bookedDay[$i] = strtotime($bookedDay[$i]);
-            if (($bookedDay[$i]+$periodFaktor) >= $beginStamp && ($bookedDay[$i]+$periodFaktor) <= $endStamp) {
-                $fullDay = true;
+        $periodFaktor = self::getPeriodFaktor($timeObjectParams['object']->getPeriodType());
+        $periodType = $timeParams['type']["periodType"];
+        if ($periodType == 'day' || $periodType == 'overnight' || $periodType == 'week') {
+            $bookedDays = self::getBookedDays($timeParams['type'],$timeObjectParams['object']);
+            $bookedDay = explode(",",$bookedDays['dates']);
+            for ($i = 0; $i < count($bookedDay); $i++) {
+                $bookedDay[$i] = strtotime($bookedDay[$i]);
+                if (($bookedDay[$i]+$periodFaktor) >= $beginStamp && ($bookedDay[$i]+$periodFaktor) <= $endStamp) {
+                    $fullDay = true;
+                }
             }
         }
+        
 
         $objectCount = intval($timeParams['type']['objectCount']);
         $objectQuantity = intval($timeObjectParams['quantity']);
@@ -2181,7 +2189,7 @@ class C4gReservationHandler
                             $periodCounterPosition += $periodFaktor;
                         }
                     }
-                } 
+                }
 
                 foreach ($currentBookedTimes as $currentTimes) {
                     $currentTimeBegin = $currentTimes['beginDate'];
@@ -2211,11 +2219,11 @@ class C4gReservationHandler
         } else if ($listType['reservationObjectType']) {
             $objectType = intval($listType['reservationObjectType']);
         }
-        $minDuration =intval($listType['min_residence_time'] ? $listType['min_residence_time'] : $reservationObject->getTimeinterval());
+        $minDuration = intval($listType['min_residence_time'] ? $listType['min_residence_time'] : $reservationObject->getTimeinterval());
         $maxCapacity = $reservationObject->getDesiredCapacity()[1];
         $currentReservations = $reservationObject->getCurrentReservations();
         $severalBookings = $reservationObject->getSeveralBookings();
-        $periodFaktor = self::getPeriodFaktor($listType['periodType']);
+        $periodFaktor = $listType['periodType'] != 'week' ? self::getPeriodFaktor($listType['periodType']) : self::getPeriodFaktor($listType['periodType']) / 7;
         $allTypesQuantity = $reservationObject->getAllTypesQuantity(); 
         
         $database = Database::getInstance();

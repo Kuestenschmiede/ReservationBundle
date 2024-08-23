@@ -438,7 +438,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
 
             $periodType = $listType['periodType'];
             $bookedDays = "";
-            if ($periodType == 'day' || $periodType  == 'overnight') {            
+            if ($periodType == 'day' || $periodType  == 'overnight' || $periodType  == 'week') {            
                 $bookedDays = C4gReservationHandler::getBookedDays($listType,$reservationObject);
                 if ($bookedDays) {
                     $bookedDays = $bookedDays['dates'];

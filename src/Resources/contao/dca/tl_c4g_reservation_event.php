@@ -22,9 +22,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         'enableVersioning'  => true,
         'ptable'            => 'tl_calendar_events',
         'onload_callback'   => [['tl_c4g_reservation_event', 'setParent']],
-        'doNotCopyRecords'  => true,
-        'sql'               => array
-        (
+        'sql'               => array(
             'keys' => array
             (
                 'id' => 'primary',
@@ -93,9 +91,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants,maxParticipantsPerEventBooking, min_reservation_day, price, taxOptions, priceoption, participant_params, participantParamsFieldType,reservationForwarding,reservationForwardingButtonCaption; {team_legend}, team;',
+        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants,maxParticipantsPerEventBooking, min_reservation_day, price, taxOptions, priceoption,showParticipantInfoFields, participant_params, participantParamsFieldType,reservationForwarding,reservationForwardingButtonCaption; {team_legend}, team;',
     ),
-
 
     //Fields
     'fields' => array
@@ -322,7 +319,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'inputType'         => 'select',
             'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'doNotCopy' => true),
             'sql'               => "char(1) NOT NULL default '0'"
-        )
+        ),
+
+        'showParticipantInfoFields' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['showParticipantInfoFields'],
+            'exclude'           => true,
+            'inputType'         => 'checkbox',
+            'options'           => array('email','phone','address','postal','city','dateOfBirth','comment','reservation_participant_option','additional1','additional2','additional3','booker'),
+            'reference'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['references'],
+            'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
+            'sql'               => "blob NULL"
+        ),
     )
 );
 

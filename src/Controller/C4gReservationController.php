@@ -631,6 +631,7 @@ foreach ($typelist as $listType) {
         $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
         $reservationDesiredCapacity->setCallOnChange(true);
         $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ");");
+        #$reservationDesiredCapacity->setCallOnChangeFunction("changeCapacity(".$listType['id'] . "," . $showDateTime . ");");
         $reservationDesiredCapacity->setNotificationField(true);
         $reservationDesiredCapacity->setAdditionalID($listType['id']);
         $reservationDesiredCapacity->setStyleClass('desired-capacity');
@@ -1650,6 +1651,13 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
         $memberId->setNotificationField(false);
         $fieldList[] = $memberId;
 
+        $formularId = new C4GTextField();
+        $formularId->setFieldName('formular_id');
+        $formularId->setTableColumn(true);
+        $formularId->setFormField(false);
+        $formularId->setNotificationField(false);
+        $fieldList[] = $formularId;
+
         $dbkey = new C4GTextField();
         $dbkey->setFieldName('dbkey');
         $dbkey->setTableColumn(false);
@@ -1770,7 +1778,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
      */
     public function clickReservation($values, $putVars)
     {
-
+        $formId = $this->reservationSettings->id;
         $type = $putVars['reservation_type'];
         $database = \Database::getInstance();
         $reservationType = $database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
@@ -2379,6 +2387,8 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
                 $putVars['contact_city'] = $contact_city;
             }
         }
+
+        $putVars['formular_id'] = $formId;
 
         $memberId = 0;
         if (FE_USER_LOGGED_IN === true) {

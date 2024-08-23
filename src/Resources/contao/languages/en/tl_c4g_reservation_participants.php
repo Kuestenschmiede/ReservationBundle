@@ -30,7 +30,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['cancellation'] = array("
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['yes'] = 'ja';
 
 /** LEGENDS **/
-$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['participants_legend'] = "Teilnehmerdaten";
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['participants_legend'] = "Participant Data";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['new'] = array("Add participant","Add participant");
