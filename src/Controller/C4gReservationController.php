@@ -520,7 +520,7 @@ foreach ($typelist as $listType) {
     } else if ($objectMaxCapacity) {
         $maxCapacity = $objectMaxCapacity;
     } else {
-        $maxCapacity = 100; #PHP_INT_MAX;
+        $maxCapacity = 100;
     }
 
        
@@ -631,7 +631,7 @@ foreach ($typelist as $listType) {
         $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
         $reservationDesiredCapacity->setCallOnChange(true);
         $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ");");
-        #$reservationDesiredCapacity->setCallOnChangeFunction("changeCapacity(".$listType['id'] . "," . $showDateTime . ");");
+        //$reservationDesiredCapacity->setCallOnChangeFunction("changeCapacity(".$listType['id'] . "," . $showDateTime . ");");
         $reservationDesiredCapacity->setNotificationField(true);
         $reservationDesiredCapacity->setAdditionalID($listType['id']);
         $reservationDesiredCapacity->setStyleClass('desired-capacity');
@@ -2091,10 +2091,13 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking']];
             }
 
-            if(C4gReservationHandler::preventNonCorrectPeriod($reservationType,$reservationObject,$putVars)) {
-                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key']];
+            $periodType = $reservationType->periodType;
+            if ($periodType == 'day' || $periodType == 'overnight' || $periodType == 'week') {
+                if(C4gReservationHandler::preventNonCorrectPeriod($reservationType,$reservationObject,$putVars)) {
+                    return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key']];
+                }
             }
-
+            
             $time_interval = $reservationObject->time_interval;
             $interval = '';
             switch ($reservationType->periodType) {
