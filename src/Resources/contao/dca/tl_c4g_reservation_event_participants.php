@@ -271,7 +271,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_participants'] = array
             'inputType'               => 'text',
             'eval'                    => array(
                                             'mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => "varchar(50) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => ''),
         ),
 
         'additional1' => array (
