@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -167,9 +167,10 @@ class C4gReservationCancellationController extends C4GBaseController
             $action->setCloseDialog(false);
             $result = $action->run();
 
-            if ($this->dialogParams->getRedirectSite() && (($jumpTo = \PageModel::findByPk($this->dialogParams->getRedirectSite())) !== null)) {
-                $result['jump_to_url'] = $jumpTo->getFrontendUrl();
-                return $result;
+            if ($this->dialogParams->getRedirectSite() && (($jumpTo = \Contao\PageModel::findByPk($this->dialogParams->getRedirectSite())) !== null)) {
+                $returnValue = ['jump_to_url' => $jumpTo->getFrontendUrl()];
+                //$result['jump_to_url'] = $jumpTo->getFrontendUrl();
+                return $returnValue;
             }
         } else {
             return array('usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['cancellation_failed']);

@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -48,7 +48,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocationUrl'] = 'Location';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectlocation'] = 'Location';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['objectspeaker'] = 'Persons';
 
-$GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'] = 'incl. &nbsp; VAT';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'] = 'incl. VAT';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'] = '';//o\'clock'; use a.m. / p.m. with timeFormat A
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'] = 'Target audience';

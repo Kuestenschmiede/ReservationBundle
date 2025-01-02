@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -13,16 +13,29 @@
  * Table tl_module
  */
 
-use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
+use con4gis\ReservationBundle\Classes\Callbacks\C4gReservationType;
+use Contao\DataContainer;
+use Contao\Config;
+use Contao\DC_Table;
+// use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
+// use Contao\Backend;
+// use Contao\BackendUser;
+// use Contao\Input;
+// use Contao\StringUtil;
+// use Contao\Image;
+// use Contao\Versions;
+
+$cbClass = C4gReservationType::class;
+
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
 (
     //config
     'config' => array
     (
-        'dataContainer'     => 'Table',
+        'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
-        'onload_callback'   => [['tl_c4g_reservation_type', 'showInfoMessage']],
+        'onload_callback'   => [[$cbClass, 'showInfoMessage']],
         'sql'               => array
         (
             'keys' => array
@@ -47,7 +60,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'label' => array
         (
             'fields'            => array('caption','reservationObjectType','periodType','objectCount'),
-            //'label_callback'    => array('tl_c4g_reservation_type', 'listTypes'),
+            // 'label_callback'    => array($cbClass, 'listTypes'),
             'showColumns'       => true
         ),
 
@@ -94,7 +107,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['TOGGLE'],
                 'icon'                => 'visible.gif',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array('tl_c4g_reservation_type', 'toggleIcon')
+                'button_callback'     => array($cbClass, 'toggleIcon')
             )
         )
     ),
@@ -133,7 +146,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'select',
-            'options_callback'  => array('tl_c4g_reservation_type', 'loadMemberOptions'),
+            'options_callback'  => array($cbClass, 'loadMemberOptions'),
             'eval'              => array('mandatory'=>false, 'chosen'=>true,
                 'disabled' => false, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId']),
             'filter'            => true,
@@ -146,7 +159,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'select',
-            'options_callback'  => array('tl_c4g_reservation_type', 'loadGroupOptions'),
+            'options_callback'  => array($cbClass, 'loadGroupOptions'),
             'eval'              => array('mandatory'=>false, 'chosen'=>true,
                 'disabled' => false, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyGroupId']),
             'filter'            => true,
@@ -163,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'search'            => true,
             'inputType'         => 'text',
             'eval'              => array('mandatory' => true, 'tl_class' => 'w50'),
-            'sql'               => "varchar(254) NOT NULL default ''"
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'alias' => array
@@ -175,9 +188,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'tl_class'=>'w50'),
             'save_callback' => array
             (
-                array('tl_c4g_reservation_type', 'generateAlias')
+                array($cbClass, 'generateAlias')
             ),
-            'sql' => "varchar(255) BINARY NOT NULL default ''"
+            // 'sql' => "varchar(255) BINARY NOT NULL default ''"
+            'sql'    => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'options' => array
@@ -220,7 +234,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'options'                 => ['1','3','2'],
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'],
             'eval'                    => ['tl_class'=>'clr long','submitOnChange' => true],
-            'sql'                     => "varchar(254) NOT NULL default '1'"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '1')
         ),
 
        'periodType' => array
@@ -303,7 +317,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'select',
             'foreignKey'              => 'tl_c4g_reservation_object.caption',
             'eval'                    => array('mandatory'=>false, 'includeBlankOption' => true, 'tl_class' => 'long clr', 'multiple'=>false, 'chosen'=>true),
-            'sql'                     => "varchar(10) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
         ),
 
         'minParticipantsPerBooking' => array
@@ -365,7 +379,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'notification_confirmation_type'  => array
@@ -375,7 +389,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'notification_special_type'  => array
@@ -385,7 +399,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
         'auto_send' => array
         (
@@ -622,151 +636,4 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'sql'                     => "int(1) unsigned NULL default 1"
         )
     )
-
 );
-
-
-/**
- * Class tl_c4g_reservation_type
- */
-class tl_c4g_reservation_type extends Backend
-{
-    /**
-     * Import the back end user object
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
-
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
-        $this->import('BackendUser', 'User');
-
-        if (strlen($this->Input->get('tid'))) {
-            $this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == '0'));
-            $this->redirect($this->getReferer());
-        }
-
-        // Check permissions AFTER checking the tid, so hacking attempts are logged
-        if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_type::published', 'alexf')) {
-            return '';
-        }
-
-        $href .= '&amp;id=' . $this->Input->get('id') . '&amp;tid=' . $row['id'] . '&amp;state='.($row['published'] ? '' : 1);
-
-        if (!$row['published']) {
-            $icon = 'invisible.gif';
-        }
-
-        return '<a href="' . $this->addToUrl($href) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
-    }
-
-    /**
-     * Disable/enable a user group
-     *
-     * @param integer $intId
-     * @param boolean $blnVisible
-     * @param DataContainer $dc
-     *
-     * @throws Contao\CoreBundle\Exception\AccessDeniedException
-     */
-    public function toggleVisibility($intId, $blnPublished)
-    {
-        // Check permissions to publish
-        if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_type::published', 'alexf')) {
-            $this->log('Not enough permissions to show/hide record ID "' . $intId . '"', 'tl_c4g_reservation_type toggleVisibility', TL_ERROR);
-            $this->redirect('contao/main.php?act=error');
-        }
-
-        $this->createInitialVersion('tl_c4g_reservation_type', $intId);
-
-        // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_c4g_reservation_type']['fields']['published']['save_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_c4g_reservation_type']['fields']['published']['save_callback'] as $callback) {
-                $this->import($callback[0]);
-                $blnPublished = $this->$callback[0]->$callback[1]($blnPublished, $this);
-            }
-        }
-
-        // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation_type SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE `id`=?")
-            ->execute($intId);
-        $this->createNewVersion('tl_c4g_reservation_type', $intId);
-    }
-
-    /**
-     * @param $dc
-     * @return array
-     */
-    public function loadMemberOptions($dc) {
-        $options = [];
-
-        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
-        $result = $stmt->execute()->fetchAllAssoc();
-
-        foreach ($result as $row) {
-            $options[$row['id']] = $row['lastname'] . ', ' . $row['firstname'];
-        }
-        return $options;
-    }
-
-    /**
-     * @param $dc
-     * @return array
-     */
-    public function loadGroupOptions($dc) {
-        $options = [];
-
-        $stmt = $this->Database->prepare("SELECT id, name FROM tl_member_group WHERE `disable` != 1");
-        $result = $stmt->execute()->fetchAllAssoc();
-
-        foreach ($result as $row) {
-            $options[$row['id']] = $row['name'];
-        }
-        return $options;
-    }
-
-    /**
-     * @param \Contao\DataContainer $dc
-     */
-    public function showInfoMessage(Contao\DataContainer $dc)
-    {
-        \Contao\Message::addInfo($GLOBALS['TL_LANG']['tl_c4g_reservation_type']['infotext']);
-    }
-
-    /**
-     * Auto-generate the object alias if it has not been set yet
-     *
-     * @param mixed         $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias($varValue, \Contao\DataContainer $dc)
-    {
-        $aliasExists = function (string $alias) use ($dc): bool
-        {
-            return $this->Database->prepare("SELECT id FROM tl_c4g_reservation_type WHERE alias=? AND id!=?")->execute($alias, $dc->id)->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue)
-        {
-            $varValue = \Contao\System::getContainer()->get('contao.slug')->generate($dc->activeRecord->caption, C4gReservationTypeModel::findByPk($dc->activeRecord->id)->jumpTo, $aliasExists);
-        }
-        elseif (preg_match('/^[1-9]\d*$/', $varValue))
-        {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        }
-        elseif ($aliasExists($varValue))
-        {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-}

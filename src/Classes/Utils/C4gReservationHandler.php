@@ -57,6 +57,7 @@ class C4gReservationHandler
             foreach ($list as $object) {
                 $we = $object->getWeekdayExclusion();
                 foreach ($we as $key => $value) {
+                    $weekdays[$key] = $key;
                     if (!$value) {
                         $weekdays[$key] = $weekdays[$key] !== false ? true : false;
                     } else {
@@ -174,10 +175,12 @@ class C4gReservationHandler
                 if ($exclusionPeriods) {
                     foreach ($exclusionPeriods as $period) {
                         if ($period && $period['date_exclusion'] && $period['date_exclusion_end']) {
-                            $exclusionBegin = $period['date_exclusion'];
-                            $exclusionEnd = $period['date_exclusion_end'];
+                            $exclusionBegin = $period['date_exclusion'] == -3600 ? 0 : $period['date_exclusion'];
+                            $exclusionEnd = $period['date_exclusion_end'] == -3600 ? 0 : $period['date_exclusion_end'];
 
-                            $excludePeriodArr[] = ['begin'=>$exclusionBegin, 'end'=> $exclusionEnd];
+                            if ($exclusionBegin && $exclusionEnd) {
+                                $excludePeriodArr[] = ['begin'=>$exclusionBegin, 'end'=> $exclusionEnd];
+                            }
                         }
                     }
                 }
@@ -333,7 +336,7 @@ class C4gReservationHandler
         $withoutTime = false;
         $description = '';
         $weekday = C4gReservationDateChecker::getWeekdayStr($list['weekday']);
-        if ($list['showArrivalAndDeparture'][$weekday] && is_array($list['showArrivalAndDeparture'][$weekday])) {
+        if (isset($list['showArrivalAndDeparture'][$weekday]) && $list['showArrivalAndDeparture'][$weekday] && is_array($list['showArrivalAndDeparture'][$weekday])) {
             $arrivalTimeBegin =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][0]['time_begin']);
             $arrivalTimeEnd =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][0]['time_end_org']);
             $departureTimeBegin =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][1]['time_begin']);
@@ -394,13 +397,13 @@ class C4gReservationHandler
 //                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $time+$interval).$clock;
 //                    $end = date('I', $list['tsdate']) ? date($format, $time+$interval+3600).$clock : date($format, $time+$interval).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.' - '.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
                 if (!$mergedTime) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.' - '.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else {
                 $key = $time.'#'.$interval;
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj], 'description' => $description);
@@ -412,14 +415,15 @@ class C4gReservationHandler
                     date_default_timezone_set('Europe/Berlin');
                     $summertime = C4gReservationDateChecker::getTimeDiff($time);
                     $end = date($format, $time + $interval+$summertime-3600).$clock;
+                    $stop = 1;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.' - '.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
                 if (!$mergedTime) {
                     $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
                 }
-                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.'&nbsp;-&nbsp;'.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
+                $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.' - '.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else {
                 $key = $time.'#'.$interval;
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => 0, 'name' => $begin, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
@@ -477,10 +481,12 @@ class C4gReservationHandler
                 if ($exclusionPeriods) {
                     foreach ($exclusionPeriods as $period) {
                         if ($period && $period['date_exclusion'] && $period['date_exclusion_end']) {
-                            $exclusionBegin = $period['date_exclusion'];
-                            $exclusionEnd = $period['date_exclusion_end'];
+                            $exclusionBegin = $period['date_exclusion'] == -3600 ? 0 : $period['date_exclusion'];
+                            $exclusionEnd = $period['date_exclusion_end'] == -3600 ? 0 : $period['date_exclusion_end'];
 
-                            $excludePeriodArr[] = ['begin' => $exclusionBegin, 'end' => $exclusionEnd];
+                            if ($exclusionBegin && $exclusionEnd) {
+                                $excludePeriodArr[] = ['begin' => $exclusionBegin, 'end' => $exclusionEnd];
+                            }
                         }
                     }
                 }
@@ -543,6 +549,7 @@ class C4gReservationHandler
                    $nextDays = ($nextDays > 0) ? $nextDays-- : 0;
                 }
 
+                $alldates[$i] = $i;
                 if (!$alldates[$i]) {
                     $hitIt = true;
                     foreach ($excludePeriodArr as $period) {
@@ -712,7 +719,7 @@ class C4gReservationHandler
     private static function getReservationTimesDefault($timeParams, $timeObjectParams, $period) {
         $time_begin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
         $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
-        $typeOfObject = $timeObjectParams['object']->getTypeOfObject;
+        $typeOfObject = $timeObjectParams['object']->getTypeOfObject();
 
         if (($time_begin !== false) && ($time_end !== false)) {
             $time = $time_begin;
@@ -736,7 +743,7 @@ class C4gReservationHandler
                 }
 
                 if ($timeParams['type']) {
-                    if ($periodChanged && ($time >= 86400)) {
+                    if (isset($periodChanged) && $periodChanged && ($time >= 86400)) {
                         $timeParams['tsdate'] += 86400;
                         $periodChanged = false;
                         $nxtDay = true;
@@ -1384,7 +1391,7 @@ class C4gReservationHandler
             ->execute($typeId,$objectId,$reservationObjectType_ID,$beginDateAsTstamp,$beginTime,'1')->fetchAllAssoc();
             
             $capacityMax = $reservationObject->desiredCapacityMax;
-            $chosenCapacity = intval($putVars['desiredCapacity_'.$typeId]);
+            $chosenCapacity = isset($putVars['desiredCapacity_'.$typeId]) ? intval($putVars['desiredCapacity_'.$typeId]) : null;
             
             $reservationCount = C4gReservationHandler::countReservations($reservations);
             if ($reservationType->severalBookings) {
@@ -1708,7 +1715,7 @@ class C4gReservationHandler
                 $priceArray = $showPrices ? C4gReservationCalculator::calcPrices($eventObject, $type, true, 1, '', '','','') : array('price' => 0, 'priceSum' => 0);
                 $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']).$priceArray['priceInfo'];
 
-                $frontendObject->setCaption($price ? StringHelper::spaceToNbsp($eventObject['title'])."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
+                $frontendObject->setCaption($price ? $eventObject['title']." (".$price.")" : $eventObject['title']);
                 $frontendObject->setDesiredCapacity([$event['minParticipants'] ?:  $calendarObject['reservationMinParticipants'], $event['maxParticipants'] ?: $maxParticipants]);
                 $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
                 $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'],$eventObject['startTime']));
@@ -1769,7 +1776,7 @@ class C4gReservationHandler
                             $eventObject['priceoption'] = $reservationEvent['priceoption'] ?: $calendarObject['reservationPriceOption'];
                             $priceArray = $showPrices ? C4gReservationCalculator::calcPrices($eventObject, $type, true, 1,'','','','') : array('price' => 0, 'priceSum' => 0);
                             $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']);
-                            $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($eventObject['title']) . "<span class='price'>&nbsp;(" . $price . ")</span>" : StringHelper::spaceToNbsp($eventObject['title']));
+                            $frontendObject->setCaption($showPrices && $price ? $eventObject['title'] . " (" . $price . ")" : $eventObject['title']);
                             $frontendObject->setDesiredCapacity([$reservationEvent['minParticipants'] ?: $calendarObject['reservationMinParticipants'], $maxParticipants]);
                             $frontendObject->setBeginDate(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'], $eventObject['startTime']));
                             $frontendObject->setBeginTime(C4gReservationDateChecker::mergeDateWithTime($eventObject['startDate'], $eventObject['startTime']));
@@ -1838,9 +1845,9 @@ class C4gReservationHandler
         $database = Database::getInstance();
 
         if ($langCookie) {
-            $GLOBALS['LANGUAGE'] = $GLOBALS['LANGUAGE'] ?: $langCookie;
+            $GLOBALS['TL_LANGUAGE'] = $GLOBALS['TL_LANGUAGE'] ?: $langCookie;
         }
-        System::loadLanguageFile('fe_c4g_reservation', $GLOBALS['LANGUAGE']);
+        System::loadLanguageFile('fe_c4g_reservation', $GLOBALS['TL_LANGUAGE']);
 
         if ($objectId && is_numeric($objectId)) {
             $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND id = ? ORDER BY caption")->execute('1', $objectId)->fetchAllAssoc();
@@ -1894,13 +1901,13 @@ class C4gReservationHandler
                 $frontendObject->setType(1);
                 $frontendObject->setId($object['id']);
 
-                $frontendObject->setCaption(StringHelper::spaceToNbsp($object['caption']));
+                $frontendObject->setCaption($object['caption']);
 
                 $captions = StringUtil::deserialize($object['options']);
                 if ($captions) {
                     foreach ($captions as $caption) {
                         if ((strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) && $caption['caption']) {
-                            $frontendObject->setCaption(StringHelper::spaceToNbsp($caption['caption']));
+                            $frontendObject->setCaption($caption['caption']);
                             break;
                         }
                     }
@@ -1909,7 +1916,7 @@ class C4gReservationHandler
                 $priceArray = $showPrices ? C4gReservationCalculator::calcPrices($object, $type, false, 1, $duration, $date,'','' ) : array('price' => 0, 'priceSum' => 0);
                 $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']).$priceArray['priceInfo'];
 
-                $frontendObject->setCaption($showPrices && $price ? StringHelper::spaceToNbsp($frontendObject->getCaption())."<span class='price'>&nbsp;(".$price.")</span>" : StringHelper::spaceToNbsp($frontendObject->getCaption()));
+                $frontendObject->setCaption($showPrices && $price ? $frontendObject->getCaption()." (".$price.")" : $frontendObject->getCaption());
 
                 $frontendObject->setPeriodType($type['periodType']);
                 $frontendObject->setReservationTypes(\Contao\StringUtil::deserialize($object['viewableTypes']));
@@ -1934,7 +1941,7 @@ class C4gReservationHandler
                 $frontendObject->setSeveralBookings($severalBookings);
 
                 if ($cloneObject) {
-                    $frontendObject->setTimeinterval($object['time_interval'] ?: $cloneObject['time_interval']);
+                    $frontendObject->setTimeinterval(($object['time_interval'] && $object['time_interval'] !== 1) || !$cloneObject['time_interval'] ? $object['time_interval']: $cloneObject['time_interval']);
                     $frontendObject->setDuration($object['duration'] ?: $cloneObject['duration']);
                     $frontendObject->setMinReservationDay($object['min_reservation_day'] ?: $cloneObject['min_reservation_day']);
                     $frontendObject->setMaxReservationDay($object['max_reservation_day'] ?: $cloneObject['max_reservation_day']);
@@ -1991,65 +1998,68 @@ class C4gReservationHandler
                     $datesExclusion = \Contao\StringUtil::deserialize($object['days_exclusion']);
                     $calendars = \Contao\StringUtil::deserialize($object['allTypesEvents']);
 
-                    foreach ($calendars as $calendarId) {
-                        if ($calendarId) {
-                            $events = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ? AND `published` = '1'")->execute($calendarId)->fetchAllAssoc();
-
-                            foreach ($events as $event) {
-                                if ($event){
-                                    $startDate = $event['startDate'];
-                                    $endDate = $event['endDate'] ?: $startDate;
-                                    $startTime = $event['startTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate']);
-                                    $endTime = $event['endTime'];
-                                    if ($startTime != $endTime) {
-                                        $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
-                                    } else {
-                                        $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
-                                    }
-
-                                    $startDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($startDate, $startTime); //+1 ToDo Check Why?
-                                    $endDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($endDate, $endTime);
-                                    $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
-
-                                    if ($event['recurring']) {
-                                        $repeatEach = StringUtil::deserialize($event['repeatEach']);
-                                        $repeatEnd = $event['repeatEnd']; //timestamp
-                                        $recurrences = $event['recurrences'];
-
-                                        switch ($repeatEach['unit']) {
-                                            case 'days':
-                                                $recInterval = 86400*$repeatEach['value'];
-                                                break;
-                                            case 'weeks':
-                                                $recInterval = 86400*7*$repeatEach['value'];
-                                                break;
-                                            case 'months': //ToDo other solution
-                                                $recInterval = 86400*7*4*$repeatEach['value'];
-                                                break;
-                                            case 'years':  //ToDo other solution
-                                                $recInterval = 86400*12*4*7*$repeatEach['value'];
-                                                break;
-                                            default:
-                                                $recInterval = 0;
-                                                break;
+                    if (is_array($calendars) || is_object($calendars)) {
+                        foreach ($calendars as $calendarId) {
+                            if ($calendarId) {
+                                $events = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ? AND `published` = '1'")->execute($calendarId)->fetchAllAssoc();
+    
+                                foreach ($events as $event) {
+                                    if ($event){
+                                        $startDate = $event['startDate'];
+                                        $endDate = $event['endDate'] ?: $startDate;
+                                        $startTime = $event['startTime'] ?: C4gReservationDateChecker::getBeginOfDate($event['startDate']);
+                                        $endTime = $event['endTime'];
+                                        if ($startTime != $endTime) {
+                                            $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
+                                        } else {
+                                            $endTime = $endTime ?: C4gReservationDateChecker::getBeginOfDate($event['startDate'])+86399;
                                         }
-
-                                        for ($i=0;$i<=$recurrences;$i++) {
-                                            $startDateTime = $startDateTime + $recInterval;
-                                            $endDateTime = $endDateTime + $recInterval;
-
-                                            if ($startDateTime >= $repeatEnd) {
-                                                break;
+    
+                                        $startDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($startDate, $startTime); //+1 ToDo Check Why?
+                                        $endDateTime = C4gReservationDateChecker::mergeDateAndTimeStamp($endDate, $endTime);
+                                        $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
+    
+                                        if ($event['recurring']) {
+                                            $repeatEach = StringUtil::deserialize($event['repeatEach']);
+                                            $repeatEnd = $event['repeatEnd']; //timestamp
+                                            $recurrences = $event['recurrences'];
+    
+                                            switch ($repeatEach['unit']) {
+                                                case 'days':
+                                                    $recInterval = 86400*$repeatEach['value'];
+                                                    break;
+                                                case 'weeks':
+                                                    $recInterval = 86400*7*$repeatEach['value'];
+                                                    break;
+                                                case 'months': //ToDo other solution
+                                                    $recInterval = 86400*7*4*$repeatEach['value'];
+                                                    break;
+                                                case 'years':  //ToDo other solution
+                                                    $recInterval = 86400*12*4*7*$repeatEach['value'];
+                                                    break;
+                                                default:
+                                                    $recInterval = 0;
+                                                    break;
                                             }
-
-                                            $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
+    
+                                            for ($i=0;$i<=$recurrences;$i++) {
+                                                $startDateTime = $startDateTime + $recInterval;
+                                                $endDateTime = $endDateTime + $recInterval;
+    
+                                                if ($startDateTime >= $repeatEnd) {
+                                                    break;
+                                                }
+    
+                                                $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
+                                            }
                                         }
                                     }
+    
                                 }
-
                             }
                         }
                     }
+                    
                 }
 
                 $frontendObject->setDatesExclusion($datesExclusion);

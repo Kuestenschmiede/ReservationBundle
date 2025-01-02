@@ -64,7 +64,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         foreach ($reservationObjects as $reservationObject) {
             $objects[] = array(
                 'id' => $reservationObject->getId(),
-                'name' => $reservationObject->getNumber() ? '[' . $reservationObject->getNumber() . ']&nbsp;' . $reservationObject->getCaption() : $reservationObject->getCaption(),
+                'name' => $reservationObject->getNumber() ? '[' . $reservationObject->getNumber() . '] ' . $reservationObject->getCaption() : $reservationObject->getCaption(),
 //                'title' => $reservationObject->getTitle(),
                 'min' => $reservationObject->getDesiredCapacity()[0] ?: 1,
                 'max' => $reservationObject->getDesiredCapacity()[1] ?: 0 //ToDo check
@@ -249,7 +249,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 if ($location) {
                     $href = '';
                     if ($reservationSettings->location_redirect_site) {
-                        $jumpTo = \PageModel::findByPk($reservationSettings->location_redirect_site);
+                        $jumpTo = \Contao\PageModel::findByPk($reservationSettings->location_redirect_site);
                         if ($jumpTo) {
                             $locationAlias = $location->alias ?: $locationId;
                             $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$locationAlias;
@@ -261,7 +261,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $postal = $location->contact_postal;
                     $city = $location->contact_city;
                     if ($street && $postal && $city) {
-                        $locationName .= "&nbsp;(" . $street . ",&nbsp;" . $postal . "&nbsp;" . $city . ")";
+                        $locationName .= " (" . $street . ", " . $postal . " " . $city . ")";
                     }
 
                     if ($href) {
@@ -297,7 +297,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 if ($organizer) {
                     $href = '';
                     if ($reservationSettings->location_redirect_site) {
-                        $jumpTo = \PageModel::findByPk($reservationSettings->location_redirect_site);
+                        $jumpTo = \Contao\PageModel::findByPk($reservationSettings->location_redirect_site);
                         if ($jumpTo) {
                             $organizerAlias = $organizer->alias ?: $organizerId;
                             $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$organizerAlias;
@@ -309,7 +309,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $postal = $organizer->contact_postal;
                     $city = $organizer->contact_city;
                     if ($street && $postal && $city) {
-                        $organizerName .= "&nbsp;(" . $street . ",&nbsp;" . $postal . "&nbsp;" . $city . ")";
+                        $organizerName .= " (" . $street . ", " . $postal . " " . $city . ")";
                     }
 
                     if ($href) {
@@ -349,10 +349,10 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $speakerNr++;
                     $speaker = C4gReservationEventSpeakerModel::findByPk($speakerId);
                     if ($speaker) {
-                        $speakerName = $speaker->title ? $speaker->title . '&nbsp;' . $speaker->firstname . '&nbsp;' . $speaker->lastname : $speaker->firstname . '&nbsp;' . $speaker->lastname;
+                        $speakerName = $speaker->title ? $speaker->title . ' ' . $speaker->firstname . ' ' . $speaker->lastname : $speaker->firstname . ' ' . $speaker->lastname;
 
                         if ($reservationSettings->speaker_redirect_site) {
-                            $jumpTo = \PageModel::findByPk($reservationSettings->speaker_redirect_site);
+                            $jumpTo = \Contao\PageModel::findByPk($reservationSettings->speaker_redirect_site);
                             if ($jumpTo) {
                                 $speakerAlias = $speaker->alias ?: $speakerId;
                                 $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerAlias;
@@ -388,7 +388,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $topic = C4gReservationEventTopicModel::findByPk($topicId);
                     if ($topic) {
                         $topicName = $topic->topic;
-                        $topicStr = $topicStr ? $topicStr . ',&nbsp;' . $topicName : $topicName;
+                        $topicStr = $topicStr ? $topicStr . ', ' . $topicName : $topicName;
                     }
                 }
 
@@ -418,7 +418,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $audience = C4gReservationEventAudienceModel::findByPk($audienceId);
                     if ($audience) {
                         $audienceName = $audience->targetAudience;
-                        $audienceStr = $audienceStr ? $audienceStr . ',&nbsp;' . $audienceName : $audienceName;
+                        $audienceStr = $audienceStr ? $audienceStr . ', ' . $audienceName : $audienceName;
                     }
                 }
 

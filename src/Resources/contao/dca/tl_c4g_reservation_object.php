@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -13,21 +13,18 @@
  * Table tl_module
  */
 
-use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
-use Contao\CalendarBundle\Security\ContaoCalendarPermissions;
+use con4gis\ReservationBundle\Classes\Callbacks\C4gReservationObject;
+use Contao\DataContainer;
+use Contao\Config;
+use Contao\DC_Table;
 
-
-
-//$default = '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id';
-
-$GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
+$cbClass = C4gReservationObject::class;
+$GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array 
 (
     //config
     'config' => array
     (   //'onsubmit_callback' => [['tl_c4g_reservation_object', 'multi_booking']],
-        'dataContainer'     => 'Table',
+        'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
         'sql'               => array
         (
@@ -52,63 +49,61 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'label' => array
         (
             'fields'            => array('caption','quantity','desiredCapacityMin','desiredCapacityMax','viewableTypes:tl_c4g_reservation_type.caption','time_interval'),
-            'label_callback'    => array('tl_c4g_reservation_object', 'listFields'),
+            'label_callback'    => array($cbClass, 'listFields'),
             'showColumns'       => true
         ),
 
         'global_operations' => array
         (
-            'all' => array
-            (
+            'all' =>
+            [
                 'label'         => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'          => 'act=select',
                 'class'         => 'header_edit_all',
                 'attributes'    => 'onclick="Backend.getScrollOffSet()" accesskey="e"'
-            )
+            ]
         ),
 
-        'operations' => array
-        (
-            'edit' => array
-            (
-                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['edit'],
-                'href'          => 'act=edit',
-                'icon'          => 'edit.gif',
-            ),
-            'copy' => array
-            (
-                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['copy'],
-                'href'          => 'act=copy',
-                'icon'          => 'copy.gif',
-            ),
-            'delete' => array
-            (
-                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['delete'],
-                'href'          => 'act=delete',
-                'icon'          => 'delete.gif',
-                'attributes'    => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\')) return false;Backend.getScrollOffset()"',
-            ),
-            'show' => array
-            (
-                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['show'],
-                'href'          => 'act=show',
-                'icon'          => 'show.gif',
-
-            ),
-            'toggle' => array
-            (
+        'operations' =>
+            [
+            'edit' =>
+                [
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['edit'],
+                'href'                => 'act=edit',
+                'icon'                => 'edit.svg',
+                ],
+            'copy' =>
+                [
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['copy'],
+                'href'                => 'act=copy',
+                'icon'                => 'copy.svg'
+                ],
+            'delete' =>
+                [
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['delete'],
+                'href'                => 'act=delete',
+                'icon'                => 'delete.svg',
+                'attributes'          => 'onclick="if (!confirm(\'' . (isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] : null) . '\')) return false; Backend.getScrollOffset();"'
+                ],
+            'toggle' =>
+                [
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['toggle'],
-                'icon'                => 'visible.gif',
-                'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array('tl_c4g_reservation_object', 'toggleIcon')
-           )
-        )
+                'icon'                => 'visible.svg',
+                'button_callback'     => [$cbClass, 'toggleIcon']
+                ],
+            'show' =>
+                [
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['show'],
+                'href'                => 'act=show',
+                'icon'                => 'show.svg'
+                ]
+            ]
     ),
 
     //Palettes
     'palettes' => array(
         '__selector__' => ['typeOfObject'],
-        'default'   =>  '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, typeOfObject, min_reservation_day, max_reservation_day, maxBeginTime;,{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id;',
+        'default'   =>  '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, typeOfObject, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id;',
         'fixed_date' => '{type_legend}, caption, alias, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, typeOfObject, min_reservation_day, max_reservation_day, maxBeginTime;{event_legend},event_selection;{event_legend:hide},location, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id;',
     ),
 
@@ -132,7 +127,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'exclude'           => true,
-            'options_callback'  => array('tl_c4g_reservation_object', 'loadMemberOptions'),
+            'options_callback'  => array($cbClass, 'loadMemberOptions'),
             'eval'              => array('mandatory'=>false, 'disabled' => true, 'tl_class' => 'clr long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['noMember']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
@@ -151,7 +146,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'search'            => true,
             'inputType'         => 'text',
             'eval'              => array('mandatory' => true, 'tl_class' => 'w50', 'maxlength' => 254),
-            'sql'               => "varchar(254) NOT NULL default ''"
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'alias' => array
@@ -163,7 +158,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
             'save_callback' => array
             (
-               array('tl_c4g_reservation_object', 'generateAlias')
+                array($cbClass, 'generateAlias')
             ),
             'sql' => "varchar(255) BINARY NOT NULL default ''"
         ),
@@ -246,7 +241,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'filter'            => false,
             'exclude'           => true,
             'inputType'         => 'checkbox',
-            'options_callback'  =>  ['tl_c4g_reservation_object', 'getTypes'],
+            'options_callback'  =>  [$cbClass, 'getTypes'],            
             'eval'              => array('mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr'),
             'sql'               => "blob NULL"
         ),
@@ -279,7 +274,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['speaker'],
             'exclude'           => true,
             'inputType'         => 'checkbox',
-            'options_callback'  => ['tl_c4g_reservation_object', 'getSpeakerName'],
+            'options_callback'  => [$cbClass, 'getSpeakerName'],
             'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
             'sql'               => "blob NULL"
         ),
@@ -332,7 +327,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
-            'options_callback'  => ['tl_c4g_reservation_object', 'getTypes'],
+            'options_callback'  => [$cbClass, 'getTypes'],
             'eval'              => array('mandatory'=>true,'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'qualifications','multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'               => "blob NULL "
         ),
@@ -345,8 +340,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'options'     => array('standard', 'fixed_date'),
             'reference'   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references'],
             'eval'        => array('chosen' => true, 'mandatory' => true, 'tl_class' => 'long', 'submitOnChange' => true),
-            'sql'         => "varchar(10) NOT NULL default 'standard'",
-
+            'sql'         => array('type' => 'string', 'length' => 10, 'default' => 'standard'),
         ),
 
         'dateTimeBegin' => array(
@@ -401,7 +395,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'time_end' => array
                 (
@@ -411,7 +405,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'min-width: 60px;'),
-                    'sql'                     => "varchar(10) NOT NULL default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_from' => array
                 (
@@ -420,7 +414,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '') 
                 ),
                 'date_to' => array
                 (
@@ -429,7 +423,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 )
             )),
             'sql'                     => "blob NULL"
@@ -451,7 +445,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'time_end' => array
                 (
@@ -461,7 +455,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_from' => array
                 (
@@ -470,7 +464,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_to' => array
                 (
@@ -479,7 +473,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 )
             )),
             'sql'                     => "blob NULL"
@@ -501,7 +495,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'time_end' => array
                 (
@@ -511,7 +505,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_from' => array
                 (
@@ -520,7 +514,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_to' => array
                 (
@@ -529,7 +523,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 )
             )),
             'sql'                     => "blob NULL"
@@ -551,7 +545,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'time_end' => array
                 (
@@ -561,7 +555,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_from' => array
                 (
@@ -570,7 +564,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_to' => array
                 (
@@ -579,7 +573,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 )
             )),
             'sql'                     => "blob NULL"
@@ -601,7 +595,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'time_end' => array
                 (
@@ -611,7 +605,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) efault ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_from' => array
                 (
@@ -620,7 +614,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_to' => array
                 (
@@ -629,7 +623,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 )
             )),
             'sql'                     => "blob NULL"
@@ -651,7 +645,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'time_end' => array
                 (
@@ -661,7 +655,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_from' => array
                 (
@@ -670,7 +664,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_to' => array
                 (
@@ -679,7 +673,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 )
             )),
             'sql'                     => "blob NULL"
@@ -701,7 +695,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'time_end' => array
                 (
@@ -711,7 +705,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'inputType'               => 'text',
                     'flag'                    => 8,
                     'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_from' => array
                 (
@@ -720,7 +714,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_to' => array
                 (
@@ -729,7 +723,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 )
             )),
             'sql'                     => "blob NULL"
@@ -750,7 +744,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 120px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 ),
                 'date_exclusion_end' => array
                 (
@@ -759,7 +753,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
                     'exclude'                 => true,
                     'inputType'               => 'text',
                     'eval'                    => array('rgxp'=>'datim', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 120px;'),
-                    'sql'                     => "varchar(10) default ''"
+                    'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
                 )
 
             )),
@@ -799,7 +793,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'inputType'               => 'text',
             'flag'                    => 8,
             'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard', 'style'=>'display: inline-block; min-width: 60px;'),
-            'sql'                     => "varchar(10) default ''"
+            'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
         ],
 
         'description' => array (
@@ -833,7 +827,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            // 'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'price' => array(
@@ -855,7 +850,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'default'                 => '',
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references'],
             'eval'                    => array('mandatory'=>false, 'tl_class' => 'long clr'),
-            'sql'                     => "varchar(50) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 50, 'default' => '')
         ),
         'taxOptions' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['taxOptions'],
@@ -865,7 +860,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'options'                 => array( 'tNone', 'tStandard', 'tReduced',),
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['references'],
             'eval'                    => array('submitOnChange' => true, 'tl_class' => 'long clr', 'fieldType'=>'radio'),
-            'sql'                     => "varchar(50) NOT NULL default 'tNone'"
+            'sql'                     => array('type' => 'string', 'length' => 50, 'default' => 'tNone')
         ),
         'published' => array(
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['published'],
@@ -874,209 +869,5 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'inputType'         => 'checkbox',
             'sql'               => "int(1) unsigned NULL default 1"
         )
-
     )
-
-
 );
-
-
-/**
- * Class tl_c4g_reservation_object
- */
-class tl_c4g_reservation_object extends Backend
-{
-    /**
-     * Import the back end user object
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
-
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
-        $this->import('BackendUser', 'User');
-
-        if (strlen($this->Input->get('tid'))) {
-            $this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 0));
-            $this->redirect($this->getReferer());
-        }
-
-        // Check permissions AFTER checking the tid, so hacking attempts are logged
-        if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_object::published', 'alexf')) {
-            return '';
-        }
-
-        $href .= '&amp;id=' . $this->Input->get('id') . '&amp;tid=' . $row['id'] . '&amp;state='.($row['published'] ? '' : 1);
-
-        if (!$row['published']) {
-            $icon = 'invisible.gif';
-        }
-
-        return '<a href="' . $this->addToUrl($href) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
-    }
-
-
-    /**
-     * Disable/enable a user group
-     *
-     * @param integer $intId
-     * @param boolean $blnVisible
-     * @param DataContainer $dc
-     *
-     * @throws Contao\CoreBundle\Exception\AccessDeniedException
-     */
-    public function toggleVisibility($intId, $blnPublished)
-    {
-        // Check permissions to publish
-        if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_object::published', 'alexf')) {
-            $this->log('Not enough permissions to show/hide record ID "' . $intId . '"', 'tl_c4g_reservation_object toggleVisibility', TL_ERROR);
-            $this->redirect('contao/main.php?act=error');
-        }
-
-        $this->createInitialVersion('tl_c4g_reservation_object', $intId);
-
-        // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_c4g_reservation_object']['fields']['published']['save_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_c4g_reservation_object']['fields']['published']['save_callback'] as $callback) {
-                $this->import($callback[0]);
-                $blnPublished = $this->$callback[0]->$callback[1]($blnPublished, $this);
-            }
-        }
-
-        // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation_object SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE `id`=?")
-            ->execute($intId);
-        $this->createNewVersion('tl_c4g_reservation_object', $intId);
-    }
-
-    public function listFields($arrRow)
-    {
-        $type_ids = \Contao\StringUtil::deserialize($arrRow['viewableTypes']);
-
-        $reservationTypes = '';
-        foreach ($type_ids as $type_id) {
-            $reservation_type = \con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel::findByPk($type_id);
-            if ($reservation_type) {
-                if ($reservationTypes == '') {
-                    $reservationTypes .= $reservation_type->caption;
-                } else {
-                    $reservationTypes .= ','.$reservation_type->caption;
-                }
-            }
-        }
-
-        $arrRow['viewableTypes'] = $reservationTypes;
-
-        $result = [
-            $arrRow['caption'],
-            $arrRow['quantity'],
-            $arrRow['desiredCapacityMin'],
-            $arrRow['desiredCapacityMax'],
-            $arrRow['viewableTypes'],
-            $arrRow['time_interval']
-        ];
-        return $result;
-    }
-
-    public function getTypes(DataContainer $dc)
-    {
-        $return = [];
-
-        $types = $this->Database->prepare("SELECT id, caption, reservationObjectType, published FROM tl_c4g_reservation_type")
-            ->execute()->fetchAllAssoc();
-        foreach ($types as $type) {
-            if ($type['reservationObjectType'] != '2') {
-                $key = $type['id'];
-                $return[$key] = $type['caption'];
-            }
-        }
-
-        asort($return);
-        return $return;
-    }
-
-    /**
-     * @param $dc
-     * @return array
-     */
-    public function loadMemberOptions($dc) {
-        $options = [];
-
-        if (!$dc->activeRecord) {
-            return $options;
-        }
-
-        $options[$dc->activeRecord->id] = '';
-
-        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
-        $result = $stmt->execute()->fetchAllAssoc();
-
-        foreach ($result as $row) {
-            $options[$row['id']] = $row['lastname'] . ', ' . $row['firstname'];
-        }
-        return $options;
-    }
-
-    /**
-     * Return all speaker as array
-     * @return array
-     */
-    public function getSpeakerName(DataContainer $dc)
-    {
-        $return = [];
-
-        $objects = $this->Database->prepare("SELECT id,title,firstname,lastname FROM tl_c4g_reservation_event_speaker ORDER BY lastname")
-            ->execute();
-
-        while ($objects->next()) {
-            $name = '';
-            if ($objects->title) {
-                $name = $objects->lastname.','.$objects->firstname.','.$objects->title;
-            } else {
-                $name = $objects->lastname.','.$objects->firstname;
-            }
-
-            $return[$objects->id] = $name;
-        }
-
-        return $return;
-    }
-
-    /**
-     * Auto-generate the object alias if it has not been set yet
-     *
-     * @param mixed         $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias($varValue, \Contao\DataContainer $dc)
-    {
-        $aliasExists = function (string $alias) use ($dc): bool
-        {
-            return $this->Database->prepare("SELECT id FROM tl_c4g_reservation_object WHERE alias=? AND id!=?")->execute($alias, $dc->id)->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue)
-        {
-            $varValue = \Contao\System::getContainer()->get('contao.slug')->generate($dc->activeRecord->caption, C4gReservationObjectModel::findByPk($dc->activeRecord->id)->jumpTo, $aliasExists);
-        }
-        elseif (preg_match('/^[1-9]\d*$/', $varValue))
-        {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        }
-        elseif ($aliasExists($varValue))
-        {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-
-}

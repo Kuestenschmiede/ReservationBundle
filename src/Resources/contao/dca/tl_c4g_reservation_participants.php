@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -13,12 +13,17 @@
  * Table tl_module
  */
 
+use con4gis\ReservationBundle\Classes\Callbacks\C4gReservationParticipants;
+use Contao\DC_Table;
+
+$cbClass = C4gReservationParticipants::class;
+
 $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
 (
     //config
     'config' => array
     (
-        'dataContainer'     => 'Table',
+        'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
         'ptable'            => 'tl_c4g_reservation',
         'sql'               => array
@@ -45,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
         'label' => array
         (
             'fields'            => array('id','title','lastname','firstname','email','cancellation'),
-            'label_callback'    => array('tl_c4g_reservation_participants', 'listFields'),
+            'label_callback'    => array($cbClass, 'listFields'),
             'showColumns'       => true,
         ),
 
@@ -92,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['TOGGLE'],
                 'icon'                => 'visible.gif',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array('tl_c4g_reservation_participants', 'toggleIcon')
+                'button_callback'     => array($cbClass, 'toggleIcon')
             )
         )
     ),
@@ -122,16 +127,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
 
-//        'uuid' => array
-//        (
-//            'label'             => array('uuid','uuid'),
-//            'exclude'           => true,
-//            'inputType'         => 'text',
-//            'search'            => false,
-//            'eval'              => array('doNotCopy'=>true, 'maxlength'=>128),
-//            'save_callback'     => array(array('tl_c4g_reservation_participants','generateUuid')),
-//            'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
-//        ),
+    //    'uuid' => array
+    //    (
+    //        'label'             => array('uuid','uuid'),
+    //        'exclude'           => true,
+    //        'inputType'         => 'text',
+    //        'search'            => false,
+    //        'eval'              => array('doNotCopy'=>true, 'maxlength'=>128),
+    //        'save_callback'     => array(array('tl_c4g_reservation_participants','generateUuid')),
+    //        'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
+    //    ),
 
         'title' => array
         (
@@ -142,7 +147,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => "varchar(50) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'lastname' => array
@@ -154,7 +159,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'firstname' => array
@@ -166,7 +171,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'email' => array
@@ -176,7 +181,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'phone' => array
@@ -186,7 +191,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
-            'sql'                     => "varchar(64) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 64, 'default' => '')
         ),
        
         'address' => array
@@ -196,7 +201,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'postal' => array(
@@ -205,7 +210,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>32, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(32) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 32, 'default' => '')
 
         ),
 
@@ -217,7 +222,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 
         ),
 
@@ -249,88 +254,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'filter'            => true,
             'inputType'         => 'checkbox',
             'eval'              => array('tl_class'=>'w50'),
+            'save_callback'     => array(array($cbClass,'generateUuid')),
             'sql'               => "char(1) NOT NULL default ''"
         )
     )
 );
-
-
-/**
- * Class tl_c4g_reservation_participants
- */
-class tl_c4g_reservation_participants extends Backend
-{
-    /**
-     * Import the back end user object
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
-
-    public function generateUuid($varValue, DataContainer $dc)
-    {
-        if ($varValue == '') {
-            return \c4g\projects\C4GBrickCommon::getGUID();
-        }
-        else {
-            return $varValue;
-        }
-    }
-
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
-        $this->import('BackendUser', 'User');
-
-        if (strlen($this->Input->get('tid')))
-        {
-            $this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 1));
-            $this->redirect($this->getReferer());
-        }
-
-        $href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.($row['published'] ? '' : 1);
-
-        if ($row['cancellation'])
-        {
-            $icon = 'invisible.gif';
-        }
-
-        return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
-
-    }
-
-    public function toggleVisibility($intId, $blnCancellation)
-    {
-
-        $this->createInitialVersion('tl_c4g_reservation_participants', $intId);
-
-        // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_c4g_reservation_participants']['fields']['cancellation']['save_callback']))
-        {
-            foreach ($GLOBALS['TL_DCA']['tl_c4g_reservation_participants']['fields']['cancellation']['save_callback'] as $callback)
-            {
-                $this->import($callback[0]);
-                $blnCancellation = $this->$callback[0]->$callback[1](!$blnCancellation, $this);
-            }
-        }
-
-        // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation_participants SET tstamp=". time() .", cancellation='" . ($blnCancellation ? '0' : '1') . "' WHERE `id`=?")
-            ->execute($intId);
-        $this->createNewVersion('tl_c4g_reservation_participants', $intId);
-    }
-
-    public function listFields($arrRow)
-    {
-        $result = [
-            $arrRow['id'],
-            $arrRow['title'],
-            $arrRow['lastname'],
-            $arrRow['firstname'],
-            $arrRow['email'],
-            $arrRow['cancellation'] ? $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['yes'] : ''
-        ];
-        return $result;
-    }
-}

@@ -2,22 +2,24 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
-use con4gis\CoreBundle\Classes\C4GVersionProvider;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
+use con4gis\ReservationBundle\Classes\Callbacks\C4gReservationLocation;
+use Contao\DC_Table;
+
+$cbClass = C4gReservationLocation::class;
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
 (
     //config
     'config' => array
     (
-        'dataContainer'     => 'Table',
+        'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
         'sql'               => array
         (
@@ -117,7 +119,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'exclude'           => true,
-            'options_callback'  => array('tl_c4g_reservation_location', 'loadMemberOptions'),
+            'options_callback'  => array($cbClass, 'loadMemberOptions'),
             'eval'              => array('mandatory'=>false, 'disabled' => true, 'tl_class' => 'clr long'),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
@@ -131,7 +133,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'sorting'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 
         ),
 
@@ -144,7 +146,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
             'save_callback' => array
             (
-                array('tl_c4g_reservation_location', 'generateAlias')
+                array($cbClass, 'generateAlias')
             ),
             'sql' => "varchar(255) BINARY NOT NULL default ''"
         ),
@@ -156,9 +158,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'inputType'               => 'c4g_text',
             'default'                 => '',
             'eval'                    => array('tl_class'=>'w50 wizard', 'require_input'=>true ),
-            'save_callback'           => array(array('tl_c4g_reservation_location','setCenterLon')),
+            'save_callback'           => array(array($cbClass,'setCenterLon')),
             'wizard'                  => [['con4gis\MapsBundle\Classes\GeoPicker', 'getPickerLink']],
-            'sql'                     =>"varchar(20) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 20, 'default' => '')
         ),
 
         'locgeoy' => array
@@ -168,9 +170,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'inputType'               => 'c4g_text',
             'default'                 => '',
             'eval'                    => array('tl_class'=>'w50 wizard', 'require_input'=>true ),
-            'save_callback'           => array(array('tl_c4g_reservation_location','setCenterLat')),
+            'save_callback'           => array(array($cbClass,'setCenterLat')),
             'wizard'                  => [['con4gis\MapsBundle\Classes\GeoPicker', 'getPickerLink']],
-            'sql'                     =>"varchar(20) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 20, 'default' => '')
         ),
 
         'contact_name' => array
@@ -183,7 +185,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('mandatory'=>false, 'tl_class'=>'w50 clr'),
-            'sql'               => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'contact_phone' => array
@@ -193,7 +195,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'mandatory'=>false, 'tl_class'=>'long clr '),
-            'sql'               => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
         'contact_email' => array
         (
@@ -202,7 +204,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true,'mandatory'=>false, 'tl_class'=>'long clr'),
-            'sql'               => "varchar(254) NOT NULL default ''"
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
         'contact_street' => array
         (
@@ -211,7 +213,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('mandatory'=>false, 'tl_class'=>'long clr'),
-            'sql'               => "varchar(254) NOT NULL default ''"
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
         'contact_postal' => array
         (
@@ -220,7 +222,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'               => "varchar(254) NOT NULL default ''"
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
         'contact_city' => array
         (
@@ -232,7 +234,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'               => "varchar(254) NOT NULL default ''"
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
         'ics' => array
         (
@@ -259,105 +261,5 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'eval'              => array('fieldType' => 'radio', 'tl_class' => 'clr', 'mandatory' => true),
             'sql'               => "blob NULL"
         ),
-
     )
 );
-
-
-/**
- * Class tl_c4G_reservation_params
- */
-class tl_c4g_reservation_location extends Backend
-{
-    /**
-     * Import the back end user object
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
-
-    public function generateUuid($varValue, DataContainer $dc)
-    {
-        if ($varValue == '') {
-            return \c4g\projects\C4GBrickCommon::getGUID();
-        } else {
-            return $varValue;
-        }
-    }
-
-    /** Validate Center Lon*/
-    public function setCenterLon($varValue, DataContainer $dc)
-    {
-        if (C4GVersionProvider::isInstalled('con4gis/maps') && !\con4gis\MapsBundle\Classes\Utils::validateLon($varValue)) {
-            throw new Exception($GLOBALS['TL_LANG']['tl_c4g_reservation_location']['geox_invalid']);
-        }
-        return $varValue;
-    }
-
-    /** Validate Center Lat*/
-    public function setCenterLat($varValue, DataContainer $dc)
-    {
-        if (C4GVersionProvider::isInstalled('con4gis/maps') && !\con4gis\MapsBundle\Classes\Utils::validateLat($varValue)) {
-            throw new Exception($GLOBALS['TL_LANG']['tl_c4g_reservation_location']['geoy_invalid']);
-        }
-        return $varValue;
-    }
-
-    /**
-     * @param $dc
-     * @return array
-     */
-    public function loadMemberOptions($dc) {
-        $options = [];
-
-        if (!$dc->activeRecord) {
-            return $options;
-        }
-
-        $options[$dc->activeRecord->id] = '';
-
-        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
-        $result = $stmt->execute()->fetchAllAssoc();
-
-        foreach ($result as $row) {
-            $options[$row['id']] = $row['lastname'] . ', ' . $row['firstname'];
-        }
-        return $options;
-    }
-
-    /**
-     * Auto-generate the object alias if it has not been set yet
-     *
-     * @param mixed         $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias($varValue, \Contao\DataContainer $dc)
-    {
-        $aliasExists = function (string $alias) use ($dc): bool
-        {
-            return $this->Database->prepare("SELECT id FROM tl_c4g_reservation_location WHERE alias=? AND id!=?")->execute($alias, $dc->id)->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue)
-        {
-            $varValue = \Contao\System::getContainer()->get('contao.slug')->generate($dc->activeRecord->name, C4gReservationLocationModel::findByPk($dc->activeRecord->id)->jumpTo, $aliasExists);
-        }
-        elseif (preg_match('/^[1-9]\d*$/', $varValue))
-        {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        }
-        elseif ($aliasExists($varValue))
-        {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-}

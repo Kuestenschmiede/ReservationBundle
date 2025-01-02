@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 namespace con4gis\ReservationBundle\Classes\InsertTags;
@@ -40,7 +40,7 @@ class C4gReservationInsertTags
         if ($db !== null) {
             $this->db = $db;
         } else {
-            $this->db = \Contao\Database::getInstance();
+            $this->db = Database::getInstance();
         }
     }
 
@@ -190,7 +190,7 @@ class C4gReservationInsertTags
                             $audienceIds = [];
                             foreach ($reservationObject as $object) {
                                 if ($object['targetAudience']) {
-                                    $audiences = \Contao\StringUtil::deserialize($object['targetAudience']);
+                                    $audiences = StringUtil::deserialize($object['targetAudience']);
                                     foreach ($audiences as $audienceId) {
                                         $audienceIds[$audienceId] = $audienceId;
                                     }
@@ -221,7 +221,7 @@ class C4gReservationInsertTags
                             $speakerIds = [];
                             foreach ($reservationObject as $object) {
                                 if ($object['speaker']) {
-                                    $speakers = \Contao\StringUtil::deserialize($object['speaker']);
+                                    $speakers = StringUtil::deserialize($object['speaker']);
                                     foreach ($speakers as $speakerId) {
                                         $speakerIds[$speakerId] = $speakerId;
                                     }
@@ -254,7 +254,7 @@ class C4gReservationInsertTags
                             $topicIds = [];
                             foreach ($reservationObject as $object) {
                                 if ($object['topic']) {
-                                    $topics = \Contao\StringUtil::deserialize($object['topic']);
+                                    $topics = StringUtil::deserialize($object['topic']);
                                     foreach ($topics as $topicId) {
                                         $topicIds[$topicId] = $topicId;
                                     }
@@ -355,7 +355,7 @@ class C4gReservationInsertTags
 
                             $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE `id` IN (?)')
                                 ->execute($ids)->fetchAssoc();
-                            $params = $includedParams && $includedParams['included_params'] ? \Contao\StringUtil::deserialize($includedParams['included_params']) : [];
+                            $params = $includedParams && $includedParams['included_params'] ? StringUtil::deserialize($includedParams['included_params']) : [];
                             $includedParamsArr = [];
                             foreach ($params as $param) {
                                 $includedParam = C4gReservationParamsModel::findByPk($param);
@@ -380,7 +380,7 @@ class C4gReservationInsertTags
 
                             $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE `id` IN (?)')
                                 ->execute($ids)->fetchAssoc();
-                            $params = $additionalParams ? \Contao\StringUtil::deserialize($additionalParams['additional_params']) : [];
+                            $params = $additionalParams ? StringUtil::deserialize($additionalParams['additional_params']) : [];
                             $additionalParamsArr = [];
                             foreach ($params as $param) {
                                 $additionalParam = C4gReservationParamsModel::findByPk($param);
@@ -400,19 +400,19 @@ class C4gReservationInsertTags
                 if ($isEvent) {
                     $reservationObject = $this->db->prepare("SELECT * FROM $tableEventObject WHERE `pid`=?")
                         ->limit(1)
-                        ->execute($pid, 1);
+                        ->execute($pid/* , 1 */);
 
                     $calendarEvent = $this->db->prepare("SELECT * FROM $tableCalendarEvent WHERE `id`=?")
                         ->limit(1)
-                        ->execute($pid, 1);
+                        ->execute($pid/* , 1 */);
 
                     $calendarObject = $calendarEvent && $calendarEvent->numRows ? $this->db->prepare("SELECT * FROM tl_calendar where `id`=?")
                         ->limit(1)
-                        ->execute($calendarEvent->pid, 1) : false;
+                        ->execute($calendarEvent->pid/* , 1 */) : false;
                 } else {
                     $reservationObject = $this->db->prepare("SELECT * FROM $tableObject WHERE `id`=?")
                         ->limit(1)
-                        ->execute($pid, 1);
+                        ->execute($pid/* , 1 */);
                 }
 
                 //ToDo with default objects!!!
@@ -428,7 +428,7 @@ class C4gReservationInsertTags
 
                     $clock = '';
                     if (!strpos($timeFormat, 'A')) {
-                        $clock = '&nbsp;' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
+                        $clock = ' ' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'];
                     }
 
                     $state = $this->getState($pid, $maxParticipants, $minReservationDay, $reservationType, $calendarEvent);
@@ -527,7 +527,8 @@ class C4gReservationInsertTags
                                     if ($calendar) {
                                         if ($calendar->numRows) {
                                             if (!$url && $calendar->reservationForwarding) {
-                                                $url = Controller::replaceInsertTags('{{link_url::' . $calendar->reservationForwarding . '}}');
+                                                // $url = Controller::replaceInsertTags('{{link_url::' . $calendar->reservationForwarding . '}}');
+                                                $url = System::getContainer()->get('contao.insert_tag.parser')->replace('{{link_url::' . $calendar->reservationForwarding . '}}');
                                             }
 
                                             if (!$buttonCaption) {
@@ -576,7 +577,7 @@ class C4gReservationInsertTags
                         case 'audience':
                             if (($reservationObject && $reservationObject->targetAudience) || ($calendarObject && $calendarObject->reservationTargetAudience)) {
                                 $targetAudience = $reservationObject && $reservationObject->targetAudience ? $reservationObject->targetAudience : $calendarObject->reservationTargetAudience;
-                                $audienceIds = \Contao\StringUtil::deserialize($targetAudience);
+                                $audienceIds = StringUtil::deserialize($targetAudience);
                                 if ($audienceIds && count($audienceIds) > 0) {
                                     $audiences = '(' ;
                                     foreach ($audienceIds as $key => $audienceId) {
@@ -602,7 +603,7 @@ class C4gReservationInsertTags
                         case 'audience_raw':
                             if (($reservationObject && $reservationObject->targetAudience) || ($calendarObject && $calendarObject->reservationTargetAudience)) {
                                 $targetAudience = $reservationObject && $reservationObject->targetAudience ? $reservationObject->targetAudience : $calendarObject->reservationTargetAudience;
-                                $audienceIds = \Contao\StringUtil::deserialize($targetAudience);
+                                $audienceIds = StringUtil::deserialize($targetAudience);
                                 if ($audienceIds && count($audienceIds) > 0) {
                                     $audiences = '(' ;
                                     foreach ($audienceIds as $key => $audienceId) {
@@ -629,20 +630,20 @@ class C4gReservationInsertTags
                         case 'speakerId':
                             if (($reservationObject && $reservationObject->speaker) || ($calendarObject && $calendarObject->reservationSpeaker)) {
                                 $speaker = $reservationObject && $reservationObject->speaker ? $reservationObject->speaker : $calendarObject->reservationSpeaker;
-                                $speakerIds = \Contao\StringUtil::deserialize($speaker);
+                                $speakerIds = StringUtil::deserialize($speaker);
                             }
                             return $speakerIds ? $speakerIds[0] : 0;
                         case 'speakerIds':
                             $speakerIds = '';
                             if (($reservationObject && $reservationObject->speaker) || ($calendarObject && $calendarObject->reservationSpeaker)) {
                                 $speaker = $reservationObject && $reservationObject->speaker ? $reservationObject->speaker : $calendarObject->reservationSpeaker;
-                                $speakerIds = explode(',',\Contao\StringUtil::deserialize($speaker));
+                                $speakerIds = explode(',', StringUtil::deserialize($speaker));
                             }
                             return $speakerIds;
                         case 'speaker':
                             if (($reservationObject && $reservationObject->speaker) || ($calendarObject && $calendarObject->reservationSpeaker)) {
                                 $speaker = $reservationObject && $reservationObject->speaker ? $reservationObject->speaker : $calendarObject->reservationSpeaker;
-                                $speakerIds = \Contao\StringUtil::deserialize($speaker);
+                                $speakerIds = StringUtil::deserialize($speaker);
                                 if ($speakerIds && count($speakerIds) > 0) {
                                     $speakers = '(' ;
                                     foreach ($speakerIds as $key => $speakerId) {
@@ -657,7 +658,7 @@ class C4gReservationInsertTags
 
                                     $result = '';
                                     foreach ($speakerElements as $speaker) {
-                                        $speakerStr = $speaker['title'] ? $speaker['title'] . '&nbsp;' . $speaker['firstname'] . '&nbsp;' . $speaker['lastname'] : $speaker['firstname'] . '&nbsp;' . $speaker['lastname'];
+                                        $speakerStr = $speaker['title'] ? $speaker['title'] . ' ' . $speaker['firstname'] . ' ' . $speaker['lastname'] : $speaker['firstname'] . ' ' . $speaker['lastname'];
                                         if ($speakerStr && $speaker['speakerForwarding']) {
                                             $url = Controller::replaceInsertTags('{{link_url::' . $speaker['speakerForwarding'] . '}}');
                                             if ($url) {
@@ -681,7 +682,7 @@ class C4gReservationInsertTags
                         case 'speaker_raw':
                             if (($reservationObject && $reservationObject->speaker) || ($calendarObject && $calendarObject->reservationSpeaker)) {
                                 $speaker = $reservationObject && $reservationObject->speaker ? $reservationObject->speaker : $calendarObject->reservationSpeaker;
-                                $speakerIds = \Contao\StringUtil::deserialize($speaker);
+                                $speakerIds = StringUtil::deserialize($speaker);
                                 if ($speakerIds && count($speakerIds) > 0) {
                                     $speakers = '(' ;
                                     foreach ($speakerIds as $key => $speakerId) {
@@ -708,7 +709,7 @@ class C4gReservationInsertTags
                         case 'topic':
                             if (($reservationObject && $reservationObject->topic) || ($calendarObject && $calendarObject->reservationTopic)) {
                                 $topic = $reservationObject && $reservationObject->topic ? $reservationObject->topic : $calendarObject->reservationTopic;
-                                $topicIds = \Contao\StringUtil::deserialize($topic);
+                                $topicIds = StringUtil::deserialize($topic);
                                 if ($topicIds && count($topicIds) > 0) {
                                     $topics = '(' ;
                                     foreach ($topicIds as $key => $topicId) {
@@ -734,7 +735,7 @@ class C4gReservationInsertTags
                         case 'topic_raw':
                             if (($reservationObject && $reservationObject->topic) || ($calendarObject && $calendarObject->reservationTopic)) {
                                 $topic = $reservationObject && $reservationObject->topic ? $reservationObject->topic : $calendarObject->reservationTopic;
-                                $topicIds = \Contao\StringUtil::deserialize($topic);
+                                $topicIds = StringUtil::deserialize($topic);
                                 if ($topicIds && count($topicIds) > 0) {
                                     $topics = '(' ;
                                     foreach ($topicIds as $key => $topicId) {
@@ -794,7 +795,7 @@ class C4gReservationInsertTags
                         case 'beginTime':
                             $value = $calendarEvent->startTime && date('H', $calendarEvent->startTime) != '00' ? date($timeFormat, $calendarEvent->startTime) : false;
                             if ($value) {
-                                $value = $this->getHtmlSkeleton('beginTime', $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'], $value . '&nbsp;' . $clock);
+                                $value = $this->getHtmlSkeleton('beginTime', $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'], $value . ' ' . $clock);
                             } else {
                                 $value = '';
                             }
@@ -914,7 +915,7 @@ class C4gReservationInsertTags
 
                                 $result = '';
                                 if ($locationElement && $locationElement['contact_street'] && $locationElement['contact_postal'] && $locationElement['contact_city']) {
-                                    $result = $locationElement['contact_street'] . ', ' . $locationElement['contact_postal'] . '&nbsp;' . $locationElement['contact_city'];
+                                    $result = $locationElement['contact_street'] . ', ' . $locationElement['contact_postal'] . ' ' . $locationElement['contact_city'];
                                 }
 
                                 return $result ? $this->getHtmlSkeleton('eventaddress', $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventaddress'], $result) : '';
@@ -929,7 +930,7 @@ class C4gReservationInsertTags
 
                                 $result = '';
                                 if ($locationElement && $locationElement['contact_street'] && $locationElement['contact_postal'] && $locationElement['contact_city']) {
-                                    $result = $locationElement['contact_street'] . ', ' . $locationElement['contact_postal'] . '&nbsp;' . $locationElement['contact_city'];
+                                    $result = $locationElement['contact_street'] . ', ' . $locationElement['contact_postal'] . ' ' . $locationElement['contact_city'];
                                 }
 
                                 return $result ? $result : '';
@@ -941,7 +942,7 @@ class C4gReservationInsertTags
 
                             $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE `id` = ?')
                                 ->execute($reservationType)->fetchAssoc();
-                            $params = $includedParams && $includedParams['included_params'] ? \Contao\StringUtil::deserialize($includedParams['included_params']) : [];
+                            $params = $includedParams && $includedParams['included_params'] ? StringUtil::deserialize($includedParams['included_params']) : [];
                             $result = '';
                             foreach ($params as $param) {
                                 $includedParam = C4gReservationParamsModel::findByPk($param);
@@ -950,12 +951,12 @@ class C4gReservationInsertTags
                                 }
                             }
 
-                            return $result ? $this->getHtmlSkeleton('includedParams', /*$GLOBALS['TL_LANG']['fe_c4g_reservation']['includedParams']*/'', $result) : '';
+                            return $result ? $this->getHtmlSkeleton('includedParams','', $result) : '';
                         case 'included_raw':
                             $reservationType = $reservationObject && $reservationObject->reservationType ? $reservationObject->reservationType : $calendarObject->reservationType;
                             $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE id = ?')
                                 ->execute($reservationType)->fetchAssoc();
-                            $params = $includedParams && $includedParams['included_params'] ? \Contao\StringUtil::deserialize($includedParams['included_params']) : [];
+                            $params = $includedParams && $includedParams['included_params'] ? StringUtil::deserialize($includedParams['included_params']) : [];
                             $includedParamsArr = [];
                             foreach ($params as $param) {
                                 $includedParam = C4gReservationParamsModel::findByPk($param);
@@ -969,7 +970,7 @@ class C4gReservationInsertTags
                             $reservationType = $reservationObject && $reservationObject->reservationType ? $reservationObject->reservationType : $calendarObject->reservationType;
                             $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE id = ?')
                                 ->execute($reservationType)->fetchAssoc();
-                            $params = $additionalParams && $additionalParams['additional_params'] ? \Contao\StringUtil::deserialize($additionalParams['additional_params']) : [];
+                            $params = $additionalParams && $additionalParams['additional_params'] ? StringUtil::deserialize($additionalParams['additional_params']) : [];
                             $result = '';
                             foreach ($params as $param) {
                                 $additionalParam = C4gReservationParamsModel::findByPk($param);
@@ -983,7 +984,7 @@ class C4gReservationInsertTags
                             $reservationType = $reservationObject && $reservationObject->reservationType ? $reservationObject->reservationType : $calendarObject->reservationType;
                             $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE id = ?')
                                 ->execute($reservationType)->fetchAssoc();
-                            $params = $additionalParams ? \Contao\StringUtil::deserialize($additionalParams) : [];
+                            $params = $additionalParams ? StringUtil::deserialize($additionalParams) : [];
                             $additionalParamsArr = [];
                             foreach ($params as $param) {
                                 $additionalParam = C4gReservationParamsModel::findByPk($param);
@@ -1017,11 +1018,11 @@ class C4gReservationInsertTags
                     case 'check':
                         return true;
                     case 'name':
-                        $speakerStr = $this->getHtmlSkeleton($key, '', $speakerObject->title ? $speakerObject->title . '&nbsp;' . $speakerObject->firstname . '&nbsp;' . $speakerObject->lastname : $speakerObject->firstname . '&nbsp;' . $speakerObject->lastname, 'c4g_speaker_details');
+                        $speakerStr = $this->getHtmlSkeleton($key, '', $speakerObject->title ? $speakerObject->title . ' ' . $speakerObject->firstname . ' ' . $speakerObject->lastname : $speakerObject->firstname . ' ' . $speakerObject->lastname, 'c4g_speaker_details');
 
                         return $speakerStr;
                     case 'zipAndCity':
-                        $cityStr = $this->getHtmlSkeleton($key, '', $speakerObject->postal . '&nbsp;' . $speakerObject->city, 'c4g_speaker_details');
+                        $cityStr = $this->getHtmlSkeleton($key, '', $speakerObject->postal . ' ' . $speakerObject->city, 'c4g_speaker_details');
 
                         return $cityStr;
                     case 'website':

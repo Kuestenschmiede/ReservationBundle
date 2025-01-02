@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -16,6 +16,8 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use Contao\Database;
+use Contao\StringUtil;
+use Contao\System;
 
 class C4gReservationCalculator
 {
@@ -57,14 +59,8 @@ class C4gReservationCalculator
             if ($all) {
                 $set = [$beginDate, $endDate, $beginDate, $endDate, $objectTypeId];
                 $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) AND `reservationObjectType` IN(1,3) AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc();
-                    
-                    #Änderungstest
-                    /* 
-                    $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) AND `reservationObjectType` = (".$objectTypeId.") AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc(); */
+                    "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) AND `reservationObjectType` =? AND NOT `cancellation`='1'")
+                    ->execute($beginDate, $endDate, $beginDate, $endDate, $objectTypeId)->fetchAllAssoc();
             } else {
                 $set = [$beginDate, $endDate, $beginDate, $endDate, $typeId, $objectTypeId];
                 $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
@@ -102,7 +98,7 @@ class C4gReservationCalculator
 
         $commaDates = C4gReservationHandler::getDateExclusionString([$object], $type,0);
         if ($commaDates) {
-            $commaDates = $commaDates['dates'];
+            $commaDates = isset($commaDates['dates']) ? $commaDates['dates'] : null;
         }
         $dates = explode(',',$commaDates);
         foreach($dates as $date) {
@@ -111,7 +107,7 @@ class C4gReservationCalculator
             }
         }
 
-        $switchAllTypes = \Contao\StringUtil::deserialize($switchAllTypes);
+        $switchAllTypes = StringUtil::deserialize($switchAllTypes);
         foreach ($reservations as $reservation) {
             if ($objectId) {
               $reservation['timeInterval'] = $object->getTimeinterval();
@@ -219,7 +215,7 @@ class C4gReservationCalculator
         $calculatorResult->setDbBookings($this->calculateDbBookingsPerType($reservationList));
         $calculatorResult->setDbBookedObjects($this->calculateDbObjectsPerType($reservationList));
         $calculatorResult->setDbPersons($this->calculateDbPersons($reservationList, $objectId));
-        $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $object->getDesiredCapacity()[1], $capacity)); //s Für Änderung überprüfen
+        $calculatorResult->setDbPercent($this->calculateDbPercent($object, $calculatorResult->getDbPersons(), $object->getDesiredCapacity()[1], $capacity));
         $calculatorResult->setTimeArray($timeArray);
 
         $this->calculatorResult = $calculatorResult;
@@ -319,7 +315,7 @@ class C4gReservationCalculator
             }
 
             if ($langCookie) {
-                \System::loadLanguageFile('fe_c4g_reservation', $langCookie);
+                System::loadLanguageFile('fe_c4g_reservation', $langCookie);
             }
 
             $priceOption = key_exists('priceoption',$object) ? $object['priceoption'] : '';
@@ -430,7 +426,7 @@ class C4gReservationCalculator
             }
         }
         if ($price) {
-            $priceInfo = $priceInfo ? "&nbsp;" . $priceInfo : '';
+            $priceInfo = $priceInfo ? " " . $priceInfo : '';
         }
 
         if ($calcTaxes) {

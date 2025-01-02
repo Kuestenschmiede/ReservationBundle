@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -44,7 +44,8 @@ $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['reservationForwardingButtonCapt
     'sorting'                 => false,
     'inputType'               => 'text',
     'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'clr long'),
-    'sql'                     => "varchar(254) NOT NULL default ''"
+    // 'sql'                     => "varchar(254) NOT NULL default ''"
+    'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 );
 
 if ($exportExists) {

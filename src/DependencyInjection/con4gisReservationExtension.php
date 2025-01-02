@@ -14,6 +14,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
+use Composer\InstalledVersions;
+
 class con4gisReservationExtension extends Extension
 {
     
@@ -26,15 +28,24 @@ class con4gisReservationExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        
         $loader = new YamlFileLoader(
             $container,
             new FileLocator(__DIR__.'/../Resources/config')
         );
+
+        // $version = intval(InstalledVersions::getVersion('contao/core-bundle'));
+        // if ($version == 4){
+        //     $loader->load('contao4_services.yml');
+        // } else if ($version == 5) {
+        //     $loader->load('contao5_services.yml');
+        // }  
+
         $loader->load('services.yml');
     }
     
-    public function getAlias()
+  /*  public function getAlias()
     {
         return "con4gis_reservation";
-    }
+    }  */
 }

@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -13,27 +13,22 @@
  * Table tl_module
  */
 
-use con4gis\CoreBundle\Classes\Helper\InputHelper;
-use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
+use con4gis\ReservationBundle\Classes\Callbacks\C4gReservation;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
-use con4gis\ProjectsBundle\Classes\Notifications\C4GNotification;
-use con4gis\ReservationBundle\Classes\Notifications\C4gReservationConfirmation;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
-use Contao\Controller;
-use Contao\Database;
-use Contao\Image;
-use Contao\StringUtil;
+use Contao\Input;
+use Contao\DC_Table;
+
+$cbClass = C4gReservation::class;
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
 (
     //config
     'config' => array
     (
-        'dataContainer'      => 'Table',
+        'dataContainer'      => DC_Table::class,
         'enableVersioning'   => true,
         'ctable'             => ['tl_c4g_reservation_participants'],
-        'onload_callback'    => [['tl_c4g_reservation', 'setParent']],
+        'onload_callback'    => [[$cbClass, 'setParent']],
         'doNotDeleteRecords' => true,
         'doNotCopyRecords'   => true,
         'sql'                => array
@@ -61,7 +56,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
 
         'label' => array
         (
-            'label_callback'    => ['tl_c4g_reservation', 'listFields'],
+            'label_callback'    => [$cbClass, 'listFields'],
             'showColumns'       => true,
         ),
 
@@ -120,14 +115,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmationEmail'],
                 //'href'                => 'key=sendNotification',
                 'icon'                => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_notification.svg',
-                'button_callback'     => ['tl_c4g_reservation', 'sendNotification'],
+                'button_callback'     => [$cbClass, 'sendNotification'],
             ),
             'toggle' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['TOGGLE'],
                 'icon'                => 'visible.gif',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array('tl_c4g_reservation', 'toggleIcon')
+                'button_callback'     => array($cbClass, 'toggleIcon')
             )
         )
     ),
@@ -135,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     //Palettes
     'palettes' => array
     (
-        '__selector__' => ['reservationObjectType'/*, 'confirmed'*/],
+        '__selector__' => ['reservationObjectType'],
         'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {additional_legend:hide}, additional1, additional2, additional3; {comment_legend}, comment, fileUpload; {notification_legend}, confirmed, internal_comment, specialNotification, emailConfirmationSend; {state_legend}, cancellation, agreed, member_id, group_id, tstamp, bookedAt;',
     ),
 
@@ -145,7 +140,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         'reservationObjectType_1' => 'reservation_object, duration',
         'reservationObjectType_2' => 'reservation_object',
         'reservationObjectType_3' => 'reservation_object, duration',
-        //'confirmed' => 'internal_comment, specialNotification, emailConfirmationSend'
     ],
 //Fields
     'fields' => array
@@ -164,7 +158,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'exclude'           => true,
-            'options_callback'  => array('tl_c4g_reservation', 'loadMemberOptions'),
+            'options_callback'  => array($cbClass, 'loadMemberOptions'),
             'eval'              => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'clr long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['noMember']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
@@ -176,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'exclude'           => true,
-            'options_callback'  => array('tl_c4g_reservation', 'loadGroupOptions'),
+            'options_callback'  => array($cbClass, 'loadGroupOptions'),
             'eval'              => array('mandatory'=>false, 'disabled' => false, 'tl_class' => 'clr long', 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['noGroup']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
@@ -304,7 +298,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'options'                 => ['1','3','2'],
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'],
             'eval'                    => ['tl_class'=>'clr long','submitOnChange' => true],
-            'sql'                     => "varchar(254) NOT NULL default '1'"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '1')
         ],
 
         'reservation_object' => array
@@ -313,9 +307,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'                 => true,
             'filter'                  => true,
             'inputType'               => 'select',
-            'options_callback'        => ['tl_c4g_reservation', 'getActObjects'],
+            'options_callback'        => [$cbClass, 'getActObjects'],
             'eval'                    => array('mandatory'=>false, 'includeBlankOption' => true, 'tl_class' => 'long clr', 'multiple'=>false, 'chosen'=>true),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'organisation' => array
@@ -324,7 +318,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long clr'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'salutation' => array
@@ -349,7 +343,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => "varchar(50) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'lastname' => array
@@ -361,7 +355,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'firstname' => array
@@ -373,7 +367,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'email' => array
@@ -383,7 +377,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'phone' => array
@@ -393,7 +387,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
-            'sql'                     => "varchar(64) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 64, 'default' => '')
         ),
        
         'address' => array
@@ -403,7 +397,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'postal' => array(
@@ -412,7 +406,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>32, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(32) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 32, 'default' => '')
 
         ),
 
@@ -424,7 +418,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 
         ),
 
@@ -446,7 +440,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'exclude'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long clr'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'salutation2' => array
@@ -471,7 +465,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => "varchar(50) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 50, 'default' => '')
         ),
 
         'lastname2' => array
@@ -483,7 +477,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'firstname2' => array
@@ -495,7 +489,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'email2' => array
@@ -505,7 +499,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'phone2' => array
@@ -515,7 +509,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
-            'sql'                     => "varchar(64) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 64, 'default' => '')
         ),
 
         'address2' => array
@@ -525,7 +519,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'postal2' => array(
@@ -534,7 +528,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>32, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(32) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 32, 'default' => '')
         ),
 
         'city2' => array (
@@ -545,7 +539,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'additional1' => array (
@@ -556,7 +550,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'additional2' => array (
@@ -567,7 +561,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'additional3' => array (
@@ -578,7 +572,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'reservation_id' => array
@@ -593,9 +587,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'eval'              => array('doNotCopy' => true, 'unique' => false, 'mandatory' => false, 'maxlength'=>254, 'tl_class' => 'long'),
             'save_callback' => array
             (
-                array('tl_c4g_reservation', 'generateKey')
+                array($cbClass, 'generateKey')
             ),
-            'sql'               => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'comment' => array (
@@ -716,319 +710,3 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
 
     )
 );
-
-
-/**
- * Class tl_c4g_reservation
- */
-class tl_c4g_reservation extends Backend
-{
-    /**
-     * Import the back end user object
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
-
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
-        $this->import('BackendUser', 'User');
-
-        if (strlen($this->Input->get('tid')))
-        {
-            $this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 1));
-            $this->redirect($this->getReferer());
-        }
-
-        $href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.($row['confirmed'] ? '' : 1);
-
-        if ($row['cancellation'])
-        {
-            $icon = 'invisible.gif';
-        }
-
-        return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
-
-    }
-
-    public function toggleVisibility($intId, $blnCancellation)
-    {
-
-        $this->createInitialVersion('tl_c4g_reservation', $intId);
-
-        // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['cancellation']['save_callback']))
-        {
-            foreach ($GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['cancellation']['save_callback'] as $callback)
-            {
-                $this->import($callback[0]);
-                $blnCancellation = $this->$callback[0]->$callback[1](!$blnCancellation, $this);
-            }
-        }
-
-        // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation SET tstamp=". time() .", cancellation='" . ($blnCancellation ? '0' : '1') . "' WHERE `id`=?")
-            ->execute($intId);
-        $this->createNewVersion('tl_c4g_reservation', $intId);
-    }
-
-    public function listFields($arrRow)
-    {
-        $objectType = $arrRow['reservationObjectType'];
-        $object_id = $arrRow['reservation_object'];
-
-        $reservationObjects = '';
-        if ($objectType === '2') {
-            $event = CalendarEventsModel::findByPk($object_id);
-            if ($event) {
-                $object = $event->title;
-            }
-        } else {
-            $reservation_object = \con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel::findByPk($object_id);
-            if ($reservation_object) {
-                $object = $reservation_object->caption;
-            }
-        }
-
-
-        $arrRow['reservation_object'] = $object;
-
-        if ($arrRow['beginDate']) {
-            $arrRow['beginDate'] = $arrRow['beginDate'] ? date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']). '&nbsp;' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['beginTime']) : date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']);
-        } else {
-            $arrRow['beginDate'] = '';
-        }
-
-        if ($arrRow['endDate']) {
-            $arrRow['endDate'] = $arrRow['endDate'] ? date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']). '&nbsp;' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']) : date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']);
-        } else {
-            $arrRow['endDate'] = '';
-        }
-
-        $type = \con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel::findByPk($arrRow['reservation_type']);
-        if ($type) {
-            $arrRow['reservation_type'] = $type->caption;
-        }
-
-        $result = [
-            $arrRow['beginDate'],
-            $arrRow['endDate'],
-            $arrRow['desiredCapacity'],
-            $arrRow['reservation_type'],
-            $arrRow['lastname'],
-            $arrRow['firstname'],
-            $arrRow['reservation_object']
-        ];
-        return $result;
-    }
-
-    /**
-     * @param DataContainer|array $dc
-     * @return array
-     */
-    public function getActObjects($dc)
-    {
-        $return = [];
-        if (!$dc->activeRecord) {
-            return $return;
-        }
-        if ($dc instanceof DataContainer && $dc->activeRecord->reservationObjectType) {
-            $reservationObjectType = $dc->activeRecord->reservationObjectType;
-        } elseif (is_array($dc)) {
-            $reservationObjectType = $dc['reservationObjectType'];
-        } else {
-            $reservationObjectType = false;
-        }
-
-        if (!$reservationObjectType) {
-            $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
-                ->execute();
-
-            while ($objects->next()) {
-                $return[$objects->id] = $objects->caption;
-            }
-
-            $events = $this->Database->prepare("SELECT id,title,startDate FROM tl_calendar_events")
-                ->execute();
-
-            while ($events->next()) {
-                $return[$events->id] = date($GLOBALS['TL_CONFIG']['dateFormat'],$events->startDate).': '.$events->title;
-            }
-        } else {
-            switch ($reservationObjectType) {
-                case '1':
-                case '3':
-                    $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
-                        ->execute();
-
-                    while ($objects->next()) {
-                        $return[$objects->id] = $objects->caption;
-                    }
-                    break;
-                case '2':
-                    $events = $this->Database->prepare("SELECT id,title,startDate FROM tl_calendar_events")
-                        ->execute();
-
-                    while ($events->next()) {
-                        $return[$events->id] = date($GLOBALS['TL_CONFIG']['dateFormat'],$events->startDate).': '.$events->title;
-                    }
-                    break;
-            }
-        }
-
-        return $return;
-    }
-
-    /**
-     * @param DataContainer $dc
-     */
-    public function doNotDeleteDataWithoutParent(DataContainer $dc)
-    {
-        //return;
-    }
-
-    /**
-     * @param \Contao\DataContainer $dc
-     */
-    public function setParent(Contao\DataContainer $dc)
-    {
-        \Contao\Message::addInfo($GLOBALS['TL_LANG']['tl_c4g_reservation']['infoReservation']);
-
-        $do = $this->Input->get('do');
-        $id = $this->Input->get('id');
-
-        $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-            ['beginDate','endDate','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object'];
-
-        if ($id && $do && ($do == 'calendar')) {
-            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['default'] = '2';
-            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['eval']['disabled'] = true;
-            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservation_object']['default'] = $id;
-            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservation_object']['eval']['chosen'] = false;
-            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservation_object']['eval']['disabled'] = true;
-
-            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['beginDate']['eval']['disabled'] = true;
-            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['beginTime']['eval']['disabled'] = true;
-            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['endDate']['eval']['disabled'] = true;
-            $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['endTime']['eval']['disabled'] = true;
-        }
-
-        // Check current action
-        $key = Contao\Input::get('key');
-        $reservationType = 0;
-        if ($id && $key && ($key == 'sendNotification')) {
-            C4gReservationConfirmation::sendNotification($id);
-            //delete key per redirect
-            Controller::redirect(str_replace('&key='.$key, '', \Environment::get('request')));
-        }
-    }
-
-    /**
-     * @param $dc
-     * @return array
-     */
-    public function loadMemberOptions($dc) {
-        $options = [];
-
-        if (!$dc->activeRecord) {
-            return $options;
-        }
-
-        $options[$dc->activeRecord->id] = '';
-
-        $stmt = $this->Database->prepare("SELECT id, firstname, lastname FROM tl_member WHERE `disable` != 1");
-        $result = $stmt->execute()->fetchAllAssoc();
-
-        foreach ($result as $row) {
-            $options[$row['id']] = $row['lastname'] . ', ' . $row['firstname'];
-        }
-        return $options;
-    }
-
-    /**
-     * @param $dc
-     * @return array
-     */
-    public function loadGroupOptions($dc) {
-        $options = [];
-
-        if (!$dc->activeRecord) {
-            return $options;
-        }
-
-        $options[$dc->activeRecord->id] = '';
-
-        $stmt = $this->Database->prepare("SELECT id, name FROM tl_member_group WHERE `disable` != 1");
-        $result = $stmt->execute()->fetchAllAssoc();
-
-        foreach ($result as $row) {
-            $options[$row['id']] = $row['name'];
-        }
-        return $options;
-    }
-
-    public function sendNotification($row, $href, $label, $title, $icon) {
-        $rt = Input::get('rt');
-        $do = Input::get('do');
-
-        $attributes = 'style="margin-right:3px"';
-        $imgAttributes = 'style="width: 18px; height: 18px"';
-
-        $showButton = false;
-
-        if (($row['confirmed'] || $row['specialNotification']) && (!$row['emailConfirmationSend'])) {
-            $type = $row['reservation_type'];
-            if ($type) {
-                $reservationType = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation_type WHERE `id`=? LIMIT 1")->execute($type)->fetchAssoc();
-
-                if ($reservationType) {
-                    if ($row['confirmed']) {
-                        $notificationConifrmationType = StringUtil::deserialize($reservationType['notification_confirmation_type']);
-
-                        if ($notificationConifrmationType && (count($notificationConifrmationType) > 0)) {
-                            $showButton = true;
-                        }
-                    }
-
-                    if ($row['specialNotification']) {
-                        $notificationSpecialType = StringUtil::deserialize($reservationType['notification_special_type']);
-
-                        if ($notificationSpecialType && (count($notificationSpecialType) > 0)) {
-                            $showButton = true;
-                        }
-                    }
-                }
-
-
-            }
-        }
-
-        if (!$showButton) {
-            return '';
-        }
-
-        $href = "/contao?do=$do&key=sendNotification&id=".$row['id'];
-        return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>'.Image::getHtml($icon, $label, $imgAttributes).'</a> ';
-    }
-
-    /**
-     * @param $varValue
-     * @param DataContainer $dc
-     * @return string
-     */
-    public function generateKey($value, $dc) {
-        if (!$value) {
-            $value = C4GBrickCommon::getUUID();
-            $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT * FROM tl_c4g_reservation where `reservation_id`=?")
-                ->execute($value)->fetchAllAssoc();
-            if ($reservations && count($reservations) > 0) {
-                $value = C4GBrickCommon::getUUID();
-            }
-        }
-
-        return $value;
-    }
-}

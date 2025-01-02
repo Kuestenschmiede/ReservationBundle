@@ -2,22 +2,26 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
 use Contao\Controller;
 use Contao\Database;
+use Contao\Backend;
+use Contao\BackendUser;
+use Contao\DC_Table;
+use Contao\System;
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
 (
     //config
     'config' => array
     (
-        'dataContainer'     => 'Table',
+        'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
         'sql'               => array
         (
@@ -121,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 
         ),
 
@@ -290,7 +294,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 //        'additionalDuration' => array
 //        (
@@ -352,7 +356,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => "varchar(100) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 100, 'default' => '')
         ),
         'reservationButtonCaption' => array
         (
@@ -362,7 +366,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'search'            => true,
             'inputType'         => 'text',
             'eval'              => array('mandatory' => false, 'tl_class' => 'long', 'maxlength' => 254),
-            'sql'               => "varchar(100) NOT NULL default ''"
+            'sql'               => array('type' => 'string', 'length' => 100, 'default' => '')
         ),
         'reservation_redirect_site' => array
         (
@@ -432,6 +436,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
 /**
  * Class tl_c4G_reservation_settings
  */
+// class tl_c4g_reservation_settings extends Backend
 class tl_c4g_reservation_settings extends Backend
 {
     /**
@@ -440,7 +445,7 @@ class tl_c4g_reservation_settings extends Backend
     public function __construct()
     {
         parent::__construct();
-        $this->import('BackendUser', 'User');
+        $this->import(BackendUser::class, 'User');
     }
 
     public function generateUuid($varValue, DataContainer $dc)

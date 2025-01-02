@@ -6,6 +6,7 @@ use Contao\Database;
 use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
+use Contao\System;
 
 class ReservationEvents {
 
@@ -28,7 +29,7 @@ class ReservationEvents {
                 $do = Input::get('do');
                 $where = "reservationObjectType = 2 AND reservation_object = ".$row['id'];
 
-                $link = '<a href="/contao?do=c4g_export&table=tl_c4g_export&calendar='.$row['pid'].'&where='.$where.'&' . $href . '&id=' . $settings['exportSelection'].'&rt='.$rt. "&ref=" . $ref;
+                $link = '<a href="'.System::getContainer()->get('router')->generate('contao_backend').'?do=c4g_export&table=tl_c4g_export&calendar='.$row['pid'].'&where='.$where.'&' . $href . '&id=' . $settings['exportSelection'].'&rt='.$rt. "&ref=" . $ref;
                 $link .= '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label);
                 $link .= '</a> ';
                 return $link;

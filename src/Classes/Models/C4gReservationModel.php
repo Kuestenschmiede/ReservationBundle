@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 namespace con4gis\ReservationBundle\Classes\Models;
@@ -14,6 +14,7 @@ namespace con4gis\ReservationBundle\Classes\Models;
 use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use Contao\Model;
+use Contao\Database;
 
 /**
  * Class C4gReservationModel
@@ -32,7 +33,7 @@ class C4gReservationModel extends Model
      * @return mixed
      */
     public static function getListItems($listParams = null) {
-        $db = \Database::getInstance();
+        $db = Database::getInstance();
 
         $types = '';
         $pastDayNumber = 1;
@@ -54,7 +55,7 @@ class C4gReservationModel extends Model
     }
 
     public static function getListItemsByMember($memberId, $tableName, $database, $fieldList, $listParams) {
-        $db = \Database::getInstance();
+        $db = Database::getInstance();
         $types = '';
         $pastDayNumber = 1;
         if ($listParams) {
@@ -78,7 +79,7 @@ class C4gReservationModel extends Model
     }
 
     public static function getListItemsByGroup($groupId, $database, $listParams, $brickDatabase) {
-        $db = \Database::getInstance();
+        $db = Database::getInstance();
         $pastDayNumber = intval($listParams->getModelListParams()[0]);
         $types = '';
         $pastDayNumber = 1;
@@ -113,7 +114,7 @@ class C4gReservationModel extends Model
      */
     public static function getAddressListItemsByGroup($groupId, $database, $listParams, $brickDatabase) {
         $types = $listParams->getModelListParams();
-        $db = \Database::getInstance();
+        $db = Database::getInstance();
         if ($types) {
             $inTypes = C4GUtils::buildInString($types);
 

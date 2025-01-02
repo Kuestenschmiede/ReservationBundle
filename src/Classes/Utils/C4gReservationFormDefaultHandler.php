@@ -174,7 +174,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             } else {
                 $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
                 if ($commaDates) {
-                    $commaDates = $commaDates['dates'];
+                    $commaDates = isset($commaDates['dates']) ? $commaDates['dates'] : "";
                 }
                 $reservationBeginDateField->setExcludeDates($commaDates);
             }
@@ -370,7 +370,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                         $postal = $location->contact_postal;
                         $city = $location->contact_city;
                         if ($street && $postal && $city) {
-                            $locationName .= "&nbsp;(" . $street . ",&nbsp;" . $postal . "&nbsp;" . $city . ")";
+                            $locationName .= " (" . $street . ", " . $postal . " " . $city . ")";
                         }
 
                         if ($href) {
@@ -412,7 +412,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                         $speakerNr++;
                         $speaker = C4gReservationEventSpeakerModel::findByPk($speakerId);
                         if ($speaker) {
-                            $speakerName = $speaker->title ? $speaker->title . '&nbsp;' . $speaker->firstname . '&nbsp;' . $speaker->lastname : $speaker->firstname . '&nbsp;' . $speaker->lastname;
+                            $speakerName = $speaker->title ? $speaker->title . ' ' . $speaker->firstname . ' ' . $speaker->lastname : $speaker->firstname . ' ' . $speaker->lastname;
 
                             if ($reservationSettings->speaker_redirect_site) {
                                 $jumpTo = \PageModel::findByPk($reservationSettings->speaker_redirect_site);
@@ -451,7 +451,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                         $topic = C4gReservationEventTopicModel::findByPk($topicId);
                         if ($topic) {
                             $topicName = $topic->topic;
-                            $topicStr = $topicStr ? $topicStr . ',&nbsp;' . $topicName : $topicName;
+                            $topicStr = $topicStr ? $topicStr . ' ' . $topicName : $topicName;
                         }
                     }
 
@@ -481,7 +481,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                         $audience = C4gReservationEventAudienceModel::findByPk($audienceId);
                         if ($audience) {
                             $audienceName = $audience->targetAudience;
-                            $audienceStr = $audienceStr ? $audienceStr . ',&nbsp;' . $audienceName : $audienceName;
+                            $audienceStr = $audienceStr ? $audienceStr . ', ' . $audienceName : $audienceName;
                         }
                     }
 

@@ -12,17 +12,12 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
-        "contao/core-bundle": "^4.9",
-        "contao/calendar-bundle": "^4.9",
-        "con4gis/projects": "^4.0.38",
-        "con4gis/documents": "^1.5.5",
-        "con4gis/groups": "^2.8.5"
-    },
-    "require-dev": {
-        "contao/test-case": "^4.9 || ^5.1",
-        "phpunit/phpunit": "^9.5",
-        "symfony/phpunit-bridge": "^5.4 || ^6.0"
+        "php": "^8.0",
+        "contao/core-bundle": "^4.13 || ^5.0",
+        "contao/calendar-bundle": "^4.13 || ^5.0",
+        "con4gis/projects": "^5.0",
+        "con4gis/documents": "^1.6",
+        "con4gis/groups": "^2.9"
     },
     "conflict": {
         "contao/core": "*",
@@ -46,20 +41,18 @@
             "src/Resources/contao/templates/"
         ]
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Contao\\ReservationBundle\\Tests\\": "tests/"
-        }
-    },
     "config": {
+        "preferred-install": "dist",
         "allow-plugins": {
             "contao-components/installer": true,
-            "contao/manager-plugin": true,
-            "preferred-install": "dist"
+            "contao/manager-plugin": true
         }
     },
     "extra": {
-        "contao-manager-plugin": "con4gis\\ReservationBundle\\ContaoManager\\Plugin"
+        "contao-manager-plugin": "con4gis\\ReservationBundle\\ContaoManager\\Plugin",
+        "branch-alias": {
+            "dev-main": "4.0.x-dev"
+        }
     },
     "scripts": {
         "all": [

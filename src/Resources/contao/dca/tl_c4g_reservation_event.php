@@ -2,12 +2,18 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
+
+ use con4gis\ReservationBundle\Classes\Callbacks\C4gReservationEvent;
+ use Contao\Input;
+ use Contao\DC_Table;
+
+ $cbClass = C4gReservationEvent::class;
 
 /**
  * Table tl_module
@@ -18,10 +24,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //config
     'config' => array
     (
-        'dataContainer'     => 'Table',
+        'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
         'ptable'            => 'tl_calendar_events',
-        'onload_callback'   => [['tl_c4g_reservation_event', 'setParent']],
+        'onload_callback'   => [[$cbClass, 'setParent']],
         'sql'               => array(
             'keys' => array
             (
@@ -52,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         (
             'back' => [
                 'class'               => 'header_back',
-                'href'                => 'do=calendar&table=tl_calendar_events&id='.$this->Input->get('pid'),
+                'href'                => 'do=calendar&table=tl_calendar_events&id='.Input::get('pid'),
                 'icon'                => 'back.svg',
                 'label'               => &$GLOBALS['TL_LANG']['MSC']['backBT'],
             ]
@@ -108,7 +114,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'inputType'         => 'select',
             'exclude'           => true,
             'default'           => 0,
-            'options_callback'  => ['tl_c4g_reservation_event', 'getActEvent'],
+            'options_callback'  => [$cbClass, 'getActEvent'],
             'eval'              => array('mandatory' => false, 'disabled' => true, 'tl_class' => 'long clr', 'unique' => true, 'doNotCopy' => true, 'includeBlankOption' => true, 'blankOptionLabel' => 'OOPS! ERROR?', 'doNotSaveEmpty' => true),
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
@@ -126,7 +132,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'search'            => true,
             'inputType'         => 'text',
             'eval'              => array('mandatory'=>false, 'tl_class'=>'w50 clr', 'doNotCopy' => true),
-            'sql'               => "varchar(128) NOT NULL default ''"
+            'sql'               => array('type' => 'string', 'length' => 128, 'default' => '')
         ),
 
         'location'  => array
@@ -158,7 +164,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['reservationType'],
             'exclude'           => true,
             'inputType'         => 'select',
-            'options_callback'  => ['tl_c4g_reservation_event', 'getReservationTypes'],
+            'options_callback'  => [$cbClass, 'getReservationTypes'],
             'eval'              => ['mandatory' => true, 'tl_class' => 'long clr', 'doNotCopy' => true],
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
@@ -212,7 +218,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['speaker'],
             'exclude'           => true,
             'inputType'         => 'checkbox',
-            'options_callback'  => ['tl_c4g_reservation_event', 'getSpeakerName'],
+            'options_callback'  => [$cbClass, 'getSpeakerName'],
             'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
             'sql'               => "blob NULL"
         ),
@@ -276,7 +282,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'options'                 => array( 'tNone', 'tStandard', 'tReduced'),
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['references'],
             'eval'                    => array('submitOnChange' => true, 'tl_class' => 'long clr', 'fieldType'=>'radio'),
-            'sql'                     => "varchar(50) NOT NULL default 'tNone'"
+            // 'sql'                     => "varchar(50) NOT NULL default 'tNone'"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => 'tNone')
         ),
         'priceoption' => array
         (
@@ -287,7 +294,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'default'                 => '',
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['references'],
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50 clr'),
-            'sql'                     => "varchar(50) NOT NULL default ''"
+            // 'sql'                     => "varchar(50) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'reservationForwarding' => [
@@ -308,7 +316,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            // 'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ],
 
         'state' => array(
@@ -333,128 +342,3 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
         ),
     )
 );
-
-
-/**
- * Class tl_c4g_reservation
- */
-class tl_c4g_reservation_event extends Backend
-{
-    /**
-     * Import the back end user object
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
-
-    /**
-     * @param \Contao\DataContainer $dc
-     */
-    public function setParent(Contao\DataContainer $dc)
-    {
-        \Contao\Message::addInfo($GLOBALS['TL_LANG']['tl_c4g_reservation_event']['infoEvent']);
-
-        $pid = intval(Input::get('pid'));
-
-        if (!$pid) {
-            $pid = $dc->activeRecord->pid;
-            if (!$pid) {
-              return $dc;
-            }
-        }
-
-        $dc->pid = $pid;
-        $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $pid;
-        $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['sql'] = "int(10) unsigned NOT NULL default ".$pid;
-
-        $calendarId = \Database::getInstance()->prepare('SELECT pid FROM tl_calendar_events WHERE id=?')->execute($pid)->fetchAssoc();
-        $calendarRow =  $calendarId ? \Database::getInstance()->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($calendarId['pid'])->fetchAssoc() : false;
-        if ($calendarRow) {
-            $dc->location = $calendarRow['reservationLocation'];
-            $dc->organizer = $calendarRow['reservationOrganizer'];
-            $dc->reservationType = $calendarRow['reservationType'];
-            $dc->minParticipants = $calendarRow['reservationMinParticipants'];
-            $dc->maxParticipants = $calendarRow['reservationMaxParticipants'];
-            $dc->speaker = $calendarRow['reservationSpeaker'];
-            $dc->topic = $calendarRow['reservationTopic'];
-            $dc->targetAudience = $calendarRow['reservationtargetAudience'];
-            $dc->price = $calendarRow['reservationPrice'];
-//            $dc->taxOptions = $calendarRow['reservationTaxOptions'];
-            $dc->priceoption = $calendarRow['reservationPriceOption'];
-
-            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['location']['default'] = $calendarRow['reservationLocation'];
-            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['organizer']['default'] = $calendarRow['reservationOrganizer'];
-            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['reservationType']['default'] = $calendarRow['reservationType'];
-            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['minParticipants']['default'] = $calendarRow['reservationMinParticipants'];
-            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['maxParticipants']['default'] = $calendarRow['reservationMaxParticipants'];
-            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['speaker']['default'] = $calendarRow['reservationSpeaker'];
-            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['topic']['default'] = $calendarRow['reservationTopic'];
-            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['targetAudience']['default'] = $calendarRow['reservationtargetAudience'];
-            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['price']['default'] = $calendarRow['reservationPrice'];
-            $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['priceoption']['default'] = $calendarRow['reservationPriceOption'];
-        }
-
-        return $dc;
-    }
-
-    /**
-     * Return all themes as array
-     * @return array
-     */
-    public function getActEvent(DataContainer $dc)
-    {
-        $return = [];
-        $events = $this->Database->prepare("SELECT id,title FROM tl_calendar_events ORDER BY title")->execute();
-
-        while ($events->next()) {
-            $return[intval($events->id)] = $events->title;
-        }
-
-        return $return;
-    }
-
-    /**
-     * Return all event types as array
-     * @return array
-     */
-    public function getReservationTypes(DataContainer $dc)
-    {
-        $return = [];
-
-        $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_type WHERE `reservationObjectType` = 2 ORDER BY caption")
-            ->execute();
-
-        while ($objects->next()) {
-            $return[$objects->id] = $objects->caption;
-        }
-
-        return $return;
-    }
-
-    /**
-     * Return all speaker as array
-     * @return array
-     */
-    public function getSpeakerName(DataContainer $dc)
-    {
-        $return = [];
-
-        $objects = $this->Database->prepare("SELECT id,title,firstname,lastname FROM tl_c4g_reservation_event_speaker ORDER BY lastname")
-            ->execute();
-
-        while ($objects->next()) {
-            $name = '';
-            if ($objects->title) {
-                $name = $objects->lastname.','.$objects->firstname.','.$objects->title;
-            } else {
-                $name = $objects->lastname.','.$objects->firstname;
-            }
-
-            $return[$objects->id] = $name;
-        }
-
-        return $return;
-    }
-}

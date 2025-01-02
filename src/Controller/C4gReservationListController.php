@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -49,6 +49,7 @@ use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class C4gReservationListController extends C4GBaseController
 {
@@ -102,12 +103,13 @@ class C4gReservationListController extends C4GBaseController
 
     /**
      * @param string $rootDir
-     * @param Session $session
+     * @param RequestStack $requestStack
      * @param ContaoFramework $framework
      */
-    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, ModuleModel $model = null)
+    
+    public function __construct(string $rootDir, RequestStack $requestStack, ContaoFramework $framework, ModuleModel $model = null)
     {
-        parent::__construct($rootDir, $session, $framework, $model);
+        parent::__construct($rootDir, $requestStack, $framework, $model);
 
         if ($model && $model->reservationView) {
             $this->viewType = $model->reservationView;
@@ -127,7 +129,7 @@ class C4gReservationListController extends C4GBaseController
      * @param Request $request
      * @return Response|null
      */
-    public function getResponse(Template $template, ModuleModel $model, Request $request): ?Response {
+    public function getResponse(Template $template, ModuleModel $model, Request $request): Response {
         if ($model && $model->reservationView) {
             $this->viewType = $model->reservationView;
             if ($this->viewType === 'publicview') {

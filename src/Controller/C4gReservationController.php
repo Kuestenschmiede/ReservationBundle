@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -72,8 +72,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Reservation form (Contao frontend module)
@@ -128,12 +128,13 @@ class C4gReservationController extends C4GBaseController
 
     /**
      * @param string $rootDir
-     * @param Session $session
+     * @param RequestStack $requestStack
      * @param ContaoFramework $framework
      */
-    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, ModuleModel $model = null)
+
+    public function __construct(string $rootDir, RequestStack $requestStack, ContaoFramework $framework, ModuleModel $model = null)
     {
-        parent::__construct($rootDir, $session, $framework, $model);
+        parent::__construct($rootDir, $requestStack, $framework, $model);
     }
 
     public function initBrickModule($id)
@@ -169,7 +170,7 @@ class C4gReservationController extends C4GBaseController
             $this->session->remove('reservationTimeCookie_'.$oldEventId);
         }
 
-        \System::loadLanguageFile('fe_c4g_reservation');
+        System::loadLanguageFile('fe_c4g_reservation');
         if ($GLOBALS['TL_LANGUAGE']) {
             $this->session->setSessionValue('reservationLangCookie', $GLOBALS['TL_LANGUAGE']);
         }
@@ -197,7 +198,7 @@ class C4gReservationController extends C4GBaseController
             $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
         }
 
-        \System::loadLanguageFile('fe_c4g_reservation');
+        System::loadLanguageFile('fe_c4g_reservation');
         if ($GLOBALS['TL_LANGUAGE']) {
             $this->session->setSessionValue('reservationLangCookie', $GLOBALS['TL_LANGUAGE']);
         }
@@ -224,7 +225,7 @@ class C4gReservationController extends C4GBaseController
             $this->permalink_name = 'event';
         }
 
-        $event = $eventId ? \CalendarEventsModel::findByPk($eventId) : false;
+        $event = $eventId ? \Contao\CalendarEventsModel::findByPk($eventId) : false;
         $eventObj = $event && $event->published ? C4gReservationEventModel::findBy('pid', $event->id) : false;
         if ($eventObj && is_countable($eventObj) && (count($eventObj) > 1)) {
             C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: ' . $event->id);
@@ -344,7 +345,7 @@ class C4gReservationController extends C4GBaseController
 
         if ($types) {
             $memberId = 0;
-            if (FE_USER_LOGGED_IN === true) {
+            if (FrontendUser::getInstance()->isLoggedIn === true) {
                 $member = FrontendUser::getInstance();
                 if ($member) {
                     $memberId = $member->id;
@@ -375,7 +376,7 @@ class C4gReservationController extends C4GBaseController
                         if ((strpos(strtolower($GLOBALS['TL_LANGUAGE']), strtolower($caption['language'])) >= 0) && $caption['caption']) {
                             $typelist[$type['id']] = array(
                                 'id' => $type['id'],
-                                'name' => StringHelper::spaceToNbsp($caption['caption']),
+                                'name' => $caption['caption'],
                                 'periodType' => $type['periodType'],
                                 'includedParams' => \Contao\StringUtil::deserialize($type['included_params']),
                                 'additionalParams' => \Contao\StringUtil::deserialize($type['additional_params']),
@@ -405,7 +406,7 @@ class C4gReservationController extends C4GBaseController
                 If (!$foundCaption) {
                     $typelist[$type['id']] = array(
                         'id' => $type['id'],
-                        'name' => StringHelper::spaceToNbsp($type['caption']),
+                        'name' => $type['caption'],
                         'periodType' => $type['periodType'],
                         'includedParams' => \Contao\StringUtil::deserialize($type['included_params']),
                         'additionalParams' => \Contao\StringUtil::deserialize($type['additional_params']),
@@ -488,7 +489,7 @@ class C4gReservationController extends C4GBaseController
         $initialValues->setObject($objectId);
 
         $onlyParticipants = $this->reservationSettings->onlyParticipants ?: false;
-        $isPartiPerEvent = $eventObj->maxParticipantsPerEventBooking ?: 0;
+        $isPartiPerEvent = $eventObj != false ? $eventObj->maxParticipantsPerEventBooking : 0;
 
 
 foreach ($typelist as $listType) {
@@ -597,11 +598,11 @@ foreach ($typelist as $listType) {
             }
             else {
                 if ($isPartiPerEvent) {
-                    $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
+                    $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
                     $reservationDesiredCapacity->setMax($listType['maxParticipantsPerBooking']);
                 } else {
                     //show current capacity option for the title
-//                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
+//                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$minCapacity.'-'.$maxCapacity.')');
                     $reservationDesiredCapacity->setMax($maxCapacity);
                     $reservationDesiredCapacity->setMin($minCapacity);
                 }
@@ -777,7 +778,8 @@ $memberArr['phone'] = '';
 $memberArr['dateOfBirth'] = '';
 $memberArr['gender'] = '';
 
-if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
+$hasFrontendUser = System::getContainer()->get('contao.security.token_checker')->hasFrontendUser();
+if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
     $member = FrontendUser::getInstance();
     if ($member) {
         $memberArr['id'] = $member->id ?: '';
@@ -903,7 +905,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
             $rowMandatory = key_exists('binding', $rowdata) ? $rowdata['binding'] : false;
-            $individualLabel = $rowdata['individualLabel'];
+            $individualLabel = isset($rowdata['individualLabel']) ? $rowdata['individualLabel'] : "";
 
             if ($rowField == "organisation") {
                 $organisationField = new C4GTextField();
@@ -951,6 +953,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
                 $firstnameField->setNotificationField(true);
                 $firstnameField->setStyleClass('firstname');
                 $firstnameField->setInitialValue($initialValue ? $initialValue : $memberArr['firstname']);
+                $firstnameField->setPattern("^[a-zA-Z]+$");
                 $fieldList[] = $firstnameField;
             } else if ($rowField == "lastname") {
                 $lastnameField = new C4GTextField();
@@ -963,6 +966,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
                 $lastnameField->setNotificationField(true);
                 $lastnameField->setStyleClass('lastname');
                 $lastnameField->setInitialValue($initialValue ? $initialValue : $memberArr['lastname']);
+                $lastnameField->setPattern("^[a-zA-Z]+$");
                 $fieldList[] = $lastnameField;
             } else if ($rowField == "email") {
                 $emailField = new C4GEmailField();
@@ -1280,13 +1284,13 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
 
 
                     if ($minCapacity && $maxCapacity && ($minCapacity != $maxCapacity && !$noCap && $isPartiPerEvent) /*|| $noCap && !$isPartiPerEvent*/) {
-                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$maxCapacity.')');
+                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$minCapacity.'-'.$maxCapacity.')');
                     } else {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
                     }
 
                     if ($isPartiPerEvent){
-                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$minCapacity.'-'.$isPartiPerEvent.')');
+                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$minCapacity.'-'.$isPartiPerEvent.')');
                     }
                     $reservationDesiredCapacity->setFormField(true);
                     $reservationDesiredCapacity->setEditable(true);
@@ -1372,8 +1376,9 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
 
                     $maxCapacityCheck = $onlyParticipants ? $maxCapacity > 0 : $maxCapacity > 1;
 
-                    if (!$specialParticipantMechanism ||
-                        ($specialParticipantMechanism && $this->reservationSettings->withCapacity) || ($specialParticipantMechanism && $maxCapacityCheck)) {
+                    $reservationSettingsWithCapacity = $this->rreservationSettings->withCapacity;
+                    if (!isset($specialParticipantMechanism) ||
+                        (isset($specialParticipantMechanism) && isset($reservationSettingsWithCapacity)) || (isset($specialParticipantMechanism) && isset($maxCapacityCheck))) {
                         if ($params) {
                             foreach ($params as $paramId) {
                                 if ($paramId) {
@@ -1550,7 +1555,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
 
         if ($this->reservationSettings->privacy_policy_site) {
             $href = \Contao\Controller::replaceInsertTags('{{link_url::' . $this->reservationSettings->privacy_policy_site . '}}');
-            $desc = '<span class="c4g_field_description_text">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . ' </span>&nbsp;<a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>.';
+            $desc = '<span class="c4g_field_description_text">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . ' </span> <a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>.';
         } else {
             $desc = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'];
         }
@@ -1780,7 +1785,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
     {
         $formId = $this->reservationSettings->id;
         $type = $putVars['reservation_type'];
-        $database = \Database::getInstance();
+        $database = Database::getInstance();
         $reservationType = $database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
             ->execute($type);
 
@@ -1836,7 +1841,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
                     ->execute($reservationType->cloneObject);
                 if ($cloneObject) {
                     $reservationObject->notification_type = $reservationObject->notification_type ?: $cloneObject->notification_type;
-                    $reservationObject->time_interval = $reservationObject->time_interval ?: $cloneObject->time_interval;
+                    $reservationObject->time_interval = ($reservationObject->time_interval && $reservationObject->time_interval !== 1) || !$cloneObject->time_interval ? $reservationObject->time_interval : $cloneObject->time_interval;
                     $reservationObject->duration = $reservationObject->duration ?: $cloneObject->duration;
                     $reservationObject->desiredCapacityMax = $reservationObject->desiredCapacityMax ?: $cloneObject->desiredCapacityMax;
                     $reservationObject->minParticipants = $reservationObject->minParticipants ?: $cloneObject->minParticipants;
@@ -1884,13 +1889,13 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
         $newFieldList = [];
         $removedFromList = [];
 
-        if ($reservationType->reservationObjectType === '3' && $typeOfObject == 'fixed_date') {
+        if ($reservationType->reservationObjectType === '3' && isset($typeOfObject) && $typeOfObject == 'fixed_date') {
             $type = ($type . '-33' . $resObject);
         }
 
         foreach ($this->getFieldList() as $key=>$field) {
 
-            $additionalId = $field->getAdditionalID();
+            $additionalId = $field->getAdditionalId();
             if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-'))))) {
                 unset($putVars[$field->getFieldName()."_".$additionalId]);
                 continue;
@@ -1995,8 +2000,10 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
                     continue;
                 }
             }
-            if ($field->getFieldName() && (!$removedFromList[$field->getFieldName()] || ($removedFromList[$field->getFieldName()] && ($removedFromList[$field->getFieldName()] == $field->getAdditionalId())))) {
-                $newFieldList[] = $field;
+            $fieldName = $field->getFieldName();
+            $stop = 1;
+            if (isset($fieldName) && (!isset($removedFromList[$fieldName]) || (isset($removedFromList[$fieldName]) && ($removedFromList[$fieldName] == $field->getAdditionalId())))) {
+                    $newFieldList[] = $field;
             }
         }
 
@@ -2047,7 +2054,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
 
             $beginDate = $reservationObject->startDate ? intval($reservationObject->startDate) : 0;
             $beginTime = $reservationObject->startTime ? intval($reservationObject->startTime) : 0;
-            $endDate   = $reservationObject->endDate ? intval($reservationObject->endDate) : 0;
+            $endDate   = isset($reservationObject->endDate) ? intval($reservationObject->endDate) : 0;
             $endTime   = $reservationObject->endTime ? intval($reservationObject->endTime) : 0;
 
             $putVars['beginDate'] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
@@ -2167,7 +2174,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
                 }
             }
 
-            $duration = $putVars['duration_'.$type];
+            $duration = isset($putVars['duration_'.$type]) ? $putVars['duration_'.$type] : null;
             if (!$duration) {
                 $duration = $time_interval;
                 $putVars['duration_'.$type] = $reservationObject->duration ?: $duration;
@@ -2342,7 +2349,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
             }
             //just notification
             $factor = 1;
-            $countPersons = intval($putVars['desiredCapacity_' . $type]);
+            $countPersons = isset($putVars['desiredCapacity_' . $type]) ? intval($putVars['desiredCapacity_' . $type]) : null;
             $settings = $this->reservationSettings;
 
             self::allPrices($settings, $putVars, $reservationObject, '', $reservationType, $isEvent, $countPersons);
@@ -2394,7 +2401,9 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
         $putVars['formular_id'] = $formId;
 
         $memberId = 0;
-        if (FE_USER_LOGGED_IN === true) {
+        
+        $hasFrontendUser = System::getContainer()->get('contao.security.token_checker')->hasFrontendUser();
+        if ($hasFrontendUser === true) {
             $member = FrontendUser::getInstance();
             if ($member) {
                 $memberId = $member->id;
@@ -2444,7 +2453,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
         $participantsArr = [];
         foreach ($putVars as $key => $value) {
             if ($this->reservationSettings->specialParticipantMechanism) {
-                $desiredCapacity = $putVars['desiredCapacity_'.$reservationType->id];
+                $desiredCapacity = isset($putVars['desiredCapacity_'.$reservationType->id]) ? $putVars['desiredCapacity_'.$reservationType->id] : null;
                 if ($desiredCapacity) {
                     $extId = $this->reservationSettings->onlyParticipants ? $desiredCapacity : $desiredCapacity-1;
                     if (strpos($key,"participants_".$type."-".$extId."§") !== false) {
@@ -2479,7 +2488,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
                 }
 
                 foreach ($putVars as $key => $value) {
-                    $desiredCapacity = $putVars['desiredCapacity_'.$reservationType->id];
+                    $desiredCapacity = isset($putVars['desiredCapacity_'.$reservationType->id]) ? $putVars['desiredCapacity_'.$reservationType->id] : null;
                     if ($desiredCapacity) {
                         $extId = $this->reservationSettings->onlyParticipants ? $desiredCapacity : ($desiredCapacity - 1);
                         for ($i = 0; $i <= 100; $i++) {
@@ -2579,10 +2588,10 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
             $putVars['participantList'] = $participants;
         }
 
-        $icsObject = $reservationEventObject ?: $reservationObject;
+        $icsObject = isset($reservationEventObject) ? $reservationEventObject : $reservationObject;
 
         $beginDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $beginTime);
-        $endDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs($endDate ?: strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $endTime);
+        $endDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(isset($endDate) ? $endDate : strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $endTime);
         $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $reservationId);
 
         $rawData = '';
@@ -2592,8 +2601,10 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
 
         $putVars['bookedAt'] = time();
 
+        // $nextElement = $database->prepare("SELECT id FROM tl_c4g_reservation order by id DESC")
+        //     ->execute($type)->fetchAssoc();
         $nextElement = $database->prepare("SELECT id FROM tl_c4g_reservation order by id DESC")
-            ->execute($type)->fetchAssoc();
+        ->execute()->fetchAssoc();
         if ($nextElement && $nextElement['id']) {
             $nextId = $nextElement['id'] + 1;
             $putVars['dbkey'] = $nextId;
@@ -2727,7 +2738,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
 //        ]);
 
         foreach ($times as $key=>$values) {
-            $times[$key]['name'] = str_replace('&nbsp;',' ',$times[$key]['name']);
+            $times[$key]['name'] = str_replace(' ',' ',$times[$key]['name']);
         }
 
         $captions = [];
@@ -2859,7 +2870,7 @@ if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
     public static function withDesiredCapacityTitle($min, $max, $showMinMax) {
 
         if ($max && $showMinMax && $max > 1) {
-            $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. '&nbsp;('.$min.'-'.$max.')';
+            $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$min.'-'.$max.')';
         } else {
             $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity'];
         }

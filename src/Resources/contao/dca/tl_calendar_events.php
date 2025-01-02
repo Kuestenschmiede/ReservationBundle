@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -20,6 +20,9 @@ use Contao\Database;
 use Contao\Date;
 use Contao\Image;
 use Contao\StringUtil;
+use Contao\System;
+use Contao\Input;
+// use Contao\InsertTags;
 
 $str = 'tl_calendar_events';
 
@@ -90,9 +93,9 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
     }
 
     public function loadChildRecord(array $row) {
-        \System::loadLanguageFile('fe_c4g_reservation');
-        $arrChildRow = \Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event WHERE pid=?')->execute($row['id'])->fetchAssoc();
-        $calendarRow =  \Database::getInstance()->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($row['pid'])->fetchAssoc();
+        System::loadLanguageFile('fe_c4g_reservation');
+        $arrChildRow = Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event WHERE pid=?')->execute($row['id'])->fetchAssoc();
+        $calendarRow =  Database::getInstance()->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($row['pid'])->fetchAssoc();
 
         $span = Calendar::calculateSpan($row['startTime'], $row['endTime']);
 
@@ -230,9 +233,9 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             if ($result && count($result) > 1) {
                 C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '. $row['id']);
             } else if ($result && count($result) == 1) {
-                $href = "/contao?do=$do&table=tl_c4g_reservation_event&amp;act=edit&amp;id=".$result[0]['id']."&amp;pid=".$row['id']."&amp;rt=".$rt;
+                $href = System::getContainer()->get('router')->generate('contao_backend')."?do=$do&table=tl_c4g_reservation_event&amp;act=edit&amp;id=".$result[0]['id']."&amp;pid=".$row['id']."&amp;rt=".$rt;
             } else {
-                $href = "/contao?do=$do&table=tl_c4g_reservation_event&amp;act=create&amp;mode=2&amp;pid=".$row['id']."&amp;rt=".$rt;
+                $href = System::getContainer()->get('router')->generate('contao_backend')."?do=$do&table=tl_c4g_reservation_event&amp;act=create&amp;mode=2&amp;pid=".$row['id']."&amp;rt=".$rt;
             }
 
             $GLOBALS['TL_DCA']['tl_c4g_reservation_event']['fields']['pid']['default'] = $row['id'];
@@ -260,12 +263,16 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             $attributes = 'style="margin-right:3px"';
             $imgAttributes = 'style="width: 18px; height: 18px"';
 
-            $href = "/contao?do=".$do."&table=tl_c4g_reservation&id=" . $row['id'] . "&pid=" . $row['pid'] . "&rt=" . $rt . "&ref=" . $ref;
+            $href = System::getContainer()->get('router')->generate('contao_backend')."?do=".$do."&table=tl_c4g_reservation&id=" . $row['id'] . "&pid=" . $row['pid'] . "&rt=" . $rt . "&ref=" . $ref;
 
-            if ($this->states[$row['id']]) {
+            if (isset($this->states[$row['id']])) {
                 $state = $this->states[$row['id']];
             } else {
-                $state = InsertTags::replaceInsertTags('{{c4gevent::' . $row['id'] . '::state_raw}}');
+                // $state = InsertTags::replaceInsertTags('{{c4gevent::' . $row['id'] . '::state_raw}}');
+
+                $state = '{{c4gevent::' . $row['id'] . '::state_raw}}';
+                $parser = System::getContainer()->get('contao.insert_tag.parser');
+                $state = html_entity_decode($parser->replace($state));
             }
             $stop = 1;
             switch ($state) {
@@ -305,7 +312,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             foreach ($currentEventParticipantList as $cepl) {
                 $cep[$i++] = $cepl['reservation_id'];
             }
-            if ($cep) {
+            if (isset($cep)) {
                 $currentEventReservationId = array_unique($cep);
                 foreach ($currentEventReservationId as $cerId){
                     $stillExist = Database::getInstance()->prepare("SELECT id FROM tl_c4g_reservation WHERE `id`=?")->execute($cerId)->fetchAllAssoc();
@@ -320,7 +327,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
                 $exist = Database::getInstance()->prepare("SELECT reservation_id FROM tl_c4g_reservation_event_participants WHERE `reservation_id`=?")->execute($evRes['id'])->fetchAssoc() ? true : false;
                 $onlyParticipants = Database::getInstance()->prepare("SELECT onlyParticipants FROM tl_c4g_reservation_settings WHERE id=? ")->execute($evRes['formular_id'])->fetchAssoc();
             
-                $onlyParticipants = $onlyParticipants['onlyParticipants'];
+                $onlyParticipants = isset($onlyParticipants['onlyParticipants']) ? $onlyParticipants['onlyParticipants'] : null;
                 if (!intval($evRes['cancellation']) && !$exist && !$onlyParticipants) {
                     Database::getInstance()->prepare("INSERT INTO `tl_c4g_reservation_event_participants` (`pid`, `reservation_id`, `participant_id`, `tstamp`, `title`, `lastname`, `firstname`, `email`, `phone`, `address`, `postal`, `city`, `comment`, `participant_params`, `booker`,`additional1`,`additional2`,`additional3`, `dateOfBirth`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")->execute($row['id'],$evRes['id'],$evRes['id'],$evRes['tstamp'],$evRes['title'],$evRes['lastname'],$evRes['firstname'],$evRes['email'],$evRes['phone'],$evRes['address'],$evRes['postal'],$evRes['city'],$evRes['comment'],$evRes['additional_params'],$booker,$evRes['additional1'],$evRes['additional2'],$evRes['additional3'],$evRes['dateOfBirth']);
                     $deleted = false;
@@ -341,14 +348,13 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
                     }                    
                 }
                 
-                if ($stillExist && !intval($evRes['cancellation'])) {
+                if (isset($stillExist) && !intval($evRes['cancellation'])) {
                      $currentData = Database::getInstance()->prepare("SELECT reservation_id FROM tl_c4g_reservation_event_participants WHERE `reservation_id`=? AND `pid`=?")->execute($evRes['id'],$row['id'])->fetchAllAssoc();
                     if($currentData) {
                         $countBegin = count($currentData);
                     } else {
                         $countBegin = 0;
                     }
-          
                     $unknown = $GLOBALS['TL_LANG']['tl_calendar_events']['unknown'];
                     for ($i = $countBegin; $i < intval($evRes['desiredCapacity']); $i++) {
                         Database::getInstance()->prepare("INSERT INTO `tl_c4g_reservation_event_participants` (`pid`,`reservation_id`,`tstamp`, `lastname`, `firstname`, `booker`) VALUES (?,?,?,?,?,?)")->execute($row['id'],$evRes['id'],$evRes['tstamp'],$unknown,$unknown,$booker);
@@ -361,7 +367,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
 
             $label_new = 'Label Umbenannt';
 
-            $href = "/contao?do=".$do."&table=tl_c4g_reservation_event_participants&id=" . $row['id'];
+            $href = System::getContainer()->get('router')->generate('contao_backend')."?do=".$do."&table=tl_c4g_reservation_event_participants&id=" . $row['id'];
 
             return '<a href="' . $href . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, $imgAttributes) . '</a> ';
         }

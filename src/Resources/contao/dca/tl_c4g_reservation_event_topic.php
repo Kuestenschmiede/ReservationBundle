@@ -2,19 +2,23 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
+
+use Contao\DC_Table;
+use Contao\BackendUser;
+use Contao\Backend;
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_event_topic'] = array
 (
     //config
     'config' => array
     (
-        'dataContainer'     => 'Table',
+        'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
         'sql'               => array
         (
@@ -112,7 +116,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_topic'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 
         )
     )
@@ -122,6 +126,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_topic'] = array
 /**
  * Class tl_c4G_reservation_params
  */
+// class tl_c4g_reservation_event_topic extends Backend
 class tl_c4g_reservation_event_topic extends Backend
 {
     /**
@@ -130,7 +135,7 @@ class tl_c4g_reservation_event_topic extends Backend
     public function __construct()
     {
         parent::__construct();
-        $this->import('BackendUser', 'User');
+        $this->import(BackendUser::class, 'User');
     }
 
     public function generateUuid($varValue, DataContainer $dc)

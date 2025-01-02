@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -48,6 +48,8 @@ use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Contao\System;
 
 class C4gReservationObjectsController extends C4GBaseController
 {
@@ -100,12 +102,12 @@ class C4gReservationObjectsController extends C4GBaseController
 
     /**
      * @param string $rootDir
-     * @param Session $session
+     * @param RequestStack $requestStack
      * @param ContaoFramework $framework
      */
-    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, ModuleModel $model = null)
+    public function __construct(string $rootDir, RequestStack $requestStack, ContaoFramework $framework, ModuleModel $model = null)
     {
-        parent::__construct($rootDir, $session, $framework, $model);
+        parent::__construct($rootDir, $requestStack, $framework, $model);
     }
 
     /**
@@ -114,7 +116,7 @@ class C4gReservationObjectsController extends C4GBaseController
      * @param Request $request
      * @return Response|null
      */
-    public function getResponse(Template $template, ModuleModel $model, Request $request): ?Response {
+    public function getResponse(Template $template, ModuleModel $model, Request $request): Response {
         $result = parent::getResponse($template, $model, $request);
 
         return $result;
@@ -142,6 +144,7 @@ class C4gReservationObjectsController extends C4GBaseController
 
     public function addFields() : array
     {
+        $hasFrontendUser = System::getContainer()->get('contao.security.token_checker')->hasFrontendUser();
         $fieldList = array();
 
         $idField = new C4GKeyField();
@@ -164,7 +167,7 @@ class C4gReservationObjectsController extends C4GBaseController
         if ($this->postals) {
             $ignorePostal = true;
             $contactData = true;
-            if (FE_USER_LOGGED_IN === true) {
+            if ($hasFrontendUser === true) {
                 $member = FrontendUser::getInstance();
                 if ($member) {
                     $postals = explode(',', $this->postals);
@@ -394,7 +397,7 @@ class C4gReservationObjectsController extends C4GBaseController
                 $result = $locset['name'] ? $stmt->execute($locset['name'])->fetchAssoc() : [];
             }
             $multiColumnStr = serialize($multiColumnArr);
-            $alias = \Contao\System::getContainer()->get('contao.slug')->generate($set['caption'], C4gReservationObjectModel::findByPk($insertId)->jumpTo);
+            $alias = System::getContainer()->get('contao.slug')->generate($set['caption'], C4gReservationObjectModel::findByPk($insertId)->jumpTo ?: 0);
 
             if ($result && count($result)) {
                 $stmt = $db->prepare("UPDATE $locationTable %s WHERE name = ?");

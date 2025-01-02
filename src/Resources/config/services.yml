@@ -4,18 +4,22 @@ services:
     autoconfigure: true
 
   con4gis\ReservationBundle\Controller\C4gReservationController:
+    #autowire: true 
     arguments:
       - '%kernel.project_dir%'
-      - "@session"
-      - "@contao.framework"
+      - '@request_stack'
+      - '@contao.framework'
+      #- "@session"
     public: true
+   
     tags:
       - { name: contao.frontend_module,category: con4gis,template: mod_c4g_brick,type: C4gReservation }
 
   con4gis\ReservationBundle\Controller\C4gReservationCancellationController:
     arguments:
       - '%kernel.project_dir%'
-      - "@session"
+      - "@request_stack"
+     # - "@session"
       - "@contao.framework"
     public: true
     tags:
@@ -24,7 +28,8 @@ services:
   con4gis\ReservationBundle\Controller\C4gReservationListController:
     arguments:
       - '%kernel.project_dir%'
-      - "@session"
+      - "@request_stack"
+    #  - "@session"
       - "@contao.framework"
     public: true
     tags:
@@ -33,7 +38,8 @@ services:
   con4gis\ReservationBundle\Controller\C4gReservationAddressListController:
     arguments:
       - '%kernel.project_dir%'
-      - "@session"
+      - "@request_stack"
+     # - "@session"
       - "@contao.framework"
     public: true
     tags:
@@ -42,7 +48,8 @@ services:
   con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController:
     arguments:
       - '%kernel.project_dir%'
-      - "@session"
+      - "@request_stack"
+     # - "@session"
       - "@contao.framework"
     public: true
     tags:
@@ -51,7 +58,8 @@ services:
   con4gis\ReservationBundle\Controller\C4gReservationLocationListController:
     arguments:
       - '%kernel.project_dir%'
-      - "@session"
+      - "@request_stack"
+    #  - "@session"
       - "@contao.framework"
     public: true
     tags:
@@ -60,8 +68,17 @@ services:
   con4gis\ReservationBundle\Controller\C4gReservationObjectsController:
     arguments:
       - '%kernel.project_dir%'
-      - "@session"
+      - "@request_stack"
+     # - "@session"
       - "@contao.framework"
     public: true
     tags:
       - { name: contao.frontend_module,category: con4gis,template: mod_c4g_brick,type: C4gReservationObjects }
+
+  con4gis\ReservationBundle\Classes\Notifications\:
+    resource: '../../Classes/Notifications'
+    autoconfigure: true
+    autowire: true
+
+  con4gis\ReservationBundle\Classes\Notifications\C4gNotificationCenterService:
+    public: true

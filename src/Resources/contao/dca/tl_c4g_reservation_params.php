@@ -2,19 +2,28 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
+
+use Contao\DC_Table;
+use Contao\BackendUser;
+use Contao\Input;
+use Contao\StringUtil;
+use Contao\Image;
+use Contao\System;
+use Contao\Versions;
+use Contao\DataContainer;
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
 (
     //config
     'config' => array
     (
-        'dataContainer'     => 'Table',
+        'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
         'sql'               => array
         (
@@ -120,7 +129,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 
         ),
         'feCaption' => array
@@ -161,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'options'                 => array( 'tNone', 'tStandard', 'tReduced'),
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['references'],
             'eval'                    => array('submitOnChange' => true, 'tl_class' => 'long clr', 'fieldType'=>'radio', 'tl_class'=>'w50 clr'),
-            'sql'                     => "varchar(50) NOT NULL default 'tNone'"
+            'sql'                     => array('type' => 'string', 'length' => 50, 'default' => 'tNone')
         ),
         'price' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['price'],
@@ -190,7 +199,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
 /**
  * Class tl_c4G_reservation_params
  */
-class tl_c4g_reservation_params extends Backend
+// class tl_c4g_reservation_params extends Backend
+class tl_c4g_reservation_params extends \Contao\Backend
 {
     /**
      * Import the back end user object
@@ -198,7 +208,7 @@ class tl_c4g_reservation_params extends Backend
     public function __construct()
     {
         parent::__construct();
-        $this->import('BackendUser', 'User');
+        $this->import(Contao\BackendUser::class, 'User');
     }
 
     public function generateUuid($varValue, DataContainer $dc)
@@ -212,33 +222,35 @@ class tl_c4g_reservation_params extends Backend
 
     public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
     {
-        $this->import('BackendUser', 'User');
+        $this->import(Contao\BackendUser::class, 'User');
 
-        if (strlen($this->Input->get('tid'))) {
-            $this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 0));
+        if (strlen(Input::get('tid'))) {
+            $this->toggleVisibility(Input::get('tid'), (Input::get('state') == ''));
             $this->redirect($this->getReferer());
         }
 
-        $href .= '&amp;id=' . $this->Input->get('id') . '&amp;tid=' . $row['id'] . '&amp;state='.($row['published'] ? '' : 1);
+        $href .= '&amp;id=' . Input::get('id') . '&amp;tid=' . $row['id'] . '&amp;state='.($row['published'] ? '' : 1);
 
         if (!$row['published']) {
             $icon = 'invisible.gif';
         }
 
-        return '<a href="' . $this->addToUrl($href) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+        return '<a href="' . $this->addToUrl($href) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ';
     }
     public function toggleVisibility($intId, $blnPublished)
     {
         // Check permissions to publish
         if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_params::published', 'alexf')) {
             $this->log('Not enough permissions to show/hide record ID "' . $intId . '"', 'tl_c4g_reservation_params toggleVisibility', TL_ERROR);
-            $this->redirect('contao/main.php?act=error');
+            $this->redirect(System::getContainer()->get('router')->generate('contao_backend').'/main.php?act=error');
         }
 
-        $this->createInitialVersion('tl_c4g_reservation_params', $intId);
+        $objVersions = new Versions('tl_c4g_reservation_params', $intId);
+		$objVersions->initialize();
+
 
         // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_c4g_reservation_params']['fields']['published']['save_callback'])) {
+        if (isset($GLOBALS['TL_DCA']['tl_c4g_reservation_params']['fields']['published']['save_callback']) && is_array($GLOBALS['TL_DCA']['tl_c4g_reservation_params']['fields']['published']['save_callback'])) {
             foreach ($GLOBALS['TL_DCA']['tl_c4g_reservation_params']['fields']['published']['save_callback'] as $callback) {
                 $this->import($callback[0]);
                 $blnPublished = $this->$callback[0]->$callback[1]($blnPublished, $this);
@@ -248,6 +260,7 @@ class tl_c4g_reservation_params extends Backend
         // Update the database
         $this->Database->prepare("UPDATE tl_c4g_reservation_params SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE `id`=?")
             ->execute($intId);
-        $this->createNewVersion('tl_c4g_reservation_params', $intId);
+        $objVersions = new Versions('tl_c4g_reservation_params', $intId);
+		$objVersions->create();
     }
 }

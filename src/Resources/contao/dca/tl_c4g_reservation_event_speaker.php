@@ -2,21 +2,27 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
+use con4gis\ReservationBundle\Classes\Callbacks\C4gReservationEventSpeaker;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel;
+use Contao\DC_Table;
+use Contao\Config;
+
+
+$cbClass = C4gReservationEventSpeaker::class;
 
 $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
 (
     //config
     'config' => array
     (
-        'dataContainer'     => 'Table',
+        'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
         'sql'               => array
         (
@@ -87,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['toggle'],
                 'icon'                => 'visible.gif',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array('tl_c4g_reservation_event_speaker', 'toggleIcon')
+                'button_callback'     => array($cbClass, 'toggleIcon')
             )
         )
     ),
@@ -123,8 +129,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
-
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'firstname' => array (
@@ -135,7 +140,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'sorting'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 
         ),
 
@@ -147,7 +152,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'sorting'                 => true,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 
         ),
 
@@ -160,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'long clr'),
             'save_callback' => array
             (
-                array('tl_c4g_reservation_event_speaker', 'generateAlias')
+                array($cbClass, 'generateAlias')
             ),
             'sql' => "varchar(255) BINARY NOT NULL default ''"
         ),
@@ -172,7 +177,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w50 clr'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'phone' => array
@@ -182,7 +187,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w50'),
-            'sql'                     => "varchar(64) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 64, 'default' => '')
         ),
 
         'address' => array
@@ -192,7 +197,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long clr'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'postal' => array (
@@ -201,7 +206,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>32, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'w50 clr'),
-            'sql'                     => "varchar(32) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 32, 'default' => '')
 
         ),
 
@@ -213,7 +218,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'sorting'                 => false,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'w50'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 
         ),
 
@@ -250,7 +255,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => true,
             'inputType'               => 'text',
             'eval'                    => array('rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>254, 'fieldType'=>'radio', 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'forum', 'memberLink' => true, 'tl_class'=>'clr w50'),
-            'sql'                     => "varchar(254) NOT NULL default ''"
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
         'speakerForwarding' => array
@@ -282,118 +287,5 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'inputType'         => 'checkbox',
             'sql'               => "int(1) unsigned NULL default 1"
         )
-
     )
 );
-
-class tl_c4g_reservation_event_speaker extends Backend
-{
-    /**
-     * Import the back end user object
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
-
-    public function generateUuid($varValue, DataContainer $dc)
-    {
-        if ($varValue == '') {
-            return \c4g\projects\C4GBrickCommon::getGUID();
-        } else {
-            return $varValue;
-        }
-    }
-
-    /**
-     * Auto-generate the object alias if it has not been set yet
-     *
-     * @param mixed         $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias($varValue, \Contao\DataContainer $dc)
-    {
-        $aliasExists = function (string $alias) use ($dc): bool
-        {
-            return $this->Database->prepare("SELECT id FROM tl_c4g_reservation_event_speaker WHERE alias=? AND id!=?")->execute($alias, $dc->id)->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue)
-        {
-            $alias = $dc->activeRecord->title ? $dc->activeRecord->title.'-'.$dc->activeRecord->lastname.'-'.$dc->activeRecord->firstname : $dc->activeRecord->lastname.'-'.$dc->activeRecord->firstname;
-            $varValue = \Contao\System::getContainer()->get('contao.slug')->generate($alias, C4gReservationSettingsModel::findByPk($dc->activeRecord->id)->jumpTo, $aliasExists);
-        }
-        elseif (preg_match('/^[1-9]\d*$/', $varValue))
-        {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        }
-        elseif ($aliasExists($varValue))
-        {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
-        $this->import('BackendUser', 'User');
-
-        if (strlen($this->Input->get('tid'))) {
-            $this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 0));
-            $this->redirect($this->getReferer());
-        }
-
-        // Check permissions AFTER checking the tid, so hacking attempts are logged
-        if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_event_speaker::published', 'alexf')) {
-            return '';
-        }
-
-        $href .= '&amp;id=' . $this->Input->get('id') . '&amp;tid=' . $row['id'] . '&amp;state='.($row['published'] ? '' : 1);
-
-        if (!$row['published']) {
-            $icon = 'invisible.gif';
-        }
-
-        return '<a href="' . $this->addToUrl($href) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
-    }
-
-    /**
-     * Disable/enable a user group
-     *
-     * @param integer $intId
-     * @param boolean $blnVisible
-     * @param DataContainer $dc
-     *
-     * @throws Contao\CoreBundle\Exception\AccessDeniedException
-     */
-    public function toggleVisibility($intId, $blnPublished)
-    {
-        // Check permissions to publish
-        if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_event_speaker::published', 'alexf')) {
-            $this->log('Not enough permissions to show/hide record ID "' . $intId . '"', 'tl_c4g_reservation_event_speaker toggleVisibility', TL_ERROR);
-            $this->redirect('contao/main.php?act=error');
-        }
-
-        $this->createInitialVersion('tl_c4g_reservation_object', $intId);
-
-        // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker']['fields']['published']['save_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker']['fields']['published']['save_callback'] as $callback) {
-                $this->import($callback[0]);
-                $blnPublished = $this->$callback[0]->$callback[1]($blnPublished, $this);
-            }
-        }
-
-        // Update the database
-        $this->Database->prepare("UPDATE tl_c4g_reservation_event_speaker SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE `id`=?")
-            ->execute($intId);
-        $this->createNewVersion('tl_c4g_reservation_event_speaker', $intId);
-    }
-}

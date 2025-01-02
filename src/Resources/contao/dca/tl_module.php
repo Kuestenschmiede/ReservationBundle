@@ -2,10 +2,10 @@
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis
- * @version 8
+ * @version 10
  * @author con4gis contributors (see "authors.txt")
  * @license LGPL-3.0-or-later
- * @copyright (c) 2010-2022, by Küstenschmiede GmbH Software & Design
+ * @copyright (c) 2010-2025, by Küstenschmiede GmbH Software & Design
  * @link https://www.con4gis.org
  */
 
@@ -63,7 +63,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['renderMode'] = array
     'default'           => C4GBrickRenderMode::TILEBASED,
     'options'           => [C4GBrickRenderMode::TILEBASED,C4GBrickRenderMode::TABLEBASED,C4GBrickRenderMode::LISTBASED],
     'reference'          => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references'],
-    'sql'               => "varchar(25) NOT NULL default 'tiles'"
+    // 'sql'               => "varchar(25) NOT NULL default 'tiles'"
+    'sql'               => array('type' => 'string', 'length' => 254, 'default' => 'tiles')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['event_redirect_site'] = array
 (
@@ -102,7 +103,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['notification_type_contact_request'] =
     'inputType'               => 'checkbox',
     'foreignKey'              => 'tl_nc_notification.title',
     'eval'                    => array('multiple' => true),
-    'sql'                     => "varchar(100) NOT NULL default ''"
+    // 'sql'                     => "varchar(100) NOT NULL default ''"
+    'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_redirect_site'] = array
 (
@@ -122,7 +124,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cancellationButtonCaption'] = array
     'search'            => true,
     'inputType'         => 'text',
     'eval'              => array('mandatory' => false, 'tl_class' => 'long', 'maxlength' => 254),
-    'sql'               => "varchar(100) NOT NULL default ''"
+    // 'sql'               => "varchar(100) NOT NULL default ''"
+    'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservationView'] = array
 (
@@ -133,7 +136,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservationView'] = array
     'default'           => 'publicview',
     'options'           => ['publicview','memberview','member','group'],
     'reference'          => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references'],
-    'sql'               => "varchar(25) NOT NULL default 'publicview'"
+    // 'sql'               => "varchar(25) NOT NULL default 'publicview'"
+    'sql'               => array('type' => 'string', 'length' => 254, 'default' => 'publicview')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationType'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationType'],
@@ -205,7 +209,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['printTpl'] = array
         return Controller::getTemplateGroup('pdf_');
     },
     'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'long clr'),
-    'sql'                     => "varchar(64) NOT NULL default 'pdf_c4g_brick'"
+    // 'sql'                     => "varchar(64) NOT NULL default 'pdf_c4g_brick'"
+    'sql'                     => array('type' => 'string', 'length' => 254, 'default' => 'pdf_c4g_brick')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['withMap'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withMap'],
