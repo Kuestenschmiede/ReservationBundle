@@ -11,6 +11,7 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\ProjectsBundle\Classes\Actions\C4GRedirectAction;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
@@ -376,8 +377,8 @@ class C4gReservationSpeakerListController extends C4GBaseController
                         $event = CalendarEventsModel::findByPk($eventId);
                         if ($event and $event->published) {
                             $startDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $event->startDate);
-                            $href = Controller::replaceInsertTags('{{event_url::'.$eventId.'}}');
-                            $title = $startDate.' '.Controller::replaceInsertTags('{{event_title::'.$eventId.'}}');
+                            $href = C4GUtils::replaceInsertTags('{{event_url::'.$eventId.'}}');
+                            $title = $startDate.' '.C4GUtils::replaceInsertTags('{{event_title::'.$eventId.'}}');
 
                             if ($href && $title) {
                                 $links[] = ['linkHref'=>$href, 'linkTitle'=>$title, 'linkNewTab'=>0];

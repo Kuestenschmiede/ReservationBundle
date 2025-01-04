@@ -10,6 +10,7 @@
  */
 
 namespace con4gis\ReservationBundle\Classes\Notifications;
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Notifications\C4GNotification;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventAudienceModel;
@@ -299,11 +300,11 @@ class C4gReservationConfirmation
                         $filePath = '';
                         if ($binFileUuid) {
                             $pathUuid = StringUtil::binToUuid($binFileUuid);
-                            $filePath = Controller::replaceInsertTags("{{file::$pathUuid}}");
+                            $filePath = C4GUtils::replaceInsertTags("{{file::$pathUuid}}");
                             if (!$filePath) {
                                 C4gLogModel::addLogEntry('reservation', 'File not found: ' . $pathUuid . '. Try again in 5 seconds ...');
                                 sleep(5);
-                                $filePath = Controller::replaceInsertTags("{{file::$pathUuid}}");
+                                $filePath = C4GUtils::replaceInsertTags("{{file::$pathUuid}}");
                                 if (!$filePath) {
                                     C4gLogModel::addLogEntry('reservation', 'File not found again.: ' . $pathUuid . '. Why?');
                                 } else {

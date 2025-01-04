@@ -11,6 +11,7 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\ProjectsBundle\Classes\Actions\C4GSendEmailNotificationAction;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
@@ -126,7 +127,7 @@ class C4gReservationCancellationController extends C4GBaseController
 
          $clickButton = new C4GBrickButton(
              C4GBrickConst::BUTTON_CLICK,
-             $this->cancellationButtonCaption ?  \Contao\Controller::replaceInsertTags($this->cancellationButtonCaption) : $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['button_cancellation'],
+             $this->cancellationButtonCaption ?  C4GUtils::replaceInsertTags($this->cancellationButtonCaption) : $GLOBALS['TL_LANG']['fe_c4g_reservation_cancellation']['button_cancellation'],
              $visible = true,
              $enabled = true,
              $action = '',

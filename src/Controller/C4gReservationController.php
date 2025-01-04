@@ -11,6 +11,7 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Actions\C4GSaveAndRedirectDialogAction;
@@ -1542,7 +1543,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $privacyPolicyText = new C4GTextField();
             $privacyPolicyText->setSimpleTextWithoutEditing(true);
             $privacyPolicyText->setFieldName('privacy_policy_text');
-            $privacyPolicyText->setInitialValue(\Contao\Controller::replaceInsertTags($this->reservationSettings->privacy_policy_text));
+            $privacyPolicyText->setInitialValue(C4GUtils::replaceInsertTags($this->reservationSettings->privacy_policy_text));
             $privacyPolicyText->setSize(4);
             $privacyPolicyText->setTableColumn(false);
             $privacyPolicyText->setEditable(false);
@@ -1554,7 +1555,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         }
 
         if ($this->reservationSettings->privacy_policy_site) {
-            $href = \Contao\Controller::replaceInsertTags('{{link_url::' . $this->reservationSettings->privacy_policy_site . '}}');
+            $href = C4GUtils::replaceInsertTags('{{link_url::' . $this->reservationSettings->privacy_policy_site . '}}');
             $desc = '<span class="c4g_field_description_text">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed'] . ' </span> <a href="' . $href . '" target="_blank" rel="noopener">' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text'] . '</a>.';
         } else {
             $desc = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link'];
@@ -1575,7 +1576,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $clickButton = new C4GBrickButton(
             C4GBrickConst::BUTTON_CLICK,
-            $this->reservationSettings->reservationButtonCaption ? \Contao\Controller::replaceInsertTags($this->reservationSettings->reservationButtonCaption) : $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'],
+            $this->reservationSettings->reservationButtonCaption ? C4GUtils::replaceInsertTags($this->reservationSettings->reservationButtonCaption) : $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'],
             $visible = true,
             $enabled = true,
             $action = '',
@@ -2660,7 +2661,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $pathUuid = $location->icsPath;
             if ($pathUuid) {
                 $pathUuid = StringUtil::binToUuid($pathUuid);
-                $path = Controller::replaceInsertTags("{{file::$pathUuid}}");
+                $path = C4GUtils::replaceInsertTags("{{file::$pathUuid}}");
 
                 $filename = $path.'/'.$fileId.'/'.'reservation.ics';
                 try {
@@ -2687,8 +2688,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
      * @param $values
      * @param $putVars
      * @return array
-     * @Route("/reservation-api/currentTimeset/{date}/{type}/{duration}/{capacity}/{objectId}", methods={"GET"})
      */
+    #[Route(
+        path: '/reservation-api/currentTimeset/{date}/{type}/{duration}/{capacity}/{objectId}',
+        methods: ['GET']
+    )]
     public function getCurrentTimesetAction(Request $request, $date, $type, $duration, $capacity, $objectId)
     {
         $wd = -1;

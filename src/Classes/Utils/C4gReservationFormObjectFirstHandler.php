@@ -2,6 +2,7 @@
 
 namespace con4gis\ReservationBundle\Classes\Utils;
 
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\ProjectsBundle\Classes\Buttons\C4GBrickButton;
@@ -253,7 +254,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                             $jumpTo = \Contao\PageModel::findByPk($reservationSettings->location_redirect_site);
                             if ($jumpTo) {
                                 $locationAlias = $location->alias ?: $locationId;
-                                $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$locationAlias;
+                                $href = C4GUtils::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?location='.$locationAlias;
                             }
                         }
 
@@ -309,7 +310,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                                 $jumpTo = \Contao\PageModel::findByPk($reservationSettings->speaker_redirect_site);
                                 if ($jumpTo) {
                                     $speakerAlias = $speaker->alias ?: $speakerId;
-                                    $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerAlias;
+                                    $href = C4GUtils::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerAlias;
                                 }
                             }
 

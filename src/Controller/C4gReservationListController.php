@@ -11,6 +11,7 @@
 
 namespace con4gis\ReservationBundle\Controller;
 
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\CoreBundle\Classes\C4GVersionProvider;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\ProjectsBundle\Classes\Actions\C4GBrickActionType;
@@ -929,7 +930,7 @@ class C4gReservationListController extends C4GBaseController
     public function clickCancellation($values, $putVars) {
         $return = [];
         if ($this->cancellation_redirect_site) {
-            $redirectPage = Controller::replaceInsertTags("{{link_url::".$this->cancellation_redirect_site."}}")."?lastname=".$putVars['lastname']."&reservation_id=".$putVars['reservation_id'];
+            $redirectPage = C4GUtils::replaceInsertTags("{{link_url::".$this->cancellation_redirect_site."}}")."?lastname=".$putVars['lastname']."&reservation_id=".$putVars['reservation_id'];
             $return['jump_to_url'] = $redirectPage;
         }
 

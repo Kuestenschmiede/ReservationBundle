@@ -227,7 +227,7 @@
             if ($id && $key && ($key == 'sendNotification')) {
                 C4gReservationConfirmation::sendNotification($id);
                 //delete key per redirect
-                Controller::redirect(str_replace('&key='.$key, '', \Environment::get('request')));
+                Controller::redirect(str_replace('&key='.$key, '', \Contao\Environment::get('request')));
             }
         }
 

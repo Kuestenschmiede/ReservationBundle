@@ -10,6 +10,7 @@
  */
 namespace con4gis\ReservationBundle\Classes\InsertTags;
 
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\CoreBundle\Classes\Helper\StringHelper;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
@@ -513,7 +514,7 @@ class C4gReservationInsertTags
                                 $buttonCaption = '';
 
                                 if ($reservationObject->reservationForwarding) {
-                                    $url = Controller::replaceInsertTags('{{link_url::' . $reservationObject->reservationForwarding . '}}');
+                                    $url = C4GUtils::replaceInsertTags('{{link_url::' . $reservationObject->reservationForwarding . '}}');
                                 }
 
                                 if ($reservationObject->reservationForwardingButtonCaption) {
@@ -527,7 +528,7 @@ class C4gReservationInsertTags
                                     if ($calendar) {
                                         if ($calendar->numRows) {
                                             if (!$url && $calendar->reservationForwarding) {
-                                                // $url = Controller::replaceInsertTags('{{link_url::' . $calendar->reservationForwarding . '}}');
+                                                // $url = C4GUtils::replaceInsertTags('{{link_url::' . $calendar->reservationForwarding . '}}');
                                                 $url = System::getContainer()->get('contao.insert_tag.parser')->replace('{{link_url::' . $calendar->reservationForwarding . '}}');
                                             }
 
@@ -544,7 +545,7 @@ class C4gReservationInsertTags
                                     ->execute();
                                 if ($settings->numRows) {
                                     if ($settings->reservationForwarding) {
-                                        $url = $url ?: Controller::replaceInsertTags('{{link_url::' . $settings->reservationForwarding . '}}');
+                                        $url = $url ?: C4GUtils::replaceInsertTags('{{link_url::' . $settings->reservationForwarding . '}}');
                                     }
                                     $buttonCaption = $buttonCaption ?: $settings->reservationForwardingButtonCaption;
                                 }
@@ -660,7 +661,7 @@ class C4gReservationInsertTags
                                     foreach ($speakerElements as $speaker) {
                                         $speakerStr = $speaker['title'] ? $speaker['title'] . ' ' . $speaker['firstname'] . ' ' . $speaker['lastname'] : $speaker['firstname'] . ' ' . $speaker['lastname'];
                                         if ($speakerStr && $speaker['speakerForwarding']) {
-                                            $url = Controller::replaceInsertTags('{{link_url::' . $speaker['speakerForwarding'] . '}}');
+                                            $url = C4GUtils::replaceInsertTags('{{link_url::' . $speaker['speakerForwarding'] . '}}');
                                             if ($url) {
                                                 $speakerAlias = $speaker['id'];
                                                 if ($speaker['alias']) {
@@ -1043,7 +1044,7 @@ class C4gReservationInsertTags
                                 $uuid = StringUtil::binToUuid($uuid);
                             }
 
-                            return $this->getHtmlSkeleton($key, '', Controller::replaceInsertTags("{{image::$uuid?height=400&mode=proportional&class=img-fluid}}"), 'c4g_speaker_details');
+                            return $this->getHtmlSkeleton($key, '', C4GUtils::replaceInsertTags("{{image::$uuid?height=400&mode=proportional&class=img-fluid}}"), 'c4g_speaker_details');
                         }
 
                         break;
