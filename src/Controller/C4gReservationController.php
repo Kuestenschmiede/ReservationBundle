@@ -2685,6 +2685,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
     }
 
     /**
+     * @Route(
+     *      path="/reservation-api/currentTimeset/{date}/{type}/{duration}/{capacity}/{objectId}",
+     *      methods={"GET"}
+     *  )
      * @param $values
      * @param $putVars
      * @return array
