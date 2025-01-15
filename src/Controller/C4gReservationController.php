@@ -954,7 +954,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $firstnameField->setNotificationField(true);
                 $firstnameField->setStyleClass('firstname');
                 $firstnameField->setInitialValue($initialValue ? $initialValue : $memberArr['firstname']);
-                $firstnameField->setPattern("^[a-zA-Z]+$");
+                $firstnameField->setPattern("^[a-z A-Z -äöüÄÖÜ]+$");
                 $fieldList[] = $firstnameField;
             } else if ($rowField == "lastname") {
                 $lastnameField = new C4GTextField();
@@ -967,7 +967,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $lastnameField->setNotificationField(true);
                 $lastnameField->setStyleClass('lastname');
                 $lastnameField->setInitialValue($initialValue ? $initialValue : $memberArr['lastname']);
-                $lastnameField->setPattern("^[a-zA-Z]+$");
+                $lastnameField->setPattern("^[a-z A-Z -äöüÄÖÜ]+$");
                 $fieldList[] = $lastnameField;
             } else if ($rowField == "email") {
                 $emailField = new C4GEmailField();

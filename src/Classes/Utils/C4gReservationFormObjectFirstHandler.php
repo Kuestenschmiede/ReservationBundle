@@ -445,6 +445,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $bookedDays = $bookedDays['dates'];
                 } 
                 $reservationBeginDateField->setExcludeDates($bookedDays);
+                $initialValue = $initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate([$reservationObject], $listType);
             } else {
                 $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
                 if ($commaDates) {
