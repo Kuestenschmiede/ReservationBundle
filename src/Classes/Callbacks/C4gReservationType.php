@@ -60,7 +60,7 @@ class C4gReservationType extends Backend
         if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_type::published', 'alexf'))
         {
             $this->log('Not enough permissions to show/hide record ID "'.$intId.'"', 'tl_c4g_reservation_type toggleVisibility', TL_ERROR);
-            $this->redirect(System::getContainer()->get('router')->generate('contao_backend').'/main.php?act=error');
+            $this->redirect(System::getContainer()->get('router')->generate('contao_backend').'?act=error');
         }
         $objVersions = new Versions('tl_c4g_reservation_type', $intId);
         $objVersions->initialize();
