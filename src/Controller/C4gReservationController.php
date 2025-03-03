@@ -496,8 +496,14 @@ class C4gReservationController extends C4GBaseController
 foreach ($typelist as $listType) {
     $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
     $bookingMaxCapacity = $listType['maxParticipantsPerBooking'];
+    
     $typeOfObject = $listType['objects'][0]->getTypeOfObject();
-    $objectMaxCapacity = intval($listType['objects'][0]->getDesiredCapacity()[1]);
+
+    $objectMaxCapacity = 0;
+    foreach ($listType['objects'] as $object) {
+        $objectMaxCapacity = intval($object->getDesiredCapacity()[1]) > $objectMaxCapacity ? intval($object->getDesiredCapacity()[1]) : $objectMaxCapacity;
+    }
+
     $showMinMax = $this->reservationSettings->showMinMaxWithCapacity ? "1" : "0";
 
     if ($listType['maxParticipantsPerBooking'] && $eventObj && !$eventObj->maxParticipants) {
