@@ -154,7 +154,6 @@ class C4gReservationController extends C4GBaseController
             $arrValues = array();
             $arrOptions = array();
             foreach ($moduleTypes as $moduleType) {
-                //$moduleType = intval($moduleType);
                 $arrColumns = array("$t.published='1' AND $t.reservationObjectType='2' AND $t.id = $moduleType"); //no event type selection - use get params
                 $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
                 if ($types) {
@@ -912,7 +911,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
             $rowMandatory = key_exists('binding', $rowdata) ? $rowdata['binding'] : false;
-            $individualLabel = isset($rowdata['individualLabel']) ? $rowdata['individualLabel'] : "";
+            $individualLabel = isset($rowdata['individualLabel']) ? str_replace(' ', '&nbsp;',
+                $rowdata['individualLabel']) : "";
 
             if ($rowField == "organisation") {
                 $organisationField = new C4GTextField();
