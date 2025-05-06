@@ -911,7 +911,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
             $rowMandatory = key_exists('binding', $rowdata) ? $rowdata['binding'] : false;
-            $individualLabel = isset($rowdata['individualLabel']) ? str_replace(' ', '&nbsp;',
+            $individualLabel = isset($rowdata['individualLabel']) ? str_replace(' ', '&nbsp;&#x200B;',
                 $rowdata['individualLabel']) : "";
 
             if ($rowField == "organisation") {
@@ -1549,7 +1549,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $privacyPolicyText = new C4GTextField();
             $privacyPolicyText->setSimpleTextWithoutEditing(true);
             $privacyPolicyText->setFieldName('privacy_policy_text');
-            $privacyPolicyText->setInitialValue(C4GUtils::replaceInsertTags($this->reservationSettings->privacy_policy_text));
+            $privacyPolicyText->setInitialValue(str_replace(' ', '&nbsp;&#x200B;',
+                C4GUtils::replaceInsertTags($this->reservationSettings->privacy_policy_text)));
             $privacyPolicyText->setSize(4);
             $privacyPolicyText->setTableColumn(false);
             $privacyPolicyText->setEditable(false);
