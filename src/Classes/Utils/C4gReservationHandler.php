@@ -2172,7 +2172,7 @@ class C4gReservationHandler
                 }
 
                 if ($currentBookedTimes) {
-                    $fullyBookedDate = self::getFullyBookedDates($minDuration,$currentBookedTimes,$periodFaktor, $objectQuantity, $objectId);
+                    $fullyBookedDate = self::getFullyBookedDates($minDuration,$currentBookedTimes,$periodFaktor, $objectQuantity, $objectId, $periodType);
                     $currentDates = self::getBookedDates($minDuration,$currentBookedTimes,$periodFaktor,$periodType);
                     foreach ($currentDates as $currentDate) {
                         $allDates[$i++] = $currentDate;
@@ -2286,10 +2286,12 @@ class C4gReservationHandler
         ->execute($typeId,$objectId,$objectType,'1')->fetchAllAssoc(); 
 
         $result = [];
+        $periodType = $listType['periodType'];
+
         if ($currentBookedTimes || $otherObjectsBookedTimes) {
             $i = 0;
             if ($otherObjectsBookedTimes) {
-                $otherDates = self::getBookedDates($minDuration,$otherObjectsBookedTimes,$periodFaktor, $periodType);
+                $otherDates = self::getBookedDates($minDuration, $otherObjectsBookedTimes, $periodFaktor, $periodType);
                 foreach ($otherDates as $otherDate) {
                     $allDates[$i++] = $otherDate;
                     if ($listType['periodType'] == 'week') {
@@ -2299,7 +2301,7 @@ class C4gReservationHandler
             }
 
             if ($currentBookedTimes) {
-                $fullyBookedDate = self::getFullyBookedDates($minDuration,$currentBookedTimes,$periodFaktor, $objectQuantity, $objectId);
+                $fullyBookedDate = self::getFullyBookedDates($minDuration,$currentBookedTimes,$periodFaktor, $objectQuantity, $objectId, $periodType);
                 $currentDates = self::getBookedDates($minDuration,$currentBookedTimes,$periodFaktor, $periodType);
                 foreach ($currentDates as $currentDate) {
                     $allDates[$i++] = $currentDate;
@@ -2421,7 +2423,7 @@ class C4gReservationHandler
         return $periodFaktor;
     }
 
-    public static function getFullyBookedDates($minDuration, $currentBookedTimes, $periodFaktor, $objectQuantity, $objectId) {
+    public static function getFullyBookedDates($minDuration, $currentBookedTimes, $periodFaktor, $objectQuantity, $objectId, $periodType) {
         $bookedDates = self::getBookedDates($minDuration, $currentBookedTimes, $periodFaktor, $periodType);
         $bookedDatesQuantity = array_count_values($bookedDates);
 
