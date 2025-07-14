@@ -2165,7 +2165,7 @@ class C4gReservationHandler
                
                 $i = 0;
                 if ($otherObjectsBookedTimes) {
-                    $otherDates = self::getBookedDates($minDuration,$otherObjectsBookedTimes,$periodFaktor);
+                    $otherDates = self::getBookedDates($minDuration,$otherObjectsBookedTimes,$periodFaktor,$periodType);
                     foreach ($otherDates as $otherDate) {
                         $allDates[$i++] = $otherDate;
                     }
