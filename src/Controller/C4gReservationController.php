@@ -911,6 +911,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
             $rowMandatory = key_exists('binding', $rowdata) ? $rowdata['binding'] : false;
+            $rowPrintable = key_exists('printing', $rowdata) ? $rowdata['printing'] : false;
             $individualLabel = isset($rowdata['individualLabel']) ? str_replace(' ', '&nbsp;&#x200B;',
                 $rowdata['individualLabel']) : "";
             $additionalClass = isset($rowdata['additionalClass']) ? $rowdata['additionalClass'] : "";
@@ -927,6 +928,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $organisationField->setStyleClass('organisation');
                 $organisationField->setInitialValue($initialValue ? $initialValue : $memberArr['company']);
                 $organisationField->setStyleClass($additionalClass);
+                $organisationField->setPrintable($rowPrintable);
                 $fieldList[] = $organisationField;
             } else if ($rowField == "title") {
                 $titleField = new C4GTextField();
@@ -939,6 +941,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $titleField->setStyleClass('title');
                 $titleField->setInitialValue($initialValue);
                 $titleField->setStyleClass($additionalClass);
+                $titleField->setPrintable($rowPrintable);
                 $fieldList[] = $titleField;
             } else if ($rowField == "salutation") {
                 $salutationField = new C4GSelectField();
@@ -952,6 +955,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $salutationField->setStyleClass('salutation');
                 $salutationField->setInitialValue($initialValue ?: $memberArr['gender']);
                 $salutationField->setStyleClass($additionalClass);
+                $salutationField->setPrintable($rowPrintable);
                 $fieldList[] = $salutationField;
             } else if ($rowField == "firstname") {
                 $firstnameField = new C4GTextField();
@@ -966,6 +970,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $firstnameField->setInitialValue($initialValue ? $initialValue : $memberArr['firstname']);
                 $firstnameField->setPattern("^[a-z A-Z -äöüÄÖÜ]+$");
                 $firstnameField->setStyleClass($additionalClass);
+                $firstnameField->setPrintable($rowPrintable);
                 $fieldList[] = $firstnameField;
             } else if ($rowField == "lastname") {
                 $lastnameField = new C4GTextField();
@@ -980,6 +985,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $lastnameField->setInitialValue($initialValue ? $initialValue : $memberArr['lastname']);
                 $lastnameField->setPattern("^[a-z A-Z -äöüÄÖÜ]+$");
                 $lastnameField->setStyleClass($additionalClass);
+                $lastnameField->setPrintable($rowPrintable);
                 $fieldList[] = $lastnameField;
             } else if ($rowField == "email") {
                 $emailField = new C4GEmailField();
@@ -993,6 +999,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $emailField->setStyleClass('email');
                 $emailField->setInitialValue($initialValue ? $initialValue : $memberArr['email']);
                 $emailField->setStyleClass($additionalClass);
+                $emailField->setPrintable($rowPrintable);
                 $fieldList[] = $emailField;
             } else if ($rowField == "phone") {
                 $phoneField = new C4GTelField();
@@ -1006,6 +1013,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $phoneField->setStyleClass('phone');
                 $phoneField->setInitialValue($initialValue ? $initialValue : $memberArr['phone']);
                 $phoneField->setStyleClass($additionalClass);
+                $phoneField->setPrintable($rowPrintable);
                 $fieldList[] = $phoneField;
             } else if ($rowField == "address") {
                 $addressField = new C4GTextField();
@@ -1019,6 +1027,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $addressField->setStyleClass('address');
                 $addressField->setInitialValue($initialValue ? $initialValue : $memberArr['street']);
                 $addressField->setStyleClass($additionalClass);
+                $addressField->setPrintable($rowPrintable);
                 $fieldList[] = $addressField;
             } else if ($rowField == "postal") {
                 $postalField = new C4GPostalField();
@@ -1033,6 +1042,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $postalField->setStyleClass('postal');
                 $postalField->setInitialValue($initialValue ? $initialValue : $memberArr['postal']);
                 $postalField->setStyleClass($additionalClass);
+                $postalField->setPrintable($rowPrintable);
                 $fieldList[] = $postalField;
             } else if ($rowField == "city") {
                 $cityField = new C4GTextField();
@@ -1046,6 +1056,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $cityField->setStyleClass('city');
                 $cityField->setInitialValue($initialValue ? $initialValue : $memberArr['city']);
                 $cityField->setStyleClass($additionalClass);
+                $cityField->setPrintable($rowPrintable);
                 $fieldList[] = $cityField;
             } else if ($rowField == "dateOfBirth") {
                 $birthDateField = new C4GDateField();
@@ -1066,6 +1077,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $birthDateField->setInitialValue($initialValue ? $initialValue : $memberArr['dateOfBirth']);
                 $birthDateField->setDatePickerByBrowser(true);
                 $birthDateField->setStyleClass($additionalClass);
+                $birthDateField->setPrintable($rowPrintable);
                 $fieldList[] = $birthDateField;
             } else if ($rowField == "salutation2") {
                 $salutationField2 = new C4GSelectField();
@@ -1079,6 +1091,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $salutationField2->setStyleClass('salutation');
                 $salutationField2->setInitialValue($initialValue);
                 $salutationField2->setStyleClass($additionalClass);
+                $salutationField2->setPrintable($rowPrintable);
                 $fieldList[] = $salutationField2;
             } else if ($rowField == "title2") {
                 $titleField2 = new C4GTextField();
@@ -1091,6 +1104,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $titleField2->setStyleClass('title');
                 $titleField2->setInitialValue($initialValue);
                 $titleField2->setStyleClass($additionalClass);
+                $titleField2->setPrintable($rowPrintable);
                 $fieldList[] = $titleField2;
             } else if ($rowField == "firstname2") {
                 $firstnameField2 = new C4GTextField();
@@ -1104,6 +1118,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $firstnameField2->setStyleClass('firstname');
                 $firstnameField2->setInitialValue($initialValue);
                 $firstnameField2->setStyleClass($additionalClass);
+                $firstnameField2->setPrintable($rowPrintable);
                 $fieldList[] = $firstnameField2;
             } else if ($rowField == "lastname2") {
                 $lastnameField2 = new C4GTextField();
@@ -1117,6 +1132,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $lastnameField2->setStyleClass('lastname');
                 $lastnameField2->setInitialValue($initialValue);
                 $lastnameField2->setStyleClass($additionalClass);
+                $lastnameField2->setPrintable($rowPrintable);
                 $fieldList[] = $lastnameField2;
             } else if ($rowField == "email2") {
                 $emailField2 = new C4GEmailField();
@@ -1130,6 +1146,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $emailField2->setStyleClass('email');
                 $emailField2->setInitialValue($initialValue);
                 $emailField2->setStyleClass($additionalClass);
+                $emailField2->setPrintable($rowPrintable);
                 $fieldList[] = $emailField2;
             } else if ($rowField == "organisation2") {
                 $organisationField2 = new C4GTextField();
@@ -1143,6 +1160,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $organisationField2->setStyleClass('organisation');
                 $organisationField2->setInitialValue($initialValue);
                 $organisationField2->setStyleClass($additionalClass);
+                $organisationField2->setPrintable($rowPrintable);
                 $fieldList[] = $organisationField2;
             } else if ($rowField == "phone2") {
                 $phoneField2 = new C4GTelField();
@@ -1156,6 +1174,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $phoneField2->setStyleClass('phone');
                 $phoneField2->setInitialValue($initialValue);
                 $phoneField2->setStyleClass($additionalClass);
+                $phoneField2->setPrintable($rowPrintable);
                 $fieldList[] = $phoneField2;
             } else if ($rowField == "address2") {
                 $addressField2 = new C4GTextField();
@@ -1169,6 +1188,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $addressField2->setStyleClass('address');
                 $addressField2->setInitialValue($initialValue);
                 $addressField2->setStyleClass($additionalClass);
+                $addressField2->setPrintable($rowPrintable);
                 $fieldList[] = $addressField2;
             } else if ($rowField == "postal2") {
                 $postalField2 = new C4GPostalField();
@@ -1183,6 +1203,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $postalField2->setStyleClass('postal');
                 $postalField2->setInitialValue($initialValue);
                 $postalField2->setStyleClass($additionalClass);
+                $postalField2->setPrintable($rowPrintable);
                 $fieldList[] = $postalField2;
             } else if ($rowField == "city2") {
                 $cityField2 = new C4GTextField();
@@ -1196,6 +1217,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $cityField2->setStyleClass('city');
                 $cityField2->setInitialValue($initialValue);
                 $cityField2->setStyleClass($additionalClass);
+                $cityField2->setPrintable($rowPrintable);
                 $fieldList[] = $cityField2;
             } else if ($rowField == "discountCode") {
                 $discountCodeField = new C4GTextField();
@@ -1209,6 +1231,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $discountCodeField->setStyleClass('discountCode');
                 $discountCodeField->setInitialValue($initialValue);
                 $discountCodeField->setStyleClass($additionalClass);
+                $discountCodeField->setPrintable($rowPrintable);
                 $fieldList[] = $discountCodeField;
             } else if ($rowField == "additional1") {
                 $additional1Field = new C4GTextField();
@@ -1222,6 +1245,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $additional1Field->setStyleClass('additional1');
                 $additional1Field->setInitialValue($initialValue);
                 $additional1Field->setStyleClass($additionalClass);
+                $additional1Field->setPrintable($rowPrintable);
                 $fieldList[] = $additional1Field;
             } else if ($rowField == "additional2") {
                 $additional2Field = new C4GTextField();
@@ -1235,6 +1259,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $additional2Field->setStyleClass('additional2');
                 $additional2Field->setInitialValue($initialValue);
                 $additional2Field->setStyleClass($additionalClass);
+                $additional2Field->setPrintable($rowPrintable);
                 $fieldList[] = $additional2Field;
             } else if ($rowField == "additional3") {
                 $additional3Field = new C4GTextField();
@@ -1248,6 +1273,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $additional3Field->setStyleClass('additional3');
                 $additional3Field->setInitialValue($initialValue);
                 $additional3Field->setStyleClass($additionalClass);
+                $additional3Field->setPrintable($rowPrintable);
                 $fieldList[] = $additional3Field;
             } else if ($rowField == "comment") {
                 $commentField = new C4GTextareaField();
@@ -1261,6 +1287,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $commentField->setStyleClass('comment');
                 $commentField->setInitialValue($initialValue);
                 $commentField->setStyleClass($additionalClass);
+                $commentField->setPrintable($rowPrintable);
                 $fieldList[] = $commentField;
             } else if ($rowField == "additionalHeadline") {
                 $headlineField = new C4GHeadlineField();

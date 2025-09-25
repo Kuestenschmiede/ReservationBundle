@@ -29,6 +29,7 @@ $GLOBALS['TL_LANG'][$str]['notification_type'] = array('Notification', 'Select t
 $GLOBALS['TL_LANG'][$str]['additionaldatas'] = array("Data fields", "The order here corresponds to the display in the frontend. Except for the heading, each field can be used only once.");
 $GLOBALS['TL_LANG'][$str]['mandatory'] = array("Mandatory field?","");
 $GLOBALS['TL_LANG'][$str]['binding'] = array("Mandatory field?", "Should this data field be displayed as a mandatory field in the frontend?");
+$GLOBALS['TL_LANG'][$str]['printing'] = array("Into PDF?", "Should this data field be included in the PDF? (Invoice, ticket, etc.)");
 $GLOBALS['TL_LANG'][$str]['initialValue'] = array("Initial value", "Here you can enter an initial value. Important for the heading - otherwise optional.");
 $GLOBALS['TL_LANG'][$str]['individualLabel'] = array("Individual Label", "Here you can set an individual label. If it is empty, the default from the language files is used.");
 $GLOBALS['TL_LANG'][$str]['additionalClass'] = array("Additional class", "You can extend the field by one class.");

@@ -352,6 +352,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         'exclude'                 => true,
                         'inputType'               => 'checkbox',
                         'eval'                    => array('multiple' => false,'mandatory'=>false,'alwaysSave'=>true, 'style'=>'width: 33%')
+                    ),
+                    'printing' => array
+                    (
+                        'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['printing'],
+                        'exclude'                 => true,
+                        'inputType'               => 'checkbox',
+                        'eval'                    => array('multiple' => false,'mandatory'=>false,'alwaysSave'=>true, 'style'=>'width: 33%')
                     )
                 ),
             ),
