@@ -26,6 +26,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['city'] = array("City", "
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['comment'] = array("comment", "comment from creator");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['reservation_participant_option'] = array("Participant services", "Selected participant options");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['cancellation'] = array("Canceled", "If the appointment is cancelled, select this field");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['checkedIn'] = array('Person is on site (check-in).','');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['payed'] = array('Reservation has been paid.','');
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['yes'] = 'ja';
 

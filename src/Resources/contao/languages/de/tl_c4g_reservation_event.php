@@ -29,8 +29,12 @@ $GLOBALS['TL_LANG'][$str]['state'] = array("Aktueller Status", "grün, orange, r
 $GLOBALS['TL_LANG'][$str]['price'] = array("Preis", "Bestimmen sie den Preis für die Buchung (bspw.: 50.00)");
 $GLOBALS['TL_LANG'][$str]['participant_params'] = array("Teilnehmeroptionen", "Stellen sie mögliche Optionen zur Auswahl.");
 $GLOBALS['TL_LANG'][$str]['participantParamsFieldType'] = array("Feldtyp", "Wählen sie den Feldtyp für die Teilnehmeroptionen im Reservierungsformular.");
+$GLOBALS['TL_LANG'][$str]['participantParamsMandatory'] = array("Pflichtfeld", "Sollen die Teilnehmeroptionen ein Pflichtfeld sein? (keine Vorauswahl)");
 $GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Steuersatz auswählen", "Wählen Sie eine Steueroption für alle Preise."];
-$GLOBALS['TL_LANG'][$str]['priceoption'] = array("Preiseinstellung", "Wonach soll der Preis berechnet werden");
+$GLOBALS['TL_LANG'][$str]['priceoption'] = array("Preiseinstellung", "Wonach soll der Preis berechnet werden?");
+$GLOBALS['TL_LANG'][$str]['discountCode'] = array("Rabattcode", "Ist hier ein Rabattcode eingeben, dann wird der Rabatt automatisch verrechnet.");
+$GLOBALS['TL_LANG'][$str]['discountPercent'] = array("Rabatt", "Prozentsatz für den Rabatt.");
+$GLOBALS['TL_LANG'][$str]['conferenceLink'] = array("Konferenz Link", "Hier kann zum Beispiel ein Teamslink angebgeben werden, der dann mit in der Reservierungsbetätigung aufgelistet werden kann.");
 
 $GLOBALS['TL_LANG'][$str]['reservationForwarding'] = ["Weiterleitung zum Modul", "Wählen Sie die Seite aus, auf der sich das Reservierungsmodul befindet. Kann auch am Kalender und in den Dashboard/Einstellungen global gesetzt werden."];
 $GLOBALS['TL_LANG'][$str]['reservationForwardingButtonCaption'] = ["Buttonbeschriftung Weiterleitung", "Beschriftung des Weiterleitungsbutton zur Reservierung. Standard: leer. Es greifen die Einträge aus den Sprachdateien."];

@@ -31,6 +31,7 @@ $GLOBALS['TL_LANG'][$str]['mandatory'] = array("Mandatory field?","");
 $GLOBALS['TL_LANG'][$str]['binding'] = array("Mandatory field?", "Should this data field be displayed as a mandatory field in the frontend?");
 $GLOBALS['TL_LANG'][$str]['initialValue'] = array("Initial value", "Here you can enter an initial value. Important for the heading - otherwise optional.");
 $GLOBALS['TL_LANG'][$str]['individualLabel'] = array("Individual Label", "Here you can set an individual label. If it is empty, the default from the language files is used.");
+$GLOBALS['TL_LANG'][$str]['additionalClass'] = array("Additional class", "You can extend the field by one class.");
 $GLOBALS['TL_LANG'][$str]['fieldSelection'] = array("Add data fields", "Attention! First name, last name and e-mail are appended if they are missing. The three fields are always required.");
 $GLOBALS['TL_LANG'][$str]['additionalDuration'] = array("Individual length of use (initial)", "If 0, no individual entry of the length of use is possible (default). Min and max ");
 $GLOBALS['TL_LANG'][$str]['withCapacity'] = array("Customer can specify number of persons", "The customer can specify the number of persons. This is required, for example, for a table reservation in the restaurant.");

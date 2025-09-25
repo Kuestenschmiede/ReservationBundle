@@ -97,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants,maxParticipantsPerEventBooking, min_reservation_day, price, taxOptions, priceoption,showParticipantInfoFields, participant_params, participantParamsFieldType,reservationForwarding,reservationForwardingButtonCaption; {team_legend}, team;',
+        'default'   =>  '{event_legend}, pid, number, location, organizer, speaker, topic, targetAudience; {reservation_legend}, reservationType, minParticipants, maxParticipants,maxParticipantsPerEventBooking, min_reservation_day, price, taxOptions, priceoption,showParticipantInfoFields, participant_params, participantParamsFieldType,participantParamsMandatory,reservationForwarding,reservationForwardingButtonCaption,discountCode,discountPercent,conferenceLink; {team_legend}, team;',
     ),
 
     //Fields
@@ -274,6 +274,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'eval'                    => array('tl_class'=>'w50','feViewable'=>true, 'mandatory'=>false),
             'sql'                     => "char(25) NOT NULL default 'multi'"
         ),
+        'participantParamsMandatory' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['participantParamsMandatory'],
+            'exclude'           => true,
+            'filter'            => false,
+            'default'           => '0',
+            'inputType'         => 'checkbox',
+            'eval'               => array('tl_class'=>'w50 clr'),
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
         'taxOptions' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['taxOptions'],
             'exclude'                 => true,
@@ -340,5 +350,37 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'eval'              => array('mandatory' => false, 'tl_class' => 'long clr', 'multiple' => true, 'chosen' => true,'includeBlankOption'=>true, 'doNotCopy' => true),
             'sql'               => "blob NULL"
         ),
+
+        'discountCode' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['discountCode'],
+            'default'           => "",
+            'exclude'           => true,
+            'sorting'           => false,
+            'inputType'         => 'text',
+            'eval'              => array('doNotCopy' => true, 'unique' => false, 'mandatory' => false, 'maxlength'=>254, 'tl_class' => 'w50 clr'),
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
+        'discountPercent' => array(
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['discountPercent'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'default'                 => '',
+            'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>4, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "double(2,2) unsigned default '0'"
+        ),
+
+        'conferenceLink' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event']['conferenceLink'],
+            'exclude'           => true,
+            'search'            => true,
+            'inputType'         => 'text',
+            'eval'              => array('rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>254, 'fieldType'=>'radio', 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'forum', 'memberLink' => true, 'tl_class'=>'clr w50'),
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
     )
 );

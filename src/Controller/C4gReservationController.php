@@ -913,6 +913,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $rowMandatory = key_exists('binding', $rowdata) ? $rowdata['binding'] : false;
             $individualLabel = isset($rowdata['individualLabel']) ? str_replace(' ', '&nbsp;&#x200B;',
                 $rowdata['individualLabel']) : "";
+            $additionalClass = isset($rowdata['additionalClass']) ? $rowdata['additionalClass'] : "";
 
             if ($rowField == "organisation") {
                 $organisationField = new C4GTextField();
@@ -925,6 +926,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $organisationField->setNotificationField(true);
                 $organisationField->setStyleClass('organisation');
                 $organisationField->setInitialValue($initialValue ? $initialValue : $memberArr['company']);
+                $organisationField->setStyleClass($additionalClass);
                 $fieldList[] = $organisationField;
             } else if ($rowField == "title") {
                 $titleField = new C4GTextField();
@@ -936,6 +938,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $titleField->setNotificationField(true);
                 $titleField->setStyleClass('title');
                 $titleField->setInitialValue($initialValue);
+                $titleField->setStyleClass($additionalClass);
                 $fieldList[] = $titleField;
             } else if ($rowField == "salutation") {
                 $salutationField = new C4GSelectField();
@@ -948,6 +951,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $salutationField->setNotificationField(true);
                 $salutationField->setStyleClass('salutation');
                 $salutationField->setInitialValue($initialValue ?: $memberArr['gender']);
+                $salutationField->setStyleClass($additionalClass);
                 $fieldList[] = $salutationField;
             } else if ($rowField == "firstname") {
                 $firstnameField = new C4GTextField();
@@ -961,6 +965,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $firstnameField->setStyleClass('firstname');
                 $firstnameField->setInitialValue($initialValue ? $initialValue : $memberArr['firstname']);
                 $firstnameField->setPattern("^[a-z A-Z -äöüÄÖÜ]+$");
+                $firstnameField->setStyleClass($additionalClass);
                 $fieldList[] = $firstnameField;
             } else if ($rowField == "lastname") {
                 $lastnameField = new C4GTextField();
@@ -974,6 +979,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $lastnameField->setStyleClass('lastname');
                 $lastnameField->setInitialValue($initialValue ? $initialValue : $memberArr['lastname']);
                 $lastnameField->setPattern("^[a-z A-Z -äöüÄÖÜ]+$");
+                $lastnameField->setStyleClass($additionalClass);
                 $fieldList[] = $lastnameField;
             } else if ($rowField == "email") {
                 $emailField = new C4GEmailField();
@@ -986,6 +992,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $emailField->setNotificationField(true);
                 $emailField->setStyleClass('email');
                 $emailField->setInitialValue($initialValue ? $initialValue : $memberArr['email']);
+                $emailField->setStyleClass($additionalClass);
                 $fieldList[] = $emailField;
             } else if ($rowField == "phone") {
                 $phoneField = new C4GTelField();
@@ -998,6 +1005,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $phoneField->setNotificationField(true);
                 $phoneField->setStyleClass('phone');
                 $phoneField->setInitialValue($initialValue ? $initialValue : $memberArr['phone']);
+                $phoneField->setStyleClass($additionalClass);
                 $fieldList[] = $phoneField;
             } else if ($rowField == "address") {
                 $addressField = new C4GTextField();
@@ -1010,6 +1018,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $addressField->setNotificationField(true);
                 $addressField->setStyleClass('address');
                 $addressField->setInitialValue($initialValue ? $initialValue : $memberArr['street']);
+                $addressField->setStyleClass($additionalClass);
                 $fieldList[] = $addressField;
             } else if ($rowField == "postal") {
                 $postalField = new C4GPostalField();
@@ -1023,6 +1032,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $postalField->setNotificationField(true);
                 $postalField->setStyleClass('postal');
                 $postalField->setInitialValue($initialValue ? $initialValue : $memberArr['postal']);
+                $postalField->setStyleClass($additionalClass);
                 $fieldList[] = $postalField;
             } else if ($rowField == "city") {
                 $cityField = new C4GTextField();
@@ -1035,6 +1045,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $cityField->setNotificationField(true);
                 $cityField->setStyleClass('city');
                 $cityField->setInitialValue($initialValue ? $initialValue : $memberArr['city']);
+                $cityField->setStyleClass($additionalClass);
                 $fieldList[] = $cityField;
             } else if ($rowField == "dateOfBirth") {
                 $birthDateField = new C4GDateField();
@@ -1054,6 +1065,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $birthDateField->setStyleClass('dateOfBirth');
                 $birthDateField->setInitialValue($initialValue ? $initialValue : $memberArr['dateOfBirth']);
                 $birthDateField->setDatePickerByBrowser(true);
+                $birthDateField->setStyleClass($additionalClass);
                 $fieldList[] = $birthDateField;
             } else if ($rowField == "salutation2") {
                 $salutationField2 = new C4GSelectField();
@@ -1066,6 +1078,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $salutationField2->setNotificationField(true);
                 $salutationField2->setStyleClass('salutation');
                 $salutationField2->setInitialValue($initialValue);
+                $salutationField2->setStyleClass($additionalClass);
                 $fieldList[] = $salutationField2;
             } else if ($rowField == "title2") {
                 $titleField2 = new C4GTextField();
@@ -1077,6 +1090,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $titleField2->setNotificationField(true);
                 $titleField2->setStyleClass('title');
                 $titleField2->setInitialValue($initialValue);
+                $titleField2->setStyleClass($additionalClass);
                 $fieldList[] = $titleField2;
             } else if ($rowField == "firstname2") {
                 $firstnameField2 = new C4GTextField();
@@ -1089,6 +1103,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $firstnameField2->setNotificationField(true);
                 $firstnameField2->setStyleClass('firstname');
                 $firstnameField2->setInitialValue($initialValue);
+                $firstnameField2->setStyleClass($additionalClass);
                 $fieldList[] = $firstnameField2;
             } else if ($rowField == "lastname2") {
                 $lastnameField2 = new C4GTextField();
@@ -1101,6 +1116,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $lastnameField2->setNotificationField(true);
                 $lastnameField2->setStyleClass('lastname');
                 $lastnameField2->setInitialValue($initialValue);
+                $lastnameField2->setStyleClass($additionalClass);
                 $fieldList[] = $lastnameField2;
             } else if ($rowField == "email2") {
                 $emailField2 = new C4GEmailField();
@@ -1113,6 +1129,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $emailField2->setNotificationField(true);
                 $emailField2->setStyleClass('email');
                 $emailField2->setInitialValue($initialValue);
+                $emailField2->setStyleClass($additionalClass);
                 $fieldList[] = $emailField2;
             } else if ($rowField == "organisation2") {
                 $organisationField2 = new C4GTextField();
@@ -1125,6 +1142,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $organisationField2->setNotificationField(true);
                 $organisationField2->setStyleClass('organisation');
                 $organisationField2->setInitialValue($initialValue);
+                $organisationField2->setStyleClass($additionalClass);
                 $fieldList[] = $organisationField2;
             } else if ($rowField == "phone2") {
                 $phoneField2 = new C4GTelField();
@@ -1137,6 +1155,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $phoneField2->setNotificationField(true);
                 $phoneField2->setStyleClass('phone');
                 $phoneField2->setInitialValue($initialValue);
+                $phoneField2->setStyleClass($additionalClass);
                 $fieldList[] = $phoneField2;
             } else if ($rowField == "address2") {
                 $addressField2 = new C4GTextField();
@@ -1149,6 +1168,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $addressField2->setNotificationField(true);
                 $addressField2->setStyleClass('address');
                 $addressField2->setInitialValue($initialValue);
+                $addressField2->setStyleClass($additionalClass);
                 $fieldList[] = $addressField2;
             } else if ($rowField == "postal2") {
                 $postalField2 = new C4GPostalField();
@@ -1162,6 +1182,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $postalField2->setNotificationField(true);
                 $postalField2->setStyleClass('postal');
                 $postalField2->setInitialValue($initialValue);
+                $postalField2->setStyleClass($additionalClass);
                 $fieldList[] = $postalField2;
             } else if ($rowField == "city2") {
                 $cityField2 = new C4GTextField();
@@ -1174,43 +1195,60 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $cityField2->setNotificationField(true);
                 $cityField2->setStyleClass('city');
                 $cityField2->setInitialValue($initialValue);
+                $cityField2->setStyleClass($additionalClass);
                 $fieldList[] = $cityField2;
+            } else if ($rowField == "discountCode") {
+                $discountCodeField = new C4GTextField();
+                $discountCodeField->setFieldName('discountCode');
+                $discountCodeField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['discountCode']);
+                $discountCodeField->setColumnWidth(60);
+                $discountCodeField->setSortColumn(false);
+                $discountCodeField->setTableColumn(false);
+                $discountCodeField->setMandatory($rowMandatory);
+                $discountCodeField->setNotificationField(true);
+                $discountCodeField->setStyleClass('discountCode');
+                $discountCodeField->setInitialValue($initialValue);
+                $discountCodeField->setStyleClass($additionalClass);
+                $fieldList[] = $discountCodeField;
             } else if ($rowField == "additional1") {
-                $cityField2 = new C4GTextField();
-                $cityField2->setFieldName('additional1');
-                $cityField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional1']);
-                $cityField2->setColumnWidth(60);
-                $cityField2->setSortColumn(false);
-                $cityField2->setTableColumn(false);
-                $cityField2->setMandatory($rowMandatory);
-                $cityField2->setNotificationField(true);
-                $cityField2->setStyleClass('additional1');
-                $cityField2->setInitialValue($initialValue);
-                $fieldList[] = $cityField2;
+                $additional1Field = new C4GTextField();
+                $additional1Field->setFieldName('additional1');
+                $additional1Field->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional1']);
+                $additional1Field->setColumnWidth(60);
+                $additional1Field->setSortColumn(false);
+                $additional1Field->setTableColumn(false);
+                $additional1Field->setMandatory($rowMandatory);
+                $additional1Field->setNotificationField(true);
+                $additional1Field->setStyleClass('additional1');
+                $additional1Field->setInitialValue($initialValue);
+                $additional1Field->setStyleClass($additionalClass);
+                $fieldList[] = $additional1Field;
             } else if ($rowField == "additional2") {
-                $cityField2 = new C4GTextField();
-                $cityField2->setFieldName('additional2');
-                $cityField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional2']);
-                $cityField2->setColumnWidth(60);
-                $cityField2->setSortColumn(false);
-                $cityField2->setTableColumn(false);
-                $cityField2->setMandatory($rowMandatory);
-                $cityField2->setNotificationField(true);
-                $cityField2->setStyleClass('additional2');
-                $cityField2->setInitialValue($initialValue);
-                $fieldList[] = $cityField2;
+                $additional2Field = new C4GTextField();
+                $additional2Field->setFieldName('additional2');
+                $additional2Field->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional2']);
+                $additional2Field->setColumnWidth(60);
+                $additional2Field->setSortColumn(false);
+                $additional2Field->setTableColumn(false);
+                $additional2Field->setMandatory($rowMandatory);
+                $additional2Field->setNotificationField(true);
+                $additional2Field->setStyleClass('additional2');
+                $additional2Field->setInitialValue($initialValue);
+                $additional2Field->setStyleClass($additionalClass);
+                $fieldList[] = $additional2Field;
             } else if ($rowField == "additional3") {
-                $cityField2 = new C4GTextField();
-                $cityField2->setFieldName('additional3');
-                $cityField2->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional3']);
-                $cityField2->setColumnWidth(60);
-                $cityField2->setSortColumn(false);
-                $cityField2->setTableColumn(false);
-                $cityField2->setMandatory($rowMandatory);
-                $cityField2->setNotificationField(true);
-                $cityField2->setStyleClass('additional3');
-                $cityField2->setInitialValue($initialValue);
-                $fieldList[] = $cityField2;
+                $additional3Field = new C4GTextField();
+                $additional3Field->setFieldName('additional3');
+                $additional3Field->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional3']);
+                $additional3Field->setColumnWidth(60);
+                $additional3Field->setSortColumn(false);
+                $additional3Field->setTableColumn(false);
+                $additional3Field->setMandatory($rowMandatory);
+                $additional3Field->setNotificationField(true);
+                $additional3Field->setStyleClass('additional3');
+                $additional3Field->setInitialValue($initialValue);
+                $additional3Field->setStyleClass($additionalClass);
+                $fieldList[] = $additional3Field;
             } else if ($rowField == "comment") {
                 $commentField = new C4GTextareaField();
                 $commentField->setFieldName('comment');
@@ -1222,6 +1260,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $commentField->setNotificationField(true);
                 $commentField->setStyleClass('comment');
                 $commentField->setInitialValue($initialValue);
+                $commentField->setStyleClass($additionalClass);
                 $fieldList[] = $commentField;
             } else if ($rowField == "additionalHeadline") {
                 $headlineField = new C4GHeadlineField();
@@ -1400,9 +1439,12 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
                         if (count($participantParamsArr) > 0) {
                             $eventOptionsRadio = $eventObj->participantParamsFieldType == 'radio';
+                            $eventOptionsMandatory = $eventObj->participantParamsMandatory == '1';
                             if ($eventOptionsRadio) {
                                 $participantParamField = new C4GRadioGroupField();
-                                $participantParamField->setInitialValue($participantParamsArr[0]['id']);
+                                if (!$eventOptionsMandatory) {
+                                    $participantParamField->setInitialValue($participantParamsArr[0]['id']);
+                                }
                                 $participantParamField->setSaveAsArray(true);
                             } else {
                                 $participantParamField = new C4GMultiCheckboxField();
@@ -1413,7 +1455,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                             $participantParamField->setFormField(true);
                             $participantParamField->setEditable(true);
                             $participantParamField->setOptions($participantParamsArr);
-                            $participantParamField->setMandatory($type['participantParamsMandatory']);
+                            $participantParamField->setMandatory($eventOptionsMandatory ?: $type['participantParamsMandatory']);
                             $participantParamField->setStyleClass('participant-params');
                             $participantParamField->setNotificationField(false);
                             $participantParamField->setSort(false);

@@ -31,6 +31,7 @@ $GLOBALS['TL_LANG'][$str]['mandatory'] = array("Pflichtfeld?","");
 $GLOBALS['TL_LANG'][$str]['binding'] = array("Pflichtfeld?","Soll dieses Datenfeld als Pflichtfeld im Frontend angezeigt werden");
 $GLOBALS['TL_LANG'][$str]['initialValue'] = array("Initialer Wert", "Hier können Sie einen initialen Wert eingeben. Wichtig bei der Überschrift - ansonsten optional.");
 $GLOBALS['TL_LANG'][$str]['individualLabel'] = array("Individuelles Label", "Hier können Sie ein individuelles Label setzen. Ist es Leer greift der Standard aus den Language Dateien.");
+$GLOBALS['TL_LANG'][$str]['additionalClass'] = array("Zusätzl. Klasse", "Sie können das Feld um eine Klasse erweitern.");
 $GLOBALS['TL_LANG'][$str]['fieldSelection'] = array("Formularfelder Hinzufügen","Achtung! Vorname, Nachname und E-Mail werden angehangen, falls diese fehlen. Die drei Felder sind immer erforderlich.");
 $GLOBALS['TL_LANG'][$str]['additionalDuration'] = array("Individuelle Nutzungsdauer (initial)","Bei 0 ist keine individuelle Eingabe der Nutzungsdauer möglich (Standard). Es greifen die Einstellungen aus der Art für min und max Werte.");
 $GLOBALS['TL_LANG'][$str]['withCapacity'] = array("Kunde kann Personenanzahl angeben","Der Kunde kann die Personenanzahl angeben. Dieses wird bspw. für eine Tischreservierung im Restaurant benötigt.");

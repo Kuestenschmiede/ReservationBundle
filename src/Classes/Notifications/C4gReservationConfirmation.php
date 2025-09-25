@@ -207,6 +207,10 @@ class C4gReservationConfirmation
 
                             }
 
+                            if ($eventObject && $eventObject['conferenceLink']) {
+                                $c4gNotify->setTokenValue('conferenceLink', $eventObject['conferenceLink'] ?: '');
+                            }
+
                             if (($eventObject && $eventObject['price']) || ($calendarObject && $calendarObject['reservationPrice'])) {
                                 $price = C4gReservationHandler::formatPrice($eventObject && $eventObject['price'] ? $eventObject['price'] : $calendarObject['reservationPrice']);
                                 $priceOptionSum = C4gReservationHandler::formatPrice($eventObject && $eventObject['priceOptionSum']);
@@ -259,7 +263,6 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('city2', $reservation['city2'] ? $reservation['city2'] : '');
                         $c4gNotify->setTokenValue('comment', $reservation['comment'] ? \Contao\StringUtil::deserialize($reservation['comment']) : '');
                         $c4gNotify->setTokenValue('internal_comment', $reservation['internal_comment'] ? \Contao\StringUtil::deserialize($reservation['internal_comment']) : '');
-
                         $c4gNotify->setTokenValue('additional1', $reservation['additional1'] ?: '');
                         $c4gNotify->setTokenValue('additional2', $reservation['additional2'] ?: '');
                         $c4gNotify->setTokenValue('additional3', $reservation['additional3'] ?: '');
@@ -274,7 +277,6 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('reservation_id', $reservation['reservation_id']);
                         $c4gNotify->setTokenValue('agreed', $reservation['agreed']);
 
-
                         if ($reservationObject['price']) {
                             $price = C4gReservationHandler::formatPrice($reservationObject['price']);
                             $priceOptionSum = C4gReservationHandler::formatPrice($reservationObject['priceOptionSum']);
@@ -283,6 +285,16 @@ class C4gReservationConfirmation
                             $c4gNotify->setTokenValue('priceOptionSum', $priceOptionSum);
                             $c4gNotify->setTokenValue('priceSum', $priceSum);
                         }
+
+                        if ($eventObject && $eventObject['discountCode'] && $eventObject['discountPercent'] && $reservation['discountCode'] &&
+                            ($reservation['discountCode'] == $eventObject['discountCode'])) {
+                            $c4gNotify->setTokenValue('discountPercent', $eventObject['discountPercent']);
+                            $c4gNotify->setTokenValue('discountCode', $reservation['discountCode']);
+
+                            $dicountValue = $reservationObject['price'] && $reservation['discountPercent'] ? C4gReservationHandler::formatPrice($reservationObject['price'] * ($reservation['discountPercent'] / 100)) : '';
+                            $c4gNotify->setTokenValue('discountValue', $dicountValue);
+                        }
+
                         if ($reservationObject && $reservationObject['priceSumTax']) {
                             $c4gNotify->setTokenValue('priceTax', $reservation['priceTax'] ? $reservation['priceTax'] : '');
                             $c4gNotify->setTokenValue('priceNet', $reservation['priceNet'] ? $reservation['priceNet'] : '');
