@@ -737,7 +737,34 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'flag'              => 12,
             'default'           => time(),
             'eval' => array('rgxp'=>'datim', 'doNotCopy'=>true, 'tl_class'=>'w50', 'disabled'=>true)
-        )
+        ),
 
+        'qrContent' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['qrContent'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'textarea',
+            'default'                 => null,
+            'editable'                => false,
+            'eval'                    => ['tl_class'=>'clr long', 'feEditable'=>false, 'feViewable'=>false, 'disabled'=>true],
+            'sql'                     => "text NULL"
+        ),
+
+        'qrFileName' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['qrFileName'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'textarea',
+            'default'                 => null,
+            'editable'                => false,
+            'eval'                    => ['tl_class'=>'clr long', 'feEditable'=>false, 'feViewable'=>false, 'disabled'=>true],
+            'sql'                     => "text NULL"
+        )
     )
 );

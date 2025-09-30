@@ -78,6 +78,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Canceled", "I
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['tstamp'] = array('Last changed','');
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['bookedAt'] = array('Booked at','');
 
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['qrContent'] = array('QR-Code Content', '');
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['qrContent'] = array('QR-Code Filename', '');
+
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'] = array("For member", "The reservation was created for or by this member.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['groupId'] = array("For group", "The reservation was created for or by this group.");
 

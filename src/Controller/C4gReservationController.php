@@ -21,6 +21,7 @@ use con4gis\ProjectsBundle\Classes\Common\C4GBrickConst;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickRegEx;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickCondition;
 use con4gis\ProjectsBundle\Classes\Conditions\C4GBrickConditionType;
+use con4gis\ProjectsBundle\Classes\Dialogs\C4GBeforeDialogSave;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GButtonField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GCheckboxField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
@@ -52,6 +53,7 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Classes\Projects\C4gReservationBrickTypes;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationCheckInHelper;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationFormDefaultHandler;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationFormEventHandler;
@@ -101,7 +103,7 @@ class C4gReservationController extends C4GBaseController
     protected $loadMoreButtonResources = false;
     protected $loadFontAwesomeResources = true;
     protected $loadTriggerSearchFromOtherModuleResources = false;
-    protected $loadFileUploadResources = false;
+    protected $loadFileUploadResources = true; //ToDo Check if needed
     protected $loadMultiColumnResources = false;
     protected $loadMiniSearchResources = false;
     protected $loadHistoryPushResources = false;
@@ -189,6 +191,14 @@ class C4gReservationController extends C4GBaseController
         $this->dialogParams->deleteButton(C4GBrickConst::BUTTON_DELETE);
         $this->dialogParams->setRedirectSite($this->reservationSettings->reservation_redirect_site);
         $this->dialogParams->setSaveWithoutSavingMessage(false);
+
+        //Todo generate QR-Code only with active CheckIn
+        $checkInHelper = new C4gReservationCheckInHelper();
+        $beforeSaveAction = new C4GBeforeDialogSave($checkInHelper, 'generateBeforeSaving', false);
+        $this->dialogParams->setBeforeSaveAction($beforeSaveAction);
+        //ToDo genereate different document tyoes
+        $this->dialogParams->setSavePrintoutToField('fileUpload');
+        $this->dialogParams->setGeneratePrintoutWithSaving(true);
     }
 
     public function addFields() : array
@@ -1391,6 +1401,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $participantsKey->setEditable(false);
                 $participantsKey->setHidden(true);
                 $participantsKey->setFormField(true);
+                $participantsKey->setPrintable(false);
                 $participantsForeign = new C4GForeignKeyField();
                 $participantsForeign->setFieldName('pid');
                 $participantsForeign->setHidden(true);
@@ -1405,6 +1416,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $firstnameField->setTableColumn(true);
                 $firstnameField->setMandatory($specialParticipantMechanism ? $rowMandatory : true);
                 $firstnameField->setNotificationField(false);
+                $firstnameField->setPrintable(false);
                 $participants[] = $firstnameField;
 
                 $lastnameField = new C4GTextField();
@@ -1415,6 +1427,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $lastnameField->setTableColumn(true);
                 $lastnameField->setMandatory($specialParticipantMechanism ? $rowMandatory : true);
                 $lastnameField->setNotificationField(false);
+                $lastnameField->setPrintable(false);
                 $participants[] = $lastnameField;
 
                 if (!$hideParticipantsEmail){
@@ -1426,6 +1439,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $emailField->setTableColumn(false);
                     $emailField->setMandatory($rowMandatory);
                     $emailField->setNotificationField(false);
+                    $emailField->setPrintable(false);
                     $participants[] = $emailField;
                 }
 
@@ -1486,6 +1500,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                             $participantParamField->setStyleClass('participant-params');
                             $participantParamField->setNotificationField(false);
                             $participantParamField->setSort(false);
+                            $participantParamField->setPrintable(false);
 
                             $participants[] = $participantParamField;
                         }
@@ -1848,6 +1863,23 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
         $fieldList[] = $priceDBField;
+
+        $qrContentField = new C4GTextareaField();
+        $qrContentField->setFieldName('qrContent');
+        $qrContentField->setInitialValue('');
+        $qrContentField->setDatabaseField(true);
+        $qrContentField->setFormField(false);
+        $qrContentField->setPrintable(true); //ToDo switch
+        $fieldList[] = $qrContentField;
+
+        $qrFileNameField = new C4GTextareaField();
+        $qrFileNameField->setFieldName('qrFileName');
+        $qrFileNameField->setInitialValue('');
+        $qrFileNameField->setDatabaseField(true);
+        $qrFileNameField->setFormField(false);
+        $qrFileNameField->setPrintable(true); //ToDo switch
+        $fieldList[] = $qrFileNameField;
+
 
         return $fieldList;
     }

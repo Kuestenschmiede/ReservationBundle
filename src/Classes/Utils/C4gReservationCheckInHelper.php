@@ -6,21 +6,33 @@ use con4gis\ProjectsBundle\Classes\QRCode\LinkToQRCode;
 
 class C4gReservationCheckInHelper
 {
-    public function generateQRCode($fileName)
+    public function generateQRCode($content, $fileName)
     {
-        $link = $fileName; //ToDo
-        if ($link) {
-            $hash = array_key_first($link);
-            if (LinkToQRCode::linkToQRCode($link, $fileName)) {
-                $fileArr['hash'] = $hash;
-                $fileArr['link'] = $link;
-                $fileArr['file'] = $fileName;
+        if ($content && $fileName) {
+            if (LinkToQRCode::linkToQRCode($content, $fileName)) {
+                $fileArr['content'] = $content;
+                $fileArr['fileName'] = $fileName;
 
                 return $fileArr;
             };
         }
 
         return false;
+    }
+
+    public function generateBeforeSaving($params)
+    {
+        $key = $params['reservation_id'];
+        //ToDo mkdir?
+        $fileName = 'files/c4g_brick_data/qrcode/qrcode_' . $key . '.png';
+        $content  = '?checkIn='.$key; //ToDo Check Content
+        $linkArr = $this->generateQRCode($content, $fileName);
+        if ($linkArr && is_array($linkArr)) {
+            $params['qrContent'] = $linkArr['content'] ?: '';
+            $params['qrFileName'] = $linkArr['fileName'] ?: '';
+        }
+
+        return $params;
     }
 
 }
