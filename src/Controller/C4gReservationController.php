@@ -28,6 +28,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GDateField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GEmailField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GForeignKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GHeadlineField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GImageField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GInfoTextField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GKeyField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GLabelField;
@@ -129,6 +130,8 @@ class C4gReservationController extends C4GBaseController
 
     protected $reservationSettings = null;
 
+    private $withDefaultPDFContent = true;
+
     /**
      * @param string $rootDir
      * @param RequestStack $requestStack
@@ -179,6 +182,12 @@ class C4gReservationController extends C4GBaseController
 
         $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']);
         $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural']);
+
+        $this->printTemplate = $this->reservationSettings->documentTemplate ?: 'c4g_pdf_brick';
+        if ($this->printTemplate !== 'pdf_c4g_brick') {
+            $this->withDefaultPDFContent = false;
+        }
+
         parent::initBrickModule($id);
 
         if (!$this->reservationSettings && $this->reservation_settings) {
@@ -192,11 +201,18 @@ class C4gReservationController extends C4GBaseController
         $this->dialogParams->setRedirectSite($this->reservationSettings->reservation_redirect_site);
         $this->dialogParams->setSaveWithoutSavingMessage(false);
 
-        //Todo generate QR-Code only with active CheckIn
-        $checkInHelper = new C4gReservationCheckInHelper();
-        $beforeSaveAction = new C4GBeforeDialogSave($checkInHelper, 'generateBeforeSaving', false);
-        $this->dialogParams->setBeforeSaveAction($beforeSaveAction);
-        //ToDo genereate different document tyoes
+        if ($this->printTemplate == 'pdf_reservation_bill') {
+            $this->dialogParams->setDocumentHeadline($GLOBALS['TL_LANG']['fe_c4g_reservation']['headlineBill']);
+        } else if ($this->printTemplate == 'pdf_reservation_checkin') {
+            $this->dialogParams->setDocumentHeadline($GLOBALS['TL_LANG']['fe_c4g_reservation']['headlineCheckIn']);
+        }
+
+        if ($this->reservationSettings->checkInPage) {
+            $checkInHelper = new C4gReservationCheckInHelper($this->reservationSettings->checkInPage);
+            $beforeSaveAction = new C4GBeforeDialogSave($checkInHelper, 'generateBeforeSaving', false);
+            $this->dialogParams->setBeforeSaveAction($beforeSaveAction);
+        }
+
         $this->dialogParams->setSavePrintoutToField('fileUpload');
         $this->dialogParams->setGeneratePrintoutWithSaving(true);
     }
@@ -483,6 +499,8 @@ class C4gReservationController extends C4GBaseController
                 $reservationTypeField->setEditable(count($typelist) > 1);
                 $reservationTypeField->setInitialValue($firstType);
             }
+
+            $reservationTypeField->setPrintable($this->withDefaultPDFContent);
 
             $fieldList[] = $reservationTypeField;
         } else {
@@ -1402,6 +1420,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $participantsKey->setHidden(true);
                 $participantsKey->setFormField(true);
                 $participantsKey->setPrintable(false);
+
                 $participantsForeign = new C4GForeignKeyField();
                 $participantsForeign->setFieldName('pid');
                 $participantsForeign->setHidden(true);
@@ -1416,7 +1435,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $firstnameField->setTableColumn(true);
                 $firstnameField->setMandatory($specialParticipantMechanism ? $rowMandatory : true);
                 $firstnameField->setNotificationField(false);
-                $firstnameField->setPrintable(false);
+                $firstnameField->setPrintable(true);
                 $participants[] = $firstnameField;
 
                 $lastnameField = new C4GTextField();
@@ -1427,7 +1446,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $lastnameField->setTableColumn(true);
                 $lastnameField->setMandatory($specialParticipantMechanism ? $rowMandatory : true);
                 $lastnameField->setNotificationField(false);
-                $lastnameField->setPrintable(false);
+                $lastnameField->setPrintable(true);
                 $participants[] = $lastnameField;
 
                 if (!$hideParticipantsEmail){
@@ -1531,6 +1550,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                             $reservationParticipants->setCondition(array($condition));
                             $reservationParticipants->setRemoveWithEmptyCondition(true);
                             $reservationParticipants->setAdditionalID($listType['id']);
+                            $reservationParticipants->setPrintable(true);
 
                             $fieldList[] = $reservationParticipants;
                         } else {
@@ -1562,6 +1582,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                         $reservationParticipants->setCondition(array($condition, $newCondition));
                                         $reservationParticipants->setRemoveWithEmptyCondition(true);
                                         $reservationParticipants->setAdditionalID($listType['id'] . '-' . $counter);
+                                        $reservationParticipants->setPrintable(true);
 
                                         $fieldList[] = $reservationParticipants;
                                     }
@@ -1592,6 +1613,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                 $reservationParticipants->setCondition(array($condition));
                                 $reservationParticipants->setRemoveWithEmptyCondition(true);
                                 $reservationParticipants->setAdditionalID($listType['id']);
+                                $reservationParticipants->setPrintable(true);
 
                                 $fieldList[] = $reservationParticipants;
 
@@ -1605,6 +1627,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $reservationParticipantList->setDatabaseField(false);
                 $reservationParticipantList->setNotificationField(true);
                 $reservationParticipantList->setFormField(false);
+                $reservationParticipantList->setPrintable(true);
                 $fieldList[] = $reservationParticipantList;
             }
         }
@@ -1627,6 +1650,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']);
         $reservationIdField->setStyleClass('reservation-id');
         $reservationIdField->setHidden($hideReservationKey);
+        $reservationIdField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $reservationIdField;
 
         if ($this->reservationSettings->privacy_policy_text) {
@@ -1642,6 +1666,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $privacyPolicyText->setMandatory(false);
             $privacyPolicyText->setNotificationField(false);
             $privacyPolicyText->setStyleClass('privacy-policy-text');
+            $privacyPolicyText->setPrintable($this->withDefaultPDFContent);
             $fieldList[] = $privacyPolicyText;
         }
 
@@ -1663,6 +1688,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $agreedField->setNotificationField(true);
         $agreedField->setStyleClass('agreed');
         $agreedField->setWithoutDescriptionLineBreak(true);
+        $agreedField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $agreedField;
 
         $clickButton = new C4GBrickButton(
@@ -1686,6 +1712,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $location_name->setFormField(false);
         $location_name->setTableColumn(true);
         $location_name->setNotificationField(true);
+        $location_name->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $location_name;
 
         $contact_name = new C4GTextField();
@@ -1694,6 +1721,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_name->setFormField(false);
         $contact_name->setTableColumn(true);
         $contact_name->setNotificationField(true);
+        $contact_name->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $contact_name;
 
         $contact_phone = new C4GTelField();
@@ -1701,6 +1729,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_phone->setFormField(false);
         $contact_phone->setTableColumn(false);
         $contact_phone->setNotificationField(true);
+        $contact_phone->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $contact_phone;
 
         $contact_email = new C4GEmailField();
@@ -1708,6 +1737,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_email->setTableColumn(false);
         $contact_email->setFormField(false);
         $contact_email->setNotificationField(true);
+        $contact_email->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $contact_email;
 
 
@@ -1716,6 +1746,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_street->setTableColumn(false);
         $contact_street->setFormField(false);
         $contact_street->setNotificationField(true);
+        $contact_street->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $contact_street;
 
 
@@ -1724,6 +1755,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_postal->setFormField(false);
         $contact_postal->setTableColumn(false);
         $contact_postal->setNotificationField(true);
+        $contact_postal->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $contact_postal;
 
 
@@ -1732,6 +1764,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_city->setTableColumn(false);
         $contact_city->setFormField(false);
         $contact_city->setNotificationField(true);
+        $contact_city->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $contact_city;
 
         $contact_city = new C4GTextField();
@@ -1739,6 +1772,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_city->setTableColumn(false);
         $contact_city->setFormField(false);
         $contact_city->setNotificationField(true);
+        $contact_city->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $contact_city;
 
         $memberId = new C4GTextField();
@@ -1746,6 +1780,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $memberId->setTableColumn(true);
         $memberId->setFormField(false);
         $memberId->setNotificationField(false);
+        $memberId->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $memberId;
 
         $formularId = new C4GTextField();
@@ -1753,6 +1788,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $formularId->setTableColumn(true);
         $formularId->setFormField(false);
         $formularId->setNotificationField(false);
+        $formularId->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $formularId;
 
         $dbkey = new C4GTextField();
@@ -1760,6 +1796,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $dbkey->setTableColumn(false);
         $dbkey->setFormField(false);
         $dbkey->setNotificationField(true);
+        $dbkey->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $dbkey;
 
         $memberEmail = new C4GTextField();
@@ -1767,6 +1804,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $memberEmail->setTableColumn(false);
         $memberEmail->setFormField(false);
         $memberEmail->setNotificationField(true);
+        $memberEmail->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $memberEmail;
 
         $groupId = new C4GTextField();
@@ -1774,6 +1812,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $groupId->setTableColumn(true);
         $groupId->setFormField(false);
         $groupId->setNotificationField(false);
+        $groupId->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $groupId;
 
         $bookedAt = new C4GTextField();
@@ -1781,6 +1820,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $bookedAt->setTableColumn(true);
         $bookedAt->setFormField(false);
         $bookedAt->setNotificationField(false);
+        $bookedAt->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $bookedAt;
 
         //price for notification
@@ -1790,6 +1830,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -1798,6 +1839,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -1806,6 +1848,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -1814,6 +1857,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -1822,6 +1866,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -1830,6 +1875,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -1838,6 +1884,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -1846,6 +1893,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -1854,6 +1902,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -1862,23 +1911,34 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
-        $qrContentField = new C4GTextareaField();
-        $qrContentField->setFieldName('qrContent');
-        $qrContentField->setInitialValue('');
-        $qrContentField->setDatabaseField(true);
-        $qrContentField->setFormField(false);
-        $qrContentField->setPrintable(true); //ToDo switch
-        $fieldList[] = $qrContentField;
+        if ($this->reservationSettings->checkInPage) {
+            $qrContentField = new C4GTextareaField();
+            $qrContentField->setFieldName('qrContent');
+            $qrContentField->setInitialValue('');
+            $qrContentField->setDatabaseField(true);
+            $qrContentField->setFormField(false);
+            $qrContentField->setPrintable(false);
+            $fieldList[] = $qrContentField;
 
-        $qrFileNameField = new C4GTextareaField();
-        $qrFileNameField->setFieldName('qrFileName');
-        $qrFileNameField->setInitialValue('');
-        $qrFileNameField->setDatabaseField(true);
-        $qrFileNameField->setFormField(false);
-        $qrFileNameField->setPrintable(true); //ToDo switch
-        $fieldList[] = $qrFileNameField;
+            $qrFileNameField = new C4GImageField();
+            $qrFileNameField->setFieldName('qrFileName');
+            $qrFileNameField->setTitle(''); //'Check in'
+            $qrFileNameField->setInitialValue('');
+            $qrFileNameField->setDatabaseField(true);
+            $qrFileNameField->setFormField(true);
+            $qrFileNameField->setPrintable(true); //ToDo switch
+            $qrFileNameField->setWidth(100);
+            $qrFileNameField->setHeight(100);
+            $qrFileNameField->setMandatory(false);
+            $qrFileNameField->setComparable(false);
+            $qrFileNameField->setLightBoxField('1');
+            $qrFileNameField->setDisplay(false);
+            $qrFileNameField->setAlign("right");
+            $fieldList[] = $qrFileNameField;
+        }
 
 
         return $fieldList;
@@ -2462,7 +2522,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $settings = $this->reservationSettings;
 
             self::allPrices($settings, $putVars, $reservationObject, '', $reservationType, $isEvent, $countPersons);
-
         }
 
         $locationId = 0;
@@ -2887,13 +2946,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
     {
         $this->reservationSettings = $reservationSettings;
     }
+
     public static function allPrices ($settings, &$putVars, $reservationObject, $reservationEventObject, $reservationType, $isEvent, $desiredCapacity) {
         $calcTaxes = $settings->showPricesWithTaxes ?: false;
         $showPrices = $settings->showPrices ?: false;
         if ($isEvent) {
             $desiredCapacity = $reservationEventObject->minParticipants;
             $resObject = $reservationEventObject;
-//            $price = $reservationEventObject->price ?: 0;
             $price = $reservationEventObject->price ?? 0;
         } else {
             $price = $reservationObject->price;
@@ -2924,7 +2983,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             // Reservation price
             if ($showPrices) {
                 $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, $isEvent, $desiredCapacity, $duration, '', '', $calcTaxes);
-                $priceSum = $priceArray['priceSum'];
+                $priceSum = $priceArray['priceSum'] ?: $priceArray['price'];
             }
 
             // All reservation options
@@ -2991,6 +3050,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $title = $GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity'];
         }
         return $title;
+    }
+
+    public function isWithDefaultPDFContent(): bool
+    {
+        return $this->withDefaultPDFContent;
     }
 }
 

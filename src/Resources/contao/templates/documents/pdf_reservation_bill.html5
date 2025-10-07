@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<!-- example file to generate a bill with con4gis/reservation -->
+<head>
+  <link rel="stylesheet" type="text/css" href="<?php echo $this->style; ?>">
+</head>
+
+<body>
+    <!-- switch to own logo or remove -->
+    <div class="pdf-logo" style="text-align: right">
+        <?php
+            $src = \Contao\System::getContainer()->getParameter('kernel.project_dir')."/vendor/con4gis/reservation/src/Resources/public/images/test.png";
+            $type = pathinfo($src, PATHINFO_EXTENSION);
+            $data = file_get_contents($src);
+            $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        ?>
+        <img src="<?php echo $src ?>" alt="" width="150" height="150">
+    </div>
+
+    <div class="pdf-address" style="margin-top: -2cm">
+        <?php echo $this->fieldData['contact_name']; ?>, <?php echo $this->fieldData['contact_street']; ?>, <?php echo $this->fieldData['contact_postal']; ?> <?php echo $this->fieldData['contact_city']; ?>
+        <br><br>
+        <?php if ($this->fieldData['organisation']): ?>
+        <?php echo $this->fieldData['organisation']; ?> <?php echo $this->fieldData['organisation']; ?><br>
+        <?php endif; ?>
+        <?php echo $this->fieldData['firstname']; ?> <?php echo $this->fieldData['lastname']; ?><br>
+        <?php echo $this->fieldData['address']; ?><br><br>
+        <?php echo $this->fieldData['postal']; ?> <?php echo $this->fieldData['city']; ?><br><br>
+    </div>
+
+    <div class="pdf-headline" tyle="display: inline-block; width:100%; margin-top: 2cm;">
+        <h1 style="text-align: left; ">Rechnung Nr. <?php echo $this->fieldData['reservation_id']; ?></h1>
+        <div class="pdf-date" style="text-align: right;"><?php echo \Contao\Date::parse("d.m.Y", time()); ?></div>
+    </div>
+
+    <div class="pdf-main">
+    Veranstaltung: <?php echo $this->fieldData['reservation_title']; ?><br>
+    Datum / Zeit: <?php echo $this->fieldData['beginDate']; ?> <?php echo $this->fieldData['beginTime']; ?> Uhr<br>
+    Ort: <?php echo $this->fieldData['location_2-221']; ?><br><br>
+
+    Teilnehmerliste:<br>
+
+    <br><br>
+    Ihr Rechnungsbetrag: <?php echo $this->fieldData['priceSum']; ?><br>
+    Beinhaltet Mehrwertsteuer in Höhe von: <?php echo $this->fieldData['priceTax']; ?><br>
+    <br><br>
+    Bitte überweisen Sie den Betrag (ohne Abzug) innerhalb von einer Woche auf unser Konto:<br>
+    Bankname<br>
+    IBAN: XXXX XXXX XXXX XXXX XXXX XX<br>
+    SWIFT: XXXXXXXXXXX<br>
+    <br>
+    (Computerbrief, auch ohne Unterschrift gültig)<br>
+    </div>
+    <div class="pdf-footer" style="margin-top:-0.7cm">
+    <!-- automatic pdf content by default -->
+    <?php if ($this->content): ?>
+        <?php echo $this->content; ?>
+    <?php endif; ?>
+    <div class="pdf-key" style="text-align:right">
+        Buchungsschlüssel: <?php echo $this->fieldData['reservation_id']; ?><br>
+        (Bei Rückfragen bitte angeben)
+    </div>
+    <br>
+    <hr>
+    <?php echo $this->fieldData['contact_name']; ?><br>
+    Sitz des Unternehmens: <?php echo $this->fieldData['contact_street']; ?> | <?php echo $this->fieldData['contact_postal']; ?> <?php echo $this->fieldData['contact_city']; ?> <br>
+    Geschäftsführer: XXX <br>
+    Handelsregister: XXX <br>
+    </div>
+</body>
+</html>

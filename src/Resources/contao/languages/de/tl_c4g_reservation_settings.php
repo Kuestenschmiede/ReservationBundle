@@ -53,6 +53,8 @@ $GLOBALS['TL_LANG'][$str]['hideParticipantsEmail'] = array("Teilnehmer E-Mail-Fe
 $GLOBALS['TL_LANG'][$str]['hideReservationKey'] = array("Reservierungsschlüssel verstecken", "Wenn diese Option aktiviert ist, wird der Reservierungsschlüssel im Frontend nicht angezeigt.");
 $GLOBALS['TL_LANG'][$str]['onlyParticipants'] = array("Nur Teilnehmer berücksichtigen", "Wenn dieser Mechanismus aktiviert ist, werden nur die Teilnehmer bei der Preisberechnung / Buchung berücksichtigt und die buchende Person nicht mit gezählt (z.B. nur Rechnungsadresse).");
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Postleitzahlen einschränken","Hierüber können Sie ermöglichen, dass Reservierungen nur über bestimmte Postleitzahlen möglich sind (kommagetrennte Liste).");
+$GLOBALS['TL_LANG'][$str]['documentTemplate'] = array("Dokumenten-Template","Hier könnt Ihr das Template für die Dokumentengenerierung zuordnen.");
+$GLOBALS['TL_LANG'][$str]['checkInPage'] = array("Link zur CheckIn Seite","Der Link wird in den QR-Code generiert. Achtung! Sobald eine CheckIn-Seite gesetzt ist. Wird der QR-Code generiert.");
 
 $GLOBALS['TL_LANG'][$str]['typeWithEmptyOption'] = array('Reservierungsart Auswahl treffen', 'Wenn dieser Schalter gesetzt ist, wird die Reservierungsart nicht vorbelegt und muss ausgewählt werden.');
 
@@ -66,6 +68,8 @@ $GLOBALS['TL_LANG'][$str]['type_legend'] = "Einstellungen zur Reservierungsart";
 $GLOBALS['TL_LANG'][$str]['object_legend'] = "Einstellungen zur Zeitauswahl";
 $GLOBALS['TL_LANG'][$str]['form_legend'] = "Reservierungsformular";
 $GLOBALS['TL_LANG'][$str]['notification_legend'] = 'Notification Center';
+$GLOBALS['TL_LANG'][$str]['document_legend'] = "Dokumentgenerator";
+$GLOBALS['TL_LANG'][$str]['checkin_legend'] = "CheckIn Optionen";
 $GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Weiterleitung';
 $GLOBALS['TL_LANG'][$str]['expert_legend'] = 'Experteneinstellungen';
 

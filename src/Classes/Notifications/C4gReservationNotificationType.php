@@ -87,7 +87,8 @@
                 $this->factory->create(AnythingTokenDefinition::class, 'reservationTaxRate', 'reservationTaxRate'), 
                 $this->factory->create(AnythingTokenDefinition::class, 'dbkey', 'dbkey'), 
                 $this->factory->create(AnythingTokenDefinition::class, 'icsFilename', 'icsFilename'), 
-                $this->factory->create(AnythingTokenDefinition::class, 'raw_data', 'raw_data'), 
+                $this->factory->create(AnythingTokenDefinition::class, 'raw_data', 'raw_data'),
+                $this->factory->create(AnythingTokenDefinition::class, 'uploadFile', 'uploadFile'),
             ];
         }
     }

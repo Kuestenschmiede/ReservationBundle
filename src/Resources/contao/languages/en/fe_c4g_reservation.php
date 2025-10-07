@@ -137,6 +137,9 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params'] = 'Participant s
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['emptyOptionLabel'] = '- Please select -';
 
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['headlineBill'] = 'Rechnung';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['headlineCheckIn'] = 'Check In';
+
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'reservation form';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['person_data'] = 'your data';

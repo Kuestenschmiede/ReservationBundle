@@ -98,6 +98,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
                         '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, hideReservationKey, typeWithEmptyOption;'.
                         '{notification_legend:hide}, notification_type;'.
+                        '{document_legend:hide}, documentTemplate;'.
+                        '{checkin_legend:hide}, checkInPage;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
                         '{expert_legend:hide}, specialParticipantMechanism, showMinMaxWithCapacity, hideParticipantsEmail, onlyParticipants, showMemberData, postals;'
     ),
@@ -373,6 +375,25 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'eval'                    => array('multiple' => true),
             'sql'                     => array('type' => 'string', 'length' => 100, 'default' => '')
         ),
+        'documentTemplate' =>
+        [
+            'exclude'                 => true,
+            'default'                 => '',
+            'inputType'               => 'select',
+            'options_callback'        => ['tl_c4g_reservation_settings', 'getDocumentTemplates'],
+            'eval'                    => ['mandatore'=>true, 'chosen'=>true],
+            'sql'                     => "varchar(64) NOT NULL default ''"
+        ],
+        'checkInPage' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['checkInPage'],
+            'exclude'                 => true,
+            'inputType'               => 'pageTree',
+            'foreignKey'              => 'tl_page.title',
+            'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+            'sql'                     => "int(10) unsigned NOT NULL default '0'",
+            'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+        ),
         'reservationButtonCaption' => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['reservationButtonCaption'],
@@ -500,6 +521,7 @@ class tl_c4g_reservation_settings extends Backend
         $columnsFormatted['postal2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'][0];
         $columnsFormatted['city2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'][0];
         $columnsFormatted['discountCode'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['discountCode'][0];
+        //$columnsFormatted['qrCode'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['qrCode'][0];
         $columnsFormatted['additional1'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional1'][0];
         $columnsFormatted['additional2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional2'][0];
         $columnsFormatted['additional3'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional3'][0];
@@ -509,4 +531,7 @@ class tl_c4g_reservation_settings extends Backend
 
     }
 
+    public function getDocumentTemplates() {
+        return Controller::getTemplateGroup('pdf_reservation_');
+    }
 }

@@ -15,6 +15,7 @@
 
 use con4gis\ReservationBundle\Classes\Callbacks\C4gReservation;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
+use Contao\Controller;
 use Contao\Input;
 use Contao\DC_Table;
 

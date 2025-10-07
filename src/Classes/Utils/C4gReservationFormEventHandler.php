@@ -79,6 +79,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationObjectDBField->setFormField(false);
         $reservationObjectDBField->setOptions($objects);
         $reservationObjectDBField->setNotificationField(true);
+        $reservationObjectDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationObjectDBField;
 
         //save beginDate
@@ -89,6 +90,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationBeginDateDBField->setFormField(false);
         $reservationBeginDateDBField->setMax(999999999999);
         $reservationBeginDateDBField->setNotificationField(true);
+        $reservationBeginDateDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationBeginDateDBField;
 
         //save beginTime
@@ -99,6 +101,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationBeginTimeDBField->setFormField(false);
         $reservationBeginTimeDBField->setMax(999999999999);
         $reservationBeginTimeDBField->setNotificationField(true);
+        $reservationBeginTimeDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationBeginTimeDBField;
 
         //save endDate
@@ -109,6 +112,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationEndDateDBField->setFormField(false);
         $reservationEndDateDBField->setMax(9999999999999);
         $reservationEndDateDBField->setNotificationField(true);
+        $reservationEndDateDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationEndDateDBField;
 
         //save endTime
@@ -119,6 +123,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationEndTimeDBField->setFormField(false);
         $reservationEndTimeDBField->setMax(9999999999999);
         $reservationEndTimeDBField->setNotificationField(true);
+        $reservationEndTimeDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationEndTimeDBField;
 
         //$dateCondition = new C4GBrickCondition(C4GBrickConditionType::BOOLSWITCH, 'beginDate_'.$listType['id']);
@@ -146,15 +151,16 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationObjectField->setCallOnChangeFunction("checkEventFields(this)");
         $reservationObjectField->setAdditionalID($listType["id"]);
         $reservationObjectField->setHidden($reservationSettings->objectHide);
+        $reservationObjectField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationObjectField;
 
         $reservationObjectName = new C4GTextField();
         $reservationObjectName->setFieldName('reservation_title');
         $reservationObjectName->setDatabaseField(false);
         $reservationObjectName->setFormField(false);
-        $reservationObjectDBField->setOptions($objects);
         $reservationObjectName->setMax(9999999999999);
         $reservationObjectName->setNotificationField(true);
+        $reservationObjectName->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationObjectName;
 
         foreach ($reservationObjects as $reservationObject) {
@@ -187,6 +193,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
             $reservationBeginDateField->setStyleClass('begindate-event');
+            $reservationBeginDateField->setPrintable($this->module->isWithDefaultPDFContent());
             $this->fieldList[] = $reservationBeginDateField;
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString([$reservationObject]));
 //            $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
@@ -219,6 +226,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 $reservationEndDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                 $reservationEndDateField->setShowIfEmpty(false);
                 $reservationEndDateField->setStyleClass('enddate-event');
+                $reservationEndDateField->setPrintable($this->module->isWithDefaultPDFContent());
                 $this->fieldList[] = $reservationEndDateField;
             }
 
@@ -241,6 +249,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 $reservationBeginTimeField->setShowButtons(true);
                 $reservationBeginTimeField->setRemoveWithEmptyCondition(true);
                 $reservationBeginTimeField->setStyleClass('reservation_time_event_button reservation_time_event_button_' . $listType['id'] . '-22' . $reservationObject->getId() . C4gReservationHandler::getButtonStateClass($reservationObject,$listType['objectType']));
+                $reservationBeginTimeField->setPrintable($this->module->isWithDefaultPDFContent());
                 $this->fieldList[] = $reservationBeginTimeField;
             }
 
@@ -288,6 +297,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $reservationLocationField->setNotificationField(true);
                     $reservationLocationField->setWithoutValidation(true);
                     $reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-location');
+                    $reservationLocationField->setPrintable($this->module->isWithDefaultPDFContent());
                     $this->fieldList[] = $reservationLocationField;
                 }
             }

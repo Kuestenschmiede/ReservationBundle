@@ -413,6 +413,7 @@ class C4gReservationCalculator
                     break;
                 case 'pReservation':
                     $price = intval($price);
+                    $priceSum = $price;
                     $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pEvent'];
                     break;
                 case 'pPerson':
@@ -657,13 +658,10 @@ class C4gReservationCalculator
      * @return int
      */
     public static function setTaxRates($taxOption) {
-//this should be called when calc taxs is true butt only once
         $settings = C4gSettingsModel::findSettings();
         //Dashboard taxrates
         $taxRateStandard = ($settings->taxRateStandard ?? 0);
         $taxRateReduced = ($settings->taxRateReduced ?? 0);
-//            $taxRateStandard = $taxRateStandardToken / 100;
-//            $taxRateReduced = $taxRateReducedToken / 100;
 
         if ($taxOption === 'tStandard') {
             return $taxRateStandard;

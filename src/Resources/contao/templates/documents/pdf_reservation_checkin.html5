@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="<?php echo $this->style; ?>">
+</head>
+<body>
+    <?php if ($this->headline): ?>
+        <<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
+    <?php endif; ?>
+
+    <?php if ($this->content): ?>
+        <?php echo $this->content; ?>
+    <?php endif; ?>
+</body>
+</html>

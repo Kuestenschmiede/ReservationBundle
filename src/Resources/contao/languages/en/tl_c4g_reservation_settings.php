@@ -53,6 +53,8 @@ $GLOBALS['TL_LANG'][$str]['hideParticipantsEmail'] = array("Hide Participants E-
 $GLOBALS['TL_LANG'][$str]['onlyParticipants'] = array("Only take participants into account", "If this mechanism is enabled, only participants will be considered in the price calculation.");
 $GLOBALS['TL_LANG'][$str]['hideReservationKey'] = array("Hide Reservationkey", "If enabled, the reservation key will not be visible in the frontend.");
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Restrict zip codes", "Here you can enable that reservations are only possible via certain zip codes (comma separated list).");
+$GLOBALS['TL_LANG'][$str]['documentTemplate'] = array("Document Template", "Here you can assign the template for document generation.");
+$GLOBALS['TL_LANG'][$str]['checkInPage'] = array("Link to the check-in page", "The link will be generated in the QR code.");
 
 $GLOBALS['TL_LANG'][$str]['typeWithEmptyOption'] = array('Make reservation type selection', 'If this switch is set, the reservation type is not preset and must be selected.');
 
@@ -66,6 +68,8 @@ $GLOBALS['TL_LANG'][$str]['type_legend'] = "Reservation type settings";
 $GLOBALS['TL_LANG'][$str]['object_legend'] = "Time selection settings";
 $GLOBALS['TL_LANG'][$str]['form_legend'] = "Form settings";
 $GLOBALS['TL_LANG'][$str]['notification_legend'] = 'Notification Center';
+$GLOBALS['TL_LANG'][$str]['document_legend'] = "Document generator";
+$GLOBALS['TL_LANG'][$str]['checkin_legend'] = "CheckIn options";
 $GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Redirection';
 $GLOBALS['TL_LANG'][$str]['expert_legend'] = 'Expert settings';
 

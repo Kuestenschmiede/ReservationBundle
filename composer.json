@@ -49,10 +49,7 @@
         }
     },
     "extra": {
-        "contao-manager-plugin": "con4gis\\ReservationBundle\\ContaoManager\\Plugin",
-        "branch-alias": {
-            "dev-main": "4.0.x-dev"
-        }
+        "contao-manager-plugin": "con4gis\\ReservationBundle\\ContaoManager\\Plugin"
     },
     "scripts": {
         "all": [

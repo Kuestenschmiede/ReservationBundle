@@ -210,6 +210,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",0,true);");
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id']);
+            $reservationBeginDateField->setPrintable($this->module->isWithDefaultPDFContent());
 
             $this->fieldList[] = $reservationBeginDateField;
         }
@@ -270,6 +271,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setTimeButtonSpecial(true);
         $reservationBeginTimeField->setWithoutScripts(true);
         $reservationBeginTimeField->setShowIfEmpty(true);
+        $reservationBeginTimeField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationBeginTimeField;
 
         //save endDate
@@ -280,6 +282,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationEndDateDBField->setFormField(false);
         $reservationEndDateDBField->setMax(9999999999999);
         $reservationEndDateDBField->setNotificationField(true);
+        $reservationEndDateDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationEndDateDBField;
 
         //save endTime
@@ -290,6 +293,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationEndTimeDBField->setFormField(false);
         $reservationEndTimeDBField->setMax(9999999999999);
         $reservationEndTimeDBField->setNotificationField(true);
+        $reservationEndTimeDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationEndTimeDBField;
 
         $reservationObjectField = new C4GSelectField();
@@ -314,6 +318,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationObjectField->setCallOnChange(true);
         $reservationObjectField->setAdditionalID($listType["id"]);
         $reservationObjectField->setHidden($reservationSettings->objectHide);
+        $reservationObjectField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationObjectField;
 
         if ($reservationSettings->showDetails) {
