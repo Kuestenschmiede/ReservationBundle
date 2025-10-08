@@ -2,7 +2,9 @@
 
 namespace con4gis\ReservationBundle\Classes\Utils;
 
+use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\ProjectsBundle\Classes\QRCode\LinkToQRCode;
+use Contao\PageModel;
 
 class C4gReservationCheckInHelper
 {
@@ -35,7 +37,12 @@ class C4gReservationCheckInHelper
 
         $checkInPage = $this->checkInPage;
         if ($checkInPage) {
-            $checkInUrl = '/'; //ToDo get CheckIn Page
+            $checkInUrl = '/';
+            $jumpTo = PageModel::findByPk($checkInPage);
+
+            if ($jumpTo) {
+                $checkInUrl = C4GUtils::replaceInsertTags("{{env::url}}").$jumpTo->getFrontendUrl();
+            }
 
             $content  = $checkInUrl.'?checkIn='.$key;
             $linkArr = $this->generateQRCode($content, $fileName);

@@ -17,4 +17,5 @@ class C4gReservationBrickTypes
     const BRICK_RESERVATION_SPEAKER = 'brick_speaker';
     const BRICK_RESERVATION_LOCATION = 'brick_location';
     const BRICK_RESERVATION_OBJECTS = 'brick_reservation_objects';
+    const BRICK_RESERVATION_CHECKIN = 'brick_reservation_checkin';
 }
