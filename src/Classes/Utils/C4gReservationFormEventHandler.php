@@ -298,6 +298,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $reservationLocationField->setWithoutValidation(true);
                     $reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-location');
                     $reservationLocationField->setPrintable($this->module->isWithDefaultPDFContent());
+                    $reservationLocationField->setHidden($reservationSettings->hideLocation);
                     $this->fieldList[] = $reservationLocationField;
                 }
             }
@@ -346,6 +347,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $organizerField->setNotificationField(true);
                     $organizerField->setWithoutValidation(true);
                     $organizerField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-organizer');
+                    $organizerField->setHidden($reservationSettings->hideOrganizer);
                     $this->fieldList[] = $organizerField;
                 }
             }

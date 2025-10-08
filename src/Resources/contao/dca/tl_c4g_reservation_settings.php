@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
         'default'   =>  '{settings_legend}, caption;'.
                         '{form_legend:hide}, withCapacity, fieldSelection, privacy_policy_text, privacy_policy_site, reservationButtonCaption, showDetails, showPrices, showPricesWithTaxes, showEndTime, showInlineDatepicker, removeBookedDays,showArrivalAndDeparture;'.
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
-                        '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, hideReservationKey, typeWithEmptyOption;'.
+                        '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, hideReservationKey, hideOrganizer, hideLocation, typeWithEmptyOption;'.
                         '{notification_legend:hide}, notification_type;'.
                         '{document_legend:hide}, documentTemplate;'.
                         '{checkin_legend:hide}, checkInPage;'.
@@ -241,6 +241,20 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
         ),
         'hideReservationKey' => array
         (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['hideReservationKey'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
+        'hideOrganizer' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['hideOrganizer'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
+        'hideLocation' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['hideLocation'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
