@@ -303,7 +303,7 @@ class C4gReservationCalculator
      * @return int|array
      */
     public static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '', $calcTaxes) {
-        $price = intval($object['price']) ?? 0;
+        $price = floatval($object['price']) ?? 0;
         $priceSum = 0;
         $priceInfo = '';
         $countPersons = intval($countPersons);
@@ -348,7 +348,7 @@ class C4gReservationCalculator
                                 '';
                         }
                     }
-                    $priceSum = intval($price * $minutes);
+                    $priceSum = floatval($price * $minutes);
                     $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pMin'];
                     break;
                 case 'pHour':
@@ -377,7 +377,7 @@ class C4gReservationCalculator
                                 '';
                         }
                     }
-                    $priceSum = intval($price * $hours);
+                    $priceSum = floatval($price * $hours);
                     $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pHour'];
                     break;
                 case 'pNight':
@@ -388,7 +388,7 @@ class C4gReservationCalculator
                     } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
                         $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
                     }
-                    $priceSum = intval($price * $days);
+                    $priceSum = floatval($price * $days);
                     $priceInfo = ($type['periodType'] === 'day') ? $GLOBALS['TL_LANG']['fe_c4g_reservation']['pDay'] : $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNight'];
                     break;
                 case 'pNightPerson':
@@ -398,7 +398,7 @@ class C4gReservationCalculator
                     } else if (!$days && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
                         $days = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24));
                     }
-                    $priceSum = intval($price * $days * $countPersons);
+                    $priceSum = floatval($price * $days * $countPersons);
                     $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pNightPerson'];
                     break;
                 case 'pWeek':
@@ -408,16 +408,16 @@ class C4gReservationCalculator
                     } else if (!$weeks && !$isEvent && key_exists('beginDate', $object) && $object['beginDate'] && key_exists('endDate', $object) && $object['endDate']) {
                         $weeks = round(abs($object['endDate'] - $object['beginDate']) / (60 * 60 * 24 * 7));
                     }
-                    $priceSum = intval($price * $weeks);
+                    $priceSum = floatval($price * $weeks);
                     $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pWeek'];
                     break;
                 case 'pReservation':
-                    $price = intval($price);
+                    $price = floatval($price);
                     $priceSum = $price;
                     $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pEvent'];
                     break;
                 case 'pPerson':
-                    $priceSum = intval($price * $countPersons);
+                    $priceSum = floatval($price * $countPersons);
                     $priceInfo = $GLOBALS['TL_LANG']['fe_c4g_reservation']['pPerson'];
                     break;
 

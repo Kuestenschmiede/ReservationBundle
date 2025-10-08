@@ -1906,6 +1906,15 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
+        $priceDBField->setFieldName('priceDiscount');
+        $priceDBField->setDatabaseField(false);
+        $priceDBField->setFormField(false);
+        $priceDBField->setMax(100);
+        $priceDBField->setNotificationField(true);
+        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $priceDBField;
+
+        $priceDBField = new C4GTextField();
         $priceDBField->setFieldName('reservationTaxRate');
         $priceDBField->setDatabaseField(false);
         $priceDBField->setFormField(false);
@@ -2954,6 +2963,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $desiredCapacity = $reservationEventObject->minParticipants;
             $resObject = $reservationEventObject;
             $price = $reservationEventObject->price ?? 0;
+            $discountCode = $reservationEventObject->discountCode ?? '';
+            if (trim($discountCode) == trim($putVars['discountCode'])) {
+                $putVars['discountPercent'] = $reservationEventObject->discountPercent ?? 0;
+            }
         } else {
             $price = $reservationObject->price;
             $resObject = $reservationObject;
@@ -2980,11 +2993,20 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $priceOptionSum = false;
             $priceParticipantOptionSum = false;
 
+            //ToDo calculation with all types and with netto switch (rework calc prices)
+            if ($putVars['discountPercent']) {
+                if ($objArray['price']) {
+                    $discount = (floatval($objArray['price']) / 100) * $putVars['discountPercent'];
+                    $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount) . $priceArray['priceInfo'];
+                    $objArray['price'] = floatval($objArray['price']) - $discount;
+                }
+            }
+
             // Reservation price
-            if ($showPrices) {
+            //if ($showPrices) {
                 $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, $isEvent, $desiredCapacity, $duration, '', '', $calcTaxes);
                 $priceSum = $priceArray['priceSum'] ?: $priceArray['price'];
-            }
+            //}
 
             // All reservation options
             $includedParams = $reservationType->included_params ?: false;
@@ -3017,6 +3039,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             } else {
                 $putVars['priceSum'] = C4gReservationHandler::formatPrice($price) . $priceArray['priceInfo'];
             }
+
 //                $putVars['optionsPriceSum'] = C4gReservationHandler::formatPrice($putVars['optionsPriceSum']);
             $putVars['priceOptionSum'] = C4gReservationHandler::formatPrice($optionsPriceSum);
 

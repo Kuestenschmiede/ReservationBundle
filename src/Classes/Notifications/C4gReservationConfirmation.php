@@ -290,9 +290,7 @@ class C4gReservationConfirmation
                             ($reservation['discountCode'] == $eventObject['discountCode'])) {
                             $c4gNotify->setTokenValue('discountPercent', $eventObject['discountPercent']);
                             $c4gNotify->setTokenValue('discountCode', $reservation['discountCode']);
-
-                            $dicountValue = $reservationObject['price'] && $reservation['discountPercent'] ? C4gReservationHandler::formatPrice($reservationObject['price'] * ($reservation['discountPercent'] / 100)) : '';
-                            $c4gNotify->setTokenValue('discountValue', $dicountValue);
+                            $c4gNotify->setTokenValue('priceDiscount', $reservation['priceDiscount'] ? $reservation['priceDiscount'] : '');
                         }
 
                         if ($reservationObject && $reservationObject['priceSumTax']) {
@@ -334,7 +332,8 @@ class C4gReservationConfirmation
                                 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment', 'location', 'contact_name',
                                 'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'agreed',
                                 'description', 'additional1', 'additional2', 'additional3','member_email',
-                                'price','priceTax','priceSum','priceSumTax','priceNet','priceSumNet', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax', 'reservationTaxRate', 'dbkey'
+                                'price','priceTax','priceSum','priceSumTax','priceNet','priceSumNet', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax',
+                                'priceDiscount', 'doscuntCode', 'discountPercent', 'reservationTaxRate', 'dbkey'
                             ]
                         );
 
