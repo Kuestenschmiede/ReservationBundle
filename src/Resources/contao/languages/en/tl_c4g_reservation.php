@@ -64,6 +64,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone2'] = array("Phone number (2)", 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['address2'] = array("Street (2)", "Street");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'] = array("Postal code (2)", "Postcode");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'] = array("City (2)", "Town");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['creditInstitute'] = array("Credit institute", "Name of the credit institute");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['iban'] = array("IBAN", "Account IBAN");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['bic'] = array("BIC", "Account BIC/SWIFT");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional1'] = array("Additional field 1", "Additional information");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional2'] = array("Additional field 2", "Additional information");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional3'] = array("Additional field 3", "Additional information");
@@ -105,6 +108,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional_legend']   = "Additional i
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment_legend']      = "Attachments";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['notification_legend'] = "Confirmation to the booker";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['state_legend']        = "State";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['account_legend'] = "Account data";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['new'] = array("Add reservation", "Add reservation");

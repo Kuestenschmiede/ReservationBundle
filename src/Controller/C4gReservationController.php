@@ -1028,6 +1028,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $emailField->setInitialValue($initialValue ? $initialValue : $memberArr['email']);
                 $emailField->setStyleClass($additionalClass);
                 $emailField->setPrintable($rowPrintable);
+                $emailField->setPattern(C4GBrickRegEx::EMAIL);
                 $fieldList[] = $emailField;
             } else if ($rowField == "phone") {
                 $phoneField = new C4GTelField();
@@ -1042,6 +1043,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $phoneField->setInitialValue($initialValue ? $initialValue : $memberArr['phone']);
                 $phoneField->setStyleClass($additionalClass);
                 $phoneField->setPrintable($rowPrintable);
+                $phoneField->setPattern(C4GBrickRegEx::PHONE);
                 $fieldList[] = $phoneField;
             } else if ($rowField == "address") {
                 $addressField = new C4GTextField();
@@ -1071,6 +1073,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $postalField->setInitialValue($initialValue ? $initialValue : $memberArr['postal']);
                 $postalField->setStyleClass($additionalClass);
                 $postalField->setPrintable($rowPrintable);
+                $postalField->setPattern(C4GBrickRegEx::POSTAL);
                 $fieldList[] = $postalField;
             } else if ($rowField == "city") {
                 $cityField = new C4GTextField();
@@ -1175,6 +1178,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $emailField2->setInitialValue($initialValue);
                 $emailField2->setStyleClass($additionalClass);
                 $emailField2->setPrintable($rowPrintable);
+                $emailField2->setPattern(C4GBrickRegEx::EMAIL);
                 $fieldList[] = $emailField2;
             } else if ($rowField == "organisation2") {
                 $organisationField2 = new C4GTextField();
@@ -1203,6 +1207,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $phoneField2->setInitialValue($initialValue);
                 $phoneField2->setStyleClass($additionalClass);
                 $phoneField2->setPrintable($rowPrintable);
+                $phoneField2->setPattern(C4GBrickRegEx::PHONE);
                 $fieldList[] = $phoneField2;
             } else if ($rowField == "address2") {
                 $addressField2 = new C4GTextField();
@@ -1232,6 +1237,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $postalField2->setInitialValue($initialValue);
                 $postalField2->setStyleClass($additionalClass);
                 $postalField2->setPrintable($rowPrintable);
+                $postalField2->setPattern(C4GBrickRegEx::POSTAL);
                 $fieldList[] = $postalField2;
             } else if ($rowField == "city2") {
                 $cityField2 = new C4GTextField();
@@ -1247,6 +1253,50 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $cityField2->setStyleClass($additionalClass);
                 $cityField2->setPrintable($rowPrintable);
                 $fieldList[] = $cityField2;
+            } else if ($rowField == "creditInstitute") {
+                $creditInstituteField = new C4GTextField();
+                $creditInstituteField->setFieldName('creditInstitute');
+                $creditInstituteField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['creditInstitute']);
+                $creditInstituteField->setColumnWidth(60);
+                $creditInstituteField->setSortColumn(false);
+                $creditInstituteField->setTableColumn(false);
+                $creditInstituteField->setMandatory($rowMandatory);
+                $creditInstituteField->setNotificationField(true);
+                $creditInstituteField->setStyleClass('credit-institute');
+                $creditInstituteField->setInitialValue($initialValue);
+                $creditInstituteField->setStyleClass($additionalClass);
+                $creditInstituteField->setPrintable($rowPrintable);
+                $fieldList[] = $creditInstituteField;
+            } else if ($rowField == "iban") {
+                $ibanField = new C4GTextField();
+                $ibanField->setFieldName('iban');
+                $ibanField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['iban']);
+                $ibanField->setColumnWidth(60);
+                $ibanField->setSortColumn(false);
+                $ibanField->setTableColumn(false);
+                $ibanField->setMandatory($rowMandatory);
+                $ibanField->setNotificationField(true);
+                $ibanField->setStyleClass('iban');
+                $ibanField->setInitialValue($initialValue);
+                $ibanField->setStyleClass($additionalClass);
+                $ibanField->setPrintable($rowPrintable);
+                $ibanField->setPattern(C4GBrickRegEx::IBAN);
+                $fieldList[] = $ibanField;
+            } else if ($rowField == "bic") {
+                $bicField = new C4GTextField();
+                $bicField->setFieldName('bic');
+                $bicField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['bic']);
+                $bicField->setColumnWidth(60);
+                $bicField->setSortColumn(false);
+                $bicField->setTableColumn(false);
+                $bicField->setMandatory($rowMandatory);
+                $bicField->setNotificationField(true);
+                $bicField->setStyleClass('bic');
+                $bicField->setInitialValue($initialValue);
+                $bicField->setStyleClass($additionalClass);
+                $bicField->setPrintable($rowPrintable);
+                $bicField->setPattern(C4GBrickRegEx::BIC);
+                $fieldList[] = $bicField;
             } else if ($rowField == "discountCode") {
                 $discountCodeField = new C4GTextField();
                 $discountCodeField->setFieldName('discountCode');

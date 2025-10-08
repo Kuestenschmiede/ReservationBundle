@@ -132,7 +132,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     'palettes' => array
     (
         '__selector__' => ['reservationObjectType'],
-        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id, discountCode; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {additional_legend:hide}, additional1, additional2, additional3; {comment_legend}, comment, fileUpload; {notification_legend}, confirmed, internal_comment, specialNotification, emailConfirmationSend; {state_legend}, payed, checkedIn, cancellation, agreed, member_id, group_id, tstamp, bookedAt;',
+        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id, discountCode; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {account_legend:hide}, creditInstitute, iban, bic;{additional_legend:hide}, additional1, additional2, additional3; {comment_legend}, comment, fileUpload; {notification_legend}, confirmed, internal_comment, specialNotification, emailConfirmationSend; {state_legend}, payed, checkedIn, cancellation, agreed, member_id, group_id, tstamp, bookedAt;',
     ),
 
     // Subpalettes
@@ -641,6 +641,37 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'eval'                    => ['preserve_tags'=>true, 'style'=>'width: calc(100% - 50px); max-height: 480px'],
             'sql'                     => "text NULL"
         ),
+
+        'creditInstitute' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['creditInstitute'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'decodeEntities'=>true, 'tl_class'=>'long'),
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
+        'iban' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['iban'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'decodeEntities'=>true, 'tl_class'=>'long'),
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
+        'bic' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['bic'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'decodeEntities'=>true, 'tl_class'=>'long'),
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
 
         'payed' => array(
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['payed'],

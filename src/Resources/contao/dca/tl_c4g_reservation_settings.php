@@ -521,7 +521,9 @@ class tl_c4g_reservation_settings extends Backend
         $columnsFormatted['postal2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'][0];
         $columnsFormatted['city2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'][0];
         $columnsFormatted['discountCode'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['discountCode'][0];
-        //$columnsFormatted['qrCode'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['qrCode'][0];
+        $columnsFormatted['creditInstitute'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['creditInstitute'][0];
+        $columnsFormatted['iban'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['iban'][0];
+        $columnsFormatted['bic'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['bic'][0];
         $columnsFormatted['additional1'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional1'][0];
         $columnsFormatted['additional2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional2'][0];
         $columnsFormatted['additional3'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional3'][0];

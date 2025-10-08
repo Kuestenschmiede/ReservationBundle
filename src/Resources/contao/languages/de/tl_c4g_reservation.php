@@ -62,6 +62,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone2'] = array("Telefonnummer (2)",
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['address2'] = array("Straße (2)", "Straße");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'] = array("Postleitzahl (2)", "Postleitzahl");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'] = array("Ort (2)", "Ort");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['creditInstitute'] = array("Kreditinstitut", "Name der Bank");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['iban'] = array("IBAN", "IBAN des Lastschrift Kontos");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['bic'] = array("BIC", "BIC/SWIFT des Lastschrift Kontos");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional1'] = array("Zusatzfeld 1", "Zusatzinformation");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional2'] = array("Zusatzfeld 2", "Zusatzinformation");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional3'] = array("Zusatzfeld 3", "Zusatzinformation");
@@ -103,6 +106,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional_legend']  = "Zusatzinforma
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment_legend']     = "Anlagen";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['notification_legend'] = "Bestätigung an den Buchenden";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['state_legend']       = "Status";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['account_legend'] = "Kontoangaben";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['new'] = array("Reservierung hinzufügen","Reservierung hinzufügen");
