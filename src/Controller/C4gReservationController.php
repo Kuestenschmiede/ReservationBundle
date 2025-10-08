@@ -2579,7 +2579,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
             //just notification
             $factor = 1;
-            $countPersons = isset($putVars['desiredCapacity_' . $type]) ? intval($putVars['desiredCapacity_' . $type]) : null;
+            $countPersons = isset($putVars['desiredCapacity_' . $type]) ? intval($putVars['desiredCapacity_' . $type]) : null; //ToDo
             $settings = $this->reservationSettings;
 
             self::allPrices($settings, $putVars, $reservationObject, '', $reservationType, $isEvent, $countPersons);
@@ -2683,7 +2683,17 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         foreach ($putVars as $key => $value) {
             if ($this->reservationSettings->specialParticipantMechanism) {
                 //ToDo check without desired capacity field -> default 1
-                $desiredCapacity = isset($putVars['desiredCapacity_'.$reservationType->id]) ? $putVars['desiredCapacity_'.$reservationType->id] : null;
+                //Max participant per booking
+                $maxParticipants = null;
+                if (property_exists($reservationObject, 'maxParticipantsPerEventBooking') && $reservationObject->maxParticipantsPerEventBooking) {
+                    $maxParticipants = $reservationObject->maxParticipantsPerEventBooking;
+                } else if ($reservationType->maxParticipantsPerBooking){
+                    $maxParticipants = $reservationType->maxParticipantsPerBooking;
+                }
+
+                //ToDo doesn't work without special participant mechanism
+
+                $desiredCapacity = isset($putVars['desiredCapacity_'.$reservationType->id]) ? $putVars['desiredCapacity_'.$reservationType->id] : null; //ToDo $maxParticipants
                 if ($desiredCapacity) {
                     $extId = $this->reservationSettings->onlyParticipants ? $desiredCapacity : $desiredCapacity-1;
                     if (strpos($key,"participants_".$type."-".$extId."§") !== false) {
@@ -3130,9 +3140,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         return $title;
     }
 
-    public function isWithDefaultPDFContent(): bool
-    {
+    public function isWithDefaultPDFContent(): bool {
         return $this->withDefaultPDFContent;
+    }
+
+    public function afterSaveAction($changes, $insertId)
+    {
+       C4gReservationCheckInHelper::removeQRCodeFile();
     }
 }
 

@@ -33,7 +33,12 @@ class C4gReservationCheckInHelper
     public function generateBeforeSaving($params)
     {
         $key = $params['reservation_id'];
-        $fileName = 'files/c4g_brick_data/qrcode/qrcode_' . $key . '.png';
+        $path = 'files/c4g_brick_data/qrcode/';
+        $rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
+        if (!is_dir($rootDir.'/'.$path)) {
+            mkdir($rootDir.'/'.$path);
+        }
+        $fileName = $path.'qrcode_' . $key . '.png';
 
         $checkInPage = $this->checkInPage;
         if ($checkInPage) {
@@ -55,4 +60,19 @@ class C4gReservationCheckInHelper
         return $params;
     }
 
+    public static function removeQRCodeFile() {
+        $rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
+        $path = $rootDir.'/files/c4g_brick_data/qrcode';
+
+        if (is_dir($path)) {
+            $files = array_diff(scandir($path), array('.','..'));
+
+            foreach ($files as $file) {
+                $file_path = "$path/$file";
+                unlink($file_path);
+            }
+
+            rmdir($path);
+        }
+    }
 }
