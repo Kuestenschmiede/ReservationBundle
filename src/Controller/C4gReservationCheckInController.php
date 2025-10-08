@@ -146,8 +146,8 @@ class C4gReservationCheckInController extends C4GBaseController
                         if ($checkedIn) {
                             $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_checkin']['reservation_checkin_exists'];
                         } else {
-                            $stmt = $database->prepare("UPDATE `tl_c4g_reservation` SET checkedIn = ? WHERE reservation_id = ?");
-                            $stmt->execute('1', $reservationKey);
+                            $stmt = $database->prepare("UPDATE `tl_c4g_reservation` SET tstamp = ?, checkedIn = ? WHERE reservation_id = ?");
+                            $stmt->execute(time(), '1', $reservationKey);
 
                             $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_checkin']['reservation_checkin_okay'];
                         }

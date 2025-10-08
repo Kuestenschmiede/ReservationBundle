@@ -125,7 +125,8 @@
                 $arrRow['reservation_type'],
                 $arrRow['lastname'],
                 $arrRow['firstname'],
-                $arrRow['reservation_object']
+                $arrRow['reservation_object'],
+                $arrRow['checkedIn'] ? 'ja' : 'nein'
             ];
             return $result;
         }
@@ -206,7 +207,7 @@
             $id = Input::get('id');
             
             $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-                ['beginDate','endDate','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object'];
+                ['beginDate','endDate','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object','checkedIn'];
 
             if ($id && $do && ($do == 'calendar')) {
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['default'] = '2';
