@@ -1597,6 +1597,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                             $reservationParticipants->setShowFirstDataSet(true);
                             $reservationParticipants->setParentFieldList($fieldList);
                             $reservationParticipants->setDelimiter('§');
+                            $reservationParticipants->setWildcard('³'); //ToDo Test
                             $reservationParticipants->setCondition(array($condition));
                             $reservationParticipants->setRemoveWithEmptyCondition(true);
                             $reservationParticipants->setAdditionalID($listType['id']);
@@ -1638,7 +1639,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                     }
                                 }
                             } else {
-                                $maxCapacity = $maxCapacity ?: 1;
+                                //ToDo check without desired Capacity.
+                                $maxCapacity = $maxCapacity ?: 0; //ToDo check instead of 1
 
                                 $reservationParticipants = new C4GSubDialogField();
                                 $reservationParticipants->setFieldName('participants');
@@ -2680,6 +2682,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $participantsArr = [];
         foreach ($putVars as $key => $value) {
             if ($this->reservationSettings->specialParticipantMechanism) {
+                //ToDo check without desired capacity field -> default 1
                 $desiredCapacity = isset($putVars['desiredCapacity_'.$reservationType->id]) ? $putVars['desiredCapacity_'.$reservationType->id] : null;
                 if ($desiredCapacity) {
                     $extId = $this->reservationSettings->onlyParticipants ? $desiredCapacity : $desiredCapacity-1;
@@ -2714,6 +2717,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     }
                 }
 
+                //ToDo check code position
+                //ToDo check without desired capacity field
                 foreach ($putVars as $key => $value) {
                     $desiredCapacity = isset($putVars['desiredCapacity_'.$reservationType->id]) ? $putVars['desiredCapacity_'.$reservationType->id] : null;
                     if ($desiredCapacity) {

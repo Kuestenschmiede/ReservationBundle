@@ -40,11 +40,16 @@
     Ort: <?php echo $this->fieldData['location_2-221']; ?><br><br>
 
     Teilnehmerliste:<br>
+    <?php echo $this->fieldData['participantList']; ?>
 
     <br><br>
     Ihr Rechnungsbetrag: <?php echo $this->fieldData['priceSum']; ?><br>
     Beinhaltet Mehrwertsteuer in Höhe von: <?php echo $this->fieldData['priceTax']; ?><br>
-    <?php echo "Im Preis ist ein Rabatt von ".  $this->fieldData['priceDiscount']. " enthalten."; ?>
+    <?php
+        if ($this->fieldData['priceDiscount']) {
+            echo "Im Preis ist ein Rabatt von ".  $this->fieldData['priceDiscount']. " enthalten.";
+        }
+    ?>
     <br><br>
     Bitte überweisen Sie den Betrag (ohne Abzug) innerhalb von einer Woche auf unser Konto:<br>
     Bankname<br>
