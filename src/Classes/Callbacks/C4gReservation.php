@@ -118,6 +118,11 @@
                 $arrRow['reservation_type'] = $type->caption;
             }
 
+            $checkedInYes = 'Ja';
+            if ($arrRow['checkedIn'] && $arrRow['checkedIn'] > 1) {
+                $checkedInYes = 'Ja ('.$arrRow['checkedIn'].')';
+            }
+
             $result = [
                 $arrRow['beginDate'],
                 $arrRow['endDate'],
@@ -126,7 +131,7 @@
                 $arrRow['lastname'],
                 $arrRow['firstname'],
                 $arrRow['reservation_object'],
-                $arrRow['checkedIn'] ? 'ja ('.$arrRow['checkedIn'].')' : 'nein'
+                $arrRow['checkedIn'] ? $checkedInYes : 'nein'
             ];
             return $result;
         }

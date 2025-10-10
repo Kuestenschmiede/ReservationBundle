@@ -27,7 +27,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['city'] = array("Or
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['comment'] = array("Anmerkung zum Teilnehmer", "Kommentarfeld zur Reservierung.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['reservation_participant_option'] = array("Teilnehmeroptionen", "Ausgewählte Teilnehmerleistungen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['cancellation'] = array("Storniert", "Wenn ein Teilnehmern den Termin storniert hat, ist dieses Feld anzuwählen");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['payed'] = array("Reservierung wurde bezahlt.","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['payed'] = array("Bezahlt?","");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['checkedIn'] = array("Eingecheckt?","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['agreed'] = array("Datenschutzerklärung", "Wird vom Nutzer im Frontend ausgewählt.");
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional1'] = 'Zusatzfeld 1';

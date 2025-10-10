@@ -272,7 +272,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'filter'            => true,
             'inputType'         => 'checkbox',
             'eval'              => array('tl_class'=>'w50'),
-            'save_callback'     => array(array($cbClass,'generateUuid')),
+           // 'save_callback'     => array(array($cbClass,'generateUuid')),
             'sql'               => "char(1) NOT NULL default ''"
         )
     )

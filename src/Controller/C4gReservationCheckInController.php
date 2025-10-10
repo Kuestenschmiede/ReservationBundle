@@ -145,12 +145,12 @@ class C4gReservationCheckInController extends C4GBaseController
                 if ($count == 1) {
                     $reservation = $reservations[0];
                     if ($reservation) {
-                        $checkedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? $reservation['checkedIn'] && (intval($reservation['checkedIn']) >= $reservation['desiredCapacity']): $reservation['checkedIn'];
+                        $checkedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? $reservation['checkedIn'] && ($reservation['checkedIn'] >= $reservation['desiredCapacity']): $reservation['checkedIn'];
                         if ($checkedIn) {
                             $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_checkin']['reservation_checkin_exists'];
                         } else {
                             $persons = intval($reservation['checkedIn']) +1;
-                            $checkedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? strval($persons) : '1';
+                            $checkedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? $persons : 1;
                                 $stmt = $database->prepare("UPDATE `tl_c4g_reservation` SET tstamp = ?, checkedIn = ? WHERE reservation_id = ?");
                             $stmt->execute(time(), $checkedIn, $reservationKey);
 

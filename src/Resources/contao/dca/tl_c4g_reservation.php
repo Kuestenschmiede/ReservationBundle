@@ -688,7 +688,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'filter'            => true,
             'inputType'         => 'text',
             'eval'              => array('tl_class'=>'long clr', 'regex'=>'digit', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false),
-            'sql'               => "INT UNSIGNED NULL"
+            'sql'               =>  "int(10) unsigned NOT NULL default '0'"
         ),
 
         'cancellation' => array(
