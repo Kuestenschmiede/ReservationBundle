@@ -19,16 +19,16 @@ use con4gis\ReservationBundle\Controller\C4gReservationAddressListController;
 use con4gis\ReservationBundle\Controller\C4gReservationCheckInController;
 
 $GLOBALS['TL_LANG']['MOD']['Reservation'] = array('con4gis Reservation', 'www.con4gis.org');
-$GLOBALS['TL_LANG']['MOD']['C4gReservation'] = array('Reservierungen', 'Auflistung bereits erfolgter Reservierungen');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationObject'] = array('Reservierungsobjekte', 'Definition der buchbaren Objekte (z.B. Tische, Räume, Seminare).');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationLocation'] = array('Veranstalter und Orte', 'Veranstalter und Veranstaltungsorte erfassen.');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservierungsarten', 'Definition der Reservierungsarten (z.B. Tischreservierung, Raumreservierung)');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationParams'] = array('Optionen (Leistungen)', 'Erfassung verschiedener Buchungsoptionen (optional).');
+$GLOBALS['TL_LANG']['MOD']['C4gReservation'] = array('Reservierung', 'Auflistung bereits erfolgter Reservierungen');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationObject'] = array('Reservierungsobjekt', 'Definition der buchbaren Objekte (z.B. Tische, Räume, Seminare).');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationLocation'] = array('Veranstalter-/Ort', 'Veranstalter und Veranstaltungsorte erfassen.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservierungsart', 'Definition der Reservierungsarten (z.B. Tischreservierung, Raumreservierung)');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationParams'] = array('Option/Leistung', 'Erfassung verschiedener Buchungsoptionen (optional).');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEvent']  = array('Event <=> Reservierung', 'Hier können Veranstaltungen und Reservierungen verknüpft werden.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventAudience'] = array('Zielpublikum', 'Hier können Sie Zielgruppen hinterlegen.');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Referent*innen', 'Hier können Sie die Referenten pflegen.');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Themen (Schwerpunkte)', 'Hier können Sie bspw. die Seminarthemen hinterlegen.');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Reservierungsformular', 'Hier können Sie das Formular konfigurieren und im Modul verknüpfen.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Referent*in', 'Hier können Sie die Referenten pflegen.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Thema/Schwerpunkt', 'Hier können Sie bspw. die Seminarthemen hinterlegen.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Formulareinstellung', 'Hier können Sie das Formular konfigurieren und im Modul verknüpfen.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationCheckIn'] = array('Ticket CheckIn', 'Einfaches Modul zum einchecken der Gäste.');
 
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Formular', 'Reservierungsformular');
