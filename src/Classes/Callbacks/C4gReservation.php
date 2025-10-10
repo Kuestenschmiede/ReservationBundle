@@ -126,7 +126,7 @@
                 $arrRow['lastname'],
                 $arrRow['firstname'],
                 $arrRow['reservation_object'],
-                $arrRow['checkedIn'] ? 'ja' : 'nein'
+                $arrRow['checkedIn'] ? 'ja ('.$arrRow['checkedIn'].')' : 'nein'
             ];
             return $result;
         }

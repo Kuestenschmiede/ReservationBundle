@@ -3091,7 +3091,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $onlyParticipants = $settings->onlyParticipants ?: false;
 
             if ($participantParams) {
-                $priceParticipantOptionSum = C4gReservationCalculator::calcParticipantOptionPrices(intval($desiredCapacity), $putVars, $objArray, $typeArray, $calcTaxes, $onlyParticipants, $reservationSettings->specialParticipantMechanism);
+                $priceParticipantOptionSum = C4gReservationCalculator::calcParticipantOptionPrices(intval($desiredCapacity), $putVars, $objArray, $typeArray, $calcTaxes, $onlyParticipants, $settings->specialParticipantMechanism);
 
                 $optionsPriceSum = $priceOptionSum['priceOptionSum'] + $priceParticipantOptionSum['priceParticipantOptionSum'];
                 $priceSum += $priceParticipantOptionSum['priceParticipantOptionSum'];

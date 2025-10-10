@@ -21,6 +21,7 @@ use con4gis\ReservationBundle\Controller\C4gReservationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationLocationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationObjectsController;
 use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
+use con4gis\ReservationBundle\Controller\C4gReservationCheckInController;
 use Contao\Controller;
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_settings;';
@@ -36,6 +37,8 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationLocationListController
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationObjectsController::TYPE]  = '{title_legend},name,headline,type;{reservation_objects_legend}, reservation_object_types, login_redirect_site, postals, reservation_add_member_location;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationAddressListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservation_object_types, printTpl';
+
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCheckInController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_settings;';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_object_types'] = [
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_object_types'],

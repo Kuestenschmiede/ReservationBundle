@@ -99,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, hideReservationKey, hideOrganizer, hideLocation, typeWithEmptyOption;'.
                         '{notification_legend:hide}, notification_type;'.
                         '{document_legend:hide}, documentTemplate;'.
-                        '{checkin_legend:hide}, checkInPage;'.
+                        '{ticket_legend:hide}, checkInPage, paricipantCheckInWithSameCode;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
                         '{expert_legend:hide}, specialParticipantMechanism, showMinMaxWithCapacity, hideParticipantsEmail, onlyParticipants, showMemberData, postals;'
     ),
@@ -407,6 +407,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
             'sql'                     => "int(10) unsigned NOT NULL default '0'",
             'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+        ),
+        'paricipantCheckInWithSameCode' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['paricipantCheckInWithSameCode'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
         ),
         'reservationButtonCaption' => array
         (

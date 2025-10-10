@@ -57,6 +57,7 @@ $GLOBALS['TL_LANG'][$str]['hideLocation'] = array("Hide location", "The location
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Restrict zip codes", "Here you can enable that reservations are only possible via certain zip codes (comma separated list).");
 $GLOBALS['TL_LANG'][$str]['documentTemplate'] = array("Document Template", "Here you can assign the template for document generation.");
 $GLOBALS['TL_LANG'][$str]['checkInPage'] = array("Link to the check-in page", "The link will be generated in the QR code.");
+$GLOBALS['TL_LANG'][$str]['paricipantCheckInWithSameCode'] = array("Check in participants via QR code","When this feature is enabled, multiple participants can be checked in using the same QR code. Please note: It is not yet possible to generate different QR codes for participants, i.e., multiple tickets.");
 
 $GLOBALS['TL_LANG'][$str]['typeWithEmptyOption'] = array('Make reservation type selection', 'If this switch is set, the reservation type is not preset and must be selected.');
 
@@ -71,7 +72,7 @@ $GLOBALS['TL_LANG'][$str]['object_legend'] = "Time selection settings";
 $GLOBALS['TL_LANG'][$str]['form_legend'] = "Form settings";
 $GLOBALS['TL_LANG'][$str]['notification_legend'] = 'Notification Center';
 $GLOBALS['TL_LANG'][$str]['document_legend'] = "Document generator";
-$GLOBALS['TL_LANG'][$str]['checkin_legend'] = "CheckIn options";
+$GLOBALS['TL_LANG'][$str]['ticket_legend'] = "Ticketing";
 $GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Redirection';
 $GLOBALS['TL_LANG'][$str]['expert_legend'] = 'Expert settings';
 

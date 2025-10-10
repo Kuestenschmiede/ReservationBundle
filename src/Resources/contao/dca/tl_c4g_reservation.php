@@ -686,9 +686,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['checkedIn'],
             'exclude'           => true,
             'filter'            => true,
-            'inputType'         => 'checkbox',
-            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true, 'submitOnChange'=>false),
-            'sql'               => "char(1) NOT NULL default ''"
+            'inputType'         => 'text',
+            'eval'              => array('tl_class'=>'long clr', 'regex'=>'digit', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false),
+            'sql'               => "INT UNSIGNED NULL"
         ),
 
         'cancellation' => array(
@@ -707,7 +707,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'inputType'         => 'checkbox',
             'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'disabled'=>true),
             'sql'               => "char(1) NOT NULL default ''"
-
         ),
 
         'confirmed' => array(

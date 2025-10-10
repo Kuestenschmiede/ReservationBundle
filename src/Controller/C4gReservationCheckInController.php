@@ -75,8 +75,6 @@ class C4gReservationCheckInController extends C4GBaseController
     protected $withPermissionCheck = false;
     protected $useUuidCookie = false;
 
-    protected $reservationSettings = null;
-
     /**
      * @param string $rootDir
      * @param RequestStack $requestStack
@@ -105,7 +103,7 @@ class C4gReservationCheckInController extends C4GBaseController
 
         parent::initBrickModule($id);
 
-        if (!$this->reservationSettings && $this->reservation_settings) {
+        if ($this->reservation_settings) {
             $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
         }
 
@@ -119,9 +117,14 @@ class C4gReservationCheckInController extends C4GBaseController
 
     public function addFields() : array
     {
-        if (!$this->reservationSettings && $this->reservation_settings) {
-            $this->session->setSessionValue('reservationSettings', $this->reservation_settings);
+        if ($this->reservation_settings) {
             $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
+        } else {
+            $info = new C4GInfoTextField();
+            $info->setFieldName('info');
+            $info->setEditable(false);
+            $info->setInitialValue("No settings");
+            return [$info];
         }
 
         System::loadLanguageFile('fe_c4g_reservation_checkin');
@@ -135,19 +138,21 @@ class C4gReservationCheckInController extends C4GBaseController
 
         if ($reservationKey) {
             $database = Database::getInstance();
-            $reservations = $database->prepare("SELECT checkedIn FROM `tl_c4g_reservation` WHERE `reservation_id`=? AND NOT `cancellation`=?")
+            $reservations = $database->prepare("SELECT checkedIn, desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_id`=? AND NOT `cancellation`=?")
                 ->execute(trim($reservationKey), '1')->fetchAllAssoc();
             $count = count($reservations);
             if ($count > 0) {
                 if ($count == 1) {
                     $reservation = $reservations[0];
                     if ($reservation) {
-                        $checkedIn = $reservation['checkedIn'];
+                        $checkedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? $reservation['checkedIn'] && (intval($reservation['checkedIn']) >= $reservation['desiredCapacity']): $reservation['checkedIn'];
                         if ($checkedIn) {
                             $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_checkin']['reservation_checkin_exists'];
                         } else {
-                            $stmt = $database->prepare("UPDATE `tl_c4g_reservation` SET tstamp = ?, checkedIn = ? WHERE reservation_id = ?");
-                            $stmt->execute(time(), '1', $reservationKey);
+                            $persons = intval($reservation['checkedIn']) +1;
+                            $checkedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? strval($persons) : '1';
+                                $stmt = $database->prepare("UPDATE `tl_c4g_reservation` SET tstamp = ?, checkedIn = ? WHERE reservation_id = ?");
+                            $stmt->execute(time(), $checkedIn, $reservationKey);
 
                             $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_checkin']['reservation_checkin_okay'];
                         }
