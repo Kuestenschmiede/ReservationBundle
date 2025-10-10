@@ -547,7 +547,7 @@ class C4gReservationCalculator
      * @param $onlyParticipants
      * @return array
      */
-  public static function calcParticipantOptionPrices ($desiredCapacity, $putVars, $object, $type, $calcTaxes, $onlyParticipants) {
+  public static function calcParticipantOptionPrices ($desiredCapacity, $putVars, $object, $type, $calcTaxes, $onlyParticipants, $mechanism = true) {
       $priceParticipantOptionSum = 0;
       $priceParticipantOptionSumNet = 0;
       $priceParticipantOptionSumTax = 0;
@@ -567,47 +567,72 @@ class C4gReservationCalculator
           }
 
           for ($i = 0; $i < ($counter); $i++) {
-
               foreach ($participantParamArr as $key => $value){
+                  if ($mechanism) {
+                      if ($object['participantParamsFieldType'] == 'radio') {
 
-                  if ($object['participantParamsFieldType'] == 'radio'){
+                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i];
 
-                      $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i];
+                          if ($chosenParticipantOptions === $value['id']) {
+                              $priceParticipantOptionSum += $value['price'];
+                              $chosenParticipantOptions = true;
+                          } else {
+                              $chosenParticipantOptions = false;
+                          }
 
-                      if ($chosenParticipantOptions === $value['id']){
-                          $priceParticipantOptionSum += $value['price'];
-                          $chosenParticipantOptions = true;
                       } else {
-                          $chosenParticipantOptions = false;
+                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']];
+
+                          if ($chosenParticipantOptions === 'true') {
+                              $chosenParticipantOptions = true;
+                          } else {
+                              $chosenParticipantOptions = false;
+                          }
                       }
 
+                      if ($chosenParticipantOptions) {
+                          $priceParticipantOptionSum += $value['price'];
+
+                          if ($calcTaxes) {
+                              $priceParticipantOptionSumNet += $value['priceOptionNet'];
+                              $priceParticipantOptionSumTax += $value['price'] - $value['priceOptionNet'];
+                          }
+                      }
                   } else {
+                      if ($object['participantParamsFieldType'] == 'radio') {
+                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '§participant_params§' . $i];
 
-                      $chosenParticipantOptions = $putVars['participants_' . $type['id']  . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']];
-
-                      if ($chosenParticipantOptions === 'true') {
-                          $chosenParticipantOptions = true;
+                          if ($chosenParticipantOptions === $value['id']) {
+                              $priceParticipantOptionSum += $value['price'];
+                              $chosenParticipantOptions = true;
+                          } else {
+                              $chosenParticipantOptions = false;
+                          }
                       } else {
-                          $chosenParticipantOptions = false;
+                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '§participant_params§' . $i. '|' . $value['id']];
+
+                          if ($chosenParticipantOptions === $value['id']) {
+                              $priceParticipantOptionSum += $value['price'];
+                              $chosenParticipantOptions = true;
+                          } else {
+                              $chosenParticipantOptions = false;
+                          }
                       }
-                      if ($chosenParticipantOptions){
+
+                      if ($chosenParticipantOptions) {
                           $priceParticipantOptionSum += $value['price'];
+
+                          if ($calcTaxes) {
+                              $priceParticipantOptionSumNet += $value['priceOptionNet'];
+                              $priceParticipantOptionSumTax += $value['price'] - $value['priceOptionNet'];
+                          }
                       }
-                  }
-                  //individual participant option tax
-                  if ($calcTaxes && $chosenParticipantOptions) {
-                      $priceParticipantOptionSumNet += $value['priceOptionNet'];
-                      if ($value['taxOptions'] == 'tNone') {
-                          $value['priceOptionNet'] = $value['price'];
-                      }
-                      $priceParticipantOptionSumTax += $value['price'] - $value['priceOptionNet'];
                   }
               }
           }
       }
 
       if ($calcTaxes) {
-
           return array( 'priceParticipantOptionSum' => $priceParticipantOptionSum,
                         'priceParticipantOptionSumNet' => $priceParticipantOptionSumNet,
                         'priceParticipantOptionSumTax' => $priceParticipantOptionSumTax);

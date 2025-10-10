@@ -29,22 +29,19 @@
         <?php echo $this->fieldData['postal']; ?> <?php echo $this->fieldData['city']; ?><br><br>
     </div>
 
-    <div class="pdf-headline" tyle="display: inline-block; width:100%; margin-top: 2cm;">
-        <h1 style="text-align: left; ">Rechnung Nr. <?php echo $this->fieldData['reservation_id']; ?></h1>
-        <div class="pdf-date" style="text-align: right;"><?php echo \Contao\Date::parse("d.m.Y", time()); ?></div>
+    <div class="pdf-headline" style="margin-top: 0.7cm; with: 100%; display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="text-align: left; margin: 0; padding: 0;">Rechnung Nr. <?php echo $this->fieldData['reservation_id']; ?></h1>
+        <div class="pdf-date" style="text-align: right; margin: 0; padding: 0;"><?php echo \Contao\Date::parse("d.m.Y", time()); ?></div>
     </div>
 
-    <div class="pdf-main">
+    <div class="pdf-main" style="margin-top: 0.7cm; with: 100%;">
     Veranstaltung: <?php echo $this->fieldData['reservation_title']; ?><br>
     Datum / Zeit: <?php echo $this->fieldData['beginDate']; ?> <?php echo $this->fieldData['beginTime']; ?> Uhr<br>
     Ort: <?php echo $this->fieldData['location_2-221']; ?><br><br>
-
     Teilnehmerliste:<br>
-    <?php echo $this->fieldData['participantList']; ?>
-
-    <br><br>
+    <?php echo $this->fieldData['participantList']; ?><br><br>
     Ihr Rechnungsbetrag: <?php echo $this->fieldData['priceSum']; ?><br>
-    Beinhaltet Mehrwertsteuer in Höhe von: <?php echo $this->fieldData['priceTax']; ?><br>
+    Beinhaltet Mehrwertsteuer in Höhe von: <?php echo $this->fieldData['priceSumTax']; ?><br>
     <?php
         if ($this->fieldData['priceDiscount']) {
             echo "Im Preis ist ein Rabatt von ".  $this->fieldData['priceDiscount']. " enthalten.";
@@ -58,7 +55,7 @@
     <br>
     (Computerbrief, auch ohne Unterschrift gültig)<br>
     </div>
-    <div class="pdf-footer" style="margin-top:-0.7cm">
+    <div class="pdf-footer" style="margin-top:-0.7cm; with: 100%;">
     <!-- automatic pdf content by default -->
     <?php if ($this->content): ?>
         <?php echo $this->content; ?>
