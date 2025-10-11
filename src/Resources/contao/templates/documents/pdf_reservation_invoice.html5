@@ -36,7 +36,7 @@
     </div>
 
     <div class="pdf-headline" style="margin-top: 0.7cm; with: 100%; display: flex; justify-content: space-between; align-items: center;">
-        <h1 style="text-align: left; margin: 0; padding: 0;">Rechnung Nr. <?php echo $this->fieldData['reservation_id']; ?></h1>
+        <h1 style="text-align: left; margin: 0; padding: 0;">Rechnung Nr. <?php echo $this->fieldData['documentId']; ?></h1>
         <div class="pdf-date" style="text-align: right; margin: 0; padding: 0;"><?php echo \Contao\Date::parse("d.m.Y", time()); ?></div>
     </div>
 

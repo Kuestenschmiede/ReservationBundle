@@ -57,6 +57,10 @@ $GLOBALS['TL_LANG'][$str]['hideLocation'] = array("Hide location", "The location
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Restrict zip codes", "Here you can enable that reservations are only possible via certain zip codes (comma separated list).");
 $GLOBALS['TL_LANG'][$str]['documentTemplate'] = array("Document Template", "Here you can assign the template for document generation.");
 $GLOBALS['TL_LANG'][$str]['documentStyle'] = array("EExternal CSS file","Here you can link an external CSS file to your template. Important! The file must work with DOM-PDF. Ideally, simple CSS2 instructions.");
+$GLOBALS['TL_LANG'][$str]['documentIdPrefix'] = array("ID Prefix","Specify a prefix for your document ID (e.g., invoice number).");
+$GLOBALS['TL_LANG'][$str]['documentIdSuffix'] = array("ID Suffix","Specify a suffix for your document ID (e.g., invoice number).");
+$GLOBALS['TL_LANG'][$str]['documentIdLength'] = array("ID Length","Specify a length for your document ID (e.g., invoice number).");
+$GLOBALS['TL_LANG'][$str]['documentIdNext'] = array("Next ID","Enter the next document ID (e.g., invoice number).");
 $GLOBALS['TL_LANG'][$str]['checkInPage'] = array("Link to the check-in page", "The link will be generated in the QR code.");
 $GLOBALS['TL_LANG'][$str]['paricipantCheckInWithSameCode'] = array("Check in participants via QR code","When this feature is enabled, multiple participants can be checked in using the same QR code. Please note: It is not yet possible to generate different QR codes for participants, i.e., multiple tickets.");
 

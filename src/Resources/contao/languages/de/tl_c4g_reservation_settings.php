@@ -59,7 +59,10 @@ $GLOBALS['TL_LANG'][$str]['documentTemplate'] = array("Dokumenten-Template","Hie
 $GLOBALS['TL_LANG'][$str]['documentStyle'] = array("Externe CSS Datei","Hier könnt Ihr eine externe CSS Datei für Euer Template anbinden. Wichtig! Die Datei muss mit DOM-PDF funktionieren. Idealerweise einfache CSS2 Anweisungen.");
 $GLOBALS['TL_LANG'][$str]['checkInPage'] = array("Link zur CheckIn Seite","Der Link wird in den QR-Code generiert. Achtung! Sobald eine CheckIn-Seite gesetzt ist. Wird der QR-Code generiert.");
 $GLOBALS['TL_LANG'][$str]['paricipantCheckInWithSameCode'] = array("Teilnehmer*innen über QR-Code einchecken","Wenn diese Funktion aktiv ist, können mehrere Teilnehmer*innen über den selben QR-Code eingecheckt werden. Achtung! Die Möglichkeit verschiedene QR-Codes für Teilnehmer*innen zu generieren, also mehrere Tickets zu erzeugen, gibt es noch nicht.");
-
+$GLOBALS['TL_LANG'][$str]['documentIdPrefix'] = array("ID Präfix","Geben Sie einen Präfix für Ihre Dokument-ID an (z.B. Rechnungsnummer).");
+$GLOBALS['TL_LANG'][$str]['documentIdSuffix'] = array("ID Suffix","Geben Sie einen Suffix für Ihre Dokument-ID an (z.B. Rechnungsnummer).");
+$GLOBALS['TL_LANG'][$str]['documentIdLength'] = array("ID Länge","Geben Sie eine Länge für Ihre Dokument-ID an (z.B. Rechnungsnummer).");
+$GLOBALS['TL_LANG'][$str]['documentIdNext'] = array("Nächste ID","Geben Sie die nächste Dokument-ID an (z.B. Rechnungsnummer).");
 $GLOBALS['TL_LANG'][$str]['typeWithEmptyOption'] = array('Reservierungsart Auswahl treffen', 'Wenn dieser Schalter gesetzt ist, wird die Reservierungsart nicht vorbelegt und muss ausgewählt werden.');
 
 

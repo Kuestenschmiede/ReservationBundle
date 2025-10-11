@@ -1990,6 +1990,22 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $priceDBField;
 
+        if ($this->reservationSettings->documentIdNext) {
+            $idNext = str_pad($this->reservationSettings->documentIdNext, $this->reservationSettings->documentIdLength, "0", STR_PAD_LEFT);
+            $documentId = $this->reservationSettings->documentIdPrefix.$idNext.$this->reservationSettings->documentIdSuffix;
+            $documentIdField = new C4GTextField();
+            $documentIdField->setFieldName('documentId');
+            $documentIdField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['documentId']);
+            $documentIdField->setDatabaseField(true);
+            $documentIdField->setFormField(true);
+            $documentIdField->setSortColumn(false);
+            $documentIdField->setNotificationField(true);
+            $documentIdField->setInitialValue('');
+            $documentIdField->setPrintable($this->withDefaultPDFContent);
+            $documentIdField->setHidden(true);
+            $fieldList[] = $documentIdField;
+        }
+
         if ($this->reservationSettings->checkInPage) {
             $qrContentField = new C4GTextareaField();
             $qrContentField->setFieldName('qrContent');
@@ -2876,6 +2892,14 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         if ($nextElement && $nextElement['id']) {
             $nextId = $nextElement['id'] + 1;
             $putVars['dbkey'] = $nextId;
+        }
+
+        if ($this->reservationSettings->documentIdNext) {
+            $idNext = str_pad($this->reservationSettings->documentIdNext, $this->reservationSettings->documentIdLength, "0", STR_PAD_LEFT);
+            $documentId = $this->reservationSettings->documentIdPrefix.$idNext.$this->reservationSettings->documentIdSuffix;
+            $putVars['documentId'] = $documentId;
+            $nextId = intval($this->reservationSettings->documentIdNext)+1;
+            $database->prepare("UPDATE tl_c4g_reservation_settings SET documentIdNext = ? WHERE id = ?")->execute($nextId, $this->reservationSettings->id);
         }
 
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());

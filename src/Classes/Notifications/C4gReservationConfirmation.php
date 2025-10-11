@@ -295,6 +295,10 @@ class C4gReservationConfirmation
                             $c4gNotify->setTokenValue('priceDiscount', $reservation['priceDiscount'] ? $reservation['priceDiscount'] : '');
                         }
 
+                        if ($reservationObject['documentId']) {
+                            $c4gNotify->setTokenValue('documentId', $reservation['documentId']);
+                        }
+
                         if ($reservationObject && $reservationObject['priceSumTax']) {
                             $c4gNotify->setTokenValue('priceTax', $reservation['priceTax'] ? $reservation['priceTax'] : '');
                             $c4gNotify->setTokenValue('priceNet', $reservation['priceNet'] ? $reservation['priceNet'] : '');
@@ -335,7 +339,7 @@ class C4gReservationConfirmation
                                 'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'agreed',
                                 'description', 'additional1', 'additional2', 'additional3','member_email',
                                 'price','priceTax','priceSum','priceSumTax','priceNet','priceSumNet', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax',
-                                'priceDiscount', 'doscuntCode', 'discountPercent', 'reservationTaxRate', 'dbkey'
+                                'priceDiscount', 'discountCode', 'discountPercent', 'documentId', 'reservationTaxRate', 'dbkey'
                             ]
                         );
 

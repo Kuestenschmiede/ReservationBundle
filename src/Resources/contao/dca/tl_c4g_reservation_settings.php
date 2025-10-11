@@ -98,7 +98,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
                         '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, hideReservationKey, hideOrganizer, hideLocation, typeWithEmptyOption;'.
                         '{notification_legend:hide}, notification_type;'.
-                        '{document_legend:hide}, documentTemplate,documentStyle;'.
+                        '{document_legend:hide}, documentTemplate,documentStyle,documentIdPrefix,documentIdSuffix,documentIdLength,documentIdNext;'.
                         '{ticket_legend:hide}, checkInPage, paricipantCheckInWithSameCode;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
                         '{expert_legend:hide}, specialParticipantMechanism, showMinMaxWithCapacity, hideParticipantsEmail, onlyParticipants, showMemberData, postals;'
@@ -406,6 +406,44 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'eval'                    => array('multiple'=>false, 'fieldType'=>'checkbox', 'filesOnly'=>true, 'extensions'=>'css', 'isSortable'=>false),
             'sql'                     => "blob NULL"
         ],
+        'documentIdPrefix' =>
+        [
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['documentIdPrefix'],
+            'default'           => 'RE-',
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'text',
+            'eval'              => array('tl_class'=>'w50', 'regex'=>'digit', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false),
+            'sql'               => "varchar(64) NOT NULL default 'RE-'"
+        ],
+        'documentIdSuffix' =>
+        [
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['documentIdSuffix'],
+            'default'           => '',
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'text',
+            'eval'              => array('tl_class'=>'w50', 'regex'=>'digit', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false),
+            'sql'               => "varchar(64) NOT NULL default ''"
+        ],
+        'documentIdLength' =>
+        [
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['documentIdLength'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'text',
+            'eval'              => array('tl_class'=>'w50', 'regex'=>'digit', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false),
+            'sql'               =>  "int(10) unsigned NOT NULL default 4"
+        ],
+        'documentIdNext' =>
+        [
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['documentIdNext'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'text',
+            'eval'              => array('tl_class'=>'w50', 'regex'=>'digit', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false),
+            'sql'               => "int(10) unsigned NOT NULL default 0"
+        ],
         'checkInPage' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['checkInPage'],
@@ -413,7 +451,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'inputType'               => 'pageTree',
             'foreignKey'              => 'tl_page.title',
             'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
-            'sql'                     => "int(10) unsigned NOT NULL default '0'",
+            'sql'                     => "int(10) unsigned NOT NULL default 0",
             'relation'                => array('type'=>'hasOne', 'load'=>'eager')
         ),
         'paricipantCheckInWithSameCode' => array
