@@ -70,6 +70,7 @@ $GLOBALS['TL_LANG'][$str]['referencesObjectType'][1] = 'Zeitauswahl';
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][2] = 'Contao Events';
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][3] = 'Objektauswahl';
 
+$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['noDocument'] = 'Kein Dokument';
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['settings_legend'] = "Allgemeine Einstellungen";
 $GLOBALS['TL_LANG'][$str]['type_legend'] = "Einstellungen zur Reservierungsart";

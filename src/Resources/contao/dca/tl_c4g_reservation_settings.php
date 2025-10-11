@@ -395,7 +395,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'default'                 => '',
             'inputType'               => 'select',
             'options_callback'        => ['tl_c4g_reservation_settings', 'getDocumentTemplates'],
-            'eval'                    => ['mandatore'=>true, 'chosen'=>true],
+            'eval'                    => ['mandatore'=>true, 'chosen'=>true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['noDocument']],
             'sql'                     => "varchar(64) NOT NULL default ''"
         ],
         'documentStyle' =>
