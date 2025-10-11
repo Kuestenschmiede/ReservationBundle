@@ -29,9 +29,11 @@ $GLOBALS['TL_LANG'][$str]['notification_type'] = array('Benachrichtigung', 'Wäh
 $GLOBALS['TL_LANG'][$str]['additionaldatas'] = array("Formularfelder","Reihenfolge hier entspricht der Anzeige im Frontend. Bis auf die Überschrift, kann jedes Feld nur einmal verwendet werden. Achtung! Vorname, Nachname und E-Mail werden angehangen, falls diese fehlen. Die drei Felder sind immer erforderlich.");
 $GLOBALS['TL_LANG'][$str]['mandatory'] = array("Pflichtfeld?","");
 $GLOBALS['TL_LANG'][$str]['binding'] = array("Pflichtfeld?","Soll dieses Datenfeld als Pflichtfeld im Frontend angezeigt werden");
+$GLOBALS['TL_LANG'][$str]['printing'] = array("Ins PDF?","Soll dieses Datenfeld ins PDF mit aufgenommen werden? (Rechnung, Ticket, ...)");
 $GLOBALS['TL_LANG'][$str]['initialValue'] = array("Initialer Wert", "Hier können Sie einen initialen Wert eingeben. Wichtig bei der Überschrift - ansonsten optional.");
 $GLOBALS['TL_LANG'][$str]['individualLabel'] = array("Individuelles Label", "Hier können Sie ein individuelles Label setzen. Ist es Leer greift der Standard aus den Language Dateien.");
-$GLOBALS['TL_LANG'][$str]['fieldSelection'] = array("Formularfelder Hinzufügen","Achtung! Vorname, Nachname und E-Mail werden angehangen, falls diese fehlen. Die drei Felder sind immer erforderlich.");
+$GLOBALS['TL_LANG'][$str]['additionalClass'] = array("Zusätzl. Klasse", "Sie können das Feld um eine Klasse erweitern.");
+$GLOBALS['TL_LANG'][$str]['fieldSelection'] = array("Formularfelder Hinzufügen","Achtung! Vorname, Nachname und E-Mail werden angehangen, falls diese fehlen. Die drei Felder sind immer erforderlich. 'Ins PDF' wird nur benötigt, wenn ein PDF generiert werden soll. Zum Beispiel Rechnung oder CheckIn-Dokument.");
 $GLOBALS['TL_LANG'][$str]['additionalDuration'] = array("Individuelle Nutzungsdauer (initial)","Bei 0 ist keine individuelle Eingabe der Nutzungsdauer möglich (Standard). Es greifen die Einstellungen aus der Art für min und max Werte.");
 $GLOBALS['TL_LANG'][$str]['withCapacity'] = array("Kunde kann Personenanzahl angeben","Der Kunde kann die Personenanzahl angeben. Dieses wird bspw. für eine Tischreservierung im Restaurant benötigt.");
 $GLOBALS['TL_LANG'][$str]['showFreeSeats'] = array("Freie Plätze anzeigen","Offene Plätze werden dargestellt.");
@@ -49,10 +51,16 @@ $GLOBALS['TL_LANG'][$str]['specialParticipantMechanism'] = array("Teilnehmermech
 $GLOBALS['TL_LANG'][$str]['showMinMaxWithCapacity'] = array("Minimum und Maximum anzeigen","Die mini- bis maximal erlaubte Eingabe für die Angabe der Personenzahl wird angezeigt");
 $GLOBALS['TL_LANG'][$str]['hideParticipantsEmail'] = array("Teilnehmer E-Mail-Feld ausblenden", "Bei den zusätzlichen Teilnehmerfeldern wird das E-Mail-Feld nicht berücksichtigt.");
 $GLOBALS['TL_LANG'][$str]['hideReservationKey'] = array("Reservierungsschlüssel verstecken", "Wenn diese Option aktiviert ist, wird der Reservierungsschlüssel im Frontend nicht angezeigt.");
+$GLOBALS['TL_LANG'][$str]['hideOrganizer'] = array("Veranstalter ausblenden", "Der Veranstalter wird nicht angezeigt.");
+$GLOBALS['TL_LANG'][$str]['hideLocation'] = array("Veranstaltungsort ausblenden", "Der Veranstaltungsort wird nicht angezeigt.");
 $GLOBALS['TL_LANG'][$str]['onlyParticipants'] = array("Nur Teilnehmer berücksichtigen", "Wenn dieser Mechanismus aktiviert ist, werden nur die Teilnehmer bei der Preisberechnung / Buchung berücksichtigt und die buchende Person nicht mit gezählt (z.B. nur Rechnungsadresse).");
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Postleitzahlen einschränken","Hierüber können Sie ermöglichen, dass Reservierungen nur über bestimmte Postleitzahlen möglich sind (kommagetrennte Liste).");
+$GLOBALS['TL_LANG'][$str]['documentTemplate'] = array("Dokumenten-Template","Hier könnt Ihr das Template für die Dokumentengenerierung zuordnen.");
+$GLOBALS['TL_LANG'][$str]['checkInPage'] = array("Link zur CheckIn Seite","Der Link wird in den QR-Code generiert. Achtung! Sobald eine CheckIn-Seite gesetzt ist. Wird der QR-Code generiert.");
+$GLOBALS['TL_LANG'][$str]['paricipantCheckInWithSameCode'] = array("Teilnehmer*innen über QR-Code einchecken","Wenn diese Funktion aktiv ist, können mehrere Teilnehmer*innen über den selben QR-Code eingecheckt werden. Achtung! Die Möglichkeit verschiedene QR-Codes für Teilnehmer*innen zu generieren, also mehrere Tickets zu erzeugen, gibt es noch nicht.");
 
 $GLOBALS['TL_LANG'][$str]['typeWithEmptyOption'] = array('Reservierungsart Auswahl treffen', 'Wenn dieser Schalter gesetzt ist, wird die Reservierungsart nicht vorbelegt und muss ausgewählt werden.');
+
 
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][1] = 'Zeitauswahl';
 $GLOBALS['TL_LANG'][$str]['referencesObjectType'][2] = 'Contao Events';
@@ -64,6 +72,8 @@ $GLOBALS['TL_LANG'][$str]['type_legend'] = "Einstellungen zur Reservierungsart";
 $GLOBALS['TL_LANG'][$str]['object_legend'] = "Einstellungen zur Zeitauswahl";
 $GLOBALS['TL_LANG'][$str]['form_legend'] = "Reservierungsformular";
 $GLOBALS['TL_LANG'][$str]['notification_legend'] = 'Notification Center';
+$GLOBALS['TL_LANG'][$str]['document_legend'] = "Dokumentgenerator";
+$GLOBALS['TL_LANG'][$str]['ticket_legend'] = "Ticketing";
 $GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Weiterleitung';
 $GLOBALS['TL_LANG'][$str]['expert_legend'] = 'Experteneinstellungen';
 

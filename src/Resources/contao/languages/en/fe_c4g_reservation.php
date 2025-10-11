@@ -98,6 +98,9 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['phone2'] = 'Phone number';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['address2'] = 'Street';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['postal2'] = 'Postal code';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['city2'] = 'City';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['creditInstitute'] = 'Credit institute';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['iban'] = 'IBAN';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['bic'] = 'BIC';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional1'] = 'Additional field 1';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional2'] = 'Additional field 2';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['additional3'] = 'Additional field 3';
@@ -136,6 +139,9 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['removeParticipantMessage'] = 'Really 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['participant_params'] = 'Participant services';
 
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['emptyOptionLabel'] = '- Please select -';
+
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['headlineBill'] = 'Rechnung';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['headlineCheckIn'] = 'Check In';
 
 /** Legends */
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_data'] = 'reservation form';

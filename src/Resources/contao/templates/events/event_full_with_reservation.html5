@@ -18,10 +18,10 @@
     <?php else: ?>
 
         <?php
-        $startDate = $this->parseDate("d.m.Y", $this->startDate);
-        $endDate = $this->parseDate("d.m.Y", $this->endDate);
-        $startTime = $this->parseDate("H:i", $this->startTime);
-        $endTime = $this->parseDate("H:i", $this->endTime);
+        $startDate = \Contao\Date::parse("d.m.Y", $this->startDate);
+        $endDate = \Contao\Date::parse("d.m.Y", $this->endDate);
+        $startTime = \Contao\Date::parse("H:i", $this->startTime);
+        $endTime = \Contao\Date::parse("H:i", $this->endTime);
         ?>
 
         <?php if ($this->startDate): ?>

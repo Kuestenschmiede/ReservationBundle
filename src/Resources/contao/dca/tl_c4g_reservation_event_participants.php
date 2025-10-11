@@ -106,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_participants'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{participants_legend}, title, lastname, firstname, email, comment, participant_params, cancellation;',
+        'default'   =>  '{participants_legend}, title, lastname, firstname, email, comment, participant_params, payed, checkedIn, cancellation;',
     ),
 
 
@@ -279,7 +279,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_participants'] = array
         ),
 
         'additional1' => array (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['additional1'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional1'],
             'exclude'                 => true,
             'filter'                  => false,
             'search'                  => false,
@@ -290,7 +290,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_participants'] = array
         ),
 
         'additional2' => array (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['additional2'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional2'],
             'exclude'                 => true,
             'filter'                  => false,
             'search'                  => false,
@@ -301,7 +301,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_participants'] = array
         ),
 
         'additional3' => array (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['additional3'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional3'],
             'exclude'                 => true,
             'filter'                  => false,
             'search'                  => false,
@@ -309,6 +309,24 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_participants'] = array
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
             'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
+        'payed' => array(
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['payed'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true, 'submitOnChange'=>false),
+            'sql'               => "char(1) NOT NULL default ''"
+        ),
+
+        'checkedIn' => array(
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['checkedIn'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true, 'submitOnChange'=>false),
+            'sql'               => "char(1) NOT NULL default ''"
         ),
 
         'cancellation' => array(

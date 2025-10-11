@@ -29,8 +29,12 @@ $GLOBALS['TL_LANG'][$str]['state'] = array("Current status", "green, orange, red
 $GLOBALS['TL_LANG'][$str]['participant_params'] = array("Participant options inc. tax rate", "Select participants options");
 $GLOBALS['TL_LANG'][$str]['participantParamsFieldType'] = array("Field type", "Select the participant params field type in the reservation form.");
 $GLOBALS['TL_LANG'][$str]['price'] = array("Price", "Specify the price for the booking (for example: 50.00).");
+$GLOBALS['TL_LANG'][$str]['participantParamsMandatory'] = array("Mandatory", "Should the participant options be a mandatory field? (no preselection)");
 $GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Select Tax Rate option", "Select a tax option for all prices."];
 $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Price setting", "What should the price be calculated by.");
+$GLOBALS['TL_LANG'][$str]['discountCode'] = array("Discount code", "Enter a discount code here, and the discount will be applied automatically.");
+$GLOBALS['TL_LANG'][$str]['discountPercent'] = array("Discount", "Percentage for the discount.");
+$GLOBALS['TL_LANG'][$str]['conferenceLink'] = array("Conference Link", "For example, a Teams link can be specified here, which can then be listed in the reservation confirmation.");
 
 $GLOBALS['TL_LANG'][$str]['reservationForwarding'] = ["Redirect to module", "Select the page where the reservation module is located. Can also be set globally on the calendar and in the dashboard/settings."];
 $GLOBALS['TL_LANG'][$str]['reservationForwardingButtonCaption'] = ["Button label forwarding", "Labeling of the forwarding button to the reservation. Default: empty. The entries from the language files apply."];

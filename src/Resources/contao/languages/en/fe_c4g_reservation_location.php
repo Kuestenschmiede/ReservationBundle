@@ -18,6 +18,7 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation_location']['name'] = 'Caption';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_location']['geopicker'] = 'Map';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_name'] = 'Name';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_email'] = 'E-Mail';
+$GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_website'] = 'Website';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_phone'] = 'Phone';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_street'] = 'Street';
 $GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_postal'] = 'Postal';

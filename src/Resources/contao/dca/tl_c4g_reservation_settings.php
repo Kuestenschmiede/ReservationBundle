@@ -96,8 +96,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
         'default'   =>  '{settings_legend}, caption;'.
                         '{form_legend:hide}, withCapacity, fieldSelection, privacy_policy_text, privacy_policy_site, reservationButtonCaption, showDetails, showPrices, showPricesWithTaxes, showEndTime, showInlineDatepicker, removeBookedDays,showArrivalAndDeparture;'.
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
-                        '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, hideReservationKey, typeWithEmptyOption;'.
+                        '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, hideReservationKey, hideOrganizer, hideLocation, typeWithEmptyOption;'.
                         '{notification_legend:hide}, notification_type;'.
+                        '{document_legend:hide}, documentTemplate;'.
+                        '{ticket_legend:hide}, checkInPage, paricipantCheckInWithSameCode;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
                         '{expert_legend:hide}, specialParticipantMechanism, showMinMaxWithCapacity, hideParticipantsEmail, onlyParticipants, showMemberData, postals;'
     ),
@@ -244,6 +246,20 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'inputType'         => 'checkbox',
             'sql'               => "int(1) unsigned NULL default 0"
         ),
+        'hideOrganizer' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['hideOrganizer'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
+        'hideLocation' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['hideLocation'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
         'objectHide' => array
         (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['objectHide'],
             'exclude'           => true,
@@ -338,9 +354,24 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         'inputType'               => 'text',
                         'eval'                    => array('multiple' => false,'mandatory'=>false, 'style'=>'width: 100%')
                     ),
+                    'additionalClass' => array
+                    (
+                        'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['additionalClass'],
+                        'exclude'                 => true,
+                        'default'                 => '',
+                        'inputType'               => 'text',
+                        'eval'                    => array('multiple' => false,'mandatory'=>false, 'style'=>'width: 100%')
+                    ),
                     'binding' => array
                     (
                         'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['binding'],
+                        'exclude'                 => true,
+                        'inputType'               => 'checkbox',
+                        'eval'                    => array('multiple' => false,'mandatory'=>false,'alwaysSave'=>true, 'style'=>'width: 33%')
+                    ),
+                    'printing' => array
+                    (
+                        'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['printing'],
                         'exclude'                 => true,
                         'inputType'               => 'checkbox',
                         'eval'                    => array('multiple' => false,'mandatory'=>false,'alwaysSave'=>true, 'style'=>'width: 33%')
@@ -357,6 +388,32 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
             'sql'                     => array('type' => 'string', 'length' => 100, 'default' => '')
+        ),
+        'documentTemplate' =>
+        [
+            'exclude'                 => true,
+            'default'                 => '',
+            'inputType'               => 'select',
+            'options_callback'        => ['tl_c4g_reservation_settings', 'getDocumentTemplates'],
+            'eval'                    => ['mandatore'=>true, 'chosen'=>true],
+            'sql'                     => "varchar(64) NOT NULL default ''"
+        ],
+        'checkInPage' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['checkInPage'],
+            'exclude'                 => true,
+            'inputType'               => 'pageTree',
+            'foreignKey'              => 'tl_page.title',
+            'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+            'sql'                     => "int(10) unsigned NOT NULL default '0'",
+            'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+        ),
+        'paricipantCheckInWithSameCode' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['paricipantCheckInWithSameCode'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
         ),
         'reservationButtonCaption' => array
         (
@@ -484,6 +541,10 @@ class tl_c4g_reservation_settings extends Backend
         $columnsFormatted['address2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['address2'][0];
         $columnsFormatted['postal2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'][0];
         $columnsFormatted['city2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'][0];
+        $columnsFormatted['discountCode'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['discountCode'][0];
+        $columnsFormatted['creditInstitute'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['creditInstitute'][0];
+        $columnsFormatted['iban'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['iban'][0];
+        $columnsFormatted['bic'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['bic'][0];
         $columnsFormatted['additional1'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional1'][0];
         $columnsFormatted['additional2'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional2'][0];
         $columnsFormatted['additional3'] = $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional3'][0];
@@ -493,4 +554,7 @@ class tl_c4g_reservation_settings extends Backend
 
     }
 
+    public function getDocumentTemplates() {
+        return Controller::getTemplateGroup('pdf_reservation_');
+    }
 }

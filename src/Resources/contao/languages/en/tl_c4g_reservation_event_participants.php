@@ -27,6 +27,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['city'] = array("Ci
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['comment'] = array("comment", "comment from creator");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['reservation_participant_option'] = array("Participant services", "Selected participant options");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['cancellation'] = array("Canceled", "If the appointment is cancelled, select this field");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['checkedIn'] = array('Checked in','');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['payed'] = array('Payed','');
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['yes'] = 'ja';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['no'] = 'no';

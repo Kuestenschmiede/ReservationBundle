@@ -20,6 +20,7 @@ $GLOBALS['TL_LANG'][$str]['locgeoy'] = array("Y-Koordinate","Geben Sie die Y-Koo
 $GLOBALS['TL_LANG'][$str]['contact_name'] = array("Kontaktname","");
 $GLOBALS['TL_LANG'][$str]['contact_phone'] = array("Telefonnummer","");
 $GLOBALS['TL_LANG'][$str]['contact_email'] = array("Emailadresse","");
+$GLOBALS['TL_LANG'][$str]['contact_website'] = array("Website","");
 $GLOBALS['TL_LANG'][$str]['contact_street'] = array("Straße","");
 $GLOBALS['TL_LANG'][$str]['contact_postal'] = array("Postleitzahl","");
 $GLOBALS['TL_LANG'][$str]['contact_city'] = array("Ort","");

@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{participants_legend}, title, lastname, firstname, email, comment, participant_params, cancellation;',
+        'default'   =>  '{participants_legend}, title, lastname, firstname, email, comment, participant_params, payed, checkedIn, cancellation;',
     ),
 
 
@@ -248,13 +248,31 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'sql'               => "blob NULL",
         ),
 
+        'payed' => array(
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['payed'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true, 'submitOnChange'=>false),
+            'sql'               => "char(1) NOT NULL default ''"
+        ),
+
+        'checkedIn' => array(
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['checkedIn'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true, 'submitOnChange'=>false),
+            'sql'               => "char(1) NOT NULL default ''"
+        ),
+
         'cancellation' => array(
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['cancellation'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
             'eval'              => array('tl_class'=>'w50'),
-            'save_callback'     => array(array($cbClass,'generateUuid')),
+           // 'save_callback'     => array(array($cbClass,'generateUuid')),
             'sql'               => "char(1) NOT NULL default ''"
         )
     )

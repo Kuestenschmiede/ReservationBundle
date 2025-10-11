@@ -29,8 +29,10 @@ $GLOBALS['TL_LANG'][$str]['notification_type'] = array('Notification', 'Select t
 $GLOBALS['TL_LANG'][$str]['additionaldatas'] = array("Data fields", "The order here corresponds to the display in the frontend. Except for the heading, each field can be used only once.");
 $GLOBALS['TL_LANG'][$str]['mandatory'] = array("Mandatory field?","");
 $GLOBALS['TL_LANG'][$str]['binding'] = array("Mandatory field?", "Should this data field be displayed as a mandatory field in the frontend?");
+$GLOBALS['TL_LANG'][$str]['printing'] = array("Into PDF?", "Should this data field be included in the PDF? (Invoice, ticket, etc.)");
 $GLOBALS['TL_LANG'][$str]['initialValue'] = array("Initial value", "Here you can enter an initial value. Important for the heading - otherwise optional.");
 $GLOBALS['TL_LANG'][$str]['individualLabel'] = array("Individual Label", "Here you can set an individual label. If it is empty, the default from the language files is used.");
+$GLOBALS['TL_LANG'][$str]['additionalClass'] = array("Additional class", "You can extend the field by one class.");
 $GLOBALS['TL_LANG'][$str]['fieldSelection'] = array("Add data fields", "Attention! First name, last name and e-mail are appended if they are missing. The three fields are always required.");
 $GLOBALS['TL_LANG'][$str]['additionalDuration'] = array("Individual length of use (initial)", "If 0, no individual entry of the length of use is possible (default). Min and max ");
 $GLOBALS['TL_LANG'][$str]['withCapacity'] = array("Customer can specify number of persons", "The customer can specify the number of persons. This is required, for example, for a table reservation in the restaurant.");
@@ -50,7 +52,12 @@ $GLOBALS['TL_LANG'][$str]['showMinMaxWithCapacity'] = array("Display Minimum and
 $GLOBALS['TL_LANG'][$str]['hideParticipantsEmail'] = array("Hide Participants E-Mail", "Additional participant fields do not include the e-mail field.");
 $GLOBALS['TL_LANG'][$str]['onlyParticipants'] = array("Only take participants into account", "If this mechanism is enabled, only participants will be considered in the price calculation.");
 $GLOBALS['TL_LANG'][$str]['hideReservationKey'] = array("Hide Reservationkey", "If enabled, the reservation key will not be visible in the frontend.");
+$GLOBALS['TL_LANG'][$str]['hideOrganizer'] = array("Hide organizer", "The organizer will not be displayed.");
+$GLOBALS['TL_LANG'][$str]['hideLocation'] = array("Hide location", "The location will not be displayed.");
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Restrict zip codes", "Here you can enable that reservations are only possible via certain zip codes (comma separated list).");
+$GLOBALS['TL_LANG'][$str]['documentTemplate'] = array("Document Template", "Here you can assign the template for document generation.");
+$GLOBALS['TL_LANG'][$str]['checkInPage'] = array("Link to the check-in page", "The link will be generated in the QR code.");
+$GLOBALS['TL_LANG'][$str]['paricipantCheckInWithSameCode'] = array("Check in participants via QR code","When this feature is enabled, multiple participants can be checked in using the same QR code. Please note: It is not yet possible to generate different QR codes for participants, i.e., multiple tickets.");
 
 $GLOBALS['TL_LANG'][$str]['typeWithEmptyOption'] = array('Make reservation type selection', 'If this switch is set, the reservation type is not preset and must be selected.');
 
@@ -64,6 +71,8 @@ $GLOBALS['TL_LANG'][$str]['type_legend'] = "Reservation type settings";
 $GLOBALS['TL_LANG'][$str]['object_legend'] = "Time selection settings";
 $GLOBALS['TL_LANG'][$str]['form_legend'] = "Form settings";
 $GLOBALS['TL_LANG'][$str]['notification_legend'] = 'Notification Center';
+$GLOBALS['TL_LANG'][$str]['document_legend'] = "Document generator";
+$GLOBALS['TL_LANG'][$str]['ticket_legend'] = "Ticketing";
 $GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Redirection';
 $GLOBALS['TL_LANG'][$str]['expert_legend'] = 'Expert settings';
 

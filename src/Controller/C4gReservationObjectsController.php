@@ -355,6 +355,7 @@ class C4gReservationObjectsController extends C4GBaseController
                 $locset['contact_postal'] = $memberModel->postal;
                 $locset['contact_city'] = $memberModel->city;
                 $locset['contact_email'] = $memberModel->email;
+                $locset['contact_website'] = $memberModel->website;
                 $locset['contact_phone'] = $memberModel->phone;
 
                 $coordinates = C4GUtils::geocodeAddress($memberModel->street.' '.$memberModel->postal.' '.$memberModel->city);

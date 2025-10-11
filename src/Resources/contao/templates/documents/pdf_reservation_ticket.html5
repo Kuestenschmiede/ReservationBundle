@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<!-- this is just a unreadyexample file to generate a ticket with con4gis/reservation -->
+<head>
+    <link rel="stylesheet" type="text/css" href="<?php echo $this->style; ?>">
+</head>
+
+<body>
+
+<!-- switch to own logo or remove -->
+<div class="pdf-logo" style="text-align: left">
+    <?php
+        $src = \Contao\System::getContainer()->getParameter('kernel.project_dir')."/vendor/con4gis/reservation/src/Resources/public/images/test.png";
+        $type = pathinfo($src, PATHINFO_EXTENSION);
+        $data = file_get_contents($src);
+        $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    ?>
+    <img src="<?php echo $src ?>" alt="" width="100" height="100">
+</div>
+
+<div class="pdf-contact" style="text-align: left">
+    <?php echo $this->fieldData['contact_phone']; ?><br>
+    <?php echo $this->fieldData['contact_email']; ?><br>
+    <?php echo $this->fieldData['contact_website']; ?><br>
+</div>
+
+<div class="pdf-ticket" style="text-align: center">
+    <h1>TICKET</h1>
+    <h2><?php echo $this->fieldData['reservation_title']; ?></h2><br>
+    <?php echo $this->fieldData['beginDate']; ?> <?php echo $this->fieldData['beginTime']; ?> Uhr<br>
+    <?php echo $this->fieldData['location_2-221']; ?><br><br>
+    <?php echo $this->fieldData['priceSum']; ?><br>
+
+    <!-- automatic pdf content by default -->
+    <?php if ($this->content): ?>
+    <?php echo $this->content; ?>
+    <?php endif; ?>
+    <div class="pdf-code" style="text-align:center">
+        Buchungsschlüssel: <?php echo $this->fieldData['reservation_id']; ?><br>
+        (Bei Rückfragen bitte angeben)
+    </div>
+    <br>
+</div>
+
+<hr>
+
+<b>Wichtige Hinweise:</b><br>
+Dieses Ticket bitte beim Einlass vorzeigen.<br>
+<br>
+Bewahren Sie dieses Ticket sicher auf. Das Ticket ist nur einmalig gültig. Jedes Kopieren und jede Weitergabe verhindert den Zutriott.<br>
+Bei Verlust besteht kein Anspruch auf Ersatz. Das Ticket ist personalisiert und kann nicht übertragen werden.<br>
+<br>
+<b>Gekauft von:</b><br>
+<div class="pdf-address" style="margin-top: 0">
+<?php if ($this->fieldData['organisation']): ?>
+<?php echo $this->fieldData['organisation']; ?><br>
+<?php endif; ?>
+<?php echo $this->fieldData['firstname']; ?> <?php echo $this->fieldData['lastname']; ?><br>
+<?php echo $this->fieldData['address']; ?><br><br>
+<?php echo $this->fieldData['postal']; ?> <?php echo $this->fieldData['city']; ?><br><br>
+</div>
+
+</body>
+</html>

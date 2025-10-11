@@ -15,6 +15,7 @@
 
 use con4gis\ReservationBundle\Classes\Callbacks\C4gReservation;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
+use Contao\Controller;
 use Contao\Input;
 use Contao\DC_Table;
 
@@ -131,7 +132,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
     'palettes' => array
     (
         '__selector__' => ['reservationObjectType'],
-        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {additional_legend:hide}, additional1, additional2, additional3; {comment_legend}, comment, fileUpload; {notification_legend}, confirmed, internal_comment, specialNotification, emailConfirmationSend; {state_legend}, cancellation, agreed, member_id, group_id, tstamp, bookedAt;',
+        'default'   =>  '{reservation_legend}, reservation_type, included_params, additional_params, desiredCapacity, beginDate, endDate, beginTime, endTime, reservationObjectType, reservation_id, discountCode; {person_legend}, organisation,salutation, lastname, firstname, email, phone, address, postal, city, dateOfBirth; {person2_legend}, organisation2, salutation2, title2, lastname2, firstname2, email2, phone2, address2, postal2, city2; {account_legend:hide}, creditInstitute, iban, bic;{additional_legend:hide}, additional1, additional2, additional3; {comment_legend}, comment, fileUpload; {notification_legend}, confirmed, internal_comment, specialNotification, emailConfirmationSend; {state_legend}, payed, checkedIn, cancellation, agreed, member_id, group_id, tstamp, bookedAt;',
     ),
 
     // Subpalettes
@@ -592,6 +593,19 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
 
+        'discountCode' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['discountCode'],
+            'default'           => "",
+            'flag'              => 1,
+            'exclude'           => true,
+            'sorting'           => false,
+            'search'            => true,
+            'inputType'         => 'text',
+            'eval'              => array('doNotCopy' => true, 'unique' => false, 'mandatory' => false, 'maxlength'=>254, 'tl_class' => 'long'),
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
         'comment' => array (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'],
             'exclude'                 => true,
@@ -628,6 +642,55 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sql'                     => "text NULL"
         ),
 
+        'creditInstitute' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['creditInstitute'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'decodeEntities'=>true, 'tl_class'=>'long'),
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
+        'iban' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['iban'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'decodeEntities'=>true, 'tl_class'=>'long'),
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
+        'bic' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['bic'],
+            'exclude'                 => true,
+            'search'                  => false,
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'decodeEntities'=>true, 'tl_class'=>'long'),
+            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
+
+        'payed' => array(
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['payed'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true, 'submitOnChange'=>false),
+            'sql'               => "char(1) NOT NULL default ''"
+        ),
+
+        'checkedIn' => array(
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['checkedIn'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'text',
+            'eval'              => array('tl_class'=>'long clr', 'regex'=>'digit', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false),
+            'sql'               =>  "int(10) unsigned NOT NULL default '0'"
+        ),
+
         'cancellation' => array(
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'],
             'exclude'           => true,
@@ -644,7 +707,6 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'inputType'         => 'checkbox',
             'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'disabled'=>true),
             'sql'               => "char(1) NOT NULL default ''"
-
         ),
 
         'confirmed' => array(
@@ -706,7 +768,34 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'flag'              => 12,
             'default'           => time(),
             'eval' => array('rgxp'=>'datim', 'doNotCopy'=>true, 'tl_class'=>'w50', 'disabled'=>true)
-        )
+        ),
 
+        'qrContent' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['qrContent'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'textarea',
+            'default'                 => null,
+            'editable'                => false,
+            'eval'                    => ['tl_class'=>'clr long', 'feEditable'=>false, 'feViewable'=>false, 'disabled'=>true],
+            'sql'                     => "text NULL"
+        ),
+
+        'qrFileName' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['qrFileName'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'textarea',
+            'default'                 => null,
+            'editable'                => false,
+            'eval'                    => ['tl_class'=>'clr long', 'feEditable'=>false, 'feViewable'=>false, 'disabled'=>true],
+            'sql'                     => "text NULL"
+        )
     )
 );

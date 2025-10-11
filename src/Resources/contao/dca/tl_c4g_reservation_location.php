@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
     'palettes' => array
     (
         '__selector__' => ['ics'],
-        'default'   =>  '{location_legend}, name, alias, locgeox, locgeoy;{contact_legend},contact_name,contact_phone,contact_email,contact_street,contact_postal,contact_city,ics;'
+        'default'   =>  '{location_legend}, name, alias, locgeox, locgeoy;{contact_legend},contact_name,contact_phone,contact_email,contact_website,contact_street,contact_postal,contact_city,ics;'
     ),
 
     'subpalettes' => array
@@ -204,6 +204,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'eval'              => array('maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true,'mandatory'=>false, 'tl_class'=>'long clr'),
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+        'contact_website' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['contact_website'],
+            'default'           => '',
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              => array('maxlength'=>254, 'rgxp'=>'url', 'decodeEntities'=>true,'mandatory'=>false, 'tl_class'=>'long clr'),
             'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
         'contact_street' => array

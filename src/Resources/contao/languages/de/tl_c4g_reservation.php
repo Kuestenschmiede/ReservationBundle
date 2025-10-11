@@ -35,6 +35,8 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][2] = 'Contao E
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['referencesObjectType'][3] = 'Objektauswahl';
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_object'] = array("Gebucht wurde", "Welches Objekt soll reserviert werden?");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['reservation_id'] = array("Reservierungsschlüssel", "Bitte einen Reservierungsschlüssel zur Identifizierung angeben. Der Schlüssel muss eindeutig sein und wird beim Speichern eines leeren Feldes automatisch generiert.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['discountCode'] = array("Rabattcode", "Der Rabattcode wurde / wird bei der Preisberechnung berücksichtigt.");
+//$GLOBALS['TL_LANG']['tl_c4g_reservation']['qrCode'] = array("QR Code", "Der QR-Code wird nicht im Formular angezeigt. Kann hier aber für den PDF-Druck aktiviert werden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['man'] = ['Herr'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'] = ['Frau'];
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['various'] = [' - '];
@@ -60,12 +62,17 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['phone2'] = array("Telefonnummer (2)",
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['address2'] = array("Straße (2)", "Straße");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['postal2'] = array("Postleitzahl (2)", "Postleitzahl");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['city2'] = array("Ort (2)", "Ort");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['creditInstitute'] = array("Kreditinstitut", "Name der Bank");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['iban'] = array("IBAN", "IBAN des Lastschrift Kontos");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['bic'] = array("BIC", "BIC/SWIFT des Lastschrift Kontos");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional1'] = array("Zusatzfeld 1", "Zusatzinformation");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional2'] = array("Zusatzfeld 2", "Zusatzinformation");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional3'] = array("Zusatzfeld 3", "Zusatzinformation");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment'] = array("Anmerkung vom Kunden", "Kommentarfeld zur Reservierung.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['fileUpload'] = array("Datei Upload", "Hier kann eine Datei angehangen werden.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['internal_comment'] = array("Nachricht an Kunden", "");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['checkedIn'] = array("Eingecheckt","Gast vor Ort bzw. Ticket entwertet.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['payed'] = array("Reservierung wurde bezahlt.","");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['agreed'] = array("Datenschutzerklärung", "Wird vom Nutzer im Frontend ausgewählt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['confirmed'] = array("Bestätigen", "Der Termin wird bestätigt. Benachrichtigung können an der Reservierungsart verknüpft werden (optional).");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['specialNotification'] = array("Spezialnachricht senden", "Ist dieser Schalter gesetzt wird die an der Reservierungsart verknüpfte Spezialnachricht versendet.");
@@ -73,6 +80,9 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['emailConfirmationSend'] = array("Best
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['cancellation'] = array("Storniert", "Wenn der Termin storniert wird, ist dieses Feld auszuwählen");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['tstamp'] = array('Letzte Änderung','');
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['bookedAt'] = array('Gebucht am','');
+
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['qrContent'] = array('QR-Code Content', '');
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['qrContent'] = array('QR-Code Filename', '');
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['memberId'] = array("Für Mitglied", "Die Reservierung wurde durch oder für dieses Mitglied erstellt.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['groupId'] = array("Für Gruppe", "Die Reservierung wurde durch oder für diese Mitgliedergruppe erstellt.");
@@ -96,6 +106,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation']['additional_legend']  = "Zusatzinforma
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['comment_legend']     = "Anlagen";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['notification_legend'] = "Bestätigung an den Buchenden";
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['state_legend']       = "Status";
+$GLOBALS['TL_LANG']['tl_c4g_reservation']['account_legend'] = "Kontoangaben";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation']['new'] = array("Reservierung hinzufügen","Reservierung hinzufügen");

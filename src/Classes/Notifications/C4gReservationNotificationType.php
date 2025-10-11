@@ -26,8 +26,9 @@
                 $this->factory->create(AnythingTokenDefinition::class, 'admin_email', 'admin_email'),
                 $this->factory->create(AnythingTokenDefinition::class, 'email', 'email'), 
                 $this->factory->create(AnythingTokenDefinition::class, 'email2', 'email2'), 
-                $this->factory->create(AnythingTokenDefinition::class, 'contact_email', 'contact_email'), 
-                $this->factory->create(AnythingTokenDefinition::class, 'member_email', 'member_email'), 
+                $this->factory->create(AnythingTokenDefinition::class, 'contact_email', 'contact_email'),
+                $this->factory->create(AnythingTokenDefinition::class, 'contact_website', 'contact_website'),
+                $this->factory->create(AnythingTokenDefinition::class, 'member_email', 'member_email'),
                 $this->factory->create(AnythingTokenDefinition::class, 'reservation_type', 'reservation_type'), 
                 $this->factory->create(AnythingTokenDefinition::class, 'desiredCapacity', 'desiredCapacity'), 
                 $this->factory->create(AnythingTokenDefinition::class, 'beginDate', 'beginDate'), 
@@ -87,7 +88,8 @@
                 $this->factory->create(AnythingTokenDefinition::class, 'reservationTaxRate', 'reservationTaxRate'), 
                 $this->factory->create(AnythingTokenDefinition::class, 'dbkey', 'dbkey'), 
                 $this->factory->create(AnythingTokenDefinition::class, 'icsFilename', 'icsFilename'), 
-                $this->factory->create(AnythingTokenDefinition::class, 'raw_data', 'raw_data'), 
+                $this->factory->create(AnythingTokenDefinition::class, 'raw_data', 'raw_data'),
+                $this->factory->create(AnythingTokenDefinition::class, 'uploadFile', 'uploadFile'),
             ];
         }
     }
