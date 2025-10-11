@@ -186,7 +186,7 @@ class C4gReservationController extends C4GBaseController
         $this->setBrickCaption($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption']);
         $this->setBrickCaptionPlural($GLOBALS['TL_LANG']['fe_c4g_reservation']['brick_caption_plural']);
 
-        $this->printTemplate = $this->reservationSettings->documentTemplate ?: 'c4g_pdf_brick';
+        $this->printTemplate = $this->reservationSettings->documentTemplate ?: 'pdf_c4g_brick';
         if ($this->printTemplate !== 'pdf_c4g_brick') {
             $this->withDefaultPDFContent = false;
         }
@@ -225,8 +225,10 @@ class C4gReservationController extends C4GBaseController
             $this->dialogParams->setBeforeSaveAction($beforeSaveAction);
         }
 
-        $this->dialogParams->setSavePrintoutToField('fileUpload');
-        $this->dialogParams->setGeneratePrintoutWithSaving(true);
+        if ($this->reservationSettings->documentTemplate) {
+            $this->dialogParams->setSavePrintoutToField('fileUpload');
+            $this->dialogParams->setGeneratePrintoutWithSaving(true);
+        }
     }
 
     public function addFields() : array
