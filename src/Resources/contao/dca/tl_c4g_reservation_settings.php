@@ -98,7 +98,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
                         '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, hideReservationKey, hideOrganizer, hideLocation, typeWithEmptyOption;'.
                         '{notification_legend:hide}, notification_type;'.
-                        '{document_legend:hide}, documentTemplate;'.
+                        '{document_legend:hide}, documentTemplate,documentStyle;'.
                         '{ticket_legend:hide}, checkInPage, paricipantCheckInWithSameCode;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
                         '{expert_legend:hide}, specialParticipantMechanism, showMinMaxWithCapacity, hideParticipantsEmail, onlyParticipants, showMemberData, postals;'
@@ -397,6 +397,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'options_callback'        => ['tl_c4g_reservation_settings', 'getDocumentTemplates'],
             'eval'                    => ['mandatore'=>true, 'chosen'=>true],
             'sql'                     => "varchar(64) NOT NULL default ''"
+        ],
+        'documentStyle' =>
+        [
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['documentStyle'],
+            'exclude'                 => true,
+            'inputType'               => 'fileTree',
+            'eval'                    => array('multiple'=>false, 'fieldType'=>'checkbox', 'filesOnly'=>true, 'extensions'=>'css', 'isSortable'=>false),
+            'sql'                     => "blob NULL"
         ],
         'checkInPage' => array
         (

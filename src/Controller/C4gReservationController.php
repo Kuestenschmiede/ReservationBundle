@@ -67,12 +67,14 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\Date;
+use Contao\FilesModel;
 use Contao\FrontendUser;
 use Contao\Input;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\StringUtil;
 use Contao\System;
+use Contao\Template;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -187,6 +189,15 @@ class C4gReservationController extends C4GBaseController
         $this->printTemplate = $this->reservationSettings->documentTemplate ?: 'c4g_pdf_brick';
         if ($this->printTemplate !== 'pdf_c4g_brick') {
             $this->withDefaultPDFContent = false;
+        }
+
+        if ($this->reservationSettings->documentStyle) {
+            $arrExternalCSS = StringUtil::deserialize($this->reservationSettings->documentStyle);
+            $objFile = FilesModel::findByUuid($arrExternalCSS);
+            $projectDir = System::getContainer()->getParameter('kernel.project_dir');
+            if (file_exists($projectDir . '/' . $objFile->path)) {
+                $this->printStyle = $projectDir . '/' . $objFile->path;
+            }
         }
 
         parent::initBrickModule($id);

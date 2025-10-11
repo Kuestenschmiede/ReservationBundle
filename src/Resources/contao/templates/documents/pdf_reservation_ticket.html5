@@ -3,7 +3,7 @@
 
 <!-- this is just a unreadyexample file to generate a ticket with con4gis/reservation -->
 <head>
-    <link rel="stylesheet" type="text/css" href="<?php echo $this->style; ?>">
+    <link rel="stylesheet" type="text/css" media="all" href="<?php echo $this->style; ?>">
 </head>
 
 <body>
