@@ -118,21 +118,35 @@
                 $arrRow['reservation_type'] = $type->caption;
             }
 
-            $checkedInYes = 'Ja';
-            if ($arrRow['checkedIn'] && $arrRow['checkedIn'] > 1) {
-                $checkedInYes = 'Ja ('.$arrRow['checkedIn'].')';
+            $do = Input::get('do');
+            if ($do && ($do == 'calendar')) {
+                $checkedInYes = 'Ja';
+                if ($arrRow['checkedIn'] && $arrRow['checkedIn'] > 1) {
+                    $checkedInYes = 'Ja ('.$arrRow['checkedIn'].')';
+                }
+
+                $result = [
+                    $arrRow['beginDate'],
+                    $arrRow['endDate'],
+                    $arrRow['desiredCapacity'],
+                    $arrRow['reservation_type'],
+                    $arrRow['lastname'],
+                    $arrRow['firstname'],
+                    $arrRow['reservation_object'],
+                    $arrRow['checkedIn'] ? $checkedInYes : 'nein'
+                ];
+            } else {
+                $result = [
+                    $arrRow['beginDate'],
+                    $arrRow['endDate'],
+                    $arrRow['desiredCapacity'],
+                    $arrRow['reservation_type'],
+                    $arrRow['lastname'],
+                    $arrRow['firstname'],
+                    $arrRow['reservation_object']
+                ];
             }
 
-            $result = [
-                $arrRow['beginDate'],
-                $arrRow['endDate'],
-                $arrRow['desiredCapacity'],
-                $arrRow['reservation_type'],
-                $arrRow['lastname'],
-                $arrRow['firstname'],
-                $arrRow['reservation_object'],
-                $arrRow['checkedIn'] ? $checkedInYes : 'nein'
-            ];
             return $result;
         }
 
@@ -211,10 +225,12 @@
             $do = Input::get('do');
             $id = Input::get('id');
             
-            $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-                ['beginDate','endDate','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object','checkedIn'];
+
 
             if ($id && $do && ($do == 'calendar')) {
+                $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
+                    ['beginDate','endDate','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object','checkedIn'];
+
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['default'] = '2';
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['eval']['disabled'] = true;
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservation_object']['default'] = $id;
@@ -225,6 +241,9 @@
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['beginTime']['eval']['disabled'] = true;
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['endDate']['eval']['disabled'] = true;
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['endTime']['eval']['disabled'] = true;
+            } else {
+                $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
+                    ['beginDate','endDate','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object'];
             }
 
             // Check current action
