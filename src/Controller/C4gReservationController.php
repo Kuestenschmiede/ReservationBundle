@@ -42,6 +42,7 @@ use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GSubDialogField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTelField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextareaField;
 use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GTextField;
+use con4gis\ProjectsBundle\Classes\Fieldtypes\C4GUrlField;
 use con4gis\ProjectsBundle\Classes\Framework\C4GBaseController;
 use con4gis\ProjectsBundle\Classes\Framework\C4GController;
 use con4gis\ProjectsBundle\Classes\Views\C4GBrickViewType;
@@ -1788,6 +1789,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_email->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $contact_email;
 
+        $contact_website = new C4GUrlField();
+        $contact_website->setFieldName('contact_website');
+        $contact_website->setTableColumn(false);
+        $contact_website->setFormField(false);
+        $contact_website->setNotificationField(true);
+        $contact_website->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $contact_website;
 
         $contact_street = new C4GTextField();
         $contact_street->setFieldName('contact_street');
@@ -1980,6 +1988,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $qrContentField->setPrintable(false);
             $fieldList[] = $qrContentField;
 
+            //ToDo enable configuration
+            $size = ($this->printTemplate == 'pdf_reservation_invoice') ? 100 : 200;
+            $align = ($this->printTemplate == 'pdf_reservation_invoice') ? "right" : "left";
+            $align = ($this->printTemplate == 'pdf_reservation_ticket') ? "center" : $align;
+
             $qrFileNameField = new C4GImageField();
             $qrFileNameField->setFieldName('qrFileName');
             $qrFileNameField->setTitle(''); //'Check in'
@@ -1987,13 +2000,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $qrFileNameField->setDatabaseField(true);
             $qrFileNameField->setFormField(true);
             $qrFileNameField->setPrintable(true); //ToDo switch
-            $qrFileNameField->setWidth(100);
-            $qrFileNameField->setHeight(100);
+            $qrFileNameField->setWidth($size);
+            $qrFileNameField->setHeight($size);
             $qrFileNameField->setMandatory(false);
             $qrFileNameField->setComparable(false);
             $qrFileNameField->setLightBoxField('1');
             $qrFileNameField->setDisplay(false);
-            $qrFileNameField->setAlign("right");
+            $qrFileNameField->setAlign($align);
             $fieldList[] = $qrFileNameField;
         }
 
@@ -2752,6 +2765,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $locationName = $location->name;
                 $contact_name = $location->contact_name;
                 $contact_email = $location->contact_email;
+                $contact_website = $location->contact_website;
                 $vcard = $location->vcard_show;
                 if ($vcard) {
                     $contact_street = $location->contact_street;
@@ -2772,6 +2786,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $putVars['contact_name'] = $contact_name;
                 $putVars['contact_phone'] = $contact_phone;
                 $putVars['contact_email'] = $contact_email;
+                $putVars['contact_website'] = $contact_website;
                 $putVars['contact_street'] = $contact_street;
                 $putVars['contact_postal'] = $contact_postal;
                 $putVars['contact_city'] = $contact_city;

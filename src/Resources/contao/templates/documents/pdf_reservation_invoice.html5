@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 
-<!-- example file to generate a bill with con4gis/reservation -->
+<!-- this ist just an unready example file to generate an invoice with con4gis/reservation -->
 <head>
   <link rel="stylesheet" type="text/css" href="<?php echo $this->style; ?>">
 </head>
@@ -15,14 +15,20 @@
             $data = file_get_contents($src);
             $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
         ?>
-        <img src="<?php echo $src ?>" alt="" width="150" height="150">
+        <img src="<?php echo $src ?>" alt="" width="100" height="100">
+    </div>
+
+    <div class="pdf-contact" style="text-align: right">
+        <?php echo $this->fieldData['contact_phone']; ?><br>
+        <?php echo $this->fieldData['contact_email']; ?><br>
+        <?php echo $this->fieldData['contact_website']; ?><br>
     </div>
 
     <div class="pdf-address" style="margin-top: -2cm">
         <?php echo $this->fieldData['contact_name']; ?>, <?php echo $this->fieldData['contact_street']; ?>, <?php echo $this->fieldData['contact_postal']; ?> <?php echo $this->fieldData['contact_city']; ?>
         <br><br>
         <?php if ($this->fieldData['organisation']): ?>
-        <?php echo $this->fieldData['organisation']; ?> <?php echo $this->fieldData['organisation']; ?><br>
+        <?php echo $this->fieldData['organisation']; ?><br>
         <?php endif; ?>
         <?php echo $this->fieldData['firstname']; ?> <?php echo $this->fieldData['lastname']; ?><br>
         <?php echo $this->fieldData['address']; ?><br><br>

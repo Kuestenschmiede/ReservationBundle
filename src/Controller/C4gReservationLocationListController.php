@@ -248,6 +248,16 @@ class C4gReservationLocationListController extends C4GBaseController
         $contactEmailField->setLinkType(C4GUrlField::LINK_TYPE_EMAIL);
         $fieldList[] = $contactEmailField;
 
+        $contactWebsiteField = new C4GUrlField();
+        $contactWebsiteField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_website']);
+        $contactWebsiteField->setFieldName('contact_website');
+        $contactWebsiteField->setEditable(false);
+        $contactWebsiteField->setFormField(true);
+        $contactWebsiteField->setTableColumn(false);
+        $contactWebsiteField->setShowIfEmpty(false);
+        $contactWebsiteField->setLinkType(C4GUrlField::LINK_TYPE_DEFAULT);
+        $fieldList[] = $contactWebsiteField;
+
         $postal = new C4GPostalField();
         $postal->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation_location']['contact_postal']);
         $postal->setFieldName('contact_postal');

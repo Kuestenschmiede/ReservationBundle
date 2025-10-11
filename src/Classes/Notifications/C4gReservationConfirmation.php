@@ -83,8 +83,10 @@ class C4gReservationConfirmation
 
                         if ($organizer) {
                             $c4gNotify->setTokenValue('contact_email', $organizer && $organizer['contact_email'] ? $organizer['contact_email'] : false);
+                            $c4gNotify->setTokenValue('contact_website', $organizer && $organizer['contact_website'] ? $organizer['contact_website'] : false);
                         } else {
                             $c4gNotify->setTokenValue('contact_email', $location && $location['contact_email'] ? $location['contact_email'] : false);
+                            $c4gNotify->setTokenValue('contact_website', $organizer && $organizer['contact_website'] ? $organizer['contact_website'] : false);
                         }
 
                         $c4gNotify->setTokenValue('reservation_type', $type['caption'] ? $type['caption'] : '');
@@ -327,7 +329,7 @@ class C4gReservationConfirmation
 
                         $c4gNotify->setOptionalTokens(
                             [
-                                'contact_email','desiredCapacity', 'endDate', 'endTime', 'included_params', 'additional_params', 'participantList', 'speaker', 'topic',
+                                'contact_email','contact_website','desiredCapacity', 'endDate', 'endTime', 'included_params', 'additional_params', 'participantList', 'speaker', 'topic',
                                 'audience', 'salutation', 'title', 'organisation', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
                                 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment', 'location', 'contact_name',
                                 'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'agreed',
