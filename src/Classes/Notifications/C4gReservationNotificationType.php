@@ -90,6 +90,11 @@
                 $this->factory->create(AnythingTokenDefinition::class, 'icsFilename', 'icsFilename'), 
                 $this->factory->create(AnythingTokenDefinition::class, 'raw_data', 'raw_data'),
                 $this->factory->create(AnythingTokenDefinition::class, 'uploadFile', 'uploadFile'),
+                $this->factory->create(AnythingTokenDefinition::class, 'conferenceLink', 'conferenceLink'),
+                $this->factory->create(AnythingTokenDefinition::class, 'priceDiscount', 'priceDiscount'),
+                $this->factory->create(AnythingTokenDefinition::class, 'discountCode', 'discountCode'),
+                $this->factory->create(AnythingTokenDefinition::class, 'discountPercent', 'discountPercent'),
+                $this->factory->create(AnythingTokenDefinition::class, 'documentId', 'documentId')
             ];
         }
     }

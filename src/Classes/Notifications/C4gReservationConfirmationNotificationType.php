@@ -87,7 +87,12 @@
                 $this->factory->create(AnythingTokenDefinition::class, 'priceOptionSumTax', 'priceOptionSumTax'), 
                 $this->factory->create(AnythingTokenDefinition::class, 'reservationTaxRate', 'reservationTaxRate'), 
                 $this->factory->create(AnythingTokenDefinition::class, 'dbkey', 'dbkey'), 
-                $this->factory->create(AnythingTokenDefinition::class, 'uploadFile', 'uploadFile'),  
+                $this->factory->create(AnythingTokenDefinition::class, 'uploadFile', 'uploadFile'),
+                $this->factory->create(AnythingTokenDefinition::class, 'conferenceLink', 'conferenceLink'),
+                $this->factory->create(AnythingTokenDefinition::class, 'priceDiscount', 'priceDiscount'),
+                $this->factory->create(AnythingTokenDefinition::class, 'discountCode', 'discountCode'),
+                $this->factory->create(AnythingTokenDefinition::class, 'discountPercent', 'discountPercent'),
+                $this->factory->create(AnythingTokenDefinition::class, 'documentId', 'documentId')
             ];
         }
     }
