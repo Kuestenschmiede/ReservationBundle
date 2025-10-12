@@ -34,7 +34,7 @@ $GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Steuersatz auswählen", "Wählen Sie
 $GLOBALS['TL_LANG'][$str]['priceoption'] = array("Preiseinstellung", "Wonach soll der Preis berechnet werden?");
 $GLOBALS['TL_LANG'][$str]['discountCode'] = array("Rabattcode", "Ist hier ein Rabattcode eingeben, dann wird der Rabatt automatisch verrechnet.");
 $GLOBALS['TL_LANG'][$str]['discountPercent'] = array("Rabatt", "Prozentsatz für den Rabatt.");
-$GLOBALS['TL_LANG'][$str]['conferenceLink'] = array("Konferenz Link", "Hier kann zum Beispiel ein Teamslink angebgeben werden, der dann mit in der Reservierungsbetätigung aufgelistet werden kann.");
+$GLOBALS['TL_LANG'][$str]['conferenceLink'] = array("Konferenzlink", "Hier kann zum Beispiel ein Teamslink angebgeben werden, der dann mit in der Reservierungsbetätigung aufgelistet werden kann.");
 
 $GLOBALS['TL_LANG'][$str]['reservationForwarding'] = ["Weiterleitung zum Modul", "Wählen Sie die Seite aus, auf der sich das Reservierungsmodul befindet. Kann auch am Kalender und in den Dashboard/Einstellungen global gesetzt werden."];
 $GLOBALS['TL_LANG'][$str]['reservationForwardingButtonCaption'] = ["Buttonbeschriftung Weiterleitung", "Beschriftung des Weiterleitungsbutton zur Reservierung. Standard: leer. Es greifen die Einträge aus den Sprachdateien."];
