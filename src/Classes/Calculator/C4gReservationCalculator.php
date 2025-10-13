@@ -319,7 +319,7 @@ class C4gReservationCalculator
             }
 
             $priceOption = key_exists('priceoption',$object) ? $object['priceoption'] : '';
-            $interval = $object['time_interval'];
+            $interval = key_exists('time_interval',$object) ? $object['time_interval'] : 0;
             $timeSpan = max(intval($duration), intval($interval));
             switch ($priceOption) {
                 case 'pMin':

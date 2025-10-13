@@ -522,7 +522,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
 
         $params = $listType['additionalParams'];
         $additionalParamsArr = [];
-        $taxInc = $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxInc'];
+        //$taxIncl = $GLOBALS['TL_LANG']['fe_c4g_reservation']['taxIncl'];
 
         if ($params) {
             foreach ($params as $paramId) {

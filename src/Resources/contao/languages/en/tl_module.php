@@ -39,7 +39,6 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_add_m
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['additionaldatas'] = array("Data fields", "The order here corresponds to the appearance shown in the frontend. Except for the heading, each field can be used only once.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['mandatory'] = array("Mandatory?","");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['binding'] = array("Mandatory?","Should this data field be displayed as a mandatory field in the frontend");
-$GLOBALS['TL_LANG'][$str]['printing'] = array("Ins PDF?","Soll dieses Datenfeld ins PDF mit aufgenommen werden? (Rechnung, Ticket, ...)");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['initialValue'] = array("Initial value", "Here you can enter an initial value. Important for the heading - otherwise optional.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['publicview'] = 'Public (reservations will be visible)';
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references']['memberview'] = 'Member view (Only reservations for logged in member, without editing)';

@@ -1053,7 +1053,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $phoneField->setInitialValue($initialValue ? $initialValue : $memberArr['phone']);
                 $phoneField->setStyleClass($additionalClass);
                 $phoneField->setPrintable($rowPrintable);
-                $phoneField->setPattern(C4GBrickRegEx::PHONE);
                 $fieldList[] = $phoneField;
             } else if ($rowField == "address") {
                 $addressField = new C4GTextField();
@@ -1217,7 +1216,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $phoneField2->setInitialValue($initialValue);
                 $phoneField2->setStyleClass($additionalClass);
                 $phoneField2->setPrintable($rowPrintable);
-                $phoneField2->setPattern(C4GBrickRegEx::PHONE);
                 $fieldList[] = $phoneField2;
             } else if ($rowField == "address2") {
                 $addressField2 = new C4GTextField();
@@ -1542,7 +1540,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
                     $maxCapacityCheck = $onlyParticipants ? $maxCapacity > 0 : $maxCapacity > 1;
 
-                    $reservationSettingsWithCapacity = $this->rreservationSettings->withCapacity;
+                    $reservationSettingsWithCapacity = $this->reservationSettings->withCapacity;
                     if (!isset($specialParticipantMechanism) ||
                         (isset($specialParticipantMechanism) && isset($reservationSettingsWithCapacity)) || (isset($specialParticipantMechanism) && isset($maxCapacityCheck))) {
                         if ($params) {
@@ -1997,7 +1995,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $documentId = $this->reservationSettings->documentIdPrefix.$idNext.$this->reservationSettings->documentIdSuffix;
             $documentIdField = new C4GTextField();
             $documentIdField->setFieldName('documentId');
-            $documentIdField->setTitle($individualLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['documentId']);
             $documentIdField->setDatabaseField(true);
             $documentIdField->setFormField(true);
             $documentIdField->setSortColumn(false);

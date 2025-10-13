@@ -319,8 +319,8 @@ class C4gReservationHandler
     {
         $clock = '';
 
-        $langCookie = $list['langCookie'];
-        $withEndTimes = $list['withEndTimes'];
+        $langCookie = key_exists('langCookie', $list) ? $list['langCookie'] : '';
+        $withEndTimes = key_exists('withEndTimes', $list) ? $list['withEndTimes'] : false;
         $departureTimeEndStamp = 0;
 
         if ($langCookie) {
@@ -335,7 +335,7 @@ class C4gReservationHandler
 
         $withoutTime = false;
         $description = '';
-        $weekday = C4gReservationDateChecker::getWeekdayStr($list['weekday']);
+        $weekday = key_exists('weekday',$list) ? C4gReservationDateChecker::getWeekdayStr($list['weekday']) : '';
         if (isset($list['showArrivalAndDeparture'][$weekday]) && $list['showArrivalAndDeparture'][$weekday] && is_array($list['showArrivalAndDeparture'][$weekday])) {
             $arrivalTimeBegin =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][0]['time_begin']);
             $arrivalTimeEnd =  date($GLOBALS['TL_CONFIG']['timeFormat'], $list['showArrivalAndDeparture'][$weekday][0]['time_end_org']);
@@ -354,17 +354,19 @@ class C4gReservationHandler
             $withoutTime = true;
         }
 
-        foreach ($list['result'] as $key => $item) {
-            if ($key === $time || ($interval && ($key === ($time.'#'.$interval))) || ($endTime && ($key === ($time.'#'.($endTime-$time))))) {
-                $list['result'][$key]['objects'][] = $obj;
-                return $list['result'];
+        if (key_exists('result', $list)) {
+            foreach ($list['result'] as $key => $item) {
+                if ($key === $time || ($interval && ($key === ($time.'#'.$interval))) || ($endTime && ($key === ($time.'#'.($endTime-$time))))) {
+                    $list['result'][$key]['objects'][] = $obj;
+                    return $list['result'];
+                }
             }
         }
         $format = $GLOBALS['TL_CONFIG']['timeFormat'];
         //$begin = date('I', $list['tsdate']) ? date($format, $time+3600).$clock : date($format, $time).$clock; 
         $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
         $mergedTime = false;
-        if ($obj['mergedTime'] && $obj['mergedEndTime']) {
+        if (key_exists('mergedTime',$obj) && $obj['mergedTime'] && key_exists('mergedEndTime',$obj) && $obj['mergedEndTime']) {
             $clockEx = $withoutTime ? '' : $clock;
             $format = $withoutTime ? $GLOBALS['TL_CONFIG']['dateFormat'] : $GLOBALS['TL_CONFIG']['datimFormat'];
             $begin = date('I', $obj['mergedTime']) ? date($format, $obj['mergedTime']-3600).$clockEx : date($format, $obj['mergedTime']).$clockEx ;
@@ -1682,7 +1684,7 @@ class C4gReservationHandler
             if ($langCookie) {
                 $GLOBALS['LANGUAGE'] = $GLOBALS['LANGUAGE'] ?: $langCookie;
             }
-            System::loadLanguageFile('fe_c4g_reservation', $GLOBALS['LANGUAGE']);
+            System::loadLanguageFile('fe_c4g_reservation', key_exists('language', $GLOBALS ) && $GLOBALS['LANGUAGE'] ? $GLOBALS['LANGUAGE'] : 'de');
 
             $eventObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($objectId)->fetchAssoc();
             $calendarObject =  $database->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($eventObject['pid'])->fetchAssoc();
@@ -1692,14 +1694,14 @@ class C4gReservationHandler
             //$eventObject = \CalendarEventsModel::findByPk($objectId);
             if (($event || $calendarObject) && $eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > $startTime)) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= $startTime))) {
 
-                $targetAudience = $event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : [];
-                $reservationTargetAudience = $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience']) : [];
+                $targetAudience = key_exists('targetAudience', $event) && $event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : [];
+                $reservationTargetAudience = key_exists('reservationTargetAudience', $calendarObject) && $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience']) : [];
 
-                $speaker = $event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : [];
-                $reservationSpeaker = $calendarObject['reservationSpeaker'] ? \Contao\StringUtil::deserialize($calendarObject['reservationSpeaker']) : [];
+                $speaker = key_exists('speaker', $event) && $event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : [];
+                $reservationSpeaker = key_exists('reservationSpeaker', $calendarObject) && $calendarObject['reservationSpeaker'] ? \Contao\StringUtil::deserialize($calendarObject['reservationSpeaker']) : [];
 
-                $topic = $event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : [];
-                $reservationTopic = $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic']) : [];
+                $topic = key_exists('topic', $event) && $event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : [];
+                $reservationTopic = key_exists('reservationTopic', $calendarObject) && $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic']) : [];
 
                 $maxParticipants = $event['maxParticipants'] ?: $calendarObject['reservationMaxParticipants'];
                 $maxParticipants = self::getMaxParticipentsForObject($objectId, $maxParticipants);
@@ -1711,10 +1713,22 @@ class C4gReservationHandler
                 $eventObject['priceoption'] = $event['priceoption'] ?: $calendarObject['reservationPriceOption'];
                 $eventObject['taxOptions'] = $event['taxOptions'] ?: $calendarObject['taxOptions'] ?: '';
 
-                $eventObject['reservationOptionSum'] = $event['reservationOptionSum'] ?: $calendarObject['reservationOptionSum'] ?: '';
-                $eventObject['participantOptionSum'] = $event['participantOptionSum'] ?: $calendarObject['participantOptionSum'] ?: '';
+                $reservationOptionSum = '';
+                if (key_exists('reservationOptionSum', $event) && $event['reservationOptionSum']) {
+                    $reservationOptionSum = $event['reservationOptionSum'];
+                } else if (key_exists('reservationOptionSum', $calendarObject) && $calendarObject['reservationOptionSum']) {
+                    $reservationOptionSum = $calendarObject['reservationOptionSum'];
+                }
+                $eventObject['reservationOptionSum'] =  $reservationOptionSum;
 
-//                $settings = C4gSettingsModel::findSettings();
+                $participantOptionSum = '';
+                if (key_exists('participantOptionSum', $event) && $event['participantOptionSum']) {
+                    $participantOptionSum = $event['participantOptionSum'];
+                } else if (key_exists('participantOptionSum', $calendarObject) && $calendarObject['participantOptionSum']) {
+                    $participantOptionSum = $calendarObject['participantOptionSum'];
+                }
+                $eventObject['participantOptionSum'] = $participantOptionSum;
+
                 $priceArray = $showPrices ? C4gReservationCalculator::calcPrices($eventObject, $type, true, 1, '', '','',$showPricesWithTaxes) : array('price' => 0, 'priceSum' => 0);
                 $price = ($priceArray['price'] == 0 || $priceArray['price'] == '' || empty($priceArray['price'])) ? '' : C4gReservationHandler::formatPrice($priceArray['price']).$priceArray['priceInfo'];
 
