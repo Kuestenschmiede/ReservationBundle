@@ -574,7 +574,7 @@ class C4gReservationCalculator
                           $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i];
 
                           if ($chosenParticipantOptions === $value['id']) {
-                              $priceParticipantOptionSum += $value['price'];
+                              //$priceParticipantOptionSum += $value['price'];
                               $chosenParticipantOptions = true;
                           } else {
                               $chosenParticipantOptions = false;
