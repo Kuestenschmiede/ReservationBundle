@@ -1381,6 +1381,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $fieldList[] = $headlineField;
             } else if ($rowField == "participants") {
 
+                //ToDo why is here a second desired capacity
                 if ($this->reservationSettings->withCapacity && $onlyParticipants) {
                     $reservationDesiredCapacity = new C4GNumberField();
                     $error = 0;
@@ -1469,8 +1470,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $reservationDesiredCapacity->setAdditionalID($listType['id']);
                     $reservationDesiredCapacity->setStyleClass('desired-capacity');
 
-                    $fieldList[] = $reservationDesiredCapacity;
+                    //ToDo Rework desired capacity field position
+                    //$fieldList[] = $reservationDesiredCapacity;
                 }
+
                 $participantsKey = new C4GKeyField();
                 $participantsKey->setFieldName('id');
                 $participantsKey->setComparable(false);
