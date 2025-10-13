@@ -2018,9 +2018,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $fieldList[] = $qrContentField;
 
             //ToDo enable configuration
-            $size = ($this->printTemplate == 'pdf_reservation_invoice') ? 100 : 200;
-            $align = ($this->printTemplate == 'pdf_reservation_invoice') ? "right" : "left";
-            $align = ($this->printTemplate == 'pdf_reservation_ticket') ? "center" : $align;
+            $size = (strpos($this->printTemplate, 'pdf_reservation_invoice') !== false) ? 100 : 200;
+            $align = (strpos($this->printTemplate, 'pdf_reservation_invoice') !== false) ? "right" : "left";
+            $align = (strpos($this->printTemplate, 'pdf_reservation_ticket') !== false) ? "center" : $align;
 
             $qrFileNameField = new C4GImageField();
             $qrFileNameField->setFieldName('qrFileName');
