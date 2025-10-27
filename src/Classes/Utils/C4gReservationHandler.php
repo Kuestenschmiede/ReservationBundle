@@ -1782,6 +1782,8 @@ class C4gReservationHandler
                         $topic = $reservationEvent['topic'] ? \Contao\StringUtil::deserialize($reservationEvent['topic']) : [];
                         $reservationTopic = $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic']) : [];
 
+                        $conferenceLink = $reservationEvent['conferenceLink'] ?: '';
+
                         if ($eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > $startTime)) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= $startTime))) {
                             $maxParticipants = $reservationEvent['maxParticipants'] ?: $calendarObject['reservationMaxParticipants'];
                             $maxParticipants = self::getMaxParticipentsForObject($objectId, $maxParticipants);
@@ -1813,6 +1815,7 @@ class C4gReservationHandler
                             $frontendObject->setTaxOptions($reservationEvent['taxOptions'] ?: '');
 //                            $frontendObject->setTaxOptions($reservationEvent['taxOptions']);
                             $frontendObject->setPriceOption($reservationEvent['priceoption'] ?: $calendarObject['reservationPriceOption']);
+                            $frontendObject->setConferenceLink($conferenceLink ?: '');
                             $objectList[] = $frontendObject;
                         }
                     }

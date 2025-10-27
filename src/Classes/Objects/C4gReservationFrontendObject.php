@@ -58,6 +58,7 @@ class C4gReservationFrontendObject
     private $reducedTaxRate = 0.0;
     private $priceOption = 'pReservation';
     private $allTypesEvents = null;
+    private $conferenceLink = '';
 
     private $currentReservations = null;
     private $severalBookings = null;
@@ -759,5 +760,15 @@ class C4gReservationFrontendObject
     public function getSeveralBookings()
     {
         return $this->severalBookings;
+    }
+
+    public function getConferenceLink(): string
+    {
+        return $this->conferenceLink;
+    }
+
+    public function setConferenceLink(string $conferenceLink): void
+    {
+        $this->conferenceLink = $conferenceLink;
     }
 }
