@@ -485,6 +485,20 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $this->fieldList[] = $imageField;
                 }
             }
+
+            $conferenceLink = $reservationObject->getConferenceLink();
+            if ($conferenceLink) {
+                $conferenceLink = new C4GUrlField();
+                $conferenceLink->setFieldName('conferenceLink');
+                $conferenceLink->setInitialValue($conferenceLink);
+                $conferenceLink->setTableColumn(false);
+                $conferenceLink->setFormField(true);
+                $conferenceLink->setNotificationField(true);
+                $conferenceLink->setPrintable(false);
+                $conferenceLink->setHidden(true);
+                $fieldList[] = $conferenceLink;
+            }
+
         }
 
         $includedParams = $listType['includedParams'];
@@ -558,18 +572,6 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             $additionalParams->setNotificationField(true);
             $additionalParams->setSort(false);
             $this->fieldList[] = $additionalParams;
-        }
-
-        $conferenceLink = $reservationObject->getConferenceLink();
-        if ($conferenceLink) {
-            $conferenceLink = new C4GUrlField();
-            $conferenceLink->setFieldName('conferenceLink');
-            $conferenceLink->setInitialValue($conferenceLink);
-            $conferenceLink->setTableColumn(false);
-            $conferenceLink->setFormField(false);
-            $conferenceLink->setNotificationField(true);
-            $conferenceLink->setPrintable(false);
-            $fieldList[] = $conferenceLink;
         }
 
         return $this->fieldList;

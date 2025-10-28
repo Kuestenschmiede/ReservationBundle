@@ -682,7 +682,10 @@ foreach ($typelist as $listType) {
     $reservationDesiredCapacity->setAdditionalID($listType['id']);
     $reservationDesiredCapacity->setStyleClass('desired-capacity');
     $reservationDesiredCapacity->setHidden(!$this->reservationSettings->withCapacity);
-    $fieldList[] = $reservationDesiredCapacity;
+
+    if (!$this->reservationSettings->moveCapacity) {
+      $fieldList[] = $reservationDesiredCapacity;
+    }
 
     $hidden = false;
     if ((intval($listType['min_residence_time']) >= 1) && (intval($listType['max_residence_time']) >= 1)) {
@@ -1470,8 +1473,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $reservationDesiredCapacity->setAdditionalID($listType['id']);
                     $reservationDesiredCapacity->setStyleClass('desired-capacity');
 
-                    //ToDo Rework desired capacity field position
-                    //$fieldList[] = $reservationDesiredCapacity;
+                    if ($this->reservationSettings->moveCapacity) {
+                        $fieldList[] = $reservationDesiredCapacity;
+                    }
                 }
 
                 $participantsKey = new C4GKeyField();
@@ -2776,6 +2780,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             self::allPrices($settings, $putVars, $reservationObject, $reservationEventObject, $reservationType, $isEvent, $putVars['desiredCapacity_'.$reservationType->id]);
         } else {
             self::allPrices($settings, $putVars, $reservationObject, '', $reservationType, $isEvent, $putVars['desiredCapacity_'.$reservationType->id]);
+        }
+
+        if ($isEvent) {
+            $putVars['conferenceLink'] = $reservationEventObject->conferenceLink ?: '';
         }
 
         $locationId = 0;

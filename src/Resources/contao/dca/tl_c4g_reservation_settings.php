@@ -94,11 +94,11 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
     'palettes' => array
     (
         'default'   =>  '{settings_legend}, caption;'.
-                        '{form_legend:hide}, withCapacity, fieldSelection, privacy_policy_text, privacy_policy_site, reservationButtonCaption, showDetails, showPrices, showPricesWithTaxes, showEndTime, showInlineDatepicker, removeBookedDays,showArrivalAndDeparture;'.
+                        '{form_legend:hide}, withCapacity, moveCapacity, fieldSelection, privacy_policy_text, privacy_policy_site, reservationButtonCaption, showDetails, showPrices, showPricesWithTaxes, showEndTime, showInlineDatepicker, removeBookedDays,showArrivalAndDeparture;'.
                         '{object_legend:hide}, emptyOptionLabel, showDateTime;'.
                         '{type_legend:hide}, reservation_types, typeDefault, typeHide, objectHide, hideReservationKey, hideOrganizer, hideLocation, typeWithEmptyOption;'.
                         '{notification_legend:hide}, notification_type;'.
-                        '{document_legend:hide}, documentTemplate,documentStyle,documentIdPrefix,documentIdSuffix,documentIdLength,documentIdNext;'.
+                        '{document_legend:hide}, documentTemplate,documentStyle,documentIdPrefix,documentIdSuffix,documentIdLength,documentIdNext,documentFileName;'.
                         '{ticket_legend:hide}, checkInPage, paricipantCheckInWithSameCode;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
                         '{expert_legend:hide}, specialParticipantMechanism, showMinMaxWithCapacity, hideParticipantsEmail, onlyParticipants, showMemberData, postals;'
@@ -171,6 +171,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
         ),
        'withCapacity' => array
         (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['withCapacity'],
+            'exclude'           => true,
+            'filter'            => true,
+            'inputType'         => 'checkbox',
+            'sql'               => "int(1) unsigned NULL default 0"
+        ),
+        'moveCapacity' => array
+        (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['moveCapacity'],
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
@@ -443,6 +450,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'inputType'         => 'text',
             'eval'              => array('tl_class'=>'w50', 'regex'=>'digit', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false),
             'sql'               => "int(10) unsigned NOT NULL default 0"
+        ],
+        'documentFileName' => [
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['documentFileName'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['tl_class' => 'long clr', 'decodeEntities' => true],
+            'sql' => ['type' => 'string', 'length' => 255, 'default' => null, 'notnull' => false],
         ],
         'checkInPage' => array
         (

@@ -1703,6 +1703,8 @@ class C4gReservationHandler
                 $topic = key_exists('topic', $event) && $event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : [];
                 $reservationTopic = key_exists('reservationTopic', $calendarObject) && $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic']) : [];
 
+                $conferenceLink = key_exists('conferenceLink', $event) && $event['conferenceLink'] ? $event['conferenceLink'] : '';
+
                 $maxParticipants = $event['maxParticipants'] ?: $calendarObject['reservationMaxParticipants'];
                 $maxParticipants = self::getMaxParticipentsForObject($objectId, $maxParticipants);
 
@@ -1753,6 +1755,7 @@ class C4gReservationHandler
                 $frontendObject->setTaxOptions($event['taxOptions'] ?: '');
 //                $frontendObject->setTaxOptions($event['taxOptions']);
                 $frontendObject->setPriceOption($event['priceoption'] ?: $calendarObject['reservationPriceOption']);
+                $frontendObject->setConferenceLink($conferenceLink ?: '');
                 $objectList[] = $frontendObject;
             }
         } else {
