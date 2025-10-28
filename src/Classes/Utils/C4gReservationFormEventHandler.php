@@ -486,17 +486,17 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 }
             }
 
-            $conferenceLink = $reservationObject->getConferenceLink();
-            if ($conferenceLink) {
+            $cLink = $reservationObject->getConferenceLink();
+            if ($cLink) {
                 $conferenceLink = new C4GUrlField();
                 $conferenceLink->setFieldName('conferenceLink');
-                $conferenceLink->setInitialValue($conferenceLink);
+                $conferenceLink->setInitialValue($cLink);
                 $conferenceLink->setTableColumn(false);
-                $conferenceLink->setFormField(true);
+                $conferenceLink->setFormField(false);
                 $conferenceLink->setNotificationField(true);
                 $conferenceLink->setPrintable(false);
                 $conferenceLink->setHidden(true);
-                $fieldList[] = $conferenceLink;
+                $this->fieldList[] = $conferenceLink;
             }
 
         }
