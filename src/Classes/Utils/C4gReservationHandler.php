@@ -2470,4 +2470,23 @@ class C4gReservationHandler
         }
         return $bookedDates;
     }
+
+    public static function replaceSimpleTokensWithFormValues($filename, $formValues)
+    {
+        $simpleTokenRegExp = "/##(\w+)##/";
+
+        $output = preg_replace_callback($simpleTokenRegExp, function($matches) use ($formValues) {
+            $simpleTokenKey = $matches[1];
+            if(isset($formValues[$simpleTokenKey]))
+                return $formValues[$simpleTokenKey];
+        }, $filename);
+
+        $pathinfo = pathinfo($output);
+        if(!isset($pathinfo['extension']) || empty($pathinfo['extension']))
+        {
+            $output .= '.pdf';
+        }
+
+        return $output;
+    }
 }

@@ -2912,6 +2912,12 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $database->prepare("UPDATE tl_c4g_reservation_settings SET documentIdNext = ? WHERE id = ?")->execute($nextId, $this->reservationSettings->id);
         }
 
+        $fileName = $this->reservationSettings->documentFileName;
+        if ($fileName) {
+            $fileName = C4gReservationHandler::replaceSimpleTokensWithFormValues($fileName, $putVars);
+            $this->getDialogParams()->setDocumentFilename($fileName);
+        }
+
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
         $result = $action->run();
