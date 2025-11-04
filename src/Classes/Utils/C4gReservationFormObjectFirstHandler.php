@@ -73,7 +73,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
 //            if ($typeOfObject !== 'fixed_date') {
                 $objects[] = array(
                     'id' => $reservationObject->getId(),
-                    'name' => $reservationObject->getCaption(),
+                    'name' => str_replace(' ', '&nbsp;&#x200B;', $reservationObject->getCaption()),
                     'min' => $reservationObject->getDesiredCapacity()[0] ?: 1,
                     'max' => $reservationObject->getDesiredCapacity()[1] ?: 0,
                     'currentReservations' => $reservationObject->getCurrentReservations(),
