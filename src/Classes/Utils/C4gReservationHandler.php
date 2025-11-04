@@ -2350,7 +2350,7 @@ class C4gReservationHandler
                  
             if (!$severalBookings || ($severalBookings && !$allTypesQuantity && $currentReservations >= $maxCapacity)) {
                 if ($fullyBookedDate || $allFullyBookedDates) {
-                    sort($bookedBeginDate);
+                    if (isset($bookedBeginDate)) sort($bookedBeginDate);
                     if (isset($bookedEndDate)) sort($bookedEndDate);
                     if (isset($fullyBookedDate)) sort($fullyBookedDate);
                     $i = 1;
