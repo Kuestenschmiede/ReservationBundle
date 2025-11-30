@@ -367,20 +367,28 @@ class C4gReservationController extends C4GBaseController
         if ($eventObj) {
             $typeId = $eventObj->reservationType;
             $database = Database::getInstance();
-            $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?")
-                ->execute($typeId, '1')->fetchAllAssoc();
+            $sql = "SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?";
+            $params = [$typeId, '1'];
+            $stmt = $database->prepare($sql);
+            $types = $stmt->execute(...$params)->fetchAllAssoc();
         } else if ($typeId && is_numeric($typeId)) {
             $database = Database::getInstance();
-            $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?")
-                ->execute($typeId, '1')->fetchAllAssoc();
+            $sql = "SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?";
+            $params = [$typeId, '1'];
+            $stmt = $database->prepare($sql);
+            $types = $stmt->execute(...$params)->fetchAllAssoc();
         }  else if ($typeId && is_string($typeId)) {
             $database = Database::getInstance();
-            $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `alias`=? AND `published`=?")
-                ->execute($typeId, '1')->fetchAllAssoc();
+            $sql = "SELECT * FROM `tl_c4g_reservation_type` WHERE `alias`=? AND `published`=?";
+            $params = [$typeId, '1'];
+            $stmt = $database->prepare($sql);
+            $types = $stmt->execute(...$params)->fetchAllAssoc();
         } else if (!$eventObj && !$eventId) {
             $database = Database::getInstance();
-            $types = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `published`=? AND NOT `reservationObjectType`=?")
-                ->execute('1', '2')->fetchAllAssoc();
+            $sql = "SELECT * FROM `tl_c4g_reservation_type` WHERE `published`=? AND NOT `reservationObjectType`=?";
+            $params = ['1', '2'];
+            $stmt = $database->prepare($sql);
+            $types = $stmt->execute(...$params)->fetchAllAssoc();
         }
 
         if ($types) {
@@ -590,7 +598,7 @@ foreach ($typelist as $listType) {
     $reservationDesiredCapacity = new C4GNumberField();
     $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
-    if ($maxCapacity && $eventObj->maxParticipants) {
+    if ($maxCapacity && $eventObj && property_exists($eventObj, 'maxParticipants') && $eventObj->maxParticipants) {
         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
     }
 
@@ -611,7 +619,7 @@ foreach ($typelist as $listType) {
             $max = $listType['maxParticipantsPerBooking'];
             $reservationDesiredCapacity->setTitle(self::withDesiredCapacityTitle($min,$max,$showMinMax));
             $reservationDesiredCapacity->setMax($max);
-        } else if ($eventObj->maxParticipants == 0 || empty($maxCapacity) || $isPartiPerEvent <= $maxCapacity) {
+        } else if ($eventObj && (property_exists($eventObj, 'maxParticipants') && $eventObj->maxParticipants == 0) || empty($maxCapacity) || $isPartiPerEvent <= $maxCapacity) {
             if ($isPartiPerEvent && $isPartiPerEvent <= $maxCapacity) {
                 $min = $minCapacity;
                 $max = $isPartiPerEvent;
@@ -911,7 +919,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $memberArr['dateOfBirth'] = '';
         $memberArr['gender'] = '';
 
-        if ($this->reservationSettings->showMemberData && FE_USER_LOGGED_IN === true) {
+        if ($this->reservationSettings->showMemberData && C4GUtils::isFrontendUserLoggedIn()) {
             $member = FrontendUser::getInstance();
             if ($member) {
                 $memberArr['id'] = $member->id ?: '';

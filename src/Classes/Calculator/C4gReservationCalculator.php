@@ -63,9 +63,25 @@ class C4gReservationCalculator
                     ->execute($beginDate, $endDate, $beginDate, $endDate, $objectTypeId)->fetchAllAssoc();
             } else {
                 $set = [$beginDate, $endDate, $beginDate, $endDate, $typeId, $objectTypeId];
-                $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) AND `reservation_type` = ? AND `reservationObjectType` = ? AND `reservation_object` IN (".$objStr.") AND NOT `cancellation`='1'")
-                    ->execute($set)->fetchAllAssoc();
+                // Normalize object ids array
+                $objectIds = [];
+                foreach ($objectList as $object) {
+                    $objectIds[] = (string) $object->getId();
+                }
+                if (count($objectIds) > 0) {
+                    $placeholders = implode(',', array_fill(0, count($objectIds), '?'));
+                    $sql = 'SELECT * FROM `tl_c4g_reservation` WHERE '
+                        . "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) "
+                        . 'AND `reservation_type` = ? '
+                        . 'AND `reservationObjectType` = ? '
+                        . 'AND `reservation_object` IN (' . $placeholders . ") "
+                        . "AND NOT `cancellation`='1'";
+                    $params = array_merge($set, $objectIds);
+                    $result = $database->prepare($sql)->execute(...$params)->fetchAllAssoc();
+                } else {
+                    // No objects to filter -> return empty result set
+                    $result = [];
+                }
             }
 
             if ($result) {

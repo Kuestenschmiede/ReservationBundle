@@ -353,9 +353,16 @@ class C4gReservationInsertTags
                             }
 
                             $ids = explode(',',$ids);
-
-                            $includedParams = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE `id` IN (?)')
-                                ->execute($ids)->fetchAssoc();
+                            $ids = array_values(array_filter((array) $ids, static function ($v) {
+                                return $v !== null && $v !== '';
+                            }));
+                            if (!empty($ids)) {
+                                $in = C4GUtils::buildInString($ids);
+                                $stmt = $this->db->prepare('SELECT included_params FROM tl_c4g_reservation_type WHERE `id` ' . $in);
+                                $includedParams = $stmt->execute(...$ids)->fetchAssoc();
+                            } else {
+                                $includedParams = false;
+                            }
                             $params = $includedParams && $includedParams['included_params'] ? StringUtil::deserialize($includedParams['included_params']) : [];
                             $includedParamsArr = [];
                             foreach ($params as $param) {
@@ -378,9 +385,16 @@ class C4gReservationInsertTags
                             }
 
                             $ids = explode(',',$ids);
-
-                            $additionalParams = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE `id` IN (?)')
-                                ->execute($ids)->fetchAssoc();
+                            $ids = array_values(array_filter((array) $ids, static function ($v) {
+                                return $v !== null && $v !== '';
+                            }));
+                            if (!empty($ids)) {
+                                $in = C4GUtils::buildInString($ids);
+                                $stmt = $this->db->prepare('SELECT additional_params FROM tl_c4g_reservation_type WHERE `id` ' . $in);
+                                $additionalParams = $stmt->execute(...$ids)->fetchAssoc();
+                            } else {
+                                $additionalParams = false;
+                            }
                             $params = $additionalParams ? StringUtil::deserialize($additionalParams['additional_params']) : [];
                             $additionalParamsArr = [];
                             foreach ($params as $param) {

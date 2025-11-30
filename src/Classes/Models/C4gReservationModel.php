@@ -44,10 +44,27 @@ class C4gReservationModel extends Model
 
         if ($types) {
             $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `reservation_type` IN (" . $types . ") AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ".$pastDayNumber." DAY))");
+            if (is_string($types) && strpos($types, '?') !== false) {
+                $types = [];
+            }
+            if (!is_array($types)) {
+                $types = array_filter(array_map('trim', explode(',', (string) $types)));
+            }
+            if ($types && count($types) > 0) {
+                $in = C4GUtils::buildInString($types); // produces e.g. "IN (?, ?, ?)"
+                $sql = "SELECT * FROM tl_c4g_reservation WHERE `reservation_type` $in AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ".$pastDayNumber." DAY))";
+                $stmt = $db->prepare($sql);
+                $dbResult = $stmt->execute(...$types);
+            } else {
+                $sql = "SELECT * FROM tl_c4g_reservation WHERE `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ".$pastDayNumber." DAY))";
+                $stmt = $db->prepare($sql);
+                $dbResult = $stmt->execute();
+            }
         } else {
-            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ".$pastDayNumber." DAY))");
+            $sql = "SELECT * FROM tl_c4g_reservation WHERE `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ".$pastDayNumber." DAY))";
+            $stmt = $db->prepare($sql);
+            $dbResult = $stmt->execute();
         }
-        $dbResult = $stmt->execute();
         $dbResult = $dbResult->fetchAllAssoc();
         $result = $dbResult;
 
@@ -64,10 +81,28 @@ class C4gReservationModel extends Model
         }
         if ($types) {
             $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `reservation_type` IN (" . $types . ") AND `member_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))");
+            if (is_string($types) && strpos($types, '?') !== false) {
+                $types = [];
+            }
+            if (!is_array($types)) {
+                $types = array_filter(array_map('trim', explode(',', (string) $types)));
+            }
+            if ($types && count($types) > 0) {
+                $in = C4GUtils::buildInString($types);
+                $sql = "SELECT * FROM tl_c4g_reservation WHERE `reservation_type` $in AND `member_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))";
+                $params = array_merge($types, [$memberId]);
+                $stmt = $db->prepare($sql);
+                $dbResult = $stmt->execute(...$params);
+            } else {
+                $sql = "SELECT * FROM tl_c4g_reservation WHERE `member_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))";
+                $stmt = $db->prepare($sql);
+                $dbResult = $stmt->execute($memberId);
+            }
         } else {
-            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `member_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))");
+            $sql = "SELECT * FROM tl_c4g_reservation WHERE `member_id`=? AND `cancellation` <> '1' AND `beginDate` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))";
+            $stmt = $db->prepare($sql);
+            $dbResult = $stmt->execute($memberId);
         }
-        $dbResult = $stmt->execute($memberId);
         $dbResult = $dbResult->fetchAllAssoc();
 
         $result = [];
@@ -88,11 +123,29 @@ class C4gReservationModel extends Model
             $types = $listParams->getModelListParams()[1];
         }
         if ($types) {
-            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `reservation_type` IN (" . $types . ") AND `group_id`=? AND `cancellation` <> '1' AND beginDate >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))");
+            // Defensive: if a placeholder string like "?,?" slipped through, ignore filtering to avoid HY093
+            if (is_string($types) && strpos($types, '?') !== false) {
+                $types = [];
+            }
+            if (!is_array($types)) {
+                $types = array_filter(array_map('trim', explode(',', (string) $types)));
+            }
+            if ($types && count($types) > 0) {
+                $in = C4GUtils::buildInString($types);
+                $sql = "SELECT * FROM tl_c4g_reservation WHERE `reservation_type` $in AND `group_id`=? AND `cancellation` <> '1' AND beginDate >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))";
+                $params = array_merge($types, [$groupId]);
+                $stmt = $db->prepare($sql);
+                $dbResult = $stmt->execute(...$params);
+            } else {
+                $sql = "SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND beginDate >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))";
+                $stmt = $db->prepare($sql);
+                $dbResult = $stmt->execute($groupId);
+            }
         } else {
-            $stmt = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND beginDate >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))");
+            $sql = "SELECT * FROM tl_c4g_reservation WHERE `group_id`=? AND `cancellation` <> '1' AND beginDate >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL " . $pastDayNumber . " DAY))";
+            $stmt = $db->prepare($sql);
+            $dbResult = $stmt->execute($groupId);
         }
-        $dbResult = $stmt->execute($groupId);
         $dbResult = $dbResult->fetchAllAssoc();
 
         $result = [];

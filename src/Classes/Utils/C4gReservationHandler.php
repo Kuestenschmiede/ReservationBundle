@@ -30,7 +30,6 @@ use Contao\System;
  */
 class C4gReservationHandler
 {
-
     /**
      * @param $date
      * @return string|null
@@ -1873,11 +1872,14 @@ class C4gReservationHandler
         System::loadLanguageFile('fe_c4g_reservation', $GLOBALS['TL_LANGUAGE']);
 
         if ($objectId && is_numeric($objectId)) {
-            $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND id = ? ORDER BY caption")->execute('1', $objectId)->fetchAllAssoc();
+            $sql = "SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND id = ? ORDER BY caption";
+            $allObjects = $database->prepare($sql)->execute('1', $objectId)->fetchAllAssoc();
         } else if ($objectId && is_string($objectId)) {
-            $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND alias = ? ORDER BY caption")->execute('1', $objectId)->fetchAllAssoc();
+            $sql = "SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND alias = ? ORDER BY caption";
+            $allObjects = $database->prepare($sql)->execute('1', $objectId)->fetchAllAssoc();
         } else {
-            $allObjects = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE published = ? ORDER BY caption")->execute('1')->fetchAllAssoc();
+            $sql = "SELECT * FROM tl_c4g_reservation_object WHERE published = ? ORDER BY caption";
+            $allObjects = $database->prepare($sql)->execute('1')->fetchAllAssoc();
         }
 
         $almostFullyBookedAt = $type['almostFullyBookedAt'] ?: 0;
@@ -1908,15 +1910,18 @@ class C4gReservationHandler
                 $reservationTypeID = $type['id'];
                 $database = Database::getInstance();
                 
-                $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object` =? AND `reservation_type` =? AND NOT `cancellation`=?")
+                $sql = "SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object` =? AND `reservation_type` =? AND NOT `cancellation`=?";
+                $reservations = $database->prepare($sql)
                 ->execute($reservationObjectID, $reservationTypeID,'1')->fetchAllAssoc();
                 $currentReservations = C4gReservationHandler::countReservations($reservations);
 
-                $objectMaxCapacity = $database->prepare("SELECT desiredCapacityMax FROM `tl_c4g_reservation_object` WHERE `id` =?")
+                $sql = "SELECT desiredCapacityMax FROM `tl_c4g_reservation_object` WHERE `id` =?";
+                $objectMaxCapacity = $database->prepare($sql)
                 ->execute($reservationObjectID)->fetchAllAssoc();
                 $objectMaxCapacity = $objectMaxCapacity[0]['desiredCapacityMax'];
 
-                $severalBookings = $database->prepare("SELECT severalBookings FROM `tl_c4g_reservation_type` WHERE `id`=?")
+                $sql = "SELECT severalBookings FROM `tl_c4g_reservation_type` WHERE `id`=?";
+                $severalBookings = $database->prepare($sql)
                 ->execute($reservationTypeID)->fetchAllAssoc();
                 $severalBookings = $severalBookings[0]['severalBookings'];
 
