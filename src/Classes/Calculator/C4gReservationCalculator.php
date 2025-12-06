@@ -123,7 +123,7 @@ class C4gReservationCalculator
             }
         }
 
-        $switchAllTypes = StringUtil::deserialize($switchAllTypes);
+        $switchAllTypes = StringUtil::deserialize($switchAllTypes, true);
         foreach ($reservations as $reservation) {
             if ($objectId) {
               $reservation['timeInterval'] = $object->getTimeinterval();

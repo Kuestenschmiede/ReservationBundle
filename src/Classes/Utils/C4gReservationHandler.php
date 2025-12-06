@@ -2,34 +2,23 @@
 
 namespace con4gis\ReservationBundle\Classes\Utils;
 
-
 use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
-use con4gis\CoreBundle\Classes\Helper\StringHelper;
-use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
-use con4gis\CoreBundle\Resources\contao\models\C4gSettingsModel;
-use con4gis\ExportBundle\Classes\Events\ExportLoadDataEvent;
-use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectPricesModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
-use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
-use con4gis\ReservationBundle\con4gisReservationBundle;
-use Contao\CalendarEventsModel;
+use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
+use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
 use Contao\Database;
+use Contao\System;
 use Contao\Date;
 use Contao\StringUtil;
-use Contao\System;
 
-/**
- * Main class for reservation handling
- */
 class C4gReservationHandler
 {
+    // Per-request caches to reduce repeated computations during form build
+    protected static array $ohEndCache = [];        // key: object-hash_weekday_overnight
+    protected static array $captionCache = [];      // key: objectId_lang
+    protected static ?string $langLower = null;     // normalized current language
+    protected static array $weekdaysCache = [];     // key: signature(opening_hours + periodType)
+
     /**
      * @param $date
      * @return string|null
@@ -103,25 +92,25 @@ class C4gReservationHandler
             $interval = $object->getTimeInterval();
 
             if($weekday == 0){
-                $array = \Contao\StringUtil::deserialize($objectData['oh_sunday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_sunday'], true);
             }
             if($weekday == 1){
-                $array = \Contao\StringUtil::deserialize($objectData['oh_monday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_monday'], true);
             }
             if($weekday == 2){
-                $array = \Contao\StringUtil::deserialize($objectData['oh_tuesday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_tuesday'], true);
             }
             if($weekday == 3){
-                $array = \Contao\StringUtil::deserialize($objectData['oh_wednesday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_wednesday'], true);
             }
             if($weekday == 4){
-                $array = \Contao\StringUtil::deserialize($objectData['oh_thursday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_thursday'], true);
             }
             if($weekday == 5){
-                $array = \Contao\StringUtil::deserialize($objectData['oh_friday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_friday'], true);
             }
             if($weekday == 6){
-                $array = \Contao\StringUtil::deserialize($objectData['oh_saturday']);
+                $array = \Contao\StringUtil::deserialize($objectData['oh_saturday'], true);
             }
 
             $possibleBookings = 0;
@@ -694,19 +683,23 @@ class C4gReservationHandler
      * @return false|mixed
      */
     public static function getEndTimeForMultipleDays($object, $weekday, $isOvernight=false) {
-
+        // Memoize end time per object+weekday+overnight to avoid repeated array work
+        $hash = is_object($object) ? spl_object_hash($object) : (string)($object['id'] ?? uniqid('obj_', true));
+        $cacheKey = $hash.'_'.$weekday.'_'.($isOvernight ? 1 : 0);
+        if (isset(self::$ohEndCache[$cacheKey])) {
+            return self::$ohEndCache[$cacheKey];
+        }
         $weekdayStr = C4gReservationDateChecker::getWeekdayStr($weekday);
         $ohString = "oh_".C4gReservationDateChecker::getWeekdayFullStr($weekday);
-        $oh = StringUtil::deserialize($object->$ohString);
+        $oh = StringUtil::deserialize($object->$ohString, true);
 
         if ($isOvernight) {
             if (key_exists(1, $oh)) {
-
-                return $oh[1]['time_end'];
+                return self::$ohEndCache[$cacheKey] = $oh[1]['time_end'];
             }
         } else {
             foreach ($oh as $key => $period) {
-                return $period['time_end'];
+                return self::$ohEndCache[$cacheKey] = $period['time_end'];
             }
         }
 
@@ -1693,14 +1686,14 @@ class C4gReservationHandler
             //$eventObject = \CalendarEventsModel::findByPk($objectId);
             if (($event || $calendarObject) && $eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > $startTime)) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= $startTime))) {
 
-                $targetAudience = key_exists('targetAudience', $event) && $event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience']) : [];
-                $reservationTargetAudience = key_exists('reservationTargetAudience', $calendarObject) && $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience']) : [];
+                $targetAudience = key_exists('targetAudience', $event) && $event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience'], true) : [];
+                $reservationTargetAudience = key_exists('reservationTargetAudience', $calendarObject) && $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience'], true) : [];
 
-                $speaker = key_exists('speaker', $event) && $event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker']) : [];
-                $reservationSpeaker = key_exists('reservationSpeaker', $calendarObject) && $calendarObject['reservationSpeaker'] ? \Contao\StringUtil::deserialize($calendarObject['reservationSpeaker']) : [];
+                $speaker = key_exists('speaker', $event) && $event['speaker'] ? \Contao\StringUtil::deserialize($event['speaker'], true) : [];
+                $reservationSpeaker = key_exists('reservationSpeaker', $calendarObject) && $calendarObject['reservationSpeaker'] ? \Contao\StringUtil::deserialize($calendarObject['reservationSpeaker'], true) : [];
 
-                $topic = key_exists('topic', $event) && $event['topic'] ? \Contao\StringUtil::deserialize($event['topic']) : [];
-                $reservationTopic = key_exists('reservationTopic', $calendarObject) && $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic']) : [];
+                $topic = key_exists('topic', $event) && $event['topic'] ? \Contao\StringUtil::deserialize($event['topic'], true) : [];
+                $reservationTopic = key_exists('reservationTopic', $calendarObject) && $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic'], true) : [];
 
                 $conferenceLink = key_exists('conferenceLink', $event) && $event['conferenceLink'] ? $event['conferenceLink'] : '';
 
@@ -1775,14 +1768,14 @@ class C4gReservationHandler
                     foreach ($allEvents as $eventObject) {
                         $reservationEvent = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `id` = ? AND `reservationType` IN $idString")->execute($eventObject['id'])->fetchAssoc();
 
-                        $targetAudience = $reservationEvent['targetAudience'] ? \Contao\StringUtil::deserialize($reservationEvent['targetAudience']) : [];
-                        $reservationTargetAudience = $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience']) : [];
+                        $targetAudience = $reservationEvent['targetAudience'] ? \Contao\StringUtil::deserialize($reservationEvent['targetAudience'], true) : [];
+                        $reservationTargetAudience = $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience'], true) : [];
 
-                        $speaker = $reservationEvent['speaker'] ? \Contao\StringUtil::deserialize($reservationEvent['speaker']) : [];
-                        $reservationSpeaker = $calendarObject['reservationSpeaker'] ? \Contao\StringUtil::deserialize($calendarObject['reservationSpeaker']) : [];
+                        $speaker = $reservationEvent['speaker'] ? \Contao\StringUtil::deserialize($reservationEvent['speaker'], true) : [];
+                        $reservationSpeaker = $calendarObject['reservationSpeaker'] ? \Contao\StringUtil::deserialize($calendarObject['reservationSpeaker'], true) : [];
 
-                        $topic = $reservationEvent['topic'] ? \Contao\StringUtil::deserialize($reservationEvent['topic']) : [];
-                        $reservationTopic = $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic']) : [];
+                        $topic = $reservationEvent['topic'] ? \Contao\StringUtil::deserialize($reservationEvent['topic'], true) : [];
+                        $reservationTopic = $calendarObject['reservationTopic'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTopic'], true) : [];
 
                         $conferenceLink = $reservationEvent['conferenceLink'] ?: '';
 
@@ -1834,22 +1827,38 @@ class C4gReservationHandler
      * @return false[]
      */
     private static function checkWeekdays(&$opening_hours, $type) {
+        // Build a stable, light-weight signature for caching
+        $sigArray = [];
+        foreach ($opening_hours as $d => $p) {
+            // only take begin/end needed for decision to keep signature small
+            $sigArray[$d] = [
+                isset($p[0]['time_begin']) ? (int)$p[0]['time_begin'] : 0,
+                isset($p[0]['time_end']) ? (int)$p[0]['time_end'] : 0,
+                isset($p[1]['time_end']) ? (int)$p[1]['time_end'] : 0,
+            ];
+        }
+        $sig = md5(json_encode([$sigArray, (string)($type['periodType'] ?? '')]));
+        if (isset(self::$weekdaysCache[$sig])) {
+            return self::$weekdaysCache[$sig];
+        }
+
         $weekdays = array('0'=>false,'1'=>false,'2'=>false,'3'=>false,'4'=>false,'5'=>false,'6'=>false);
         $timeBeginKey = 0;
-        $timeEndKey = $type['periodType'] == 'overnight' ? 1 : 0;
+        $timeEndKey = ($type['periodType'] ?? '') === 'overnight' ? 1 : 0;
 
         foreach ($opening_hours as $day=>$period) {
-            if ($opening_hours[$day][$timeBeginKey]['time_begin'] && $opening_hours[$day][$timeEndKey]['time_end']) {
-
+            if (!empty($opening_hours[$day][$timeBeginKey]['time_begin']) && !empty($opening_hours[$day][$timeEndKey]['time_end'])) {
                 if ($timeEndKey) {
                     $opening_hours[$day][$timeBeginKey]['time_end_org'] = $opening_hours[$day][$timeBeginKey]['time_end'];
-                    $opening_hours[$day][$timeBeginKey]['time_end'] = $opening_hours[$day][$timeEndKey]['time_end'] < $opening_hours[$day][$timeBeginKey]['time_end'] ? $opening_hours[$day][$timeEndKey]['time_end'] + 86400 : $opening_hours[$day][$timeEndKey]['time_end'];
+                    $opening_hours[$day][$timeBeginKey]['time_end'] = $opening_hours[$day][$timeEndKey]['time_end'] < $opening_hours[$day][$timeBeginKey]['time_end']
+                        ? $opening_hours[$day][$timeEndKey]['time_end'] + 86400
+                        : $opening_hours[$day][$timeBeginKey]['time_end'];
                 }
                 $weekdays[C4gReservationDateChecker::getWeekdayNumber($day)] = true;
             }
         }
 
-        return $weekdays;
+        return self::$weekdaysCache[$sig] = $weekdays;
     }
 
     /**
@@ -1887,7 +1896,7 @@ class C4gReservationHandler
             $types = $moduleTypes;
             $objects = [];
             foreach ($allObjects as $object) {
-                $objectTypes = \Contao\StringUtil::deserialize($object['viewableTypes']);
+                $objectTypes = \Contao\StringUtil::deserialize($object['viewableTypes'], true);
                 foreach($objectTypes as $objectType) {
                     if (in_array($objectType, $types)) {
                         $objects[] = $object;
@@ -1929,14 +1938,26 @@ class C4gReservationHandler
                 $frontendObject->setType(1);
                 $frontendObject->setId($object['id']);
 
+                // Caption mit per-request Cache (
                 $frontendObject->setCaption($object['caption']);
 
-                $captions = StringUtil::deserialize($object['options']);
-                if ($captions) {
-                    foreach ($captions as $caption) {
-                        if ((strpos($GLOBALS['TL_LANGUAGE'],$caption['language']) >= 0) && $caption['caption']) {
-                            $frontendObject->setCaption($caption['caption']);
-                            break;
+                // prepare language key once
+                if (self::$langLower === null) {
+                    self::$langLower = strtolower((string)($GLOBALS['TL_LANGUAGE'] ?? ''));
+                }
+                $captionCacheKey = ($object['id'] ?? '0') . '_' . self::$langLower;
+                if (isset(self::$captionCache[$captionCacheKey])) {
+                    $frontendObject->setCaption(self::$captionCache[$captionCacheKey]);
+                } else {
+                    $captions = StringUtil::deserialize($object['options'], true);
+                    if ($captions) {
+                        foreach ($captions as $caption) {
+                            $capLang = strtolower((string)($caption['language'] ?? ''));
+                            if (($capLang !== '' && strpos(self::$langLower, $capLang) !== false) && !empty($caption['caption'])) {
+                                $frontendObject->setCaption($caption['caption']);
+                                self::$captionCache[$captionCacheKey] = $caption['caption'];
+                                break;
+                            }
                         }
                     }
                 }
@@ -1947,7 +1968,7 @@ class C4gReservationHandler
                 $frontendObject->setCaption($showPrices && $price ? $frontendObject->getCaption()." (".$price.")" : $frontendObject->getCaption());
 
                 $frontendObject->setPeriodType($type['periodType']);
-                $frontendObject->setReservationTypes(\Contao\StringUtil::deserialize($object['viewableTypes']));
+                $frontendObject->setReservationTypes(\Contao\StringUtil::deserialize($object['viewableTypes'], true));
                 $frontendObject->setQuantity($object['quantity']);
                 $frontendObject->setAlmostFullyBookedAt($almostFullyBookedAt);
                 $frontendObject->setPriority($object['priority'] ?: 0);
@@ -1955,9 +1976,9 @@ class C4gReservationHandler
                 $frontendObject->setDescription($object['description'] ?: '');
                 $frontendObject->setImage($object['image']);
                 $frontendObject->setLocation($object['location'] ?: $type['location']);
-                $frontendObject->setAudience($object['targetAudience'] ? \Contao\StringUtil::deserialize($object['targetAudience']) : []);
-                $frontendObject->setSpeaker($object['speaker'] ? \Contao\StringUtil::deserialize($object['speaker']) : []);
-                $frontendObject->setTopic($object['topic'] ? \Contao\StringUtil::deserialize($object['topic']) : []);
+                $frontendObject->setAudience($object['targetAudience'] ? \Contao\StringUtil::deserialize($object['targetAudience'], true) : []);
+                $frontendObject->setSpeaker($object['speaker'] ? \Contao\StringUtil::deserialize($object['speaker'], true) : []);
+                $frontendObject->setTopic($object['topic'] ? \Contao\StringUtil::deserialize($object['topic'], true) : []);
                 $frontendObject->setPrice($object['price'] ?: 0.00);
                 $frontendObject->setTaxOptions($object['taxOptions'] ?: '');
                 $frontendObject->setPriceOption($object['priceoption']);
@@ -2002,35 +2023,37 @@ class C4gReservationHandler
 
                 if ($frontendObject->getTypeOfObject() !== 'fixed_date') {
                     if ($cloneObject) {
-                        $opening_hours['su'] = \Contao\StringUtil::deserialize($cloneObject['oh_sunday']);
-                        $opening_hours['mo'] = \Contao\StringUtil::deserialize($cloneObject['oh_monday']);
-                        $opening_hours['tu'] = \Contao\StringUtil::deserialize($cloneObject['oh_tuesday']);
-                        $opening_hours['we'] = \Contao\StringUtil::deserialize($cloneObject['oh_wednesday']);
-                        $opening_hours['th'] = \Contao\StringUtil::deserialize($cloneObject['oh_thursday']);
-                        $opening_hours['fr'] = \Contao\StringUtil::deserialize($cloneObject['oh_friday']);
-                        $opening_hours['sa'] = \Contao\StringUtil::deserialize($cloneObject['oh_saturday']);
+                        $opening_hours['su'] = \Contao\StringUtil::deserialize($cloneObject['oh_sunday'], true);
+                        $opening_hours['mo'] = \Contao\StringUtil::deserialize($cloneObject['oh_monday'], true);
+                        $opening_hours['tu'] = \Contao\StringUtil::deserialize($cloneObject['oh_tuesday'], true);
+                        $opening_hours['we'] = \Contao\StringUtil::deserialize($cloneObject['oh_wednesday'], true);
+                        $opening_hours['th'] = \Contao\StringUtil::deserialize($cloneObject['oh_thursday'], true);
+                        $opening_hours['fr'] = \Contao\StringUtil::deserialize($cloneObject['oh_friday'], true);
+                        $opening_hours['sa'] = \Contao\StringUtil::deserialize($cloneObject['oh_saturday'], true);
                     } else {
-                        $opening_hours['su'] = \Contao\StringUtil::deserialize($object['oh_sunday']);
-                        $opening_hours['mo'] = \Contao\StringUtil::deserialize($object['oh_monday']);
-                        $opening_hours['tu'] = \Contao\StringUtil::deserialize($object['oh_tuesday']);
-                        $opening_hours['we'] = \Contao\StringUtil::deserialize($object['oh_wednesday']);
-                        $opening_hours['th'] = \Contao\StringUtil::deserialize($object['oh_thursday']);
-                        $opening_hours['fr'] = \Contao\StringUtil::deserialize($object['oh_friday']);
-                        $opening_hours['sa'] = \Contao\StringUtil::deserialize($object['oh_saturday']);
+                        $opening_hours['su'] = \Contao\StringUtil::deserialize($object['oh_sunday'], true);
+                        $opening_hours['mo'] = \Contao\StringUtil::deserialize($object['oh_monday'], true);
+                        $opening_hours['tu'] = \Contao\StringUtil::deserialize($object['oh_tuesday'], true);
+                        $opening_hours['we'] = \Contao\StringUtil::deserialize($object['oh_wednesday'], true);
+                        $opening_hours['th'] = \Contao\StringUtil::deserialize($object['oh_thursday'], true);
+                        $opening_hours['fr'] = \Contao\StringUtil::deserialize($object['oh_friday'], true);
+                        $opening_hours['sa'] = \Contao\StringUtil::deserialize($object['oh_saturday'], true);
                     }
 
                     $weekdays = C4gReservationHandler::checkWeekdays($opening_hours, $type);
                     $frontendObject->setWeekdayExclusion($weekdays);
                     $frontendObject->setOpeningHours($opening_hours);
 
-                    $datesExclusion = \Contao\StringUtil::deserialize($object['days_exclusion']);
-                    $calendars = \Contao\StringUtil::deserialize($object['allTypesEvents']);
+                    $datesExclusion = \Contao\StringUtil::deserialize($object['days_exclusion'], true);
+                    $calendars = \Contao\StringUtil::deserialize($object['allTypesEvents'], true);
 
                     if (is_array($calendars) || is_object($calendars)) {
+                        // Reuse prepared statement for repeated calendar event fetches
+                        $stmtEvents = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ? AND `published` = '1'");
                         foreach ($calendars as $calendarId) {
                             if ($calendarId) {
-                                $events = $database->prepare("SELECT * FROM tl_calendar_events WHERE `pid` = ? AND `published` = '1'")->execute($calendarId)->fetchAllAssoc();
-    
+                                $events = $stmtEvents->execute($calendarId)->fetchAllAssoc();
+
                                 foreach ($events as $event) {
                                     if ($event){
                                         $startDate = $event['startDate'];
@@ -2048,7 +2071,7 @@ class C4gReservationHandler
                                         $datesExclusion[] = ['date_exclusion'=>$startDateTime, 'date_exclusion_end'=>$endDateTime];
     
                                         if ($event['recurring']) {
-                                            $repeatEach = StringUtil::deserialize($event['repeatEach']);
+                                            $repeatEach = StringUtil::deserialize($event['repeatEach'], true);
                                             $repeatEnd = $event['repeatEnd']; //timestamp
                                             $recurrences = $event['recurrences'];
     

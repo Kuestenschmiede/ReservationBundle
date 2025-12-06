@@ -153,20 +153,22 @@ class C4gReservationController extends C4GBaseController
         if ((!property_exists($this,'reservationSettings') || !$this->reservationSettings) && property_exists($this,'reservation_settings') && $this->reservation_settings) {
             $this->session->setSessionValue('reservationSettings', $this->reservation_settings);
             $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
-            $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types);
+            $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types, true);
         }
 
         if ($moduleTypes) {
             $doIt = true;
             $t = 'tl_c4g_reservation_type';
-            $arrValues = array();
-            $arrOptions = array();
-            foreach ($moduleTypes as $moduleType) {
-                $arrColumns = array("$t.published='1' AND $t.reservationObjectType='2' AND $t.id = $moduleType"); //no event type selection - use get params
-                $types = C4gReservationTypeModel::findBy($arrColumns, $arrValues, $arrOptions);
-                if ($types) {
+            // PERFORMANCE: Existenzprüfung gebündelt statt je Typ eine Query
+            $idList = array_map('intval', (array) $moduleTypes);
+            if (!empty($idList)) {
+                $inList = implode(',', $idList);
+                $row = Database::getInstance()
+                    ->prepare("SELECT id FROM $t WHERE published=? AND reservationObjectType=? AND id IN ($inList) LIMIT 1")
+                    ->execute('1', '2')
+                    ->fetchAssoc();
+                if ($row) {
                     $doIt = false;
-                    break;
                 }
             }
         }
@@ -192,7 +194,7 @@ class C4gReservationController extends C4GBaseController
         }
 
         if ($this->reservationSettings->documentStyle) {
-            $arrExternalCSS = StringUtil::deserialize($this->reservationSettings->documentStyle);
+            $arrExternalCSS = StringUtil::deserialize($this->reservationSettings->documentStyle, true);
             $objFile = FilesModel::findByUuid($arrExternalCSS);
             $projectDir = System::getContainer()->getParameter('kernel.project_dir');
             if (file_exists($projectDir . '/' . $objFile->path)) {
@@ -288,7 +290,7 @@ class C4gReservationController extends C4GBaseController
                 $currentTimeStamp = time();
                 $minReservationDates =  $currentTimeStamp + ($minReservationDay * 86400);
                 if ($recurring && !($startDate == $actDate)) {
-                    $repeatEach = StringUtil::deserialize($event->repeatEach);
+                    $repeatEach = StringUtil::deserialize($event->repeatEach, true);
                     $goodDay = false;
                     if ($repeatEach) {
                         $unit = $repeatEach['unit'];
@@ -393,14 +395,13 @@ class C4gReservationController extends C4GBaseController
 
         if ($types) {
             $memberId = 0;
-            if (FrontendUser::getInstance()->isLoggedIn === true) {
-                $member = FrontendUser::getInstance();
-                if ($member) {
-                    $memberId = $member->id;
-                }
+            $frontendUser = FrontendUser::getInstance();
+            if ($frontendUser && $frontendUser->isLoggedIn === true) {
+                $memberId = (int) $frontendUser->id;
             }
 
-            $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types);
+            $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types, true);
+            $langLower = strtolower((string) ($GLOBALS['TL_LANGUAGE'] ?? ''));
 
             foreach ($types as $type) {
                 if ($moduleTypes && is_array($moduleTypes) && (count($moduleTypes) > 0)) {
@@ -416,21 +417,25 @@ class C4gReservationController extends C4GBaseController
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
                 }
-
-                $captions = \Contao\StringUtil::deserialize($type['options']);
+                // Precompute and reuse deserialized arrays (performance)
+                $captions = \Contao\StringUtil::deserialize($type['options'], true);
+                $includedParams = \Contao\StringUtil::deserialize($type['included_params'], true);
+                $additionalParams = \Contao\StringUtil::deserialize($type['additional_params'], true);
+                $participantParams = \Contao\StringUtil::deserialize($type['participant_params'], true);
                 $foundCaption = false;
                 if ($captions && (count($captions) > 0)) {
                     foreach ($captions as $caption) {
-                        if ((strpos(strtolower($GLOBALS['TL_LANGUAGE']), strtolower($caption['language'])) >= 0) && $caption['caption']) {
+                        $capLang = strtolower((string) ($caption['language'] ?? ''));
+                        if (($capLang !== '' && strpos($langLower, $capLang) !== false) && !empty($caption['caption'])) {
                             $typelist[$type['id']] = array(
                                 'id' => $type['id'],
                                 'name' => $caption['caption'],
                                 'periodType' => $type['periodType'],
-                                'includedParams' => \Contao\StringUtil::deserialize($type['included_params']),
-                                'additionalParams' => \Contao\StringUtil::deserialize($type['additional_params']),
+                                'includedParams' => $includedParams,
+                                'additionalParams' => $additionalParams,
                                 'additionalParamsFieldType' => $type['additionalParamsFieldType'],
                                 'additionalParamsMandatory' => $type['additionalParamsMandatory'] ? true : false,
-                                'participantParams' => \Contao\StringUtil::deserialize($type['participant_params']),
+                                'participantParams' => $participantParams,
                                 'participantParamsFieldType' => $type['participantParamsFieldType'],
                                 'participantParamsMandatory' => $type['participantParamsMandatory'] ? true : false,
                                 'minParticipantsPerBooking' => $type['minParticipantsPerBooking'],
@@ -451,16 +456,16 @@ class C4gReservationController extends C4GBaseController
                     }
                 }
 
-                If (!$foundCaption) {
+                if (!$foundCaption) {
                     $typelist[$type['id']] = array(
                         'id' => $type['id'],
                         'name' => $type['caption'],
                         'periodType' => $type['periodType'],
-                        'includedParams' => \Contao\StringUtil::deserialize($type['included_params']),
-                        'additionalParams' => \Contao\StringUtil::deserialize($type['additional_params']),
+                        'includedParams' => $includedParams,
+                        'additionalParams' => $additionalParams,
                         'additionalParamsFieldType' => $type['additionalParamsFieldType'],
                         'additionalParamsMandatory' => $type['additionalParamsMandatory'] ? true : false,
-                        'participantParams' => \Contao\StringUtil::deserialize($type['participant_params']),
+                        'participantParams' => $participantParams,
                         'participantParamsFieldType' => $type['participantParamsFieldType'],
                         'participantParamsMandatory' => $type['participantParamsMandatory'] ? true : false,
                         'minParticipantsPerBooking' => $type['minParticipantsPerBooking'],
@@ -793,7 +798,7 @@ $salutation = [
     ['id' => 'divers', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['divers']],
 ];
 
-$additionaldatas = StringUtil::deserialize($this->reservationSettings->fieldSelection);
+$additionaldatas = StringUtil::deserialize($this->reservationSettings->fieldSelection, true);
 if (!$additionaldatas) {
     $additionaldatas = [];
 }
@@ -879,7 +884,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             ['id' => 'divers', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['divers']],
         ];
 
-        $additionaldatas = StringUtil::deserialize($this->reservationSettings->fieldSelection);
+        $additionaldatas = StringUtil::deserialize($this->reservationSettings->fieldSelection, true);
         if (!$additionaldatas) {
             $additionaldatas = [];
         }
