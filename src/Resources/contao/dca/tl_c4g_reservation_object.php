@@ -345,7 +345,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
 
         'dateTimeBegin' => array(
             'label'     => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['dateTimeBegin'],
-            'default'   => time(),
+            'default'   => '',
             'exclude'   => true,
             'inputType' => 'text',
             'eval'      => array('rgxp' => 'datim', 'mandatory' => true, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
@@ -382,7 +382,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'oh_monday' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_monday'],
-            'default'                 => time(),
+            'default'                 => '',
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
             'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
@@ -432,7 +432,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'oh_tuesday' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_tuesday'],
-            'default'                 => time(),
+            'default'                 => '',
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
             'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
@@ -482,7 +482,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'oh_wednesday' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_wednesday'],
-            'default'                 => time(),
+            'default'                 => '',
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
             'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
@@ -532,7 +532,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'oh_thursday' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_thursday'],
-            'default'                 => time(),
+            'default'                 => '',
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
             'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
@@ -582,7 +582,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'oh_friday' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_friday'],
-            'default'                 => time(),
+            'default'                 => '',
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
             'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
@@ -632,7 +632,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'oh_saturday' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_saturday'],
-            'default'                 => time(),
+            'default'                 => '',
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
             'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
@@ -682,7 +682,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'oh_sunday' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['oh_sunday'],
-            'default'                 => time(),
+            'default'                 => '',
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
             'eval'                    => array('style'=>'min-width: 320px','columnFields'	=> array
@@ -732,7 +732,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'days_exclusion' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['days_exclusion'],
-            'default'                 => time(),
+            'default'                 => '',
             'exclude'                 => true,
             'inputType'               => 'multiColumnWizard',
             'eval'                    => array('style'=>'min-width: 320px', 'columnFields'	=> array
