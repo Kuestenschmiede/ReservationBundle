@@ -2303,6 +2303,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $reservationId = $putVars['reservation_id'];
 
+        $putVars['reservation_title'] = $isEvent ? $reservationObject->title : $reservationObject->caption;
+
         if ($isEvent) {
             $putVars['reservationObjectType'] = '2';
             $objectId = $reservationObject ? $reservationObject->id : 0;
@@ -2355,8 +2357,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $putVars['beginTime'] = $beginTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime) : $beginTime;
             $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate']; //ToDO Check
             $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
-
-            $isEvent ? $putVars['reservation_title'] = $reservationObject->title : $putVars['reservation_title'] = $reservationObject->caption;
 
             // Just notification
             $settings = $this->reservationSettings;
@@ -2519,7 +2519,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
 
             if (!$reservationType->directBooking && ($endTime > 86400)) {
-                //$putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime);
+                $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime);
                 $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime-86400);
             } else if (!$reservationType->directBooking && ($endTime == 86400)) {
                 //$putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime-1);
@@ -3153,8 +3153,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             //}
 
             // All reservation options
-            $includedParams = $reservationType->included_params ?: false;
-            $additionalParams = $reservationType->additional_params ?: false;
+            $includedParams = $typeArray['included_params'] ?: false;
+            $additionalParams = $typeArray['additional_params'] ?: false;
             if ($includedParams || $additionalParams) {
                 $optionsPriceSum = 0;
                 $priceOptionSum = C4gReservationCalculator::calcOptionPrices($putVars, $objArray, $typeArray, $calcTaxes);
