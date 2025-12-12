@@ -146,6 +146,34 @@ class C4gReservationHandler
      */
     public static function getDateExclusionString($list, $type, $removeBookedDays=1, $asArray=0)
     {
+        // Short cross-request cache to avoid repeated heavy computations
+        try {
+            $cache = null; $ttl = 900; // 15 minutes default
+            $container = \Contao\System::getContainer();
+            if ($container && $container->has('cache.app')) { $cache = $container->get('cache.app'); }
+            // Optional container parameter to tune TTL globally (if defined)
+            if ($container && method_exists($container, 'hasParameter') && $container->hasParameter('c4g_reservation_dates_ttl')) {
+                $p = (int)$container->getParameter('c4g_reservation_dates_ttl');
+                if ($p > 0) { $ttl = min($p, 1800); } // cap at 30 minutes
+            }
+            if ($cache && is_array($list) && is_array($type) && isset($type['id'])) {
+                $ids = [];
+                foreach ($list as $o) { if (is_object($o) && method_exists($o, 'getId')) { $ids[] = (string)$o->getId(); } }
+                sort($ids);
+                $lang = (string)($GLOBALS['TL_LANGUAGE'] ?? '');
+                $key = 'c4g_res_date_excl_' . md5(implode('|', [ (string)$type['id'], (string)$removeBookedDays, (string)$asArray, $lang, implode(',', $ids) ]));
+                $item = $cache->getItem($key);
+                if ($item->isHit()) {
+                    $val = $item->get();
+                    if ($asArray) {
+                        if (is_array($val)) { return $val; }
+                    } else {
+                        if (is_string($val)) { return $val; }
+                    }
+                }
+            }
+        } catch (\Throwable $t) { $cache = null; $ttl = 900; }
+
         $result = '';
         if ($list) {
             $alldates = [];
@@ -272,6 +300,16 @@ class C4gReservationHandler
                 }
             }
         }
+
+        // Save to cache if possible
+        try {
+            if (isset($cache) && $cache && isset($item)) {
+                $saveVal = $asArray ? (is_array($result) ? $result : []) : (is_string($result) ? $result : '');
+                $item->set($saveVal);
+                if (method_exists($item, 'expiresAfter')) { $item->expiresAfter($ttl); }
+                $cache->save($item);
+            }
+        } catch (\Throwable $t) { /* ignore cache write errors */ }
 
         return $result;
     }
@@ -2330,6 +2368,29 @@ class C4gReservationHandler
     }
 
   public static function getBookedDays($listType,$reservationObject) {
+        // Short cross-request cache to speed up booked-days calculation
+        try {
+            $cache = null; $ttl = 900; // default 15 min
+            $container = \Contao\System::getContainer();
+            if ($container && $container->has('cache.app')) { $cache = $container->get('cache.app'); }
+            if ($container && method_exists($container, 'hasParameter') && $container->hasParameter('c4g_reservation_dates_ttl')) {
+                $p = (int)$container->getParameter('c4g_reservation_dates_ttl');
+                if ($p > 0) { $ttl = min($p, 1800); }
+            }
+            if ($cache && is_array($listType) && is_object($reservationObject) && method_exists($reservationObject, 'getId')) {
+                $typeId = (string)($listType['id'] ?? '0');
+                $objId = (string)$reservationObject->getId();
+                $period = (string)($listType['periodType'] ?? '');
+                $lang = (string)($GLOBALS['TL_LANGUAGE'] ?? '');
+                $key = 'c4g_res_booked_days_' . md5($typeId.'|'.$objId.'|'.$period.'|'.$lang);
+                $it = $cache->getItem($key);
+                if ($it->isHit()) {
+                    $val = $it->get();
+                    if (is_array($val)) { return $val; }
+                }
+            }
+        } catch (\Throwable $t) { $cache = null; }
+
         $typeId = $listType['id'];
         $objectId = $reservationObject->getId();
         $objectQuantity = $reservationObject->getQuantity();
@@ -2477,7 +2538,15 @@ class C4gReservationHandler
                 $result['dates'] = "";
             }
         }
-        return $result;     
+        // Save result to cache if available
+        try {
+            if (isset($cache) && $cache && isset($it)) {
+                $it->set(is_array($result) ? $result : []);
+                if (method_exists($it, 'expiresAfter')) { $it->expiresAfter($ttl ?? 900); }
+                $cache->save($it);
+            }
+        } catch (\Throwable $t) { /* ignore cache write errors */ }
+        return $result;
     }
 
     public static function getPeriodFaktor($periodType) {
