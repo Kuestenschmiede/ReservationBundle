@@ -101,7 +101,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         '{document_legend:hide}, documentTemplate,documentStyle,documentIdPrefix,documentIdSuffix,documentIdLength,documentIdNext,documentFileName;'.
                         '{ticket_legend:hide}, checkInPage, paricipantCheckInWithSameCode;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
-                        '{expert_legend:hide}, specialParticipantMechanism, showMinMaxWithCapacity, hideParticipantsEmail, onlyParticipants, showMemberData, postals;'
+                        '{expert_legend:hide}, specialParticipantMechanism, showMinMaxWithCapacity, hideParticipantsEmail, onlyParticipants, showMemberData, postals;'.
+                        '{cache_legend:hide}, reservation_enable_cache, reservation_cache_ttl;'
     ),
 
 
@@ -112,6 +113,23 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['id'],
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
+        ),
+        'reservation_enable_cache' => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['reservation_enable_cache'],
+            'exclude'   => true,
+            'inputType' => 'checkbox',
+            'eval'      => array('tl_class' => 'clr'),
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'reservation_cache_ttl' => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['reservation_cache_ttl'],
+            'exclude'   => true,
+            'inputType' => 'text',
+            'default'   => 43200,
+            'eval'      => array('rgxp' => 'natural', 'tl_class' => 'w50', 'maxlength' => 10, 'helpwizard' => false),
+            'sql'       => "int(10) unsigned NOT NULL default '0'",
         ),
 
         'tstamp' => array
