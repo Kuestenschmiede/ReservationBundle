@@ -591,14 +591,12 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $params = $listType['additionalParams'];
         $additionalParamsArr = [];
         if ($params) {
-            foreach ($params as $paramId) {
-                if ($paramId) {
-                    $additionalParam = C4gReservationParamsModel::feParamsCaptions($paramId, $reservationSettings);
-
-                    if ($additionalParam !== null) {
-                        $additionalParamsArr[] = $additionalParam;
-                    }
-                }
+            // Bulk load to avoid N+1 queries
+            $map = C4gReservationParamsModel::feParamsCaptionsBulk((array)$params, $reservationSettings);
+            foreach ((array)$params as $paramId) {
+                if (!$paramId) { continue; }
+                $additionalParam = $map[(string)$paramId] ?? null;
+                if ($additionalParam !== null) { $additionalParamsArr[] = $additionalParam; }
             }
         }
 

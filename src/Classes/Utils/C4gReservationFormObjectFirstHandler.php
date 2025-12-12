@@ -638,14 +638,12 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $includedParamsArr = [];
 
         if ($includedParams) {
-            foreach ($includedParams as $paramId) {
-                if ($paramId) {
-                    $includedParam = C4gReservationParamsModel::feParamsCaptions($paramId, $reservationSettings);
-
-                    if ($includedParam !== null) {
-                        $includedParamsArr[] = $includedParam;
-                    }
-                }
+            // Bulk load to avoid N+1 lookups
+            $map = C4gReservationParamsModel::feParamsCaptionsBulk((array)$includedParams, $reservationSettings);
+            foreach ((array)$includedParams as $paramId) {
+                if (!$paramId) { continue; }
+                $includedParam = $map[(string)$paramId] ?? null;
+                if ($includedParam !== null) { $includedParamsArr[] = $includedParam; }
             }
         }
 
@@ -672,14 +670,12 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $additionalParamsArr = [];
 
         if ($params) {
-            foreach ($params as $paramId) {
-                if ($paramId) {
-                    $additionalParam = C4gReservationParamsModel::feParamsCaptions($paramId, $reservationSettings);
-
-                    if ($additionalParam !== null) {
-                        $additionalParamsArr[] = $additionalParam;
-                    }
-                }
+            // Bulk load to avoid N+1 lookups
+            $map = C4gReservationParamsModel::feParamsCaptionsBulk((array)$params, $reservationSettings);
+            foreach ((array)$params as $paramId) {
+                if (!$paramId) { continue; }
+                $additionalParam = $map[(string)$paramId] ?? null;
+                if ($additionalParam !== null) { $additionalParamsArr[] = $additionalParam; }
             }
         }
 
