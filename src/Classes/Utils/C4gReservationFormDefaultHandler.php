@@ -229,17 +229,59 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $classes = 'reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id'];
         } else {
             /* public static function getReservationTimes($objectList, $typeId, $weekday = -1, $date = null, $actDuration=0, $actCapacity=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '', $showArrivalAndDeparture=false) */
-            $options = C4gReservationHandler::getReservationTimes(
-                        $reservationObjects,
-                        $listType['id'],
-                        0,
-                        -1,
-                        0,
-                        0,
-                        $reservationSettings->showEndTime,
-                        $reservationSettings->showFreeSeats
-
-        );
+            // Cross-request cache for timeslot options (short TTL; respects Reservation Settings enable/TTL)
+            $options = null;
+            try {
+                $useCache = (string)($reservationSettings->reservation_enable_cache ?? '');
+                $useCache = ($useCache === '1' || $useCache === 1 || $useCache === true);
+                $ttlSetting = (int)($reservationSettings->reservation_cache_ttl ?? 0);
+                $ttl = $ttlSetting > 0 ? min($ttlSetting, 1800) : 900; // cap at 30m, default 15m
+                $container = \Contao\System::getContainer();
+                $cache = ($useCache && $container && $container->has('cache.app')) ? $container->get('cache.app') : null;
+                if ($cache) {
+                    $ids = [];
+                    foreach ((array)$reservationObjects as $o) { if (is_object($o) && method_exists($o, 'getId')) { $ids[] = (string)$o->getId(); } }
+                    sort($ids);
+                    $lang = (string)($GLOBALS['TL_LANGUAGE'] ?? '');
+                    $key = 'c4g_res_times_' . md5(implode('|', [ (string)$listType['id'], 'wd=0', 'date=-1', 'dur=0', 'cap=0',
+                        $reservationSettings->showEndTime ? 'we=1' : 'we=0',
+                        $reservationSettings->showFreeSeats ? 'fs=1' : 'fs=0',
+                        'lang='.$lang, implode(',', $ids) ]));
+                    $item = $cache->getItem($key);
+                    if ($item->isHit()) {
+                        $val = $item->get();
+                        if (is_array($val)) { $options = $val; }
+                    }
+                    if ($options === null) {
+                        $val = C4gReservationHandler::getReservationTimes(
+                            $reservationObjects,
+                            $listType['id'],
+                            0,
+                            -1,
+                            0,
+                            0,
+                            $reservationSettings->showEndTime,
+                            $reservationSettings->showFreeSeats
+                        );
+                        $options = is_array($val) ? $val : [];
+                        $item->set($options);
+                        if (method_exists($item, 'expiresAfter')) { $item->expiresAfter($ttl); }
+                        $cache->save($item);
+                    }
+                }
+            } catch (\Throwable $t) { $options = null; }
+            if ($options === null) {
+                $options = C4gReservationHandler::getReservationTimes(
+                    $reservationObjects,
+                    $listType['id'],
+                    0,
+                    -1,
+                    0,
+                    0,
+                    $reservationSettings->showEndTime,
+                    $reservationSettings->showFreeSeats
+                );
+            }
             $classes = 'reservation_time_button reservation_time_button_' . $listType['id']  ;
             //$classes = 'reservation_time_button reservation_time_button_' . $listType['id'] . C4gReservationHandler::getButtonStateClass($reservationObject,$listType['objectType']) ;
         }

@@ -935,6 +935,35 @@ class C4gReservationHandler
      */
     public static function getReservationTimes($objectList, $typeId, $weekday = -1, $date = null, $actDuration=0, $actCapacity=0, $withEndTimes=false, $showFreeSeats=false, $checkToday=false, $langCookie = '', $showArrivalAndDeparture=false)
     {
+        // In-request memoization to avoid duplicate heavy computations during one request
+        // Build a stable key based on parameters and involved object IDs
+        static $___memo = [];
+        try {
+            $ids = [];
+            if (is_array($objectList)) {
+                foreach ($objectList as $obj) { if (is_object($obj) && method_exists($obj, 'getId')) { $ids[] = (string)$obj->getId(); } }
+            } elseif (is_object($objectList) && method_exists($objectList, 'getId')) {
+                $ids[] = (string)$objectList->getId();
+            }
+            sort($ids);
+            $key = implode('|', [
+                (string)$typeId,
+                (string)$weekday,
+                (string)$date,
+                (string)$actDuration,
+                (string)$actCapacity,
+                $withEndTimes ? '1':'0',
+                $showFreeSeats ? '1':'0',
+                $checkToday ? '1':'0',
+                (string)$langCookie,
+                $showArrivalAndDeparture ? '1':'0',
+                implode(',', $ids)
+            ]);
+            if (array_key_exists($key, $___memo)) {
+                return $___memo[$key];
+            }
+        } catch (\Throwable $t) { $key = null; }
+
         $timeParams = [
           'tsdate' => 0,
           'objectList' => $objectList,
@@ -1327,7 +1356,9 @@ class C4gReservationHandler
             $timeParams['result'] = [];
         }
 
-        return $timeParams['result'];
+        $result = $timeParams['result'];
+        if (isset($key)) { $___memo[$key] = $result; }
+        return $result;
     }
 
     /**
