@@ -403,6 +403,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                         $reservationLocationField->setRemoveWithEmptyCondition(true);
                         $reservationLocationField->setNotificationField(true);
                         $reservationLocationField->setWithoutValidation(true);
+                        $reservationLocationField->setHidden($reservationSettings->hideLocation);
                         //$reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-location');
                         $this->fieldList[] = $reservationLocationField;
                     }

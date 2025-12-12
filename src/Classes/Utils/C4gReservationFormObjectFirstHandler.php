@@ -295,6 +295,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                         $reservationLocationField->setWithoutValidation(true);
                         //$reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-' . $reservationObject->getId() . ' event-location');
                         $reservationLocationField->setPrintable($this->module->isWithDefaultPDFContent());
+                        $reservationLocationField->setHidden($reservationSettings->hideLocation);
                         $this->fieldList[] = $reservationLocationField;
                     }
                 }
