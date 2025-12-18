@@ -3,6 +3,13 @@ services:
     autowire: true
     autoconfigure: true
 
+  # Dedicated cache pool for con4gis Reservation to avoid impacting other modules
+  cache.c4g_reservation:
+    class: Symfony\Component\Cache\Adapter\TagAwareAdapter
+    arguments:
+      - '@cache.app'
+    public: true
+
   con4gis\ReservationBundle\Controller\C4gReservationController:
     #autowire: true 
     arguments:

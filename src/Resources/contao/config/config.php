@@ -105,3 +105,11 @@ if ($exportExists) {
 }
 
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array(\con4gis\ReservationBundle\Classes\InsertTags\C4gReservationInsertTags::class, 'replaceTag');
+
+/**
+ * Purge entry for reservation form cache (System > Wartung).
+ */
+$GLOBALS['TL_PURGE']['folders']['con4gis_reservation_form'] = [
+    'callback' => [\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class, 'purgeReservationFormCache'],
+    'affected' => ['var/cache/* (cache.app)']
+];
