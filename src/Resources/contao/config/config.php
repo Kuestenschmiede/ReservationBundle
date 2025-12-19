@@ -106,6 +106,15 @@ if ($exportExists) {
 
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array(\con4gis\ReservationBundle\Classes\InsertTags\C4gReservationInsertTags::class, 'replaceTag');
 
+// Hook: Projects-Framework generische Print-Daten-Anreicherung
+if (!isset($GLOBALS['TL_HOOKS']['c4gProjectsPreparePrintData']) || !is_array($GLOBALS['TL_HOOKS']['c4gProjectsPreparePrintData'])) {
+    $GLOBALS['TL_HOOKS']['c4gProjectsPreparePrintData'] = [];
+}
+$GLOBALS['TL_HOOKS']['c4gProjectsPreparePrintData'][] = [
+    \con4gis\ReservationBundle\Classes\Hooks\ReservationPrintDataEnricher::class,
+    'enrich'
+];
+
 /**
  * Purge entry for reservation form cache (System > Wartung).
  */

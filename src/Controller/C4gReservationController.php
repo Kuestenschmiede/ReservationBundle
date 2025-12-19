@@ -2966,6 +2966,25 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $this->getDialogParams()->setDocumentFilename($fileName);
         }
 
+        // Sicherstellen: Finale Preisfelder (Basis + Optionen + Rabatt [+Steuern]) sind in $putVars vorhanden,
+        // bevor gespeichert/weitergeleitet wird. AllPrices wurde weiter oben bereits ausgeführt, aber
+        // hier wird ein letzter, idempotenter Aufruf vorgenommen, um etwaige spätere Änderungen an $putVars
+        // (z. B. Dokumenten-IDs) nicht zu beeinträchtigen und konsistente Werte zu garantieren.
+        try {
+            if ($isEvent) {
+                self::allPrices($settings, $putVars, $reservationObject, $reservationEventObject, $reservationType, $isEvent, $putVars['desiredCapacity_'.$reservationType->id]);
+            } else {
+                self::allPrices($settings, $putVars, $reservationObject, '', $reservationType, $isEvent, $putVars['desiredCapacity_'.$reservationType->id]);
+            }
+        } catch (\Throwable $t) {
+            // still continue – putVars behalten bestehende Werte
+        }
+
+        // Die finalen PutVars zusätzlich im Modul ablegen, damit nachgelagerte Prozesse (z. B. PDF) sie abrufen können
+        if (method_exists($this, 'setPutVars')) {
+            $this->setPutVars($putVars);
+        }
+
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
         $result = $action->run();
@@ -3153,54 +3172,158 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         if ($price || $calcTaxes || $showPrices) {
 
-            $objectArr = is_array($resObject) ? $resObject : (array)$resObject;
-            $typeArr = is_array($reservationType) ? $reservationType : (array)$reservationType;
+            // Robuste Normalisierung der Eingaben nach Array-Struktur,
+            // damit Optionslisten/IDs sauber verfügbar sind (keine brittle array_values-Offsets)
+            $normalizeToArray = static function ($value) {
+                if ($value === null) {
+                    return [];
+                }
+                // Contao Model → row()
+                if ($value instanceof \Contao\Model) {
+                    /** @var \Contao\Model $value */
+                    return $value->row();
+                }
+                // Contao Database\Result oder beliebiges Objekt mit row() → row()
+                if (is_object($value) && method_exists($value, 'row')) {
+                    try {
+                        $row = $value->row();
+                        if (is_array($row) && !empty($row)) {
+                            return $row;
+                        }
+                    } catch (\Throwable $t) {
+                        // ignore, fallback below
+                    }
+                }
+                // Generischer Objekt-Fallback: nur als Array abbilden, wenn es public properties gibt
+                if (is_object($value)) {
+                    $props = get_object_vars($value);
+                    if (!empty($props)) {
+                        return $props;
+                    }
+                    // als letztes Mittel: in Array casten
+                    return (array) $value;
+                }
+                // Bereits Array oder skalare Werte
+                return is_array($value) ? $value : (array) $value;
+            };
 
-            $typeArray = is_array($reservationType) ? $reservationType : (array_values($typeArr)[2][0] ?? $reservationType);
+            $typeArray = $normalizeToArray($reservationType);
+            $objArray  = $normalizeToArray($isEvent ? $reservationEventObject : $reservationObject);
+            $resArray  = $normalizeToArray($resObject);
 
-            if ($isEvent) {
-                $objArray = is_array($reservationObject) ? $reservationObject : (array_values($objectArr)[0] ?? $reservationObject);
-                $countPersons = intval($putVars['desiredCapacity_' . $objArray['reservationType']]);
-                $desiredCapacity = $countPersons;
-            } else {
-                $objArray = is_array($reservationObject) ? $reservationObject : (array_values($objectArr)[2][0] ?? $reservationObject);
+            // PID Sicherung (wird für calcOptionPrices benötigt)
+            if (!isset($objArray['pid']) && $isEvent && $reservationEventObject instanceof \Contao\Model) {
+                $objArray['pid'] = $reservationEventObject->pid;
+            } elseif (!isset($objArray['pid']) && !$isEvent && $reservationObject instanceof \Contao\Model) {
+                $objArray['pid'] = $reservationObject->pid;
             }
 
-            $duration = $putVars['duration_'.$typeArray['id']];
+            // Minimal erforderliche Schlüssel absichern
+            if (!isset($typeArray['id']) && is_object($reservationType) && property_exists($reservationType, 'id')) {
+                $typeArray['id'] = $reservationType->id;
+            }
+            // Dauer (falls im PUT nicht vorhanden) wird in calcPrices nochmal fallbacked, aber wir versuchen hier den Key zu lesen
+            $durationKey = isset($typeArray['id']) ? ('duration_'.$typeArray['id']) : null;
+            // Dauer aus putVars bevorzugen (Frontend liefert ggf. Werte wie "4#..." → nur Zahl übernehmen)
+            $duration = 0;
+            if ($durationKey && isset($putVars[$durationKey]) && $putVars[$durationKey] !== '') {
+                $durVal = $putVars[$durationKey];
+                if (is_string($durVal) && strpos($durVal, '#') !== false) {
+                    $durVal = substr($durVal, 0, strpos($durVal, '#'));
+                }
+                $duration = intval($durVal);
+            } elseif (isset($putVars['duration']) && $putVars['duration'] !== '') {
+                $duration = intval($putVars['duration']);
+            }
+            // Fallback: wenn Dauer 0 ist und periodType week/day, versuche aus beginDate_/endDate_ zu ermitteln
+            if (!$duration && !empty($typeArray['periodType'])) {
+                $typeId = $typeArray['id'] ?? null;
+                if ($typeId) {
+                    $bdKey = 'beginDate_'.$typeId;
+                    $edKey = 'endDate_'.$typeId;
+                    $beginTs = isset($putVars[$bdKey]) ? (is_numeric($putVars[$bdKey]) ? intval($putVars[$bdKey]) : strtotime($putVars[$bdKey])) : 0;
+                    $endTs   = isset($putVars[$edKey]) ? (is_numeric($putVars[$edKey]) ? intval($putVars[$edKey]) : strtotime($putVars[$edKey])) : 0;
+                    if ($beginTs && $endTs && $endTs >= $beginTs) {
+                        if ($typeArray['periodType'] === 'week') {
+                            $duration = max(1, (int) round(($endTs - $beginTs) / (60 * 60 * 24 * 7)));
+                        } elseif ($typeArray['periodType'] === 'day' || $typeArray['periodType'] === 'overnight') {
+                            $duration = max(1, (int) round(($endTs - $beginTs) / (60 * 60 * 24)));
+                        }
+                    }
+                }
+            }
+
+            // Falls Event: desiredCapacity aus putVars für diesen Typ lesen
+            if ($isEvent) {
+                $typeIdForCap = $typeArray['id'] ?? ($objArray['reservationType'] ?? null);
+                if ($typeIdForCap) {
+                    $countPersons = intval($putVars['desiredCapacity_' . $typeIdForCap] ?? 0);
+                    if ($countPersons > 0) {
+                        $desiredCapacity = $countPersons;
+                    }
+                }
+            }
 
             $priceArray = false;
-            $priceOptionSum = false;
-            $priceParticipantOptionSum = false;
+            // Sichere Defaults, um spätere Indexzugriffe zu erlauben
+            $priceOptionSum = ['priceOptionSum' => 0, 'priceOptionNet' => 0, 'priceOptionTax' => 0];
+            $priceParticipantOptionSum = [
+                'priceParticipantOptionSum' => 0,
+                'priceParticipantOptionSumNet' => 0,
+                'priceParticipantOptionSumTax' => 0
+            ];
+            $optionsPriceSum = 0;
 
             // Reservation price
             //if ($showPrices) {
                 $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, $isEvent, $desiredCapacity, $duration, '', '', $calcTaxes);
-                $priceSum = $priceArray['priceSum'] ?: $priceArray['price'];
+
+                // Basis: Preis für EIN Objekt über die gewählte Dauer
+                $priceSum = ($priceArray['priceSum'] ?? 0) ?: ($priceArray['price'] ?? 0);
             //}
 
             // All reservation options
-            $includedParams = $typeArray['included_params'] ?: false;
-            $additionalParams = $typeArray['additional_params'] ?: false;
+            $includedParams = $typeArray['included_params'] ?? false;
+            $additionalParams = $typeArray['additional_params'] ?? false;
             if ($includedParams || $additionalParams) {
-                $optionsPriceSum = 0;
-                $priceOptionSum = C4gReservationCalculator::calcOptionPrices($putVars, $objArray, $typeArray, $calcTaxes);
-
-                if ($priceOptionSum) {
-                    $putVars['optionsPriceSum'] = $priceOptionSum['priceOptionSum'];
-                    $priceSum += $priceOptionSum['priceOptionSum'];
+                // Härtung putVars für calcOptionPrices (Strings zu Booleans/Ints wandeln)
+                foreach ($putVars as $pk => $pv) {
+                    if (is_string($pv) && strpos($pk, 'additional_params_') === 0) {
+                        if ($pv === 'true') { $putVars[$pk] = true; }
+                        elseif ($pv === 'false') { $putVars[$pk] = false; }
+                        elseif (is_numeric($pv) && (float)$pv == (int)$pv) { $putVars[$pk] = (int)$pv; }
+                    }
+                }
+                $tmpOption = C4gReservationCalculator::calcOptionPrices($putVars, $objArray, $typeArray, $calcTaxes);
+                if (is_array($tmpOption)) {
+                    $priceOptionSum = array_merge($priceOptionSum, $tmpOption);
                 }
             }
 
             // Participant options
-            $participantParams = $resObject->participant_params ?: false;
+            $participantParams = $resArray['participant_params'] ?? false;
             $onlyParticipants = $settings->onlyParticipants ?: false;
 
             if ($participantParams) {
-                $priceParticipantOptionSum = C4gReservationCalculator::calcParticipantOptionPrices(intval($desiredCapacity), $putVars, $objArray, $typeArray, $calcTaxes, $onlyParticipants, $settings->specialParticipantMechanism);
-
-                $optionsPriceSum = $priceOptionSum['priceOptionSum'] + $priceParticipantOptionSum['priceParticipantOptionSum'];
-                $priceSum += $priceParticipantOptionSum['priceParticipantOptionSum'];
+                // Härtung putVars für calcParticipantOptionPrices
+                foreach ($putVars as $pk => $pv) {
+                    if (is_string($pv) && strpos($pk, 'participants_') === 0) {
+                        if ($pv === 'true') { $putVars[$pk] = true; }
+                        elseif ($pv === 'false') { $putVars[$pk] = false; }
+                        elseif (is_numeric($pv) && (float)$pv == (int)$pv) { $putVars[$pk] = (int)$pv; }
+                    }
+                }
+                $tmpPartOption = C4gReservationCalculator::calcParticipantOptionPrices(intval($desiredCapacity), $putVars, $objArray, $typeArray, $calcTaxes, $onlyParticipants, $settings->specialParticipantMechanism);
+                if (is_array($tmpPartOption)) {
+                    $priceParticipantOptionSum = array_merge($priceParticipantOptionSum, $tmpPartOption);
+                }
             }
+
+            // Gesamte Optionssumme (Reservierung + Teilnehmer) berechnen und zur Basis addieren
+            $priceOptionSumValue = floatval($priceOptionSum['priceOptionSum'] ?? 0);
+            $priceParticipantOptionSumValue = floatval($priceParticipantOptionSum['priceParticipantOptionSum'] ?? 0);
+            $optionsPriceSum = $priceOptionSumValue + $priceParticipantOptionSumValue;
+            $priceSum = floatval($priceSum) + $optionsPriceSum;
 
             if ($putVars['discountPercent']) {
                 if ($priceSum) {
@@ -3210,35 +3333,132 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
 
-            if ($priceArray['price'] || $priceSum) {
-                $putVars['price'] = C4gReservationHandler::formatPrice($priceArray['price']) . $priceArray['priceInfo'];
+            if (($priceArray['price'] ?? 0) || $priceSum) {
+                $putVars['price'] = C4gReservationHandler::formatPrice($priceArray['price'] ?? 0) . ($priceArray['priceInfo'] ?? '');
                 $putVars['priceSum'] = C4gReservationHandler::formatPrice($priceSum);
             } else {
-                $putVars['priceSum'] = C4gReservationHandler::formatPrice($price) . $priceArray['priceInfo'];
+                $putVars['priceSum'] = C4gReservationHandler::formatPrice($price) . ($priceArray['priceInfo'] ?? '');
             }
 
-//                $putVars['optionsPriceSum'] = C4gReservationHandler::formatPrice($putVars['optionsPriceSum']);
+            // Summe aller Optionen (Reservierung + Teilnehmer) für Ausgabe
             $putVars['priceOptionSum'] = C4gReservationHandler::formatPrice($optionsPriceSum);
 
             if ($calcTaxes) {
-                $priceNet = $priceArray['priceNet'] ?: 0;
-                $priceTax = $priceArray['priceTax'] ?: 0;
+                $priceNet = floatval($priceArray['priceNet'] ?? 0);
+                $priceTax = floatval($priceArray['priceTax'] ?? 0);
 
                 $putVars['reservationTaxRate'] = $priceArray['reservationTaxRate'];
 
-                $putVars['priceNet'] = C4gReservationHandler::formatPrice($priceArray['priceNet']);
-                $putVars['priceTax'] = C4gReservationHandler::formatPrice($priceArray['priceTax']);
+                $putVars['priceNet'] = C4gReservationHandler::formatPrice($priceNet);
+                $putVars['priceTax'] = C4gReservationHandler::formatPrice($priceTax);
 
-                $putVars['priceOptionSumNet'] = C4gReservationHandler::formatPrice($priceOptionSum['priceOptionNet'] + $priceParticipantOptionSum['priceParticipantOptionSumNet']);
-                $putVars['priceOptionSumTax'] = C4gReservationHandler::formatPrice($priceOptionSum['priceOptionTax'] + $priceParticipantOptionSum['priceParticipantOptionSumTax']);
+                $optNet = floatval($priceOptionSum['priceOptionNet'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSumNet'] ?? 0);
+                $optTax = floatval($priceOptionSum['priceOptionTax'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSumTax'] ?? 0);
+                $putVars['priceOptionSumNet'] = C4gReservationHandler::formatPrice($optNet);
+                $putVars['priceOptionSumTax'] = C4gReservationHandler::formatPrice($optTax);
 
-                $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($priceNet + $priceOptionSum['priceOptionNet'] + $priceParticipantOptionSum['priceParticipantOptionSumNet']);
-                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($priceTax + $priceOptionSum['priceOptionTax'] + $priceParticipantOptionSum['priceParticipantOptionSumTax']);
+                $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($priceNet + $optNet);
+                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($priceTax + $optTax);
             }
         } else {
-            $putVars['price'] = C4gReservationHandler::formatPrice($price);
-            $putVars['priceSum'] = C4gReservationHandler::formatPrice($price ?? '');
-//            $putVars['optionsPriceSum'] =  C4gReservationHandler::formatPrice($putVars['optionsPriceSum']);
+            // Fallback: Berechne Basis + Optionen auch dann, wenn keine Preis-/Anzeige-Flags gesetzt sind,
+            // damit priceSum in putVars stets korrekt inkl. Optionen ankommt.
+
+            // Robuste Normalisierung (wie oben)
+            $normalizeToArray = static function ($value) {
+                if ($value === null) return [];
+                if ($value instanceof \Contao\Model) return $value->row();
+                if (is_object($value) && method_exists($value, 'row')) {
+                    try { $row = $value->row(); if (is_array($row) && !empty($row)) return $row; } catch (\Throwable $t) {}
+                }
+                if (is_object($value)) {
+                    $props = get_object_vars($value);
+                    return !empty($props) ? $props : (array) $value;
+                }
+                return is_array($value) ? $value : (array) $value;
+            };
+
+            $typeArray = $normalizeToArray($reservationType);
+            $objArray  = $normalizeToArray($isEvent ? $reservationEventObject : $reservationObject);
+            $resArray  = $normalizeToArray($resObject);
+
+            if (!isset($objArray['pid']) && $isEvent && $reservationEventObject instanceof \Contao\Model) {
+                $objArray['pid'] = $reservationEventObject->pid;
+            } elseif (!isset($objArray['pid']) && !$isEvent && $reservationObject instanceof \Contao\Model) {
+                $objArray['pid'] = $reservationObject->pid;
+            }
+
+            $duration = 0;
+            $typeId = $typeArray['id'] ?? null;
+            if ($typeId && isset($putVars['duration_'.$typeId]) && $putVars['duration_'.$typeId] !== '') {
+                $durVal = $putVars['duration_'.$typeId];
+                if (is_string($durVal) && strpos($durVal, '#') !== false) {
+                    $durVal = substr($durVal, 0, strpos($durVal, '#'));
+                }
+                $duration = intval($durVal);
+            }
+            if (!$duration && !empty($typeArray['periodType']) && $typeId) {
+                $bdKey = 'beginDate_'.$typeId; $edKey = 'endDate_'.$typeId;
+                $beginTs = isset($putVars[$bdKey]) ? (is_numeric($putVars[$bdKey]) ? intval($putVars[$bdKey]) : strtotime($putVars[$bdKey])) : 0;
+                $endTs   = isset($putVars[$edKey]) ? (is_numeric($putVars[$edKey]) ? intval($putVars[$edKey]) : strtotime($putVars[$edKey])) : 0;
+                if ($beginTs && $endTs && $endTs >= $beginTs) {
+                    if ($typeArray['periodType'] === 'week') {
+                        $duration = max(1, (int) round(($endTs - $beginTs) / (60 * 60 * 24 * 7)));
+                    } elseif ($typeArray['periodType'] === 'day' || $typeArray['periodType'] === 'overnight') {
+                        $duration = max(1, (int) round(($endTs - $beginTs) / (60 * 60 * 24)));
+                    }
+                }
+            }
+
+            // Sichere Defaults vorbereiten
+            $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, $isEvent, $desiredCapacity, $duration, '', '', false);
+            $priceSum = ($priceArray['priceSum'] ?? 0) ?: ($priceArray['price'] ?? 0);
+
+            // Optionssummen berechnen
+            $priceOptionSum = ['priceOptionSum' => 0];
+            $priceParticipantOptionSum = ['priceParticipantOptionSum' => 0];
+
+            // Härtung putVars (Strings zu Booleans/Ints wandeln) für alle Optionstypen
+            foreach ($putVars as $pk => $pv) {
+                if (is_string($pv) && (strpos($pk, 'additional_params_') === 0 || strpos($pk, 'participants_') === 0)) {
+                    if ($pv === 'true') { $putVars[$pk] = true; }
+                    elseif ($pv === 'false') { $putVars[$pk] = false; }
+                    elseif (is_numeric($pv) && (float)$pv == (int)$pv) { $putVars[$pk] = (int)$pv; }
+                }
+            }
+
+            $includedParams = $typeArray['included_params'] ?? false;
+            $additionalParams = $typeArray['additional_params'] ?? false;
+            if ($includedParams || $additionalParams) {
+                $tmpOption = C4gReservationCalculator::calcOptionPrices($putVars, $objArray, $typeArray, false);
+                if (is_array($tmpOption)) {
+                    $priceOptionSum = array_merge($priceOptionSum, $tmpOption);
+                }
+            }
+
+            $participantParams = $resArray['participant_params'] ?? false;
+            $onlyParticipants = $settings->onlyParticipants ?: false;
+            if ($participantParams) {
+                $tmpPartOption = C4gReservationCalculator::calcParticipantOptionPrices(intval($desiredCapacity), $putVars, $objArray, $typeArray, false, $onlyParticipants, $settings->specialParticipantMechanism);
+                if (is_array($tmpPartOption)) {
+                    $priceParticipantOptionSum = array_merge($priceParticipantOptionSum, $tmpPartOption);
+                }
+            }
+
+            $optionsPriceSum = floatval($priceOptionSum['priceOptionSum'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSum'] ?? 0);
+            $priceSum += $optionsPriceSum;
+
+            // Rabatt anwenden, falls vorhanden
+            if (!empty($putVars['discountPercent']) && $priceSum) {
+                $discount = (floatval($priceSum) / 100) * floatval($putVars['discountPercent']);
+                $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount);
+                $priceSum = floatval($priceSum) - $discount;
+            }
+
+            // Ausgabe-Felder setzen
+            $putVars['price'] = C4gReservationHandler::formatPrice($priceArray['price'] ?? 0);
+            $putVars['priceSum'] = C4gReservationHandler::formatPrice($priceSum);
+            $putVars['priceOptionSum'] = C4gReservationHandler::formatPrice($optionsPriceSum);
         }
     }
 

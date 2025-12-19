@@ -502,24 +502,24 @@ class C4gReservationCalculator
           }
       }
 
-        // Additional reservation options
       $additionalParams = $type['additional_params'] ?: false;
       if ($additionalParams) {
           $optionList = unserialize($additionalParams);
           $additionalParamArr = isset($optionList) ? self::getReservationOptions($optionList, [], $calcTaxes) : false;
-          $objectPid = $object['pid'];
+          $objectId = $object['id'] ?? 0;
+          $objectPid = $object['pid'] ?? 0;
           foreach ($additionalParamArr as $key => $value) {
 
               if ($type['additionalParamsFieldType'] == 'radio') {
-                  $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectPid];
+                  $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectId] ?? $putVars['additional_params_' . $type['id'] . '-00' . $objectPid];
                   if ($value['id'] == $chosenAdditionalOptions) {
                       $addParamSum += $value['price'];
                   }
 
               } else {
 
-                  $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectPid . '|' . $value['id']];
-                  if ($chosenAdditionalOptions === 'true') {
+                  $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectId . '|' . $value['id']] ?? $putVars['additional_params_' . $type['id'] . '-00' . $objectPid . '|' . $value['id']];
+                  if ($chosenAdditionalOptions === 'true' || $chosenAdditionalOptions === true || $chosenAdditionalOptions === 1 || $chosenAdditionalOptions === '1') {
                       $chosenAdditionalOptions = true;
                   } else {
                       $chosenAdditionalOptions = false;
@@ -599,7 +599,7 @@ class C4gReservationCalculator
                       } else {
                           $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']];
 
-                          if ($chosenParticipantOptions === 'true') {
+                          if ($chosenParticipantOptions === 'true' || $chosenParticipantOptions === true) {
                               $chosenParticipantOptions = true;
                           } else {
                               $chosenParticipantOptions = false;
@@ -627,7 +627,7 @@ class C4gReservationCalculator
                       } else {
                           $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '§participant_params§' . $i. '|' . $value['id']];
 
-                          if ($chosenParticipantOptions === $value['id']) {
+                          if ($chosenParticipantOptions === $value['id'] || $chosenParticipantOptions === 'true' || $chosenParticipantOptions === true || $chosenParticipantOptions === 1 || $chosenParticipantOptions === '1') {
                               $priceParticipantOptionSum += $value['price'];
                               $chosenParticipantOptions = true;
                           } else {
