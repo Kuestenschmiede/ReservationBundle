@@ -4,7 +4,7 @@
  * in gutes.io operator or provider pages.
 
  * @package    gutesio
- * @copyright  Küstenschmiede GmbH Software & Design (Matthias Eilers)
+ * @copyright (c) 2010-2026, by Küstenschmiede GmbH Software & Design (Matthias Eilers)
  * @link       https://gutes.io
  */
 namespace con4gis\ReservationBundle\DependencyInjection;
