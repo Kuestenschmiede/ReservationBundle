@@ -32,7 +32,10 @@ class C4gReservationCheckInHelper
 
     public function generateBeforeSaving($params)
     {
-        $key = $params['reservation_id'];
+        $key = $params['reservation_id'] ?? '';
+        if (!$key) {
+            return $params;
+        }
         $path = 'files/c4g_brick_data/qrcode/';
         $rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
         if (!is_dir($rootDir.'/'.$path)) {

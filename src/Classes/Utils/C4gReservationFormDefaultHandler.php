@@ -296,6 +296,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationEndTimeDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationEndTimeDBField;
 
+
         $reservationObjectField = new C4GSelectField();
         $reservationObjectField->setChosen(false);
         $reservationObjectField->setFieldName('reservation_object');

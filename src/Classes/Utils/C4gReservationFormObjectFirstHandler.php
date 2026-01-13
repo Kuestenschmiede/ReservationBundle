@@ -589,6 +589,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $reservationEndTimeDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationEndTimeDBField;
 
+
 //        $captions = StringUtil::deserialize($object['options']);
         $includedParams = $listType['includedParams'];
         $includedParamsArr = [];

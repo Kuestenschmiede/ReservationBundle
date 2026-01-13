@@ -126,6 +126,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationEndTimeDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationEndTimeDBField;
 
+
         //$dateCondition = new C4GBrickCondition(C4GBrickConditionType::BOOLSWITCH, 'beginDate_'.$listType['id']);
 
         $reservationObjectField = new C4GSelectField();

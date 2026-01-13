@@ -492,11 +492,13 @@ class C4gReservationCalculator
           $optionList = unserialize($includedParams);
           $incParamArr = isset($optionList) ? self::getReservationOptions($optionList, [], $calcTaxes) : false;
           foreach ($incParamArr as $key => $value) {
-              $incParamSum += $value['price'];
+              $priceVal = floatval($value['price'] ?? 0);
+              $incParamSum += $priceVal;
               if ($calcTaxes) {
                   //individual included option tax
-                  $incParamSumNet += $value['priceOptionNet'];
-                  $incParamSumTax += $value['price'] - $value['priceOptionNet'];
+                  $netVal = floatval($value['priceOptionNet'] ?? 0);
+                  $incParamSumNet += $netVal;
+                  $incParamSumTax += $priceVal - $netVal;
               }
           }
       }
@@ -508,11 +510,17 @@ class C4gReservationCalculator
           $objectId = $object['id'] ?? 0;
           $objectPid = $object['pid'] ?? 0;
           foreach ($additionalParamArr as $key => $value) {
+              $priceVal = floatval($value['price'] ?? 0);
+              $netVal = floatval($value['priceOptionNet'] ?? 0);
 
               if ($type['additionalParamsFieldType'] == 'radio') {
                   $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectId] ?? $putVars['additional_params_' . $type['id'] . '-00' . $objectPid];
                   if ($value['id'] == $chosenAdditionalOptions) {
-                      $addParamSum += $value['price'];
+                      $addParamSum += $priceVal;
+                      if ($calcTaxes) {
+                          $addParamSumNet += $netVal;
+                          $addParamSumTax += $priceVal - $netVal;
+                      }
                   }
 
               } else {
@@ -525,11 +533,11 @@ class C4gReservationCalculator
                   }
 
                   if ($chosenAdditionalOptions) {
-                      $addParamSum += $value['price'];
+                      $addParamSum += $priceVal;
                       if ($calcTaxes) {
                           //individual additional option tax
-                          $addParamSumNet += $value['priceOptionNet'];
-                          $addParamSumTax += $value['price'] - $value['priceOptionNet'];
+                          $addParamSumNet += $netVal;
+                          $addParamSumTax += $priceVal - $netVal;
                       }
                   }
               }
@@ -581,24 +589,24 @@ class C4gReservationCalculator
               $priceParticipantOptionSumTax = 0;
           }
 
-          for ($i = 0; $i < ($counter); $i++) {
+          for ($i = 0; $i < ($desiredCapacity); $i++) {
               foreach ($participantParamArr as $key => $value){
                   if ($mechanism) {
                       if ($object['participantParamsFieldType'] == 'radio') {
+                          $keyStr = 'participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i;
+                          $chosenParticipantOptions = $putVars[$keyStr] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . $i] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . ($i+1)] ?? null;
 
-                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i];
-
-                          if ($chosenParticipantOptions === $value['id']) {
-                              //$priceParticipantOptionSum += $value['price'];
+                          if (strval($chosenParticipantOptions) === strval($value['id']) || (is_array($chosenParticipantOptions) && in_array($value['id'], $chosenParticipantOptions))) {
                               $chosenParticipantOptions = true;
                           } else {
                               $chosenParticipantOptions = false;
                           }
 
                       } else {
-                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']];
+                          $keyStr = 'participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id'];
+                          $chosenParticipantOptions = $putVars[$keyStr] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . $i . '|' . $value['id']] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . ($i+1) . '|' . $value['id']] ?? null;
 
-                          if ($chosenParticipantOptions === 'true' || $chosenParticipantOptions === true) {
+                          if ($chosenParticipantOptions === 'true' || $chosenParticipantOptions === true || strval($chosenParticipantOptions) === '1' || (is_array($chosenParticipantOptions) && in_array($value['id'], $chosenParticipantOptions))) {
                               $chosenParticipantOptions = true;
                           } else {
                               $chosenParticipantOptions = false;
@@ -606,28 +614,26 @@ class C4gReservationCalculator
                       }
 
                       if ($chosenParticipantOptions) {
-                          $priceParticipantOptionSum += $value['price'];
+                          $priceParticipantOptionSum += floatval($value['price'] ?? 0);
 
                           if ($calcTaxes) {
-                              $priceParticipantOptionSumNet += $value['priceOptionNet'];
-                              $priceParticipantOptionSumTax += $value['price'] - $value['priceOptionNet'];
+                              $priceParticipantOptionSumNet += floatval($value['priceOptionNet'] ?? 0);
+                              $priceParticipantOptionSumTax += floatval($value['price'] ?? 0) - floatval($value['priceOptionNet'] ?? 0);
                           }
                       }
                   } else {
                       if ($object['participantParamsFieldType'] == 'radio') {
-                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '§participant_params§' . $i];
+                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '§participant_params§' . $i] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . ($i+1)] ?? $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i] ?? null;
 
-                          if ($chosenParticipantOptions === $value['id']) {
-                              $priceParticipantOptionSum += $value['price'];
+                          if (strval($chosenParticipantOptions) === strval($value['id'])) {
                               $chosenParticipantOptions = true;
                           } else {
                               $chosenParticipantOptions = false;
                           }
                       } else {
-                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '§participant_params§' . $i. '|' . $value['id']];
+                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '§participant_params§' . $i. '|' . $value['id']] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . ($i+1) . '|' . $value['id']] ?? $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']] ?? null;
 
-                          if ($chosenParticipantOptions === $value['id'] || $chosenParticipantOptions === 'true' || $chosenParticipantOptions === true || $chosenParticipantOptions === 1 || $chosenParticipantOptions === '1') {
-                              $priceParticipantOptionSum += $value['price'];
+                          if (strval($chosenParticipantOptions) === strval($value['id']) || $chosenParticipantOptions === 'true' || $chosenParticipantOptions === true || strval($chosenParticipantOptions) === '1') {
                               $chosenParticipantOptions = true;
                           } else {
                               $chosenParticipantOptions = false;
@@ -635,11 +641,11 @@ class C4gReservationCalculator
                       }
 
                       if ($chosenParticipantOptions) {
-                          $priceParticipantOptionSum += $value['price'];
+                          $priceParticipantOptionSum += floatval($value['price'] ?? 0);
 
                           if ($calcTaxes) {
-                              $priceParticipantOptionSumNet += $value['priceOptionNet'];
-                              $priceParticipantOptionSumTax += $value['price'] - $value['priceOptionNet'];
+                              $priceParticipantOptionSumNet += floatval($value['priceOptionNet'] ?? 0);
+                              $priceParticipantOptionSumTax += floatval($value['price'] ?? 0) - floatval($value['priceOptionNet'] ?? 0);
                           }
                       }
                   }
@@ -667,7 +673,7 @@ class C4gReservationCalculator
             foreach ($optionsId as $paramId) {
                 if ($paramId) {
                     $param = C4gReservationParamsModel::findByPk($paramId);
-                    if ($param && $param->caption && $param->published && ($param->price && $calcTaxes)) {
+                    if ($param && $param->caption && $param->published) {
                         $taxOption = $param->taxOptions;
                         $optionTaxRate = self::setTaxRates($taxOption);
                         $paramData = [
@@ -677,15 +683,15 @@ class C4gReservationCalculator
                             'taxOptions' => $param->taxOptions,
                         ];
 
-                        if ($taxOption !== 'tNone') {
+                        if ($taxOption !== 'tNone' && $calcTaxes) {
                             $priceOptionNet = $param->price / (1 + $optionTaxRate/100);
                             $paramData['priceOptionNet'] = $priceOptionNet;
+                        } else {
+                            $paramData['priceOptionNet'] = $param->price;
                         }
 
                         $paramArr[] = $paramData;
 
-                    } else if ($param && $param->caption && $param->published) {
-                        $paramArr[] = ['id' => $paramId, 'name' => $param->caption];
                     }
                 }
             }
