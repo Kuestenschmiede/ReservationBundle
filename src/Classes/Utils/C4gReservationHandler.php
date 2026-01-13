@@ -150,8 +150,7 @@ class C4gReservationHandler
         try {
             $cache = null; $ttl = 900; // 15 minutes default
             $container = \Contao\System::getContainer();
-            if ($container && $container->has('cache.c4g_reservation')) { $cache = $container->get('cache.c4g_reservation'); }
-            elseif ($container && $container->has('cache.app')) { $cache = $container->get('cache.app'); }
+            if ($container && $container->has('cache.app')) { $cache = $container->get('cache.app'); }
             // Optional container parameter to tune TTL globally (if defined)
             if ($container && method_exists($container, 'hasParameter') && $container->hasParameter('c4g_reservation_dates_ttl')) {
                 $p = (int)$container->getParameter('c4g_reservation_dates_ttl');
@@ -307,7 +306,6 @@ class C4gReservationHandler
             if (isset($cache) && $cache && isset($item)) {
                 $saveVal = $asArray ? (is_array($result) ? $result : []) : (is_string($result) ? $result : '');
                 $item->set($saveVal);
-                if (method_exists($item, 'tag')) { $item->tag(['c4g_reservation']); }
                 if (method_exists($item, 'expiresAfter')) { $item->expiresAfter($ttl); }
                 $cache->save($item);
             }
@@ -2343,8 +2341,7 @@ class C4gReservationHandler
         try {
             $cache = null; $ttl = 900; // default 15 min
             $container = \Contao\System::getContainer();
-            if ($container && $container->has('cache.c4g_reservation')) { $cache = $container->get('cache.c4g_reservation'); }
-            elseif ($container && $container->has('cache.app')) { $cache = $container->get('cache.app'); }
+            if ($container && $container->has('cache.app')) { $cache = $container->get('cache.app'); }
             if ($container && method_exists($container, 'hasParameter') && $container->hasParameter('c4g_reservation_dates_ttl')) {
                 $p = (int)$container->getParameter('c4g_reservation_dates_ttl');
                 if ($p > 0) { $ttl = min($p, 1800); }
