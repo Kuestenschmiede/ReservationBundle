@@ -234,41 +234,6 @@ class C4gReservationController extends C4GBaseController
 
     public function addFields() : array
     {
-        // Lightweight profiling toggle (no overhead when disabled)
-        $___perfEnabled = false;
-        try {
-            $container = System::getContainer();
-            if ($container && $container->hasParameter('kernel.debug')) {
-                $___perfEnabled = (bool) $container->getParameter('kernel.debug');
-            }
-            // Allow enabling via env var CONTROLLER_PERF_DEBUG=1 without full kernel debug
-            if (!$___perfEnabled) {
-                $env = getenv('CONTROLLER_PERF_DEBUG');
-                if ($env !== false && (string)$env === '1') { $___perfEnabled = true; }
-            }
-        } catch (\Throwable $t) { /* ignore */ }
-        $___perfMarks = [];
-        $___mark = function(string $name) use (&$___perfMarks, $___perfEnabled) {
-            if (!$___perfEnabled) { return; }
-            $___perfMarks[] = [$name, microtime(true)];
-        };
-        $___flush = function(string $section) use (&$___perfMarks, $___perfEnabled) {
-            if (!$___perfEnabled) { return; }
-            $prev = null; $out = [];
-            foreach ($___perfMarks as $m) {
-                if ($prev === null) { $prev = $m[1]; $out[] = $m[0] . ': +0ms'; continue; }
-                $delta = (int) round(1000 * ($m[1] - $prev));
-                $out[] = $m[0] . ': +' . $delta . 'ms';
-                $prev = $m[1];
-            }
-            $total = 0;
-            if (count($___perfMarks) >= 2) {
-                $total = (int) round(1000 * (end($___perfMarks)[1] - $___perfMarks[0][1]));
-            }
-            C4gLogModel::addLogEntry('reservation_perf', '['.$section."] " . implode(' | ', $out) . ' | total=' . $total . 'ms');
-        };
-        $___mark('start:addFields');
-
         if (!$this->reservationSettings && $this->reservation_settings) {
             $this->session->setSessionValue('reservationSettings', $this->reservation_settings);
             $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
@@ -288,7 +253,7 @@ class C4gReservationController extends C4GBaseController
 
         $typeId = Input::get('type') ?: 0;
         $objectId = Input::get('object') ?: 0;
-        
+
         $eventId = Input::get('event') ? Input::get('event') : 0;
 
         if (!$eventId && $this->session->getSessionValue('reservationEventCookie')) {
@@ -400,7 +365,6 @@ class C4gReservationController extends C4GBaseController
         $arrValues = array();
         $arrOptions = array('order' => "$t.caption ASC, $t.options ASC",);
 
-        $___mark('before:loadTypes');
         if ($eventObj) {
             $typeId = $eventObj->reservationType;
             $database = Database::getInstance();
@@ -427,7 +391,6 @@ class C4gReservationController extends C4GBaseController
             $stmt = $database->prepare($sql);
             $types = $stmt->execute(...$params)->fetchAllAssoc();
         }
-        $___mark('after:loadTypes');
 
         if ($types) {
             $memberId = 0;
@@ -439,99 +402,16 @@ class C4gReservationController extends C4GBaseController
             $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types, true);
             $langLower = strtolower((string) ($GLOBALS['TL_LANGUAGE'] ?? ''));
 
-            // Fragment cache for the expensive typelist computation to speed up controller rendering
-            $cachedTypelist = null;
-            try {
-                $container = System::getContainer();
-                $cache = $container->has('cache.app') ? $container->get('cache.app') : null;
-            } catch (\Throwable $t) {
-                $cache = null;
-            }
-
-            $cacheEnabled = true;
-            $cacheTtl = 600; // default 10 minutes fallback
-            try {
-                if ($this->reservationSettings && property_exists($this->reservationSettings, 'reservation_enable_cache')) {
-                    $flag = (string) $this->reservationSettings->reservation_enable_cache;
-                    $cacheEnabled = ($flag === '1' || $flag === 1 || $flag === true);
-                }
-                if ($this->reservationSettings && property_exists($this->reservationSettings, 'reservation_cache_ttl')) {
-                    $ttlCandidate = (int) $this->reservationSettings->reservation_cache_ttl;
-                    if ($ttlCandidate > 0) { $cacheTtl = $ttlCandidate; }
-                    // If not set, prefer a sane default of 12h for relatively static structures
-                    if ($ttlCandidate === 0) { $cacheTtl = 43200; }
-                }
-            } catch (\Throwable $t) { /* ignore */ }
-
-            if ($cache && $cacheEnabled) {
-                try {
-                    $settingsId = ($this->reservationSettings && property_exists($this->reservationSettings, 'id')) ? (string)$this->reservationSettings->id : '0';
-                    $moduleTypesKey = is_array($moduleTypes) ? implode(',', $moduleTypes) : '';
-                    $cacheKey = 'c4g_reservation_typelist_' . md5(
-                        $settingsId . '|' . (string)$typeId . '|' . (string)$eventId . '|' . (string)$objectId . '|' . $langLower . '|' . (string)$memberId . '|' . (string)($this->reservationSettings->showPrices ? 1 : 0) . '|' . (string)($this->reservationSettings->showPricesWithTaxes ? 1 : 0) . '|' . $moduleTypesKey
-                    );
-                    $item = $cache->getItem($cacheKey);
-                    if ($item->isHit()) {
-                        $cached = $item->get();
-                        if (is_array($cached)) {
-                            $typelist = $cached;
-                        }
+            foreach ($types as $type) {
+                if ($moduleTypes && is_array($moduleTypes) && (count($moduleTypes) > 0)) {
+                    $arrModuleTypes = $moduleTypes;
+                    if (!in_array($type['id'], $arrModuleTypes)) {
+                        continue;
                     }
-                } catch (\Throwable $t) { /* ignore cache read errors */ }
-            }
-
-            if (!isset($typelist) || !is_array($typelist) || count($typelist) === 0) {
-                $___mark('before:buildTypelist');
-                foreach ($types as $type) {
-                    if ($moduleTypes && is_array($moduleTypes) && (count($moduleTypes) > 0)) {
-                        $arrModuleTypes = $moduleTypes;
-                        if (!in_array($type['id'], $arrModuleTypes)) {
-                            continue;
-                        }
-                    }
+                }
 
                 $defaultObject = $eventId ?: $objectId;
-                // Blueprint/Object list caching (Default handler fast-path):
-                // Cache the heavy object list only if there are no request-specific constraints
-                // that could change the resulting objects (no event/object/date/time set).
-                $objects = null;
-                $canCacheObjects = (
-                    !$eventId && !$objectId && !$initialDate && !$initialTime
-                );
-                $objectsCacheEnabled = $cacheEnabled; // reuse settings flag
-                $objectsCacheTtl = $cacheTtl > 0 ? $cacheTtl : 43200; // fallback 12h
-                $objectsCacheKey = null;
-                if ($cache && $objectsCacheEnabled && $canCacheObjects) {
-                    try {
-                        $settingsId = ($this->reservationSettings && property_exists($this->reservationSettings, 'id')) ? (string)$this->reservationSettings->id : '0';
-                        $langLower = strtolower((string) ($GLOBALS['TL_LANGUAGE'] ?? ''));
-                        $objectsCacheKey = 'c4g_reservation_objects_' . md5(
-                            $settingsId . '|' . (string)$type['id'] . '|' . $langLower . '|' .
-                            (string)($this->reservationSettings->showPrices ? 1 : 0) . '|' . (string)($this->reservationSettings->showPricesWithTaxes ? 1 : 0)
-                        );
-                        $item = $cache->getItem($objectsCacheKey);
-                        if ($item->isHit()) {
-                            $cachedObjects = $item->get();
-                            if (is_array($cachedObjects)) {
-                                $objects = $cachedObjects;
-                            }
-                        }
-                    } catch (\Throwable $t) { /* ignore cache read errors */ }
-                }
-
-                if ($objects === null) {
-                    $objects = C4gReservationHandler::getReservationObjectList(array($type), $defaultObject, $this->reservationSettings->showPrices, $this->reservationSettings->showPricesWithTaxes ?: false,);
-                    if ($cache && $objectsCacheEnabled && $canCacheObjects && $objectsCacheKey && is_array($objects)) {
-                        try {
-                            $item = $cache->getItem($objectsCacheKey);
-                            $item->set($objects);
-                            if (method_exists($item, 'expiresAfter')) {
-                                $item->expiresAfter($objectsCacheTtl);
-                            }
-                            $cache->save($item);
-                        } catch (\Throwable $t) { /* ignore cache write errors */ }
-                    }
-                }
+                $objects = C4gReservationHandler::getReservationObjectList(array($type), $defaultObject, $this->reservationSettings->showPrices, $this->reservationSettings->showPricesWithTaxes ?: false,);
 
                 if (!$objects || (count($objects) <= 0)) {
                     continue;
@@ -601,24 +481,7 @@ class C4gReservationController extends C4GBaseController
                     );
                 }
             }
-
-                // Save to cache for short period to avoid repeated heavy computation on subsequent requests
-                if ($cache && $cacheEnabled && isset($cacheKey) && isset($typelist) && is_array($typelist)) {
-                    try {
-                        $item = $cache->getItem($cacheKey);
-                        $item->set($typelist);
-                        if (method_exists($item, 'expiresAfter')) {
-                            $item->expiresAfter($cacheTtl > 0 ? $cacheTtl : 600);
-                        }
-                        $cache->save($item);
-                    } catch (\Throwable $t) { /* ignore cache write errors */ }
-                }
-                $___mark('after:buildTypelist');
-            }
         }
-
-        // Mark start of field building after typelist prepared
-        $___mark('before:buildFields');
 
         $idField = new C4GKeyField();
         $idField->setFieldName('id');
@@ -1847,7 +1710,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $fieldList[] = $reservationParticipantList;
             }
         }
-        // Create reservation_id live (request-specific UUID must not be cached)
         $reservationIdField = new C4GTextField();
         $reservationIdField->setFieldName('reservation_id');
         $reservationIdField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_id']);
@@ -1866,18 +1728,130 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $reservationIdField->setDatabaseField(true);
         $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']);
         $reservationIdField->setStyleClass('reservation-id');
-        $reservationIdField->setHidden((bool)($this->reservationSettings->hideReservationKey ?? false));
+        $reservationIdField->setHidden($hideReservationKey);
         $reservationIdField->setPrintable($this->withDefaultPDFContent);
         $fieldList[] = $reservationIdField;
 
-        // Append the static tail fields from blueprint cache (request-invariant)
-        foreach ($this->getStaticFieldBlueprint() as $bpField) {
-            // clone to avoid shared state between requests
-            $fieldList[] = clone $bpField;
+        if ($this->reservationSettings->privacy_policy_text) {
+            $privacyPolicyText = new C4GTextField();
+            $privacyPolicyText->setSimpleTextWithoutEditing(true);
+            $privacyPolicyText->setFieldName('privacy_policy_text');
+            $privacyPolicyText->setInitialValue(str_replace(' ', '&nbsp;&#x200B;',
+                C4GUtils::replaceInsertTags($this->reservationSettings->privacy_policy_text)));
+            $privacyPolicyText->setSize(4);
+            $privacyPolicyText->setTableColumn(false);
+            $privacyPolicyText->setEditable(false);
+            $privacyPolicyText->setDatabaseField(false);
+            $privacyPolicyText->setMandatory(false);
+            $privacyPolicyText->setNotificationField(false);
+            $privacyPolicyText->setStyleClass('privacy-policy-text');
+            $privacyPolicyText->setPrintable($this->withDefaultPDFContent);
+            $fieldList[] = $privacyPolicyText;
         }
 
-        $___mark('after:buildFields');
-        $___flush('addFields');
+        if ($this->reservationSettings->privacy_policy_site) {
+            $href = C4GUtils::replaceInsertTags('{{link_url::' . $this->reservationSettings->privacy_policy_site . '}}');
+            $desc = '<span class="c4g_field_description_text">' . str_replace(' ', '&nbsp;&#x200B;', $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed']) . '&nbsp;&#x200B;</span><a href="' . $href . '" target="_blank" rel="noopener">' . str_replace(' ', '&nbsp;&#x200B;', $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text']) . '</a>.';
+        } else {
+            $desc = str_replace(' ', '&nbsp;&#x200B;', $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link']);
+        }
+
+        $agreedField = new C4GCheckboxField();
+        $agreedField->setFieldName('agreed');
+        $agreedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'].'&nbsp;&#x200B;'.$desc);
+        $agreedField->setTableRow(false);
+        $agreedField->setColumnWidth(5);
+        $agreedField->setSortColumn(false);
+        $agreedField->setTableColumn(false);
+        $agreedField->setMandatory(true);
+        $agreedField->setNotificationField(true);
+        $agreedField->setStyleClass('agreed');
+        $agreedField->setWithoutDescriptionLineBreak(true);
+        $agreedField->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $agreedField;
+
+        $clickButton = new C4GBrickButton(
+            C4GBrickConst::BUTTON_CLICK,
+            $this->reservationSettings->reservationButtonCaption ? C4GUtils::replaceInsertTags($this->reservationSettings->reservationButtonCaption) : $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'],
+            $visible = true,
+            $enabled = true,
+            $action = '',
+            $accesskey = '',
+            $defaultByEnter = true);
+
+        $buttonField = new C4GButtonField($clickButton);
+        $buttonField->setOnClickType(C4GBrickConst::ONCLICK_TYPE_SERVER);
+        $buttonField->setOnClick('clickReservation');
+        $buttonField->setWithoutLabel(true);
+        $fieldList[] = $buttonField;
+
+        $location_name = new C4GTextField();
+        $location_name->setFieldName('location');
+        $location_name->setSortColumn(false);
+        $location_name->setFormField(false);
+        $location_name->setTableColumn(true);
+        $location_name->setNotificationField(true);
+        $location_name->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $location_name;
+
+        $contact_name = new C4GTextField();
+        $contact_name->setFieldName('contact_name');
+        $contact_name->setSortColumn(false);
+        $contact_name->setFormField(false);
+        $contact_name->setTableColumn(true);
+        $contact_name->setNotificationField(true);
+        $contact_name->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $contact_name;
+
+        $contact_phone = new C4GTelField();
+        $contact_phone->setFieldName('contact_phone');
+        $contact_phone->setFormField(false);
+        $contact_phone->setTableColumn(false);
+        $contact_phone->setNotificationField(true);
+        $contact_phone->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $contact_phone;
+
+        $contact_email = new C4GEmailField();
+        $contact_email->setFieldName('contact_email');
+        $contact_email->setTableColumn(false);
+        $contact_email->setFormField(false);
+        $contact_email->setNotificationField(true);
+        $contact_email->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $contact_email;
+
+        $contact_website = new C4GUrlField();
+        $contact_website->setFieldName('contact_website');
+        $contact_website->setTableColumn(false);
+        $contact_website->setFormField(false);
+        $contact_website->setNotificationField(true);
+        $contact_website->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $contact_website;
+
+        $contact_street = new C4GTextField();
+        $contact_street->setFieldName('contact_street');
+        $contact_street->setTableColumn(false);
+        $contact_street->setFormField(false);
+        $contact_street->setNotificationField(true);
+        $contact_street->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $contact_street;
+
+
+        $contact_postal = new C4GTextField();
+        $contact_postal->setFieldName('contact_postal');
+        $contact_postal->setFormField(false);
+        $contact_postal->setTableColumn(false);
+        $contact_postal->setNotificationField(true);
+        $contact_postal->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $contact_postal;
+
+
+        $contact_city = new C4GTextField();
+        $contact_city->setFieldName('contact_city');
+        $contact_city->setTableColumn(false);
+        $contact_city->setFormField(false);
+        $contact_city->setNotificationField(true);
+        $contact_city->setPrintable($this->withDefaultPDFContent);
+        $fieldList[] = $contact_city;
 
         $contact_city = new C4GTextField();
         $contact_city->setFieldName('icsFilename');
@@ -3478,215 +3452,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
     public function afterSaveAction($changes, $insertId)
     {
        C4gReservationCheckInHelper::removeQRCodeFile();
-    }
-
-    /**
-     * Build and cache the request-invariant tail of the form (privacy text, consent checkbox,
-     * submit button, and contact info fields). The reservation_id field is NOT part of this
-     * blueprint because it contains a per-request UUID.
-     *
-     * The blueprint respects the following configuration aspects for cache keying:
-     * - Reservation settings ID (structure source)
-     * - Current language (labels/descriptions)
-     * - Reservation button caption (may include insert tags)
-     * - Presence of a privacy policy page link and text
-     * - Printable flag (withDefaultPDFContent) which affects field printing behavior
-     */
-    protected function getStaticFieldBlueprint(): array
-    {
-        // Defaults
-        $useCache = true;
-        $ttl = 43200; // 12h default
-        $settingsId = '0';
-        try {
-            if ($this->reservationSettings && property_exists($this->reservationSettings, 'id')) {
-                $settingsId = (string) $this->reservationSettings->id;
-            }
-            if ($this->reservationSettings && property_exists($this->reservationSettings, 'reservation_enable_cache')) {
-                $flag = (string) $this->reservationSettings->reservation_enable_cache;
-                $useCache = ($flag === '1' || $flag === 1 || $flag === true);
-            }
-            if ($this->reservationSettings && property_exists($this->reservationSettings, 'reservation_cache_ttl')) {
-                $ttlCandidate = (int) $this->reservationSettings->reservation_cache_ttl;
-                if ($ttlCandidate > 0) { $ttl = $ttlCandidate; }
-            }
-        } catch (\Throwable $t) { /* ignore */ }
-
-        $lang = strtolower((string) ($GLOBALS['TL_LANGUAGE'] ?? ''));
-        $buttonCaption = '';
-        try {
-            $btn = $this->reservationSettings->reservationButtonCaption ?? '';
-            if ($btn) { $buttonCaption = C4GUtils::replaceInsertTags($btn); }
-        } catch (\Throwable $t) { $buttonCaption = ''; }
-        $hasPrivacyText = !empty($this->reservationSettings->privacy_policy_text);
-        $privacySite = (string) ($this->reservationSettings->privacy_policy_site ?? '');
-        $printableFlag = $this->withDefaultPDFContent ? '1' : '0';
-
-        $blueprint = null;
-        $cache = null;
-        $cacheKey = 'c4g_reservation_blueprint_' . md5(implode('|', [
-            $settingsId, $lang, (string) $privacySite, $hasPrivacyText ? '1' : '0',
-            (string) $buttonCaption, $printableFlag,
-        ]));
-
-        if ($useCache) {
-            try {
-                $container = System::getContainer();
-                $cache = $container && $container->has('cache.app') ? $container->get('cache.app') : null;
-                if ($cache) {
-                    $item = $cache->getItem($cacheKey);
-                    if ($item->isHit()) {
-                        $stored = $item->get();
-                        if (is_array($stored)) {
-                            $blueprint = $stored;
-                        }
-                    }
-                }
-            } catch (\Throwable $t) { $cache = null; }
-        }
-
-        if ($blueprint === null) {
-            $fields = [];
-
-            // Optional privacy policy text (static)
-            if (!empty($this->reservationSettings->privacy_policy_text)) {
-                $privacyPolicyText = new C4GTextField();
-                $privacyPolicyText->setSimpleTextWithoutEditing(true);
-                $privacyPolicyText->setFieldName('privacy_policy_text');
-                $privacyPolicyText->setInitialValue(str_replace(' ', '&nbsp;&#x200B;',
-                    C4GUtils::replaceInsertTags($this->reservationSettings->privacy_policy_text)));
-                $privacyPolicyText->setSize(4);
-                $privacyPolicyText->setTableColumn(false);
-                $privacyPolicyText->setEditable(false);
-                $privacyPolicyText->setDatabaseField(false);
-                $privacyPolicyText->setMandatory(false);
-                $privacyPolicyText->setNotificationField(false);
-                $privacyPolicyText->setStyleClass('privacy-policy-text');
-                $privacyPolicyText->setPrintable($this->withDefaultPDFContent);
-                $fields[] = $privacyPolicyText;
-            }
-
-            // Consent checkbox with optional link
-            if ($this->reservationSettings->privacy_policy_site) {
-                $href = C4GUtils::replaceInsertTags('{{link_url::' . $this->reservationSettings->privacy_policy_site . '}}');
-                $desc = '<span class="c4g_field_description_text">' . str_replace(' ', '&nbsp;&#x200B;', $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed']) . '&nbsp;&#x200B;</span><a href="' . $href . '" target="_blank" rel="noopener">' . str_replace(' ', '&nbsp;&#x200B;', $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_link_text']) . '</a>.';
-            } else {
-                $desc = str_replace(' ', '&nbsp;&#x200B;', $GLOBALS['TL_LANG']['fe_c4g_reservation']['desc_agreed_without_link']);
-            }
-
-            $agreedField = new C4GCheckboxField();
-            $agreedField->setFieldName('agreed');
-            $agreedField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['agreed'].'&nbsp;&#x200B;'.$desc);
-            $agreedField->setTableRow(false);
-            $agreedField->setColumnWidth(5);
-            $agreedField->setSortColumn(false);
-            $agreedField->setTableColumn(false);
-            $agreedField->setMandatory(true);
-            $agreedField->setNotificationField(true);
-            $agreedField->setStyleClass('agreed');
-            $agreedField->setWithoutDescriptionLineBreak(true);
-            $agreedField->setPrintable($this->withDefaultPDFContent);
-            $fields[] = $agreedField;
-
-            // Submit button
-            $clickButton = new C4GBrickButton(
-                C4GBrickConst::BUTTON_CLICK,
-                $buttonCaption ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['button_reservation'],
-                $visible = true,
-                $enabled = true,
-                $action = '',
-                $accesskey = '',
-                $defaultByEnter = true
-            );
-            $buttonField = new C4GButtonField($clickButton);
-            $buttonField->setOnClickType(C4GBrickConst::ONCLICK_TYPE_SERVER);
-            $buttonField->setOnClick('clickReservation');
-            $buttonField->setWithoutLabel(true);
-            $fields[] = $buttonField;
-
-            // Contact/location fields (static meta, not form inputs)
-            $location_name = new C4GTextField();
-            $location_name->setFieldName('location');
-            $location_name->setSortColumn(false);
-            $location_name->setFormField(false);
-            $location_name->setTableColumn(true);
-            $location_name->setNotificationField(true);
-            $location_name->setPrintable($this->withDefaultPDFContent);
-            $fields[] = $location_name;
-
-            $contact_name = new C4GTextField();
-            $contact_name->setFieldName('contact_name');
-            $contact_name->setSortColumn(false);
-            $contact_name->setFormField(false);
-            $contact_name->setTableColumn(true);
-            $contact_name->setNotificationField(true);
-            $contact_name->setPrintable($this->withDefaultPDFContent);
-            $fields[] = $contact_name;
-
-            $contact_phone = new C4GTelField();
-            $contact_phone->setFieldName('contact_phone');
-            $contact_phone->setFormField(false);
-            $contact_phone->setTableColumn(false);
-            $contact_phone->setNotificationField(true);
-            $contact_phone->setPrintable($this->withDefaultPDFContent);
-            $fields[] = $contact_phone;
-
-            $contact_email = new C4GEmailField();
-            $contact_email->setFieldName('contact_email');
-            $contact_email->setTableColumn(false);
-            $contact_email->setFormField(false);
-            $contact_email->setNotificationField(true);
-            $contact_email->setPrintable($this->withDefaultPDFContent);
-            $fields[] = $contact_email;
-
-            $contact_website = new C4GUrlField();
-            $contact_website->setFieldName('contact_website');
-            $contact_website->setTableColumn(false);
-            $contact_website->setFormField(false);
-            $contact_website->setNotificationField(true);
-            $contact_website->setPrintable($this->withDefaultPDFContent);
-            $fields[] = $contact_website;
-
-            $contact_street = new C4GTextField();
-            $contact_street->setFieldName('contact_street');
-            $contact_street->setTableColumn(false);
-            $contact_street->setFormField(false);
-            $contact_street->setNotificationField(true);
-            $contact_street->setPrintable($this->withDefaultPDFContent);
-            $fields[] = $contact_street;
-
-            $contact_postal = new C4GTextField();
-            $contact_postal->setFieldName('contact_postal');
-            $contact_postal->setFormField(false);
-            $contact_postal->setTableColumn(false);
-            $contact_postal->setNotificationField(true);
-            $contact_postal->setPrintable($this->withDefaultPDFContent);
-            $fields[] = $contact_postal;
-
-            $contact_city = new C4GTextField();
-            $contact_city->setFieldName('contact_city');
-            $contact_city->setTableColumn(false);
-            $contact_city->setFormField(false);
-            $contact_city->setNotificationField(true);
-            $contact_city->setPrintable($this->withDefaultPDFContent);
-            $fields[] = $contact_city;
-
-            $blueprint = $fields;
-
-            if ($useCache && $cache) {
-                try {
-                    $item = $cache->getItem($cacheKey);
-                    $item->set($blueprint);
-                    if (method_exists($item, 'expiresAfter')) {
-                        $item->expiresAfter($ttl);
-                    }
-                    $cache->save($item);
-                } catch (\Throwable $t) { /* ignore cache write errors */ }
-            }
-        }
-
-        // Ensure an array is always returned
-        return is_array($blueprint) ? $blueprint : [];
     }
 }
 

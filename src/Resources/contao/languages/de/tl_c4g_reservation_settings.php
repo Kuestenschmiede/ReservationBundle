@@ -82,7 +82,6 @@ $GLOBALS['TL_LANG'][$str]['document_legend'] = "Dokumentgenerator";
 $GLOBALS['TL_LANG'][$str]['ticket_legend'] = "Ticketing";
 $GLOBALS['TL_LANG'][$str]['redirect_legend'] = 'Weiterleitung';
 $GLOBALS['TL_LANG'][$str]['expert_legend'] = 'Experteneinstellungen';
-$GLOBALS['TL_LANG'][$str]['cache_legend'] = 'Caching';
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG'][$str]['new'] = array("Formular erstellen","Neues Formular erstellen");
@@ -91,7 +90,3 @@ $GLOBALS['TL_LANG'][$str]['copy'] = array("Einstellungen kopieren","Kopieren der
 $GLOBALS['TL_LANG'][$str]['delete'] = array("Einstellungen löschen","Löschen der Einstellung ID %s");
 $GLOBALS['TL_LANG'][$str]['show'] = array("Einstellungen anzeigen","Anzeigen der Einstellung ID %s");
 $GLOBALS['TL_LANG'][$str]['TOGGLE'] = array("Einstellungen aktivieren","Aktivieren der Einstellung ID %s");
-
-// Cache settings
-$GLOBALS['TL_LANG'][$str]['reservation_enable_cache'] = array('Caches aktivieren', 'Aktiviert die internen Caches zur Beschleunigung der Formularerzeugung.');
-$GLOBALS['TL_LANG'][$str]['reservation_cache_ttl'] = array('Cache‑TTL (Sekunden)', 'Lebensdauer für zwischengespeicherte Strukturen/Listen. Empfohlen: 43 200 (12 Stunden).');
