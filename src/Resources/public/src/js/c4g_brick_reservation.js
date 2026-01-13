@@ -638,6 +638,9 @@ function shuffle(array) {
 }
 
 function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime, objId) {
+    if (!data || !data['times']) {
+        return;
+    }
     var times = data['times'];
 
     //delete all childs from radioGroup

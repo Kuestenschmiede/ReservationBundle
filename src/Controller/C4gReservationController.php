@@ -3106,8 +3106,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         return new JsonResponse([
             'reservationId' => C4GBrickCommon::getUUID(),
-            'times' => $times,
-            'captions' => $times && count($times) > 0 ? $captions : []
+            'times' => $times ?: [],
+            'captions' => ($times && count($times) > 0) ? $captions : []
         ]);
     }
 
