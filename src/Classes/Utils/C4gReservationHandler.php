@@ -190,7 +190,7 @@ class C4gReservationHandler
                 $exclusionPeriods = $object->getDatesExclusion();
                 if ($exclusionPeriods) {
                     foreach ($exclusionPeriods as $period) {
-                        if ($period && $period['date_exclusion'] && $period['date_exclusion_end']) {
+                        if (is_array($period) && $period['date_exclusion'] && $period['date_exclusion_end']) {
                             $exclusionBegin = $period['date_exclusion'] == -3600 ? 0 : $period['date_exclusion'];
                             $exclusionEnd = $period['date_exclusion_end'] == -3600 ? 0 : $period['date_exclusion_end'];
 
@@ -504,7 +504,7 @@ class C4gReservationHandler
                 $exclusionPeriods = $object->getDatesExclusion();
                 if ($exclusionPeriods) {
                     foreach ($exclusionPeriods as $period) {
-                        if ($period && $period['date_exclusion'] && $period['date_exclusion_end']) {
+                        if (is_array($period) && $period['date_exclusion'] && $period['date_exclusion_end']) {
                             $exclusionBegin = $period['date_exclusion'] == -3600 ? 0 : $period['date_exclusion'];
                             $exclusionEnd = $period['date_exclusion_end'] == -3600 ? 0 : $period['date_exclusion_end'];
 
