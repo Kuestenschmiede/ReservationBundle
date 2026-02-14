@@ -2962,7 +2962,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 if ($reservationObject instanceof C4gReservationFrontendObject) {
                     $freshDescription = $reservationObject->getDescription();
                 } else {
-                    $freshDescription = (string)(($reservationObject->description ?: $reservationObject->details) ?? '');
+                    $freshDescription = (string)(($reservationObject->description ?: ($reservationObject->details ?: $reservationObject->teaser)) ?? '');
                 }
 
                 $dataMapping = [
@@ -3011,7 +3011,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 if ($reservationObject instanceof C4gReservationFrontendObject) {
                     $putVars['description'] = $reservationObject->getDescription();
                 } else {
-                    $putVars['description'] = ($reservationObject->description ?: $reservationObject->details) ?: '';
+                    $putVars['description'] = (string)(($reservationObject->description ?: ($reservationObject->details ?: $reservationObject->teaser)) ?: '');
                 }
             }
             //check duplicate reservation id
@@ -3709,6 +3709,32 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
             // Mirror to instance putVars as well for SaveAction
             $this->putVars[$key] = $putVars[$key];
+
+            // Radical Mirroring for Notification System:
+            // Ensure that tokens like 'description' are also present with all possible
+            // suffixed versions in putVars, so that C4GBrickNotification::getArrayTokens
+            // can find them regardless of whether it looks for the base key or a suffixed one.
+            if ($type && $putVars[$key] !== '') {
+                $suffixedKey = $key . '_' . $type;
+                if (!isset($putVars[$suffixedKey]) || $putVars[$suffixedKey] === '') {
+                    $putVars[$suffixedKey] = $putVars[$key];
+                    $this->putVars[$suffixedKey] = $putVars[$key];
+                }
+                if ($objectId) {
+                    $eventSuffix = $type . '-22' . $objectId;
+                    $suffixedKey = $key . '_' . $eventSuffix;
+                    if (!isset($putVars[$suffixedKey]) || $putVars[$suffixedKey] === '') {
+                        $putVars[$suffixedKey] = $putVars[$key];
+                        $this->putVars[$suffixedKey] = $putVars[$key];
+                    }
+                    $objSuffix = $type . '-' . $objectId;
+                    $suffixedKey = $key . '_' . $objSuffix;
+                    if (!isset($putVars[$suffixedKey]) || $putVars[$suffixedKey] === '') {
+                        $putVars[$suffixedKey] = $putVars[$key];
+                        $this->putVars[$suffixedKey] = $putVars[$key];
+                    }
+                }
+            }
         }
 
         // DEEP CLEAN BEFORE SAVE: 

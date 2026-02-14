@@ -467,11 +467,11 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             }
 
             if ($reservationSettings->showDetails) {
-                if ($reservationObject->getDescription()) {
+                if ($reservationObject->getDescription() ?: $reservationObject->teaser) {
                     $descriptionField = new C4GTrixEditorField();
                     $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
                     $descriptionField->setFieldName('description');
-                    $descriptionField->setInitialValue($reservationObject->getDescription());
+                    $descriptionField->setInitialValue($reservationObject->getDescription() ?: $reservationObject->teaser);
                     $descriptionField->setCondition($objConditionArr);
                     $descriptionField->setFormField(true);
                     $descriptionField->setShowIfEmpty(false);
