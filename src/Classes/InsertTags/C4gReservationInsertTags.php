@@ -552,15 +552,16 @@ class C4gReservationInsertTags
                                     }
                                 }
 
-                                if (!$url || !$buttonCaption)
-                                $settings = $this->db->prepare("SELECT reservationForwarding, reservationForwardingButtonCaption FROM $tableSettings")
-                                    ->limit(1)
-                                    ->execute();
-                                if ($settings->numRows) {
-                                    if ($settings->reservationForwarding) {
-                                        $url = $url ?: C4GUtils::replaceInsertTags('{{link_url::' . $settings->reservationForwarding . '}}');
+                                if (!$url || !$buttonCaption) {
+                                    $settings = $this->db->prepare("SELECT reservationForwarding, reservationForwardingButtonCaption FROM $tableSettings")
+                                        ->limit(1)
+                                        ->execute();
+                                    if ($settings && $settings->numRows) {
+                                        if ($settings->reservationForwarding) {
+                                            $url = $url ?: C4GUtils::replaceInsertTags('{{link_url::' . $settings->reservationForwarding . '}}');
+                                        }
+                                        $buttonCaption = $buttonCaption ?: $settings->reservationForwardingButtonCaption;
                                     }
-                                    $buttonCaption = $buttonCaption ?: $settings->reservationForwardingButtonCaption;
                                 }
 
                                 $buttonCaption = $buttonCaption ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['eventForwardingButtonText'];
@@ -605,13 +606,15 @@ class C4gReservationInsertTags
                                         ->execute()->fetchAllAssoc();
 
                                     $result = '';
-                                    foreach ($audienceElements as $audience) {
-                                        $result = $result ? $result . ', ' . $audience['targetAudience'] : $audience['targetAudience'];
+                                    if (isset($audienceElements) && is_array($audienceElements)) {
+                                        foreach ($audienceElements as $audience) {
+                                            $result = $result ? $result . ', ' . $audience['targetAudience'] : $audience['targetAudience'];
+                                        }
                                     }
                                 }
                             }
 
-                            return $result ? $this->getHtmlSkeleton('targetAudience', $GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'], $result) : '';
+                            return (isset($result) && $result) ? $this->getHtmlSkeleton('targetAudience', $GLOBALS['TL_LANG']['fe_c4g_reservation']['targetAudience'], $result) : '';
 
                             break;
                         case 'audience_raw':
@@ -642,18 +645,19 @@ class C4gReservationInsertTags
                             $price = $reservationObject && $reservationObject->price ? $reservationObject->price : $calendarObject->price;
                             return C4gReservationHandler::formatPrice($price);
                         case 'speakerId':
+                            $speakerIds = [];
                             if (($reservationObject && $reservationObject->speaker) || ($calendarObject && $calendarObject->reservationSpeaker)) {
                                 $speaker = $reservationObject && $reservationObject->speaker ? $reservationObject->speaker : $calendarObject->reservationSpeaker;
                                 $speakerIds = StringUtil::deserialize($speaker);
                             }
-                            return $speakerIds ? $speakerIds[0] : 0;
+                            return (is_array($speakerIds) && isset($speakerIds[0])) ? $speakerIds[0] : 0;
                         case 'speakerIds':
                             $speakerIds = '';
                             if (($reservationObject && $reservationObject->speaker) || ($calendarObject && $calendarObject->reservationSpeaker)) {
                                 $speaker = $reservationObject && $reservationObject->speaker ? $reservationObject->speaker : $calendarObject->reservationSpeaker;
                                 $speakerIds = explode(',', StringUtil::deserialize($speaker));
                             }
-                            return $speakerIds;
+                            return is_array($speakerIds) ? implode(',', $speakerIds) : $speakerIds;
                         case 'speaker':
                             if (($reservationObject && $reservationObject->speaker) || ($calendarObject && $calendarObject->reservationSpeaker)) {
                                 $speaker = $reservationObject && $reservationObject->speaker ? $reservationObject->speaker : $calendarObject->reservationSpeaker;
@@ -791,21 +795,19 @@ class C4gReservationInsertTags
                             }
                         case 'endDate':
                             $value = '';
-                            if ($calendarEvent->startDate != $calendarEvent->endDate) {
+                            if ($calendarEvent && $calendarEvent->startDate != $calendarEvent->endDate) {
                                 $value = $calendarEvent->endDate ? date($dateFormat, $calendarEvent->endDate) : false;
                                 if ($value) {
                                     $value = $this->getHtmlSkeleton('endDate', $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'], $value);
                                 }
                             }
 
-                            return $value;
+                            return $value ?: '';
                         case 'endDate_raw':
-                            $value = '';
-                            if ($calendarEvent->startDate != $calendarEvent->endDate) {
+                            if ($calendarEvent && $calendarEvent->startDate != $calendarEvent->endDate) {
                                 return $calendarEvent->endDate ? date($dateFormat, $calendarEvent->endDate) : '';
                             }
-
-                            break;
+                            return '';
                         case 'beginTime':
                             $value = $calendarEvent->startTime && date('H', $calendarEvent->startTime) != '00' ? date($timeFormat, $calendarEvent->startTime) : false;
                             if ($value) {
@@ -819,21 +821,20 @@ class C4gReservationInsertTags
                             return $calendarEvent->startTime && date('H', $calendarEvent->startTime) != '00' ? date($timeFormat, $calendarEvent->startTime) : '';
                         case 'endTime':
                             $value = '';
-                            if (!$calendarEvent->endDate || ($calendarEvent->startDate == $calendarEvent->endDate)) {
+                            if ($calendarEvent && (!$calendarEvent->endDate || ($calendarEvent->startDate == $calendarEvent->endDate))) {
                                 $value = $calendarEvent->startTime < $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : false;
                                 if ($value) {
                                     $value = $this->getHtmlSkeleton('endTime', $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'], $value . $clock);
                                 }
                             }
 
-                            return $value;
+                            return $value ?: '';
                         case 'endTime_raw':
-                            $value = '';
-                            if (!$calendarEvent->endDate || ($calendarEvent->startDate == $calendarEvent->endDate)) {
+                            if ($calendarEvent && (!$calendarEvent->endDate || ($calendarEvent->startDate == $calendarEvent->endDate))) {
                                 return $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : '';
                             }
 
-                            return $value;
+                            return '';
                         case 'title':
                             $value = $calendarEvent->title;
                             if ($value) {

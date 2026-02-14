@@ -35,6 +35,7 @@ class C4gReservationCalculator
      */
     public function __construct($startDay, $endDay, $typeId, $objectTypeId, $objectList, $testResults = [])
     {
+        C4gReservationHandler::resetStaticCaches();
         $beginDate = C4gReservationDateChecker::getBeginOfDate($startDay);
         $endDate = C4gReservationDateChecker::getEndOfDate($endDay);
 
@@ -96,6 +97,7 @@ class C4gReservationCalculator
      */
     public function loadReservations($type, $object)
     {
+        C4gReservationHandler::resetStaticCaches();
         if (!$type || !$object || !$this->date || !count($this->reservations)) {
             return;
         }
@@ -317,7 +319,8 @@ class C4gReservationCalculator
      * @param $langCookie
      * @return int|array
      */
-    public static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '', $calcTaxes) {
+    public static function calcPrices($object, $type, $isEvent = false, $countPersons = 1, $duration = 0, $date = 0, $langCookie = '', $calcTaxes = false) {
+        C4gReservationHandler::resetStaticCaches();
         $price = floatval($object['price']) ?? 0;
         $priceSum = 0;
         $priceInfo = '';
@@ -471,6 +474,7 @@ class C4gReservationCalculator
      * @return int|array
      */
   public static function calcOptionPrices ($putVars, $object, $type, $calcTaxes) {
+    C4gReservationHandler::resetStaticCaches();
 
     $incParamSum = 0;
     $addParamSum = 0;
@@ -571,6 +575,7 @@ class C4gReservationCalculator
      * @return array
      */
   public static function calcParticipantOptionPrices ($desiredCapacity, $putVars, $object, $type, $calcTaxes, $onlyParticipants, $mechanism = true) {
+    C4gReservationHandler::resetStaticCaches();
       $priceParticipantOptionSum = 0;
       $priceParticipantOptionSumNet = 0;
       $priceParticipantOptionSumTax = 0;

@@ -19,6 +19,14 @@ class C4gReservationHandler
     protected static ?string $langLower = null;     // normalized current language
     protected static array $weekdaysCache = [];     // key: signature(opening_hours + periodType)
 
+    public static function resetStaticCaches(): void
+    {
+        self::$ohEndCache = [];
+        self::$captionCache = [];
+        self::$langLower = null;
+        self::$weekdaysCache = [];
+    }
+
     /**
      * @param $date
      * @return string|null
@@ -2519,6 +2527,7 @@ class C4gReservationHandler
     }
 
     public static function getPeriodFaktor($periodType) {
+        $periodFaktor = 86400; // default to day
         switch ($periodType) {
             case 'minute':
                 $periodFaktor = 60;
@@ -2535,7 +2544,6 @@ class C4gReservationHandler
             case 'week':
                 $periodFaktor = 604800;
                 break;
-            default: '';
         }
         return $periodFaktor;
     }

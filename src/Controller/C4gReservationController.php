@@ -145,6 +145,82 @@ class C4gReservationController extends C4GBaseController
         parent::__construct($rootDir, $requestStack, $framework, $model);
     }
 
+    public function getPutVars()
+    {
+        if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+            // Force re-parsing if we suspect stale data or just want to be absolutely sure.
+            // However, we must not clear this->putVars if it was already populated correctly in this SAME request.
+            // But here, we suspect state-bleeding across "logical" requests in persistent environments.
+            $content = '';
+            if ($this->requestStack && $this->requestStack->getCurrentRequest()) {
+                $content = $this->requestStack->getCurrentRequest()->getContent();
+            }
+            if (!$content) {
+                $content = file_get_contents('php://input');
+            }
+            
+            if ($content) {
+                parse_str($content, $putVars);
+                
+                if (is_array($putVars) && !empty($putVars)) {
+                    $this->putVars = []; // Start fresh for this parsing
+                    foreach ($putVars as $key => $putVar) {
+                        if (is_string($putVar)) {
+                            $tmpVar = C4GUtils::secure_ugc($putVar);
+                            $tmpVar = C4GUtils::cleanHtml($tmpVar);
+                            $this->putVars[$key] = $tmpVar;
+                        } else {
+                            $this->putVars[$key] = $putVar;
+                        }
+                    }
+                }
+            }
+        }
+        return $this->putVars;
+    }
+
+    public function resetStaticCaches()
+    {
+        C4gReservationHandler::resetStaticCaches();
+    }
+
+    public function nukeState()
+    {
+        // 1. Clear session variables that hold form state
+        $this->session->remove('c4g_brick_dialog_id');
+        $this->session->remove('c4g_brick_dialog_values');
+        $this->session->remove('reservationInitialDateCookie');
+        $this->session->remove('reservationTimeCookie');
+        $this->session->remove('reservationEventCookie');
+        
+        // 2. Clear instance variables
+        $this->putVars = [];
+        
+        // 3. Reset internal memos of the base controller (to force DB reload)
+        $memos = [
+            '__modelFindByPkMemo',
+            '__modelFindByMemo',
+            '__deserializeFastMemo',
+            '__insertTagsFastMemo',
+            '__ajaxMemo',
+            '__projectListForBrickMemo',
+            '__checkProjectIdMemo',
+            '__getTablePermMemo',
+            '__getC4GTablePermissionMemo',
+            '__isMemberOfGroupMemo',
+            '__hasRightInGroupMemo'
+        ];
+        foreach ($memos as $memo) {
+            if (property_exists($this, $memo)) {
+                $this->$memo = [];
+            }
+        }
+        
+        // 4. Reset static caches in handlers
+        C4gReservationHandler::resetStaticCaches();
+        $this->resetStaticCaches();
+    }
+
     public function initBrickModule($id)
     {
         $moduleTypes = [];
@@ -172,7 +248,24 @@ class C4gReservationController extends C4GBaseController
             }
         }
 
-        $eventId  = Input::get('event') ? Input::get('event') : 0;
+        $eventId = Input::get('event') ?: 0;
+        
+        // Falls wir in einem PUT-Request sind (Speichern), MUSS die ID aus dem Request-Body kommen.
+        // Ein Fallback auf Input::get (GET) oder Session ist hier gefährlich, da diese veraltet sein könnten.
+        if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+            $this->putVars = []; // Reset instance variable before reload
+            $putVars = $this->getPutVars();
+            if ($putVars) {
+                $typeId = $putVars['reservation_type'] ?? 0;
+                if ($typeId) {
+                    $eventId = $putVars['reservation_object_event_' . $typeId] ?? 0;
+                }
+            }
+        }
+        if ($eventId) {
+            $this->permalink_name = 'event';
+        }
+
         if (!$eventId && $doIt && ($oldEventId = $this->session->getSessionValue('reservationEventCookie'))) {
             $this->session->remove('reservationEventCookie');
             $this->session->remove('reservationInitialDateCookie_'.$oldEventId);
@@ -234,9 +327,17 @@ class C4gReservationController extends C4GBaseController
 
     public function addFields() : array
     {
-        if (!$this->reservationSettings && $this->reservation_settings) {
-            $this->session->setSessionValue('reservationSettings', $this->reservation_settings);
-            $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
+        if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] !== 'PUT')) {
+            $this->nukeState();
+        }
+        
+        C4gReservationHandler::resetStaticCaches();
+
+        if (!$this->reservationSettings && key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+            $putVars = $this->getPutVars();
+            if ($putVars && isset($putVars['reservation_settings'])) {
+                $this->reservationSettings = C4gReservationSettingsModel::findByPk($putVars['reservation_settings']);
+            }
         }
 
         System::loadLanguageFile('fe_c4g_reservation');
@@ -250,24 +351,61 @@ class C4gReservationController extends C4GBaseController
         $initialDate = '';
         $initialTime = '';
 
-
         $typeId = Input::get('type') ?: 0;
+        $eventId = Input::get('event') ?: 0;
         $objectId = Input::get('object') ?: 0;
+        
+        // Falls wir in einem PUT-Request sind (Speichern), bevorzugen wir IMMER die Daten aus dem Request-Body.
+        // Die Session/GET-Parameter könnten veraltet sein (State-Bleeding).
+        if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+            $putVars = $this->getPutVars();
+            if ($putVars) {
+                $typeId = $putVars['reservation_type'] ?? $typeId;
+                if ($typeId) {
+                    $eventId = $putVars['reservation_object_event_' . $typeId] ?? $eventId;
+                    if ($eventId) {
+                        // Mirror to controller instance to ensure addFields uses the correct eventId
+                        // even if it was just changed in the current request.
+                        if ($typeId) {
+                            $this->putVars['reservation_object_event_' . $typeId] = $eventId;
+                        }
+                        $this->session->setSessionValue('reservationEventCookie', $eventId);
+                    }
+                    $objectId = $putVars['reservation_object_' . $typeId] ?? $objectId;
+                    if ($objectId && $typeId) {
+                        $this->putVars['reservation_object_' . $typeId] = $objectId;
+                    }
+                }
+            }
+        }
 
-        $eventId = Input::get('event') ? Input::get('event') : 0;
-
-        if (!$eventId && $this->session->getSessionValue('reservationEventCookie')) {
-            $eventId = $this->session->getSessionValue('reservationEventCookie');
-        } else if ($eventId) {
+        if ($eventId) {
             $this->session->setSessionValue('reservationEventCookie', $eventId);
+        } else if ($this->session->getSessionValue('reservationEventCookie')) {
+            $eventId = $this->session->getSessionValue('reservationEventCookie');
         }
 
         if ($eventId) {
             $this->permalink_name = 'event';
         }
 
-        $event = $eventId ? \Contao\CalendarEventsModel::findByPk($eventId) : false;
-        $eventObj = $event && $event->published ? C4gReservationEventModel::findBy('pid', $event->id) : false;
+        $database = Database::getInstance();
+        $event = false;
+        $eventObj = false;
+        if ($eventId) {
+            $eventResult = $database->prepare("SELECT * FROM tl_calendar_events WHERE id=? AND published='1'")
+                ->execute($eventId);
+            if ($eventResult && $eventResult->id) {
+                $event = $eventResult;
+                // Since we don't have a Model here, we use a manual check for the connection
+                $eventObjResult = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE pid=?")
+                    ->execute($event->id);
+                if ($eventObjResult && $eventObjResult->id) {
+                    $eventObj = $eventObjResult;
+                }
+            }
+        }
+
         if ($eventObj && is_countable($eventObj) && (count($eventObj) > 1)) {
             C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: ' . $event->id);
         } else {
@@ -327,7 +465,7 @@ class C4gReservationController extends C4GBaseController
                             }
                         }
                     }
-                    if (!$goodDay) {
+                    if (!$goodDay && !(key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))) {
                         $info = new C4GInfoTextField();
                         $info->setFieldName('info');
                         $info->setEditable(false);
@@ -335,7 +473,7 @@ class C4gReservationController extends C4GBaseController
                         return [$info];
                     }
                 }
-                if ($minReservationDates >= $startDate){
+                if (($minReservationDates >= $startDate) && !(key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))){
                     $info = new C4GInfoTextField();
                     $info->setFieldName('info');
                     $info->setEditable(false);
@@ -641,7 +779,7 @@ foreach ($typelist as $listType) {
                 $reservationDesiredCapacity->setMin($minCapacity);
                 $reservationDesiredCapacity->setMax($maxCapacity);
             } else {
-                $reservationDesiredCapacity->setMax[$isPartiPerEvent];
+                $reservationDesiredCapacity->setMax($isPartiPerEvent);
             }
 
          } else if (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
@@ -665,7 +803,7 @@ foreach ($typelist as $listType) {
             }
         }
 
-        if ($error) {
+        if ($error && !(key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))) {
             $reservationDesiredCapacity->setMin(0);
             $reservationDesiredCapacity->setMax(0);
 
@@ -1446,7 +1584,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
                     }
 
-                    if ($error) {
+                    if ($error && !(key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))) {
                         $reservationDesiredCapacity->setMin(0);
                         $reservationDesiredCapacity->setMax(0);
 
@@ -1718,7 +1856,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $reservationIdField->setSortColumn(false);
         $reservationIdField->setTableColumn(true);
         $reservationIdField->setMandatory(false);
-        $reservationIdField->setInitialValue(C4GBrickCommon::getUUID());
+        $reservationId = C4GBrickCommon::getUUID();
+        if (isset($putVars['reservation_id']) && $putVars['reservation_id']) {
+            $reservationId = $putVars['reservation_id'];
+        }
+        $reservationIdField->setInitialValue($reservationId);
         $reservationIdField->setTableRow(false);
         $reservationIdField->setEditable(false);
         $reservationIdField->setUnique(true);
@@ -2077,18 +2219,95 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
      */
     public function clickReservation($values, $putVars)
     {
+        // First ensure we have fresh putVars from input stream for PUT requests
+        if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+            $this->putVars = []; // Reset instance variable before reload
+            $putVars = $this->getPutVars();
+        }
+
+        $this->nukeState();
+        
+        if (!is_array($putVars)) {
+            $putVars = [];
+        }
+        
+        // Repopulate putVars directly from input again to be absolutely sure after nuke
+        $rawPut = $this->getPutVars();
+        if (!empty($rawPut)) {
+            $putVars = array_merge($putVars, $rawPut);
+        }
+        
+        // LOG ALL KEYS in putVars to see what the browser actually sends
+        // C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation START - Request keys: " . implode(',', array_keys($putVars)));
+        
+        // Clear Event Cookies only if we're not repeating the SAME event (based on putVars)
+        $typeIdInReq = $putVars['reservation_type'] ?? null;
+        if ($typeIdInReq) {
+            $eventIdInReq = $putVars['reservation_object_event_' . $typeIdInReq] ?? null;
+            $oldEventId = $this->session->getSessionValue('reservationEventCookie');
+            if ($eventIdInReq && $oldEventId && $oldEventId != $eventIdInReq) {
+                $this->session->remove('reservationInitialDateCookie_' . $oldEventId);
+                $this->session->remove('reservationTimeCookie_' . $oldEventId);
+            }
+            if ($eventIdInReq) {
+                $this->session->setSessionValue('reservationEventCookie', $eventIdInReq);
+            }
+        }
+
+        // We also need to clear internal memos of the base controller to avoid model caching
+        if (property_exists($this, '__modelFindByPkMemo')) { $this->__modelFindByPkMemo = []; }
+        if (property_exists($this, '__modelFindByMemo')) { $this->__modelFindByMemo = []; }
+        if (property_exists($this, '__deserializeFastMemo')) { $this->__deserializeFastMemo = []; }
+        if (property_exists($this, '__insertTagsFastMemo')) { $this->__insertTagsFastMemo = []; }
+        if (property_exists($this, '__ajaxMemo')) { $this->__ajaxMemo = []; }
+        if (property_exists($this, '__projectListForBrickMemo')) { $this->__projectListForBrickMemo = []; }
+        if (property_exists($this, '__checkProjectIdMemo')) { $this->__checkProjectIdMemo = []; }
+
+        // Always regenerate the reservation_id at the start of the process to prevent duplicates
+        $putVars['reservation_id'] = \con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon::getUUID();
+        $this->putVars['reservation_id'] = $putVars['reservation_id'];
+        
+        // Force empty dialog values in session to prevent the framework from "remembering"
+        $this->session->setSessionValue('c4g_brick_dialog_values', ['reservation_id' => $putVars['reservation_id']]);
+
+            // Sync back to session if present to avoid restoration of old values from elsewhere
+            $dialogValues = ['reservation_id' => $putVars['reservation_id']];
+
+            // Ensure that IDs from current request are used and mirrored
+            if (isset($putVars['reservation_type'])) {
+                $typeId = $putVars['reservation_type'];
+                $this->putVars['reservation_type'] = $typeId;
+                $currentEventInRequest = $putVars['reservation_object_event_' . $typeId] ?? null;
+                if ($currentEventInRequest) {
+                    $this->putVars['reservation_object_event_' . $typeId] = $currentEventInRequest;
+                    $this->session->setSessionValue('reservationEventCookie', $currentEventInRequest);
+                }
+                
+                $currentObjectInRequest = $putVars['reservation_object_' . $typeId] ?? null;
+                if ($currentObjectInRequest) {
+                    $this->putVars['reservation_object_' . $typeId] = $currentObjectInRequest;
+                }
+            }
+
+            $this->session->setSessionValue('c4g_brick_dialog_values', $dialogValues);
+
         $formId = $this->reservationSettings->id;
-        $type = $putVars['reservation_type'];
+        $type = $putVars['reservation_type'] ?? '';
         $database = Database::getInstance();
-        $reservationType = $database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
-            ->execute($type);
+        $reservationType = null;
+        if ($type) {
+            $reservationType = $database->prepare("SELECT * FROM tl_c4g_reservation_type WHERE id=? AND published='1'")
+                ->execute($type);
+        }
 
         $this->notification_type = $this->reservationSettings->notification_type;
-        $this->getDialogParams()->setNotificationType($this->reservationSettings->notification_type);
+        if ($this->getDialogParams()) {
+            $this->getDialogParams()->setNotificationType($this->reservationSettings->notification_type);
+        }
 
-        if ($reservationType->reservationObjectType === '3') {
+        if ($reservationType && $reservationType->reservationObjectType === '3') {
             $reservationTypeID = $putVars['reservation_type'];
-            $reservationObjectID = $putVars['reservation_object_' .$reservationTypeID];
+            $reservationObjectID = $putVars['reservation_object_' .$reservationTypeID] ?? 0;
             $database = Database::getInstance();
             $reservations = $database->prepare("SELECT desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object` =? AND `reservation_type` =? AND NOT `cancellation`=?")
             ->execute($reservationObjectID, $reservationTypeID,'1')->fetchAllAssoc();
@@ -2097,38 +2316,111 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $maxReservationCapacity = $database->prepare("SELECT desiredCapacityMax FROM `tl_c4g_reservation_object` WHERE `id` =?") 
             ->execute($reservationObjectID)->fetchAllAssoc();
             
-            $maxReservations = intval($maxReservationCapacity[0]['desiredCapacityMax']);
+            $maxReservations = isset($maxReservationCapacity[0]['desiredCapacityMax']) ? intval($maxReservationCapacity[0]['desiredCapacityMax']) : 0;
             $currentReservations = C4gReservationHandler::countReservations($reservations); 
         }
 
-        if ($reservationType->notification_type) {
-            $this->getDialogParams()->setNotificationType($reservationType->notification_type);
-            $this->notification_type = $reservationType->notification_type;
-        }
+            if ($reservationType && $reservationType->notification_type) {
+                if ($this->getDialogParams()) {
+                    $this->getDialogParams()->setNotificationType($reservationType->notification_type);
+                }
+                $this->notification_type = $reservationType->notification_type;
+            }
 
-        $isEvent = $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
+            $isEvent = $reservationType && $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
 
         if ($isEvent) {
+            // DEEP CLEAN: Remove any existing event data keys from putVars to prevent state-bleeding.
+            // This ensures that only the fresh values assigned below will be used.
+            $keysToClear = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location'];
+            foreach (array_keys($putVars) as $pk) {
+                foreach ($keysToClear as $baseKey) {
+                    if ($pk === $baseKey || strpos($pk, $baseKey . '_') === 0) {
+                        unset($putVars[$pk]);
+                        unset($this->putVars[$pk]);
+                    }
+                }
+            }
+
             $key = "reservation_object_event_" . $type;
-            $resObject = $putVars[$key];
+            $resObject = $putVars[$key] ?? 0;
 
             if ($resObject) {
-                $reservationObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE id=? AND published='1'")
+                // Ensure $resObject matches $eventId to be safe
+                if ($eventId && $resObject != $eventId) {
+                    $resObject = $eventId;
+                }
+                
+                // IMPORTANT: We explicitly reload the event from the database here 
+                // to avoid any caching issues or state bleeding from previous bookings.
+                $reservationObjectResult = $database->prepare("SELECT * FROM tl_calendar_events WHERE id=? AND published='1'")
                     ->execute($resObject);
 
-                foreach ($putVars as $key => $value) {
-                    if (strpos($key, strval($type.'-22'))) {
-                        if (strpos($key, strval($type.'-22'.$resObject)) === false) {
-                            unset($putVars[$key]);
+                if ($reservationObjectResult && $reservationObjectResult->id) {
+                    $reservationObject = $reservationObjectResult;
+                    $eventId = $reservationObject->id;
+                    
+                    // Mirror to controller instance to ensure addFields uses the correct eventId
+                    if (isset($putVars['reservation_type'])) {
+                        $putVars['reservation_object_event_' . $putVars['reservation_type']] = $eventId;
+                        $this->putVars['reservation_object_event_' . $putVars['reservation_type']] = $eventId;
+                    }
+
+                    // Clear date and time cookies if the event changed, to force reloading fresh defaults
+                    $oldEventInSession = $this->session->getSessionValue('reservationEventCookie');
+                    if ($oldEventInSession && $oldEventInSession != $eventId) {
+                        $this->session->remove('reservationInitialDateCookie_' . $oldEventInSession);
+                        $this->session->remove('reservationTimeCookie_' . $oldEventInSession);
+                    }
+                    $this->session->setSessionValue('reservationEventCookie', $eventId);
+                    // Also mirror specifically to putVars if it was missing or different
+                    $putVars['reservation_object_event_' . $type] = $eventId;
+
+                    // Ensure final event tokens are formatted as strings for the form validator
+                    $freshTitle = (string)($reservationObject->title ?? '');
+                    $beginDateTs = ($reservationObject->startDate ?? 0) ? intval($reservationObject->startDate) : 0;
+                    $beginTimeTs = ($reservationObject->startTime ?? 0) ? intval($reservationObject->startTime) : 0;
+                    $endDateTs   = (isset($reservationObject->endDate) && $reservationObject->endDate) ? intval($reservationObject->endDate) : 0;
+                    $endTimeTs   = ($reservationObject->endTime ?? 0) ? intval($reservationObject->endTime) : 0;
+
+                    $freshBeginDate = $beginDateTs ? (string)date($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y', $beginDateTs) : '';
+                    $freshBeginTime = $beginTimeTs ? (string)date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', $beginTimeTs) : '';
+                    $freshEndDate = $endDateTs ? (string)date($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y', $endDateTs) : $freshBeginDate;
+                    $freshEndTime = $endTimeTs ? (string)date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', $endTimeTs) : '';
+
+                    $dataMapping = [
+                        'beginDate' => $freshBeginDate,
+                        'beginTime' => $freshBeginTime,
+                        'endDate' => $freshEndDate,
+                        'endTime' => $freshEndTime,
+                        'reservation_title' => $freshTitle
+                    ];
+
+                    foreach ($dataMapping as $mappedKey => $mappedValue) {
+                        $putVars[$mappedKey] = $mappedValue;
+                        $this->putVars[$mappedKey] = $mappedValue;
+                        if (isset($type)) {
+                            $putVars[$mappedKey . '_' . $type] = $mappedValue;
+                            $this->putVars[$mappedKey . '_' . $type] = $mappedValue;
                         }
+                        $eventSuffix = $type . '-22' . $eventId;
+                        $putVars[$mappedKey . '_' . $eventSuffix] = $mappedValue;
+                        $this->putVars[$mappedKey . '_' . $eventSuffix] = $mappedValue;
+                        $objSuffix = $type . '-' . $eventId;
+                        $putVars[$mappedKey . '_' . $objSuffix] = $mappedValue;
+                        $this->putVars[$mappedKey . '_' . $objSuffix] = $mappedValue;
                     }
                 }
             }
         } else {
             $key = "reservation_object_" . $type;
             $resObject = $putVars[$key];
-            $reservationObject = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
+            // IMPORTANT: We explicitly reload the object from the database here.
+            $reservationObjectResult = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=? AND published='1'")
                 ->execute($resObject);
+            if ($reservationObjectResult && $reservationObjectResult->id) {
+                $reservationObject = $reservationObjectResult;
+            }
 
             if ($reservationObject && $reservationType->cloneObject) {
                 $cloneObject = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id=?")
@@ -2150,20 +2442,26 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
 
-            if ($reservationObject && $reservationObject->notification_type) {
-                $this->getDialogParams()->setNotificationType($reservationObject->notification_type);
-                $this->notification_type = $reservationObject->notification_type;
-            }
+                if ($reservationObject && $reservationObject->notification_type) {
+                    if ($this->getDialogParams()) {
+                        $this->getDialogParams()->setNotificationType($reservationObject->notification_type);
+                    }
+                    $this->notification_type = $reservationObject->notification_type;
+                }
 
+            // Hotfix: Wir entfernen hier KEINE Daten mehr aus putVars.
+            /*
             foreach ($putVars as $key => $value) {
                 if (strpos($key, '_picker') !== false) {
                     unset($putVars[$key]);
                 }
             }
+            */
 
-            if ($reservationType->reservationObjectType === '3') {
+            if ($reservationType && $reservationType->reservationObjectType === '3') {
+                /*
                 foreach ($putVars as $key => $value) {
-                    if (strpos($key, strval($type.'-33'))) {
+                    if (strpos($key, strval($type.'-33')) !== false) {
                         if (strpos($key, strval($type.'-33'.$resObject)) === false) {
                             unset($putVars[$key]);
                         }
@@ -2177,40 +2475,48 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                         unset($putVars[$key]);
                     }
                 }
+                */
             }
         }
 
         $newFieldList = $this->addFields();
         $finalFieldList = [];
-        $removedFromList = [];
+        // $removedFromList = []; // Deaktiviert, da wir nicht mehr destructiv filtern
 
         if ($reservationType->reservationObjectType === '3' && isset($typeOfObject) && $typeOfObject == 'fixed_date') {
             $type = ($type . '-33' . $resObject);
         }
 
-        foreach ($newFieldList as $key=>$field) {
-            $additionalId = $field->getAdditionalId();
-            if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-'))))) {
-                unset($putVars[$field->getFieldName()."_".$additionalId]);
-                continue;
-            } else if ($additionalId) {
-                $removedFromList[$field->getFieldName()] = $additionalId;
-                unset($putVars[$field->getFieldName()]);
-            }
+            foreach ($newFieldList as $key=>$field) {
+                $additionalId = $field->getAdditionalId();
+                $fieldName = $field->getFieldName();
 
-            if ($additionalId && ($additionalId != $type)) {
-                if (($field->getFieldName() == 'desiredCapacity') || ($field->getFieldName() == 'duration')) {
-                    unset($putVars[$field->getFieldName()."_".$additionalId]);
-                    continue;
-                }
+                // Filtern: Wir entscheiden hier nur, welche Felder in die finalFieldList kommen.
+                // Wir löschen KEINE Daten aus putVars basierend auf dem additionalId-Mismatch,
+                // da diese Daten später für die Speicherung wichtig sein könnten.
+                if ($additionalId) {
+                    $match = false;
+                    // Exakter Match
+                    if ($additionalId == $type) {
+                        $match = true;
+                    }
+                    // Prefix Match (z.B. "123-" für Typ 123)
+                    if (strpos($additionalId, strval($type . '-')) === 0) {
+                        $match = true;
+                    }
+                    // Event Match (z.B. "123-22456" für Typ 123 und Event 456)
+                    if ($isEvent && strpos($additionalId, strval($type . '-22' . $reservationObject->id)) === 0) {
+                        $match = true;
+                    }
+                    // Fixed Date Match (z.B. "123-33789" für Typ 123 und Object 789)
+                    if ($reservationType->reservationObjectType === '3' && strpos($additionalId, strval($type . '-33' . $reservationObject->id)) === 0) {
+                        $match = true;
+                    }
 
-                if ($reservationType->reservationObjectType && $reservationType->reservationObjectType === '1') {
-                    if ($field->getFieldName() == 'beginDate') {
-                        unset($putVars[$field->getFieldName()."_".$additionalId]);
+                    if (!$match) {
                         continue;
                     }
                 }
-            }
 
             if (!$isEvent && ($field->getFieldName() == "beginTime")) {
                 foreach ($putVars as $key => $value) {
@@ -2223,6 +2529,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
 
+            /*
             if ($isEvent) {
                 if ($additionalId && (($additionalId != $type) && (strpos($additionalId, strval($type.'-22')) !== false))) {
                     if (strpos($additionalId, strval($type.'-22'.$reservationObject->id)) === false) {
@@ -2241,6 +2548,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     }
                 }
             }
+            */
 
             if (!$field->isEditable() && !$field->isDatabaseField() && $field->getInitialValue() && $field->isNotificationField()) {
                 if ($field->getAdditionalId()) {
@@ -2295,12 +2603,24 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
             $fieldName = $field->getFieldName();
-            if (isset($fieldName) && (!isset($removedFromList[$fieldName]) || (isset($removedFromList[$fieldName]) && ($removedFromList[$fieldName] == $field->getAdditionalId())))) {
+            if (isset($fieldName)) {
                 $finalFieldList[] = $field;
+
+                $additionalId = $field->getAdditionalId();
+                if ($additionalId) {
+                    $suffixedKey = $fieldName . '_' . $additionalId;
+                    if (isset($putVars[$fieldName]) && (!isset($putVars[$suffixedKey]) || $putVars[$suffixedKey] === '' || $putVars[$suffixedKey] === null)) {
+                        $putVars[$suffixedKey] = $putVars[$fieldName];
+                    }
+                    if ((!isset($putVars[$fieldName]) || $putVars[$fieldName] === '' || $putVars[$fieldName] === null) && isset($putVars[$suffixedKey])) {
+                        $putVars[$fieldName] = $putVars[$suffixedKey];
+                    }
+                }
+
                 if ($field->isNotificationField()) {
-                    if ($field->getAdditionalId()) {
-                        if (isset($putVars[$fieldName . "_" . $field->getAdditionalId()])) {
-                            $putVars[$fieldName] = $putVars[$fieldName . "_" . $field->getAdditionalId()];
+                    if ($additionalId) {
+                        if (isset($putVars[$fieldName . "_" . $additionalId])) {
+                            $putVars[$fieldName] = $putVars[$fieldName . "_" . $additionalId];
                         } elseif ($field->getInitialValue() !== null && !isset($putVars[$fieldName])) {
                             $putVars[$fieldName] = $field->getInitialValue();
                         }
@@ -2314,11 +2634,19 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $newFieldList = $finalFieldList;
 
-        $reservationId = $putVars['reservation_id'];
-
-        $putVars['reservation_title'] = $isEvent ? $reservationObject->title : $reservationObject->caption;
-
         if ($isEvent) {
+            // DEEP CLEAN: Remove any existing event data keys from putVars to prevent state-bleeding.
+            // This ensures that only the fresh values assigned below will be used.
+            $keysToClear = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location'];
+            foreach (array_keys($putVars) as $pk) {
+                foreach ($keysToClear as $baseKey) {
+                    if ($pk === $baseKey || strpos($pk, $baseKey . '_') === 0) {
+                        unset($putVars[$pk]);
+                        unset($this->putVars[$pk]);
+                    }
+                }
+            }
+
             $putVars['reservationObjectType'] = '2';
             $objectId = $reservationObject ? $reservationObject->id : 0;
             $t = 'tl_c4g_reservation';
@@ -2357,23 +2685,58 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
 
             $putVars['reservation_object'] = $objectId;
+            $this->putVars['reservation_object'] = $objectId;
 
-            //ToDo implement all event possibilities
-            //ToDo check with is_numeric
+            if ($reservationObject) {
+                $freshTitle = (string)($reservationObject->title ?? '');
+                $beginDateTs = ($reservationObject->startDate ?? 0) ? intval($reservationObject->startDate) : 0;
+                $beginTimeTs = ($reservationObject->startTime ?? 0) ? intval($reservationObject->startTime) : 0;
+                $endDateTs   = (isset($reservationObject->endDate) && $reservationObject->endDate) ? intval($reservationObject->endDate) : 0;
+                $endTimeTs   = ($reservationObject->endTime ?? 0) ? intval($reservationObject->endTime) : 0;
 
-            $beginDate = $reservationObject->startDate ? intval($reservationObject->startDate) : 0;
-            $beginTime = $reservationObject->startTime ? intval($reservationObject->startTime) : 0;
-            $endDate   = isset($reservationObject->endDate) ? intval($reservationObject->endDate) : 0;
-            $endTime   = $reservationObject->endTime ? intval($reservationObject->endTime) : 0;
+                $freshBeginDate = $beginDateTs ? (string)date($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y', $beginDateTs) : '';
+                $freshBeginTime = $beginTimeTs ? (string)date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', $beginTimeTs) : '';
+                $freshEndDate = $endDateTs ? (string)date($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y', $endDateTs) : $freshBeginDate;
+                $freshEndTime = $endTimeTs ? (string)date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', $endTimeTs) : '';
 
-            $putVars['beginDate'] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
-            $putVars['beginTime'] = $beginTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime) : $beginTime;
-            $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate']; //ToDO Check
-            $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
+                $dataMapping = [
+                    'beginDate' => $freshBeginDate,
+                    'beginTime' => $freshBeginTime,
+                    'endDate' => $freshEndDate,
+                    'endTime' => $freshEndTime,
+                    'reservation_title' => $freshTitle
+                ];
+
+                foreach ($dataMapping as $mappedKey => $mappedValue) {
+                    $putVars[$mappedKey] = $mappedValue;
+                    $this->putVars[$mappedKey] = $mappedValue;
+                    if (isset($type)) {
+                        $putVars[$mappedKey . '_' . $type] = $mappedValue;
+                        $this->putVars[$mappedKey . '_' . $type] = $mappedValue;
+                    }
+                    $eventSuffix = $type . '-22' . $objectId;
+                    $putVars[$mappedKey . '_' . $eventSuffix] = $mappedValue;
+                    $this->putVars[$mappedKey . '_' . $eventSuffix] = $mappedValue;
+                    $objSuffix = $type . '-' . $objectId;
+                    $putVars[$mappedKey . '_' . $objSuffix] = $mappedValue;
+                    $this->putVars[$mappedKey . '_' . $objSuffix] = $mappedValue;
+                }
+            }
 
             // Just notification
             $settings = $this->reservationSettings;
         } else {
+            // DEEP CLEAN: Also for regular objects to be safe.
+            $keysToClear = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'location', 'description', 'image'];
+            foreach (array_keys($putVars) as $pk) {
+                foreach ($keysToClear as $baseKey) {
+                    if ($pk === $baseKey || strpos($pk, $baseKey . '_') === 0) {
+                        unset($putVars[$pk]);
+                        unset($this->putVars[$pk]);
+                    }
+                }
+            }
+
             $typeOfObject = $reservationObject->typeOfObject;
             $putVars['reservationObjectType'] = $reservationType->reservationObjectType;
             $objectId = $reservationObject ? $reservationObject->id : 0;
@@ -2447,9 +2810,26 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']];
             }
 
+            $type = $putVars['reservation_type'];
+            $freshTitle = (string)($reservationObject->caption ?? '');
+            $dataMapping = [
+                'reservation_title' => $freshTitle
+            ];
+
+            foreach ($dataMapping as $mappedKey => $mappedValue) {
+                $putVars[$mappedKey] = $mappedValue;
+                $this->putVars[$mappedKey] = $mappedValue;
+                if (isset($type)) {
+                    $putVars[$mappedKey . '_' . $type] = $mappedValue;
+                    $this->putVars[$mappedKey . '_' . $type] = $mappedValue;
+                }
+                $objSuffix = $type . '-' . $objectId;
+                $putVars[$mappedKey . '_' . $objSuffix] = $mappedValue;
+                $this->putVars[$mappedKey . '_' . $objSuffix] = $mappedValue;
+            }
+
             $beginTime = 0;
             $timeKey = false;
-            $type = $putVars['reservation_type'];
             foreach ($putVars as $key => $value) {
                 if ($reservationType->reservationObjectType === '3') {
                     $beginDate = $putVars['beginDate_'.$type.'-33'.$objectId];
@@ -2901,7 +3281,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         ];
 
         foreach ($tokenDefaults as $key => $defaultValue) {
-            if (!isset($putVars[$key]) || $putVars[$key] === null) {
+            if (!isset($putVars[$key]) || $putVars[$key] === null || $putVars[$key] === '') {
                 $putVars[$key] = $defaultValue;
             }
         }
@@ -3022,17 +3402,106 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $this->setPutVars($putVars);
         }
 
+        // Fix: Ensure basic tokens are always present to avoid template warnings and delivery issues
+        $tokenDefaults = [
+            'firstname' => '',
+            'lastname' => '',
+            'email' => '',
+            'phone' => '',
+            'address' => '',
+            'postal' => '',
+            'city' => '',
+            'organisation' => '',
+            'company' => '',
+            'description' => '',
+            'location' => $putVars['location'] ?? '',
+            'desiredCapacity' => $desiredCapacity ?? 1,
+            'reservation_title' => $putVars['reservation_title'] ?? '',
+            'beginDate' => $putVars['beginDate'] ?? '',
+            'beginTime' => $putVars['beginTime'] ?? '',
+            'endDate' => $putVars['endDate'] ?? '',
+            'endTime' => $putVars['endTime'] ?? '',
+            'participantList' => $putVars['participantList'] ?? '',
+            'priceSum' => $putVars['priceSum'] ?? '0,00 €',
+            'priceDiscount' => $putVars['priceDiscount'] ?? '0,00 €',
+            'discountPercent' => $putVars['discountPercent'] ?? 0,
+            'discountCode' => $putVars['discountCode'] ?? '',
+            'conferenceLink' => $putVars['conferenceLink'] ?? '',
+        ];
+
+        foreach ($tokenDefaults as $key => $defaultValue) {
+            if (!isset($putVars[$key]) || $putVars[$key] === null || $putVars[$key] === '') {
+                $putVars[$key] = $defaultValue;
+            }
+            // Mirror to instance putVars as well for SaveAction
+            $this->putVars[$key] = $putVars[$key];
+        }
+
+        // DEEP CLEAN BEFORE SAVE: 
+        // We ensure that NO old suffixed keys for event data remain in the variables
+        // that are passed to the SaveAction. This prevents the notification system
+        // from picking up "ghost data" from previous reservations in the same session.
+        $keysToSanitize = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location'];
+        $typeForSanitize = $putVars['reservation_type'] ?? null;
+        $eventForSanitize = $putVars['reservation_object'] ?? null;
+        
+        $sanitizeVars = function(&$vars) use ($keysToSanitize, $typeForSanitize, $eventForSanitize) {
+            if (!is_array($vars)) return;
+            foreach (array_keys($vars) as $vk) {
+                foreach ($keysToSanitize as $base) {
+                    // If it's a suffixed version of a base key...
+                    if (strpos($vk, $base . '_') === 0) {
+                        // ...and it doesn't match the current type/event combination, delete it.
+                        $isCurrentMatch = false;
+                        if ($typeForSanitize) {
+                            if ($vk === ($base . '_' . $typeForSanitize)) $isCurrentMatch = true;
+                            if ($eventForSanitize) {
+                                if ($vk === ($base . '_' . $typeForSanitize . '-22' . $eventForSanitize)) $isCurrentMatch = true;
+                                if ($vk === ($base . '_' . $typeForSanitize . '-' . $eventForSanitize)) $isCurrentMatch = true;
+                                if ($vk === ($base . '_' . $typeForSanitize . '-33' . $eventForSanitize)) $isCurrentMatch = true;
+                            }
+                        }
+                        if (!$isCurrentMatch) {
+                            unset($vars[$vk]);
+                        }
+                    }
+                }
+            }
+        };
+
+        $sanitizeVars($putVars);
+        $sanitizeVars($this->putVars);
+        
+        // Update session with the sanitized values
+        $this->session->setSessionValue('c4g_brick_dialog_values', $putVars);
+
+        // FINAL MIRROR: Ensure instance putVars is identical to local putVars
+        // before passing to the action, as some parts of the framework
+        // might access the instance variable via the module reference.
+        $this->putVars = $putVars;
+        
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
         $result = $action->run();
 
-        if (!isset($result['usermessage']) || !$result['usermessage']) {
-            if ($oldEventId = $this->session->getSessionValue('reservationEventCookie')) {
-                $this->session->remove('reservationEventCookie');
-                $this->session->remove('reservationInitialDateCookie_'.$oldEventId);
-                $this->session->remove('reservationTimeCookie_'.$oldEventId);
+        if (is_array($result) && !isset($result['jump_to_url']) && $this->reservationSettings->reservation_redirect_site) {
+            $jumpTo = \Contao\PageModel::findByPk($this->reservationSettings->reservation_redirect_site);
+            if ($jumpTo) {
+                $result['jump_to_url'] = $jumpTo->getFrontendUrl();
             }
         }
+
+        // Absoluter Deep Clean nach dem Speichern
+        $this->nukeState();
+        $this->session->remove('reservationEventCookie');
+        if (isset($eventId) && $eventId) {
+            $this->session->remove('reservationInitialDateCookie_' . $eventId);
+            $this->session->remove('reservationTimeCookie_' . $eventId);
+        }
+        
+        // Fix: Wir leeren hier auch $this->putVars der Controller-Instanz, 
+        // damit bei einem eventuellen internen Re-Use der Instanz keine alten Daten mehr vorhanden sind.
+        $this->putVars = [];
 
         return $result;
     }
@@ -3563,7 +4032,16 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
     public function afterSaveAction($changes, $insertId)
     {
-       C4gReservationCheckInHelper::removeQRCodeFile();
+        C4gReservationCheckInHelper::removeQRCodeFile();
+        
+        // Radical cleanup after successful save to ensure the next booking in the same browser session
+        // starts with a completely clean state. This is a mitigation for frontend stale state
+        // where the browser might send old data if the page is not fully reloaded.
+        $this->nukeState();
+        $this->session->remove('reservationEventCookie');
+        $this->session->remove('c4g_brick_dialog_id');
+        $this->session->remove('c4g_brick_dialog_values');
+        $this->putVars = [];
     }
 }
 

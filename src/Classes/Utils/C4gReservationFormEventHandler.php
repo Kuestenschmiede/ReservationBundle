@@ -142,7 +142,12 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationObjectField->setRangeField('desiredCapacity_' . $listType['id']);
         $reservationObjectField->setStyleClass('reservation-event-object displayReservationObjects');
         $reservationObjectField->setWithEmptyOption(false);
-        $reservationObjectField->setInitialValue(-1);
+        $initialEventId = -1;
+        if ($this->module) {
+            $initialEventId = $this->module->getSession()->getSessionValue('reservationEventCookie') ?: -1;
+        }
+
+        $reservationObjectField->setInitialValue($initialEventId);
         $reservationObjectField->setShowIfEmpty(true);
         $reservationObjectField->setDatabaseField(false);
         $reservationObjectField->setEmptyOptionLabel($reservationSettings->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_object_none']);
