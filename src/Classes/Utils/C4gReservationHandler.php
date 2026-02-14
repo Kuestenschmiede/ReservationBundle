@@ -6,6 +6,7 @@ use con4gis\CoreBundle\Classes\Helper\ArrayHelper;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
 use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
+use con4gis\ReservationBundle\Classes\Models\C4gLogModel;
 use Contao\Database;
 use Contao\System;
 use Contao\Date;
@@ -1810,7 +1811,9 @@ class C4gReservationHandler
             $calendarObject = $database->prepare("SELECT * FROM tl_calendar WHERE activateEventReservation='1' AND `reservationType` IN $idString")->execute()->fetchAllAssoc();
             if ($calendarObject) {
                 foreach ($calendarObject as $calendar) {
-                    $allEvents = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($calendar['iid'])->fetchAllAssoc();
+                    $calId = $calendar['iid'] ?? ($calendar['id'] ?? 0);
+                    if (!$calId) continue;
+                    $allEvents = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($calId)->fetchAllAssoc();
                     foreach ($allEvents as $eventObject) {
                         $reservationEvent = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `id` = ? AND `reservationType` IN $idString")->execute($eventObject['id'])->fetchAssoc();
 

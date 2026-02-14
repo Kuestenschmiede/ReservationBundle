@@ -10,6 +10,7 @@
 
 namespace con4gis\ReservationBundle\Classes\Calculator;
 
+use con4gis\CoreBundle\Resources\contao\models\C4gLogModel;
 use con4gis\CoreBundle\Resources\contao\models\C4gSettingsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;

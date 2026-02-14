@@ -303,13 +303,16 @@ function checkType(dateField, event) {
 
 function setReservationForm(typeId, showDateTime) {
     callFromChangeCapacity = false;
-    document.getElementsByClassName("reservation-id")[0].style.display = "none";
+    if (document.getElementsByClassName("reservation-id")[0]) {
+        document.getElementsByClassName("reservation-id")[0].style.display = "none";
+    }
 
     var event = false;
     var object = false;
 
     var typeField = document.getElementById("c4g_reservation_type");
-    typeId = typeField ? typeField.value : -1;
+    if (!typeField) return; // Safety first
+    typeId = typeField.value || -1;
 
     var selectedIndex = typeField.selectedIndex;
     var selectedOption = typeField.options[selectedIndex];
@@ -348,27 +351,43 @@ function setReservationForm(typeId, showDateTime) {
             var objectElement = document.getElementById("c4g_reservation_object_"+typeId);
             if (objectElement) {
                 dateId = dateId + '-33' +objectElement.value;
-                setTimeset(document.getElementById(dateId).value, typeId, showDateTime,objectElement.value);
+                if (document.getElementById(dateId)) {
+                    setTimeset(document.getElementById(dateId).value, typeId, showDateTime,objectElement.value);
+                }
             }
         } else if (event) {
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
-            const eventId = urlParams.get('event')
+            let eventIdFromUrl = urlParams.get('event');
 
-            if (eventId) {
-                var dateId = 'c4g_beginDateEvent_' + typeId + '-22' + eventId;
-                if (document.getElementById(dateId)) {
-                    setTimeset(document.getElementById(dateId).value, typeId, showDateTime,0);
+            if (!eventIdFromUrl) {
+                // Try to get from URL path (auto_item)
+                let pathParts = window.location.pathname.split('/');
+                let eventIndex = pathParts.indexOf('event');
+                if (eventIndex !== -1 && pathParts[eventIndex + 1]) {
+                    eventIdFromUrl = pathParts[eventIndex + 1].replace('.html', '');
+                }
+            }
+
+            if (eventIdFromUrl) {
+                var eventSelect = document.getElementById("c4g_reservation_object_event_" + typeId);
+                if (eventSelect) {
+                    eventSelect.value = eventIdFromUrl;
+                }
+                
+                var dateIdEvent = 'c4g_beginDateEvent_' + typeId + '-22' + eventIdFromUrl;
+                if (document.getElementById(dateIdEvent)) {
+                    setTimeset(document.getElementById(dateIdEvent).value, typeId, showDateTime,0);
                     checkEventFields();
                 }
             } else {
                 var dateFields = document.getElementsByClassName('c4g__form-date-input');
                 if (dateFields) {
-                    for (i = 0; i < dateFields.length; i++) {
+                    for (var i = 0; i < dateFields.length; i++) {
                         var dateField = dateFields[i];
                         if (dateField && checkType(dateField, event) && dateField.value) {
                             var fieldId = dateField.id;
-                            if (fieldId && fieldId.indexOf('c4g_beginDateEvent_' + typeId + '-22')) {
+                            if (fieldId && fieldId.indexOf('c4g_beginDateEvent_' + typeId + '-22') !== -1) {
                                 setTimeset(dateField.value, typeId, showDateTime,0);
                                 checkEventFields();
                                 break;
@@ -383,18 +402,23 @@ function setReservationForm(typeId, showDateTime) {
     }
     handleBrickConditions();
 
-    document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
+    if (document.getElementsByClassName('c4g__spinner-wrapper')[0]) {
+        document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
+    }
 }
 
 function changeCapacity(typeId, showDateTime) {
     callFromChangeCapacity = true;
-    document.getElementsByClassName("reservation-id")[0].style.display = "none";
+    if (document.getElementsByClassName("reservation-id")[0]) {
+        document.getElementsByClassName("reservation-id")[0].style.display = "none";
+    }
 
     var event = false;
     var object = false;
 
     var typeField = document.getElementById("c4g_reservation_type");
-    typeId = typeField ? typeField.value : -1;
+    if (!typeField) return; // Safety first
+    typeId = typeField.value || -1;
 
     var selectedIndex = typeField.selectedIndex;
     var selectedOption = typeField.options[selectedIndex];
@@ -433,27 +457,43 @@ function changeCapacity(typeId, showDateTime) {
             var objectElement = document.getElementById("c4g_reservation_object_"+typeId);
             if (objectElement) {
                 dateId = dateId + '-33' +objectElement.value;
-                setTimeset(document.getElementById(dateId).value, typeId, showDateTime,objectElement.value);
+                if (document.getElementById(dateId)) {
+                    setTimeset(document.getElementById(dateId).value, typeId, showDateTime,objectElement.value);
+                }
             }
         } else if (event) {
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
-            const eventId = urlParams.get('event')
+            let eventIdFromUrl = urlParams.get('event');
 
-            if (eventId) {
-                var dateId = 'c4g_beginDateEvent_' + typeId + '-22' + eventId;
-                if (document.getElementById(dateId)) {
-                    setTimeset(document.getElementById(dateId).value, typeId, showDateTime,0);
+            if (!eventIdFromUrl) {
+                // Try to get from URL path (auto_item)
+                let pathParts = window.location.pathname.split('/');
+                let eventIndex = pathParts.indexOf('event');
+                if (eventIndex !== -1 && pathParts[eventIndex + 1]) {
+                    eventIdFromUrl = pathParts[eventIndex + 1].replace('.html', '');
+                }
+            }
+
+            if (eventIdFromUrl) {
+                var eventSelect = document.getElementById("c4g_reservation_object_event_" + typeId);
+                if (eventSelect) {
+                    eventSelect.value = eventIdFromUrl;
+                }
+                
+                var dateIdEvent = 'c4g_beginDateEvent_' + typeId + '-22' + eventIdFromUrl;
+                if (document.getElementById(dateIdEvent)) {
+                    setTimeset(document.getElementById(dateIdEvent).value, typeId, showDateTime,0);
                     checkEventFields();
                 }
             } else {
                 var dateFields = document.getElementsByClassName('c4g__form-date-input');
                 if (dateFields) {
-                    for (i = 0; i < dateFields.length; i++) {
-                        var dateField = dateFields[i];
+                    for (var j = 0; j < dateFields.length; j++) {
+                        var dateField = dateFields[j];
                         if (dateField && checkType(dateField, event) && dateField.value) {
                             var fieldId = dateField.id;
-                            if (fieldId && fieldId.indexOf('c4g_beginDateEvent_' + typeId + '-22')) {
+                            if (fieldId && fieldId.indexOf('c4g_beginDateEvent_' + typeId + '-22') !== -1) {
                                 setTimeset(dateField.value, typeId, showDateTime,0);
                                 checkEventFields();
                                 break;
@@ -468,7 +508,9 @@ function changeCapacity(typeId, showDateTime) {
     }
     handleBrickConditions();
 
-    document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
+    if (document.getElementsByClassName('c4g__spinner-wrapper')[0]) {
+        document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
+    }
 }
 
 function checkTimelist(value, timeList) {

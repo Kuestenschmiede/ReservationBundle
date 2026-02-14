@@ -106,7 +106,7 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('endDate', $reservation['endDate'] ? date($dateFormat, $reservation['endDate']) : '');
                         $c4gNotify->setTokenValue('endTime', $reservation['endTime'] ? date($timeFormat, $reservation['endTime']) : '');
 
-                        $c4gNotify->setTokenValue('description', $reservationObject['description'] ?: '');
+                        $c4gNotify->setTokenValue('description', $reservationObject['description'] ?: ($reservationObject['details'] ?: ''));
 
                         $params = $reservation['included_params'] ? \Contao\StringUtil::deserialize($reservation['included_params']) : [];
                         $includedParamsArr = [];

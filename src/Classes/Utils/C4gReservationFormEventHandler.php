@@ -43,6 +43,8 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
 use Contao\Controller;
 use Contao\Date;
@@ -61,6 +63,9 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $condition = $this->condition;
         $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
 
+        $typeId = $listType['id'] ?: 0;
+        $eventId = \Contao\Input::get('event') ?: $this->module->getSession()->getSessionValue('reservationEventCookie');
+        
         $objects = [];
         foreach ($reservationObjects as $reservationObject) {
             $objects[] = array(
@@ -143,7 +148,9 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationObjectField->setStyleClass('reservation-event-object displayReservationObjects');
         $reservationObjectField->setWithEmptyOption(false);
         $initialEventId = -1;
-        if ($this->module) {
+        if ($eventId) {
+            $initialEventId = $eventId;
+        } else if ($this->module) {
             $initialEventId = $this->module->getSession()->getSessionValue('reservationEventCookie') ?: -1;
         }
 
@@ -473,6 +480,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $descriptionField->setDatabaseField(false);
                     $descriptionField->setEditable(false);
                     $descriptionField->setNotificationField(true);
+                    $descriptionField->setPrintable(false);
                     $this->fieldList[] = $descriptionField;
                 }
 

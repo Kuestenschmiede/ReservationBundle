@@ -43,6 +43,8 @@ use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationParamsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationSettingsModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationHandler;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
 use Contao\Controller;
 use Contao\Date;
@@ -61,12 +63,23 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $condition = $this->condition;
         $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
 
+        $typeId = $listType['id'] ?: 0;
+        $eventId = \Contao\Input::get('event') ?: $this->module->getSession()->getSessionValue('reservationEventCookie');
+        $objectId = \Contao\Input::get('object') ?: 0;
+        
+        $initialDateFromSession = $eventId ? $this->module->getSession()->getSessionValue('reservationInitialDateCookie_' . $eventId) : 0;
+        $initialTimeFromSession = $eventId ? $this->module->getSession()->getSessionValue('reservationTimeCookie_' . $eventId) : 0;
+        
         $initialBookingDate = '';
         $initialBookingTime = '';
         $typeOfObject = 'standard';
         if (($listType['periodType'] === 'minute') || ($listType['periodType'] === 'hour') || ($listType['periodType'] === 'day') || ($listType['periodType'] === 'overnight') || ($listType['periodType'] === 'week')) {
 
-            if (!$this->initialValues->getDate() && $listType['directBooking']) {
+            if ($this->initialValues->getDate()) {
+                $initialBookingDate = $this->initialValues->getDate();
+            } else if ($initialDateFromSession) {
+                $initialBookingDate = $initialDateFromSession;
+            } else if ($listType['directBooking']) {
                 $objDate = new Date(date($GLOBALS['TL_CONFIG']['dateFormat'],time()), Date::getFormatFromRgxp('date'));
                 $initialBookingDate = $objDate->tstamp;
             } else {
@@ -311,7 +324,9 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationObjectField->setStyleClass('reservation-object displayReservationObjects');
         $reservationObjectField->setWithEmptyOption(true);
         $initialObjectId = -1;
-        if ($this->module) {
+        if ($objectId) {
+            $initialObjectId = $objectId;
+        } else if ($this->module) {
             $initialObjectId = $this->module->getSession()->getSessionValue('reservationObjectCookie') ?: -1;
         }
         $reservationObjectField->setInitialValue($initialObjectId);

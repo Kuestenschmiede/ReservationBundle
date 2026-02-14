@@ -184,14 +184,17 @@ class C4gReservationController extends C4GBaseController
         C4gReservationHandler::resetStaticCaches();
     }
 
-    public function nukeState()
+    public function nukeState($keepEvent = false)
     {
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG nukeState called (keepEvent: " . ($keepEvent ? 'yes' : 'no') . ")");
         // 1. Clear session variables that hold form state
         $this->session->remove('c4g_brick_dialog_id');
         $this->session->remove('c4g_brick_dialog_values');
         $this->session->remove('reservationInitialDateCookie');
         $this->session->remove('reservationTimeCookie');
-        $this->session->remove('reservationEventCookie');
+        if (!$keepEvent) {
+            $this->session->remove('reservationEventCookie');
+        }
         
         // 2. Clear instance variables
         $this->putVars = [];
@@ -219,6 +222,11 @@ class C4gReservationController extends C4GBaseController
         // 4. Reset static caches in handlers
         C4gReservationHandler::resetStaticCaches();
         $this->resetStaticCaches();
+    }
+
+    public function renewInitialValues()
+    {
+        $this->addFields();
     }
 
     public function initBrickModule($id)
@@ -249,6 +257,20 @@ class C4gReservationController extends C4GBaseController
         }
 
         $eventId = Input::get('event') ?: 0;
+        if (!$eventId && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+            $eventId = $request->attributes->get('event') ?: 0;
+            if (!$eventId && $request->attributes->has('auto_item')) {
+                $eventId = $request->attributes->get('auto_item');
+            }
+            
+            // Still no event? Try to parse from the raw URI if possible
+            if (!$eventId) {
+                $uri = $request->getUri();
+                if (preg_match('/\/event\/([^\/\?]+)/', $uri, $matches)) {
+                    $eventId = $matches[1];
+                }
+            }
+        }
         
         // Falls wir in einem PUT-Request sind (Speichern), MUSS die ID aus dem Request-Body kommen.
         // Ein Fallback auf Input::get (GET) oder Session ist hier gefährlich, da diese veraltet sein könnten.
@@ -258,11 +280,102 @@ class C4gReservationController extends C4GBaseController
             if ($putVars) {
                 $typeId = $putVars['reservation_type'] ?? 0;
                 if ($typeId) {
-                    $eventId = $putVars['reservation_object_event_' . $typeId] ?? 0;
+                    $eventIdFromPut = $putVars['reservation_object_event_' . $typeId] ?? 0;
+                    
+                    // Fail-safe: if eventId is missing in the expected field, try to find it in any other field
+                    if (!$eventIdFromPut) {
+                        foreach ($putVars as $pk => $pv) {
+                            if (strpos($pk, 'reservation_object_event_') === 0 && $pv) {
+                                $eventIdFromPut = $pv;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Check if we found something in the PUT
+                    if ($eventIdFromPut) {
+                        $eventId = $eventIdFromPut;
+                    } else {
+                        // NO eventId in PUT! 
+                        // First check if we already have it in our controller instance from a previous call in the SAME request
+                        if (isset($this->putVars['reservation_object_event_' . $typeId]) && $this->putVars['reservation_object_event_' . $typeId]) {
+                            $eventId = $this->putVars['reservation_object_event_' . $typeId];
+                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - eventId missing in PUT, using ID already stored in instance: $eventId");
+                        } else {
+                            // Emergency fallback to URL: The URL in the browser is more likely to be correct
+                            // than a stale session, if the browser skipped the GET request.
+                            $eventIdFromUrl = \Contao\Input::get('event') ?: 0;
+                            if (!$eventIdFromUrl && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+                                $eventIdFromUrl = $request->attributes->get('event') ?: 0;
+                                if (!$eventIdFromUrl && $request->attributes->has('auto_item')) {
+                                    $eventIdFromUrl = $request->attributes->get('auto_item');
+                                }
+                                
+                                // Referer check
+                                if (!$eventIdFromUrl) {
+                                    $referer = $request->headers->get('referer');
+                                    if ($referer) {
+                                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - Checking Referer: $referer");
+                                        if (preg_match('/[\/\?\&]event[=\/]([^\/\?\&]+)/', $referer, $matches)) {
+                                            $eventIdFromUrl = $matches[1];
+                                            $eventIdFromUrl = str_replace('.html', '', $eventIdFromUrl);
+                                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - eventId extracted from Referer: $eventIdFromUrl");
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Alias resolution if eventId is not numeric
+                            if ($eventIdFromUrl && !is_numeric($eventIdFromUrl)) {
+                                $aliasObj = $database->prepare("SELECT id FROM tl_calendar_events WHERE alias=?")
+                                    ->execute($eventIdFromUrl);
+                                if ($aliasObj && $aliasObj->next()) {
+                                    $oldAlias = $eventIdFromUrl;
+                                    $eventIdFromUrl = $aliasObj->id;
+                                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - Resolved alias '$oldAlias' to ID: $eventIdFromUrl");
+                                }
+                            }
+                            
+                            if ($eventIdFromUrl) {
+                                $eventId = $eventIdFromUrl;
+                                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - eventId missing in PUT, using ID from URL/Referer: $eventId");
+                                $putVars['reservation_object_event_' . $typeId] = $eventId;
+                                $this->putVars['reservation_object_event_' . $typeId] = $eventId;
+                            } else {
+                                // Last resort fallback to session, but with logging
+                                $eventIdFromSession = $this->session->getSessionValue('reservationEventCookie');
+                                if ($eventIdFromSession) {
+                                    $eventId = $eventIdFromSession;
+                                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - eventId missing in PUT/URL, falling back to Session: $eventId");
+                                    
+                                    // SECURITY CHECK: If we just saved a booking, the session ID might be stale
+                                    // and belong to the PREVIOUS event.
+                                    if ($this->session->getSessionValue('reservationJustSaved')) {
+                                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - Refusing Session fallback because reservationJustSaved is set. ID was likely from previous booking.");
+                                        $eventId = 0;
+                                        $this->session->remove('reservationEventCookie');
+                                    } else {
+                                        $putVars['reservation_object_event_' . $typeId] = $eventId;
+                                        $this->putVars['reservation_object_event_' . $typeId] = $eventId;
+                                    }
+                                } else {
+                                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - eventId missing in PUT, URL and Session! Aborting.");
+                                }
+                            }
+                        }
+                    }
+                    
+                    if ($eventId) {
+                        $this->putVars['reservation_object_event_' . $typeId] = $eventId;
+                        $this->session->setSessionValue('reservationEventCookie', $eventId);
+                    }
+                    
+                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - IDs from PUT: type=$typeId, event=$eventId");
                 }
             }
         }
         if ($eventId) {
+            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - effective eventId: $eventId");
             $this->permalink_name = 'event';
         }
 
@@ -329,7 +442,46 @@ class C4gReservationController extends C4GBaseController
     {
         if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] !== 'PUT')) {
             $this->nukeState();
+            
+            // Clear "just saved" flag on new GET request
+            $this->session->remove('reservationJustSaved');
+            
+            // Prevent browser caching of the form fields
+            header("Cache-Control: no-cache, no-store, must-revalidate, proxy-revalidate");
+            header("Pragma: no-cache");
+            header("Expires: 0");
+            header("Surrogate-Control: no-store");
+            
+            // If it's a GET request and we have an event in the URL, make sure it's in the session
+            // BUT do it AFTER nukeState
+            $eventIdUrl = \Contao\Input::get('event') ?: 0;
+            $source = 'GET';
+            if (!$eventIdUrl && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+                $eventIdUrl = $request->attributes->get('event') ?: 0;
+                if ($eventIdUrl) { $source = 'Attributes'; }
+                if (!$eventIdUrl && $request->attributes->has('auto_item')) {
+                    $eventIdUrl = $request->attributes->get('auto_item');
+                    $source = 'Auto-Item';
+                }
+            }
+            if ($eventIdUrl) {
+                $this->session->setSessionValue('reservationEventCookie', $eventIdUrl);
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG addFields GET - Forced eventId from $source: $eventIdUrl");
+            } else {
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG addFields GET - No eventId found in URL");
+            }
         }
+        
+        // Logs IDs at start of addFields to see what we are working with
+        $typeIdLog = Input::get('type') ?: 0;
+        $eventIdLog = Input::get('event') ?: 0;
+        if (!$eventIdLog && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+            $eventIdLog = $request->attributes->get('event') ?: 0;
+            if (!$eventIdLog && $request->attributes->has('auto_item')) {
+                $eventIdLog = $request->attributes->get('auto_item');
+            }
+        }
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG addFields START - IDs from Input: type=$typeIdLog, event=$eventIdLog");
         
         C4gReservationHandler::resetStaticCaches();
 
@@ -353,6 +505,12 @@ class C4gReservationController extends C4GBaseController
 
         $typeId = Input::get('type') ?: 0;
         $eventId = Input::get('event') ?: 0;
+        if (!$eventId && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+            $eventId = $request->attributes->get('event') ?: 0;
+            if (!$eventId && $request->attributes->has('auto_item')) {
+                $eventId = $request->attributes->get('auto_item');
+            }
+        }
         $objectId = Input::get('object') ?: 0;
         
         // Falls wir in einem PUT-Request sind (Speichern), bevorzugen wir IMMER die Daten aus dem Request-Body.
@@ -362,19 +520,27 @@ class C4gReservationController extends C4GBaseController
             if ($putVars) {
                 $typeId = $putVars['reservation_type'] ?? $typeId;
                 if ($typeId) {
-                    $eventId = $putVars['reservation_object_event_' . $typeId] ?? $eventId;
-                    if ($eventId) {
+                    $eventIdFromPut = $putVars['reservation_object_event_' . $typeId] ?? 0;
+                    
+                    // Priority check: instance variable (already rescued in initBrickModule)
+                    if (!$eventIdFromPut && isset($this->putVars['reservation_object_event_' . $typeId])) {
+                        $eventIdFromPut = $this->putVars['reservation_object_event_' . $typeId];
+                    }
+                    
+                    if ($eventIdFromPut) {
+                        $eventId = $eventIdFromPut;
                         // Mirror to controller instance to ensure addFields uses the correct eventId
                         // even if it was just changed in the current request.
-                        if ($typeId) {
-                            $this->putVars['reservation_object_event_' . $typeId] = $eventId;
-                        }
+                        $this->putVars['reservation_object_event_' . $typeId] = $eventId;
                         $this->session->setSessionValue('reservationEventCookie', $eventId);
                     }
-                    $objectId = $putVars['reservation_object_' . $typeId] ?? $objectId;
-                    if ($objectId && $typeId) {
+                    
+                    $objectIdFromPut = $putVars['reservation_object_' . $typeId] ?? 0;
+                    if ($objectIdFromPut) {
+                        $objectId = $objectIdFromPut;
                         $this->putVars['reservation_object_' . $typeId] = $objectId;
                     }
+                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG addFields PUT - IDs after evaluation: type=$typeId, event=$eventId, object=$objectId");
                 }
             }
         }
@@ -2225,7 +2391,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $putVars = $this->getPutVars();
         }
 
-        $this->nukeState();
+        $this->nukeState(true);
         
         if (!is_array($putVars)) {
             $putVars = [];
@@ -2238,12 +2404,105 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         }
         
         // LOG ALL KEYS in putVars to see what the browser actually sends
-        // C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation START - Request keys: " . implode(',', array_keys($putVars)));
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation START - Request keys: " . implode(',', array_keys($putVars)));
         
-        // Clear Event Cookies only if we're not repeating the SAME event (based on putVars)
         $typeIdInReq = $putVars['reservation_type'] ?? null;
         if ($typeIdInReq) {
             $eventIdInReq = $putVars['reservation_object_event_' . $typeIdInReq] ?? null;
+            
+            // Emergency lookup if eventId is missing in request
+            if (!$eventIdInReq) {
+                // First check if we already have it in our controller instance from a previous call in the SAME request (e.g. from initBrickModule)
+                if (isset($this->putVars['reservation_object_event_' . $typeIdInReq]) && $this->putVars['reservation_object_event_' . $typeIdInReq]) {
+                    $eventIdInReq = $this->putVars['reservation_object_event_' . $typeIdInReq];
+                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Found eventIdInReq in instance putVars: $eventIdInReq");
+                } else {
+                    $eventIdFromUrl = \Contao\Input::get('event') ?: 0;
+                    if (!$eventIdFromUrl && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+                        $eventIdFromUrl = $request->attributes->get('event') ?: 0;
+                        if (!$eventIdFromUrl && $request->attributes->has('auto_item')) {
+                            $eventIdFromUrl = $request->attributes->get('auto_item');
+                        }
+                        
+                        // Referer check
+                        if (!$eventIdFromUrl) {
+                            $referer = $request->headers->get('referer');
+                            if ($referer && preg_match('/[\/\?\&]event[=\/]([^\/\?\&]+)/', $referer, $matches)) {
+                                $eventIdFromUrl = $matches[1];
+                                $eventIdFromUrl = str_replace('.html', '', $eventIdFromUrl);
+                            }
+                        }
+                    }
+                    
+                    // Alias resolution
+                    if ($eventIdFromUrl && !is_numeric($eventIdFromUrl)) {
+                        $aliasObj = $database->prepare("SELECT id FROM tl_calendar_events WHERE alias=?")
+                            ->execute($eventIdFromUrl);
+                        if ($aliasObj && $aliasObj->next()) {
+                            $eventIdFromUrl = $aliasObj->id;
+                        }
+                    }
+                    
+                    if ($eventIdFromUrl) {
+                        $eventIdInReq = $eventIdFromUrl;
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Emergency found eventId in URL/Referer: $eventIdInReq");
+                        $putVars['reservation_object_event_' . $typeIdInReq] = $eventIdInReq;
+                        $this->putVars['reservation_object_event_' . $typeIdInReq] = $eventIdInReq;
+                    } else {
+                        // Try session as absolute last resort
+                        $eventIdInReq = $this->session->getSessionValue('reservationEventCookie');
+                        if ($eventIdInReq) {
+                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Last resort: using eventId from session: $eventIdInReq");
+                            
+                            // SECURITY CHECK: If we just saved a booking, the session ID might be stale
+                            if ($this->session->getSessionValue('reservationJustSaved')) {
+                                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Refusing Session fallback because reservationJustSaved is set.");
+                                $eventIdInReq = 0;
+                            } else {
+                                $putVars['reservation_object_event_' . $typeIdInReq] = $eventIdInReq;
+                                $this->putVars['reservation_object_event_' . $typeIdInReq] = $eventIdInReq;
+                            }
+                        }
+                    }
+                    
+                    if (!$eventIdInReq) {
+                        // Refuse fallback if even session is empty
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - eventId missing in Request, instance and session! Aborting.");
+                        return ['usermessage' => 'Fehler: Ungültige Event-ID. Bitte laden Sie die Seite neu.'];
+                    }
+                }
+            }
+
+            if ($eventIdInReq) {
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation START - IDs from putVars: type=$typeIdInReq, event=$eventIdInReq");
+                
+                $sessionEventId = $this->session->getSessionValue('reservationEventCookie');
+                if ($sessionEventId && $sessionEventId != $eventIdInReq) {
+                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Mismatch detected! Request Event: $eventIdInReq, Session Event: $sessionEventId. Overriding with Session Event.");
+                    $eventIdInReq = $sessionEventId;
+                    
+                    // Forcefully override ALL potential keys that might contain the wrong ID
+                    $putVars['reservation_object_event_' . $typeIdInReq] = $eventIdInReq;
+                    $this->putVars['reservation_object_event_' . $typeIdInReq] = $eventIdInReq;
+                    
+                    // Reload reservation object to match corrected eventId
+                    $reservationObject = $database->prepare("SELECT * FROM tl_calendar_events WHERE id=?")
+                        ->execute($eventIdInReq);
+                    if ($reservationObject && $reservationObject->next()) {
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Successfully reloaded correct event from DB: " . $reservationObject->title);
+                    }
+                }
+            } else {
+                // Check if it's encoded in another way or if we can find it
+                foreach ($putVars as $pk => $pv) {
+                    if (strpos($pk, 'reservation_object_event_') === 0 && $pv) {
+                        $eventIdInReq = $pv;
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation START - Found eventIdInReq in alternative key $pk: $pv");
+                        break;
+                    }
+                }
+            }
+            
             $oldEventId = $this->session->getSessionValue('reservationEventCookie');
             if ($eventIdInReq && $oldEventId && $oldEventId != $eventIdInReq) {
                 $this->session->remove('reservationInitialDateCookie_' . $oldEventId);
@@ -2359,6 +2618,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 if ($reservationObjectResult && $reservationObjectResult->id) {
                     $reservationObject = $reservationObjectResult;
                     $eventId = $reservationObject->id;
+                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Fresh event loaded from DB: id=$eventId, title=" . $reservationObject->title);
                     
                     // Mirror to controller instance to ensure addFields uses the correct eventId
                     if (isset($putVars['reservation_type'])) {
@@ -2698,13 +2958,20 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $freshBeginTime = $beginTimeTs ? (string)date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', $beginTimeTs) : '';
                 $freshEndDate = $endDateTs ? (string)date($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y', $endDateTs) : $freshBeginDate;
                 $freshEndTime = $endTimeTs ? (string)date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', $endTimeTs) : '';
+                $freshDescription = '';
+                if ($reservationObject instanceof C4gReservationFrontendObject) {
+                    $freshDescription = $reservationObject->getDescription();
+                } else {
+                    $freshDescription = (string)(($reservationObject->description ?: $reservationObject->details) ?? '');
+                }
 
                 $dataMapping = [
                     'beginDate' => $freshBeginDate,
                     'beginTime' => $freshBeginTime,
                     'endDate' => $freshEndDate,
                     'endTime' => $freshEndTime,
-                    'reservation_title' => $freshTitle
+                    'reservation_title' => $freshTitle,
+                    'description' => $freshDescription
                 ];
 
                 foreach ($dataMapping as $mappedKey => $mappedValue) {
@@ -2740,6 +3007,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $typeOfObject = $reservationObject->typeOfObject;
             $putVars['reservationObjectType'] = $reservationType->reservationObjectType;
             $objectId = $reservationObject ? $reservationObject->id : 0;
+            if ($reservationObject) {
+                if ($reservationObject instanceof C4gReservationFrontendObject) {
+                    $putVars['description'] = $reservationObject->getDescription();
+                } else {
+                    $putVars['description'] = ($reservationObject->description ?: $reservationObject->details) ?: '';
+                }
+            }
             //check duplicate reservation id
             $reservations = C4gReservationModel::findBy("reservation_id", $reservationId);
             $reservationCount = is_array($reservations) ? count($reservations) : 0;
@@ -3264,7 +3538,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'city' => '',
             'organisation' => '',
             'company' => '',
-            'description' => '',
+            'description' => $putVars['description'] ?? '',
             'location' => $putVars['location'] ?? '',
             'desiredCapacity' => $desiredCapacity ?? 1,
             'reservation_title' => $putVars['reservation_title'] ?? '',
@@ -3413,7 +3687,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'city' => '',
             'organisation' => '',
             'company' => '',
-            'description' => '',
+            'description' => $putVars['description'] ?? '',
             'location' => $putVars['location'] ?? '',
             'desiredCapacity' => $desiredCapacity ?? 1,
             'reservation_title' => $putVars['reservation_title'] ?? '',
@@ -3487,13 +3761,22 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         if (is_array($result) && !isset($result['jump_to_url']) && $this->reservationSettings->reservation_redirect_site) {
             $jumpTo = \Contao\PageModel::findByPk($this->reservationSettings->reservation_redirect_site);
             if ($jumpTo) {
-                $result['jump_to_url'] = $jumpTo->getFrontendUrl();
+                $url = $jumpTo->getFrontendUrl();
+                // Add a random cache buster to the redirect URL to prevent browser from loading cached state
+                $url .= (strpos($url, '?') === false ? '?' : '&') . 'cb=' . uniqid();
+                
+                // Radical: If it's an AJAX request (usually identified by X-Requested-With)
+                // we might need to tell the frontend to do a hard reload.
+                // Contao's brick_ajax_api often expects a JSON response with jump_to_url.
+                $result['jump_to_url'] = $url;
+                
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Setting redirect to: $url");
             }
         }
 
         // Absoluter Deep Clean nach dem Speichern
-        $this->nukeState();
-        $this->session->remove('reservationEventCookie');
+        $this->nukeState(true);
+        // $this->session->remove('reservationEventCookie');
         if (isset($eventId) && $eventId) {
             $this->session->remove('reservationInitialDateCookie_' . $eventId);
             $this->session->remove('reservationTimeCookie_' . $eventId);
@@ -4034,14 +4317,24 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
     {
         C4gReservationCheckInHelper::removeQRCodeFile();
         
-        // Radical cleanup after successful save to ensure the next booking in the same browser session
-        // starts with a completely clean state. This is a mitigation for frontend stale state
-        // where the browser might send old data if the page is not fully reloaded.
-        $this->nukeState();
-        $this->session->remove('reservationEventCookie');
+        // Mark session as "just saved" to prevent stale fallback in next request
+        $this->session->setSessionValue('reservationJustSaved', true);
+        
+        // Final cleanup after successful save.
+        $this->nukeState(true); // Keep event cookie for the upcoming redirect
         $this->session->remove('c4g_brick_dialog_id');
         $this->session->remove('c4g_brick_dialog_values');
         $this->putVars = [];
+        
+        // Force browser to reload the next page and don't cache anything
+        header("Cache-Control: no-cache, no-store, must-revalidate, proxy-revalidate");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+        header("Surrogate-Control: no-store");
+        
+        if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+            C4gLogModel::addLogEntry('reservation', 'DEBUG afterSaveAction - Cleanup completed for insertId: ' . $insertId);
+        }
     }
 }
 
