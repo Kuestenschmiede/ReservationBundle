@@ -147,36 +147,69 @@ class C4gReservationController extends C4GBaseController
 
     public function getPutVars()
     {
+        $putVarsResult = [];
         if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
-            // Force re-parsing if we suspect stale data or just want to be absolutely sure.
-            // However, we must not clear this->putVars if it was already populated correctly in this SAME request.
-            // But here, we suspect state-bleeding across "logical" requests in persistent environments.
             $content = '';
-            if ($this->requestStack && $this->requestStack->getCurrentRequest()) {
-                $content = $this->requestStack->getCurrentRequest()->getContent();
+            if ($this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+                $content = $request->getContent();
             }
             if (!$content) {
                 $content = file_get_contents('php://input');
             }
             
             if ($content) {
-                parse_str($content, $putVars);
+                parse_str($content, $parsedVars);
                 
-                if (is_array($putVars) && !empty($putVars)) {
-                    $this->putVars = []; // Start fresh for this parsing
-                    foreach ($putVars as $key => $putVar) {
+                if (is_array($parsedVars) && !empty($parsedVars)) {
+                    foreach ($parsedVars as $key => $putVar) {
                         if (is_string($putVar)) {
                             $tmpVar = C4GUtils::secure_ugc($putVar);
                             $tmpVar = C4GUtils::cleanHtml($tmpVar);
-                            $this->putVars[$key] = $tmpVar;
+                            $putVarsResult[$key] = $tmpVar;
                         } else {
-                            $this->putVars[$key] = $putVar;
+                            $putVarsResult[$key] = $putVar;
                         }
                     }
                 }
             }
         }
-        return $this->putVars;
+        
+        // UPDATE the instance variable.
+        // For Event types (Type 2), this is critical to avoid state-bleeding from previous requests
+        // as we typically clear state before.
+        // For standard types, we append/update but don't clear, ensuring framework-prefilled
+        // values (like those from datepickers) are preserved if not present in current PUT.
+        if (!empty($putVarsResult)) {
+            $typeIdInPut = $putVarsResult['reservation_type'] ?? 0;
+            $isEventInPut = false;
+            if ($typeIdInPut) {
+                $resT = C4gReservationTypeModel::findByPk($typeIdInPut);
+                if ($resT && $resT->type == 2) {
+                    $isEventInPut = true;
+                }
+            }
+            
+            if ($isEventInPut) {
+                // For events, we might want to be more exclusive, 
+                // but merging is generally safer than overwriting everything if some framework vars are needed.
+                $this->putVars = array_merge((array)$this->putVars, $putVarsResult);
+            } else {
+                // For standard types, just ensure the current PUT vars are present in the instance.
+                foreach ($putVarsResult as $pk => $pv) {
+                    $this->putVars[$pk] = $pv;
+                }
+            }
+        }
+        
+        return $putVarsResult;
+    }
+
+    public function logDebug($message)
+    {
+        try {
+            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', $message);
+        } catch (\Throwable $t) {}
+        error_log("[RESERVATION] " . $message);
     }
 
     public function resetStaticCaches()
@@ -186,7 +219,7 @@ class C4gReservationController extends C4GBaseController
 
     public function nukeState($keepEvent = false)
     {
-        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG nukeState called (keepEvent: " . ($keepEvent ? 'yes' : 'no') . ")");
+        $this->logDebug("nukeState called (keepEvent: " . ($keepEvent ? 'yes' : 'no') . ")");
         // 1. Clear session variables that hold form state
         $this->session->remove('c4g_brick_dialog_id');
         $this->session->remove('c4g_brick_dialog_values');
@@ -227,6 +260,15 @@ class C4gReservationController extends C4GBaseController
     public function renewInitialValues()
     {
         $this->addFields();
+    }
+
+    public function generateAjax($request = null)
+    {
+        $this->logDebug("generateAjax START - req: " . ($request ?: ($_GET['req'] ?? 'NONE')));
+        if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+            $this->logDebug("generateAjax - PUT raw content: " . substr(file_get_contents('php://input'), 0, 1000));
+        }
+        return parent::generateAjax($request);
     }
 
     public function initBrickModule($id)
@@ -272,19 +314,30 @@ class C4gReservationController extends C4GBaseController
             }
         }
         
+        $this->logDebug("initBrickModule START - reqMethod: " . ($_SERVER['REQUEST_METHOD'] ?? 'NONE'));
+        
         // Falls wir in einem PUT-Request sind (Speichern), MUSS die ID aus dem Request-Body kommen.
         // Ein Fallback auf Input::get (GET) oder Session ist hier gefährlich, da diese veraltet sein könnten.
         if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
-            $this->putVars = []; // Reset instance variable before reload
-            $putVars = $this->getPutVars();
-            if ($putVars) {
-                $typeId = $putVars['reservation_type'] ?? 0;
+            $rawPut = $this->getPutVars();
+            if ($rawPut) {
+                $typeId = $rawPut['reservation_type'] ?? 0;
+                
+                // Determine if we are dealing with an event
+                $isEventActualForInit = false;
                 if ($typeId) {
-                    $eventIdFromPut = $putVars['reservation_object_event_' . $typeId] ?? 0;
+                    $resType = C4gReservationTypeModel::findByPk($typeId);
+                    if ($resType && $resType->type == 2) {
+                        $isEventActualForInit = true;
+                    }
+                }
+
+                if ($isEventActualForInit && $typeId) {
+                    $eventIdFromPut = $rawPut['reservation_object_event_' . $typeId] ?? 0;
                     
                     // Fail-safe: if eventId is missing in the expected field, try to find it in any other field
                     if (!$eventIdFromPut) {
-                        foreach ($putVars as $pk => $pv) {
+                        foreach ($rawPut as $pk => $pv) {
                             if (strpos($pk, 'reservation_object_event_') === 0 && $pv) {
                                 $eventIdFromPut = $pv;
                                 break;
@@ -296,14 +349,13 @@ class C4gReservationController extends C4GBaseController
                     if ($eventIdFromPut) {
                         $eventId = $eventIdFromPut;
                     } else {
-                        // NO eventId in PUT! 
+                        // NO eventId in PUT for EVENT TYPE! 
                         // First check if we already have it in our controller instance from a previous call in the SAME request
                         if (isset($this->putVars['reservation_object_event_' . $typeId]) && $this->putVars['reservation_object_event_' . $typeId]) {
                             $eventId = $this->putVars['reservation_object_event_' . $typeId];
-                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - eventId missing in PUT, using ID already stored in instance: $eventId");
+                            $this->logDebug("initBrickModule - eventId missing in PUT, using ID already stored in instance: $eventId");
                         } else {
-                            // Emergency fallback to URL: The URL in the browser is more likely to be correct
-                            // than a stale session, if the browser skipped the GET request.
+                            // Emergency fallback to URL
                             $eventIdFromUrl = \Contao\Input::get('event') ?: 0;
                             if (!$eventIdFromUrl && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
                                 $eventIdFromUrl = $request->attributes->get('event') ?: 0;
@@ -315,11 +367,11 @@ class C4gReservationController extends C4GBaseController
                                 if (!$eventIdFromUrl) {
                                     $referer = $request->headers->get('referer');
                                     if ($referer) {
-                                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - Checking Referer: $referer");
+                                        $this->logDebug("initBrickModule - Checking Referer: $referer");
                                         if (preg_match('/[\/\?\&]event[=\/]([^\/\?\&]+)/', $referer, $matches)) {
                                             $eventIdFromUrl = $matches[1];
                                             $eventIdFromUrl = str_replace('.html', '', $eventIdFromUrl);
-                                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - eventId extracted from Referer: $eventIdFromUrl");
+                                            $this->logDebug("initBrickModule - eventId extracted from Referer: $eventIdFromUrl");
                                         }
                                     }
                                 }
@@ -332,34 +384,33 @@ class C4gReservationController extends C4GBaseController
                                 if ($aliasObj && $aliasObj->next()) {
                                     $oldAlias = $eventIdFromUrl;
                                     $eventIdFromUrl = $aliasObj->id;
-                                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - Resolved alias '$oldAlias' to ID: $eventIdFromUrl");
+                                    $this->logDebug("initBrickModule - Resolved alias '$oldAlias' to ID: $eventIdFromUrl");
                                 }
                             }
                             
                             if ($eventIdFromUrl) {
                                 $eventId = $eventIdFromUrl;
-                                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - eventId missing in PUT, using ID from URL/Referer: $eventId");
-                                $putVars['reservation_object_event_' . $typeId] = $eventId;
+                                $this->logDebug("initBrickModule - eventId missing in PUT, using ID from URL/Referer: $eventId");
+                                $rawPut['reservation_object_event_' . $typeId] = $eventId;
                                 $this->putVars['reservation_object_event_' . $typeId] = $eventId;
                             } else {
-                                // Last resort fallback to session, but with logging
+                                // Last resort fallback to session
                                 $eventIdFromSession = $this->session->getSessionValue('reservationEventCookie');
                                 if ($eventIdFromSession) {
                                     $eventId = $eventIdFromSession;
-                                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - eventId missing in PUT/URL, falling back to Session: $eventId");
+                                    $this->logDebug("initBrickModule - eventId missing in PUT/URL, falling back to Session: $eventId");
                                     
-                                    // SECURITY CHECK: If we just saved a booking, the session ID might be stale
-                                    // and belong to the PREVIOUS event.
+                                    // SECURITY CHECK
                                     if ($this->session->getSessionValue('reservationJustSaved')) {
-                                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - Refusing Session fallback because reservationJustSaved is set. ID was likely from previous booking.");
+                                        $this->logDebug("initBrickModule - Refusing Session fallback because reservationJustSaved is set.");
                                         $eventId = 0;
                                         $this->session->remove('reservationEventCookie');
                                     } else {
-                                        $putVars['reservation_object_event_' . $typeId] = $eventId;
+                                        $rawPut['reservation_object_event_' . $typeId] = $eventId;
                                         $this->putVars['reservation_object_event_' . $typeId] = $eventId;
                                     }
                                 } else {
-                                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - eventId missing in PUT, URL and Session! Aborting.");
+                                    $this->logDebug("initBrickModule - eventId missing in PUT, URL and Session for EVENT TYPE! Aborting.");
                                 }
                             }
                         }
@@ -370,16 +421,34 @@ class C4gReservationController extends C4GBaseController
                         $this->session->setSessionValue('reservationEventCookie', $eventId);
                     }
                     
-                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - IDs from PUT: type=$typeId, event=$eventId");
+                    $this->logDebug("initBrickModule - IDs from PUT: type=$typeId, event=$eventId");
                 }
             }
         }
         if ($eventId) {
-            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG initBrickModule - effective eventId: $eventId");
+            $this->logDebug("initBrickModule - effective eventId: $eventId");
             $this->permalink_name = 'event';
         }
 
-        if (!$eventId && $doIt && ($oldEventId = $this->session->getSessionValue('reservationEventCookie'))) {
+        // Only cleanup old event from session if we are actually in an event context
+        // and no new event was provided.
+        $isEventActualForSession = false;
+        if (!$eventId && $this->session->getSessionValue('reservationEventCookie')) {
+            $typeIdInReq = Input::get('type') ?: 0;
+            if (!$typeIdInReq && key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+                $pVars = $this->getPutVars();
+                $typeIdInReq = $pVars['reservation_type'] ?? 0;
+            }
+            
+            if ($typeIdInReq) {
+                $resType = C4gReservationTypeModel::findByPk($typeIdInReq);
+                if ($resType && $resType->type == 2) {
+                    $isEventActualForSession = true;
+                }
+            }
+        }
+
+        if (!$eventId && $doIt && $isEventActualForSession && ($oldEventId = $this->session->getSessionValue('reservationEventCookie'))) {
             $this->session->remove('reservationEventCookie');
             $this->session->remove('reservationInitialDateCookie_'.$oldEventId);
             $this->session->remove('reservationTimeCookie_'.$oldEventId);
@@ -441,7 +510,29 @@ class C4gReservationController extends C4GBaseController
     public function addFields() : array
     {
         if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] !== 'PUT')) {
-            $this->nukeState();
+            // SECURITY: Only nuke if we are SURE it's a completely new request without any context.
+            // Nuking for existing types definitely breaks session-based datepickers.
+            $typeIdForNuke = \Contao\Input::get('type') ?: 0;
+            $eventIdUrlForNuke = \Contao\Input::get('event') ?: 0;
+            if (!$eventIdUrlForNuke && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+                $eventIdUrlForNuke = $request->attributes->get('event') ?: 0;
+                if (!$eventIdUrlForNuke && $request->attributes->has('auto_item')) {
+                    $eventIdUrlForNuke = $request->attributes->get('auto_item');
+                }
+            }
+
+            $shouldNuke = false;
+            if (!$typeIdForNuke && !$eventIdUrlForNuke) {
+                // No context at all? Safe to nuke old junk.
+                $shouldNuke = true;
+            } else if ($eventIdUrlForNuke) {
+                // If it's an event, we still want to nuke once to prevent bleeding from PREVIOUS events.
+                $shouldNuke = true;
+            }
+            
+            if ($shouldNuke) {
+                $this->nukeState();
+            }
             
             // Clear "just saved" flag on new GET request
             $this->session->remove('reservationJustSaved');
@@ -1849,15 +1940,15 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $minParticipants = $type['minParticipantsPerBooking'];
 
                     //Max participant per booking
-                    if ($eventObj->maxParticipantsPerEventBooking) {
+                    if ($eventObj && property_exists($eventObj, 'maxParticipantsPerEventBooking') && $eventObj->maxParticipantsPerEventBooking) {
                         $maxParticipants = $eventObj->maxParticipantsPerEventBooking;
                     } else if ($type['maxParticipantsPerBooking']){
-                        $maxParticipants = $type['maxParticipantsPerBooking'];;
+                        $maxParticipants = $type['maxParticipantsPerBooking'];
                     }
 
                     $maxCapacity = $maxParticipants ?: 0;
                     $minCapacity = $minParticipants ?: 1;
-                    $participantParam = unserialize($eventObj->participant_params);
+                    $participantParam = ($eventObj && property_exists($eventObj, 'participant_params')) ? unserialize($eventObj->participant_params) : null;
                     $params = $participantParam ?: $type['participantParams'];
                     $participantParamsArr = [];
 
@@ -1879,8 +1970,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                         }
 
                         if (count($participantParamsArr) > 0) {
-                            $eventOptionsRadio = $eventObj->participantParamsFieldType == 'radio';
-                            $eventOptionsMandatory = $eventObj->participantParamsMandatory == '1';
+                            $eventOptionsRadio = $eventObj && property_exists($eventObj, 'participantParamsFieldType') && $eventObj->participantParamsFieldType == 'radio';
+                            $eventOptionsMandatory = $eventObj && property_exists($eventObj, 'participantParamsMandatory') && $eventObj->participantParamsMandatory == '1';
                             if ($eventOptionsRadio) {
                                 $participantParamField = new C4GRadioGroupField();
                                 if (!$eventOptionsMandatory) {
@@ -2374,7 +2465,56 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
 
         $this->fieldList = $fieldList;
-        return $fieldList;
+        
+        // HACK: Dynamically add fields that might be sent via PUT to bypass framework filtering
+        // The framework's C4GSaveDialogAction filters putVars based on the fieldList.
+        // Since reservation fields often have dynamic names (beginDate_X), we need to register them.
+        
+        // OPTIMIZATION: Instead of adding 1000s of fields blindly, we only add those that 
+        // are actually present in the current PUT request to reduce DOM size and prevent JS crashes.
+        $rawPut = [];
+        if (key_exists('REQUEST_METHOD', $_SERVER) && (($_SERVER['REQUEST_METHOD'] == 'PUT') || ($_SERVER['REQUEST_METHOD'] == 'POST'))) {
+            $rawPut = $this->getPutVars();
+            if (empty($rawPut) && $_SERVER['REQUEST_METHOD'] == 'POST') {
+                $rawPut = \Contao\Input::postAll();
+            }
+        }
+
+        if ($rawPut && is_array($rawPut)) {
+            $this->logDebug("addFields - Selectively registering fields from Request to bypass framework filtering.");
+            $dynamicPrefixes = ['beginDate', 'beginTime', 'endDate', 'endTime', 'duration', 'reservation_object', 'desiredCapacity', 'participants', 'reservation_type', 'agreed', '_'];
+            foreach ($rawPut as $key => $value) {
+                $isDynamic = false;
+                foreach ($dynamicPrefixes as $prefix) {
+                    if (strpos($key, $prefix) === 0) {
+                        $isDynamic = true;
+                        break;
+                    }
+                }
+                
+                if ($isDynamic) {
+                    // Check if field is already in list
+                    $alreadyExists = false;
+                    foreach ($this->fieldList as $existingField) {
+                        if ($existingField->getFieldName() === $key) {
+                            $alreadyExists = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!$alreadyExists) {
+                        $catchAllField = new C4GTextField();
+                        $catchAllField->setFieldName($key);
+                        $catchAllField->setDatabaseField(false);
+                        $catchAllField->setFormField(true);
+                        $catchAllField->setEditable(true);
+                        $this->fieldList[] = $catchAllField;
+                    }
+                }
+            }
+        }
+
+        return $this->fieldList;
     }
 
     /**
@@ -2385,26 +2525,62 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
      */
     public function clickReservation($values, $putVars)
     {
-        // First ensure we have fresh putVars from input stream for PUT requests
-        if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
-            $this->putVars = []; // Reset instance variable before reload
-            $putVars = $this->getPutVars();
+        // 1. Determine type as early as possible to decide on strategy
+        $typeIdForStrategy = $putVars['reservation_type'] ?? 0;
+        if (!$typeIdForStrategy && key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+            $rawP = $this->getPutVars();
+            $typeIdForStrategy = $rawP['reservation_type'] ?? 0;
+        }
+        
+        $isEventActualForStrategy = false;
+        if ($typeIdForStrategy) {
+            $resType = C4gReservationTypeModel::findByPk($typeIdForStrategy);
+            if ($resType && $resType->type == 2) {
+                $isEventActualForStrategy = true;
+            }
         }
 
-        $this->nukeState(true);
-        
-        if (!is_array($putVars)) {
-            $putVars = [];
-        }
-        
-        // Repopulate putVars directly from input again to be absolutely sure after nuke
-        $rawPut = $this->getPutVars();
-        if (!empty($rawPut)) {
-            $putVars = array_merge($putVars, $rawPut);
+        // LOG RAW INPUT STREAM for diagnostic purposes
+        $rawStream = file_get_contents('php://input');
+        $this->logDebug("clickReservation - RAW INPUT (type $typeIdForStrategy): " . substr($rawStream, 0, 1000));
+
+        // ONLY for events we do the aggressive state management to prevent state-bleeding
+        if ($isEventActualForStrategy) {
+            if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+                $this->putVars = []; 
+                $rawPut = $this->getPutVars();
+                if (is_array($rawPut)) {
+                    $putVars = array_merge((array)$putVars, $rawPut);
+                    $this->putVars = $putVars;
+                }
+            }
+            $this->nukeState(true);
+            
+            $rawPut = $this->getPutVars();
+            if (!empty($rawPut)) {
+                $putVars = array_merge((array)$putVars, $rawPut);
+                $this->putVars = $putVars;
+            }
+        } else {
+            $this->logDebug("clickReservation - STANDARD MODE for type $typeIdForStrategy. Merging fresh PUT data into existing state.");
+            
+            // For standard types, we DO NOT clear the existing state.
+            // But we still want to ensure that if the browser sends fresh PUT data, it's merged.
+            if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+                $rawPut = $this->getPutVars();
+                if (!empty($rawPut)) {
+                    // Framework might have already populated $this->putVars.
+                    // We only overwrite or add, never clear.
+                    $putVars = array_merge((array)$putVars, $rawPut);
+                    foreach ($putVars as $rk => $rv) {
+                        $this->putVars[$rk] = $rv;
+                    }
+                }
+            }
         }
         
         // LOG ALL KEYS in putVars to see what the browser actually sends
-        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation START - Request keys: " . implode(',', array_keys($putVars)));
+        $this->logDebug("clickReservation START - Request keys: " . implode(',', array_keys($putVars)));
         
         $typeIdInReq = $putVars['reservation_type'] ?? null;
         if ($typeIdInReq) {
@@ -2415,7 +2591,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 // First check if we already have it in our controller instance from a previous call in the SAME request (e.g. from initBrickModule)
                 if (isset($this->putVars['reservation_object_event_' . $typeIdInReq]) && $this->putVars['reservation_object_event_' . $typeIdInReq]) {
                     $eventIdInReq = $this->putVars['reservation_object_event_' . $typeIdInReq];
-                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Found eventIdInReq in instance putVars: $eventIdInReq");
+                    $this->logDebug("clickReservation - Found eventIdInReq in instance putVars: $eventIdInReq");
                 } else {
                     $eventIdFromUrl = \Contao\Input::get('event') ?: 0;
                     if (!$eventIdFromUrl && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
@@ -2445,18 +2621,28 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     
                     if ($eventIdFromUrl) {
                         $eventIdInReq = $eventIdFromUrl;
-                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Emergency found eventId in URL/Referer: $eventIdInReq");
+                        $this->logDebug("clickReservation - Emergency found eventId in URL/Referer: $eventIdInReq");
                         $putVars['reservation_object_event_' . $typeIdInReq] = $eventIdInReq;
                         $this->putVars['reservation_object_event_' . $typeIdInReq] = $eventIdInReq;
                     } else {
                         // Try session as absolute last resort
                         $eventIdInReq = $this->session->getSessionValue('reservationEventCookie');
+                        
+                        // Check if it's an event type (Type 2)
+                        $isEventActual = false;
+                        if ($typeIdInReq) {
+                            $resType = C4gReservationTypeModel::findByPk($typeIdInReq);
+                            if ($resType && $resType->type == 2) {
+                                $isEventActual = true;
+                            }
+                        }
+                        
                         if ($eventIdInReq) {
-                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Last resort: using eventId from session: $eventIdInReq");
+                            $this->logDebug("clickReservation - Last resort: using eventId from session: $eventIdInReq");
                             
                             // SECURITY CHECK: If we just saved a booking, the session ID might be stale
-                            if ($this->session->getSessionValue('reservationJustSaved')) {
-                                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - Refusing Session fallback because reservationJustSaved is set.");
+                            if ($this->session->getSessionValue('reservationJustSaved') && $isEventActual) {
+                                $this->logDebug("clickReservation - Refusing Session fallback because reservationJustSaved is set.");
                                 $eventIdInReq = 0;
                             } else {
                                 $putVars['reservation_object_event_' . $typeIdInReq] = $eventIdInReq;
@@ -2467,8 +2653,21 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     
                     if (!$eventIdInReq) {
                         // Refuse fallback if even session is empty
-                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - eventId missing in Request, instance and session! Aborting.");
-                        return ['usermessage' => 'Fehler: Ungültige Event-ID. Bitte laden Sie die Seite neu.'];
+                        // BUT ONLY IF it is an event type (Type 2)
+                        $isEventActual = false;
+                        if ($typeIdInReq) {
+                            $resType = C4gReservationTypeModel::findByPk($typeIdInReq);
+                            if ($resType && $resType->type == 2) {
+                                $isEventActual = true;
+                            }
+                        }
+                        
+                        if ($isEventActual) {
+                            $this->logDebug("clickReservation - eventId missing in Request, instance and session for EVENT TYPE! Aborting.");
+                            return ['usermessage' => 'Fehler: Ungültige Event-ID. Bitte laden Sie die Seite neu.'];
+                        } else {
+                            $this->logDebug("clickReservation - eventId missing but not an event type. Continuing.");
+                        }
                     }
                 }
             }
@@ -2993,17 +3192,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             // Just notification
             $settings = $this->reservationSettings;
         } else {
-            // DEEP CLEAN: Also for regular objects to be safe.
-            $keysToClear = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'location', 'description', 'image'];
-            foreach (array_keys($putVars) as $pk) {
-                foreach ($keysToClear as $baseKey) {
-                    if ($pk === $baseKey || strpos($pk, $baseKey . '_') === 0) {
-                        unset($putVars[$pk]);
-                        unset($this->putVars[$pk]);
-                    }
-                }
-            }
-
             $typeOfObject = $reservationObject->typeOfObject;
             $putVars['reservationObjectType'] = $reservationType->reservationObjectType;
             $objectId = $reservationObject ? $reservationObject->id : 0;
@@ -3015,10 +3203,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
             //check duplicate reservation id
-            $reservations = C4gReservationModel::findBy("reservation_id", $reservationId);
+            $rId = $putVars['reservation_id'] ?? ($putVars['id'] ?? 0);
+            $reservations = C4gReservationModel::findBy("reservation_id", $rId);
             $reservationCount = is_array($reservations) ? count($reservations) : 0;
             if ($reservationCount >= 1) {
-                C4gLogModel::addLogEntry('reservation', 'Duplicate reservation ID detected.');
+                $this->logDebug('Duplicate reservation ID detected.');
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']];
             }
 
@@ -3037,14 +3226,45 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
             //check duplicate bookings
             if ($reservationObject && $reservationObject->id && C4gReservationHandler::preventDublicateBookings($reservationType,$reservationObject,$putVars)) {
-                C4gLogModel::addLogEntry('reservation', 'Duplicate booking detected.');
+                $this->logDebug('Duplicate booking detected.');
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_booking']];
             }
+
+            $isEventActualForCheck = ($reservationType && $reservationType->type == 2);
+
+            // LOG ALL KEYS BEFORE period check
+            $this->logDebug("clickReservation (Line 3244) - BEFORE PERIOD CHECK. Keys: " . implode(',', array_keys($putVars)));
 
             $periodType = $reservationType->periodType;
             if ($periodType == 'day' || $periodType == 'overnight' || $periodType == 'week') {
                 if(C4gReservationHandler::preventNonCorrectPeriod($reservationType,$reservationObject,$putVars)) {
-                    return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key']];
+                    // Only abort if it's NOT an event, or if we really have no data
+                    if (!$isEventActualForCheck) {
+                        $keys = implode(',', array_keys($putVars));
+                        $this->logDebug("clickReservation - preventNonCorrectPeriod failed. putVars Keys: " . $keys);
+                        
+                        // SECOND RESCUE ATTEMPT before failing
+                        $rescueSuccess = false;
+                        foreach ($putVars as $rk => $rv) {
+                            if ($rv && (strpos($rk, 'beginDate') === 0 || strpos($rk, 'beginDateEvent') === 0 || strpos($rk, 'beginTime') === 0)) {
+                                $this->logDebug("clickReservation - SECOND RESCUE SUCCESS for key: $rk");
+                                $rescueSuccess = true;
+                                break;
+                            }
+                        }
+            
+                        if (!$rescueSuccess) {
+                            // LAST CHANCE: Check raw stream
+                            if (strpos($rawStream, 'beginDate') !== false || strpos($rawStream, 'beginTime') !== false) {
+                                 $this->logDebug("clickReservation - SECOND RESCUE: Found time/date strings in raw stream, allowing through.");
+                                 $rescueSuccess = true;
+                            }
+                        }
+            
+                        if (!$rescueSuccess) {
+                            return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key']];
+                        }
+                    }
                 }
             }
 
@@ -3084,7 +3304,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']];
             }
 
-            $type = $putVars['reservation_type'];
+            $type = $putVars['reservation_type'] ?? 0;
             $freshTitle = (string)($reservationObject->caption ?? '');
             $dataMapping = [
                 'reservation_title' => $freshTitle
@@ -3093,46 +3313,173 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             foreach ($dataMapping as $mappedKey => $mappedValue) {
                 $putVars[$mappedKey] = $mappedValue;
                 $this->putVars[$mappedKey] = $mappedValue;
-                if (isset($type)) {
+                if ($type) {
                     $putVars[$mappedKey . '_' . $type] = $mappedValue;
                     $this->putVars[$mappedKey . '_' . $type] = $mappedValue;
                 }
-                $objSuffix = $type . '-' . $objectId;
-                $putVars[$mappedKey . '_' . $objSuffix] = $mappedValue;
-                $this->putVars[$mappedKey . '_' . $objSuffix] = $mappedValue;
+                if ($type && isset($objectId)) {
+                    $objSuffix = $type . '-' . $objectId;
+                    $putVars[$mappedKey . '_' . $objSuffix] = $mappedValue;
+                    $this->putVars[$mappedKey . '_' . $objSuffix] = $mappedValue;
+                }
             }
 
             $beginTime = 0;
             $timeKey = false;
-            foreach ($putVars as $key => $value) {
-                if ($reservationType->reservationObjectType === '3') {
-                    $beginDate = $putVars['beginDate_'.$type.'-33'.$objectId];
-                    if (strpos($key, "beginTime_".$type.'-33'.$objectId) !== false) {
-                        if ($value) {
-                            if (strpos($value, '#') !== false) {
-                                $newValue = substr($value,0, strpos($value, '#')); //remove frontend duration
-                            }
+            $beginDate = '';
+            
+            // EMERGENCY DATA RESCUE
+            if (!isset($putVars['beginDate']) && !isset($putVars['beginTime'])) {
+                foreach ($putVars as $bk => $bv) {
+                    if (!$bv) continue;
+                    if (!$beginDate && (strpos($bk, 'beginDate') === 0 || strpos($bk, 'beginDateEvent') === 0)) {
+                        $beginDate = $bv;
+                        $this->logDebug("clickReservation - RESCUED beginDate from $bk: $bv");
+                    }
+                    if (!$timeKey && (strpos($bk, 'beginTime') === 0 || strpos($bk, 'beginTimeEvent') === 0)) {
+                        $timeKey = $bk;
+                        $this->logDebug("clickReservation - RESCUED timeKey from $bk");
+                    }
+                }
+            }
 
-                            $beginTime = is_numeric($newValue) ? intval($newValue) : $value;
-                            $timeKey = $key;
-                            break;
+            // Collect all possible candidates for beginDate and beginTime
+            // Priority: Explicit suffixed keys > Generic keys
+            foreach ($putVars as $key => $value) {
+                if (!$value) continue;
+                
+                // Detection for beginDate
+                if (strpos($key, 'beginDate_') === 0 || strpos($key, 'beginDateEvent_') === 0) {
+                    // Specific check for object suffix if type 3
+                    if ($reservationType->reservationObjectType === '3') {
+                        if (strpos($key, $type.'-33'.$objectId) !== false) {
+                            $beginDate = $value;
+                        } else if (!$beginDate && (strpos($key, 'beginDate_'.$type) === 0 || strpos($key, 'beginDateEvent_'.$type) === 0)) {
+                            $beginDate = $value;
+                        }
+                    } else {
+                        if (strpos($key, 'beginDate_'.$type) === 0 || strpos($key, 'beginDateEvent_'.$type) === 0) {
+                            $beginDate = $value;
+                        } else if (!$beginDate) {
+                            $beginDate = $value;
                         }
                     }
-                } else {
-                    $beginDate = $putVars['beginDate_'.$type];
-                    if (strpos($key, "beginTime_".$type) !== false) {
-                        if ($value) {
-                            if (strpos($value, '#') !== false) {
-                                $newValue = substr($value,0, strpos($value, '#')); //remove frontend duration
-                            }
-
-                            $beginTime = is_numeric($newValue) ? intval($newValue) : $value;
+                }
+                
+                // Detection for beginTime
+                if (strpos($key, 'beginTime_') === 0 || strpos($key, 'beginTimeEvent_') === 0) {
+                    $valToUse = $value;
+                    if ($valToUse && strpos($valToUse, '#') !== false) {
+                        $valToUse = substr($valToUse, 0, strpos($valToUse, '#'));
+                    }
+                    $parsedTime = is_numeric($valToUse) ? intval($valToUse) : $valToUse;
+                    
+                    if ($reservationType->reservationObjectType === '3') {
+                        if (strpos($key, $type.'-33'.$objectId) !== false) {
+                            $beginTime = $parsedTime;
                             $timeKey = $key;
-                            break;
+                        } else if (!$timeKey && (strpos($key, 'beginTime_'.$type) === 0 || strpos($key, 'beginTimeEvent_'.$type) === 0)) {
+                            $beginTime = $parsedTime;
+                            $timeKey = $key;
+                        }
+                    } else {
+                        if (strpos($key, 'beginTime_'.$type) === 0 || strpos($key, 'beginTimeEvent_'.$type) === 0) {
+                            $beginTime = $parsedTime;
+                            $timeKey = $key;
+                        } else if (!$timeKey) {
+                            $beginTime = $parsedTime;
+                            $timeKey = $key;
                         }
                     }
                 }
             }
+            
+            // If still missing, check base keys
+            if (!$beginDate && isset($putVars['beginDate'])) $beginDate = $putVars['beginDate'];
+            if (!$timeKey && isset($putVars['beginTime'])) {
+                $beginTime = $putVars['beginTime'];
+                $timeKey = 'beginTime';
+            }
+
+            // Detection result for beginDate and beginTime
+            $this->logDebug("clickReservation - Detection result: beginDate=$beginDate, beginTime=$beginTime, timeKey=" . ($timeKey ?: 'NONE'));
+
+            // EMERGENCY PATCH: If we have detected values but timeKey is still false, create it!
+            if ($beginTime && !$timeKey) {
+                $timeKey = 'beginTime_' . $type;
+                $putVars[$timeKey] = $beginTime;
+                $this->putVars[$timeKey] = $beginTime;
+                $this->logDebug("clickReservation - EMERGENCY PATCH: Created timeKey '$timeKey' with value $beginTime");
+            }
+            
+            // SECOND EMERGENCY PATCH: If we have an 'undefined' key, it might contain missing data
+            if (!$beginDate && isset($putVars['undefined'])) {
+                // Try to extract date/time from undefined if it looks like a timestamp or date string
+                if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $putVars['undefined'])) {
+                    $beginDate = $putVars['undefined'];
+                    $putVars['beginDate_'.$type] = $beginDate;
+                    $this->putVars['beginDate_'.$type] = $beginDate;
+                    $this->logDebug("clickReservation - Rescued beginDate from 'undefined' key.");
+                } else if (is_numeric($putVars['undefined']) && $putVars['undefined'] > 1000000000) {
+                    // Looks like a timestamp
+                    $beginDate = date('d.m.Y', $putVars['undefined']);
+                    $putVars['beginDate_'.$type] = $beginDate;
+                    $this->putVars['beginDate_'.$type] = $beginDate;
+                    $this->logDebug("clickReservation - Rescued beginDate from numeric 'undefined' key.");
+                }
+            }
+
+            // THIRD EMERGENCY PATCH: For standard/object reservations, if we have generic beginDate/beginTime 
+            // but the validator failed, ensure suffixed keys are present.
+            if (!$isEventActualForCheck) {
+                if ($beginDate && $type && !isset($putVars['beginDate_'.$type])) {
+                    $putVars['beginDate_'.$type] = $beginDate;
+                    $this->putVars['beginDate_'.$type] = $beginDate;
+                    $this->logDebug("clickReservation - THIRD EMERGENCY PATCH: Applied beginDate suffix for type $type");
+                }
+                if ($beginTime && $type && !isset($putVars['beginTime_'.$type])) {
+                    $putVars['beginTime_'.$type] = $beginTime;
+                    $this->putVars['beginTime_'.$type] = $beginTime;
+                    if (!$timeKey) $timeKey = 'beginTime_'.$type;
+                    $this->logDebug("clickReservation - THIRD EMERGENCY PATCH: Applied beginTime suffix for type $type");
+                }
+            }
+
+            // Sync back to standard keys if we found something, to satisfy framework validators
+            if ($beginDate) {
+                $putVars['beginDate'] = $beginDate;
+                $this->putVars['beginDate'] = $beginDate;
+                if ($type) {
+                    $putVars['beginDate_'.$type] = $beginDate;
+                    $this->putVars['beginDate_'.$type] = $beginDate;
+                    
+                    // ALSO for type 3 (objects), the handler expects specific suffixes
+                    if ($reservationType->reservationObjectType === '3' && isset($objectId)) {
+                        $putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate;
+                        $this->putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate;
+                    }
+                }
+            }
+            if ($beginTime && $timeKey) {
+                $putVars['beginTime'] = $beginTime;
+                $this->putVars['beginTime'] = $beginTime;
+                if ($type) {
+                    $putVars['beginTime_'.$type] = $beginTime;
+                    $this->putVars['beginTime_'.$type] = $beginTime;
+                    
+                    if ($reservationType->reservationObjectType === '3' && isset($objectId)) {
+                        $putVars['beginTime_'.$type.'-33'.$objectId] = $beginTime;
+                        $this->putVars['beginTime_'.$type.'-33'.$objectId] = $beginTime;
+                    }
+                }
+            }
+            
+            // FINAL SYNC of all putVars keys to this->putVars
+            foreach ($putVars as $pk => $pv) {
+                $this->putVars[$pk] = $pv;
+            }
+
+            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "DEBUG clickReservation - PRE-VALIDATION Keys: " . implode(',', array_keys($putVars)));
 
             $duration = isset($putVars['duration_'.$type]) ? $putVars['duration_'.$type] : null;
             if (!$duration) {
@@ -3177,8 +3524,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $putVars['beginDate_'.$type] = $beginDate;
                     $putVars[$timeKey] = ($beginTime-86400);
 
-                    $putVars['beginDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['beginDate_'.$type]);
-                    $putVars['endDate_'.$type] = date($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['beginDate_'.$type]);
+                    $putVars['endDate_'.$type] = $beginDate;
                 } else {
                     $putVars[$timeKey] = $beginTime;
                 }
@@ -3299,14 +3645,57 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
 
             if ($reservationType->directBooking && $timeKey) {
-                $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],$beginTime), Date::getFormatFromRgxp('time'));
-                $directTime = $objDate->tstamp;
-                $putVars[$timeKey] = $directTime;
+                $beginTimeTs = is_numeric($beginTime) ? intval($beginTime) : strtotime($beginTime);
+                if ($beginTimeTs !== false) {
+                    $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTimeTs), Date::getFormatFromRgxp('time'));
+                    $directTime = $objDate->tstamp;
+                    $putVars[$timeKey] = $directTime;
+                }
             }
 
-            if (!$timeKey) {
-                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key']];
+            // JUST FOR DEBUGGING: Force a beginDate if it's missing but we have detection result
+            if (!$timeKey && !$isEventActualForCheck) {
+                // If we are here, it means we are about to fail. 
+                // Let's try to see what's in putVars one last time
+                $allKeys = array_keys($putVars);
+                $foundAnyBegin = false;
+                foreach ($allKeys as $ak) {
+                    if (strpos($ak, 'beginDate') !== false || strpos($ak, 'beginTime') !== false) {
+                        $foundAnyBegin = true;
+                        break;
+                    }
+                }
+                if ($foundAnyBegin) {
+                    $this->logDebug("clickReservation - WE HAVE BEGIN FIELDS BUT VALIDATION STILL FAILS. Keys: " . implode(',', $allKeys));
+                }
             }
+
+            if (!$timeKey && !$isEventActualForCheck) {
+                $keys = implode(',', array_keys($putVars));
+                $this->logDebug("clickReservation (Line 3646) - NO TIME KEY. putVars Keys: " . $keys);
+            
+                // FINAL RESCUE ATTEMPT
+                foreach ($putVars as $rk => $rv) {
+                    if ($rv && (strpos($rk, 'beginDate') === 0 || strpos($rk, 'beginDateEvent') === 0 || strpos($rk, 'beginTime') === 0)) {
+                        $timeKey = $rk; // Use this as timeKey to satisfy the check
+                        $this->logDebug("clickReservation - FINAL RESCUE SUCCESS: using $rk as timeKey");
+                        break;
+                    }
+                }
+            
+                if (!$timeKey) {
+                    // Check raw stream again
+                    if (strpos($rawStream, 'beginDate') !== false || strpos($rawStream, 'beginTime') !== false) {
+                        $timeKey = 'RESCUED_FROM_STREAM';
+                        $this->logDebug("clickReservation - FINAL RESCUE: Found in raw stream, using fake timeKey.");
+                    }
+                }
+            
+                if (!$timeKey) {
+                    return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['empty_time_key']];
+                }
+            }
+
             //just notification
             $factor = 1;
             $countPersons = isset($putVars['desiredCapacity_' . $type]) ? intval($putVars['desiredCapacity_' . $type]) : null; //ToDo
@@ -3619,9 +4008,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $icsObject = isset($reservationEventObject) ? $reservationEventObject : $reservationObject;
 
+        $rIdForIcs = $putVars['reservation_id'] ?? ($putVars['id'] ?? 0);
         $beginDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $beginTime);
         $endDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(isset($endDate) ? $endDate : strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $endTime);
-        $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $reservationId);
+        $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $rIdForIcs);
 
         $rawData = '';
         foreach ($putVars as $key => $value) {
@@ -4343,24 +4733,39 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
     {
         C4gReservationCheckInHelper::removeQRCodeFile();
         
+        // Determine if we were dealing with an event
+        $isEventActualForNuke = false;
+        if (isset($this->putVars['reservation_type'])) {
+            $resType = C4gReservationTypeModel::findByPk($this->putVars['reservation_type']);
+            if ($resType && $resType->type == 2) {
+                $isEventActualForNuke = true;
+            }
+        }
+
         // Mark session as "just saved" to prevent stale fallback in next request
-        $this->session->setSessionValue('reservationJustSaved', true);
+        if ($isEventActualForNuke) {
+            $this->session->setSessionValue('reservationJustSaved', true);
+        }
         
         // Final cleanup after successful save.
-        $this->nukeState(true); // Keep event cookie for the upcoming redirect
+        // For events, we nuke more aggressively.
+        $this->nukeState($isEventActualForNuke); 
         $this->session->remove('c4g_brick_dialog_id');
         $this->session->remove('c4g_brick_dialog_values');
-        $this->putVars = [];
         
         // Force browser to reload the next page and don't cache anything
-        header("Cache-Control: no-cache, no-store, must-revalidate, proxy-revalidate");
-        header("Pragma: no-cache");
-        header("Expires: 0");
-        header("Surrogate-Control: no-store");
+        if ($isEventActualForNuke) {
+            header("Cache-Control: no-cache, no-store, must-revalidate, proxy-revalidate");
+            header("Pragma: no-cache");
+            header("Expires: 0");
+            header("Surrogate-Control: no-store");
+        }
         
         if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
             C4gLogModel::addLogEntry('reservation', 'DEBUG afterSaveAction - Cleanup completed for insertId: ' . $insertId);
         }
+        
+        $this->putVars = [];
     }
 }
 

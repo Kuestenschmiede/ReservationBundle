@@ -1387,11 +1387,22 @@ class C4gReservationHandler
         if ($reservationObject and $putVars) {
             $objectId = $reservationObject->id;
             $typeId   = $reservationType->id;
+            
+            error_log("[RESERVATION DEBUG] preventDublicateBookings START. Type: $typeId, Object: $objectId");
+            
             $beginTime = 0;
             if ($reservationType->reservationObjectType === '3') {
-                $beginDate = $putVars['beginDate_'.$typeId.'-33'.$objectId];
+                $beginDate = $putVars['beginDate_'.$typeId.'-33'.$objectId] ?: ($putVars['beginDate_'.$typeId] ?: ($putVars['beginDate'] ?: ''));
+                if (!$beginDate) {
+                    foreach ($putVars as $bk => $bv) {
+                        if ($bv && (strpos($bk, 'beginDate_') === 0 || strpos($bk, 'beginDateEvent_') === 0)) {
+                            $beginDate = $bv;
+                            break;
+                        }
+                    }
+                }
                 foreach ($putVars as $key => $value) {
-                    if (strpos($key, "beginTime_" . $typeId . '-33' . $objectId) !== false) {
+                    if (strpos($key, "beginTime_" . $typeId . '-33' . $objectId) !== false || $key === "beginTime_".$typeId || $key === "beginTime") {
                         if ($value) {
                             if (strpos($value, '#') !== false) {
                                 $newValue = substr($value, 0, strpos($value, '#')); //remove frontend duration
@@ -1412,9 +1423,9 @@ class C4gReservationHandler
                 }
                 $beginDateAsTstamp = strtotime($beginDate);
             } else {
-                $beginDate = strtotime($putVars['beginDate_' . $typeId]);
+                $beginDate = strtotime($putVars['beginDate_' . $typeId] ?: $putVars['beginDate']);
                 foreach ($putVars as $key => $value) {
-                    if (strpos($key, "beginTime_".$typeId) !== false) {
+                    if (strpos($key, "beginTime_".$typeId) !== false || $key === "beginTime") {
                         if ($value) {
                             if (strpos($value, '#') !== false) {
                                 $value = substr($value,0, strpos($value, '#')); //remove frontend duration
@@ -2187,12 +2198,28 @@ class C4gReservationHandler
         if ($reservationObject and $putVars) {
             $objectId = $reservationObject->id;
             $typeId   = $reservationType->id;
+            
+            error_log("[RESERVATION] preventNonCorrectPeriod START. Type: $typeId, Object: $objectId");
+            try {
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "preventNonCorrectPeriod START. Type: $typeId, Object: $objectId. Keys: " . implode(',', array_keys($putVars)));
+            } catch (\Throwable $t) {}
+
             $periodType = $reservationType->periodType;
             $beginTime = 0;
             if ($reservationType->reservationObjectType === '3') {
-                $beginDate = $putVars['beginDate_'.$typeId.'-33'.$objectId];
+                $beginDate = $putVars['beginDate_'.$typeId.'-33'.$objectId] ?: ($putVars['beginDate_'.$typeId] ?: ($putVars['beginDate'] ?: ''));
+                if (!$beginDate) {
+                    foreach ($putVars as $bk => $bv) {
+                        if ($bv && (strpos($bk, 'beginDate_') === 0 || strpos($bk, 'beginDateEvent_') === 0)) {
+                            $beginDate = $bv;
+                            break;
+                        }
+                    }
+                }
+                
+                $beginTimeFound = false;
                 foreach ($putVars as $key => $value) {
-                    if (strpos($key, "beginTime_" . $typeId . '-33' . $objectId) !== false) {
+                    if (strpos($key, "beginTime_" . $typeId . '-33' . $objectId) !== false || $key === "beginTime_".$typeId || $key === "beginTime") {
                         if ($value) {
                             if (strpos($value, '#') !== false) {
                                 $newValue = substr($value, 0, strpos($value, '#')); //remove frontend duration
@@ -2203,29 +2230,65 @@ class C4gReservationHandler
                                } else {
                                     $beginTime = $value - $begindate_timestamp; 
                                 }     
+                               $beginTimeFound = true;
                                break;
                             }
 
                             $beginTime = $newValue ?: $value;
+                            $beginTimeFound = true;
                             break;
                         }
                     }
                 }
+                
+                // FALLBACK: If no standard beginTime key found, try to find ANY beginTime
+                if (!$beginTimeFound) {
+                    foreach ($putVars as $bk => $bv) {
+                        if ($bv && (strpos($bk, 'beginTime_') === 0 || strpos($bk, 'beginTimeEvent_') === 0)) {
+                            $beginTime = $bv; // Assuming timestamp or direct value
+                            $beginTimeFound = true;
+                            break;
+                        }
+                    }
+                }
+                
                 $beginDateAsTstamp = strtotime($beginDate);
             } else {
-                $beginDate = strtotime($putVars['beginDate_' . $typeId]);
+                $beginDate = strtotime($putVars['beginDate_' . $typeId] ?: ($putVars['beginDate'] ?: '0'));
+                if (!$beginDate) {
+                    foreach ($putVars as $bk => $bv) {
+                        if ($bv && (strpos($bk, 'beginDate_') === 0 || strpos($bk, 'beginDateEvent_') === 0)) {
+                            $beginDate = strtotime($bv);
+                            break;
+                        }
+                    }
+                }
+                
+                $beginTimeFound = false;
                 foreach ($putVars as $key => $value) {
-                    if (strpos($key, "beginTime_".$typeId) !== false) {
+                    if (strpos($key, "beginTime_".$typeId) !== false || $key === "beginTime") {
                         if ($value) {
                             if (strpos($value, '#') !== false) {
                                 $value = substr($value,0, strpos($value, '#')); //remove frontend duration
                             }
 
                             $beginTime = $value;
+                            $beginTimeFound = true;
                             break;
                         }
                     }
                 }
+                
+                if (!$beginTimeFound) {
+                    foreach ($putVars as $bk => $bv) {
+                        if ($bv && (strpos($bk, 'beginTime_') === 0 || strpos($bk, 'beginTimeEvent_') === 0)) {
+                            $beginTime = $bv;
+                            $beginTimeFound = true;
+                            break;
+                        }
+                    }
+                }
+                
                 $beginDateAsTstamp = $beginDate;
             }
             $reservationId = $putVars['reservation_id'];
