@@ -64,7 +64,19 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $showDateTime = $reservationSettings->showDateTime ? "1" : "0";
 
         $typeId = $listType['id'] ?: 0;
-        $eventId = \Contao\Input::get('event') ?: $this->module->getSession()->getSessionValue('reservationEventCookie');
+        $eventId = \Contao\Input::get('event') ?: 0;
+        
+        if (!$eventId && $this->module && $this->module->getSession()->getSessionValue('reservationEventCookie')) {
+            $eventId = $this->module->getSession()->getSessionValue('reservationEventCookie');
+        }
+
+        // Falls wir in einem PUT-Request sind (Speichern), bevorzugen wir IMMER die Daten aus dem Request-Body.
+        if ($module && key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
+            $putVars = $module->getPutVars();
+            if ($putVars) {
+                $eventId = $putVars['reservation_object_event_' . $typeId] ?? $eventId;
+            }
+        }
         
         $objects = [];
         foreach ($reservationObjects as $reservationObject) {

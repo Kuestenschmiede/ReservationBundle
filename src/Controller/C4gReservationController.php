@@ -997,7 +997,7 @@ foreach ($typelist as $listType) {
     $reservationDesiredCapacity = new C4GNumberField();
     $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
-    if ($maxCapacity && $eventObj && property_exists($eventObj, 'maxParticipants') && $eventObj->maxParticipants) {
+    if ($maxCapacity && $eventObj && $eventObj->maxParticipants) {
         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
     }
 
@@ -1018,7 +1018,7 @@ foreach ($typelist as $listType) {
             $max = $listType['maxParticipantsPerBooking'];
             $reservationDesiredCapacity->setTitle(self::withDesiredCapacityTitle($min,$max,$showMinMax));
             $reservationDesiredCapacity->setMax($max);
-        } else if ($eventObj && (property_exists($eventObj, 'maxParticipants') && $eventObj->maxParticipants == 0) || empty($maxCapacity) || $isPartiPerEvent <= $maxCapacity) {
+        } else if ($eventObj && ($eventObj->maxParticipants == 0) || empty($maxCapacity) || $isPartiPerEvent <= $maxCapacity) {
             if ($isPartiPerEvent && $isPartiPerEvent <= $maxCapacity) {
                 $min = $minCapacity;
                 $max = $isPartiPerEvent;
@@ -1934,13 +1934,15 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $participants[] = $emailField;
                 }
 
+                $baseParticipants = $participants;
                 foreach ($typelist as $type) {
+                    $participants = $baseParticipants;
                     $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $type['id']);
                     $maxParticipants = $type['maxParticipantsPerBooking'];
                     $minParticipants = $type['minParticipantsPerBooking'];
 
                     //Max participant per booking
-                    if ($eventObj && property_exists($eventObj, 'maxParticipantsPerEventBooking') && $eventObj->maxParticipantsPerEventBooking) {
+                    if ($eventObj && $eventObj->maxParticipantsPerEventBooking) {
                         $maxParticipants = $eventObj->maxParticipantsPerEventBooking;
                     } else if ($type['maxParticipantsPerBooking']){
                         $maxParticipants = $type['maxParticipantsPerBooking'];
@@ -1948,7 +1950,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
                     $maxCapacity = $maxParticipants ?: 0;
                     $minCapacity = $minParticipants ?: 1;
-                    $participantParam = ($eventObj && property_exists($eventObj, 'participant_params')) ? unserialize($eventObj->participant_params) : null;
+                    $participantParam = ($eventObj && $eventObj->participant_params) ? StringUtil::deserialize($eventObj->participant_params, true) : null;
                     $params = $participantParam ?: $type['participantParams'];
                     $participantParamsArr = [];
 
@@ -1970,8 +1972,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                         }
 
                         if (count($participantParamsArr) > 0) {
-                            $eventOptionsRadio = $eventObj && property_exists($eventObj, 'participantParamsFieldType') && $eventObj->participantParamsFieldType == 'radio';
-                            $eventOptionsMandatory = $eventObj && property_exists($eventObj, 'participantParamsMandatory') && $eventObj->participantParamsMandatory == '1';
+                            $eventOptionsRadio = $eventObj && $eventObj->participantParamsFieldType == 'radio';
+                            $eventOptionsMandatory = $eventObj && $eventObj->participantParamsMandatory == '1';
                             if ($eventOptionsRadio) {
                                 $participantParamField = new C4GRadioGroupField();
                                 if (!$eventOptionsMandatory) {
@@ -3725,7 +3727,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 //ToDo check without desired capacity field -> default 1
                 //Max participant per booking
                 $maxParticipants = null;
-                if (property_exists($reservationObject, 'maxParticipantsPerEventBooking') && $reservationObject->maxParticipantsPerEventBooking) {
+                if ($reservationObject && $reservationObject->maxParticipantsPerEventBooking) {
                     $maxParticipants = $reservationObject->maxParticipantsPerEventBooking;
                 } else if ($reservationType->maxParticipantsPerBooking){
                     $maxParticipants = $reservationType->maxParticipantsPerBooking;
@@ -4477,7 +4479,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
 
             // Minimal erforderliche Schlüssel absichern
-            if (!isset($typeArray['id']) && is_object($reservationType) && property_exists($reservationType, 'id')) {
+            if (!isset($typeArray['id']) && is_object($reservationType) && $reservationType->id) {
                 $typeArray['id'] = $reservationType->id;
             }
             // Dauer (falls im PUT nicht vorhanden) wird in calcPrices nochmal fallbacked, aber wir versuchen hier den Key zu lesen
