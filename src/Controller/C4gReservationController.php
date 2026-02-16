@@ -2482,13 +2482,30 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         if ($rawPut && is_array($rawPut)) {
             $this->logDebug("addFields - Selectively registering fields from Request to bypass framework filtering.");
-            $dynamicPrefixes = ['beginDate', 'beginTime', 'endDate', 'endTime', 'duration', 'reservation_object', 'desiredCapacity', 'participants', 'reservation_type', 'agreed', '_'];
+            // Extended prefixes to cover more dynamic reservation fields
+            $dynamicPrefixes = [
+                'beginDate', 'beginTime', 'endDate', 'endTime', 
+                'duration', 'reservation_object', 'desiredCapacity', 
+                'participants', 'reservation_type', 'agreed', 
+                'firstName', 'lastName', 'email', 'phone', 
+                'address', 'postal', 'city', 'comment', 
+                '_'
+            ];
             foreach ($rawPut as $key => $value) {
+                if (!is_string($key)) continue;
+                
                 $isDynamic = false;
                 foreach ($dynamicPrefixes as $prefix) {
                     if (strpos($key, $prefix) === 0) {
                         $isDynamic = true;
                         break;
+                    }
+                }
+                
+                // Also match any key that has a numeric suffix or contains reservation markers
+                if (!$isDynamic) {
+                    if (preg_match('/_[0-9]+$/', $key) || preg_match('/-[0-9]+/', $key) || strpos($key, '§') !== false) {
+                        $isDynamic = true;
                     }
                 }
                 
@@ -4241,22 +4258,58 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             if ($pathUuid) {
                 $pathUuid = StringUtil::binToUuid($pathUuid);
                 $path = C4GUtils::replaceInsertTags("{{file::$pathUuid}}");
+                // Remove rootDir if it is already present in path to prevent duplication in C4GBaseController
+                if ($this->rootDir && strpos($path, $this->rootDir) === 0) {
+                    $path = substr($path, strlen($this->rootDir));
+                }
+                
+                if (strpos($path, '/files') === 0) {
+                    $path = ltrim($path, '/');
+                }
+                
+                // For internal file creation we need the absolute path
+                $absolutePath = $path;
+                if (strpos($absolutePath, '/') !== 0 && $this->rootDir) {
+                    $absolutePath = $this->rootDir . '/' . $absolutePath;
+                }
 
-                $filename = $path.'/'.$fileId.'/'.'reservation.ics';
+                $dir = $absolutePath . '/' . $fileId;
+                $filename = $dir . '/reservation.ics';
+                $this->logDebug("createIcs - absolutePath: $absolutePath, fileId: $fileId, effective dir: $dir");
+                
                 try {
-                    mkdir($path.'/'.$fileId.'/');
+                    if (!is_dir($dir)) {
+                        if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
+                            $this->logDebug("createIcs - mkdir failed for $dir");
+                        }
+                    }
+                    
+                    if (!file_exists($filename)) {
+                        touch($filename);
+                    }
                     $ics = new File($filename);
                 } catch (\Exception $exception) {
+                    $this->logDebug("createIcs - catch exception: " . $exception->getMessage());
                     $fs = new Filesystem();
-                    $fs->touch($filename);
-                    $ics = new File($filename);
+                    try {
+                        $fs->mkdir($dir);
+                        $fs->touch($filename);
+                        $ics = new File($filename);
+                    } catch (\Throwable $t) {
+                        $this->logDebug("createIcs - Final FS fallback failed: " . $t->getMessage());
+                        return '';
+                    }
                 }
 
                 $ics->openFile("w")->fwrite(
                     "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nPRODID:$icsprodid\n".
                     "X-WR-TIMEZONE:$icstimezone\nBEGIN:VEVENT\nUID:$icsuid\nLOCATION:$icslocation\nSUMMARY:$icssummary\nCLASS:PUBLIC\nDESCRIPTION:$icsdescription\n".
                     "DTSTART;$dstart\nDTEND;$dend\nDTSTAMP:$dstamp\nBEGIN:VALARM\nTRIGGER:$icsalert\nACTION:DISPLAY\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n");
-                return $filename;
+                
+                // Return relative path for Notification Center (relative to rootDir)
+                $relativePath = $path . '/' . $fileId . '/reservation.ics';
+                $this->logDebug("createIcs - returning relativePath: $relativePath");
+                return $relativePath;
             }
         }
 

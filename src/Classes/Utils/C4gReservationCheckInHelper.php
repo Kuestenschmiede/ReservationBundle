@@ -39,7 +39,7 @@ class C4gReservationCheckInHelper
         $path = 'files/c4g_brick_data/qrcode/';
         $rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
         if (!is_dir($rootDir.'/'.$path)) {
-            mkdir($rootDir.'/'.$path);
+            mkdir($rootDir.'/'.$path, 0777, true);
         }
         $fileName = $path.'qrcode_' . $key . '.png';
 
