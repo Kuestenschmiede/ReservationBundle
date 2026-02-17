@@ -366,9 +366,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'default'                 => '',
+            'default'                 => '0',
             'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>4, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "double(2,2) unsigned default '0'"
+            'sql'                     => "double(5,2) unsigned default '0'"
         ),
 
         'conferenceLink' => array
