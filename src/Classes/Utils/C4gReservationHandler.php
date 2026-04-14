@@ -1969,6 +1969,30 @@ class C4gReservationHandler
         }
 
         if ($objects) {
+            $groupedObjects = [];
+            if (self::$langLower === null) {
+                self::$langLower = strtolower((string)($GLOBALS['TL_LANGUAGE'] ?? ''));
+            }
+            foreach ($objects as $object) {
+                $caption = $object['caption'];
+                $captions = StringUtil::deserialize($object['options'], true);
+                if ($captions) {
+                    foreach ($captions as $optionCaption) {
+                        $capLang = strtolower((string)($optionCaption['language'] ?? ''));
+                        if (($capLang !== '' && strpos(self::$langLower, $capLang) !== false) && !empty($optionCaption['caption'])) {
+                            $caption = $optionCaption['caption'];
+                            break;
+                        }
+                    }
+                }
+                $groupedObjects[$caption][] = $object;
+            }
+
+            $objects = [];
+            foreach ($groupedObjects as $caption => $objectGroup) {
+                $objects[] = $objectGroup[array_rand($objectGroup)];
+            }
+
             $cloneObject = false;
             if ($type['cloneObject']) {
                 $cloneObject = $database->prepare("SELECT * FROM tl_c4g_reservation_object WHERE id = ?")->execute($type['cloneObject'])->fetchAssoc();
