@@ -120,7 +120,57 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $reservationObjectField->setCondition([$condition]);
         $reservationObjectField->setRemoveWithEmptyCondition(true);
         $initialDateFromValues = $this->initialValues->getDate() ?: '';
-        $reservationObjectField->setCallOnChangeFunction("var objField = document.getElementById('c4g_reservation_object_".$listType['id']."'); var actValue = objField.value; var dateValue = '" . $initialDateFromValues . "'; if (typeof con4gis_reservation_values !== 'undefined' && con4gis_reservation_values['" . $listType['id'] . "']) { dateValue = con4gis_reservation_values['" . $listType['id'] . "']; } if (!dateValue) { var dateFields = document.querySelectorAll('.c4g_beginDate_".$listType['id']."'); var visibleDateField = null; if (dateFields.length > 0) { for (var i = 0; i < dateFields.length; i++) { if (dateFields[i].value && (dateFields[i].offsetParent !== null || dateFields[i].type === 'hidden')) { dateValue = dateFields[i].value; visibleDateField = dateFields[i]; break; } } } } if (!dateValue) { var cookieValue = document.cookie.match('(^|;)\\\\s*reservationInitialDateCookie\\\\s*=\\\\s*([^;]+)'); if (cookieValue) { dateValue = decodeURIComponent(cookieValue.pop()); } } if (dateValue) { var targetDateField = document.getElementById('c4g_beginDate_".$listType['id']."-33' + actValue); if (targetDateField) { targetDateField.value = dateValue; var pickerField = document.getElementById('c4g_beginDate_".$listType['id']."-33' + actValue + '_picker'); if (pickerField && pickerField.datepicker && typeof pickerField.datepicker.setDate === 'function') { pickerField.datepicker.setDate(dateValue); } if (typeof eventFire === 'function') { eventFire(targetDateField, 'change'); } } document.cookie = 'reservationInitialDateCookie=' + encodeURIComponent(dateValue) + '; path=/; SameSite=Lax'; if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; } window.con4gis_reservation_values['" . $listType['id'] . "'] = dateValue; } setTimeset(dateValue, ".$listType['id'].", ".$showDateTime.", actValue); handleBrickConditions(); setTimeout(function() { var retryField = document.getElementById('c4g_beginDate_".$listType['id']."-33' + actValue); if (retryField && dateValue && retryField.value !== dateValue) { retryField.value = dateValue; var retryPicker = document.getElementById(retryField.id + '_picker'); if (retryPicker && retryPicker.datepicker && typeof retryPicker.datepicker.setDate === 'function') { retryPicker.datepicker.setDate(dateValue); } if (typeof eventFire === 'function') { eventFire(retryField, 'change'); } setTimeset(dateValue, ".$listType['id'].", ".$showDateTime.", actValue); } }, 500);");
+        $jsOnChange = "var objField = document.getElementById('c4g_reservation_object_".$listType['id']."'); ".
+            "var actValue = objField ? objField.value : ''; ".
+            "var dateValue = '" . str_replace("'", "\\'", $initialDateFromValues) . "'; ".
+            "if (typeof con4gis_reservation_values !== 'undefined' && con4gis_reservation_values['" . $listType['id'] . "']) { ".
+                "dateValue = con4gis_reservation_values['" . $listType['id'] . "']; ".
+            "} ".
+            "if (!dateValue) { ".
+                "var dateFields = document.querySelectorAll('.c4g_beginDate_".$listType['id']."'); ".
+                "if (dateFields.length > 0) { ".
+                    "for (var i = 0; i < dateFields.length; i++) { ".
+                        "if (dateFields[i].value && (dateFields[i].offsetParent !== null || dateFields[i].type === 'hidden')) { ".
+                            "dateValue = dateFields[i].value; break; ".
+                        "} ".
+                    "} ".
+                "} ".
+            "} ".
+            "if (!dateValue) { ".
+                "var cookieValue = document.cookie.match('(^|;)\\\\s*reservationInitialDateCookie\\\\s*=\\\\s*([^;]+)'); ".
+                "if (cookieValue) { dateValue = decodeURIComponent(cookieValue.pop()); } ".
+            "} ".
+            "if (dateValue && actValue) { ".
+                "var targetId = 'c4g_beginDate_".$listType['id']."-33' + actValue; ".
+                "var targetDateField = document.getElementById(targetId); ".
+                "if (targetDateField) { ".
+                    "targetDateField.value = dateValue; ".
+                    "var pickerField = document.getElementById(targetId + '_picker'); ".
+                    "if (pickerField && pickerField.datepicker && typeof pickerField.datepicker.setDate === 'function') { ".
+                        "pickerField.datepicker.setDate(dateValue); ".
+                    "} ".
+                    "if (typeof eventFire === 'function') { eventFire(targetDateField, 'change'); } ".
+                "} ".
+                "document.cookie = 'reservationInitialDateCookie=' + encodeURIComponent(dateValue) + '; path=/; SameSite=Lax'; ".
+                "if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; } ".
+                "window.con4gis_reservation_values['" . $listType['id'] . "'] = dateValue; ".
+            "} ".
+            "if (typeof setTimeset === 'function') { setTimeset(dateValue, ".$listType['id'].", ".$showDateTime.", actValue); } ".
+            "if (typeof handleBrickConditions === 'function') { handleBrickConditions(); } ".
+            "setTimeout(function() { ".
+                "var retryId = 'c4g_beginDate_".$listType['id']."-33' + actValue; ".
+                "var retryField = document.getElementById(retryId); ".
+                "if (retryField && dateValue && retryField.value !== dateValue) { ".
+                    "retryField.value = dateValue; ".
+                    "var retryPicker = document.getElementById(retryId + '_picker'); ".
+                    "if (retryPicker && retryPicker.datepicker && typeof retryPicker.datepicker.setDate === 'function') { ".
+                        "retryPicker.datepicker.setDate(dateValue); ".
+                    "} ".
+                    "if (typeof eventFire === 'function') { eventFire(retryField, 'change'); } ".
+                    "if (typeof setTimeset === 'function') { setTimeset(dateValue, ".$listType['id'].", ".$showDateTime.", actValue); } ".
+                "} ".
+            "}, 500);";
+        $reservationObjectField->setCallOnChangeFunction($jsOnChange);
         $reservationObjectField->setInitialCallOnChange(true);
         $reservationObjectField->setCallOnChange(true);
         $reservationObjectField->setAdditionalID($listType["id"]);
@@ -504,7 +554,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setRemoveWithEmptyCondition(true);
             $reservationBeginDateField->setCallOnChange(true);
             //"var actValue = document.getElementById('c4g_reservation_object_".$listType['id']."').value;setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+actValue).value,".$listType['id'].",".$showDateTime.",actValue);handleBrickConditions();"
-            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",". $reservationObject->getId().",true); document.cookie = 'reservationInitialDateCookie=' + encodeURIComponent(this.value) + '; path=/; SameSite=Lax'; if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; } window.con4gis_reservation_values['" . $listType['id'] . "'] = this.value; console.log('con4gis_reservation: date changed manually to ' + this.value);");
+            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",". $reservationObject->getId().",true); document.cookie = 'reservationInitialDateCookie=' + encodeURIComponent(this.value) + '; path=/; SameSite=Lax'; if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; } window.con4gis_reservation_values['" . $listType['id'] . "'] = this.value;");
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
             $reservationBeginDateField->setInitInvisible(false);
