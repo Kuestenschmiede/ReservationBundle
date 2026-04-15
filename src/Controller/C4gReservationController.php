@@ -96,6 +96,7 @@ class C4gReservationController extends C4GBaseController
     protected $brickScript  = 'bundles/con4gisreservation/dist/js/c4g_brick_reservation.js';
     protected $brickStyle   = 'bundles/con4gisreservation/dist/css/c4g_brick_reservation.min.css';
     protected $withNotification = true;
+    protected $notification_type = null;
 
     //Resource Params
     protected $loadDefaultResources = true;
@@ -2551,7 +2552,21 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
      */
     public function clickReservation($values, $putVars)
     {
-        // 1. Determine type as early as possible to decide on strategy
+        try {
+            if (!$this->reservationSettings) {
+                $this->initBrickModule($this->id);
+            }
+            if (!$this->reservationSettings) {
+                $errRes = ['usermessage' => 'Reservierungseinstellungen konnten nicht geladen werden.'];
+                unset($errRes['jump_to_url']);
+                unset($errRes['jump_after_message']);
+                unset($errRes['performaction']);
+                unset($errRes['callback']);
+                unset($errRes['dialogclose']);
+                unset($errRes['dialogcloseall']);
+                return $errRes;
+            }
+            // 1. Determine type as early as possible to decide on strategy
         $typeIdForStrategy = $putVars['reservation_type'] ?? 0;
         if (!$typeIdForStrategy && key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
             $rawP = $this->getPutVars();
@@ -2764,6 +2779,26 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $formId = $this->reservationSettings->id;
         $type = $putVars['reservation_type'] ?? '';
+
+        if ($this->reservationSettings->privacy_policy_text || $this->reservationSettings->privacy_policy_site) {
+            if (!isset($putVars['agreed']) || !$putVars['agreed']) {
+                if (isset($this->session) && is_object($this->session) && method_exists($this->session, 'setSessionValue')) {
+                    $this->session->setSessionValue('c4g_brick_dialog_values', null);
+                }
+                $result = [
+                    'usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY'] ?? 'Bitte stimmen Sie den Datenschutzbestimmungen zu.'
+                ];
+                // Ensure no accidental keys trigger frontend actions
+                unset($result['jump_to_url']);
+                unset($result['jump_after_message']);
+                unset($result['performaction']);
+                unset($result['callback']);
+                unset($result['dialogclose']);
+                unset($result['dialogcloseall']);
+                return $result;
+            }
+        }
+
         $database = Database::getInstance();
         $reservationType = null;
         if ($type) {
@@ -2771,9 +2806,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 ->execute($type);
         }
 
-        $this->notification_type = $this->reservationSettings->notification_type;
-        if ($this->getDialogParams()) {
-            $this->getDialogParams()->setNotificationType($this->reservationSettings->notification_type);
+        $this->notification_type = $this->reservationSettings ? $this->reservationSettings->notification_type : null;
+        if ($this->getDialogParams() && $this->reservationSettings && method_exists($this->getDialogParams(), 'setNotificationType')) {
+            $this->getDialogParams()->setNotificationType($this->notification_type);
         }
 
         if ($reservationType && $reservationType->reservationObjectType === '3') {
@@ -2792,7 +2827,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         }
 
             if ($reservationType && $reservationType->notification_type) {
-                if ($this->getDialogParams()) {
+                if ($this->getDialogParams() && method_exists($this->getDialogParams(), 'setNotificationType')) {
                     $this->getDialogParams()->setNotificationType($reservationType->notification_type);
                 }
                 $this->notification_type = $reservationType->notification_type;
@@ -3486,7 +3521,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
             if ($typeOfObject == '' || $typeOfObject == 'standard') {
                 $duration = $duration * $interval;
-                $endTime = $beginTime + intval($duration);
+                $beginTimeInt = is_numeric($beginTime) ? intval($beginTime) : (is_string($beginTime) ? strtotime($beginTime) : 0);
+                if (!$beginTimeInt && is_string($beginTime) && strpos($beginTime, ':') !== false) {
+                    $beginTimeInt = strtotime('1970-01-01 ' . $beginTime . ' UTC');
+                }
+                $endTime = ($beginTimeInt ?: 0) + intval($duration);
             }
 
             $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$endTime);
@@ -4192,9 +4231,35 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         
         // Fix: Wir leeren hier auch $this->putVars der Controller-Instanz, 
         // damit bei einem eventuellen internen Re-Use der Instanz keine alten Daten mehr vorhanden sind.
+        // Cleanup and return result
+        if (isset($result['usermessage'])) {
+            // If there's a user message, we must ensure no automatic redirect or actions occur
+            // so the user actually sees the message in the SweetAlert/DialogHandler.
+            unset($result['jump_to_url']);
+            unset($result['jump_after_message']);
+            unset($result['performaction']);
+            unset($result['callback']);
+            unset($result['dialogclose']);
+            unset($result['dialogcloseall']);
+        }
+        
         $this->putVars = [];
 
         return $result;
+        } catch (\Throwable $e) {
+            \Contao\System::log('C4gReservationController ERROR: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), __METHOD__, TL_ERROR);
+            $errResult = [
+                'usermessage' => 'Ein technischer Fehler ist aufgetreten: ' . $e->getMessage()
+            ];
+            // Ensure even on error no redirects happen
+            unset($errResult['jump_to_url']);
+            unset($errResult['jump_after_message']);
+            unset($errResult['performaction']);
+            unset($errResult['callback']);
+            unset($errResult['dialogclose']);
+            unset($errResult['dialogcloseall']);
+            return $errResult;
+        }
     }
 
     /**
