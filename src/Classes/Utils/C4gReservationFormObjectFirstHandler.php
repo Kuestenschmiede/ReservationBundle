@@ -119,7 +119,8 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         //$reservationObjectField->setEmptyOptionLabel($this->reservationSettings->emptyOptionLabel ?: $GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_objectsfirst_none']);
         $reservationObjectField->setCondition([$condition]);
         $reservationObjectField->setRemoveWithEmptyCondition(true);
-        $reservationObjectField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+document.getElementById('c4g_reservation_object_".$listType['id']."').value).value,".$listType['id'].",".$showDateTime.",document.getElementById('c4g_reservation_object_".$listType['id']."').value);handleBrickConditions();");
+        $initialDateFromValues = $this->initialValues->getDate() ?: '';
+        $reservationObjectField->setCallOnChangeFunction("var objField = document.getElementById('c4g_reservation_object_".$listType['id']."'); var actValue = objField.value; var dateValue = '" . $initialDateFromValues . "'; if (typeof con4gis_reservation_values !== 'undefined' && con4gis_reservation_values['" . $listType['id'] . "']) { dateValue = con4gis_reservation_values['" . $listType['id'] . "']; } if (!dateValue) { var dateFields = document.querySelectorAll('.c4g_beginDate_".$listType['id']."'); var visibleDateField = null; if (dateFields.length > 0) { for (var i = 0; i < dateFields.length; i++) { if (dateFields[i].value && (dateFields[i].offsetParent !== null || dateFields[i].type === 'hidden')) { dateValue = dateFields[i].value; visibleDateField = dateFields[i]; break; } } } } if (!dateValue) { var cookieValue = document.cookie.match('(^|;)\\\\s*reservationInitialDateCookie\\\\s*=\\\\s*([^;]+)'); if (cookieValue) { dateValue = decodeURIComponent(cookieValue.pop()); } } if (dateValue) { var targetDateField = document.getElementById('c4g_beginDate_".$listType['id']."-33' + actValue); if (targetDateField) { targetDateField.value = dateValue; var pickerField = document.getElementById('c4g_beginDate_".$listType['id']."-33' + actValue + '_picker'); if (pickerField && pickerField.datepicker && typeof pickerField.datepicker.setDate === 'function') { pickerField.datepicker.setDate(dateValue); } if (typeof eventFire === 'function') { eventFire(targetDateField, 'change'); } } document.cookie = 'reservationInitialDateCookie=' + encodeURIComponent(dateValue) + '; path=/; SameSite=Lax'; if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; } window.con4gis_reservation_values['" . $listType['id'] . "'] = dateValue; } setTimeset(dateValue, ".$listType['id'].", ".$showDateTime.", actValue); handleBrickConditions(); setTimeout(function() { var retryField = document.getElementById('c4g_beginDate_".$listType['id']."-33' + actValue); if (retryField && dateValue && retryField.value !== dateValue) { retryField.value = dateValue; var retryPicker = document.getElementById(retryField.id + '_picker'); if (retryPicker && retryPicker.datepicker && typeof retryPicker.datepicker.setDate === 'function') { retryPicker.datepicker.setDate(dateValue); } if (typeof eventFire === 'function') { eventFire(retryField, 'change'); } setTimeset(dateValue, ".$listType['id'].", ".$showDateTime.", actValue); } }, 500);");
         $reservationObjectField->setInitialCallOnChange(true);
         $reservationObjectField->setCallOnChange(true);
         $reservationObjectField->setAdditionalID($listType["id"]);
@@ -412,7 +413,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             }
 
             if ($this->initialValues->getDate() || $initialBookingDate/* || $typeOfObject == 'fixed_date'*/) {
-                $script = "setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+document.getElementById('c4g_reservation_object_".$listType['id']."').value).value,".$listType['id'].",".$showDateTime.",document.getElementById('c4g_reservation_object_".$listType['id']."').value);handleBrickConditions();)";
+                $script = "var listId = '".$listType['id']."'; var actField = document.getElementById('c4g_reservation_object_'+listId); var actValue = actField ? actField.value : ''; var dateField = document.getElementById('c4g_beginDate_'+listId+'-33' + actValue); var dateValue = dateField ? dateField.value : ''; if (!dateValue) { var cookieValue = document.cookie.match('(^|;)\\\\s*reservationInitialDateCookie\\\\s*=\\\\s*([^;]+)'); if (cookieValue) { dateValue = decodeURIComponent(cookieValue.pop()); if (dateField) { dateField.value = dateValue; } } } setTimeset(dateValue, listId, ".$showDateTime.", actValue); handleBrickConditions();";
                 $this->getDialogParams()->setOnloadScript($script);
             }
             //changes title
@@ -467,9 +468,18 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCustomFormat($GLOBALS['TL_CONFIG']['dateFormat']);
             $reservationBeginDateField->setCustomLanguage($GLOBALS['TL_LANGUAGE']);
             $reservationBeginDateField->setTitle($titleDate);
-            $reservationBeginDateField->setStyleClass('begin-date');
+            $reservationBeginDateField->setStyleClass('begin-date c4g_beginDate_'.$listType['id']);
             $reservationBeginDateField->setMandatory(true);
             $reservationBeginDateField->setEditable($typeOfObject !== 'fixed_date');
+
+            if ($this->initialValues->getDate()) {
+                $initialBookingDateValue = $this->initialValues->getDate();
+            } else if ($listType['directBooking']) {
+                $objDate = new Date(date($GLOBALS['TL_CONFIG']['dateFormat'],time()), Date::getFormatFromRgxp('date'));
+                $initialBookingDateValue = $objDate->date;
+            } else {
+                $initialBookingDateValue = C4gReservationHandler::getBookableMinDate([$reservationObject], $listType);
+            }
 
             if ($typeOfObject == 'fixed_date') {
                 $reservationBeginDateField->setInitialValue($reservationObject->getBeginDate());
@@ -477,7 +487,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $reservationBeginDateField->setEditable(false);
                 $reservationBeginDateField->setMandatory(false);
             } else {
-                $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate([$reservationObject], $listType));
+                $reservationBeginDateField->setInitialValue($initialBookingDateValue);
                 $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
                 $reservationBeginDateField->setMandatory(true);
                 $reservationBeginDateField->setEditable(true);
@@ -494,7 +504,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setRemoveWithEmptyCondition(true);
             $reservationBeginDateField->setCallOnChange(true);
             //"var actValue = document.getElementById('c4g_reservation_object_".$listType['id']."').value;setTimeset(document.getElementById('c4g_beginDate_".$listType['id']."-33'+actValue).value,".$listType['id'].",".$showDateTime.",actValue);handleBrickConditions();"
-            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",". $reservationObject->getId().",true);");
+            $reservationBeginDateField->setCallOnChangeFunction("setTimeset(this.value," . $listType['id'] . "," . $showDateTime . ",". $reservationObject->getId().",true); document.cookie = 'reservationInitialDateCookie=' + encodeURIComponent(this.value) + '; path=/; SameSite=Lax'; if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; } window.con4gis_reservation_values['" . $listType['id'] . "'] = this.value; console.log('con4gis_reservation: date changed manually to ' + this.value);");
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
             $reservationBeginDateField->setInitInvisible(false);

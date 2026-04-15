@@ -2492,7 +2492,7 @@ class C4gReservationHandler
         $otherObjectsBookedTimes = $database->prepare("SELECT beginDate,endDate,desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`!=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
         ->execute($typeId,$objectId,$objectType,'1')->fetchAllAssoc(); 
 
-        $result = [];
+        $result = ['dates' => ''];
         $periodType = $listType['periodType'];
 
         if ($currentBookedTimes || $otherObjectsBookedTimes) {

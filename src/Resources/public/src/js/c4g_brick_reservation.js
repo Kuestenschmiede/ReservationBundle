@@ -855,9 +855,8 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
     }
 
     //hotfix dates with slashes
-    if (date && date.indexOf("/")) {
-        date = date.replace("/", "~");
-        date = date.replace("/", "~");
+    if (date && (typeof date === 'string') && date.indexOf("/")) {
+        date = date.replace(/\//g, "~");
     }
 
 
@@ -865,6 +864,11 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
         duration = duration ? duration : -1;
         capacity = capacity ? capacity : -1;
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "flex";
+        
+        // con4gis_reservation_values sync
+        if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; }
+        window.con4gis_reservation_values[additionalId] = date.replace(/~/g, "/");
+
         let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration + "/" + capacity + "/" + objectId;
         var targetButton = false;
         fetch(url)
@@ -874,6 +878,18 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                 if (objectId) {
                     addId += '-33'+objectId;
                 }
+                
+                // Ensure targetDateField still has the correct value before rendering radio buttons
+                // This helps if something else reset it while fetch was running
+                var targetDateField = document.getElementById('c4g_beginDate_' + additionalId + (objectId ? '-33' + objectId : ''));
+                if (targetDateField && date && targetDateField.value !== date.replace(/~/g, "/")) {
+                    targetDateField.value = date.replace(/~/g, "/");
+                    var pickerField = document.getElementById(targetDateField.id + '_picker');
+                    if (pickerField && pickerField.datepicker && typeof pickerField.datepicker.setDate === 'function') {
+                        pickerField.datepicker.setDate(targetDateField.value);
+                    }
+                }
+
                 var radioGroup = document.querySelector(".radio-group-beginTime_"+addId);
                 //if (!callFromChangeCapacity) {
                     addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime, objectId); 
@@ -904,9 +920,11 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                 handleBrickConditions();
 
                 if (additionalId != -1) {
-                    var timeGroups = document.querySelectorAll('.radio-group-beginTime_'+addId+' input[type = "hidden"]');
-                    var timeValue = false;
-                    if (timeGroups) {
+                    var timeGroups = document.querySelectorAll('.radio-group-beginTime_'+additionalId+' input[type = "hidden"]');
+                    var timeValueField = document.getElementById('c4g_beginTime_'+additionalId);
+                    var timeValue = timeValueField ? timeValueField.value : false;
+                    
+                    if (!timeValue && timeGroups) {
                         for (z = 0; z < timeGroups.length; z++) {
                             if (timeGroups[z].style.display != "none") {
                                 timeValue = timeGroups[z].value;
@@ -915,15 +933,16 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                         }
                     }
 
-                    var radioButton = document.querySelectorAll('.radio-group-beginTime_'+addId+' input[type = "radio"]');
+                    var radioButton = document.querySelectorAll('.radio-group-beginTime_'+additionalId+' input[type = "radio"]');
                     var visibleButtons = [];
+                    var targetButton = null;
                     if (radioButton && radioButton.length) {
                         for (z = 0; z < radioButton.length; z++) {
                             var button = radioButton[z];
                             if (button && !button.getAttribute('disabled') && !button.getAttribute('hidden')) {
                                 if (timeValue && button.value === timeValue) {
                                     targetButton = button;
-                                } else if (button.value) {
+                                } else if (button.value && !timeValue) {
                                     visibleButtons.push(button);
                                 }
                             }
@@ -931,10 +950,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                     }
 
                     if (!targetButton && visibleButtons && visibleButtons.length >= 1) {
-                        for (z = 0; z < visibleButtons.length; z++) {
-                                targetButton = visibleButtons[z];
-                                break;
-                        }
+                        targetButton = visibleButtons[0];
                     }
 
                     if (!objectId && selectField) {
