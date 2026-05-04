@@ -102,7 +102,7 @@
 
     <!-- special speaker data -->
     <!--
-    <?php $speakerId = \Contao\Controller::replaceInsertTags('{{c4gevent::'.$this->id.'::speakerId}}'); ?>
+    <?php $speakerId = \con4gis\CoreBundle\Classes\C4GUtils::replaceInsertTags('{{c4gevent::'.$this->id.'::speakerId}}'); ?>
     {{c4gspeaker::<?=$speakerId?>::name}}
     {{c4gspeaker::<?=$speakerId?>::address}}
     {{c4gspeaker::<?=$speakerId?>::zipAndCity}}

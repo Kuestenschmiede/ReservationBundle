@@ -250,6 +250,7 @@
             $key = Input::get('key');
             $reservationType = 0;
             if ($id && $key && ($key == 'sendNotification')) {
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservation', 'Key sendNotification detected for ID: ' . $id);
                 C4gReservationConfirmation::sendNotification($id);
                 //delete key per redirect
                 Controller::redirect(str_replace('&key='.$key, '', \Contao\Environment::get('request')));
@@ -308,13 +309,19 @@
             $imgAttributes = 'style="width: 18px; height: 18px"';
 
             $showButton = false;
+            $emailSent = ($row['emailConfirmationSend'] === '1');
 
-            if (($row['confirmed'] || $row['specialNotification']) && (!$row['emailConfirmationSend'])) {
+            if (($row['confirmed'] || $row['specialNotification']) && !$emailSent) {
                 $type = $row['reservation_type'];
                 if ($type) {
                     $reservationType = Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation_type WHERE `id`=? LIMIT 1")->execute($type)->fetchAssoc();
 
                     if ($reservationType) {
+                        error_log('C4gReservation: Found reservation type for ID ' . $row['id']);
+                        $confirmed = ($row['confirmed'] === '1' || $row['confirmed'] === 1);
+                        $special = ($row['specialNotification'] === '1' || $row['specialNotification'] === 1);
+                        $autoSend = $reservationType['auto_send'] ?? 'not set';
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservation', 'Checking notification types for reservation ' . $row['id'] . ': confirmed=' . ($confirmed ? '1' : '0') . ', special=' . ($special ? '1' : '0') . ', emailSent=' . ($emailSent ? '1' : '0') . ', autoSend=' . $autoSend);
                         if ($row['confirmed']) {
                             $notificationConifrmationType = StringUtil::deserialize($reservationType['notification_confirmation_type']);
 

@@ -29,84 +29,132 @@ class C4gReservationConfirmation
      */
     public static function sendNotification(int $reservationId)
     {
-        $database = Database::getInstance();
-        $reservation = $database->prepare('SELECT * FROM tl_c4g_reservation WHERE `id`=? LIMIT 1')->execute($reservationId)->fetchAssoc();
-        $reservationType = $reservation ? $reservation['reservation_type'] : false;
-        $reservationObjectType = $reservation ? $reservation['reservationObjectType'] : false;
-        if ($reservationType && $reservation['email'] && !($reservation['emailConfirmationSend'])) {
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', 'sendNotification called for ID: ' . $reservationId);
+        $objReservation = \con4gis\ReservationBundle\Classes\Models\C4gReservationModel::findByPk($reservationId);
+        if (!$objReservation) {
+            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Reservation ID $reservationId not found in database.");
+            return;
+        }
+        $reservation = $objReservation->row();
+        $reservationType = $reservation['reservation_type'];
+        $reservationObjectType = $reservation['reservationObjectType'];
+        
+        $emailConfirmationSend = $reservation['emailConfirmationSend'];
+        $email = $reservation['email'];
+        
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Evaluating reservation ID $reservationId: email='$email', emailConfirmationSend='$emailConfirmationSend'");
+
+        if ($reservationType && $email && !($emailConfirmationSend === '1')) {
             try {
+                $database = Database::getInstance();
                 $type = $database->prepare('SELECT * FROM tl_c4g_reservation_type WHERE `id`=? LIMIT 1')->execute($reservationType)->fetchAssoc();
                 if ($type) {
-                    if (($reservationObjectType === '1') || ($reservationObjectType === '3')) {
-                        $reservationObject = $database->prepare('SELECT * FROM tl_c4g_reservation_object WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
-                    } else {
-                        $reservationObject = $database->prepare('SELECT * FROM tl_calendar_events WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
-                    }
-
+                    $isSpecial = ($reservation['specialNotification'] === '1' || $reservation['specialNotification'] === 1 || $reservation['specialNotification'] === true);
+                    $isConfirmed = ($reservation['confirmed'] === '1' || $reservation['confirmed'] === 1 || $reservation['confirmed'] === true);
+                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Processing reservation ID $reservationId: reservationObjectType={$reservationObjectType}, specialNotification={$reservation['specialNotification']}, confirmed={$reservation['confirmed']}, isSpecial=" . ($isSpecial ? '1' : '0') . ", isConfirmed=" . ($isConfirmed ? '1' : '0'));
                     $notificationConfirmationType = StringUtil::deserialize($type['notification_confirmation_type']);
                     $notificationSpecialType = StringUtil::deserialize($type['notification_special_type']);
+                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Notification IDs for ID $reservationId: special=" . (is_array($notificationSpecialType) ? implode(',', $notificationSpecialType) : var_export($notificationSpecialType, true)) . ", confirmation=" . (is_array($notificationConfirmationType) ? implode(',', $notificationConfirmationType) : var_export($notificationConfirmationType, true)) . ", raw_spec=" . var_export($type['notification_special_type'], true) . ", raw_conf=" . var_export($type['notification_confirmation_type'], true));
 
-                    $configuration = $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['con4gis_reservation_bundle']['con4gis_reservation_confirmation'];
-                    $c4gNotify = $configuration ? new C4GNotification($configuration) : false;
+                    if (($reservationObjectType === '1') || ($reservationObjectType === '3')) {
+                        $reservationObject = $database->prepare('SELECT * FROM tl_c4g_reservation_object WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Loaded reservationObject from tl_c4g_reservation_object (ID: {$reservation['reservation_object']}): " . ($reservationObject ? 'found' : 'not found'));
+                    } else {
+                        $reservationObject = $database->prepare('SELECT * FROM tl_calendar_events WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Loaded reservationObject from tl_calendar_events (ID: {$reservation['reservation_object']}): " . ($reservationObject ? 'found' : 'not found'));
+                    }
+
+                    $configuration = [
+                        'con4gis_reservation_confirmation' => [
+                            'admin_email', 'email', 'contact_email', 'contact_website', 'reservation_type', 'member_email',
+                            'desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime', 'description', 'included_params',
+                            'additional_params', 'participantList', 'speaker', 'topic', 'audience', 'conferenceLink', 'price',
+                            'priceOptionSum', 'priceSum', 'dbkey', 'priceTax', 'priceNet', 'priceOptionSumTax', 'priceOptionSumNet',
+                            'priceSumNet', 'priceSumTax', 'reservationTaxRate', 'salutation', 'title', 'organisation', 'firstname',
+                            'lastname', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
+                            'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment',
+                            'additional1', 'additional2', 'additional3', 'location', 'contact_name', 'contact_phone', 'contact_street',
+                            'contact_postal', 'contact_city', 'reservation_id', 'agreed', 'discountPercent', 'discountCode',
+                            'priceDiscount', 'documentId', 'uploadFile'
+                        ]
+                    ];
+                    $c4gNotify = new C4GNotification($configuration);
 
                     $arrNotificationIds = [];
-                    if ($reservation['specialNotification'] && $notificationSpecialType && (count($notificationSpecialType) > 0)) {
+                    if ($isSpecial && $notificationSpecialType && (count($notificationSpecialType) > 0)) {
                         $arrNotificationIds = $notificationSpecialType;
-                    } elseif ($reservation['confirmed'] && $notificationConfirmationType && (count($notificationConfirmationType) > 0)) {
+                    } elseif ($isConfirmed && $notificationConfirmationType && (count($notificationConfirmationType) > 0)) {
                         $arrNotificationIds = $notificationConfirmationType;
+                    } else {
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "No valid notification IDs found for reservation $reservationId. isSpecial: " . ($isSpecial ? 'true' : 'false') . ", count(notificationSpecialType): " . (is_array($notificationSpecialType) ? count($notificationSpecialType) : 'NaN') . ", isConfirmed: " . ($isConfirmed ? 'true' : 'false') . ", count(notificationConfirmationType): " . (is_array($notificationConfirmationType) ? count($notificationConfirmationType) : 'NaN'));
                     }
 
                     if ($c4gNotify && is_array($arrNotificationIds) && (count($arrNotificationIds) > 0) && $reservationObject) {
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', 'Attempting to send notifications: ' . implode(',', $arrNotificationIds) . ' for reservation ' . $reservationId);
+                        $c4gNotify->setOptionalTokens([
+                            'admin_email', 'email', 'contact_email', 'contact_website', 'reservation_type', 'member_email',
+                            'desiredCapacity', 'beginDate', 'beginTime', 'endDate', 'endTime', 'description', 'included_params',
+                            'additional_params', 'participantList', 'speaker', 'topic', 'audience', 'conferenceLink', 'price',
+                            'priceOptionSum', 'priceSum', 'dbkey', 'priceTax', 'priceNet', 'priceOptionSumTax', 'priceOptionSumNet',
+                            'priceSumNet', 'priceSumTax', 'reservationTaxRate', 'salutation', 'title', 'organisation', 'firstname',
+                            'lastname', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
+                            'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment',
+                            'additional1', 'additional2', 'additional3', 'location', 'contact_name', 'contact_phone', 'contact_street',
+                            'contact_postal', 'contact_city', 'reservation_id', 'agreed', 'discountPercent', 'discountCode',
+                            'priceDiscount', 'documentId', 'uploadFile', 'reservation_object', 'reservation_title'
+                        ]);
                         if ($reservationObjectType == '2') {
-                            $c4gNotify->setTokenValue('reservation_object', $reservationObject['title'] ? $reservationObject['title'] : '');
-                            $c4gNotify->setTokenValue('reservation_title', $reservationObject['title'] ? $reservationObject['title'] : '');
+                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['title'] ?? '') ?: '');
+                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['title'] ?? '') ?: '');
                         } else {
-                            $c4gNotify->setTokenValue('reservation_object', $reservationObject['caption'] ? $reservationObject['caption'] : '');
-                            $c4gNotify->setTokenValue('reservation_title', $reservationObject['caption'] ? $reservationObject['caption'] : '');
+                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['caption'] ?? '') ?: '');
+                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['caption'] ?? '') ?: '');
                         }
 
-                        $locationId = $reservationObject['location'] ?: $type['location'];
+                        $locationId = ($reservationObject['location'] ?? '') ?: ($type['location'] ?? '');
                         $location = false;
                         if ($locationId) {
                             $location = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($locationId)->fetchAssoc();
                         }
 
-                        $organizerId = $reservationObject['organizer'];
+                        $organizerId = ($reservationObject['organizer'] ?? '') ?: '';
                         $organizer = false;
                         if ($organizerId) {
                             $organizer = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($organizerId)->fetchAssoc();
                         }
 
-                        $c4gNotify->setTokenValue('admin_email', $GLOBALS['TL_CONFIG']['adminEmail']);
-                        $c4gNotify->setTokenValue('email', $reservation['email']);
+                        $c4gNotify->setTokenValue('admin_email', ($GLOBALS['TL_CONFIG']['adminEmail'] ?? '') ?: '');
+                        $c4gNotify->setTokenValue('email', ($reservation['email'] ?? '') ?: '');
 
                         if ($organizer) {
-                            $c4gNotify->setTokenValue('contact_email', $organizer && $organizer['contact_email'] ? $organizer['contact_email'] : false);
-                            $c4gNotify->setTokenValue('contact_website', $organizer && $organizer['contact_website'] ? $organizer['contact_website'] : false);
+                            $c4gNotify->setTokenValue('contact_email', ($organizer && isset($organizer['contact_email'])) ? $organizer['contact_email'] : false);
+                            $c4gNotify->setTokenValue('contact_website', ($organizer && isset($organizer['contact_website'])) ? $organizer['contact_website'] : false);
                         } else {
-                            $c4gNotify->setTokenValue('contact_email', $location && $location['contact_email'] ? $location['contact_email'] : false);
-                            $c4gNotify->setTokenValue('contact_website', $organizer && $organizer['contact_website'] ? $organizer['contact_website'] : false);
+                            $c4gNotify->setTokenValue('contact_email', ($location && isset($location['contact_email'])) ? $location['contact_email'] : false);
+                            $c4gNotify->setTokenValue('contact_website', ($organizer && isset($organizer['contact_website'])) ? $organizer['contact_website'] : false);
                         }
 
-                        $c4gNotify->setTokenValue('reservation_type', $type['caption'] ? $type['caption'] : '');
+                        $c4gNotify->setTokenValue('reservation_type', ($type['caption'] ?? '') ?: '');
 
-                        $memberId = $reservationObject['member_id'] ?: $reservation['member_id'];
+                        $memberId = ($reservationObject['member_id'] ?? '') ?: ($reservation['member_id'] ?? '');
                         if ($memberId) {
                             $member = MemberModel::findByPk($memberId);
-                            $c4gNotify->setTokenValue('member_email', $member->email);
+                            if ($member) {
+                                $c4gNotify->setTokenValue('member_email', $member->email);
+                            }
                         }
 
-                        $c4gNotify->setTokenValue('desiredCapacity', $reservation['desiredCapacity'] ? $reservation['desiredCapacity'] : '');
+                        $c4gNotify->setTokenValue('desiredCapacity', ($reservation['desiredCapacity'] ?? '') ?: '');
 
-                        $dateFormat = $GLOBALS['TL_CONFIG']['dateFormat'];
+                        $dateFormat = ($GLOBALS['TL_CONFIG']['dateFormat'] ?? '') ?: 'd.m.Y';
                         //$datimFormat = $GLOBALS['TL_CONFIG']['datimFormat'];
-                        $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
-                        $c4gNotify->setTokenValue('beginDate', $reservation['beginDate'] ? date($dateFormat, $reservation['beginDate']) : '');
-                        $c4gNotify->setTokenValue('beginTime', $reservation['beginTime'] ? date($timeFormat, $reservation['beginTime']) : '');
-                        $c4gNotify->setTokenValue('endDate', $reservation['endDate'] ? date($dateFormat, $reservation['endDate']) : '');
-                        $c4gNotify->setTokenValue('endTime', $reservation['endTime'] ? date($timeFormat, $reservation['endTime']) : '');
+                        $timeFormat = ($GLOBALS['TL_CONFIG']['timeFormat'] ?? '') ?: 'H:i';
+                        $c4gNotify->setTokenValue('beginDate', ($reservation['beginDate'] ?? '') ? date($dateFormat, $reservation['beginDate']) : '');
+                        $c4gNotify->setTokenValue('beginTime', ($reservation['beginTime'] ?? '') ? date($timeFormat, $reservation['beginTime']) : '');
+                        $c4gNotify->setTokenValue('endDate', ($reservation['endDate'] ?? '') ? date($dateFormat, $reservation['endDate']) : '');
+                        $c4gNotify->setTokenValue('endTime', ($reservation['endTime'] ?? '') ? date($timeFormat, $reservation['endTime']) : '');
 
-                        $c4gNotify->setTokenValue('description', (string)($reservationObject['description'] ?: ($reservationObject['details'] ?: ($reservationObject['teaser'] ?: ''))));
+                        $c4gNotify->setTokenValue('description', (string)(($reservationObject['description'] ?? '') ?: (($reservationObject['details'] ?? '') ?: (($reservationObject['teaser'] ?? '') ?: ''))));
 
                         $params = $reservation['included_params'] ? \Contao\StringUtil::deserialize($reservation['included_params']) : [];
                         $includedParamsArr = [];
@@ -327,17 +375,22 @@ class C4gReservationConfirmation
                                 'audience', 'salutation', 'title', 'organisation', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
                                 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment', 'location', 'contact_name',
                                 'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'agreed',
-                                'description', 'additional1', 'additional2', 'additional3','member_email',
+                                'description', 'additional1', 'additional2', 'additional3','member_email', 'conferenceLink',
                                 'price','priceTax','priceSum','priceSumTax','priceNet','priceSumNet', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax',
                                 'priceDiscount', 'discountCode', 'discountPercent', 'documentId', 'reservationTaxRate', 'dbkey'
                             ]
                         );
 
                         $sendingResult = $c4gNotify->send($arrNotificationIds);
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Sending result for reservation $reservationId: " . ($sendingResult ? 'success' : 'failure'));
                         if ($sendingResult) {
                             $database->prepare("UPDATE tl_c4g_reservation SET emailConfirmationSend='1' WHERE `id`=?")->execute($reservationId);
                         }
+                    } else {
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Notification could NOT be prepared for reservation $reservationId. Possible reasons: c4gNotify empty, no notification IDs found, or reservationObject missing. notificationIds: " . (is_array($arrNotificationIds) ? implode(',', $arrNotificationIds) : 'not an array') . ", reservationObject found: " . ($reservationObject ? 'yes' : 'no'));
                     }
+                } else {
+                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Reservation type not found for ID: $reservationType");
                 }
             } catch (\Throwable $exception) {
                 C4gLogModel::addLogEntry('reservation', $exception->getMessage());

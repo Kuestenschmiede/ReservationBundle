@@ -445,7 +445,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                                 $jumpTo = \PageModel::findByPk($reservationSettings->speaker_redirect_site);
                                 if ($jumpTo) {
                                     $speakerAlias = $speaker->alias ?: $speakerId;
-                                    $href = Controller::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerAlias;
+                                    $href = \con4gis\CoreBundle\Classes\C4GUtils::replaceInsertTags("{{env::url}}").'/'.$jumpTo->getFrontendUrl().'?speaker='.$speakerAlias;
                                 }
                             }
 

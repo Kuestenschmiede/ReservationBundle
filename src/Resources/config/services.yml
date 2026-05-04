@@ -92,3 +92,13 @@ services:
 
   con4gis\ReservationBundle\Classes\Notifications\C4gNotificationCenterService:
     public: true
+
+  con4gis\ReservationBundle\Classes\Cron\CronMinutely:
+    public: true
+    tags:
+      - { name: contao.cronjob, interval: minutely }
+
+  con4gis\ReservationBundle\Classes\Cron\CronDaily:
+    public: true
+    tags:
+      - { name: contao.cronjob, interval: daily }
