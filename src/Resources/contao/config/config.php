@@ -74,6 +74,12 @@ $GLOBALS['BE_MOD']['con4gis'] = array_merge($GLOBALS['BE_MOD']['con4gis'], [
         'brick' => 'reservation',
         'tables'    => array('tl_c4g_reservation_event_topic'),
         'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_topic.svg',
+    ),
+    'C4gReservationSuspension' => array
+    (
+        'brick' => 'reservation',
+        'tables'    => array('tl_c4g_reservation_suspension'),
+        'icon'      => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_settings.svg',
     )
 ]);
 
@@ -87,13 +93,14 @@ $GLOBALS['TL_MODELS']['tl_c4g_reservation_location'] = \con4gis\ReservationBundl
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_event_speaker'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationEventSpeakerModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_event_audience'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationEventAudienceModel::class;
 $GLOBALS['TL_MODELS']['tl_c4g_reservation_event_topic'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationEventTopicModel::class;
+$GLOBALS['TL_MODELS']['tl_c4g_reservation_suspension'] = \con4gis\ReservationBundle\Classes\Models\C4gReservationSuspensionModel::class;
 
 // $GLOBALS['TL_CRON']['daily']['reservationOnDaily'] = [\con4gis\ReservationBundle\Classes\Cron\Cron::class, 'onDaily'];
 
 // Can be overridden in the plugin bundle
 // $GLOBALS['TL_CRON']['minutely']['reservationOnMinutely'] = [\con4gis\ReservationBundle\Classes\Cron\Cron::class, 'onMinutely'];
-$GLOBALS['TL_CRON']['minutely'][] = ['\con4gis\ReservationBundle\Classes\Cron\CronMinutely', '__invoke'];
-$GLOBALS['TL_CRON']['daily'][] = ['\con4gis\ReservationBundle\Classes\Cron\CronDaily', '__invoke'];
+// $GLOBALS['TL_CRON']['minutely'][] = ['\con4gis\ReservationBundle\Classes\Cron\CronMinutely', '__invoke'];
+// $GLOBALS['TL_CRON']['daily'][] = ['\con4gis\ReservationBundle\Classes\Cron\CronDaily', '__invoke'];
 
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation_event';
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_c4g_reservation';

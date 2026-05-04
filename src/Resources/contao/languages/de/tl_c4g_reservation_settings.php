@@ -55,6 +55,7 @@ $GLOBALS['TL_LANG'][$str]['hideOrganizer'] = array("Veranstalter ausblenden", "D
 $GLOBALS['TL_LANG'][$str]['hideLocation'] = array("Veranstaltungsort ausblenden", "Der Veranstaltungsort wird nicht angezeigt.");
 $GLOBALS['TL_LANG'][$str]['onlyParticipants'] = array("Nur Teilnehmer berücksichtigen", "Wenn dieser Mechanismus aktiviert ist, werden nur die Teilnehmer bei der Preisberechnung / Buchung berücksichtigt und die buchende Person nicht mit gezählt (z.B. nur Rechnungsadresse).");
 $GLOBALS['TL_LANG'][$str]['postals'] = array("Postleitzahlen einschränken","Hierüber können Sie ermöglichen, dass Reservierungen nur über bestimmte Postleitzahlen möglich sind (kommagetrennte Liste).");
+$GLOBALS['TL_LANG'][$str]['suspension_lists'] = array("Sperrtage-Listen", "Wählen Sie die Listen mit Sperrtagen aus, an denen keine Buchungen möglich sein sollen.");
 $GLOBALS['TL_LANG'][$str]['documentTemplate'] = array("Dokument-Template","Hier könnt Ihr das Template für die Dokumentengenerierung zuordnen.");
 $GLOBALS['TL_LANG'][$str]['documentStyle'] = array("Externe CSS Datei","Hier könnt Ihr eine externe CSS Datei für Euer Template anbinden. Wichtig! Die Datei muss mit DOM-PDF funktionieren. Idealerweise einfache CSS2 Anweisungen.");
 $GLOBALS['TL_LANG'][$str]['documentFileName'] = array("Dateiname ändern","Der Dateiname kann Simple Tokens der Feldnamen enthalten (z.B. ##lastname##, ##firstname##, ##documentId##, ...)");

@@ -177,6 +177,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
             $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
 
+            $suspensionDates = C4gReservationHandler::getSuspensionDates($reservationSettings);
             $periodType = $listType['periodType'];
             $bookedDays = "";
             if ($periodType == 'day' || $periodType  == 'overnight' || $periodType == 'week') {
@@ -184,11 +185,17 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 if ($bookedDays) {
                     $bookedDays = $bookedDays['dates'];
                 } 
+                if ($suspensionDates) {
+                    $bookedDays = $bookedDays ? $bookedDays . ',' . $suspensionDates : $suspensionDates;
+                }
                 $reservationBeginDateField->setExcludeDates($bookedDays);
             } else {
                 $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
                 if ($commaDates) {
                     $commaDates = isset($commaDates['dates']) ? $commaDates['dates'] : "";
+                }
+                if ($suspensionDates) {
+                    $commaDates = $commaDates ? $commaDates . ',' . $suspensionDates : $suspensionDates;
                 }
                 $reservationBeginDateField->setExcludeDates($commaDates);
             }

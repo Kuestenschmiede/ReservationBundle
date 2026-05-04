@@ -7,6 +7,7 @@ use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
 use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\Models\C4gLogModel;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationSuspensionModel;
 use Contao\Database;
 use Contao\System;
 use Contao\Date;
@@ -304,7 +305,7 @@ class C4gReservationHandler
             } else {
                 foreach ($alldates as $date) {
                     if ($date) {
-                        $result['dates'] = self::addComma($result['dates']) . date('d.m.Y'/*$GLOBALS['TL_CONFIG']['dateFormat']*/, $date);
+                        $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
                     }
                 }
             }
@@ -2564,12 +2565,12 @@ class C4gReservationHandler
                                 }
 
                                 if ($isBeginDate == true || $selectedBeginDate == $selectedEndDate || ($date != $selectedBeginDate && $date != $selectedEndDate)) {
-                                    $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
+                                    $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
                                 } 
                             } else if ($listType['periodType'] == 'week') {
-                                $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date - $listType['min_residence_time'] * 604800+86400);
+                                $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date - $listType['min_residence_time'] * 604800+86400);
                             } else if ($listType['periodType'] == 'day') {
-                                $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
+                                $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
                             } 
                         }
                         $i++;
@@ -2586,19 +2587,19 @@ class C4gReservationHandler
                                     if ($bookedEndDate[$y] == $date) {
                                         break;
                                     } else {
-                                        $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
+                                        $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
                                     }
                                 }      
                            } else if ($listType['periodType'] == 'week') {
-                               $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date - $listType['min_residence_time'] * 604800+86400);
+                               $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date - $listType['min_residence_time'] * 604800+86400);
                            } else if ($listType['periodType'] == 'day') {
-                               $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
+                               $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
                            } 
                        }
                        $i++;
                     }
                     if ($listType['periodType'] == 'day' || $listType['periodType'] == 'week') {
-                        $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date+86400);
+                        $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date+86400);
                     } 
                 }
             } else {
@@ -2683,5 +2684,56 @@ class C4gReservationHandler
         }
 
         return $output;
+    }
+
+    /**
+     * Returns a comma-separated string of dates that are suspended based on the selected lists in settings.
+     * @param $settings
+     * @return string
+     */
+    public static function getSuspensionDates($settings)
+    {
+        if (!$settings || !$settings->suspension_lists) {
+            return '';
+        }
+
+        $listIds = StringUtil::deserialize($settings->suspension_lists, true);
+        if (empty($listIds)) {
+            return '';
+        }
+
+        $dates = [];
+        $models = C4gReservationSuspensionModel::findMultipleByIds($listIds);
+        if ($models !== null) {
+            foreach ($models as $model) {
+                $suspensionDates = StringUtil::deserialize($model->suspension_dates, true);
+                foreach ($suspensionDates as $entry) {
+                    if (!empty($entry['date'])) {
+                        if (is_numeric($entry['date'])) {
+                            $dates[] = date($GLOBALS['TL_CONFIG']['dateFormat'], (int)$entry['date']);
+                        } else {
+                            // Try to parse Y-m-d (ISO) or d.m.Y (German) or current config format
+                            $parsedDate = null;
+                            $formats = ['Y-m-d', 'd.m.Y', $GLOBALS['TL_CONFIG']['dateFormat']];
+                            foreach ($formats as $format) {
+                                $dateObj = \DateTime::createFromFormat($format, $entry['date']);
+                                if ($dateObj) {
+                                    $parsedDate = $dateObj;
+                                    break;
+                                }
+                            }
+                            
+                            if ($parsedDate) {
+                                $dates[] = $parsedDate->format($GLOBALS['TL_CONFIG']['dateFormat']);
+                            } else {
+                                $dates[] = $entry['date'];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return implode(',', array_unique($dates));
     }
 }

@@ -195,6 +195,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             $objConditionArr = $obj_condition;
 
             $reservationBeginDateField = new C4gDateField();
+            $suspensionDates = C4gReservationHandler::getSuspensionDates($reservationSettings);
+            $reservationBeginDateField->setExcludeDates($suspensionDates);
             //$reservationBeginDateField->setFlipButtonPosition(true);
             $reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate($reservationObject, $listType));
             $reservationBeginDateField->setFieldName('beginDateEvent');

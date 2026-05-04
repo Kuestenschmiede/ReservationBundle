@@ -100,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
                         '{document_legend:hide}, documentTemplate,documentStyle,documentIdPrefix,documentIdSuffix,documentIdLength,documentIdNext,documentFileName;'.
                         '{ticket_legend:hide}, checkInPage, paricipantCheckInWithSameCode;'.
                         '{redirect_legend:hide}, reservation_redirect_site, speaker_redirect_site, location_redirect_site;'.
-                        '{expert_legend:hide}, specialParticipantMechanism, showMinMaxWithCapacity, hideParticipantsEmail, onlyParticipants, showMemberData, postals;'
+                        '{expert_legend:hide}, suspension_lists, specialParticipantMechanism, showMinMaxWithCapacity, hideParticipantsEmail, onlyParticipants, showMemberData, postals;'
     ),
 
 
@@ -300,6 +300,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_settings'] = array
             'filter'            => true,
             'inputType'         => 'checkbox',
             'sql'               => "int(1) unsigned NULL default 0"
+        ),
+        'suspension_lists' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['suspension_lists'],
+            'exclude'                 => true,
+            'inputType'               => 'checkbox',
+            'foreignKey'              => 'tl_c4g_reservation_suspension.caption',
+            'eval'                    => array('mandatory'=>false, 'multiple'=>true, 'tl_class' => 'clr'),
+            'sql'                     => "blob NULL"
         ),
         'showInlineDatepicker' => array
         (   'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_settings']['showInlineDatepicker'],
