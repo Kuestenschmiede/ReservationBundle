@@ -2749,8 +2749,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         if (property_exists($this, '__projectListForBrickMemo')) { $this->__projectListForBrickMemo = []; }
         if (property_exists($this, '__checkProjectIdMemo')) { $this->__checkProjectIdMemo = []; }
 
-        // Always regenerate the reservation_id at the start of the process to prevent duplicates
-        $putVars['reservation_id'] = \con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon::getUUID();
+        // Regenerate the reservation_id if not already present in the request
+        if (!isset($putVars['reservation_id']) || !$putVars['reservation_id']) {
+            $putVars['reservation_id'] = \con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon::getUUID();
+        }
         $this->putVars['reservation_id'] = $putVars['reservation_id'];
         
         // Force empty dialog values in session to prevent the framework from "remembering"
