@@ -805,9 +805,16 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         c4gFormCheckLabel.htmlFor = c4gFormCheckInput.id;
         c4gFormCheck.appendChild(c4gFormCheckLabel);
 
-        radioGroup.appendChild(c4gFormCheck);
+        if (radioGroup) {
+            radioGroup.appendChild(c4gFormCheck);
+        }
 
-        radioGroup.parentNode.parentNode.getElementsByClassName('c4g__form-description')[0].innerText = description;
+        if (radioGroup && radioGroup.parentNode && radioGroup.parentNode.parentNode) {
+            var descriptions = radioGroup.parentNode.parentNode.getElementsByClassName('c4g__form-description');
+            if (descriptions && descriptions.length > 0) {
+                descriptions[0].innerText = description;
+            }
+        }
     });
 
     //return objstr;
@@ -863,7 +870,10 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
     if (date && additionalId) {
         duration = duration ? duration : -1;
         capacity = capacity ? capacity : -1;
-        document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "flex";
+        var spinners = document.getElementsByClassName('c4g__spinner-wrapper');
+        if (spinners && spinners.length > 0) {
+            spinners[0].style.display = "flex";
+        }
         
         // con4gis_reservation_values sync
         if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; }
@@ -897,10 +907,16 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                 var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
                 var objCaptions = data['captions'];
 
-                if (!document.getElementById("c4g_reservation_id").value || (document.getElementById("c4g_reservation_id").value != data['reservationId'])) {
-                    document.getElementById("c4g_reservation_id").value = data['reservationId']; //Force regeneration
+                var resIdFields = document.getElementById("c4g_reservation_id");
+                if (resIdFields) {
+                    if (!resIdFields.value || (resIdFields.value != data['reservationId'])) {
+                        resIdFields.value = data['reservationId']; //Force regeneration
+                    }
                 }
-                document.getElementsByClassName("reservation-id")[0].style.display = "block";
+                var resIdContainers = document.getElementsByClassName("reservation-id");
+                if (resIdContainers && resIdContainers.length > 0) {
+                    resIdContainers[0].style.display = "block";
+                }
 
                 var timeButtons = document.getElementsByClassName('reservation_time_button_'+addId);
 
@@ -983,7 +999,10 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                     }
                 }
             }).finally(function() {
-                document.getElementsByClassName("c4g__spinner-wrapper")[0].style.display = "none";
+                var spinners = document.getElementsByClassName("c4g__spinner-wrapper");
+                if (spinners && spinners.length > 0) {
+                    spinners[0].style.display = "none";
+                }
             });
     }
 }
@@ -993,7 +1012,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
  *
  * @param object
  */
-function checkEventFields() {
+function checkEventFields(val) {
     var typeField = document.getElementById("c4g_reservation_type");
     var typeId = typeField ? typeField.value : -1;
     var selectField = document.querySelectorAll('#c4g_reservation_object_event_' + typeId)[0];
@@ -1082,11 +1101,13 @@ function checkEventFields() {
 }
 
 function eventFire(el, etype) {
-    if (el.fireEvent) {
-        el.fireEvent('on' + etype);
-    } else {
-        var evObj = document.createEvent('Events');
-        evObj.initEvent(etype, true, false);
-        el.dispatchEvent(evObj);
+    if (el && typeof el.dispatchEvent === 'function' && typeof etype === 'string') {
+        try {
+            var evObj = document.createEvent('Events');
+            evObj.initEvent(etype, true, false);
+            el.dispatchEvent(evObj);
+        } catch (e) {
+            // Silently fail
+        }
     }
 }

@@ -583,8 +583,7 @@ class C4gReservationHandler
                    $nextDays = ($nextDays > 0) ? $nextDays-- : 0;
                 }
 
-                $alldates[$i] = $i;
-                if (!$alldates[$i]) {
+                if (isset($alldates[$i]) && !$alldates[$i]) {
                     $hitIt = true;
                     foreach ($excludePeriodArr as $period) {
                         if ($i >= $period['begin'] && $i <= $period['end']) {
@@ -2463,10 +2462,12 @@ class C4gReservationHandler
         $objectId = $reservationObject->getId();
         $objectQuantity = $reservationObject->getQuantity();
         
-        if ($listType['objectType']) {
+        if (isset($listType['objectType']) && $listType['objectType']) {
             $objectType = intval($listType['objectType']);
-        } else if ($listType['reservationObjectType']) {
+        } else if (isset($listType['reservationObjectType']) && $listType['reservationObjectType']) {
             $objectType = intval($listType['reservationObjectType']);
+        } else {
+            $objectType = 0;
         }
         $minDuration = intval($listType['min_residence_time'] ? $listType['min_residence_time'] : $reservationObject->getTimeinterval());
         $maxCapacity = $reservationObject->getDesiredCapacity()[1];

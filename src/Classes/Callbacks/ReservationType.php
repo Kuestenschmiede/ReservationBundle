@@ -21,4 +21,16 @@ class ReservationType {
         }
         return $return;
     }
+
+    public function getAllObjects()
+    {
+        $database = Database::getInstance();
+        $objects = $database->prepare("SELECT id,caption FROM tl_c4g_reservation_object ORDER BY caption")
+            ->execute();
+        $return = [];
+        while ($objects->next()) {
+            $return[$objects->id] = $objects->caption;
+        }
+        return $return;
+    }
 }

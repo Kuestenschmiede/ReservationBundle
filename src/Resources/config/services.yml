@@ -85,6 +85,15 @@ services:
     tags:
       - { name: contao.frontend_module,category: con4gis,template: mod_c4g_brick,type: C4gReservationCheckIn }
 
+  con4gis\ReservationBundle\Controller\C4gReservationOccupancyPlanController:
+    arguments:
+      - '%kernel.project_dir%'
+      - '@request_stack'
+      - '@contao.framework'
+    public: true
+    tags:
+      - { name: contao.frontend_module,category: con4gis,template: mod_c4g_brick,type: occupancy_plan }
+
   con4gis\ReservationBundle\Classes\Notifications\:
     resource: '../../Classes/Notifications'
     autoconfigure: true

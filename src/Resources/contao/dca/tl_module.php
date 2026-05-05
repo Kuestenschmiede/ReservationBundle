@@ -21,11 +21,14 @@ use con4gis\ReservationBundle\Controller\C4gReservationLocationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationObjectsController;
 use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
 use con4gis\ReservationBundle\Controller\C4gReservationCheckInController;
+use con4gis\ReservationBundle\Controller\C4gReservationOccupancyPlanController;
 use Contao\Controller;
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_settings;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, selectReservationTypes, showReservationType, showReservationObject, showSignatureField, showPrices, past_day_number, cancellation_redirect_site, login_redirect_site, printTpl;';
+
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationOccupancyPlanController::TYPE]  = '{title_legend},name,headline,type;{reservation_legend}, occupancy_reservation_objects, reservation_form_site;';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site, cancellationButtonCaption;';
 
@@ -45,6 +48,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_object_types'] = [
     'inputType'               => 'checkbox',
     'foreignKey'              => 'tl_c4g_reservation_type.caption',
     'eval'                    => array('mandatory'=>true, 'multiple'=>true),
+    'sql'                     => "blob NULL"
+];
+$GLOBALS['TL_DCA']['tl_module']['fields']['occupancy_reservation_objects'] = [
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['occupancy_reservation_objects'],
+    'exclude'                 => true,
+    'inputType'               => 'checkbox',
+    'options_callback'        => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationType::class,'getAllObjects'],
+    'eval'                    => array('mandatory'=>true, 'multiple'=>true, 'tl_class' => 'clr'),
     'sql'                     => "blob NULL"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_settings'] = [
@@ -107,6 +118,16 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['notification_type_contact_request'] =
     'eval'                    => array('multiple' => true),
     // 'sql'                     => "varchar(100) NOT NULL default ''"
     'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['reservation_form_site'] = array
+(
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_form_site'],
+    'exclude'                 => true,
+    'inputType'               => 'pageTree',
+    'foreignKey'              => 'tl_page.title',
+    'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+    'sql'                     => "int(10) unsigned NOT NULL default '0'",
+    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_redirect_site'] = array
 (

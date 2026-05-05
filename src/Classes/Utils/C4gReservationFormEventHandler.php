@@ -173,7 +173,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationObjectField->setCondition([$condition]);
         $reservationObjectField->setRemoveWithEmptyCondition(true);
         $reservationObjectField->setCallOnChange(true);
-        $reservationObjectField->setCallOnChangeFunction("checkEventFields(this)");
+        $reservationObjectField->setCallOnChangeFunction("if(typeof checkEventFields==='function'){try{checkEventFields(String(this.value));}catch(e){}}");
         $reservationObjectField->setAdditionalID($listType["id"]);
         $reservationObjectField->setHidden($reservationSettings->objectHide);
         $reservationObjectField->setPrintable($this->module->isWithDefaultPDFContent());

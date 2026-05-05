@@ -16,6 +16,7 @@ use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
 use con4gis\ReservationBundle\Controller\C4gReservationLocationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationAddressListController;
 use con4gis\ReservationBundle\Controller\C4gReservationCheckInController;
+use con4gis\ReservationBundle\Controller\C4gReservationOccupancyPlanController;
 
 $GLOBALS['TL_LANG']['MOD']['Reservation'] = array('con4gis Reservation', 'www.con4gis.org');
 $GLOBALS['TL_LANG']['MOD']['C4gReservation'] = array('Reservierung', 'Auflistung bereits erfolgter Reservierungen');
@@ -39,3 +40,4 @@ $GLOBALS['TL_LANG']['FMD'][C4gReservationLocationListController::TYPE] = array('
 $GLOBALS['TL_LANG']['FMD'][C4gReservationObjectsController::TYPE] = array('con4gis-Reservation: Objektpflege', 'Mitglieder können eigenen Objekte pflege. Bspw. für ein Verleihsystem.');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationAddressListController::TYPE] = array('con4gis-Reservation: Adressliste', 'Adressliste bspw. für den Labeldruck (Spezialbenachrichtigungen und Reservierungsarten).');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationCheckInController::TYPE]  = array('con4gis-Reservation: CheckIn', 'Einfaches Modul zum einchecken der Gäste.');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationOccupancyPlanController::TYPE] = array('con4gis-Reservation: Belegungsplan', 'Zeigt die Belegung von Objekten in einem Kalender an.');

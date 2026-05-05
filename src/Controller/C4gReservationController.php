@@ -259,7 +259,13 @@ class C4gReservationController extends C4GBaseController
     {
         if (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
         }
-        return parent::generateAjax($request);
+        $response = parent::generateAjax($request);
+        if ($response instanceof Response) {
+            $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
+        }
+        return $response;
     }
 
     public function initBrickModule($id)
@@ -451,7 +457,7 @@ class C4gReservationController extends C4GBaseController
             $arrExternalCSS = StringUtil::deserialize($this->reservationSettings->documentStyle, true);
             $objFile = FilesModel::findByUuid($arrExternalCSS);
             $projectDir = System::getContainer()->getParameter('kernel.project_dir');
-            if (file_exists($projectDir . '/' . $objFile->path)) {
+            if ($objFile && file_exists($projectDir . '/' . $objFile->path)) {
                 $this->printStyle = $projectDir . '/' . $objFile->path;
             }
         }
@@ -908,7 +914,7 @@ class C4gReservationController extends C4GBaseController
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
             $reservationTypeField->setCallOnChange(true);
-            $reservationTypeField->setCallOnChangeFunction("setReservationForm(-1 ," . $showDateTime . ");");
+            $reservationTypeField->setCallOnChangeFunction("var s=".json_encode((int)$showDateTime).";if(typeof setReservationForm==='function'){try{setReservationForm('-1',parseInt(s));}catch(e){}}");
             $reservationTypeField->setInitialCallOnChange(true);
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
@@ -1089,7 +1095,7 @@ foreach ($typelist as $listType) {
 
     $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
     $reservationDesiredCapacity->setCallOnChange(true);
-    $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ");");
+    $reservationDesiredCapacity->setCallOnChangeFunction("var l=".json_encode((string)$listType['id']).",s=".json_encode((int)$showDateTime).";if(typeof setReservationForm==='function'){try{setReservationForm(String(l),parseInt(s));}catch(e){}}");
     //$reservationDesiredCapacity->setCallOnChangeFunction("changeCapacity(".$listType['id'] . "," . $showDateTime . ");");
     $reservationDesiredCapacity->setNotificationField(true);
     $reservationDesiredCapacity->setAdditionalID($listType['id']);
@@ -1137,7 +1143,7 @@ foreach ($typelist as $listType) {
         $durationField->setTableColumn(true);
         $durationField->setMandatory(true);
         $durationField->setCallOnChange(true);
-        $durationField->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ");");
+        $durationField->setCallOnChangeFunction("var l=".json_encode((string)$listType['id']).",s=".json_encode((int)$showDateTime).";if(typeof setReservationForm==='function'){try{setReservationForm(String(l),parseInt(s));}catch(e){}}");
         //$durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_" . $listType['id'] . "'), " . $listType['id'] . "," . $showDateTime . ");");
         $durationField->setCondition(array($condition));
         $durationField->setNotificationField(true);
@@ -1884,7 +1890,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
                     $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                     $reservationDesiredCapacity->setCallOnChange(true);
-                    $reservationDesiredCapacity->setCallOnChangeFunction("setReservationForm(".$listType['id'] . "," . $showDateTime . ");");
+                    $reservationDesiredCapacity->setCallOnChangeFunction("var l=".json_encode((string)$listType['id']).",s=".json_encode((int)$showDateTime).";if(typeof setReservationForm==='function'){try{setReservationForm(String(l),parseInt(s));}catch(e){}}");
                     $reservationDesiredCapacity->setNotificationField(true);
                     $reservationDesiredCapacity->setAdditionalID($listType['id']);
                     $reservationDesiredCapacity->setStyleClass('desired-capacity');
