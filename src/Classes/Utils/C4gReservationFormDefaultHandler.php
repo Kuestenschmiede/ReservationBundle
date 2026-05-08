@@ -207,19 +207,13 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setStyleClass('begin-date');
             $reservationBeginDateField->setEditable($typeOfObject !== 'fixed_date');
 
-            if ($this->initialValues->getDate()) {
-                $initialValue = $this->initialValues->getDate();
-            } else {
-                $initialValue = C4gReservationHandler::getBookableMinDate($reservationObjects, $listType);
-            }
-
             if ($typeOfObject == 'fixed_date') {
                 $reservationBeginDateField->setInitialValue($initialBookingDate);
-                $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker && $typeOfObject !== 'fixed_date');
+                $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker && !$typeOfObject == 'fixed_date');
                 $reservationBeginDateField->setMandatory(false);
                 $reservationBeginDateField->setTableColumn(false);
             } else {
-                $reservationBeginDateField->setInitialValue($initialValue);
+                $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
                 $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
                 $reservationBeginDateField->setMandatory(true);
                 $reservationBeginDateField->setTableColumn(true);
@@ -233,24 +227,20 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCondition(array($condition));
             $reservationBeginDateField->setCallOnChange(true);
             $reservationBeginDateField->setRemoveWithEmptyCondition(true);
-            $reservationBeginDateField->setCallOnChangeFunction("var l=".json_encode((string)$listType['id']).",s=".json_encode((int)$showDateTime).",v=String(this.value);if(typeof setTimeset==='function'){try{setTimeset(v,parseInt(l),parseInt(s),0,true);}catch(e){}}document.cookie='reservationInitialDateCookie='+encodeURIComponent(v)+';path=/;SameSite=Lax';if(typeof con4gis_reservation_values==='undefined'){window.con4gis_reservation_values={};}window.con4gis_reservation_values[l]=v;");
+            $jsOnChange = "setTimeset(String(this.value),".json_encode((string)$listType['id']).",".json_encode((int)$showDateTime).",0)";
+            $reservationBeginDateField->setCallOnChangeFunction($jsOnChange);
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id']);
             $reservationBeginDateField->setPrintable($this->module->isWithDefaultPDFContent());
 
-            if ($initialValue) {
-                $script = "if(typeof setTimeset==='function'){try{setTimeset(String(".json_encode((string)$initialValue)."),parseInt(".json_encode((int)$listType['id'])."),parseInt(".json_encode((int)$showDateTime)."),0,true);}catch(e){}}";
-                $this->getDialogParams()->setOnloadScript($script);
-            }
-
             $this->fieldList[] = $reservationBeginDateField;
         }
 
-        if ($this->initialValues->getTime()) {
-            $initialBookingTime = $this->initialValues->getTime();
-        } else if ($listType['directBooking']) {
+        if (!$this->initialValues->getTime() && $listType['directBooking']) {
             $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],time()), Date::getFormatFromRgxp('time'));
             $initialBookingTime = $objDate->tstamp;
+        } else if ($this->initialValues->getTime()) {
+            $initialBookingTime = $this->initialValues->getTime();
         } else {
             $initialBookingTime = false;
         }
@@ -283,7 +273,8 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setDatabaseField(true);
         $reservationBeginTimeField->setOptions($initialBookingTime || $options ? $options : []);
         $reservationBeginTimeField->setCallOnChange(true);
-        $reservationBeginTimeField->setCallOnChangeFunction("if(typeof setObjectId==='function'){try{setObjectId(this,parseInt(".json_encode((int)$listType['id'])."),parseInt(".json_encode((int)$reservationSettings->showDateTime)."));}catch(e){}}");
+        $jsOnChange = "setObjectId(this,".json_encode((string)$listType['id']).",".json_encode((int)$reservationSettings->showDateTime).");";
+        $reservationBeginTimeField->setCallOnChangeFunction($jsOnChange);
         $reservationBeginTimeField->setMandatory(false);
         if ($typeOfObject == 'fixed_date'){
             $reservationBeginTimeField->setInitialValue($reservationObject->getDateTimeBegin());
@@ -354,6 +345,8 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationObjectField->setCondition([$condition]);
         $reservationObjectField->setRemoveWithEmptyCondition(true);
         $reservationObjectField->setCallOnChange(true);
+        $jsOnChange = "if(typeof handleBrickConditions==='function'){handleBrickConditions();}";
+        $reservationObjectField->setCallOnChangeFunction($jsOnChange);
         $reservationObjectField->setAdditionalID($listType["id"]);
         $reservationObjectField->setHidden($reservationSettings->objectHide);
         $reservationObjectField->setPrintable($this->module->isWithDefaultPDFContent());

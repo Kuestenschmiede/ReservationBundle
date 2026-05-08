@@ -455,6 +455,9 @@ class C4gReservationController extends C4GBaseController
 
         if ($this->reservationSettings->documentStyle) {
             $arrExternalCSS = StringUtil::deserialize($this->reservationSettings->documentStyle, true);
+            if (is_array($arrExternalCSS)) {
+                $arrExternalCSS = current($arrExternalCSS);
+            }
             $objFile = FilesModel::findByUuid($arrExternalCSS);
             $projectDir = System::getContainer()->getParameter('kernel.project_dir');
             if ($objFile && file_exists($projectDir . '/' . $objFile->path)) {
@@ -914,7 +917,8 @@ class C4gReservationController extends C4GBaseController
             $reservationTypeField->setOptions($typelist);
             $reservationTypeField->setMandatory(true);
             $reservationTypeField->setCallOnChange(true);
-            $reservationTypeField->setCallOnChangeFunction("var s=".json_encode((int)$showDateTime).";if(typeof setReservationForm==='function'){try{setReservationForm('-1',parseInt(s));}catch(e){}}");
+            $jsOnChange = "setReservationForm('-1',".json_encode((int)$showDateTime).");";
+            $reservationTypeField->setCallOnChangeFunction($jsOnChange);
             $reservationTypeField->setInitialCallOnChange(true);
             $reservationTypeField->setInitialValue($firstType);
             $reservationTypeField->setStyleClass('reservation-type');
@@ -1095,7 +1099,8 @@ foreach ($typelist as $listType) {
 
     $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
     $reservationDesiredCapacity->setCallOnChange(true);
-    $reservationDesiredCapacity->setCallOnChangeFunction("var l=".json_encode((string)$listType['id']).",s=".json_encode((int)$showDateTime).";if(typeof setReservationForm==='function'){try{setReservationForm(String(l),parseInt(s));}catch(e){}}");
+    $jsOnChangeCapacity = "setReservationForm(".json_encode((string)$listType['id']).",".json_encode((int)$showDateTime).");";
+    $reservationDesiredCapacity->setCallOnChangeFunction($jsOnChangeCapacity);
     //$reservationDesiredCapacity->setCallOnChangeFunction("changeCapacity(".$listType['id'] . "," . $showDateTime . ");");
     $reservationDesiredCapacity->setNotificationField(true);
     $reservationDesiredCapacity->setAdditionalID($listType['id']);
@@ -1143,7 +1148,8 @@ foreach ($typelist as $listType) {
         $durationField->setTableColumn(true);
         $durationField->setMandatory(true);
         $durationField->setCallOnChange(true);
-        $durationField->setCallOnChangeFunction("var l=".json_encode((string)$listType['id']).",s=".json_encode((int)$showDateTime).";if(typeof setReservationForm==='function'){try{setReservationForm(String(l),parseInt(s));}catch(e){}}");
+        $jsOnChangeDuration = "setReservationForm(".json_encode((string)$listType['id']).",".json_encode((int)$showDateTime).");";
+        $durationField->setCallOnChangeFunction($jsOnChangeDuration);
         //$durationField->setCallOnChangeFunction("setTimeset(document.getElementById('c4g_beginDate_" . $listType['id'] . "'), " . $listType['id'] . "," . $showDateTime . ");");
         $durationField->setCondition(array($condition));
         $durationField->setNotificationField(true);
@@ -1890,7 +1896,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
                     $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
                     $reservationDesiredCapacity->setCallOnChange(true);
-                    $reservationDesiredCapacity->setCallOnChangeFunction("var l=".json_encode((string)$listType['id']).",s=".json_encode((int)$showDateTime).";if(typeof setReservationForm==='function'){try{setReservationForm(String(l),parseInt(s));}catch(e){}}");
+                    $jsOnChange = "setReservationForm(".json_encode((string)$listType['id']).",".json_encode((int)$showDateTime).");";
+                    $reservationDesiredCapacity->setCallOnChangeFunction($jsOnChange);
                     $reservationDesiredCapacity->setNotificationField(true);
                     $reservationDesiredCapacity->setAdditionalID($listType['id']);
                     $reservationDesiredCapacity->setStyleClass('desired-capacity');
@@ -4219,7 +4226,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             if ($jumpTo) {
                 $url = $jumpTo->getFrontendUrl();
                 // Add a random cache buster to the redirect URL to prevent browser from loading cached state
-                $url .= (strpos($url, '?') === false ? '?' : '&') . 'cb=' . uniqid();
+                // $url .= (strpos($url, '?') === false ? '?' : '&') . 'cb=' . uniqid();
                 
                 // Radical: If it's an AJAX request (usually identified by X-Requested-With)
                 // we might need to tell the frontend to do a hard reload.
@@ -4362,6 +4369,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
     /**
      * @Route(
      *      path="/reservation-api/currentTimeset/{date}/{type}/{duration}/{capacity}/{objectId}",
+     *      defaults={"duration": -1, "capacity": -1, "objectId": 0},
      *      methods={"GET"}
      *  )
      * @param $values
@@ -4370,9 +4378,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
      */
     #[Route(
         path: '/reservation-api/currentTimeset/{date}/{type}/{duration}/{capacity}/{objectId}',
+        defaults: ['duration' => -1, 'capacity' => -1, 'objectId' => 0],
         methods: ['GET']
     )]
-    public function getCurrentTimesetAction(Request $request, $date, $type, $duration, $capacity, $objectId)
+    public function getCurrentTimesetAction(Request $request, $date, $type, $duration = -1, $capacity = -1, $objectId = 0)
     {
         $wd = -1;
         $times = [];

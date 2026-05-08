@@ -9,7 +9,8 @@
 
 var callFromChangeCapacity = false;
 
-function setObjectId(object, typeid, showDateTime = 0) {
+function setObjectId(object, typeid, showDateTime) {
+    if (showDateTime === undefined) { showDateTime = 0; }
     var objectParam = object ? object.getAttribute('data-object'): false;
     var typeId = typeid;
     var selectField = document.getElementById("c4g_reservation_object_"+typeId);
@@ -23,7 +24,7 @@ function setObjectId(object, typeid, showDateTime = 0) {
         oldValue = selectField.value && (parseInt(selectField.value) > 0) ? selectField.value : oldValue;
 
         if (reservationObjects) {
-            for (i=0; i < reservationObjects.length; i++) {
+            for (var i=0; i < reservationObjects.length; i++) {
                 var reservationObject = reservationObjects[i];
                 reservationObject.style.display = 'block';
             }
@@ -32,8 +33,8 @@ function setObjectId(object, typeid, showDateTime = 0) {
         if (objectParam) {
             objects = objectParam.split('-');
             var breakDance = false;
-            for (i=0; i < objects.length; i++) {
-                for (j = 0; j < selectField.options.length; j++) {
+            for (var i=0; i < objects.length; i++) {
+                for (var j = 0; j < selectField.options.length; j++) {
                     if (!selectField.options[j].getAttribute('hidden')) {
                         if (selectField.options[j].value == objects[i]) {
                             selectField.value = objects[i];
@@ -54,9 +55,9 @@ function setObjectId(object, typeid, showDateTime = 0) {
 
     hideOptions(typeId, values, showDateTime);
     if (object) {
-        let desc = object.getAttribute('data-desc');
+        var desc = object.getAttribute('data-desc');
         if (desc) {
-            let descElement = object.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.c4g__form-description');
+            var descElement = object.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.c4g__form-description');
             if (descElement) {
                 descElement.innerHTML = desc;
             }
@@ -64,7 +65,7 @@ function setObjectId(object, typeid, showDateTime = 0) {
     }
 
     if (oldValue) {
-       for (i = 0; i < selectField.options.length; i++) {
+       for (var i = 0; i < selectField.options.length; i++) {
            if (!selectField.options[i].getAttribute('hidden') && !selectField.options[i].getAttribute('disabled')) {
                if (selectField.options[i].value == oldValue) {
                    selectField.value = oldValue;
@@ -76,7 +77,7 @@ function setObjectId(object, typeid, showDateTime = 0) {
     }
 
     if (selectField && (parseInt(selectField.value) !== -1)) {
-        for (i = 0; i < selectField.options.length; i++) {
+        for (var i = 0; i < selectField.options.length; i++) {
             if ((parseInt(selectField.options[i].value) == -1) && selectField.options[i].style.display != "none") {
                 selectField.options[i].style.display = "none";
                 break;
@@ -100,7 +101,7 @@ function hideOptions(typeId, values, showDateTime) {
     if (selectField) {
         //var distance = 0;
 
-        for (i = 0; i < selectField.options.length; i++) {
+        for (var i = 0; i < selectField.options.length; i++) {
             var option = selectField.options[i];
             var min = option.getAttribute('min') ? parseInt(option.getAttribute('min')) : 1;
             var max = option.getAttribute('max') ? parseInt(option.getAttribute('max')) : 0;
@@ -119,7 +120,7 @@ function hideOptions(typeId, values, showDateTime) {
             var foundValue = false;
             if (Array.isArray(values)) {
                 if (min && capacity && (capacity > 0) && (capacity >= min) && (capacity <= max)) {
-                    for (j = 0; j < values.length; j++) {
+                    for (var j = 0; j < values.length; j++) {
                         if (values[j] == option.value) {
                             // if (!distance || (distance == 0) || (actCapacity && (actCapacity > 0) && (distance >= actCapacity))) {
                             //     distance = actCapacity ? actCapacity : distance;
@@ -129,7 +130,7 @@ function hideOptions(typeId, values, showDateTime) {
                         }
                     }
                 } else {
-                    for (j = 0; j < values.length; j++) {
+                    for (var j = 0; j < values.length; j++) {
                         if (values[j] == option.value) {
                             if (j == 0) {
                                 firstValueParam = values[j];
@@ -201,7 +202,7 @@ function hideOptions(typeId, values, showDateTime) {
 
                     var dateFields = document.querySelectorAll('.c4g__form-date-container .c4g_beginDate_'+typeId);
                     if (dateFields) {
-                        for (k = 0; k < dateFields.length; k++) {
+                        for (var k = 0; k < dateFields.length; k++) {
                             var dateField = dateFields[k];
                             if (dateField && dateField.value) {
                                 var org = dateField.getAttribute('data-org');
@@ -214,9 +215,9 @@ function hideOptions(typeId, values, showDateTime) {
                                     var pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
                                     var newDate = new Date(dateField.value.replace(pattern,'$3-$2-$1'));
                                     newDate.setSeconds(newDate.getSeconds() + 86400);
-                                    let ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
-                                    let mo = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
-                                    let da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+                                    var ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+                                    var mo = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+                                    var da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
                                     date = da+'.'+mo+'.'+ye;
                                     dateField.setAttribute('data-org', dateField.value);
                                     dateField.value = date;
@@ -295,14 +296,14 @@ function hideOptions(typeId, values, showDateTime) {
 
 function checkType(dateField, event) {
     if (event) {
-        return dateField.parent.parent.classList.contains('begindate-event') ? true : false;
+        return dateField.parentNode.parentNode.classList.contains('begindate-event') ? true : false;
     } else {
-        return dateField.parent.parent.classList.contains('begin-date') ? true : false
+        return dateField.parentNode.parentNode.classList.contains('begin-date') ? true : false;
     }
 }
 
 function setReservationForm(typeId, showDateTime) {
-    callFromChangeCapacity = false;
+    var callFromChangeCapacity = false;
     if (document.getElementsByClassName("reservation-id")[0]) {
         document.getElementsByClassName("reservation-id")[0].style.display = "none";
     }
@@ -311,14 +312,18 @@ function setReservationForm(typeId, showDateTime) {
     var object = false;
 
     var typeField = document.getElementById("c4g_reservation_type");
-    if (!typeField) return; // Safety first
-    typeId = typeField.value || -1;
+    if (!typeField) {
+        // If no type selector is present (e.g. object-first), use the provided typeId
+        if (!typeId) return;
+    } else {
+        typeId = typeField.value || -1;
 
-    var selectedIndex = typeField.selectedIndex;
-    var selectedOption = typeField.options[selectedIndex];
-    if (selectedOption) {
-        event = selectedOption.getAttribute('type') == 2 ? true : false;
-        object = selectedOption.getAttribute('type') == 3 ? true : false;
+        var selectedIndex = typeField.selectedIndex;
+        var selectedOption = typeField.options[selectedIndex];
+        if (selectedOption) {
+            event = selectedOption.getAttribute('type') == 2 ? true : false;
+            object = selectedOption.getAttribute('type') == 3 ? true : false;
+        }
     }
 
     if (typeId > 0) {
@@ -356,14 +361,14 @@ function setReservationForm(typeId, showDateTime) {
                 }
             }
         } else if (event) {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            let eventIdFromUrl = urlParams.get('event');
+            var queryString = window.location.search;
+            var urlParams = new URLSearchParams(queryString);
+            var eventIdFromUrl = urlParams.get('event');
 
             if (!eventIdFromUrl) {
                 // Try to get from URL path (auto_item)
-                let pathParts = window.location.pathname.split('/');
-                let eventIndex = pathParts.indexOf('event');
+                var pathParts = window.location.pathname.split('/');
+                var eventIndex = pathParts.indexOf('event');
                 if (eventIndex !== -1 && pathParts[eventIndex + 1]) {
                     eventIdFromUrl = pathParts[eventIndex + 1].replace('.html', '');
                 }
@@ -462,14 +467,14 @@ function changeCapacity(typeId, showDateTime) {
                 }
             }
         } else if (event) {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            let eventIdFromUrl = urlParams.get('event');
+            var queryString = window.location.search;
+            var urlParams = new URLSearchParams(queryString);
+            var eventIdFromUrl = urlParams.get('event');
 
             if (!eventIdFromUrl) {
                 // Try to get from URL path (auto_item)
-                let pathParts = window.location.pathname.split('/');
-                let eventIndex = pathParts.indexOf('event');
+                var pathParts = window.location.pathname.split('/');
+                var eventIndex = pathParts.indexOf('event');
                 if (eventIndex !== -1 && pathParts[eventIndex + 1]) {
                     eventIdFromUrl = pathParts[eventIndex + 1].replace('.html', '');
                 }
@@ -518,17 +523,17 @@ function checkTimelist(value, timeList) {
 
     if (value && timeList) {
         for (idx=0; idx < timeList.length; idx++) {
-            let hits = 0;
+            var hits = 0;
             if (timeList[idx]) {
-                let timeset = [];
-                let timeidx = timeList[idx].toString();
+                var timeset = [];
+                var timeidx = timeList[idx].toString();
                 if (timeidx && timeidx.indexOf('#')) {
                     timeset = timeidx.split('#');
                 } else {
                     timeset[0] = timeidx;
                 }
 
-                let valueset = [];
+                var valueset = [];
                 value = value.toString();
                 if (value.indexOf('#')) {
                     valueset = value.split('#');
@@ -542,11 +547,11 @@ function checkTimelist(value, timeList) {
                 }
 
                 if (timeset[1] && valueset[1]) {
-                    let beginTime = parseInt(timeset[0]);
-                    let endTime = beginTime + parseInt(timeset[1]);
+                    var beginTime = parseInt(timeset[0]);
+                    var endTime = beginTime + parseInt(timeset[1]);
 
-                    let beginValue = parseInt(valueset[0]);
-                    let endValue = beginValue + parseInt(valueset[1]);
+                    var beginValue = parseInt(valueset[0]);
+                    var endValue = beginValue + parseInt(valueset[1]);
 
                     if ((beginValue >= beginTime) && (beginValue < endTime)) {
                         arrIndex = idx;
@@ -562,10 +567,10 @@ function checkTimelist(value, timeList) {
                         break;
                     }
                 } else if (timeset[1] && valueset[0]) { //direct booking
-                    let beginTime = parseInt(timeset[0]);
-                    let endTime = beginTime + parseInt(timeset[1]);
+                    var beginTime = parseInt(timeset[0]);
+                    var endTime = beginTime + parseInt(timeset[1]);
 
-                    let beginValue = parseInt(valueset[0]);
+                    var beginValue = parseInt(valueset[0]);
 
                     if ((beginTime <= beginValue) && (endTime >= beginValue)) {
                         arrIndex = idx;
@@ -576,10 +581,10 @@ function checkTimelist(value, timeList) {
                         break;
                     }
                 } else if (timeset[0] && valueset[1]) { //direct booking
-                    let beginTime = parseInt(timeset[0]);
+                    var beginTime = parseInt(timeset[0]);
 
-                    let beginValue = parseInt(valueset[0]);
-                    let endValue = beginValue + parseInt(valueset[1]);
+                    var beginValue = parseInt(valueset[0]);
+                    var endValue = beginValue + parseInt(valueset[1]);
 
                     if ((beginValue <= beginTime) && (endValue >= beginTime)) {
                         arrIndex = idx;
@@ -600,21 +605,21 @@ function checkTimelist(value, timeList) {
 }
 
 function checkMax(objectList, arrindex, idx, value, timeList, capacity) {
-    let result = true;
-    let actCapacity = objectList[arrindex][idx]['act'] + parseInt(capacity);
+    var result = true;
+    var actCapacity = objectList[arrindex][idx]['act'] + parseInt(capacity);
     if (objectList[arrindex][idx]['max'] && (actCapacity <= objectList[arrindex][idx]['max'])) {
         for (y = 0; y < objectList.length; y++) {
             if (value && timeList && (y != arrindex)) {
 
-                let timeset = [];
-                let timeidx = timeList[y].toString();
+                var timeset = [];
+                var timeidx = timeList[y].toString();
                 if (timeidx && timeidx.indexOf('#')) {
                     timeset = timeidx.split('#');
                 } else {
                     timeset[0] = timeidx;
                 }
 
-                let valueset = [];
+                var valueset = [];
                 value = value.toString();
                 if (value.indexOf('#')) {
                     valueset = value.split('#');
@@ -622,16 +627,16 @@ function checkMax(objectList, arrindex, idx, value, timeList, capacity) {
                     valueset[0] = value;
                 }
 
-                let doCheck = false;
+                var doCheck = false;
 
                 if (parseInt(timeset[0]) === parseInt(valueset[0])) {
                     doCheck = true;
                 } else if (timeset[1] && valueset[1]) {
-                    let beginTime = parseInt(timeset[0]);
-                    let endTime = beginTime+parseInt(timeset[1]);
+                    var beginTime = parseInt(timeset[0]);
+                    var endTime = beginTime+parseInt(timeset[1]);
 
-                    let beginValue = parseInt(valueset[0]);
-                    let endValue = beginValue+parseInt(valueset[1]);
+                    var beginValue = parseInt(valueset[0]);
+                    var endValue = beginValue+parseInt(valueset[1]);
 
                     if ((beginValue >= beginTime) && (beginValue < endTime)) {
                         doCheck = true;
@@ -660,18 +665,18 @@ function checkMax(objectList, arrindex, idx, value, timeList, capacity) {
 }
 
 function shuffle(array) {
-    let counter = array.length;
+    var counter = array.length;
 
     // While there are elements in the array
     while (counter > 0) {
         // Pick a random index
-        let index = Math.floor(Math.random() * counter);
+        var index = Math.floor(Math.random() * counter);
 
         // Decrease counter by 1
         counter--;
 
         // And swap the last element with it
-        let temp = array[counter];
+        var temp = array[counter];
         array[counter] = array[index];
         array[index] = temp;
     }
@@ -695,10 +700,10 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
 
     //add new childs to radioGroup
     Object.keys(times)
-    .sort((a, b) => {
+    .sort(function(a, b) {
         // Split the keys by '#'
-        let timeA = a.split('#')[0];
-        let timeB = b.split('#')[0];
+        var timeA = a.split('#')[0];
+        var timeB = b.split('#')[0];
 
         // Compare the beginning time to determine the order
         return timeA - timeB;
@@ -712,7 +717,7 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         var description = times[key]['description'];
         var percent = 0;
         var priority = 0;
-        let value = '';
+        var value = '';
         var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
         var disabled = '';
         var capMin = 1;
@@ -732,8 +737,8 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
             }
         }
 
-        let objArr = [];
-        let objstr = '';
+        var objArr = [];
+        var objstr = '';
         if (!capacity || (capacity == -1) || (capacity >= capMin) && (!capMax || (capacity <= capMax))) {
             objects = shuffle(objects);
             var noObj = true;
@@ -839,7 +844,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
     if (objectId) {
         selectField.setAttribute('value',objectId);
         for (i=0;i<selectField.options.length;i++) {
-            let option = selectField.options[i];
+            var option = selectField.options[i];
             if (option.value == selectField.value) {
                 option.setAttribute("selected","true");
             } else {
@@ -879,11 +884,20 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
         if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; }
         window.con4gis_reservation_values[additionalId] = date.replace(/~/g, "/");
 
-        let url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration + "/" + capacity + "/" + objectId;
+        var url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration + "/" + capacity + "/" + objectId;
         var targetButton = false;
         fetch(url)
-            .then(response => response.json())
-            .then((data) => {
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                var contentType = response.headers.get('content-type');
+                if (!contentType || (contentType.indexOf('application/json') === -1 && contentType.indexOf('text/javascript') === -1)) {
+                    throw new TypeError("Oops, we haven't got JSON!");
+                }
+                return response.json();
+            })
+            .then(function(data) {
                 var addId = additionalId;
                 if (objectId) {
                     addId += '-33'+objectId;
@@ -1012,10 +1026,14 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
  *
  * @param object
  */
-function checkEventFields(val) {
-    var typeField = document.getElementById("c4g_reservation_type");
-    var typeId = typeField ? typeField.value : -1;
-    var selectField = document.querySelectorAll('#c4g_reservation_object_event_' + typeId)[0];
+function checkEventFields(typeId, selectField) {
+    if (!typeId) {
+        var typeField = document.getElementById("c4g_reservation_type");
+        typeId = typeField ? typeField.value : -1;
+    }
+    if (!selectField) {
+        selectField = document.querySelectorAll('#c4g_reservation_object_event_' + typeId)[0];
+    }
     var isSelectHidden = false;
     if (selectField && selectField.style && selectField.style.display === 'none') {
         isSelectHidden = true;
@@ -1100,14 +1118,90 @@ function checkEventFields(val) {
     }
 }
 
-function eventFire(el, etype) {
-    if (el && typeof el.dispatchEvent === 'function' && typeof etype === 'string') {
+function onObjectChangeFirst(typeId, showDateTime, initialDate) {
+    if (!typeId) return;
+    var objField = document.getElementById('c4g_reservation_object_' + typeId);
+    var actValue = objField ? String(objField.value) : '';
+    var dateValue = String(initialDate || '');
+    if (typeof con4gis_reservation_values !== 'undefined' && con4gis_reservation_values[typeId]) {
+        dateValue = String(con4gis_reservation_values[typeId]);
+    }
+    if (!dateValue || dateValue === 'null' || dateValue === 'undefined') {
+        dateValue = '';
+        var dateFields = document.querySelectorAll('.c4g_beginDate_' + typeId);
+        if (dateFields && dateFields.length > 0) {
+            for (var i = 0; i < dateFields.length; i++) {
+                if (dateFields[i] && dateFields[i].value && (dateFields[i].offsetParent !== null || dateFields[i].type === 'hidden')) {
+                    dateValue = String(dateFields[i].value); break;
+                }
+            }
+        }
+    }
+    if (!dateValue) {
+        var cookieValue = document.cookie.match('(^|;)\\s*reservationInitialDateCookie\\s*=\\s*([^;]+)');
+        if (cookieValue) { dateValue = decodeURIComponent(cookieValue.pop()); }
+    }
+    if (dateValue && actValue) {
+        var targetId = 'c4g_beginDate_' + typeId + '-33' + actValue;
+        var targetDateField = document.getElementById(targetId);
+        if (targetDateField) {
+            targetDateField.value = dateValue;
+            var pickerField = document.getElementById(targetId + '_picker');
+            if (pickerField && pickerField.datepicker && typeof pickerField.datepicker.setDate === 'function') {
+                pickerField.datepicker.setDate(dateValue);
+            }
+            if (typeof eventFire === 'function') { eventFire(targetDateField, 'change'); }
+        }
+        document.cookie = 'reservationInitialDateCookie=' + encodeURIComponent(dateValue) + '; path=/; SameSite=Lax';
+        if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; }
+        window.con4gis_reservation_values[typeId] = dateValue;
+    }
+    if (typeof setTimeset === 'function') {
+        try { setTimeset(String(dateValue || ''), String(typeId), parseInt(showDateTime || 0), String(actValue || '')); } catch(e1){console.error(e1);}
+    }
+    if (typeof handleBrickConditions === 'function') {
+        try { handleBrickConditions(); } catch(e2){console.error(e2);}
+    }
+    setTimeout(function() {
         try {
-            var evObj = document.createEvent('Events');
-            evObj.initEvent(etype, true, false);
-            el.dispatchEvent(evObj);
+            var retryId = 'c4g_beginDate_' + typeId + '-33' + actValue;
+            var retryField = document.getElementById(retryId);
+            if (retryField && dateValue && retryField.value !== dateValue) {
+                retryField.value = dateValue;
+                var retryPicker = document.getElementById(retryId + '_picker');
+                if (retryPicker && retryPicker.datepicker && typeof retryPicker.datepicker.setDate === 'function') {
+                    retryPicker.datepicker.setDate(dateValue);
+                }
+                if (typeof eventFire === 'function') { eventFire(retryField, 'change'); }
+                if (typeof setTimeset === 'function') { setTimeset(String(dateValue || ''), String(typeId), parseInt(showDateTime || 0), String(actValue || '')); }
+            }
+        } catch(e3){console.error(e3);}
+    }, 500);
+}
+
+function eventFire(el, etype) {
+    if (el && typeof el.dispatchEvent === 'function' && typeof etype === 'string' && etype.length > 0) {
+        try {
+            var evObj = null;
+            if (typeof Event === 'function') {
+                evObj = new Event(etype, { bubbles: true, cancelable: false });
+            } else if (document.createEvent) {
+                evObj = document.createEvent('Events');
+                evObj.initEvent(etype, true, false);
+            }
+            if (evObj) {
+                try {
+                    el.dispatchEvent(evObj);
+                } catch (de_err) {
+                    if (typeof console !== 'undefined' && console.error) {
+                        console.error('dispatchEvent failed for element:', el, 'event:', etype, de_err);
+                    }
+                }
+            }
         } catch (e) {
-            // Silently fail
+            if (typeof console !== 'undefined' && console.error) {
+                console.error('eventFire failed:', e);
+            }
         }
     }
 }

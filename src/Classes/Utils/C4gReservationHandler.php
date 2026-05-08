@@ -7,7 +7,6 @@ use con4gis\ReservationBundle\Classes\Utils\C4gReservationDateChecker;
 use con4gis\ReservationBundle\Classes\Objects\C4gReservationFrontendObject;
 use con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator;
 use con4gis\ReservationBundle\Classes\Models\C4gLogModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationSuspensionModel;
 use Contao\Database;
 use Contao\System;
 use Contao\Date;
@@ -305,7 +304,7 @@ class C4gReservationHandler
             } else {
                 foreach ($alldates as $date) {
                     if ($date) {
-                        $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
+                        $result['dates'] = self::addComma($result['dates']) . date('d.m.Y'/*$GLOBALS['TL_CONFIG']['dateFormat']*/, $date);
                     }
                 }
             }
@@ -583,7 +582,8 @@ class C4gReservationHandler
                    $nextDays = ($nextDays > 0) ? $nextDays-- : 0;
                 }
 
-                if (isset($alldates[$i]) && !$alldates[$i]) {
+                $alldates[$i] = $i;
+                if (!$alldates[$i]) {
                     $hitIt = true;
                     foreach ($excludePeriodArr as $period) {
                         if ($i >= $period['begin'] && $i <= $period['end']) {
@@ -2566,12 +2566,12 @@ class C4gReservationHandler
                                 }
 
                                 if ($isBeginDate == true || $selectedBeginDate == $selectedEndDate || ($date != $selectedBeginDate && $date != $selectedEndDate)) {
-                                    $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
+                                    $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
                                 } 
                             } else if ($listType['periodType'] == 'week') {
-                                $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date - $listType['min_residence_time'] * 604800+86400);
+                                $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date - $listType['min_residence_time'] * 604800+86400);
                             } else if ($listType['periodType'] == 'day') {
-                                $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
+                                $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
                             } 
                         }
                         $i++;
@@ -2588,19 +2588,19 @@ class C4gReservationHandler
                                     if ($bookedEndDate[$y] == $date) {
                                         break;
                                     } else {
-                                        $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
+                                        $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
                                     }
                                 }      
                            } else if ($listType['periodType'] == 'week') {
-                               $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date - $listType['min_residence_time'] * 604800+86400);
+                               $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date - $listType['min_residence_time'] * 604800+86400);
                            } else if ($listType['periodType'] == 'day') {
-                               $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date);
+                               $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date);
                            } 
                        }
                        $i++;
                     }
                     if ($listType['periodType'] == 'day' || $listType['periodType'] == 'week') {
-                        $result['dates'] = self::addComma($result['dates']) . date($GLOBALS['TL_CONFIG']['dateFormat'], $date+86400);
+                        $result['dates'] = self::addComma($result['dates']) . date('d.m.Y', $date+86400);
                     } 
                 }
             } else {
@@ -2704,7 +2704,7 @@ class C4gReservationHandler
         }
 
         $dates = [];
-        $models = C4gReservationSuspensionModel::findMultipleByIds($listIds);
+        $models = \con4gis\ReservationBundle\Classes\Models\C4gReservationSuspensionModel::findMultipleByIds($listIds);
         if ($models !== null) {
             foreach ($models as $model) {
                 $suspensionDates = StringUtil::deserialize($model->suspension_dates, true);
