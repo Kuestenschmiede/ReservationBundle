@@ -173,7 +173,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationObjectField->setCondition([$condition]);
         $reservationObjectField->setRemoveWithEmptyCondition(true);
         $reservationObjectField->setCallOnChange(true);
-        $jsOnChange = "checkEventFields(".json_encode((string)$listType['id']).",this)";
+        $jsListId = json_encode((string)$listType['id']);
+        $jsOnChange = "if(typeof checkEventFields==='function'){checkEventFields($jsListId,this)}";
         $reservationObjectField->setCallOnChangeFunction($jsOnChange);
         $reservationObjectField->setAdditionalID($listType["id"]);
         $reservationObjectField->setHidden($reservationSettings->objectHide);

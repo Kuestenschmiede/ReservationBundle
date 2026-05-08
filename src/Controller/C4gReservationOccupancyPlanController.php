@@ -309,7 +309,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                 }
             }
 
-            if ($dayBookedCount >= count($objects)) {
+            if ($dayBookedCount >= count($objects) || $dayEnd < time()) {
                 $occupancy[$day] = 'booked';
             } elseif ($dayBookedCount > 0 || $dayPartialCount > 0) {
                 $occupancy[$day] = 'partial';

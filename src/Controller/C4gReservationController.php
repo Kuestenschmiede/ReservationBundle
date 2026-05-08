@@ -80,6 +80,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Reservation form (Contao frontend module)
@@ -218,6 +219,15 @@ class C4gReservationController extends C4GBaseController
         $this->session->remove('c4g_brick_dialog_values');
         $this->session->remove('reservationInitialDateCookie');
         $this->session->remove('reservationTimeCookie');
+        
+        // Clear all event-specific date/time cookies from session
+        $sessionData = $this->session->getSession()->all();
+        foreach ($sessionData as $key => $value) {
+            if (strpos($key, 'reservationInitialDateCookie_') === 0 || strpos($key, 'reservationTimeCookie_') === 0) {
+                $this->session->remove($key);
+            }
+        }
+
         if (!$keepEvent) {
             $this->session->remove('reservationEventCookie');
         }
@@ -245,7 +255,7 @@ class C4gReservationController extends C4GBaseController
             }
         }
         
-        // 4. Reset static caches in handlers
+        // 4. Reset static caches and Contao models
         C4gReservationHandler::resetStaticCaches();
         $this->resetStaticCaches();
     }
@@ -261,10 +271,49 @@ class C4gReservationController extends C4GBaseController
         }
         $response = parent::generateAjax($request);
         if ($response instanceof Response) {
-            $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+            $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private, proxy-revalidate');
             $response->headers->set('Pragma', 'no-cache');
             $response->headers->set('Expires', '0');
+            $response->headers->set('Surrogate-Control', 'no-store');
         }
+        return $response;
+    }
+
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    {
+        if (Input::get('date')) {
+            $request->attributes->set('_no_cache', true);
+            $GLOBALS['TL_NO_CACHE'] = true;
+            $this->nukeState();
+        }
+
+        $response = parent::getResponse($template, $model, $request);
+
+        $response->setPrivate();
+        $response->setMaxAge(0);
+        $response->setSharedMaxAge(0);
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private, proxy-revalidate');
+        $response->headers->set('Surrogate-Control', 'no-store');
+        if (Input::get('date')) {
+            $response->setVary('*');
+        } else {
+            $response->setVary(['Cookie', 'Accept-Encoding', 'X-Requested-With']);
+        }
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+        
+        // Clear server-side cache if requested (e.g. via Contao internal mechanisms)
+        if (Input::get('date') && class_exists('Contao\System')) {
+            try {
+                $container = \Contao\System::getContainer();
+                if ($container->has('contao.cache.entity_cache')) {
+                    $container->get('contao.cache.entity_cache')->clear();
+                }
+            } catch (\Exception $e) {
+                // Ignore if cache clearing fails
+            }
+        }
+
         return $response;
     }
 
@@ -532,12 +581,7 @@ class C4gReservationController extends C4GBaseController
                 // BUT: If we have an object in POST or GET, it might be a partial update or a direct link
                 $objectIdForNuke = \Contao\Input::get('object') ?: (\Contao\Input::post('reservation_object') ?: 0);
                 if (!$objectIdForNuke) {
-                    // One last check: If it's a GET request and we have a session or cookie, it might be a back-navigation or a soft-refresh
-                    // con4gis often uses generic URLs for modules.
-                    if (($_SERVER['REQUEST_METHOD'] === 'GET') && (isset($_COOKIE['reservationInitialDateCookie']) || $this->session->getSessionValue('reservationInitialDateCookie'))) {
-                    } else {
-                        $shouldNuke = true;
-                    }
+                    $shouldNuke = true;
                 } else {
                 }
             } else if (($eventIdUrlForNuke || $typeIdForNuke) && !$isInitNav) {
@@ -552,12 +596,6 @@ class C4gReservationController extends C4GBaseController
             
             // Clear "just saved" flag on new GET request
             $this->session->remove('reservationJustSaved');
-            
-            // Prevent browser caching of the form fields
-            header("Cache-Control: no-cache, no-store, must-revalidate, proxy-revalidate");
-            header("Pragma: no-cache");
-            header("Expires: 0");
-            header("Surrogate-Control: no-store");
             
             // If it's a GET request and we have an event in the URL, make sure it's in the session
             // BUT do it AFTER nukeState
@@ -684,8 +722,15 @@ class C4gReservationController extends C4GBaseController
             }
             if ($date) {
                 $initialDate = $date;
+                $this->session->setSessionValue('reservationInitialDateCookie', $initialDate);
                 if (!is_numeric($initialDate)) {
-                    $initialDate = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $initialDate));
+                    $dateTime = \DateTime::createFromFormat('Y-m-d', $initialDate);
+                    if ($dateTime !== false) {
+                        $dateTime->setTime(0, 0, 0);
+                        $initialDate = $dateTime->getTimestamp();
+                    } else {
+                        $initialDate = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $initialDate));
+                    }
                 }
             }
 
@@ -4441,11 +4486,18 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
         }
 
-        return new JsonResponse([
+        $response = new JsonResponse([
             'reservationId' => C4GBrickCommon::getUUID(),
             'times' => $times ?: [],
             'captions' => ($times && count($times) > 0) ? $captions : []
         ]);
+
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private, proxy-revalidate');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+        $response->headers->set('Surrogate-Control', 'no-store');
+
+        return $response;
     }
 
     /**

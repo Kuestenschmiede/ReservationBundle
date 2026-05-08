@@ -207,13 +207,21 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setStyleClass('begin-date');
             $reservationBeginDateField->setEditable($typeOfObject !== 'fixed_date');
 
+            $initialBookingDateValue = '';
+            if ($initialBookingDate) {
+                $objDate = new Date($initialBookingDate, Date::getFormatFromRgxp('date'));
+                $initialBookingDateValue = $objDate->date;
+            } else {
+                $initialBookingDateValue = C4gReservationHandler::getBookableMinDate($reservationObjects, $listType);
+            }
+
             if ($typeOfObject == 'fixed_date') {
                 $reservationBeginDateField->setInitialValue($initialBookingDate);
                 $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker && !$typeOfObject == 'fixed_date');
                 $reservationBeginDateField->setMandatory(false);
                 $reservationBeginDateField->setTableColumn(false);
             } else {
-                $reservationBeginDateField->setInitialValue($initialBookingDate ? $this->initialValues->getDate() : C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
+                $reservationBeginDateField->setInitialValue($initialBookingDateValue);
                 $reservationBeginDateField->setShowInlinePicker($reservationSettings->showInlineDatepicker ? true : false);
                 $reservationBeginDateField->setMandatory(true);
                 $reservationBeginDateField->setTableColumn(true);
@@ -227,12 +235,25 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCondition(array($condition));
             $reservationBeginDateField->setCallOnChange(true);
             $reservationBeginDateField->setRemoveWithEmptyCondition(true);
-            $jsOnChange = "setTimeset(String(this.value),".json_encode((string)$listType['id']).",".json_encode((int)$showDateTime).",0)";
+            $jsListId = json_encode((string)$listType['id']);
+            $jsShowDT = json_encode((int)$showDateTime);
+            $jsOnChange = "if(typeof setTimeset==='function'){setTimeset(String(this.value),$jsListId,$jsShowDT,0)}";
             $reservationBeginDateField->setCallOnChangeFunction($jsOnChange);
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id']);
             $reservationBeginDateField->setPrintable($this->module->isWithDefaultPDFContent());
 
+            $jsInitialDate = "";
+            if ($initialBookingDate) {
+                $objDate = new Date($initialBookingDate, Date::getFormatFromRgxp('date'));
+                $jsInitialDate = $objDate->date;
+            }
+            $jsListId = json_encode((string)$listType['id']);
+            $jsDateValue = json_encode((string)$jsInitialDate);
+            $jsShowDateTimeVal = json_encode((int)$showDateTime);
+            $jsHasUrlDate = json_encode(!!\Contao\Input::get('date'));
+            $script = "var lid=$jsListId;var dv=$jsDateValue;var sdt=$jsShowDateTimeVal;var hud=$jsHasUrlDate;var up=new URLSearchParams(window.location.search);var ud=up.get('date');if(ud){dv=ud}if(dv){if(typeof window.con4gis_reservation_values==='undefined'){window.con4gis_reservation_values={}}if(hud||!window.con4gis_reservation_values[lid]){window.con4gis_reservation_values[lid]=dv}if(hud){document.cookie='reservationInitialDateCookie='+encodeURIComponent(dv)+'; path=/; SameSite=Lax'}}var df=document.getElementById('c4g_beginDate_'+lid);if(dv&&df&&(hud||!df.value)){df.value=dv}var sd=function(){var d=document.getElementById('c4g_beginDate_'+lid);var v=ud||dv;var p=document.getElementById('c4g_beginDate_'+lid+'_picker');if(v&&p&&p.datepicker&&typeof p.datepicker.setDate==='function'){try{var tv=v;if(v.indexOf('-')!==-1&&v.length===10){var pts=v.split('-');tv=new Date(pts[0],pts[1]-1,pts[2])}p.datepicker.setDate(tv);if(d&&d.value!==v){d.value=v}}catch(e){console.error(e)}}else if(p){setTimeout(sd,100)}};setTimeout(sd,100);if(typeof setTimeset==='function'){setTimeset(dv,lid,sdt,0)}if(typeof handleBrickConditions==='function'){handleBrickConditions()}";
+            $this->getDialogParams()->setOnloadScript($script);
             $this->fieldList[] = $reservationBeginDateField;
         }
 
@@ -253,14 +274,13 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $options = C4gReservationHandler::getReservationTimes(
                         $reservationObjects,
                         $listType['id'],
-                        0,
                         -1,
+                        $initialBookingDate,
                         0,
                         0,
                         $reservationSettings->showEndTime,
                         $reservationSettings->showFreeSeats
-
-        );
+                    );
             $classes = 'reservation_time_button reservation_time_button_' . $listType['id']  ;
             //$classes = 'reservation_time_button reservation_time_button_' . $listType['id'] . C4gReservationHandler::getButtonStateClass($reservationObject,$listType['objectType']) ;
         }
@@ -273,7 +293,9 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setDatabaseField(true);
         $reservationBeginTimeField->setOptions($initialBookingTime || $options ? $options : []);
         $reservationBeginTimeField->setCallOnChange(true);
-        $jsOnChange = "setObjectId(this,".json_encode((string)$listType['id']).",".json_encode((int)$reservationSettings->showDateTime).");";
+        $jsListId = json_encode((string)$listType['id']);
+        $jsShowDT = json_encode((int)$reservationSettings->showDateTime);
+        $jsOnChange = "if(typeof setObjectId==='function'){setObjectId(this,$jsListId,$jsShowDT)}";
         $reservationBeginTimeField->setCallOnChangeFunction($jsOnChange);
         $reservationBeginTimeField->setMandatory(false);
         if ($typeOfObject == 'fixed_date'){

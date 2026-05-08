@@ -885,6 +885,9 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
         window.con4gis_reservation_values[additionalId] = date.replace(/~/g, "/");
 
         var url = "/reservation-api/currentTimeset/" + date + "/" + additionalId + "/" + duration + "/" + capacity + "/" + objectId;
+        // Anti-Cache-Param for the API call to ensure fresh data
+        url += (url.indexOf('?') === -1 ? '?' : '&') + 't=' + new Date().getTime();
+        
         var targetButton = false;
         fetch(url)
             .then(function(response) {
@@ -906,11 +909,20 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                 // Ensure targetDateField still has the correct value before rendering radio buttons
                 // This helps if something else reset it while fetch was running
                 var targetDateField = document.getElementById('c4g_beginDate_' + additionalId + (objectId ? '-33' + objectId : ''));
-                if (targetDateField && date && targetDateField.value !== date.replace(/~/g, "/")) {
-                    targetDateField.value = date.replace(/~/g, "/");
+                var urlParams = new URLSearchParams(window.location.search);
+                var urlDate = urlParams.get('date');
+                var expectedDate = (urlDate || date || '').replace(/~/g, "/");
+                if (targetDateField && expectedDate && targetDateField.value !== expectedDate) {
+                    // console.log("Restoring dateValue from setTimeset parameter to prevent overwrite");
+                    targetDateField.value = expectedDate;
                     var pickerField = document.getElementById(targetDateField.id + '_picker');
                     if (pickerField && pickerField.datepicker && typeof pickerField.datepicker.setDate === 'function') {
-                        pickerField.datepicker.setDate(targetDateField.value);
+                        var tv = expectedDate;
+                        if (expectedDate.indexOf('-') !== -1 && expectedDate.length === 10) {
+                            var pts = expectedDate.split('-');
+                            tv = new Date(pts[0], pts[1] - 1, pts[2]);
+                        }
+                        pickerField.datepicker.setDate(tv);
                     }
                 }
 
@@ -1132,29 +1144,46 @@ function onObjectChangeFirst(typeId, showDateTime, initialDate) {
         if (dateFields && dateFields.length > 0) {
             for (var i = 0; i < dateFields.length; i++) {
                 if (dateFields[i] && dateFields[i].value && (dateFields[i].offsetParent !== null || dateFields[i].type === 'hidden')) {
-                    dateValue = String(dateFields[i].value); break;
+                    dateValue = String(dateFields[i].value);
+                    if (dateValue) { break; }
                 }
             }
         }
     }
-    if (!dateValue) {
+    if (!dateValue || dateValue === 'null' || dateValue === 'undefined') {
         var cookieValue = document.cookie.match('(^|;)\\s*reservationInitialDateCookie\\s*=\\s*([^;]+)');
         if (cookieValue) { dateValue = decodeURIComponent(cookieValue.pop()); }
     }
     if (dateValue && actValue) {
         var targetId = 'c4g_beginDate_' + typeId + '-33' + actValue;
         var targetDateField = document.getElementById(targetId);
-        if (targetDateField) {
+        
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlDate = urlParams.get('date');
+        if (urlDate) {
+            // Prioritize URL date and clear/update cookie to prevent jumping
+            dateValue = String(urlDate);
+            document.cookie = 'reservationInitialDateCookie=' + encodeURIComponent(dateValue) + '; path=/; SameSite=Lax';
+        }
+
+        if (targetDateField && dateValue && targetDateField.value !== dateValue) {
             targetDateField.value = dateValue;
             var pickerField = document.getElementById(targetId + '_picker');
             if (pickerField && pickerField.datepicker && typeof pickerField.datepicker.setDate === 'function') {
-                pickerField.datepicker.setDate(dateValue);
+                try {
+                    pickerField.datepicker.setDate(dateValue);
+                } catch (pe) {
+                    console.error('Error setting date on picker:', pe);
+                }
             }
             if (typeof eventFire === 'function') { eventFire(targetDateField, 'change'); }
         }
-        document.cookie = 'reservationInitialDateCookie=' + encodeURIComponent(dateValue) + '; path=/; SameSite=Lax';
-        if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; }
-        window.con4gis_reservation_values[typeId] = dateValue;
+        
+        if (!urlDate || (dateValue === initialDate)) {
+            document.cookie = 'reservationInitialDateCookie=' + encodeURIComponent(dateValue) + '; path=/; SameSite=Lax';
+            if (typeof con4gis_reservation_values === 'undefined') { window.con4gis_reservation_values = {}; }
+            window.con4gis_reservation_values[typeId] = dateValue;
+        }
     }
     if (typeof setTimeset === 'function') {
         try { setTimeset(String(dateValue || ''), String(typeId), parseInt(showDateTime || 0), String(actValue || '')); } catch(e1){console.error(e1);}
@@ -1162,19 +1191,30 @@ function onObjectChangeFirst(typeId, showDateTime, initialDate) {
     if (typeof handleBrickConditions === 'function') {
         try { handleBrickConditions(); } catch(e2){console.error(e2);}
     }
-    setTimeout(function() {
-        try {
-            var retryId = 'c4g_beginDate_' + typeId + '-33' + actValue;
-            var retryField = document.getElementById(retryId);
-            if (retryField && dateValue && retryField.value !== dateValue) {
-                retryField.value = dateValue;
-                var retryPicker = document.getElementById(retryId + '_picker');
-                if (retryPicker && retryPicker.datepicker && typeof retryPicker.datepicker.setDate === 'function') {
-                    retryPicker.datepicker.setDate(dateValue);
+        setTimeout(function() {
+            try {
+                var retryId = 'c4g_beginDate_' + typeId + '-33' + actValue;
+                var retryField = document.getElementById(retryId);
+                var urlParamsRetry = new URLSearchParams(window.location.search);
+                var urlDateRetry = urlParamsRetry.get('date');
+                var retryDateValue = dateValue;
+                if (urlDateRetry) {
+                    retryDateValue = String(urlDateRetry);
                 }
-                if (typeof eventFire === 'function') { eventFire(retryField, 'change'); }
-                if (typeof setTimeset === 'function') { setTimeset(String(dateValue || ''), String(typeId), parseInt(showDateTime || 0), String(actValue || '')); }
-            }
+
+                if (retryField && retryDateValue && retryField.value !== retryDateValue) {
+                    retryField.value = retryDateValue;
+                    var retryPicker = document.getElementById(retryId + '_picker');
+                    if (retryPicker && retryPicker.datepicker && typeof retryPicker.datepicker.setDate === 'function') {
+                        try {
+                            retryPicker.datepicker.setDate(retryDateValue);
+                        } catch (rpe) {
+                            console.error('Error setting date on retry picker:', rpe);
+                        }
+                    }
+                    if (typeof eventFire === 'function') { eventFire(retryField, 'change'); }
+                    if (typeof setTimeset === 'function') { setTimeset(String(retryDateValue || ''), String(typeId), parseInt(showDateTime || 0), String(actValue || '')); }
+                }
         } catch(e3){console.error(e3);}
     }, 500);
 }
