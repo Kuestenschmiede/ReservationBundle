@@ -107,6 +107,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationBeginDateDBField->setFormField(false);
         $reservationBeginDateDBField->setMax(999999999999);
         $reservationBeginDateDBField->setNotificationField(true);
+        $reservationBeginDateDBField->setPattern('');
         $reservationBeginDateDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationBeginDateDBField;
 
@@ -129,6 +130,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationEndDateDBField->setFormField(false);
         $reservationEndDateDBField->setMax(9999999999999);
         $reservationEndDateDBField->setNotificationField(true);
+        $reservationEndDateDBField->setPattern('');
         $reservationEndDateDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationEndDateDBField;
 
@@ -219,6 +221,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setInitialValue($this->initialValues->getDate() ?: $reservationObject->getBeginDate());
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+            $reservationBeginDateField->setPattern('');
             $reservationBeginDateField->setStyleClass('begindate-event');
             $reservationBeginDateField->setPrintable($this->module->isWithDefaultPDFContent());
             $this->fieldList[] = $reservationBeginDateField;
@@ -251,6 +254,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 $reservationEndDateField->setInitialValue($reservationObject->getEndDate()); //ToDo mehrtägige Termnine
                 $reservationEndDateField->setNotificationField(true);
                 $reservationEndDateField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
+                $reservationEndDateField->setPattern('');
                 $reservationEndDateField->setShowIfEmpty(false);
                 $reservationEndDateField->setStyleClass('enddate-event');
                 $reservationEndDateField->setPrintable($this->module->isWithDefaultPDFContent());

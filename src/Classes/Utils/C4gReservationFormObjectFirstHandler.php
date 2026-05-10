@@ -532,6 +532,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginDateField->setCallOnChangeFunction($jsOnChange);
             $reservationBeginDateField->setNotificationField(true);
             $reservationBeginDateField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
+            $reservationBeginDateField->setPattern('');
             $reservationBeginDateField->setInitInvisible(false);
             $reservationBeginDateField->setPrintable($this->module->isWithDefaultPDFContent());
 
@@ -611,6 +612,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $reservationEndDateDBField->setFormField(false);
         $reservationEndDateDBField->setMax(9999999999999);
         $reservationEndDateDBField->setNotificationField(true);
+        $reservationEndDateDBField->setPattern('');
         $reservationEndDateDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationEndDateDBField;
 

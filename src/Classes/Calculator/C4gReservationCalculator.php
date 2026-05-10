@@ -519,7 +519,7 @@ class C4gReservationCalculator
               $netVal = floatval($value['priceOptionNet'] ?? 0);
 
               if ($type['additionalParamsFieldType'] == 'radio') {
-                  $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectId] ?? $putVars['additional_params_' . $type['id'] . '-00' . $objectPid];
+                  $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectId] ?? $putVars['additional_params_' . $type['id'] . '-00' . $objectPid] ?? null;
                   if ($value['id'] == $chosenAdditionalOptions) {
                       $addParamSum += $priceVal;
                       if ($calcTaxes) {
@@ -530,7 +530,7 @@ class C4gReservationCalculator
 
               } else {
 
-                  $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectId . '|' . $value['id']] ?? $putVars['additional_params_' . $type['id'] . '-00' . $objectPid . '|' . $value['id']];
+                  $chosenAdditionalOptions = $putVars['additional_params_' . $type['id'] . '-00' . $objectId . '|' . $value['id']] ?? $putVars['additional_params_' . $type['id'] . '-00' . $objectPid . '|' . $value['id']] ?? null;
                   if ($chosenAdditionalOptions === 'true' || $chosenAdditionalOptions === true || $chosenAdditionalOptions === 1 || $chosenAdditionalOptions === '1') {
                       $chosenAdditionalOptions = true;
                   } else {

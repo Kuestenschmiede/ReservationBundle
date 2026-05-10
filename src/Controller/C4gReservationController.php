@@ -3585,7 +3585,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 if (!$beginTimeInt && is_string($beginTime) && strpos($beginTime, ':') !== false) {
                     $beginTimeInt = strtotime('1970-01-01 ' . $beginTime . ' UTC');
                 }
+                $beginTime = $beginTimeInt;
+                $putVars['beginTime'] = (int) $beginTime;
+                $this->putVars['beginTime'] = (int) $beginTime;
                 $endTime = ($beginTimeInt ?: 0) + intval($duration);
+                $putVars['endTimeInt'] = (int) $endTime;
             }
 
             $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$endTime);
@@ -4100,9 +4104,22 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $icsObject = isset($reservationEventObject) ? $reservationEventObject : $reservationObject;
 
+        $beginDateInt = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate));
+        $putVars['beginDate'] = (int) $beginDateInt;
+        $this->putVars['beginDate'] = (int) $beginDateInt;
+
         $rIdForIcs = $putVars['reservation_id'] ?? ($putVars['id'] ?? 0);
         $beginDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $beginTime);
         $endDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(isset($endDate) ? $endDate : strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $endTime);
+        
+        // Final database format check for integer fields
+        $putVars['beginTime'] = (int) ($beginTimeInt ?? $beginTime);
+        $putVars['endTime'] = (int) $endTime;
+        $this->putVars['beginTime'] = $putVars['beginTime'];
+        $this->putVars['endTime'] = $putVars['endTime'];
+        $putVars['beginDate'] = (int) $beginDateInt;
+        $this->putVars['beginDate'] = (int) $beginDateInt;
+
         $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $rIdForIcs);
 
         $rawData = '';
@@ -4186,7 +4203,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         ];
 
         foreach ($tokenDefaults as $key => $defaultValue) {
-            if (!isset($putVars[$key]) || $putVars[$key] === null || $putVars[$key] === '') {
+            if (!isset($putVars[$key]) || $putVars[$key] === null || ($putVars[$key] === '' && !in_array($key, ['beginTime', 'endTime']))) {
                 $putVars[$key] = $defaultValue;
             }
             // Mirror to instance putVars as well for SaveAction
@@ -4253,7 +4270,55 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $sanitizeVars($putVars);
         $sanitizeVars($this->putVars);
-        
+
+        // Before forcing to int, ensure base keys have values from suffixed keys if they are empty
+        $syncBaseKeys = function(&$vars) use ($keysToSanitize, $typeForSanitize, $eventForSanitize) {
+            if (!is_array($vars)) return;
+            foreach ($keysToSanitize as $base) {
+                if (empty($vars[$base])) {
+                    $possibleKeys = [];
+                    if ($typeForSanitize) {
+                        $possibleKeys[] = $base . '_' . $typeForSanitize;
+                        if ($eventForSanitize) {
+                            $possibleKeys[] = $base . '_' . $typeForSanitize . '-22' . $eventForSanitize;
+                            $possibleKeys[] = $base . '_' . $typeForSanitize . '-' . $eventForSanitize;
+                            $possibleKeys[] = $base . '_' . $typeForSanitize . '-33' . $eventForSanitize;
+                        }
+                    }
+                    foreach ($possibleKeys as $pk) {
+                        if (!empty($vars[$pk])) {
+                            $vars[$base] = $vars[$pk];
+                            break;
+                        }
+                    }
+                }
+            }
+        };
+
+        $syncBaseKeys($putVars);
+        $syncBaseKeys($this->putVars);
+
+        $forceInt = function(&$vars) {
+            if (!is_array($vars)) return;
+            $intKeys = ['beginTime', 'endTime', 'beginDate', 'endDate'];
+            foreach ($vars as $key => $value) {
+                foreach ($intKeys as $base) {
+                    if ($key === $base || strpos($key, $base . '_') === 0) {
+                        // If it's a string that looks like a date (e.g. contains a dot), 
+                        // DON'T force it to int here, because it will result in '0' or the day number.
+                        // Let the Field classes handle the parsing later.
+                        if (is_string($value) && strpos($value, '.') !== false) {
+                            continue;
+                        }
+                        $vars[$key] = (int)$value;
+                    }
+                }
+            }
+        };
+
+        $forceInt($putVars);
+        $forceInt($this->putVars);
+
         // Update session with the sanitized values
         $this->session->setSessionValue('c4g_brick_dialog_values', $putVars);
 
@@ -4307,7 +4372,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         return $result;
         } catch (\Throwable $e) {
-            \Contao\System::log('C4gReservationController ERROR: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), __METHOD__, TL_ERROR);
+            if (\Contao\System::getContainer()->has('monolog.logger.contao')) {
+                \Contao\System::getContainer()->get('monolog.logger.contao')->log(\Psr\Log\LogLevel::ERROR, 'C4gReservationController ERROR: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), ['contao' => new \Contao\CoreBundle\Monolog\ContaoContext(__METHOD__, 1)]);
+            }
             $errResult = [
                 'usermessage' => 'Ein technischer Fehler ist aufgetreten: ' . $e->getMessage()
             ];

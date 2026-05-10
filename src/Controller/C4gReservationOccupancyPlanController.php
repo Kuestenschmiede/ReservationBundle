@@ -91,11 +91,16 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         $reservations = $this->getReservations($objects, $month, $year);
         $occupancy = $this->calculateOccupancy($objects, $reservations, $daysInMonth, $month, $year);
 
+        $settings = C4gReservationSettingsModel::findAll();
+        if ($settings && $settings->current()) {
+            $this->session->setSessionValue('reservationSettings', $settings->current()->id);
+        }
+
         $html = '<div class="occupancy-plan">';
         $html .= '<div class="calendar-nav">';
-        $html .= '<a href="' . Controller::addToUrl("month=$prevMonth&year=$prevYear") . '">&laquo;</a>';
+        $html .= '<a href="' . Controller::addToUrl("month=$prevMonth&year=$prevYear", true, ['date']) . '">&laquo;</a>';
         $html .= '<span>' . $GLOBALS['TL_LANG']['MONTHS'][intval($month)-1] . ' ' . $year . '</span>';
-        $html .= '<a href="' . Controller::addToUrl("month=$nextMonth&year=$nextYear") . '">&raquo;</a>';
+        $html .= '<a href="' . Controller::addToUrl("month=$nextMonth&year=$nextYear", true, ['date']) . '">&raquo;</a>';
         $html .= '</div>';
 
         $html .= '<table class="calendar">';
@@ -116,6 +121,9 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             }
 
             $dateStr = sprintf('%04d-%02d-%02d', $year, $month, $day);
+            $dateFormatted = Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], strtotime($dateStr));
+            // Ensure no leading/trailing whitespace which might trip up the regex
+            $dateFormatted = trim($dateFormatted);
             $status = $occupancy[$day]; // 'free', 'booked', 'partial'
             
             $class = "day $status";
@@ -124,7 +132,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                 $page = PageModel::findByPk($this->reservation_form_site);
                 if ($page) {
                     $link = $page->getFrontendUrl();
-                    $link .= (str_contains($link, '?') ? '&' : '?') . 'date=' . $dateStr;
+                    $link .= (str_contains($link, '?') ? '&' : '?') . 'date=' . $dateFormatted;
                 }
             }
 
