@@ -128,7 +128,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             
             $class = "day $status";
             $link = '';
-            if ($status === 'free' && $this->reservation_form_site) {
+            if (($status === 'free' || $status === 'partial') && $this->reservation_form_site) {
                 $page = PageModel::findByPk($this->reservation_form_site);
                 if ($page) {
                     $link = $page->getFrontendUrl();
@@ -155,12 +155,24 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
         $html .= '</tr></tbody>';
         $html .= '</table>';
+        
+        if ($this->show_occupancy_legend) {
+            $html .= '<div class="legend">';
+            $html .= '<strong>' . ($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_legend'] ?: 'Legende') . ':</strong>';
+            $html .= '<ul>';
+            $html .= '<li><span class="box free"></span> ' . ($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_free'] ?: 'Frei') . '</li>';
+            $html .= '<li><span class="box partial"></span> ' . ($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_partial'] ?: 'Teilweise belegt') . '</li>';
+            $html .= '<li><span class="box booked"></span> ' . ($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_booked'] ?: 'Belegt') . '</li>';
+            $html .= '</ul>';
+            $html .= '</div>';
+        }
+
         $html .= '</div>';
 
         $style = '<style>
             .occupancy-plan { width: 100%; max-width: 400px; }
             .occupancy-plan .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-            .occupancy-plan table { width: 100%; border-collapse: collapse; }
+            .occupancy-plan table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
             .occupancy-plan th, .occupancy-plan td { border: 1px solid #ccc; text-align: center; padding: 10px; width: 14.28%; }
             .occupancy-plan td.free { background-color: #d4edda; color: #155724; }
             .occupancy-plan td.booked { background-color: #f8d7da; color: #721c24; }
@@ -168,8 +180,21 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             .occupancy-plan td.partial .triangle { 
                 position: absolute; top: 0; right: 0; width: 0; height: 0; 
                 border-style: solid; border-width: 0 40px 40px 0; border-color: transparent #f8d7da transparent transparent;
+                pointer-events: none;
             }
-            .occupancy-plan td a { display: block; text-decoration: none; color: inherit; }
+            .occupancy-plan td a { display: block; text-decoration: none; color: inherit; position: relative; z-index: 1; }
+            .occupancy-plan .legend ul { list-style: none; padding: 0; margin: 5px 0 0 0; display: flex; flex-wrap: wrap; gap: 10px; }
+            .occupancy-plan .legend li { display: flex; align-items: center; font-size: 0.9em; }
+            .occupancy-plan .legend .box { width: 15px; height: 15px; border: 1px solid #ccc; margin-right: 5px; display: inline-block; }
+            .occupancy-plan .legend .box.free { background-color: #d4edda; }
+            .occupancy-plan .legend .box.booked { background-color: #f8d7da; }
+            .occupancy-plan .legend .box.partial { 
+                background-color: #d4edda; position: relative; overflow: hidden;
+            }
+            .occupancy-plan .legend .box.partial::after {
+                content: ""; position: absolute; top: 0; right: 0; width: 0; height: 0;
+                border-style: solid; border-width: 0 15px 15px 0; border-color: transparent #f8d7da transparent transparent;
+            }
         </style>';
 
         return $style . $html;

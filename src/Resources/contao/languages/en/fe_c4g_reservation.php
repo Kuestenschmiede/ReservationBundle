@@ -199,3 +199,9 @@ $GLOBALS['TL_LANG']['fe_c4g_reservation']['decimal_seperator'] = '.';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['thousands_seperator'] = '’';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['currency'] = '€';
 $GLOBALS['TL_LANG']['fe_c4g_reservation']['switchCurrencyPosition'] = false;
+
+/** OCCUPANCY PLAN */
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_legend'] = 'Legend';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_free'] = 'Free';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_booked'] = 'Booked';
+$GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_partial'] = 'Partially booked';
