@@ -79,6 +79,7 @@ $GLOBALS['TL_LANG'][$str]['desiredCapacityMax'] = array("Maximum number of perso
 $GLOBALS['TL_LANG'][$str]['location_legend'] = array("Settings for the location");
 $GLOBALS['TL_LANG'][$str]['memberId'] = array("Who owns the object?", "Only important if objects are created via the frontend module.");
 $GLOBALS['TL_LANG'][$str]['notification_type'] = array('Automatic confirmation message (optional)', 'Select notification. This setting overrides the module settings and also the setting at the reservation type.');
+$GLOBALS['TL_LANG'][$str]['tags'] = array("Tags", "Assign tags to the object.");
 
 $GLOBALS['TL_LANG'][$str]['price'] = array("Price", "Specify the price for the booking (for example: 50.00).");
 $GLOBALS['TL_LANG'][$str]['taxOptions'] = ["Select Tax Rate option", "Select a tax option for all prices."];

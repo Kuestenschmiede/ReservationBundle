@@ -9,11 +9,11 @@
  */
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['id'] = array("#", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['organisation'] = 'Company / Organization / School';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['salutation'] = 'Salutation';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['man'] = 'Mr.';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['woman'] = 'Mrs.';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['various'] = ' - ';
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['organisation'] = array('Company / Organization / School', '');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['salutation'] = array('Salutation', '');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['man'] = array('Mr.', '');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['woman'] = array('Mrs.', '');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['various'] = array(' - ', '');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['title']  = array("Title", "Title");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['lastname'] = array("Last name", "Last name");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['firstname'] = array("First name", "First name");
@@ -24,12 +24,17 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['address'] = array(
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['postal'] = array("Postal code", "Postcode");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['city'] = array("City", "Town");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['comment'] = array("comment", "comment from creator");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['agreed'] = array("Agreed", "Agreed to data privacy policy.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional1'] = array("Additional field 1", "Additional information.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional2'] = array("Additional field 2", "Additional information.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional3'] = array("Additional field 3", "Additional information.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional_info'] = array("Additional information", "Additional information.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['reservation_participant_option'] = array("Participant services", "Selected participant options");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['cancellation'] = array("Canceled", "If the appointment is cancelled, select this field");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['checkedIn'] = array('Checked in','');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['payed'] = array('Payed','');
 
-$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['yes'] = 'ja';
+$GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['yes'] = 'yes';
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['no'] = 'no';
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['booked_by'] = 'Booked by';

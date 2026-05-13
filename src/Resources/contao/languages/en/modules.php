@@ -15,12 +15,12 @@ use con4gis\ReservationBundle\Controller\C4gReservationLocationListController;
 use con4gis\ReservationBundle\Controller\C4gReservationObjectsController;
 use con4gis\ReservationBundle\Controller\C4gReservationSpeakerListController;
 use con4gis\ReservationBundle\Controller\C4gReservationAddressListController;
+use con4gis\ReservationBundle\Controller\C4gReservationCheckInController;
 use con4gis\ReservationBundle\Controller\C4gReservationOccupancyPlanController;
 
 $GLOBALS['TL_LANG']['MOD']['Reservation'] = array('con4gis Reservation', 'www.con4gis.org');
 $GLOBALS['TL_LANG']['MOD']['C4gReservation'] = array('Reservations', 'What times have already been reserved?');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationObject'] = array('Reservable objects', 'Define bookable objects (e.g. rooms, tables).');
-$GLOBALS['TL_LANG']['MOD']['C4gReservationLocation'] = array('Event locations', 'Here you can maintain the event locations.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationLocation'] = array('Event organizers/locations', 'Here you can maintain the event organizers and locations.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservation types', 'Define the selection of reservation types.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationParams'] = array('Services & Options', 'Entry of various booking options (optional).');
@@ -29,6 +29,9 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationEventAudience'] = array('Target audien
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventSpeaker'] = array('Speaker', 'Here you can maintain the speakers.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Topics', 'Here you can, for example, store the seminar topics.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Form settings', 'Here you can configure the form and link it in the module.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationSuspension'] = array('Suspension dates', 'Here you can manage lists of days on which no bookings are possible.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationCheckIn'] = array('Ticket CheckIn', 'Simple module for checking in guests.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationTag'] = array('Tags', 'Tags that can be set on the object.');
 
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Form', 'Reservation form');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE] = array('con4gis-Reservation: List', 'Reservation list');
@@ -37,4 +40,5 @@ $GLOBALS['TL_LANG']['FMD'][C4gReservationSpeakerListController::TYPE]  = array('
 $GLOBALS['TL_LANG']['FMD'][C4gReservationLocationListController::TYPE]  = array('con4gis-Reservation: Location', 'Location');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationObjectsController::TYPE]  = array('con4gis-Reservation: Object maintenance', 'Members can maintain their own objects. E.g. for a rental system.');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationAddressListController::TYPE] = array('con4gis-Reservation: address list', 'Address list e.g. for label printing (special notifications and reservation types).');
+$GLOBALS['TL_LANG']['FMD'][C4gReservationCheckInController::TYPE]  = array('con4gis-Reservation: CheckIn', 'Simple module for checking in guests.');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationOccupancyPlanController::TYPE] = array('con4gis-Reservation: Occupancy Plan', 'Shows the occupancy of objects in a calendar.');

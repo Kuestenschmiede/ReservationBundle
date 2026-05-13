@@ -9,11 +9,11 @@
  */
 
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['id'] = array("#", "");
-$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['organisation'] = 'Company / Organization / School';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['salutation'] = 'Salutation';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['man'] = 'Mr.';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['woman'] = 'Mrs.';
-$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['various'] = ' - ';
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['organisation'] = array('Company / Organization / School', '');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['salutation'] = array('Salutation', '');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['man'] = array('Mr.', '');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['woman'] = array('Mrs.', '');
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['various'] = array(' - ', '');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['title']  = array("Title", "Title");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['lastname'] = array("Last name", "Last name");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['firstname'] = array("First name", "First name");
@@ -23,12 +23,13 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['address'] = array("Stree
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['postal'] = array("Postal code", "Postcode");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['city'] = array("City", "Town");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['comment'] = array("comment", "comment from creator");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['agreed'] = array("Agreed", "Agreed to data privacy policy.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['reservation_participant_option'] = array("Participant services", "Selected participant options");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['cancellation'] = array("Canceled", "If the appointment is cancelled, select this field");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['checkedIn'] = array('Checked in','');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['payed'] = array('Payed','');
 
-$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['yes'] = 'ja';
+$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['yes'] = 'yes';
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['participants_legend'] = "Participant Data";
