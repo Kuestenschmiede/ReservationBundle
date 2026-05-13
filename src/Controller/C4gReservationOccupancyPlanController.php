@@ -96,11 +96,11 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             $this->session->setSessionValue('reservationSettings', $settings->current()->id);
         }
 
-        $html = '<div class="occupancy-plan">';
+        $html = '<div id="c4g_occupancy_plan" class="occupancy-plan">';
         $html .= '<div class="calendar-nav">';
-        $html .= '<a href="' . Controller::addToUrl("month=$prevMonth&year=$prevYear", true, ['date']) . '">&laquo;</a>';
+        $html .= '<a class="c4g-calendar-link" href="' . Controller::addToUrl("month=$prevMonth&year=$prevYear", true, ['date']) . '" data-anchor="#c4g_occupancy_plan">&laquo;</a>';
         $html .= '<span>' . $GLOBALS['TL_LANG']['MONTHS'][intval($month)-1] . ' ' . $year . '</span>';
-        $html .= '<a href="' . Controller::addToUrl("month=$nextMonth&year=$nextYear", true, ['date']) . '">&raquo;</a>';
+        $html .= '<a class="c4g-calendar-link" href="' . Controller::addToUrl("month=$nextMonth&year=$nextYear", true, ['date']) . '" data-anchor="#c4g_occupancy_plan">&raquo;</a>';
         $html .= '</div>';
 
         $html .= '<table class="calendar">';
@@ -135,12 +135,13 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                 if ($page) {
                     $link = $page->getFrontendUrl();
                     $link .= (str_contains($link, '?') ? '&' : '?') . 'date=' . $dateFormatted;
+                    $anchor = '#c4g_reservation_form';
                 }
             }
 
             $html .= '<td class="' . $class . '">';
             if ($link) {
-                $html .= '<a href="' . $link . '"><span class="day-num">' . $day . '</span>';
+                $html .= '<a class="c4g-calendar-link" href="' . $link . '" data-anchor="' . $anchor . '"><span class="day-num">' . $day . '</span>';
             } else {
                 $html .= '<span><span class="day-num">' . $day . '</span>';
             }
