@@ -31,6 +31,7 @@ $GLOBALS['TL_LANG']['MOD']['C4gReservationEventTopic'] = array('Thema/Schwerpunk
 $GLOBALS['TL_LANG']['MOD']['C4gReservationSettings'] = array('Formulareinstellung', 'Hier können Sie das Formular konfigurieren und im Modul verknüpfen.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationSuspension'] = array('Sperrtage', 'Hier können Sie Listen von Tagen verwalten, an denen keine Buchungen möglich sind.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationCheckIn'] = array('Ticket CheckIn', 'Einfaches Modul zum einchecken der Gäste.');
+$GLOBALS['TL_LANG']['MOD']['C4gReservationTag'] = array('Auszeichnungen', 'Auszeichnungen die am Objekt gesetzt werden können.');
 
 $GLOBALS['TL_LANG']['FMD'][C4gReservationController::TYPE]  = array('con4gis-Reservation: Formular', 'Reservierungsformular');
 $GLOBALS['TL_LANG']['FMD'][C4gReservationListController::TYPE] = array('con4gis-Reservation: Liste', 'Reservierungsliste');
