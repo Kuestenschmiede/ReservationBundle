@@ -58,6 +58,7 @@ class C4gReservationFrontendObject
     private $priceOption = 'pReservation';
     private $allTypesEvents = null;
     private $conferenceLink = '';
+    private $tags = [];
 
     private $currentReservations = null;
     private $severalBookings = null;
@@ -769,5 +770,21 @@ class C4gReservationFrontendObject
     public function setConferenceLink(string $conferenceLink): void
     {
         $this->conferenceLink = $conferenceLink;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTags(): array
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param array $tags
+     */
+    public function setTags(array $tags): void
+    {
+        $this->tags = $tags;
     }
 }

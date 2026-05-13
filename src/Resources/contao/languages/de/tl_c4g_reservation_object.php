@@ -11,6 +11,7 @@
 $str = 'tl_c4g_reservation_object';
 
 /** FIELDS */
+$GLOBALS['TL_LANG'][$str]['tags'] = array('Tags', 'Wählen Sie die Tags für dieses Objekt aus.');
 $GLOBALS['TL_LANG'][$str]['caption'] = array("Bezeichnung", "Bezeichnung im Frontend sowie Backend. Benennen Sie das Reservierungsobjekt. Beispiele: Raum1, Tisch7, Fachkraft3");
 $GLOBALS['TL_LANG'][$str]['alias'] = array("Alias", "Der Alias wird im Frontend anstelle der ID für Detailansichten und Parameter benutzt.");
 $GLOBALS['TL_LANG'][$str]['options'] = array("Frontendbezeichnung","Wird alternativ im Frontend dargestellt.");

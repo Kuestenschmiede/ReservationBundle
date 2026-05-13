@@ -37,6 +37,7 @@ $GLOBALS['TL_LANG'][$str]['additionalDuration'] = array("Individuelle Nutzungsda
 $GLOBALS['TL_LANG'][$str]['withCapacity'] = array("Kunde kann Personenanzahl angeben","Der Kunde kann die Personenanzahl angeben. Dieses wird bspw. für eine Tischreservierung im Restaurant benötigt.");
 $GLOBALS['TL_LANG'][$str]['moveCapacity'] = array("Personenzahleingabe verschieben","Die Eingabe der Personenzahl wird oberhalb der Teilnehmerfelder dargestellt. Achtung! Nur bei Arten sinnvoll, bei denen die Personenanzahl nicht die Objektauswahl beeinflussent.");
 $GLOBALS['TL_LANG'][$str]['showFreeSeats'] = array("Freie Plätze anzeigen","Offene Plätze werden dargestellt.");
+$GLOBALS['TL_LANG'][$str]['showTagsInForm'] = array("Tags im Formular anzeigen","Wenn diese Option aktiv ist, werden die Tags der Reservierungsobjekte im Formular angezeigt.");
 $GLOBALS['TL_LANG'][$str]['showEndTime'] = array("Die Endzeiten werden mit ausgegeben","Die Endzeiten werden mit dargestellt (abhängig von der Konfiguration).");
 $GLOBALS['TL_LANG'][$str]['showPrices'] = array("Preise anzeigen","Preise werden dargestellt.");
 $GLOBALS['TL_LANG'][$str]['showPricesWithTaxes'] = array("Preise inkl. Steuern berechnen und anzeigen.", "Die Preise werden inklusive Mehrwertsteuer dargestellt.");

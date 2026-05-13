@@ -2073,6 +2073,28 @@ class C4gReservationHandler
                 $frontendObject->setCurrentReservations($currentReservations);
                 $frontendObject->setSeveralBookings($severalBookings);
 
+                $tagIds = \Contao\StringUtil::deserialize($object['tags'], true);
+                if (!empty($tagIds)) {
+                    $tags = [];
+                    $objTags = \con4gis\ReservationBundle\Classes\Models\C4gReservationTagModel::findMultipleByIds($tagIds);
+                    if ($objTags) {
+                        foreach ($objTags as $objTag) {
+                            $iconPath = '';
+                            if ($objTag->icon) {
+                                $objFile = \Contao\FilesModel::findByUuid($objTag->icon);
+                                if ($objFile) {
+                                    $iconPath = $objFile->path;
+                                }
+                            }
+                            $tags[] = [
+                                'name' => $objTag->name,
+                                'icon' => $iconPath
+                            ];
+                        }
+                    }
+                    $frontendObject->setTags($tags);
+                }
+
                 if ($cloneObject) {
                     $frontendObject->setTimeinterval(($object['time_interval'] && $object['time_interval'] !== 1) || !$cloneObject['time_interval'] ? $object['time_interval']: $cloneObject['time_interval']);
                     $frontendObject->setDuration($object['duration'] ?: $cloneObject['duration']);

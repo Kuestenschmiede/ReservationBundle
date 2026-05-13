@@ -95,7 +95,8 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                     'min' => $reservationObject->getDesiredCapacity()[0] ?: 1,
                     'max' => $reservationObject->getDesiredCapacity()[1] ?: 0,
                     'almostFullyBookedAt' => $reservationObject->getAlmostFullyBookedAt(),
-                    'openingHours' => $reservationObject->getOpeningHours()
+                    'openingHours' => $reservationObject->getOpeningHours(),
+                    'tags' => $reservationObject->getTags()
                 ];
                 // setting begin Date and Time initially
                 if ($typeOfObject == 'fixed_date') {
@@ -375,6 +376,35 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationObjectField->setHidden($reservationSettings->objectHide);
         $reservationObjectField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationObjectField;
+
+        if ($reservationSettings->showTagsInForm) {
+            $tagIndex = 0;
+            foreach ($reservationObjects as $reservationObject) {
+                $tags = $reservationObject->getTags();
+                if (!empty($tags)) {
+                    $tagHtml = '<div class="c4g_reservation_tags">';
+                    foreach ($tags as $tag) {
+                        $tagHtml .= '<span class="c4g_reservation_tag">';
+                        if ($tag['icon']) {
+                            $tagHtml .= '<img src="' . $tag['icon'] . '" alt="' . $tag['name'] . '" title="' . $tag['name'] . '" class="c4g_reservation_tag_icon"> ';
+                        }
+                        $tagHtml .= '<span class="c4g_reservation_tag_name">' . $tag['name'] . '</span>';
+                        $tagHtml .= '</span>';
+                    }
+                    $tagHtml .= '</div>';
+
+                    $tagField = new C4GInfoTextField();
+                    $tagField->setFieldName('tags_' . $listType['id'] . '_' . $tagIndex);
+                    $tagField->setInitialValue($tagHtml);
+                    $tagField->setCondition([
+                        new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
+                        new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id'])
+                    ]);
+                    $this->fieldList[] = $tagField;
+                }
+                $tagIndex++;
+            }
+        }
 
         if ($reservationSettings->showDetails) {
             foreach ($reservationObjects as $reservationObject) {
