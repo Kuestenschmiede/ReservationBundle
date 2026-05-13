@@ -42,6 +42,7 @@ $GLOBALS['TL_LANG'][$str]['showEndTime'] = array("Die Endzeiten werden mit ausge
 $GLOBALS['TL_LANG'][$str]['showPrices'] = array("Preise anzeigen","Preise werden dargestellt.");
 $GLOBALS['TL_LANG'][$str]['showPricesWithTaxes'] = array("Preise inkl. Steuern berechnen und anzeigen.", "Die Preise werden inklusive Mehrwertsteuer dargestellt.");
 $GLOBALS['TL_LANG'][$str]['showDateTime'] = array("Termin am Objekt anzeigen","Zeigt den ausgewählten Termin direkt am Objekt an. Achtung! Diese Funktion greift aktuell nur im Standard (Zeitauswahl).");
+$GLOBALS['TL_LANG'][$str]['hideTime'] = array("Uhrzeit nicht anzeigen","Die Uhrzeit wird im Formular nicht angezeigt, aber dennoch wie definiert gespeichert.");
 $GLOBALS['TL_LANG'][$str]['showMemberData'] = array("Mitgliederdaten übernehmen","Vorhandene Mitgliederdaten werden automatisch in den Formularfeldern vorbelegt.");
 $GLOBALS['TL_LANG'][$str]['showDetails'] = array("Details anzeigen","Zusatzinformationen wie Bild und Beschreibung werden dargestellt. Bei den Events Teaser und Bild.");
 $GLOBALS['TL_LANG'][$str]['removeBookedDays'] = array("Ausgebuchte Tage im Kalender sperren","Der Kalendertag ist ausgebucht nicht auswählbar. Achtung! Die Überprüfung ist zum Teil langwirrig.");

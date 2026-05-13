@@ -384,23 +384,18 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 if (!empty($tags)) {
                     $tagHtml = '<div class="c4g_reservation_tags">';
                     foreach ($tags as $tag) {
-                        $tagHtml .= '<span class="c4g_reservation_tag">';
-                        if ($tag['icon']) {
-                            $tagHtml .= '<img src="' . $tag['icon'] . '" alt="' . $tag['name'] . '" title="' . $tag['name'] . '" class="c4g_reservation_tag_icon"> ';
-                        }
-                        $tagHtml .= '<span class="c4g_reservation_tag_name">' . $tag['name'] . '</span>';
-                        $tagHtml .= '</span>';
+                        $tagField = new C4GImageField();
+                        $tagField->setTitle($tag['name']);
+                        $tagField->setFieldName('tags_' . $listType['id'] . '_' . $tagIndex);
+                        $tagField->setInitialValue($tag['icon']);
+                        $tagField->setWidth(64); //ToDo config
+                        $tagField->setHeight(64); //ToDo config
+                        $tagField->setCondition([
+                            new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
+                            $condition
+                        ]);
+                        $this->fieldList[] = $tagField;
                     }
-                    $tagHtml .= '</div>';
-
-                    $tagField = new C4GInfoTextField();
-                    $tagField->setFieldName('tags_' . $listType['id'] . '_' . $tagIndex);
-                    $tagField->setInitialValue($tagHtml);
-                    $tagField->setCondition([
-                        new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_object_' . $listType['id'], $reservationObject->getId()),
-                        new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id'])
-                    ]);
-                    $this->fieldList[] = $tagField;
                 }
                 $tagIndex++;
             }

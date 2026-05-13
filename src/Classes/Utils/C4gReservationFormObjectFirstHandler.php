@@ -452,7 +452,8 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
         $jsDateValue = json_encode((string)$jsInitialDate);
         $jsShowDateTimeVal = json_encode((int)$showDateTime);
         $jsHasUrlDate = json_encode(!!\Contao\Input::get('date'));
-        $script = "var lid=$jsListId;var dv=$jsDateValue;var sdt=$jsShowDateTimeVal;var hud=$jsHasUrlDate;var up=new URLSearchParams(window.location.search);var ud=up.get('date');if(ud){dv=ud}if(dv){if(typeof window.con4gis_reservation_values==='undefined'){window.con4gis_reservation_values={}}if(hud||!window.con4gis_reservation_values[lid]){window.con4gis_reservation_values[lid]=dv}if(hud){document.cookie='reservationInitialDateCookie='+encodeURIComponent(dv)+'; path=/; SameSite=Lax'}}var af=document.getElementById('c4g_reservation_object_'+lid);var av=af?af.value:'';var df=document.getElementById('c4g_beginDate_'+lid+'-33'+av);if(dv&&df&&(hud||!df.value)){df.value=dv}var sd=function(){var f=document.getElementById('c4g_reservation_object_'+lid);var a=f?f.value:av;var d=document.getElementById('c4g_beginDate_'+lid+'-33'+a);var v=ud||dv;var p=document.getElementById('c4g_beginDate_'+lid+'-33'+a+'_picker');if(v&&p&&p.datepicker&&typeof p.datepicker.setDate==='function'){try{var tv=v;if(v.indexOf('-')!==-1&&v.length===10){var pts=v.split('-');tv=new Date(pts[0],pts[1]-1,pts[2])}p.datepicker.setDate(tv);if(d&&d.value!==v){d.value=v}}catch(e){console.error(e)}}else if(p){setTimeout(sd,100)}};setTimeout(sd,100);if(typeof setTimeset==='function'){setTimeset(dv,lid,sdt,av)}if(typeof handleBrickConditions==='function'){handleBrickConditions()}";
+        $jsHideTime = json_encode($reservationSettings->hideTime ? "1" : "0");
+        $script = "(function(){var lid=".$jsListId.";var sdt=".$jsShowDateTimeVal.";var ht=".$jsHideTime.";var up=new URLSearchParams(window.location.search);var ud=up.get('date');var dv=".$jsDateValue.";if(ud){dv=ud}if(!window.con4gis_reservation_initialized){window.con4gis_reservation_initialized={}}if(ud&&!window.con4gis_reservation_initialized[lid]){window.con4gis_reservation_initialized[lid]=true;document.cookie='reservationInitialDateCookie='+encodeURIComponent(ud)+'; path=/; SameSite=Lax'}var rd=function(){var url=new URL(window.location.href);if(url.searchParams.has('date')){url.searchParams.delete('date');window.history.replaceState({},'',url.toString());ud=null;dv=null}};var sd=function(){var af=document.getElementById('c4g_reservation_object_'+lid);var av=af?af.value:'';var df=document.getElementById('c4g_beginDate_'+lid+'-33'+av);var p=document.getElementById('c4g_beginDate_'+lid+'-33'+av+'_picker');if(ud&&p&&p.datepicker&&typeof p.datepicker.setDate==='function'){try{var tv=ud;if(ud.indexOf('.')!==-1){var pts=ud.split('.');tv=new Date(pts[2],pts[1]-1,pts[0])}p.datepicker.setDate(tv);if(df){df.value=ud}if(p.datepicker.options){var os=p.datepicker.options.onSelect;p.datepicker.options.onSelect=function(dt,inst){rd();if(typeof os==='function'){os(dt,inst)}}}ud=null}catch(e){console.error(e)}}else if(ud&&df){df.value=ud;ud=null}if(p&&!p.datepicker&&ud){setTimeout(sd,100)}};setTimeout(sd,100);var afi=document.getElementById('c4g_reservation_object_'+lid);var avi=afi?afi.value:'';if(typeof setTimeset==='function'){setTimeset(dv,lid,sdt,avi)}if(ht==='1'){var style=document.createElement('style');style.innerHTML='.c4g-hide-field { display: none !important; }';(document.head||document.getElementsByTagName('head')[0]).appendChild(style)}if(typeof handleBrickConditions==='function'){handleBrickConditions()}})();";
         $this->getDialogParams()->setOnloadScript($script);
             //changes title
             $titleDateHour = '';
@@ -521,7 +522,7 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $objDate = new Date($this->initialValues->getDate(), Date::getFormatFromRgxp('date'));
                 $initialBookingDateValue = $objDate->date;
             } else if ($listType['directBooking']) {
-                $objDate = new Date(date($GLOBALS['TL_CONFIG']['dateFormat'],time()), Date::getFormatFromRgxp('date'));
+                $objDate = new Date(time(), Date::getFormatFromRgxp('date'));
                 $initialBookingDateValue = $objDate->date;
             } else {
                 $initialBookingDateValue = C4gReservationHandler::getBookableMinDate([$reservationObject], $listType);
@@ -571,20 +572,28 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                 $initialBookingTime = false;
             }
 
-            if ($initialBookingTime) {                
+            if ($initialBookingTime) {
                 $options = C4gReservationHandler::getReservationNowTime($objects[0], $reservationSettings->showEndTime, $reservationSettings->showFreeSeats);
+                if ($reservationSettings->hideTime && $options) {
+                    $firstOption = reset($options);
+                    $initialBookingTime = $firstOption['id'];
+                }
                 $classes = 'reservation_time_button reservation_time_button_direct reservation_time_button_' . $listType['id'];
             } else {
                 $options = C4gReservationHandler::getReservationTimes(
                     $reservationObjects,
                     $listType['id'],
                     -1,
-                    $initialBookingDate,
+                    $initialBookingDateValue ?: $initialBookingDate,
                     0,
                     0,
                     $reservationSettings->showEndTime,
                     $reservationSettings->showFreeSeats
                 );
+                if ($reservationSettings->hideTime && $options) {
+                    $firstOption = reset($options);
+                    $initialBookingTime = $firstOption['id'];
+                }
                 
                 if ($typeOfObject == 'fixed_date') {
                     $classes = 'reservation_time_button reservation_time_button_' . $listType['id'] . '-33' . $reservationObject->getId() . C4gReservationHandler::getButtonStateClass($reservationObject,$listType['objectType']);
@@ -599,6 +608,9 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $reservationBeginTimeField->setTitle($titleBeginTime);
             $reservationBeginTimeField->setDescription('');
             $reservationBeginTimeField->setFormField(true);
+            if ($reservationSettings->hideTime) {
+                $classes .= ' c4g-hide-field';
+            }
             $reservationBeginTimeField->setDatabaseField(true);
             $reservationBeginTimeField->setOptions($initialBookingTime || $options ? $options : []);
             $reservationBeginTimeField->setCallOnChange(false);
