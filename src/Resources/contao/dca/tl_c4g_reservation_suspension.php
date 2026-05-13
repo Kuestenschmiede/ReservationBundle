@@ -87,7 +87,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{suspension_legend}, caption; {suspension_dates_legend}, date_range_wizard, suspension_dates;'
+        'default'   =>  '{suspension_legend}, caption, showCaption, showComment; {suspension_dates_legend}, date_range_wizard, suspension_dates;'
     ),
 
     //Fields
@@ -112,6 +112,28 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>true, 'tl_class'=>'long'),
             'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+
+        'showCaption' => array (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['showCaption'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'checkbox',
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'boolean', 'default' => false)
+        ),
+
+        'showComment' => array (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['showComment'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'checkbox',
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'boolean', 'default' => false)
         ),
 
         'date_range_wizard' => array
