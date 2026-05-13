@@ -87,7 +87,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{suspension_legend}, caption, showCaption, showComment; {suspension_dates_legend}, date_range_wizard, suspension_dates;'
+        'default'   =>  '{suspension_legend}, caption, showCaption, showComment, showCompany; {suspension_dates_legend}, date_range_wizard, suspension_dates;'
     ),
 
     //Fields
@@ -136,6 +136,17 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
             'sql'                     => array('type' => 'boolean', 'default' => false)
         ),
 
+        'showCompany' => array (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['showCompany'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'checkbox',
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'boolean', 'default' => false)
+        ),
+
         'date_range_wizard' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['date_range_wizard'],
@@ -169,7 +180,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
                         'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['comment'],
                         'exclude'                 => true,
                         'inputType'               => 'text',
-                        'eval'                    => array('mandatory'=>false, 'style'=>'width: 400px')
+                        'eval'                    => array('mandatory'=>false, 'style'=>'width: 300px')
+                    ),
+                    'company' => array
+                    (
+                        'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['company'],
+                        'exclude'                 => true,
+                        'inputType'               => 'text',
+                        'eval'                    => array('mandatory'=>false, 'style'=>'width: 200px')
                     )
                 )
             ),

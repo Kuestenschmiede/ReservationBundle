@@ -266,7 +266,9 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                                             'caption' => $suspension->caption,
                                             'showCaption' => (bool)$suspension->showCaption,
                                             'showComment' => (bool)$suspension->showComment,
+                                            'showCompany' => (bool)$suspension->showCompany,
                                             'comment' => $dateEntry['comment'] ?? '',
+                                            'company' => $dateEntry['company'] ?? '',
                                             'priority' => 10
                                         ];
                                     }
@@ -297,7 +299,9 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                             'caption' => $exclusion['reason_exclusion'] ?? '',
                             'showCaption' => true,
                             'showComment' => false,
+                            'showCompany' => false,
                             'comment' => '',
+                            'company' => '',
                             'priority' => 5
                         ];
                     }
@@ -312,19 +316,21 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
             $isGlobalSuspended = false;
             $suspensionText = '';
+            $reservationTexts = [];
             $maxPriority = -1;
             foreach ($suspensionDates as $sDate) {
                 if ($dayStart <= $sDate['end'] && $dayEnd >= $sDate['start']) {
                     $isGlobalSuspended = true;
                     if ($sDate['priority'] > $maxPriority) {
                         $currentText = '';
-                        if ($sDate['showCaption'] && $sDate['showComment']) {
-                            $currentText = $sDate['comment'] ?: $sDate['caption'];
-                        } elseif ($sDate['showCaption']) {
-                            $currentText = $sDate['caption'];
-                        } elseif ($sDate['showComment']) {
+                        if ($sDate['showComment'] && $sDate['comment']) {
                             $currentText = $sDate['comment'];
+                        } elseif ($sDate['showCompany'] && $sDate['company']) {
+                            $currentText = $sDate['company'];
+                        } elseif ($sDate['showCaption'] && $sDate['caption']) {
+                            $currentText = $sDate['caption'];
                         }
+
                         if ($currentText) {
                             $suspensionText = $currentText;
                             $maxPriority = $sDate['priority'];
@@ -394,7 +400,9 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                         foreach ($objReservations as $res) {
                             if ($res['beginDate'] <= $dayStart && $res['endDate'] >= $dayEnd) {
                                 $coversWholeDay = true;
-                                break;
+                                if ($res['organisation'] && !in_array($res['organisation'], $reservationTexts)) {
+                                    $reservationTexts[] = $res['organisation'];
+                                }
                             }
                         }
                         if ($coversWholeDay) {
@@ -404,15 +412,21 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                         }
                     } elseif ($bookedCount > 0) {
                         $dayPartialCount++;
+                        foreach ($objReservations as $res) {
+                            if ($res['organisation'] && !in_array($res['organisation'], $reservationTexts)) {
+                                $reservationTexts[] = $res['organisation'];
+                            }
+                        }
                     }
                 }
             }
 
             if (!isset($occupancy[$day])) {
+                $reservationText = implode(', ', $reservationTexts);
                 if ($dayBookedCount >= count($objects) || $dayEnd < time()) {
-                    $occupancy[$day] = ['status' => 'booked', 'text' => ''];
+                    $occupancy[$day] = ['status' => 'booked', 'text' => $reservationText];
                 } elseif ($dayBookedCount > 0 || $dayPartialCount > 0) {
-                    $occupancy[$day] = ['status' => 'partial', 'text' => ''];
+                    $occupancy[$day] = ['status' => 'partial', 'text' => $reservationText];
                 } else {
                     $occupancy[$day] = ['status' => 'free', 'text' => ''];
                 }
