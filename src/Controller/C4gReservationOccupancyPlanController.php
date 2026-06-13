@@ -172,11 +172,11 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         
         if ($this->show_occupancy_legend) {
             $html .= '<div class="legend">';
-            $html .= '<strong>' . ($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_legend'] ?: 'Legende') . ':</strong>';
+            $html .= '<strong>' . (($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_legend'] ?? '') ?: 'Legende') . ':</strong>';
             $html .= '<ul>';
-            $html .= '<li><span class="box free"></span> ' . ($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_free'] ?: 'Frei') . '</li>';
-            $html .= '<li><span class="box partial"></span> ' . ($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_partial'] ?: 'Teilweise belegt') . '</li>';
-            $html .= '<li><span class="box booked"></span> ' . ($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_booked'] ?: 'Belegt') . '</li>';
+            $html .= '<li><span class="box free"></span> ' . (($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_free'] ?? '') ?: 'Frei') . '</li>';
+            $html .= '<li><span class="box partial"></span> ' . (($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_partial'] ?? '') ?: 'Teilweise belegt') . '</li>';
+            $html .= '<li><span class="box booked"></span> ' . (($GLOBALS['TL_LANG']['fe_c4g_reservation']['occupancy_booked'] ?? '') ?: 'Belegt') . '</li>';
             $html .= '</ul>';
             $html .= '</div>';
         }
