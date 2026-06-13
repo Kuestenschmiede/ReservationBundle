@@ -105,7 +105,9 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
         $html .= '<table class="calendar">';
         $html .= '<thead><tr>';
-        foreach ($GLOBALS['TL_LANG']['DAYS_SHORT'] as $dayShort) {
+        $daysShort = $GLOBALS['TL_LANG']['DAYS_SHORT'];
+        $daysShort[] = array_shift($daysShort);
+        foreach ($daysShort as $dayShort) {
             $html .= '<th>' . $dayShort . '</th>';
         }
         $html .= '</tr></thead>';
