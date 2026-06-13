@@ -2,6 +2,7 @@
 
 namespace con4gis\ReservationBundle\Classes\Callbacks;
 
+use con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use Contao\Backend;
 use Contao\BackendUser;
@@ -78,6 +79,7 @@ class C4gReservationType extends Backend
         // Update the database
         $this->Database->prepare("UPDATE tl_c4g_reservation_type SET tstamp=". time() .", published='" . ($blnPublished ? 0 : 1) . "' WHERE id=?")
             ->execute($intId);
+        C4gReservationCacheAutomator::purgeReservationFormCache();
         $objVersions = new Versions('tl_c4g_reservation_type', $intId);
         $objVersions->create();
     }

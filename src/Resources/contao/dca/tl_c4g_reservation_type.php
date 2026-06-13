@@ -34,6 +34,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     (
         'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
+        'onsubmit_callback' => [[\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class, 'purgeReservationFormCache']],
         'onload_callback'   => [[$cbClass, 'showInfoMessage']],
         'sql'               => array
         (

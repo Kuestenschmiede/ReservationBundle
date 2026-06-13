@@ -24,6 +24,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
     (
         'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
+        'onsubmit_callback' => [[\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class, 'purgeReservationFormCache']],
         'sql'               => array
         (
             'keys' => array
@@ -259,6 +260,7 @@ class tl_c4g_reservation_params extends \Contao\Backend
         // Update the database
         $this->Database->prepare("UPDATE tl_c4g_reservation_params SET tstamp=" . time() . ", published='" . ($blnPublished ? '0' : '1') . "' WHERE `id`=?")
             ->execute($intId);
+        \con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::purgeReservationFormCache();
         $objVersions = new Versions('tl_c4g_reservation_params', $intId);
 		$objVersions->create();
     }
