@@ -902,7 +902,8 @@ class C4gReservationController extends C4GBaseController
                                 'directBooking' => $type['directBooking'],
                                 'min_residence_time' => $type['min_residence_time'],
                                 'max_residence_time' => $type['max_residence_time'],
-                                'default_residence_time' => $type['default_residence_time']
+                                'default_residence_time' => $type['default_residence_time'],
+                                'ignoreCapacity' => $type['ignoreCapacity']
                             );
                             $foundCaption = true;
                             break;
@@ -932,7 +933,8 @@ class C4gReservationController extends C4GBaseController
                         'directBooking' => $type['directBooking'],
                         'min_residence_time' => $type['min_residence_time'],
                         'max_residence_time' => $type['max_residence_time'],
-                        'default_residence_time' => $type['default_residence_time']
+                        'default_residence_time' => $type['default_residence_time'],
+                        'ignoreCapacity' => $type['ignoreCapacity']
                     );
                 }
             }
@@ -1062,7 +1064,11 @@ foreach ($typelist as $listType) {
         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
     }
 
-    $reservationDesiredCapacity->setFormField(true);
+    if ($listType['ignoreCapacity']) {
+        $reservationDesiredCapacity->setFormField(false);
+    } else {
+        $reservationDesiredCapacity->setFormField(true);
+    }
     $reservationDesiredCapacity->setEditable(true);
     $reservationDesiredCapacity->setCondition(array($condition));
     $reservationDesiredCapacity->setInitialValue($minCapacity);
@@ -1150,10 +1156,16 @@ foreach ($typelist as $listType) {
     $reservationDesiredCapacity->setNotificationField(true);
     $reservationDesiredCapacity->setAdditionalID($listType['id']);
     $reservationDesiredCapacity->setStyleClass('desired-capacity');
-    $reservationDesiredCapacity->setHidden(!$this->reservationSettings->withCapacity);
+    if (!$listType['ignoreCapacity']) {
+        $reservationDesiredCapacity->setHidden(!$this->reservationSettings->withCapacity);
+    } else {
+        $reservationDesiredCapacity->setHidden(true);
+    }
 
-    if (!$this->reservationSettings->moveCapacity) {
-      $fieldList[] = $reservationDesiredCapacity;
+    if (!$listType['ignoreCapacity']) {
+        if (!$this->reservationSettings->moveCapacity) {
+            $fieldList[] = $reservationDesiredCapacity;
+        }
     }
 
     $hidden = false;
@@ -1858,7 +1870,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             } else if ($rowField == "participants") {
 
                 //ToDo why is here a second desired capacity
-                if ($this->reservationSettings->withCapacity && $onlyParticipants) {
+                if (!$type['ignoreCapacity'] && $this->reservationSettings->withCapacity && $onlyParticipants) {
                     $reservationDesiredCapacity = new C4GNumberField();
                     $error = 0;
                     $withEventMaxParti = $eventObj->maxParticipantsPerEventBooking ?:0;
@@ -1928,7 +1940,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     if ($isPartiPerEvent){
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$minCapacity.'-'.$isPartiPerEvent.')');
                     }
-                    $reservationDesiredCapacity->setFormField(true);
+                    if ($type['ignoreCapacity']) {
+                        $reservationDesiredCapacity->setFormField(false);
+                    } else {
+                        $reservationDesiredCapacity->setFormField(true);
+                    }
                     $reservationDesiredCapacity->setEditable(true);
                     $reservationDesiredCapacity->setCondition(array($condition));
                     $reservationDesiredCapacity->setInitialValue($minCapacity);
@@ -1947,8 +1963,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $reservationDesiredCapacity->setAdditionalID($listType['id']);
                     $reservationDesiredCapacity->setStyleClass('desired-capacity');
 
-                    if ($this->reservationSettings->moveCapacity) {
-                        $fieldList[] = $reservationDesiredCapacity;
+                    if (!$listType['ignoreCapacity']) {
+                        if ($this->reservationSettings->moveCapacity) {
+                            $fieldList[] = $reservationDesiredCapacity;
+                        }
                     }
                 }
 
@@ -3810,7 +3828,16 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $maxParticipants = $reservationType->maxParticipantsPerBooking;
                 }
 
-                $desiredCapacity = isset($putVars['desiredCapacity_'.$reservationType->id]) ? $putVars['desiredCapacity_'.$reservationType->id] : null; //ToDo $maxParticipants
+            $ignoreCapacity = false;
+            if ($reservationType) {
+                $ignoreCapacity = $reservationType->ignoreCapacity;
+            }
+
+            $desiredCapacityValue = isset($putVars['desiredCapacity_'.$reservationType->id]) ? $putVars['desiredCapacity_'.$reservationType->id] : null;
+            if ($ignoreCapacity && !$desiredCapacityValue) {
+                $desiredCapacityValue = 1;
+            }
+            $desiredCapacity = $desiredCapacityValue;
                 if ($desiredCapacity) {
                     $extId = $this->reservationSettings->onlyParticipants ? $desiredCapacity : $desiredCapacity-1;
                     if (strpos($key,"participants_".$type."-".$extId."§") !== false) {
@@ -3847,7 +3874,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 //ToDo check code position
                 //ToDo check without desired capacity field
                 foreach ($putVars as $key => $value) {
-                    $desiredCapacity = isset($putVars['desiredCapacity_'.$reservationType->id]) ? $putVars['desiredCapacity_'.$reservationType->id] : null;
+                    $desiredCapacity = isset($putVars['desiredCapacity_'.$reservationType->id]) ? $putVars['desiredCapacity_'.$reservationType->id] : ($ignoreCapacity ? 1 : null);
                     if ($desiredCapacity) {
                         $extId = $this->reservationSettings->onlyParticipants ? $desiredCapacity : ($desiredCapacity - 1);
                         for ($i = 0; $i <= 100; $i++) {
@@ -3897,8 +3924,14 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $desiredCapacity =  $reservationObject && $reservationObject->desiredCapacityMax ? ($reservationObject->desiredCapacityMax * $factor) : 0;
 
         $participants = '';
+        $pCount = $this->reservationSettings->onlyParticipants ? 0 : 1;
+        if ($ignoreCapacity) {
+            $pCount = 1;
+        }
+        if ($ignoreCapacity && !$participantsArr) {
+            $pCount = 1;
+        }
         if ($participantsArr && count($participantsArr) > 0) {
-            $pCount = $this->reservationSettings->onlyParticipants ? 0 : 1;
             foreach ($participantsArr as $key => $valueArray) {
                 if (strpos($key, '|') === false) {
                     $pCount++;

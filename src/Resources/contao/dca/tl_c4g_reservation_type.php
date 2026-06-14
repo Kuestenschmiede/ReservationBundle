@@ -116,7 +116,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,almostFullyBookedAt,included_params,additional_params,additionalParamsFieldType,additionalParamsMandatory,participant_params,participantParamsFieldType,participantParamsMandatory,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
+        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,ignoreCapacity,almostFullyBookedAt,included_params,additional_params,additionalParamsFieldType,additionalParamsMandatory,participant_params,participantParamsFieldType,participantParamsMandatory,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
     ),
 
     //Subpalettes
@@ -338,6 +338,17 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NULL default 0"
+        ),
+
+        'ignoreCapacity' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['ignoreCapacity'],
+            'default'                 => 0,
+            'exclude'                 => true,
+            'filter'                  => true,
+            'inputType'               => 'checkbox',
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50'),
+            'sql'                     => "int(1) unsigned NULL default 0"
         ),
 
         'almostFullyBookedAt' => array
