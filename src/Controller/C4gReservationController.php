@@ -2548,6 +2548,37 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $qrFileNameField->setDisplay(false);
             $qrFileNameField->setAlign($align);
             $fieldList[] = $qrFileNameField;
+
+            $bankNameField = new C4GTextField();
+            $bankNameField->setFieldName('bankName');
+            $bankNameField->setDatabaseField(false);
+            $bankNameField->setFormField(false);
+            $bankNameField->setPrintable(true);
+            $fieldList[] = $bankNameField;
+
+            $bankIbanField = new C4GTextField();
+            $bankIbanField->setFieldName('bankIban');
+            $bankIbanField->setDatabaseField(false);
+            $bankIbanField->setFormField(false);
+            $bankIbanField->setPrintable(true);
+            $fieldList[] = $bankIbanField;
+
+            $bankBicField = new C4GTextField();
+            $bankBicField->setFieldName('bankBic');
+            $bankBicField->setDatabaseField(false);
+            $bankBicField->setFormField(false);
+            $bankBicField->setPrintable(true);
+            $fieldList[] = $bankBicField;
+
+            $bankQrFileNameField = new C4GImageField();
+            $bankQrFileNameField->setFieldName('bankQrFileName');
+            $bankQrFileNameField->setDatabaseField(false);
+            $bankQrFileNameField->setFormField(false);
+            $bankQrFileNameField->setPrintable(true);
+            $bankQrFileNameField->setWidth(100);
+            $bankQrFileNameField->setHeight(100);
+            $bankQrFileNameField->setAlign('left');
+            $fieldList[] = $bankQrFileNameField;
         }
 
 

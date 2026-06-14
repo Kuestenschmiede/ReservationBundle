@@ -26,10 +26,14 @@ $GLOBALS['TL_LANG'][$str]['contact_city'] = array("City","");
 $GLOBALS['TL_LANG'][$str]['ics'] = array("Generate address data as ics file", "If the checkbox is selected, the data can be placed as ics file in the reservation confirmation.");
 $GLOBALS['TL_LANG'][$str]['icsAlert'] = array("Automatic calendar reminder", "Number of hours before appointment starts");
 $GLOBALS['TL_LANG'][$str]['icsPath'] = array("ics path", "Where can the ics files be stored?");
+$GLOBALS['TL_LANG'][$str]['bankName'] = array("Bank name","Enter the name of the bank.");
+$GLOBALS['TL_LANG'][$str]['bankIban'] = array("IBAN","Enter the IBAN.");
+$GLOBALS['TL_LANG'][$str]['bankBic'] = array("BIC","Enter the BIC/SWIFT.");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['location_legend'] = "Edit location";
 $GLOBALS['TL_LANG'][$str]['contact_legend'] = "Edit contact data";
+$GLOBALS['TL_LANG'][$str]['bank_legend'] = "Edit bank data";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG'][$str]['new'] = array("Add location", "Add location");

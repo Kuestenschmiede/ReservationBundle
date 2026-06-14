@@ -116,7 +116,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,ignoreCapacity,almostFullyBookedAt,included_params,additional_params,additionalParamsFieldType,additionalParamsMandatory,participant_params,participantParamsFieldType,participantParamsMandatory,location,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
+        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,ignoreCapacity,almostFullyBookedAt,included_params,additional_params,additionalParamsFieldType,additionalParamsMandatory,participant_params,participantParamsFieldType,participantParamsMandatory,location,location_id,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
     ),
 
     //Subpalettes
@@ -374,6 +374,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'location'  => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location'],
+            'exclude'           => true,
+            'default'           => 0,
+            'inputType'         => 'select',
+            'foreignKey'        => 'tl_c4g_reservation_location.name',
+            'eval'              => array('chosen' => true, 'includeBlankOption' => true, 'mandatory' => false, 'tl_class' => 'long clr'),
+            'sql'               => "int(10) unsigned NOT NULL default 0",
+            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+        ),
+
+        'location_id'  => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location_id'],
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'select',

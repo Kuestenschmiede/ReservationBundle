@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
     'palettes' => array
     (
         '__selector__' => ['ics'],
-        'default'   =>  '{location_legend}, name, alias, locgeox, locgeoy;{contact_legend},contact_name,contact_phone,contact_email,contact_website,contact_street,contact_postal,contact_city,ics;'
+        'default'   =>  '{location_legend}, name, alias, locgeox, locgeoy;{contact_legend},contact_name,contact_phone,contact_email,contact_website,contact_street,contact_postal,contact_city,ics;{bank_legend},bankName,bankIban,bankBic;'
     ),
 
     'subpalettes' => array
@@ -269,6 +269,30 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'inputType'         => 'fileTree',
             'eval'              => array('fieldType' => 'radio', 'tl_class' => 'clr', 'mandatory' => true),
             'sql'               => "blob NULL"
+        ),
+        'bankName' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['bankName'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+        'bankIban' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['bankIban'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+        'bankBic' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['bankBic'],
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'eval'              => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
         ),
     )
 );

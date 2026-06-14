@@ -4,6 +4,9 @@ namespace con4gis\ReservationBundle\Classes\Utils;
 
 use con4gis\CoreBundle\Classes\C4GUtils;
 use con4gis\ProjectsBundle\Classes\QRCode\LinkToQRCode;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationLocationModel;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use Contao\PageModel;
 
 class C4gReservationCheckInHelper
@@ -36,6 +39,41 @@ class C4gReservationCheckInHelper
         if (!$key) {
             return $params;
         }
+
+        $locationId = 0;
+        if (isset($params['reservation_object']) && $params['reservation_object']) {
+            $obj = C4gReservationObjectModel::findByPk($params['reservation_object']);
+            if ($obj && $obj->location_id) {
+                $locationId = $obj->location_id;
+            }
+        }
+
+        if (!$locationId && isset($params['reservation_type']) && $params['reservation_type']) {
+            $type = C4gReservationTypeModel::findByPk($params['reservation_type']);
+            if ($type && $type->location_id) {
+                $locationId = $type->location_id;
+            }
+        }
+
+        if ($locationId) {
+            $loc = C4gReservationLocationModel::findByPk($locationId);
+            if ($loc) {
+                $params['bankName'] = $loc->bankName ?: '';
+                $params['bankIban'] = $loc->bankIban ?: '';
+                $params['bankBic'] = $loc->bankBic ?: '';
+
+                if ($params['bankIban'] && $params['bankName']) {
+                    $bankContent = "BCD\n001\n1\nSCT\n" . $loc->bankBic . "\n" . $loc->bankName . "\n" . $loc->bankIban . "\nEUR" . $params['priceSum'] . "\n\n\n" . $key;
+                    $bankPath = 'files/c4g_brick_data/qrcode/';
+                    $bankFileName = $bankPath . 'bank_qrcode_' . $key . '.png';
+                    $bankLinkArr = $this->generateQRCode($bankContent, $bankFileName);
+                    if ($bankLinkArr) {
+                        $params['bankQrFileName'] = $bankLinkArr['fileName'];
+                    }
+                }
+            }
+        }
+
         $path = 'files/c4g_brick_data/qrcode/';
         $rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
         if (!is_dir($rootDir.'/'.$path)) {

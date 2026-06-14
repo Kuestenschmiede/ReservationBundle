@@ -23,6 +23,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('Aut
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_confirmation_type'] = array('Bestätigungsnachricht (Backendversand)', 'Sie können aus der Reservierungsliste heraus eine Bestätigungsnachricht verschicken.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_special_type'] = array('Spezialnachricht (Backendversand)', 'Diese Nachricht wird aus der Reservierungsliste heraus anstelle der Bestätigungsnachricht versenden, wenn die Checkbox "Spezialnachricht senden" ausgewählt wurde.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location'] = array("Veranstaltungsort", "Wo findet der Termin statt? Diese Einstellung kann am Objekt und an den Eventeinstellungen überschrieben werden.");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location_id'] = array("Veranstalter", "Wählen Sie den Veranstalter aus.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("Zeitspannenart","Art der Zeitspanne deklarieren.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['min_residence_time'] = array("Minimale Nutzungsdauer (optional)", "Minimale Nutzungsdauer, die der Kunde im Formular wählen darf. Bei 0 gilt das Zeitintervall.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['max_residence_time'] = array("Maximale Nutzungsdauer (optional)", "Maximale Nutzungsdauer, die der Kunde im Formular wählen darf. Bei 0 gilt das Zeitintervall.");

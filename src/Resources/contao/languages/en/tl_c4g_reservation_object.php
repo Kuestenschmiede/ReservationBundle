@@ -26,6 +26,7 @@ $GLOBALS['TL_LANG'][$str]['dateTimeBegin'] = array("Date and Time", "Date and ti
 $GLOBALS['TL_LANG'][$str]['typeOfObjectDuration'] = array("Duration", "Duration of the 'fixed date' object type.");
 $GLOBALS['TL_LANG'][$str]['option'] = array("Name","");
 $GLOBALS['TL_LANG'][$str]['location'] = array("Event location", "Where will the event take place?");
+$GLOBALS['TL_LANG'][$str]['location_id'] = array("Organizer", "Select the organizer.");
 $GLOBALS['TL_LANG'][$str]['speaker'] = array("Speaker", "Who leads the event?");
 $GLOBALS['TL_LANG'][$str]['topic'] = array("Topics", "Here you can link your event topics.");
 $GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Target audience", "Select your target audience.");

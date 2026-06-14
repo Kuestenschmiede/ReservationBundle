@@ -26,10 +26,14 @@ $GLOBALS['TL_LANG'][$str]['contact_city'] = array("Ort","");
 $GLOBALS['TL_LANG'][$str]['ics'] = array("Termindaten als ics file generieren","Wenn die Checkbox ausgewählt ist, können die Daten als ICS Datei in die Reservierungsbestätigung gelegt werden.");
 $GLOBALS['TL_LANG'][$str]['icsAlert'] = array("Automatische Kalendererinnerung","Anzahl der Stunden bevor Termin beginnt");
 $GLOBALS['TL_LANG'][$str]['icsPath'] = array("Pfad zu den ICS Dateien", "Wo können die ICS Dateien abgelegt werden?");
+$GLOBALS['TL_LANG'][$str]['bankName'] = array("Bankname","Geben Sie den Namen der Bank an.");
+$GLOBALS['TL_LANG'][$str]['bankIban'] = array("IBAN","Geben Sie die IBAN an.");
+$GLOBALS['TL_LANG'][$str]['bankBic'] = array("BIC","Geben Sie die BIC/SWIFT an.");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['location_legend'] = "Veranstaltungsort bearbeiten";
 $GLOBALS['TL_LANG'][$str]['contact_legend'] = "Kontaktdaten bearbeiten";
+$GLOBALS['TL_LANG'][$str]['bank_legend'] = "Bankdaten bearbeiten";
 
 /** OPERATIONS **/
 $GLOBALS['TL_LANG'][$str]['new'] = array("Veranstaltungsort hinzufügen","Veranstaltungsort hinzufügen");

@@ -22,6 +22,7 @@ $GLOBALS['TL_LANG'][$str]['allTypesEvents'] = array("Contao Events blockieren Ob
 $GLOBALS['TL_LANG'][$str]['switchAllTypes'] = array("Gilt nur für folgende Reservierungsarten","Hiermit kann die Gültigkeit der vorherigen Checkboxen auf bestimmte Reservierungsarten reduziert werden (optional).");
 $GLOBALS['TL_LANG'][$str]['priority'] = array("Soll vorrangig angeboten werden","Ist dieser Schalter aktiv, dann wir das Objekt vorausgewählt, wenn mehrere Objekte in den Zeitpunkt passen.");
 $GLOBALS['TL_LANG'][$str]['location'] = array("Veranstaltungsort", "Wo findet der Termin statt? Überschreibt die Einstellung an der Reservierungsart.");
+$GLOBALS['TL_LANG'][$str]['location_id'] = array("Veranstalter", "Wählen Sie den Veranstalter aus.");
 $GLOBALS['TL_LANG'][$str]['speaker'] = array("Referent(en)", "Wer leitet die Veranstaltung?");
 $GLOBALS['TL_LANG'][$str]['topic'] = array("Thema/Themen", "Hier können Sie Veranstaltungsthemen verknüpfen.");
 $GLOBALS['TL_LANG'][$str]['targetAudience'] = array("Zielgruppe(n)", "Wählen Sie das Zielpublikum.");

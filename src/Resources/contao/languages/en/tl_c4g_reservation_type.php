@@ -23,6 +23,7 @@ $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_type'] = array('Aut
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_confirmation_type'] = array('Confirmation message (backend message)', 'You can send a confirmation message from the reservation list.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['notification_special_type'] = array('Special message (backend message)', 'This message will be sent from the reservation list instead of the confirmation message if the "Send special message" checkbox is selected.');
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location'] = array("Event location", "Where will the event take place?");
+$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['location_id'] = array("Organizer", "Select the organizer.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['periodType'] = array("period type","Declare the type of time period.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['max_residence_time'] = array("Minimum duration of use (optional)", "Minimum usage period that the customer may choose in the form. At 0, the time interval applies.");
 $GLOBALS['TL_LANG']['tl_c4g_reservation_type']['min_residence_time'] = array("Maximum duration of use (optional)", "Maximum duration of use that the customer may choose in the form. At 0, the time interval applies.");
