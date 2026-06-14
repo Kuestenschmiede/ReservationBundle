@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 
-<!-- this ist just an unready example file to generate an invoice with con4gis/reservation -->
 <head>
   <link rel="stylesheet" type="text/css" href="<?php echo $this->style; ?>">
 </head>
@@ -11,11 +10,13 @@
     <div class="pdf-logo" style="text-align: right">
         <?php
             $src = \Contao\System::getContainer()->getParameter('kernel.project_dir')."/vendor/con4gis/reservation/src/Resources/public/images/test.png";
-            $type = pathinfo($src, PATHINFO_EXTENSION);
-            $data = file_get_contents($src);
-            $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            if (file_exists($src)) {
+                $type = pathinfo($src, PATHINFO_EXTENSION);
+                $data = file_get_contents($src);
+                $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                echo '<img src="'.$src.'" alt="" width="100" height="100">';
+            }
         ?>
-        <img src="<?php echo $src ?>" alt="" width="100" height="100">
     </div>
 
     <div class="pdf-contact" style="text-align: right">
@@ -35,17 +36,41 @@
         <?php echo $this->fieldData['postal']; ?> <?php echo $this->fieldData['city']; ?><br><br>
     </div>
 
-    <div class="pdf-headline" style="margin-top: 0.7cm; with: 100%; display: flex; justify-content: space-between; align-items: center;">
-        <h1 style="text-align: left; margin: 0; padding: 0;"><?php echo $GLOBALS['TL_LANG']['fe_c4g_reservation']['headlineBill']; ?> Nr. <?php echo $this->fieldData['documentId']; ?></h1>
+    <div class="pdf-headline" style="margin-top: 0.7cm; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="text-align: left; margin: 0; padding: 0;"><?php echo $GLOBALS['TL_LANG']['fe_c4g_reservation']['headlineBill']; ?> <?php echo $this->fieldData['documentId']; ?></h1>
         <div class="pdf-date" style="text-align: right; margin: 0; padding: 0;"><?php echo \Contao\Date::parse("d.m.Y", time()); ?></div>
     </div>
 
-    <div class="pdf-main" style="margin-top: 0.7cm; with: 100%;">
-    Veranstaltung: <?php echo $this->fieldData['reservation_title']; ?><br>
-    Datum / Zeit: <?php echo $this->fieldData['beginDate']; ?> <?php echo $this->fieldData['beginTime']; ?> Uhr<br>
-    Ort: <?php echo $this->fieldData['location_2-221']; ?><br><br>
+    <div class="pdf-main" style="margin-top: 0.7cm; width: 100%;">
+    Veranstaltung: <?php echo $this->fieldData['reservation_title'] ?: $this->fieldData['reservation_title_'.$this->fieldData['reservation_type']]; ?><br>
+    Datum / Zeit: <?php
+        $beginDate = $this->fieldData['beginDate'] ?: $this->fieldData['beginDate_'.$this->fieldData['reservation_type']];
+        if (is_numeric($beginDate)) {
+            echo \Contao\Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate);
+        } else {
+            echo $beginDate;
+        }
+    ?> <?php
+        $beginTime = $this->fieldData['beginTime'] ?: $this->fieldData['beginTime_'.$this->fieldData['reservation_type']];
+        if (is_numeric($beginTime)) {
+            echo \Contao\Date::parse($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime);
+        } else {
+            echo $beginTime;
+        }
+    ?> Uhr<br>
+    Ort: <?php
+        $location = "";
+        foreach ($this->fieldData as $key => $value) {
+            if (strpos($key, 'location_') === 0 && $value) {
+                $location = $value;
+                break;
+            }
+        }
+        echo $location;
+    ?><!--br><br>
     Teilnehmerliste:<br>
-    <?php echo $this->fieldData['participantList']; ?><br><br>
+    <?php echo $this->fieldData['participantList']; ?><br><br-->
+    <br>
     Ihr Rechnungsbetrag: <?php echo $this->fieldData['priceSum']; ?><br>
     Beinhaltet Mehrwertsteuer in Höhe von: <?php echo $this->fieldData['priceSumTax']; ?><br>
     <?php
@@ -58,10 +83,35 @@
     <?php if ($this->fieldData['bankName']): ?>
         <?php echo $this->fieldData['bankName']; ?><br>
         IBAN: <?php echo $this->fieldData['bankIban']; ?><br>
-        BIC: <?php echo $this->fieldData['bankBic']; ?><br>
-        <?php if ($this->fieldData['bankQrFileName']): ?>
-            <br>
-            <img src="<?php echo $this->fieldData['bankQrFileName']; ?>" width="100" height="100">
+        SWIFT: <?php echo $this->fieldData['bankBic']; ?><br>
+        <?php if ($this->fieldData['bankQrBase64'] || $this->fieldData['bankQrFileName']): ?>
+            <div style="margin-top: 10px;">
+                <?php
+                    $bankQrSrc = $this->fieldData['bankQrBase64'] ?: $this->fieldData['bankQrFileName'];
+                    if ($bankQrSrc) {
+                        if (strpos($bankQrSrc, 'data:') !== 0) {
+                            $rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
+                            if (file_exists($bankQrSrc) || file_exists($rootDir . '/' . $bankQrSrc)) {
+                                if (!file_exists($bankQrSrc) && file_exists($rootDir . '/' . $bankQrSrc)) {
+                                    $bankQrSrc = $rootDir . '/' . $bankQrSrc;
+                                }
+                                $type = pathinfo($bankQrSrc, PATHINFO_EXTENSION);
+                                $imgData = file_get_contents($bankQrSrc);
+                                if (strpos($imgData, '<' . 'svg') !== false) {
+                                    $type = 'svg+xml';
+                                }
+                                $bankQrSrc = 'data:image/' . $type . ';base64,' . base64_encode($imgData);
+                            }
+                        }
+                        if (strpos($bankQrSrc, 'data:') === 0) {
+                            echo '<img src="'.$bankQrSrc.'" width="100" height="100"><br>';
+                            echo '<span style="font-size: 8pt;">Banküberweisung</span>';
+                        } else {
+                            echo "<!-- Bank QR Code file not found or invalid: $bankQrSrc -->";
+                        }
+                    }
+                ?>
+            </div>
         <?php endif; ?>
     <?php else: ?>
         Bankname<br>
@@ -71,20 +121,49 @@
     <br>
     (Computerbrief, auch ohne Unterschrift gültig)<br>
     </div>
-    <div class="pdf-footer" style="margin-top:-0.7cm; with: 100%;">
-    <?php if ($this->fieldData['qrFileName']): ?>
-        <div class="pdf-qrcode" style="text-align: center">
-            <img src="<?php echo $this->fieldData['qrFileName']; ?>" width="100" height="100">
-        </div>
-    <?php endif; ?>
-    <!-- automatic pdf content by default -->
-    <?php if ($this->content): ?>
-        <?php echo $this->content; ?>
-    <?php endif; ?>
-    <div class="pdf-key" style="text-align:right">
-        Buchungsschlüssel: <?php echo $this->fieldData['reservation_id']; ?><br>
-        (Bei Rückfragen bitte angeben)
-    </div>
+    <div class="pdf-footer" style="margin-top:-0.7cm; width: 100%;">
+    <table style="width: 100%; border: none; margin-bottom: 5px;">
+        <tr>
+            <td style="width: 70%; vertical-align: bottom;">
+                <!-- automatic pdf content by default -->
+            </td>
+            <td style="width: 30%; text-align: right; vertical-align: bottom;">
+                <?php if ($this->fieldData['qrBase64'] || $this->fieldData['qrFileName']): ?>
+                    <div class="pdf-qrcode">
+                        <?php
+                            $qrSrc = $this->fieldData['qrBase64'] ?: $this->fieldData['qrFileName'];
+                            if ($qrSrc) {
+                                if (strpos($qrSrc, 'data:') !== 0) {
+                                    $rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
+                                    if (file_exists($qrSrc) || file_exists($rootDir . '/' . $qrSrc)) {
+                                        if (!file_exists($qrSrc) && file_exists($rootDir . '/' . $qrSrc)) {
+                                            $qrSrc = $rootDir . '/' . $qrSrc;
+                                        }
+                                        $type = pathinfo($qrSrc, PATHINFO_EXTENSION);
+                                        $imgData = file_get_contents($qrSrc);
+                                        if (strpos($imgData, '<' . 'svg') !== false) {
+                                            $type = 'svg+xml';
+                                        }
+                                        $qrSrc = 'data:image/' . $type . ';base64,' . base64_encode($imgData);
+                                    }
+                                }
+                                if (strpos($qrSrc, 'data:') === 0) {
+                                    echo '<img src="'.$qrSrc.'" width="100" height="100"><br>';
+                                    echo '<span style="font-size: 8pt; text-align: right; display: block;">Check-in</span>';
+                                } else {
+                                    echo "<!-- Check-in QR Code file not found or invalid: $qrSrc -->";
+                                }
+                            }
+                        ?>
+                    </div>
+                <?php endif; ?>
+                <div class="pdf-key" style="margin-top: 5px;">
+                    Buchungsschlüssel: <?php echo $this->fieldData['reservation_id']; ?><br>
+                    (Bei Rückfragen bitte angeben)
+                </div>
+            </td>
+        </tr>
+    </table>
     <br>
     <hr>
     <?php echo $this->fieldData['contact_name']; ?><br>

@@ -203,7 +203,21 @@ class C4gReservationController extends C4GBaseController
             }
         }
         
-        return $putVarsResult;
+        return $this->putVars;
+    }
+
+    public static function replaceDateTokens(string $text): string
+    {
+        $year = date('Y');
+        $year2 = date('y');
+        $month = date('m');
+        $day = date('d');
+        $text = str_replace('{{year}}', $year, $text);
+        $text = str_replace('{{year2}}', $year2, $text);
+        $text = str_replace('{{month}}', $month, $text);
+        $text = str_replace('{{day}}', $day, $text);
+
+        return $text;
     }
 
 
@@ -2505,16 +2519,20 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $fieldList[] = $priceDBField;
 
         if ($this->reservationSettings->documentIdNext) {
-            $idNext = str_pad($this->reservationSettings->documentIdNext, $this->reservationSettings->documentIdLength, "0", STR_PAD_LEFT);
-            $documentId = $this->reservationSettings->documentIdPrefix.$idNext.$this->reservationSettings->documentIdSuffix;
+            /*$idNext = str_pad($this->reservationSettings->documentIdNext, $this->reservationSettings->documentIdLength, "0", STR_PAD_LEFT);
+            $prefix = self::replaceDateTokens($this->reservationSettings->documentIdPrefix);
+            $suffix = self::replaceDateTokens($this->reservationSettings->documentIdSuffix);
+            $documentId = $prefix.$idNext.$suffix;
+            */
             $documentIdField = new C4GTextField();
             $documentIdField->setFieldName('documentId');
+            $documentIdField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['documentId']);
             $documentIdField->setDatabaseField(true);
             $documentIdField->setFormField(true);
             $documentIdField->setSortColumn(false);
             $documentIdField->setNotificationField(true);
             $documentIdField->setInitialValue('');
-            $documentIdField->setPrintable($this->withDefaultPDFContent);
+            $documentIdField->setPrintable(true);
             $documentIdField->setHidden(true);
             $fieldList[] = $documentIdField;
         }
@@ -2583,70 +2601,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
 
         $this->fieldList = $fieldList;
-        
-        // HACK: Dynamically add fields that might be sent via PUT to bypass framework filtering
-        // The framework's C4GSaveDialogAction filters putVars based on the fieldList.
-        // Since reservation fields often have dynamic names (beginDate_X), we need to register them.
-        
-        // OPTIMIZATION: Instead of adding 1000s of fields blindly, we only add those that 
-        // are actually present in the current PUT request to reduce DOM size and prevent JS crashes.
-        $rawPut = [];
-        if (key_exists('REQUEST_METHOD', $_SERVER) && (($_SERVER['REQUEST_METHOD'] == 'PUT') || ($_SERVER['REQUEST_METHOD'] == 'POST'))) {
-            $rawPut = $this->getPutVars();
-            if (empty($rawPut) && $_SERVER['REQUEST_METHOD'] == 'POST') {
-                $rawPut = \Contao\Input::postAll();
-            }
-        }
-
-        if ($rawPut && is_array($rawPut)) {
-            // Extended prefixes to cover more dynamic reservation fields
-            $dynamicPrefixes = [
-                'beginDate', 'beginTime', 'endDate', 'endTime', 
-                'duration', 'reservation_object', 'desiredCapacity', 
-                'participants', 'reservation_type', 'agreed', 
-                'firstName', 'lastName', 'email', 'phone', 
-                'address', 'postal', 'city', 'comment', 
-                '_'
-            ];
-            foreach ($rawPut as $key => $value) {
-                if (!is_string($key)) continue;
-                
-                $isDynamic = false;
-                foreach ($dynamicPrefixes as $prefix) {
-                    if (strpos($key, $prefix) === 0) {
-                        $isDynamic = true;
-                        break;
-                    }
-                }
-                
-                // Also match any key that has a numeric suffix or contains reservation markers
-                if (!$isDynamic) {
-                    if (preg_match('/_[0-9]+$/', $key) || preg_match('/-[0-9]+/', $key) || strpos($key, '§') !== false) {
-                        $isDynamic = true;
-                    }
-                }
-                
-                if ($isDynamic) {
-                    // Check if field is already in list
-                    $alreadyExists = false;
-                    foreach ($this->fieldList as $existingField) {
-                        if ($existingField->getFieldName() === $key) {
-                            $alreadyExists = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!$alreadyExists) {
-                        $catchAllField = new C4GTextField();
-                        $catchAllField->setFieldName($key);
-                        $catchAllField->setDatabaseField(false);
-                        $catchAllField->setFormField(true);
-                        $catchAllField->setEditable(true);
-                        $this->fieldList[] = $catchAllField;
-                    }
-                }
-            }
-        }
 
         return $this->fieldList;
     }
@@ -3956,6 +3910,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $participants = '';
         $pCount = $this->reservationSettings->onlyParticipants ? 0 : 1;
+        $ignoreCapacity = $this->reservationSettings->ignoreCapacity ?? false;
         if ($ignoreCapacity) {
             $pCount = 1;
         }
@@ -4101,6 +4056,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'discountPercent' => $putVars['discountPercent'] ?? 0,
             'discountCode' => $putVars['discountCode'] ?? '',
             'conferenceLink' => $putVars['conferenceLink'] ?? '',
+            'documentId' => $putVars['documentId'] ?? '',
         ];
 
         foreach ($tokenDefaults as $key => $defaultValue) {
@@ -4204,7 +4160,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         if ($this->reservationSettings->documentIdNext) {
             $idNext = str_pad($this->reservationSettings->documentIdNext, $this->reservationSettings->documentIdLength, "0", STR_PAD_LEFT);
-            $documentId = $this->reservationSettings->documentIdPrefix.$idNext.$this->reservationSettings->documentIdSuffix;
+            $prefix = self::replaceDateTokens($this->reservationSettings->documentIdPrefix);
+            $suffix = self::replaceDateTokens($this->reservationSettings->documentIdSuffix);
+            $documentId = $prefix.$idNext.$suffix;
             $putVars['documentId'] = $documentId;
             $nextId = intval($this->reservationSettings->documentIdNext)+1;
             $database->prepare("UPDATE tl_c4g_reservation_settings SET documentIdNext = ? WHERE id = ?")->execute($nextId, $this->reservationSettings->id);
@@ -4264,6 +4222,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'discountPercent' => $putVars['discountPercent'] ?? 0,
             'discountCode' => $putVars['discountCode'] ?? '',
             'conferenceLink' => $putVars['conferenceLink'] ?? '',
+            'documentId' => $putVars['documentId'] ?? '',
         ];
 
         foreach ($tokenDefaults as $key => $defaultValue) {

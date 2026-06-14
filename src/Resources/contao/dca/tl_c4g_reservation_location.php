@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
     'palettes' => array
     (
         '__selector__' => ['ics'],
-        'default'   =>  '{location_legend}, name, alias, locgeox, locgeoy;{contact_legend},contact_name,contact_phone,contact_email,contact_website,contact_street,contact_postal,contact_city,ics;{bank_legend},bankName,bankIban,bankBic;'
+        'default'   =>  '{location_legend}, name, alias, locgeox, locgeoy;{contact_legend},contact_name,contact_phone,contact_email,contact_website,contact_street,contact_postal,contact_city,ics;{bank_legend},bankName,bankIban,bankBic,bankQrFileName;'
     ),
 
     'subpalettes' => array
@@ -293,6 +293,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'inputType'         => 'text',
             'eval'              => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+        ),
+        'bankQrFileName' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['bankQrFileName'],
+            'exclude'           => true,
+            'inputType'         => 'fileTree',
+            'eval'              => array('fieldType' => 'radio', 'filesOnly' => true, 'extensions' => \Contao\Config::get('validImageTypes'), 'mandatory' => false, 'tl_class' => 'clr'),
+            'sql'               => "binary(16) NULL"
         ),
     )
 );

@@ -1,5 +1,4 @@
 <?php
-error_log('con4gis Reservation config.php loaded');
 /*
  * This file is part of con4gis, the gis-kit for Contao CMS.
  * @package con4gis

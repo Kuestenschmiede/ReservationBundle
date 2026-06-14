@@ -29,6 +29,7 @@ $GLOBALS['TL_LANG'][$str]['icsPath'] = array("Pfad zu den ICS Dateien", "Wo kön
 $GLOBALS['TL_LANG'][$str]['bankName'] = array("Bankname","Geben Sie den Namen der Bank an.");
 $GLOBALS['TL_LANG'][$str]['bankIban'] = array("IBAN","Geben Sie die IBAN an.");
 $GLOBALS['TL_LANG'][$str]['bankBic'] = array("BIC","Geben Sie die BIC/SWIFT an.");
+$GLOBALS['TL_LANG'][$str]['bankQrFileName'] = array("QR-Code","Wählen Sie den QR-Code für die Bankdaten aus.");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['location_legend'] = "Veranstaltungsort bearbeiten";

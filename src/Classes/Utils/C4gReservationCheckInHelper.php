@@ -27,7 +27,7 @@ class C4gReservationCheckInHelper
                 $fileArr['fileName'] = $fileName;
 
                 return $fileArr;
-            };
+            }
         }
 
         return false;
@@ -55,6 +55,12 @@ class C4gReservationCheckInHelper
             }
         }
 
+        $rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
+        $path = 'files/c4g_brick_data/qrcode/';
+        if (!is_dir($rootDir.'/'.$path)) {
+            mkdir($rootDir.'/'.$path, 0777, true);
+        }
+
         if ($locationId) {
             $loc = C4gReservationLocationModel::findByPk($locationId);
             if ($loc) {
@@ -62,23 +68,25 @@ class C4gReservationCheckInHelper
                 $params['bankIban'] = $loc->bankIban ?: '';
                 $params['bankBic'] = $loc->bankBic ?: '';
 
-                if ($params['bankIban'] && $params['bankName']) {
-                    $bankContent = "BCD\n001\n1\nSCT\n" . $loc->bankBic . "\n" . $loc->bankName . "\n" . $loc->bankIban . "\nEUR" . $params['priceSum'] . "\n\n\n" . $key;
-                    $bankPath = 'files/c4g_brick_data/qrcode/';
-                    $bankFileName = $bankPath . 'bank_qrcode_' . $key . '.png';
+                if ($loc->bankQrFileName) {
+                    $fileModel = \Contao\FilesModel::findByPk($loc->bankQrFileName);
+                    if ($fileModel) {
+                        $params['bankQrFileName'] = $rootDir . '/' . $fileModel->path;
+                    }
+                } elseif ($params['bankIban'] && $params['bankName']) {
+                    $priceSum = $params['priceSum'] ?? '0.00';
+                    $priceSum = str_replace(',', '.', $priceSum);
+                    $priceSum = preg_replace('/[^0-9.]/', '', $priceSum);
+                    $bankContent = "BCD\n001\n1\nSCT\n" . $loc->bankBic . "\n" . $loc->bankName . "\n" . $loc->bankIban . "\nEUR" . $priceSum . "\n\n\n" . $key;
+                    $bankFileName = $path . 'bank_qrcode_' . $key . '.png';
                     $bankLinkArr = $this->generateQRCode($bankContent, $bankFileName);
                     if ($bankLinkArr) {
-                        $params['bankQrFileName'] = $bankLinkArr['fileName'];
+                        $params['bankQrFileName'] = $rootDir . '/' . $bankLinkArr['fileName'];
                     }
                 }
             }
         }
 
-        $path = 'files/c4g_brick_data/qrcode/';
-        $rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
-        if (!is_dir($rootDir.'/'.$path)) {
-            mkdir($rootDir.'/'.$path, 0777, true);
-        }
         $fileName = $path.'qrcode_' . $key . '.png';
 
         $checkInPage = $this->checkInPage;
@@ -98,7 +106,7 @@ class C4gReservationCheckInHelper
             $linkArr = $this->generateQRCode($content, $fileName);
             if ($linkArr && is_array($linkArr)) {
                 $params['qrContent'] = $linkArr['content'] ?: '';
-                $params['qrFileName'] = $linkArr['fileName'] ?: '';
+                $params['qrFileName'] = $rootDir . '/' . ($linkArr['fileName'] ?: '');
             }
         }
 

@@ -13,11 +13,12 @@ namespace con4gis\ReservationBundle\Classes\Hooks;
 use con4gis\ReservationBundle\Controller\C4gReservationController;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel;
 use con4gis\ReservationBundle\Classes\Models\C4gReservationEventModel;
-use con4gis\ReservationBundle\Classes\Models\C4gReservationModel;
+use con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel;
+use con4gis\ReservationBundle\Classes\Utils\C4gReservationCheckInHelper;
 
 /**
  * Anreicherer für Print-Daten: Berechnet fehlende/inkonsistente Preisfelder
- * ausschließlich innerhalb des Reservation-Bundles.
+ * und erzeugt QR-Codes ausschließlich innerhalb des Reservation-Bundles.
  */
 class ReservationPrintDataEnricher
 {
@@ -31,19 +32,25 @@ class ReservationPrintDataEnricher
     public function enrich($module, array &$data): void
     {
         try {
-            // Nur tätig werden, wenn priceSum fehlt oder leer wirkt
-            // ODER wenn wir einen Verdacht auf unvollständige Summen haben
-            $hasPriceSum = isset($data['priceSum']) && trim((string) $data['priceSum']) !== '';
-            $priceSumValue = $hasPriceSum ? floatval(str_replace(',', '.', preg_replace('/[^0-9,.-]/', '', $data['priceSum']))) : 0;
-            
-            // Wenn priceSum vorhanden ist, prüfen wir, ob Optionen gewählt wurden, aber die Summe verdächtig niedrig ist
-            // (z.B. gleich dem Basispreis). Im Zweifel rechnen wir lieber einmal neu nach.
-            // Aber: Wir vermeiden Endlosschleifen oder unnötige Re-Calculations wenn möglich.
-            $recalcRequired = !$hasPriceSum;
-
             // Nur arbeiten, wenn das übergebene Modul die benötigten Settings-Funktionen bietet
-            if (!is_object($module) || !method_exists($module, 'getReservationSettings')) {
-                return;
+
+            // 1. Map dynamic keys to standard keys for the helper and template
+            $keysToSync = [
+                'reservation_id', 'priceSum', 'bankName', 'bankIban', 'bankBic', 
+                'qrFileName', 'bankQrFileName', 'documentId', 'firstname', 'lastname',
+                'address', 'postal', 'city', 'email', 'beginDate', 'beginTime', 'reservation_type',
+                'reservation_object'
+            ];
+
+            foreach ($keysToSync as $standardKey) {
+                if (!isset($data[$standardKey]) || !$data[$standardKey]) {
+                    foreach ($data as $dynamicKey => $value) {
+                        if ((strpos($dynamicKey, $standardKey . '_') === 0 || strpos($dynamicKey, $standardKey . '|') === 0 || strpos($dynamicKey, $standardKey . '-') === 0) && $value) {
+                            $data[$standardKey] = $value;
+                            break;
+                        }
+                    }
+                }
             }
 
             $reservationTypeId = isset($data['reservation_type']) ? (int) $data['reservation_type'] : 0;
@@ -51,6 +58,62 @@ class ReservationPrintDataEnricher
                 return;
             }
 
+            // 2. Preisberechnung falls nötig
+            $hasPriceSum = isset($data['priceSum']) && trim((string) $data['priceSum']) !== '';
+            if (!$hasPriceSum) {
+                $this->recalculatePrices($module, $data, $reservationTypeId);
+            }
+
+            // 3. QR-Code-Generierung
+            $settings = $module->getReservationSettings();
+            $checkInHelper = new C4gReservationCheckInHelper($settings ? $settings->checkInPage : null);
+            
+            $data = $checkInHelper->generateBeforeSaving($data);
+
+            // 4. Convert QR codes to Base64 to bypass path/permission issues in PDF engine
+            $rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
+            foreach (['qrFileName' => 'qrBase64', 'bankQrFileName' => 'bankQrBase64'] as $fileKey => $base64Key) {
+                if (isset($data[$fileKey]) && $data[$fileKey]) {
+                    $path = $data[$fileKey];
+                    if (strpos($path, '/') !== 0 && !preg_match('/^[a-zA-Z]:/', $path)) {
+                        $path = $rootDir . '/' . $path;
+                    }
+                    if (file_exists($path) && is_readable($path)) {
+                        $type = pathinfo($path, PATHINFO_EXTENSION);
+                        $imgData = file_get_contents($path);
+                        if (strpos($imgData, '<svg') !== false) {
+                            $type = 'svg+xml';
+                        }
+                        $data[$base64Key] = 'data:image/' . $type . ';base64,' . base64_encode($imgData);
+                    }
+                }
+            }
+
+            // 5. Mirror fresh results back to dynamic keys to be absolutely sure the template finds them
+            foreach (['qrFileName', 'bankQrFileName', 'qrContent', 'qrBase64', 'bankQrBase64'] as $ktm) {
+                if (isset($data[$ktm]) && $data[$ktm]) {
+                    foreach ($data as $pk => $pv) {
+                        if (strpos($pk, $ktm . '_') === 0 || strpos($pk, $ktm . '|') === 0 || strpos($pk, $ktm . '-') === 0) {
+                            $data[$pk] = $data[$ktm];
+                        }
+                    }
+                }
+            }
+
+        } catch (\Throwable $t) {
+            // Fail silently to not block printing
+            if (\Contao\System::getContainer()->has('monolog.logger.contao')) {
+                \Contao\System::getContainer()->get('monolog.logger.contao')->error('ReservationPrintDataEnricher Error: ' . $t->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Re-calculates prices based on data
+     */
+    private function recalculatePrices($module, array &$data, int $reservationTypeId): void
+    {
+        try {
             $eventKey = 'reservation_object_event_' . $reservationTypeId;
             $objKey   = 'reservation_object_' . $reservationTypeId;
             $isEvent = !empty($data[$eventKey]);
@@ -77,109 +140,29 @@ class ReservationPrintDataEnricher
             if ($isEvent) {
                 $reservationEventObject = C4gReservationEventModel::findByPk($resObjectId);
             } else {
-                $reservationObject = C4gReservationModel::findByPk($resObjectId);
+                $reservationObject = C4gReservationObjectModel::findByPk($resObjectId);
             }
             if (!$reservationObject && !$reservationEventObject) {
                 return;
             }
 
-            // putVars aus den vorliegenden Daten rekonstruieren
             $putVars = (array) $data;
             if ($duration && !isset($putVars[$durationKey])) { $putVars[$durationKey] = $duration; }
             if ($desiredCapacity && !isset($putVars[$desiredCapacityKey])) { $putVars[$desiredCapacityKey] = $desiredCapacity; }
 
-            // Härtung und Rekonstruktion von Optionen aus serialisierten Datenbankfeldern
-            $objectId = $isEvent ? ($reservationEventObject->id ?? 0) : ($reservationObject->id ?? 0);
-            $objectPid = $isEvent ? ($reservationEventObject->pid ?? 0) : ($reservationObject->pid ?? 0);
-            
-            // 1. Aus flachen Daten (Formular-Submit)
-            foreach ($data as $key => $val) {
-                if (is_string($val)) {
-                    if (strpos($key, 'additional_params_') === 0 || strpos($key, 'participants_') === 0) {
-                        if ($val === 'true') { $putVars[$key] = true; }
-                        elseif ($val === 'false') { $putVars[$key] = false; }
-                        elseif (is_numeric($val) && (float)$val == (int)$val) { $putVars[$key] = (int)$val; }
-                    }
-                }
-            }
-
-            // 2. Aus serialisierten Feldern (Datenbank-Datensatz)
-            // Normalisierung der IDs für die Keys (wie im Calculator erwartet: -00{id})
-            $suffix = $objectId ?: $objectPid;
-            
+            // Optionen rekonstruieren
+            $suffix = $resObjectId;
             if (!empty($data['additional_params']) && is_string($data['additional_params'])) {
                 $chosenAdd = \Contao\StringUtil::deserialize($data['additional_params'], true);
                 if (!empty($chosenAdd)) {
                     foreach ($chosenAdd as $optId) {
                         $putVars['additional_params_' . $reservationTypeId . '-00' . $suffix . '|' . $optId] = true;
-                        // Auch Radio-Format unterstützen
-                        $putVars['additional_params_' . $reservationTypeId . '-00' . $suffix] = $optId;
                     }
                 }
             }
 
-            if (!empty($data['included_params']) && is_string($data['included_params'])) {
-                $chosenInc = \Contao\StringUtil::deserialize($data['included_params'], true);
-                if (!empty($chosenInc)) {
-                    foreach ($chosenInc as $optId) {
-                        $putVars['included_params_' . $reservationTypeId . '-00' . $suffix . '|' . $optId] = true;
-                    }
-                }
-            }
-
-            // 3. Teilnehmer-Optionen rekonstruieren (falls vorhanden)
-            $resId = (int) ($data['id'] ?? 0);
-            if ($resId > 0) {
-                $participants = \Contao\Database::getInstance()->prepare("SELECT * FROM tl_c4g_reservation_participants WHERE pid = ?")
-                    ->execute($resId)->fetchAllAssoc();
-                if (!empty($participants)) {
-                    $onlyParticipants = $settings->onlyParticipants ?: false;
-                    $counter = $onlyParticipants ? $desiredCapacity : $desiredCapacity - 1;
-                    foreach ($participants as $idx => $participant) {
-                        if (!empty($participant['participant_params'])) {
-                            $pParams = \Contao\StringUtil::deserialize($participant['participant_params'], true);
-                            if (is_array($pParams)) {
-                                foreach ($pParams as $pOptId) {
-                                    // Wir müssen das Format des Calculators nachbilden:
-                                    // participants_{typeId}-{counter}§participant_params§{idx}|{optId}
-                                    $putVars['participants_' . $reservationTypeId . '-' . $counter . '§participant_params§' . $idx . '|' . $pOptId] = true;
-                                    $putVars['participants_' . $reservationTypeId . '-' . $counter . '§participant_params§' . $idx] = $pOptId;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Wenn wir bereits eine Summe haben, schauen wir kurz, ob Optionen gewählt wurden
-            if (!$recalcRequired) {
-                $hasOptions = false;
-                $includedParams = $reservationType->included_params ?? false;
-                $additionalParams = $reservationType->additional_params ?? false;
-                if ($includedParams || $additionalParams) {
-                    $hasOptions = true;
-                } else {
-                    $participantParams = $reservationObject ? ($reservationObject->participant_params ?? false) : ($reservationEventObject->participant_params ?? false);
-                    if ($participantParams) {
-                        $hasOptions = true;
-                    }
-                }
-                
-                // Wenn Optionen möglich sind, rechnen wir zur Sicherheit immer neu, 
-                // um sicherzustellen, dass sie in priceSum enthalten sind.
-                if ($hasOptions) {
-                    $recalcRequired = true;
-                }
-            }
-
-            if (!$recalcRequired) {
-                return;
-            }
-
-            // Preise berechnen (by ref)
             C4gReservationController::allPrices($settings, $putVars, $reservationObject, $reservationEventObject, $reservationType, $isEvent, $desiredCapacity);
 
-            // Ergebnisse zurück in $data schreiben (nur setzen, wenn vorhanden)
             foreach ([
                 'price','priceSum','priceOptionSum','priceDiscount',
                 'priceNet','priceTax','priceOptionSumNet','priceOptionSumTax',
@@ -189,8 +172,6 @@ class ReservationPrintDataEnricher
                     $data[$k] = $putVars[$k];
                 }
             }
-        } catch (\Throwable $t) {
-            // Keine Blockade bei Fehlern – lieber unverändert weiterlaufen
-        }
+        } catch (\Throwable $t) { /* ignore */ }
     }
 }
