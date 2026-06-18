@@ -4166,10 +4166,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $rIdForIcs);
         $this->putVars['icsFilename'] = $putVars['icsFilename'];
-        if ($putVars['icsFilename']) {
-            $putVars['##icsFilename##'] = $putVars['icsFilename'];
-            $this->putVars['##icsFilename##'] = $putVars['icsFilename'];
-        }
+//        if ($putVars['icsFilename']) {
+//            $putVars['##icsFilename##'] = $putVars['icsFilename'];
+//            $this->putVars['##icsFilename##'] = $putVars['icsFilename'];
+//        }
 
         $rawData = '';
         foreach ($putVars as $key => $value) {
