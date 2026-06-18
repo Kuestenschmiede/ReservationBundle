@@ -96,10 +96,9 @@ class C4gReservationCheckInHelper
 
             if ($jumpTo) {
                 $jumpToUrl = C4GUtils::replaceInsertTags("{{env::url}}");
-                if (substr($jumpToUrl, -1) !== '/') {
-                    $jumpToUrl .= '/';
-                }
-                $checkInUrl = $jumpToUrl.$jumpTo->getFrontendUrl();
+                $jumpToUrl = rtrim($jumpToUrl, '/');
+                $pageUrl = ltrim($jumpTo->getFrontendUrl(), '/');
+                $checkInUrl = $jumpToUrl . '/' . $pageUrl;
             }
 
             $content  = $checkInUrl.'?checkIn='.$key;

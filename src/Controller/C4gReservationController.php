@@ -261,7 +261,10 @@ class C4gReservationController extends C4GBaseController
             '__getTablePermMemo',
             '__getC4GTablePermissionMemo',
             '__isMemberOfGroupMemo',
-            '__hasRightInGroupMemo'
+            '__hasRightInGroupMemo',
+            '__allFieldsMemo',
+            '__fieldListMemo',
+            '__dialogParamsMemo'
         ];
         foreach ($memos as $memo) {
             if (property_exists($this, $memo)) {
@@ -299,6 +302,18 @@ class C4gReservationController extends C4GBaseController
             $request->attributes->set('_no_cache', true);
             $GLOBALS['TL_NO_CACHE'] = true;
             $this->nukeState();
+        }
+
+        $eventId = Input::get('event') ?: 0;
+        if (!$eventId && $request->attributes->has('auto_item')) {
+            $eventId = $request->attributes->get('auto_item');
+        }
+
+        if ($eventId) {
+            $oldEvent = $this->session->getSessionValue('reservationEventCookie');
+            if ($oldEvent && $oldEvent != $eventId) {
+                $this->nukeState(false);
+            }
         }
 
         $response = parent::getResponse($template, $model, $request);
@@ -2901,7 +2916,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         if ($isEvent) {
             // DEEP CLEAN: Remove any existing event data keys from putVars to prevent state-bleeding.
             // This ensures that only the fresh values assigned below will be used.
-            $keysToClear = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location'];
+            $keysToClear = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location', 'icsFilename'];
             foreach (array_keys($putVars) as $pk) {
                 foreach ($keysToClear as $baseKey) {
                     if ($pk === $baseKey || strpos($pk, $baseKey . '_') === 0) {
@@ -2915,6 +2930,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $resObject = $putVars[$key] ?? 0;
 
             if ($resObject) {
+                if (!isset($eventId)) {
+                    $eventId = (int) $resObject;
+                }
                 // Ensure $resObject matches $eventId to be safe
                 if ($eventId && $resObject != $eventId) {
                     $resObject = $eventId;
@@ -3206,7 +3224,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         if ($isEvent) {
             // DEEP CLEAN: Remove any existing event data keys from putVars to prevent state-bleeding.
             // This ensures that only the fresh values assigned below will be used.
-            $keysToClear = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location'];
+            $keysToClear = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location', 'icsFilename'];
             foreach (array_keys($putVars) as $pk) {
                 foreach ($keysToClear as $baseKey) {
                     if ($pk === $baseKey || strpos($pk, $baseKey . '_') === 0) {
@@ -4124,6 +4142,12 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $icsObject = isset($reservationEventObject) ? $reservationEventObject : $reservationObject;
 
+        $beginDate = $beginDate ?? ($putVars['beginDate'] ?? '');
+        $beginTime = $beginTime ?? ($putVars['beginTime'] ?? 0);
+        $endDate   = $endDate   ?? ($putVars['endDate']   ?? null);
+        $endTime   = $endTime   ?? ($putVars['endTime']   ?? 0);
+        $beginTimeInt = $beginTimeInt ?? (is_numeric($beginTime) ? (int)$beginTime : 0);
+
         $beginDateInt = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate));
         $putVars['beginDate'] = (int) $beginDateInt;
         $this->putVars['beginDate'] = (int) $beginDateInt;
@@ -4141,6 +4165,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $this->putVars['beginDate'] = (int) $beginDateInt;
 
         $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $rIdForIcs);
+        $this->putVars['icsFilename'] = $putVars['icsFilename'];
+        if ($putVars['icsFilename']) {
+            $putVars['##icsFilename##'] = $putVars['icsFilename'];
+            $this->putVars['##icsFilename##'] = $putVars['icsFilename'];
+        }
 
         $rawData = '';
         foreach ($putVars as $key => $value) {
@@ -4223,14 +4252,18 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'discountCode' => $putVars['discountCode'] ?? '',
             'conferenceLink' => $putVars['conferenceLink'] ?? '',
             'documentId' => $putVars['documentId'] ?? '',
+            'icsFilename' => $putVars['icsFilename'] ?? '',
         ];
 
         foreach ($tokenDefaults as $key => $defaultValue) {
-            if (!isset($putVars[$key]) || $putVars[$key] === null || ($putVars[$key] === '' && !in_array($key, ['beginTime', 'endTime']))) {
+            if (!isset($putVars[$key]) || $putVars[$key] === null || ($putVars[$key] === '' && !in_array($key, ['beginTime', 'endTime', 'icsFilename']))) {
                 $putVars[$key] = $defaultValue;
             }
             // Mirror to instance putVars as well for SaveAction
             $this->putVars[$key] = $putVars[$key];
+
+            $putVars['##' . $key . '##'] = $putVars[$key];
+            $this->putVars['##' . $key . '##'] = $putVars[$key];
 
             // Radical Mirroring for Notification System:
             // Ensure that tokens like 'description' are also present with all possible
@@ -4263,13 +4296,17 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         // We ensure that NO old suffixed keys for event data remain in the variables
         // that are passed to the SaveAction. This prevents the notification system
         // from picking up "ghost data" from previous reservations in the same session.
-        $keysToSanitize = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location'];
+        $keysToSanitize = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location', 'icsFilename'];
         $typeForSanitize = $putVars['reservation_type'] ?? null;
         $eventForSanitize = $putVars['reservation_object'] ?? null;
         
         $sanitizeVars = function(&$vars) use ($keysToSanitize, $typeForSanitize, $eventForSanitize) {
             if (!is_array($vars)) return;
             foreach (array_keys($vars) as $vk) {
+                // Keep NC tokens, don't sanitize them
+                if (strpos($vk, '##') === 0 && substr($vk, -2) === '##') {
+                    continue;
+                }
                 foreach ($keysToSanitize as $base) {
                     // If it's a suffixed version of a base key...
                     if (strpos($vk, $base . '_') === 0) {
@@ -4323,7 +4360,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $forceInt = function(&$vars) {
             if (!is_array($vars)) return;
-            $intKeys = ['beginTime', 'endTime', 'beginDate', 'endDate'];
+            $intKeys = ['beginTime', 'endTime', 'beginDate', 'endDate', 'reservation_id', 'dbkey'];
             foreach ($vars as $key => $value) {
                 foreach ($intKeys as $base) {
                     if ($key === $base || strpos($key, $base . '_') === 0) {
