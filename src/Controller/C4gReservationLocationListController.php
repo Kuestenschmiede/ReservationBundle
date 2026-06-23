@@ -101,7 +101,7 @@ class C4gReservationLocationListController extends C4GBaseController
      * @param RequestStack $requestStack
      * @param ContaoFramework $framework
      */
-    public function __construct(string $rootDir, RequestStack $requestStack, ContaoFramework $framework, ModuleModel $model = null)
+    public function __construct(string $rootDir, RequestStack $requestStack, ContaoFramework $framework, ?ModuleModel $model = null)
     {
         parent::__construct($rootDir, $requestStack, $framework, $model);
 
