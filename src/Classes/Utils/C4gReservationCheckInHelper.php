@@ -77,7 +77,8 @@ class C4gReservationCheckInHelper
                     $priceSum = $params['priceSum'] ?? '0.00';
                     $priceSum = str_replace(',', '.', $priceSum);
                     $priceSum = preg_replace('/[^0-9.]/', '', $priceSum);
-                    $bankContent = "BCD\n001\n1\nSCT\n" . $loc->bankBic . "\n" . $loc->bankName . "\n" . $loc->bankIban . "\nEUR" . $priceSum . "\n\n\n" . $key;
+                    $documentId = $params['documentId'] ?? ($params['document_id'] ?? $key);
+                    $bankContent = "BCD\n001\n1\nSCT\n" . $loc->bankBic . "\n" . $loc->bankName . "\n" . $loc->bankIban . "\nEUR" . $priceSum . "\n\n\n" . $documentId;
                     $bankFileName = $path . 'bank_qrcode_' . $key . '.png';
                     $bankLinkArr = $this->generateQRCode($bankContent, $bankFileName);
                     if ($bankLinkArr) {
