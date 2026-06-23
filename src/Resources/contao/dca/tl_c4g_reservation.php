@@ -50,14 +50,17 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         (
             'mode'              => 2,
             'fields'            => ['beginDate DESC','lastname'],
-            'filter'            => (Input::get('do') == "calendar") ? array(array('reservation_object=? AND reservationObjectType=2',Input::get('id'))) : null,
+            'filter'            => (Input::get('do') == "calendar") ? array(array('reservation_object=? AND reservationObjectType=\'2\'',Input::get('id'))) : null,
+            'headerFields'      => ['beginDate','endDate','desiredCapacity','reservation_type','lastname','firstname','reservation_object','checkedIn'],
             'panelLayout'       => 'filter;sort,search,limit',
         ),
 
         'label' => array
         (
-            'label_callback'    => [$cbClass, 'listFields'],
+            'fields'            => array('beginDate','endDate','desiredCapacity','reservation_type','lastname','firstname','reservation_object'),
+            'label_callback'    => array($cbClass, 'listFields'),
             'showColumns'       => true,
+            'operations'        => ['edit', 'copy', 'delete', 'show', 'participants', 'confirmationEmail', 'toggle']
         ),
 
         'global_operations' => array
@@ -74,35 +77,42 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
                 'href'                => Input::get('pid') ? 'do=calendar&table=tl_calendar_events&id='.Input::get('pid') : 'key=back',
                 'icon'                => 'back.svg',
                 'label'               => &$GLOBALS['TL_LANG']['MSC']['backBT'],
-            ]
+            ],
+            'new' => array
+            (
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['new'],
+                'href'                => 'act=create',
+                'class'               => 'header_new',
+                'attributes'          => 'onclick="Backend.getScrollOffset()" accesskey="n"'
+            )
         ),
 
         'operations' => array
         (
             'edit' => array
             (
-                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['edit'],
-                'href'          => 'act=edit',
-                'icon'          => 'edit.gif',
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['edit'],
+                'href'                => 'act=edit',
+                'icon'                => 'edit.svg',
             ),
             'copy' => array
             (
-                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['copy'],
-                'href'          => 'act=copy',
-                'icon'          => 'copy.gif',
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['copy'],
+                'href'                => 'act=copy',
+                'icon'                => 'copy.svg',
             ),
             'delete' => array
             (
-                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['delete'],
-                'href'          => 'act=delete',
-                'icon'          => 'delete.gif',
-                'attributes'    => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\')) return false;Backend.getScrollOffset()"',
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['delete'],
+                'href'                => 'act=delete',
+                'icon'                => 'delete.svg',
+                'attributes'          => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\')) return false;Backend.getScrollOffset()"'
             ),
             'show' => array
             (
-                'label'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['show'],
-                'href'          => 'act=show',
-                'icon'          => 'show.gif',
+                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['show'],
+                'href'                => 'act=show',
+                'icon'                => 'show.svg',
             ),
             'participants' => array
             (
@@ -120,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'toggle' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['TOGGLE'],
-                'icon'                => 'visible.gif',
+                'icon'                => 'visible.svg',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
                 'button_callback'     => array($cbClass, 'toggleIcon')
             )

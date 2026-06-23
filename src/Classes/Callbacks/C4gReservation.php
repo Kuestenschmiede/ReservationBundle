@@ -51,7 +51,11 @@
 
             if ($row['cancellation'])
             {
-                $icon = 'invisible.gif';
+                $icon = 'invisible.svg';
+            }
+            else
+            {
+                $icon = 'visible.svg';
             }
 
             return '<a href="'.$this->addToUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
@@ -102,13 +106,13 @@
             $arrRow['reservation_object'] = $object;
 
             if ($arrRow['beginDate']) {
-                $arrRow['beginDate'] = $arrRow['beginDate'] ? date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['beginTime']) : date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']);
+                $arrRow['beginDate'] = $arrRow['beginDate'] ? date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']). ' ' .gmdate($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['beginTime'] % 86400) : date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']);
             } else {
                 $arrRow['beginDate'] = '';
             }
 
             if ($arrRow['endDate']) {
-                $arrRow['endDate'] = $arrRow['endDate'] ? date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']). ' ' .date($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime']) : date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']);
+                $arrRow['endDate'] = $arrRow['endDate'] ? date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']). ' ' .gmdate($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime'] % 86400) : date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']);
             } else {
                 $arrRow['endDate'] = '';
             }
@@ -118,24 +122,6 @@
                 $arrRow['reservation_type'] = $type->caption;
             }
 
-            $do = Input::get('do');
-            if ($do && ($do == 'calendar')) {
-                $checkedInYes = 'Ja';
-                if ($arrRow['checkedIn'] && $arrRow['checkedIn'] > 1) {
-                    $checkedInYes = 'Ja ('.$arrRow['checkedIn'].')';
-                }
-
-                $result = [
-                    $arrRow['beginDate'],
-                    $arrRow['endDate'],
-                    $arrRow['desiredCapacity'],
-                    $arrRow['reservation_type'],
-                    $arrRow['lastname'],
-                    $arrRow['firstname'],
-                    $arrRow['reservation_object'],
-                    $arrRow['checkedIn'] ? $checkedInYes : 'nein'
-                ];
-            } else {
                 $result = [
                     $arrRow['beginDate'],
                     $arrRow['endDate'],
@@ -145,7 +131,13 @@
                     $arrRow['firstname'],
                     $arrRow['reservation_object']
                 ];
-            }
+                if ($do && ($do == 'calendar')) {
+                    $checkedInYes = 'Ja';
+                    if ($arrRow['checkedIn'] && $arrRow['checkedIn'] > 1) {
+                        $checkedInYes = 'Ja ('.$arrRow['checkedIn'].')';
+                    }
+                    $result[] = $arrRow['checkedIn'] ? $checkedInYes : 'nein';
+                }
 
             return $result;
         }
@@ -229,7 +221,8 @@
 
             if ($id && $do && ($do == 'calendar')) {
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-                    ['beginDate','endDate','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object','checkedIn'];
+                    ['beginDate','endDate','desiredCapacity','reservation_type','lastname','firstname','reservation_object','checkedIn'];
+                $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['operations'] = ['edit', 'copy', 'delete', 'show', 'participants', 'confirmationEmail', 'toggle'];
 
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['default'] = '2';
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['eval']['disabled'] = true;
@@ -243,7 +236,8 @@
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['endTime']['eval']['disabled'] = true;
             } else {
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-                    ['beginDate','endDate','desiredCapacity','reservation_type:tl_c4g_reservation_type.caption','lastname','firstname','reservation_object'];
+                    ['beginDate','endDate','desiredCapacity','reservation_type','lastname','firstname','reservation_object'];
+                $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['operations'] = ['edit', 'copy', 'delete', 'show', 'participants', 'confirmationEmail', 'toggle'];
             }
 
             // Check current action
@@ -304,6 +298,8 @@
         public function sendNotification($row, $href, $label, $title, $icon) {
             $rt = Input::get('rt');
             $do = Input::get('do');
+
+            $icon = 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_notification.svg';
 
             $attributes = 'style="margin-right:3px"';
             $imgAttributes = 'style="width: 18px; height: 18px"';

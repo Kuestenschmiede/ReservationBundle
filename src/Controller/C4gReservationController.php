@@ -2229,19 +2229,33 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $reservationIdField->setSortColumn(false);
         $reservationIdField->setTableColumn(true);
         $reservationIdField->setMandatory(false);
-        $reservationId = C4GBrickCommon::getUUID();
+        $reservationId = '';
         if (isset($putVars['reservation_id']) && $putVars['reservation_id']) {
             $reservationId = $putVars['reservation_id'];
+        }
+
+        if (!$reservationId) {
+            $maxLoops = 10;
+            while ($maxLoops > 0) {
+                $reservationId = C4GBrickCommon::getUUID();
+                $database = \Contao\Database::getInstance();
+                $check = $database->prepare("SELECT id FROM tl_c4g_reservation WHERE reservation_id=?")
+                    ->execute($reservationId);
+                if ($check->numRows === 0) {
+                    break;
+                }
+                $maxLoops--;
+            }
         }
         $reservationIdField->setInitialValue($reservationId);
         $reservationIdField->setTableRow(false);
         $reservationIdField->setEditable(false);
-        $reservationIdField->setUnique(true);
+        $reservationIdField->setUnique(false);
         $reservationIdField->setNotificationField(true);
-        $reservationIdField->setDbUnique(true);
+        $reservationIdField->setDbUnique(false);
         $reservationIdField->setSimpleTextWithoutEditing(false);
         $reservationIdField->setDatabaseField(true);
-        $reservationIdField->setDbUniqueResult($GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']);
+        $reservationIdField->setDbUniqueResult('');
         $reservationIdField->setStyleClass('reservation-id');
         $reservationIdField->setHidden($hideReservationKey);
         $reservationIdField->setPrintable($this->withDefaultPDFContent);
@@ -2856,7 +2870,17 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         // Regenerate the reservation_id if not already present in the request
         if (!isset($putVars['reservation_id']) || !$putVars['reservation_id']) {
-            $putVars['reservation_id'] = \con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon::getUUID();
+            $maxLoops = 10;
+            while ($maxLoops > 0) {
+                $putVars['reservation_id'] = \con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon::getUUID();
+                $database = \Contao\Database::getInstance();
+                $check = $database->prepare("SELECT id FROM tl_c4g_reservation WHERE reservation_id=?")
+                    ->execute($putVars['reservation_id']);
+                if ($check->numRows === 0) {
+                    break;
+                }
+                $maxLoops--;
+            }
         }
         $this->putVars['reservation_id'] = $putVars['reservation_id'];
         
@@ -4438,7 +4462,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $forceInt = function(&$vars) {
             if (!is_array($vars)) return;
-            $intKeys = ['beginTime', 'endTime', 'beginDate', 'endDate', 'reservation_id', 'dbkey'];
+            $intKeys = ['beginTime', 'endTime', 'beginDate', 'endDate', 'dbkey'];
             foreach ($vars as $key => $value) {
                 foreach ($intKeys as $base) {
                     if ($key === $base || strpos($key, $base . '_') === 0) {

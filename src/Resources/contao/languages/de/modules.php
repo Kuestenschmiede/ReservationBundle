@@ -19,7 +19,7 @@ use con4gis\ReservationBundle\Controller\C4gReservationCheckInController;
 use con4gis\ReservationBundle\Controller\C4gReservationOccupancyPlanController;
 
 $GLOBALS['TL_LANG']['MOD']['Reservation'] = array('con4gis Reservation', 'www.con4gis.org');
-$GLOBALS['TL_LANG']['MOD']['C4gReservation'] = array('Reservierung', 'Auflistung bereits erfolgter Reservierungen');
+$GLOBALS['TL_LANG']['MOD']['C4gReservation'] = array('Reservierungen', 'Auflistung bereits erfolgter Reservierungen');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationObject'] = array('Reservierungsobjekt', 'Definition der buchbaren Objekte (z.B. Tische, Räume, Seminare).');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationLocation'] = array('Veranstalter-/Ort', 'Veranstalter und Veranstaltungsorte erfassen.');
 $GLOBALS['TL_LANG']['MOD']['C4gReservationType'] = array('Reservierungsart', 'Definition der Reservierungsarten (z.B. Tischreservierung, Raumreservierung)');

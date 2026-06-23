@@ -50,7 +50,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         (
             'fields'            => array('caption','quantity','desiredCapacityMin','desiredCapacityMax','viewableTypes:tl_c4g_reservation_type.caption','time_interval'),
             'label_callback'    => array($cbClass, 'listFields'),
-            'showColumns'       => true
+            'showColumns'       => true,
+            'operations'        => ['edit', 'copy', 'delete', 'toggle', 'show']
         ),
 
         'global_operations' => array
