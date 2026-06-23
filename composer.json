@@ -15,9 +15,9 @@
         "php": "^8.1",
         "contao/core-bundle": "^4.13 || ^5.3",
         "contao/calendar-bundle": "^4.13 || ^5.3",
-        "con4gis/projects": "^v5.0.20",
-        "con4gis/documents": "^1.6.1",
-        "con4gis/groups": "^2.9"
+        "con4gis/projects": "^v5.0.21",
+        "con4gis/documents": "^1.6.2",
+        "con4gis/groups": "^2.10"
     },
     "conflict": {
         "contao/core": "*",
@@ -51,7 +51,7 @@
     "extra": {
         "contao-manager-plugin": "con4gis\\ReservationBundle\\ContaoManager\\Plugin",
         "branch-alias": {
-            "dev-main": "4.0.x-dev"
+            "dev-main": "4.2.x-dev"
         }
     },
     "scripts": {

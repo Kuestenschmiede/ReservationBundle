@@ -2642,6 +2642,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 unset($errRes['dialogcloseall']);
                 return $errRes;
             }
+            if (!is_array($putVars)) {
+                $putVars = [];
+            }
             // 1. Determine type as early as possible to decide on strategy
         $typeIdForStrategy = $putVars['reservation_type'] ?? 0;
         if (!$typeIdForStrategy && key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT')) {
@@ -2656,6 +2659,32 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $isEventActualForStrategy = true;
             }
         }
+
+        // --- BACKWARD COMPATIBILITY & DATA RECOVERY ---
+        if ($this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+            // Recovery from content (PUT stream)
+            $content = $request->getContent();
+            if ($content) {
+                parse_str($content, $recoveredVars);
+                if (is_array($recoveredVars)) {
+                    foreach ($recoveredVars as $rk => $rv) {
+                        if (!isset($putVars[$rk]) || $putVars[$rk] === '' || $putVars[$rk] === null) {
+                            $putVars[$rk] = $rv;
+                        }
+                    }
+                }
+            }
+            // Recovery from request parameters (POST/GET processed by Symfony)
+            $allParams = $request->request->all();
+            if (is_array($allParams)) {
+                foreach ($allParams as $rk => $rv) {
+                    if (!isset($putVars[$rk]) || $putVars[$rk] === '' || $putVars[$rk] === null) {
+                        $putVars[$rk] = $rv;
+                    }
+                }
+            }
+        }
+        // ----------------------------------------------
 
         // LOG RAW INPUT STREAM for diagnostic purposes
         $rawStream = file_get_contents('php://input');
@@ -2857,12 +2886,56 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $formId = $this->reservationSettings->id;
         $type = $putVars['reservation_type'] ?? '';
+        
+        // --- EMERGENCY DATA RECOVERY FOR OBJECT ID ---
+        if ($type) {
+            $objKey = "reservation_object_" . $type;
+            if ((!isset($putVars[$objKey]) || !$putVars[$objKey])) {
+                // Try to find ANY key that starts with reservation_object_
+                foreach ($putVars as $pk => $pv) {
+                    if (strpos($pk, 'reservation_object_') === 0 && $pv) {
+                        $putVars[$objKey] = $pv;
+                        $this->putVars[$objKey] = $pv;
+                        break;
+                    }
+                }
+            }
+            
+            // SECOND RESCUE: Check if we have an event id for event types
+            $resTypeForRescue = C4gReservationTypeModel::findByPk($type);
+            if ($resTypeForRescue && $resTypeForRescue->type == 2) {
+                $eventKey = "reservation_object_event_" . $type;
+                if (!isset($putVars[$eventKey]) || !$putVars[$eventKey]) {
+                    foreach ($putVars as $pk => $pv) {
+                        if (strpos($pk, 'reservation_object_event_') === 0 && $pv) {
+                            $putVars[$eventKey] = $pv;
+                            $this->putVars[$eventKey] = $pv;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- EMERGENCY DATA RECOVERY FOR AGREED ---
+        if (!isset($putVars['agreed']) || !$putVars['agreed']) {
+            foreach ($putVars as $pk => $pv) {
+                // Search for 'agreed' anywhere in the key, or keys starting with 'privacy'
+                if ((strpos($pk, 'agreed') !== false || strpos($pk, 'privacy') !== false) && $pv) {
+                    $putVars['agreed'] = $pv;
+                    $this->putVars['agreed'] = $pv;
+                    break;
+                }
+            }
+        }
+        // -------------------------------------------
 
         if ($this->reservationSettings->privacy_policy_text || $this->reservationSettings->privacy_policy_site) {
             if (!isset($putVars['agreed']) || !$putVars['agreed']) {
                 if (isset($this->session) && is_object($this->session) && method_exists($this->session, 'setSessionValue')) {
                     $this->session->setSessionValue('c4g_brick_dialog_values', null);
                 }
+                C4gLogModel::addLogEntry('reservation', "Mandatory error: Privacy policy not agreed.");
                 $result = [
                     'usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY'] ?? 'Bitte stimmen Sie den Datenschutzbestimmungen zu.'
                 ];
@@ -3423,6 +3496,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
 
             if (!$reservationObject || !$reservationObject->id) {
+                // LOG missing object
+                $typeId = $putVars['reservation_type'] ?? 'MISSING';
+                $objKey = "reservation_object_" . $typeId;
+                $objVal = $putVars[$objKey] ?? 'MISSING';
+                C4gLogModel::addLogEntry('reservation', "Mandatory error: Missing reservationObject for type $typeId (Key: $objKey, Value: $objVal). Content: " . substr($rawStream, 0, 500));
                 return ['usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY']];
             }
 
