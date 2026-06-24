@@ -89,31 +89,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
 
         'operations' => array
         (
-            'edit' => array
-            (
-                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['edit'],
-                'href'                => 'act=edit',
-                'icon'                => 'edit.svg',
-            ),
-            'copy' => array
-            (
-                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['copy'],
-                'href'                => 'act=copy',
-                'icon'                => 'copy.svg',
-            ),
-            'delete' => array
-            (
-                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['delete'],
-                'href'                => 'act=delete',
-                'icon'                => 'delete.svg',
-                'attributes'          => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\')) return false;Backend.getScrollOffset()"'
-            ),
-            'show' => array
-            (
-                'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['show'],
-                'href'                => 'act=show',
-                'icon'                => 'show.svg',
-            ),
+            'edit',
+            'copy',
+            'delete',
+            'show',
             'participants' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['participants'],
@@ -126,13 +105,15 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
                 //'href'                => 'key=sendNotification',
                 'icon'                => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_notification.svg',
                 'button_callback'     => [$cbClass, 'sendNotification'],
+                'primary' => true,
             ),
             'toggle' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['TOGGLE'],
                 'icon'                => 'visible.svg',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array($cbClass, 'toggleIcon')
+                'button_callback'     => array($cbClass, 'toggleIcon'),
+                'primary' => true,
             )
         )
     ),
