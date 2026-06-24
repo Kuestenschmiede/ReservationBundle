@@ -3568,7 +3568,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             // Collect all possible candidates for beginDate and beginTime
             // Priority: Explicit suffixed keys > Generic keys
             foreach ($putVars as $key => $value) {
-                if (!$value) continue;
+                if ($value === '' || $value === null) continue;
                 
                 // Detection for beginDate
                 if (strpos($key, 'beginDate_') === 0 || strpos($key, 'beginDateEvent_') === 0) {
@@ -3626,7 +3626,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             // Detection result for beginDate and beginTime
 
             // EMERGENCY PATCH: If we have detected values but timeKey is still false, create it!
-            if ($beginTime && !$timeKey) {
+            if (isset($beginTime) && $beginTime !== '' && !$timeKey) {
                 $timeKey = 'beginTime_' . $type;
                 $putVars[$timeKey] = $beginTime;
                 $this->putVars[$timeKey] = $beginTime;
@@ -3654,7 +3654,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $putVars['beginDate_'.$type] = $beginDate;
                     $this->putVars['beginDate_'.$type] = $beginDate;
                 }
-                if ($beginTime && $type && !isset($putVars['beginTime_'.$type])) {
+                if (isset($beginTime) && $beginTime !== '' && $type && !isset($putVars['beginTime_'.$type])) {
                     $putVars['beginTime_'.$type] = $beginTime;
                     $this->putVars['beginTime_'.$type] = $beginTime;
                     if (!$timeKey) $timeKey = 'beginTime_'.$type;
@@ -3676,16 +3676,24 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     }
                 }
             }
-            if ($beginTime && $timeKey) {
-                $putVars['beginTime'] = $beginTime;
-                $this->putVars['beginTime'] = $beginTime;
+            if (isset($beginTime) && $beginTime !== '' && $timeKey) {
+                $formattedBeginTime = ($beginTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $beginTime % 86400) . ' UTC'));
+                if ($formattedBeginTime === '01:00' && ($beginTime % 86400 === 0)) {
+                    $formattedBeginTime = "00:00";
+                }
+                if (is_numeric($beginTime) && (int)$beginTime === 0) {
+                    $formattedBeginTime = "00:00";
+                }
+                $putVars['beginTime'] = $formattedBeginTime;
+                $this->putVars['beginTime'] = $putVars['beginTime'];
+                $this->putVars['beginTimeInt'] = (int) $beginTime;
                 if ($type) {
-                    $putVars['beginTime_'.$type] = $beginTime;
-                    $this->putVars['beginTime_'.$type] = $beginTime;
+                    $putVars['beginTime_'.$type] = $putVars['beginTime'];
+                    $this->putVars['beginTime_'.$type] = $putVars['beginTime'];
                     
                     if ($reservationType->reservationObjectType === '3' && isset($objectId)) {
-                        $putVars['beginTime_'.$type.'-33'.$objectId] = $beginTime;
-                        $this->putVars['beginTime_'.$type.'-33'.$objectId] = $beginTime;
+                        $putVars['beginTime_'.$type.'-33'.$objectId] = $putVars['beginTime'];
+                        $this->putVars['beginTime_'.$type.'-33'.$objectId] = $putVars['beginTime'];
                     }
                 }
             }
@@ -3707,15 +3715,23 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $beginTimeInt = is_numeric($beginTime) ? intval($beginTime) : (is_string($beginTime) ? strtotime($beginTime) : 0);
                 if (!$beginTimeInt && is_string($beginTime) && strpos($beginTime, ':') !== false) {
                     $beginTimeInt = strtotime('1970-01-01 ' . $beginTime . ' UTC');
+                    $beginTimeInt -= strtotime('1970-01-01 00:00:00 UTC');
                 }
                 $beginTime = $beginTimeInt;
-                $putVars['beginTime'] = (int) $beginTime;
-                $this->putVars['beginTime'] = (int) $beginTime;
+                $putVars['beginTimeInt'] = (int) $beginTime;
+                $this->putVars['beginTimeInt'] = (int) $beginTime;
                 $endTime = ($beginTimeInt ?: 0) + intval($duration);
                 $putVars['endTimeInt'] = (int) $endTime;
             }
 
-            $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$endTime);
+            $formattedEndTime = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
+            if ($formattedEndTime === '01:00' && ($endTime % 86400 === 0)) {
+                $formattedEndTime = "00:00";
+            }
+            if (is_numeric($endTime) && (int)$endTime === 0) {
+                $formattedEndTime = "00:00";
+            }
+            $putVars['endTime'] = $formattedEndTime;
 
             if ($reservationType->reservationObjectType === '3' && $timeKey) {
                 $putVars['endDate'] = $putVars['beginDate_'.$type.'-33'.$objectId];
@@ -3756,20 +3772,27 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
             if (!$reservationType->directBooking && ($endTime > 86400)) {
                 $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime);
-                $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime-86400);
+                $formattedEndTime = date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', ($endTime-86400) % 86400) . ' UTC'));
+                if ($formattedEndTime === '01:00' && (($endTime-86400) % 86400 === 0)) {
+                    $formattedEndTime = "00:00";
+                }
+                $putVars['endTime'] = $formattedEndTime;
             } else if (!$reservationType->directBooking && ($endTime == 86400)) {
                 //$putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime-1);
-                $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime);
+                $formattedEndTime = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
+                if ($formattedEndTime === '01:00' && ($endTime % 86400 === 0)) {
+                    $formattedEndTime = "00:00";
+                }
+                $putVars['endTime'] = $formattedEndTime;
             }
 
             if ($typeOfObject == 'fixed_date') {
                 $timestamp = $reservationObject->dateTimeBegin;
 //                $object['typeOfObject'] = $reservationObject->getTypeOfObject();
                 $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
-                $summerDiff = C4gReservationDateChecker::getTimeDiff($timestamp);
                 $duration = $reservationObject->typeOfObjectDuration * $interval;
 
-                $beginTime = $timestamp - $beginDate - $summerDiff;
+                $beginTime = $timestamp - $beginDate;
                 $endTime = $beginTime + $duration;
                 $endDate = $beginDate + $endTime;
 
@@ -3777,18 +3800,38 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $putVars['duration'] = $duration;
                 $putVars['duration_'.$type] = $duration;
 
-                if ($putVars['reservationObjectType'] == '3') {
-                    $objectId = $reservationObject ? $reservationObject->id : 0;
-                    $putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $timestamp) : $timestamp;
-                    $putVars['beginTime_'.$type.'-33'.$objectId] = $beginTime;
-                    $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
-                    $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
-                } else if ($putVars['reservationObjectType'] == '2') {
-                    $putVars['beginDate_'.$type] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
-                    $putVars['beginTime'.$type] = $beginTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTime) : $beginTime;
-                    $putVars['endDate_'.$type] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
-                    $putVars['endTime_'.$type] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
-                }
+                    if ($putVars['reservationObjectType'] == '3') {
+                        $objectId = $reservationObject ? $reservationObject->id : 0;
+                        $putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $timestamp) : $timestamp;
+                        $putVars['beginTime_'.$type.'-33'.$objectId] = ($beginTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $beginTime % 86400) . ' UTC'));
+                        if ($putVars['beginTime_'.$type.'-33'.$objectId] === '01:00' || $putVars['beginTime_'.$type.'-33'.$objectId] === '1:00') {
+                            if ($beginTime % 86400 === 0) {
+                                $putVars['beginTime_'.$type.'-33'.$objectId] = "00:00";
+                            }
+                        }
+                        $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
+                        $putVars['endTime'] = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
+                        if ($putVars['endTime'] === '01:00' || $putVars['endTime'] === '1:00') {
+                            if ($endTime % 86400 === 0) {
+                                $putVars['endTime'] = "00:00";
+                            }
+                        }
+                    } else if ($putVars['reservationObjectType'] == '2') {
+                        $putVars['beginDate_'.$type] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
+                        $putVars['beginTime'.$type] = $beginTime ? (($beginTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $beginTime % 86400) . ' UTC'))) : $beginTime;
+                        if ($putVars['beginTime'.$type] === '01:00' || $putVars['beginTime'.$type] === '1:00') {
+                            if ($beginTime % 86400 === 0) {
+                                $putVars['beginTime'.$type] = "00:00";
+                            }
+                        }
+                        $putVars['endDate_'.$type] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
+                        $putVars['endTime_'.$type] = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
+                        if ($putVars['endTime_'.$type] === '01:00' || $putVars['endTime_'.$type] === '1:00') {
+                            if ($endTime % 86400 === 0) {
+                                $putVars['endTime_'.$type] = "00:00";
+                            }
+                        }
+                    }
 //                $putVars['beginDate'] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
 //                $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate']; //ToDO Check
             }
@@ -3815,7 +3858,16 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                         $addDuration = $duration - 86400; //first day counts
                     }
 
-                    $nextDay = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)) + $addDuration;
+                    $beginDateToConvert = C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate);
+                    if ($reservationType->periodType == 'week') {
+                        $numWeeks = round($addDuration / 604800);
+                        $nextDay = strtotime("+$numWeeks week", strtotime($beginDateToConvert));
+                    } else if ($reservationType->periodType == 'day' || $reservationType->periodType == 'overnight') {
+                        $numDays = round($addDuration / 86400);
+                        $nextDay = strtotime("+$numDays day", strtotime($beginDateToConvert));
+                    } else {
+                        $nextDay = strtotime($beginDateToConvert) + $addDuration;
+                    }
                     $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
 
                     $wd = date("w", strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)));
@@ -3827,7 +3879,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     }
 
 
-                    $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], intvaL($endTime)) : intval($beginTime);
+                        $formattedEndTime = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', intval($endTime % 86400)) . ' UTC'));
+                        if ($formattedEndTime === '01:00' || $formattedEndTime === '1:00') {
+                            if ($endTime % 86400 === 0) {
+                                $formattedEndTime = "00:00";
+                            }
+                        }
+                        $putVars['endTime'] = $formattedEndTime;
                 }
             }
             if ($typeOfObject == 'fixed_date') {
@@ -3844,10 +3902,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             if ($typeOfObject == 'fixed_date') {
                 $timestamp = $reservationObject->dateTimeBegin;
                 $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
-                $summerDiff = C4gReservationDateChecker::getTimeDiff($timestamp);
                 $duration = $reservationObject->typeOfObjectDuration * $interval;
 
-                $beginTime = $timestamp - $beginDate - $summerDiff;
+                $beginTime = $timestamp - $beginDate;
                 $endTime = $beginTime + $duration;
                 $endDate = $beginDate + $endTime;
 
@@ -3858,13 +3915,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 if ($putVars['reservationObjectType'] == '3') {
                     $objectId = $reservationObject ? $reservationObject->id : 0;
                     $putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
-                    $putVars['beginTime_'.$type.'-33'.$objectId] = $beginTime;
+                    $putVars['beginTimeInt_'.$type.'-33'.$objectId] = $beginTime;
                     $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
-                    $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
+                    $putVars['endTime'] = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
                 }
                 //ToDO Check
                 $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate'];
-                $putVars['endTime'] = $endTime ? date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime) : $endTime;
+                $putVars['endTime'] = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
             }
 
             if ($reservationType->directBooking && $timeKey) {
@@ -4186,7 +4243,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         }
 
         // Fix: mirrored location tokens might also be needed as defaults if not set
-        if ($locationId && !isset($putVars['location_2-' . $locationId])) {
+        if (isset($locationId) && !isset($putVars['location_2-' . $locationId])) {
             $putVars['location_2-' . $locationId] = '';
         }
 
@@ -4244,27 +4301,49 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $icsObject = isset($reservationEventObject) ? $reservationEventObject : $reservationObject;
 
-        $beginDate = $beginDate ?? ($putVars['beginDate'] ?? '');
-        $beginTime = $beginTime ?? ($putVars['beginTime'] ?? 0);
-        $endDate   = $endDate   ?? ($putVars['endDate']   ?? null);
-        $endTime   = $endTime   ?? ($putVars['endTime']   ?? 0);
-        $beginTimeInt = $beginTimeInt ?? (is_numeric($beginTime) ? (int)$beginTime : 0);
+        $beginDateRaw = $beginDate ?? ($putVars['beginDate'] ?? '');
+        $beginTimeRaw = $beginTime ?? ($putVars['beginTime'] ?? 0);
+        $endDateRaw   = $endDate   ?? ($putVars['endDate']   ?? null);
+        $endTimeRaw   = $endTime   ?? ($putVars['endTime']   ?? 0);
 
-        $beginDateInt = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate));
-        $putVars['beginDate'] = (int) $beginDateInt;
-        $this->putVars['beginDate'] = (int) $beginDateInt;
+        // We preserve formatted strings for display (notifications)
+        $putVars['beginDate'] = is_string($beginDateRaw) && strpos($beginDateRaw, '.') !== false ? $beginDateRaw : date($GLOBALS['TL_CONFIG']['dateFormat'], is_numeric($beginDateRaw) ? (int)$beginDateRaw : time());
+        $putVars['beginTime'] = is_string($beginTimeRaw) && strpos($beginTimeRaw, ':') !== false ? $beginTimeRaw : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', is_numeric($beginTimeRaw) ? (int)$beginTimeRaw : 0) . ' UTC'));
+        if ($endDateRaw) {
+            $putVars['endDate'] = is_string($endDateRaw) && strpos($endDateRaw, '.') !== false ? $endDateRaw : date($GLOBALS['TL_CONFIG']['dateFormat'], is_numeric($endDateRaw) ? (int)$endDateRaw : time());
+            $endDateInt = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['endDate']));
+            $dtEnd = new \DateTime('@' . $endDateInt);
+            $dtEnd->setTimezone(new \DateTimeZone('Europe/Berlin'));
+            $putVars['endDateInt'] = (int) $dtEnd->getTimestamp();
+        }
+        if ($endTimeRaw) {
+            $putVars['endTime'] = is_string($endTimeRaw) && strpos($endTimeRaw, ':') !== false ? $endTimeRaw : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', is_numeric($endTimeRaw) ? (int)$endTimeRaw : 0) . ' UTC'));
+        }
+
+        $beginTimeInt = $beginTimeInt ?? (is_numeric($beginTimeRaw) ? (int)$beginTimeRaw : 0);
+
+        $beginDateInt = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['beginDate']));
+        // We preserve formatted strings for display (notifications) but keep ints for database/logic
+        // Normalize beginDate to midnight Europe/Berlin to be timezone independent
+        $dtBegin = new \DateTime('@' . $beginDateInt);
+        $dtBegin->setTimezone(new \DateTimeZone('Europe/Berlin'));
+        $dtBegin->setTime(0, 0, 0);
+        $beginDateInt = $dtBegin->getTimestamp();
+
+        $putVars['beginDateInt'] = (int) $beginDateInt;
+        $this->putVars['beginDateInt'] = (int) $beginDateInt;
 
         $rIdForIcs = $putVars['reservation_id'] ?? ($putVars['id'] ?? 0);
-        $beginDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $beginTime);
-        $endDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(isset($endDate) ? $endDate : strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)), $endTime);
+        $beginDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['beginDate'])), $putVars['beginTime']);
+        $endDateTime = C4gReservationDateChecker::mergeDateWithTimeForIcs(isset($putVars['endDate']) ? strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['endDate'])) : strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['beginDate'])), $putVars['endTime']);
         
         // Final database format check for integer fields
-        $putVars['beginTime'] = (int) ($beginTimeInt ?? $beginTime);
-        $putVars['endTime'] = (int) $endTime;
-        $this->putVars['beginTime'] = $putVars['beginTime'];
-        $this->putVars['endTime'] = $putVars['endTime'];
-        $putVars['beginDate'] = (int) $beginDateInt;
-        $this->putVars['beginDate'] = (int) $beginDateInt;
+        $putVars['beginTimeInt'] = (int) $beginTimeInt;
+        $putVars['endTimeInt'] = (int) (is_numeric($endTimeRaw) ? $endTimeRaw : 0);
+        $this->putVars['beginTimeInt'] = $putVars['beginTimeInt'];
+        $this->putVars['endTimeInt'] = $putVars['endTimeInt'];
+        $putVars['beginDateInt'] = (int) $beginDateInt;
+        $this->putVars['beginDateInt'] = (int) $beginDateInt;
 
         $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $rIdForIcs);
         $this->putVars['icsFilename'] = $putVars['icsFilename'];
@@ -4466,10 +4545,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             foreach ($vars as $key => $value) {
                 foreach ($intKeys as $base) {
                     if ($key === $base || strpos($key, $base . '_') === 0) {
-                        // If it's a string that looks like a date (e.g. contains a dot), 
-                        // DON'T force it to int here, because it will result in '0' or the day number.
+                        // If it's a string that looks like a date (e.g. contains a dot) or time (colon),
+                        // DON'T force it to int here, because it will result in '0' or a mangled value.
                         // Let the Field classes handle the parsing later.
-                        if (is_string($value) && strpos($value, '.') !== false) {
+                        if (is_string($value) && (strpos($value, '.') !== false || strpos($value, ':') !== false)) {
                             continue;
                         }
                         $vars[$key] = (int)$value;
@@ -4489,6 +4568,21 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         // might access the instance variable via the module reference.
         $this->putVars = $putVars;
         
+        // Ensure that base keys for dates and times are integers for the database
+        // while we kept the formatted strings for the notification above
+        if (isset($putVars['beginTimeInt'])) {
+            $putVars['beginTime'] = (int) $putVars['beginTimeInt'];
+        }
+        if (isset($putVars['endTimeInt'])) {
+            $putVars['endTime'] = (int) $putVars['endTimeInt'];
+        }
+        if (isset($putVars['beginDateInt'])) {
+            $putVars['beginDate'] = (int) $putVars['beginDateInt'];
+        }
+        if (isset($putVars['endDateInt'])) {
+            $putVars['endDate'] = (int) $putVars['endDateInt'];
+        }
+
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
         $result = $action->run();
@@ -4688,10 +4782,12 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             if ($this->session->getSessionValue('reservationSettings')) {
                 $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->session->getSessionValue('reservationSettings'));
             }
-            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $this->reservationSettings->showPrices, $this->reservationSettings->showPricesWithTaxes ?: false,false, $duration, $date, $langCookie);
-            $withEndTimes = $this->reservationSettings->showEndTime;
-            $withFreeSeats = $this->reservationSettings->showFreeSeats;
-            $showArrivalAndDeparture = $this->reservationSettings->showArrivalAndDeparture;
+            $showPrices = $this->reservationSettings->showPrices ?? false;
+            $showPricesWithTaxes = $this->reservationSettings->showPricesWithTaxes ?? false;
+            $objects = C4gReservationHandler::getReservationObjectList(array($type), intval($objectId), $showPrices, $showPricesWithTaxes,false, $duration, $date, $langCookie);
+            $withEndTimes = $this->reservationSettings->showEndTime ?? false;
+            $withFreeSeats = $this->reservationSettings->showFreeSeats ?? false;
+            $showArrivalAndDeparture = $this->reservationSettings->showArrivalAndDeparture ?? false;
             $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $capacity, $withEndTimes, $withFreeSeats, true, $langCookie, $showArrivalAndDeparture);
         }
 //        if (!$times || $times == [] || $times == [0]) {
@@ -4709,7 +4805,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $captions = [];
 
-        if ($this->reservationSettings->showPrices) {
+        if (($this->reservationSettings->showPrices ?? false)) {
             foreach ($objects as $object) {
                 $captions[$object->getId()] = $object->getCaption();
             }

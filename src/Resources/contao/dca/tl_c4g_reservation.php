@@ -51,13 +51,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'mode'              => 2,
             'fields'            => ['beginDate DESC','lastname'],
             'filter'            => (Input::get('do') == "calendar") ? array(array('reservation_object=? AND reservationObjectType=\'2\'',Input::get('id'))) : null,
-            'headerFields'      => ['beginDate','endDate','desiredCapacity','reservation_type','lastname','firstname','reservation_object','checkedIn'],
+            'headerFields'      => ['beginDateInt','endDateInt','desiredCapacity','reservation_type','lastname','firstname','reservation_object','checkedIn'],
             'panelLayout'       => 'filter;sort,search,limit',
         ),
 
         'label' => array
         (
-            'fields'            => array('beginDate','endDate','desiredCapacity','reservation_type','lastname','firstname','reservation_object'),
+            'fields'            => array('beginDateInt','endDateInt','desiredCapacity','reservation_type','lastname','firstname','reservation_object'),
             'label_callback'    => array($cbClass, 'listFields'),
             'showColumns'       => true,
             'operations'        => ['edit', 'copy', 'delete', 'show', 'participants', 'confirmationEmail', 'toggle']
@@ -223,6 +223,20 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'default'           => '1',
             'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NOT NULL default 1"
+        ),
+
+        'beginDateInt' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['beginDate'],
+            'exclude'                 => true,
+            'inputType'               => 'text',
+        ),
+
+        'endDateInt' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['endDate'],
+            'exclude'                 => true,
+            'inputType'               => 'text',
         ),
 
         'beginDate' => array

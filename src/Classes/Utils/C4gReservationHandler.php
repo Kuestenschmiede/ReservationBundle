@@ -404,14 +404,13 @@ class C4gReservationHandler
         if (key_exists('mergedTime',$obj) && $obj['mergedTime'] && key_exists('mergedEndTime',$obj) && $obj['mergedEndTime']) {
             $clockEx = $withoutTime ? '' : $clock;
             $format = $withoutTime ? $GLOBALS['TL_CONFIG']['dateFormat'] : $GLOBALS['TL_CONFIG']['datimFormat'];
-            $begin = date('I', $obj['mergedTime']) ? date($format, $obj['mergedTime']-3600).$clockEx : date($format, $obj['mergedTime']).$clockEx ;
+            $begin = date($format, $obj['mergedTime']).$clockEx ;
 
             if ($list['type']['periodType'] == 'overnight'){
                 $actDurationStamp = $list['actDuration'] == '-1' ? ($list['actDuration']  * $interval) * -1 : $list['actDuration'] * 86400;
                 $end = date($format, $list['tsdate'] + $departureTimeEndStamp + $actDurationStamp).$clockEx;
             }else{
-                $summertime = C4gReservationDateChecker::getTimeDiff($time);
-                $end = date($format, $obj['mergedEndTime'] + $summertime).$clockEx;
+                $end = date($format, $obj['mergedEndTime']).$clockEx;
             }
 
             $mergedTime = true;
@@ -426,9 +425,7 @@ class C4gReservationHandler
             if ($withEndTimes && $interval) {
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
-                    date_default_timezone_set('Europe/Berlin');
-                    $summertime = C4gReservationDateChecker::getTimeDiff($time);
-                    $end = date($format, $time + $interval + $summertime-3600).$clock;
+                    $end = date($format, $time + $interval).$clock;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.' - '.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
@@ -445,9 +442,7 @@ class C4gReservationHandler
             if ($withEndTimes && $interval) {
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
-                    date_default_timezone_set('Europe/Berlin');
-                    $summertime = C4gReservationDateChecker::getTimeDiff($time);
-                    $end = date($format, $time + $interval+$summertime-3600).$clock;
+                    $end = date($format, $time + $interval).$clock;
                     $stop = 1;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.' - '.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
@@ -941,15 +936,11 @@ class C4gReservationHandler
                                 }
                             }
                             $cts = $timeObj['mergedTime'];
-                            $periodEnd = $endTime - C4gReservationDateChecker::getTimeDiff($cts);
+                            $periodEnd = $endTime;
                         }
 
                         $timeObj['mergedEndTime'] = C4gReservationDateChecker::mergeDateWithTime($timeParams['tsdate']+$durationInterval, $periodEnd);
                     }
-
-                    $timeObj['mergedTime'] += C4gReservationDateChecker::getCESDiffToLocale($timeObj['mergedTime']);
-                    $timeObj['mergedEndTime'] += C4gReservationDateChecker::getCESDiffToLocale($timeObj['mergedEndTime']);
-                    $time += C4gReservationDateChecker::getCESDiffToGMT($time);
 
                     $timeParams['result'] = self::getTimeResult($time, $timeParams, $timeObjectParams, $checkTime, $calculatorResult, $timeArray, $timeObj);
                 }
@@ -1085,8 +1076,8 @@ class C4gReservationHandler
                     $timestamp = $object->getDateTimeBegin();
 
                     $beginDate = C4gReservationDateChecker::getBeginOfDate($timestamp);
-                    $summerDiff = C4gReservationDateChecker::getTimeDiff($timestamp);
-                    $beginTime = $timestamp - $beginDate - $summerDiff;
+                    $summerDiff = 0;
+                    $beginTime = $timestamp - $beginDate;
                     
                     $duration = $object->getTypeOfObjectDuration();
 
@@ -1408,11 +1399,7 @@ class C4gReservationHandler
                                 $newValue = substr($value, 0, strpos($value, '#')); //remove frontend duration
                             } else {
                                $begindate_timestamp = strtotime($beginDate); 
-                               if(date('I')){
-                                    $beginTime = $value - $begindate_timestamp - 3600; 
-                               } else {
-                                    $beginTime = $value - $begindate_timestamp; 
-                                }     
+                               $beginTime = $value - $begindate_timestamp; 
                                break;
                             }
 
@@ -2271,11 +2258,7 @@ class C4gReservationHandler
                                 $newValue = substr($value, 0, strpos($value, '#')); //remove frontend duration
                             } else {
                                $begindate_timestamp = strtotime($beginDate); 
-                               if(date('I')){
-                                    $beginTime = $value - $begindate_timestamp - 3600; 
-                               } else {
-                                    $beginTime = $value - $begindate_timestamp; 
-                                }     
+                               $beginTime = $value - $begindate_timestamp; 
                                $beginTimeFound = true;
                                break;
                             }
@@ -2419,13 +2402,15 @@ class C4gReservationHandler
                         $periodCounterPosition = $beginDateAsTstamp;
                         for ($i = 0; $i < $reservationDuration; $i++) {
                             $y=0;
-                            foreach ($fullyBookedDate as $date) {
-                               if ($y !=0 && $periodType == 'overnight' && $periodCounterPosition == ($date - $periodFaktor)) {
-                                    return true;
-                                } else if ($periodType != 'overnight' && $periodCounterPosition == $date) {
-                                    return true;
+                            if (is_array($fullyBookedDate) || is_object($fullyBookedDate)) {
+                                foreach ($fullyBookedDate as $date) {
+                                   if ($y !=0 && $periodType == 'overnight' && $periodCounterPosition == ($date - $periodFaktor)) {
+                                        return true;
+                                    } else if ($periodType != 'overnight' && $periodCounterPosition == $date) {
+                                        return true;
+                                    }
+                                    $y++;
                                 }
-                                $y++;
                             }
                             $periodCounterPosition += $periodFaktor;
                         }
@@ -2437,15 +2422,17 @@ class C4gReservationHandler
                     
                     $periodCounterPosition = $beginDateAsTstamp;
                     for ($i = 0; $i < $reservationDuration; $i++) {
-                        foreach ($fullyBookedDate as $date) {
-                            $y=0;
+                        if (is_array($fullyBookedDate) || is_object($fullyBookedDate)) {
                             foreach ($fullyBookedDate as $date) {
-                               if ($y !=0 && $periodType == 'overnight' && $periodCounterPosition == ($date - $periodFaktor)) {
-                                    return true;
-                                } else if ($periodType != 'overnight' && $periodCounterPosition == $date) {
-                                    return true;
+                                $y=0;
+                                foreach ($fullyBookedDate as $date) {
+                                   if ($y !=0 && $periodType == 'overnight' && $periodCounterPosition == ($date - $periodFaktor)) {
+                                        return true;
+                                    } else if ($periodType != 'overnight' && $periodCounterPosition == $date) {
+                                        return true;
+                                    }
+                                    $y++;
                                 }
-                                $y++;
                             }
                         }
                         $periodCounterPosition += $periodFaktor;
@@ -2518,6 +2505,9 @@ class C4gReservationHandler
 
         $result = ['dates' => ''];
         $periodType = $listType['periodType'];
+        $fullyBookedDate = [];
+        $allFullyBookedDates = [];
+        $allDates = [];
 
         if ($currentBookedTimes || $otherObjectsBookedTimes) {
             $i = 0;
@@ -2542,6 +2532,7 @@ class C4gReservationHandler
                 }
             }
 
+            $allFullyBookedDates = [];
             $allDatesQuantity = array_count_values($allDates);
             $i = 0;
             foreach ($allDatesQuantity as $bookedKey => $bookedQuantity) {
@@ -2558,7 +2549,8 @@ class C4gReservationHandler
                     $bookedEndDate[$i++] = $currentBookings['endDate']; 
                 }
             }
-                 
+            
+            $fullyBookedDate = $fullyBookedDate ?? [];
             if (!$severalBookings || ($severalBookings && !$allTypesQuantity && $currentReservations >= $maxCapacity)) {
                 if ($fullyBookedDate || $allFullyBookedDates) {
                     if (isset($bookedBeginDate)) sort($bookedBeginDate);
@@ -2663,6 +2655,7 @@ class C4gReservationHandler
     }
 
     public static function getFullyBookedDates($minDuration, $currentBookedTimes, $periodFaktor, $objectQuantity, $objectId, $periodType) {
+        $fullyBookedDate = [];
         $bookedDates = self::getBookedDates($minDuration, $currentBookedTimes, $periodFaktor, $periodType);
         $bookedDatesQuantity = array_count_values($bookedDates);
 
@@ -2678,6 +2671,7 @@ class C4gReservationHandler
 
     public static function getBookedDates($minDuration, $currentBookedTimes, $periodFaktor, $periodType) {
         $i = 0;
+        $bookedDates = [];
         foreach ($currentBookedTimes as $currentBookedTime) {
             $bookedBegin = $minDuration ? $currentBookedTime['beginDate'] - (($minDuration-1) * $periodFaktor) : $currentBookedTime['beginDate'];
             $bookedEnd = $currentBookedTime['endDate'];

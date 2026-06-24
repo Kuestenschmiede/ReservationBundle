@@ -36,6 +36,7 @@ class C4gReservationConfirmation
             return;
         }
         $reservation = $objReservation->row();
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "DB Data for ID $reservationId: " . json_encode($reservation));
         $reservationType = $reservation['reservation_type'];
         $reservationObjectType = $reservation['reservationObjectType'];
         
@@ -149,10 +150,92 @@ class C4gReservationConfirmation
                         $dateFormat = ($GLOBALS['TL_CONFIG']['dateFormat'] ?? '') ?: 'd.m.Y';
                         //$datimFormat = $GLOBALS['TL_CONFIG']['datimFormat'];
                         $timeFormat = ($GLOBALS['TL_CONFIG']['timeFormat'] ?? '') ?: 'H:i';
-                        $c4gNotify->setTokenValue('beginDate', ($reservation['beginDate'] ?? '') ? date($dateFormat, $reservation['beginDate']) : '');
-                        $c4gNotify->setTokenValue('beginTime', ($reservation['beginTime'] ?? '') ? date($timeFormat, $reservation['beginTime']) : '');
-                        $c4gNotify->setTokenValue('endDate', ($reservation['endDate'] ?? '') ? date($dateFormat, $reservation['endDate']) : '');
-                        $c4gNotify->setTokenValue('endTime', ($reservation['endTime'] ?? '') ? date($timeFormat, $reservation['endTime']) : '');
+                        $beginTimeValue = $reservation['beginTime'] ?? 'NOTSET';
+                        $beginTimeInt = (int)($reservation['beginTimeInt'] ?? (isset($reservation['beginTime']) && is_numeric($reservation['beginTime']) ? $reservation['beginTime'] : 0));
+                        if (isset($reservation['beginTime']) && is_numeric($reservation['beginTime']) && (int)$reservation['beginTime'] === 0) {
+                            $beginTimeInt = 0;
+                        }
+                        // FORCE 00:00 if beginTime is numeric 0
+                        if (isset($reservation['beginTime']) && is_numeric($reservation['beginTime']) && (int)$reservation['beginTime'] === 0) {
+                            $formattedBeginTime = "00:00";
+                        } else {
+                            $formattedBeginTime = '';
+                            if (isset($reservation['beginTime']) && $reservation['beginTime'] !== '') {
+                                if (is_numeric($reservation['beginTime'])) {
+                                    if ((int)$reservation['beginTime'] % 86400 === 0) {
+                                        $formattedBeginTime = "00:00";
+                                    } else {
+                                        $formattedBeginTime = date($timeFormat, strtotime('1970-01-01 ' . gmdate('H:i', (int)$reservation['beginTime'] % 86400) . ' UTC'));
+                                        if (($formattedBeginTime === '01:00' || $formattedBeginTime === '1:00') && ((int)$reservation['beginTime'] % 86400 === 0)) {
+                                            $formattedBeginTime = "00:00";
+                                        }
+                                    }
+                                } else {
+                                    $formattedBeginTime = $reservation['beginTime'];
+                                    // If the system formatted it to 01:00 but it was likely 00:00
+                                    if (($formattedBeginTime === '01:00' || $formattedBeginTime === '1:00') && ($beginTimeInt % 86400 === 0)) {
+                                        $formattedBeginTime = "00:00";
+                                    }
+                                }
+                            } else {
+                                $formattedBeginTime = "00:00";
+                            }
+                            
+                            // Last resort check for 01:00/1:00 if beginTimeInt is 0
+                            if (($formattedBeginTime === '01:00' || $formattedBeginTime === '1:00') && $beginTimeInt === 0) {
+                                $formattedBeginTime = "00:00";
+                            }
+                            
+                            if ((int)($reservation['beginTime'] ?? -1) === 0) {
+                                $formattedBeginTime = "00:00";
+                            }
+                        }
+                        // file_put_contents('var/logs/debug_time.log', "ID: $reservationId | Final formattedBeginTime: $formattedBeginTime\n", FILE_APPEND);
+                        if ($formattedBeginTime === '0' || $formattedBeginTime === 0) {
+                            $formattedBeginTime = '00:00';
+                        }
+                        $c4gNotify->setTokenValue('beginTime', $formattedBeginTime);
+
+                        $c4gNotify->setTokenValue('endDate', (($reservation['endDate'] ?? '') !== '') ? date($dateFormat, (int)$reservation['endDate']) : '');
+                        $endTimeInt = (int)($reservation['endTimeInt'] ?? (isset($reservation['endTime']) && is_numeric($reservation['endTime']) ? $reservation['endTime'] : 0));
+                        if (isset($reservation['endTime']) && is_numeric($reservation['endTime']) && (int)$reservation['endTime'] === 0) {
+                            $endTimeInt = 0;
+                        }
+                        $formattedEndTime = '';
+                        if (isset($reservation['endTime']) && $reservation['endTime'] !== '') {
+                            if (is_numeric($reservation['endTime'])) {
+                                if ((int)$reservation['endTime'] % 86400 === 0) {
+                                    $formattedEndTime = "00:00";
+                                } else {
+                                    $formattedEndTime = date($timeFormat, strtotime('1970-01-01 ' . gmdate('H:i', (int)$reservation['endTime'] % 86400) . ' UTC'));
+                                    if (($formattedEndTime === '01:00' || $formattedEndTime === '1:00') && ((int)$reservation['endTime'] % 86400 === 0)) {
+                                        $formattedEndTime = "00:00";
+                                    }
+                                }
+                            } else {
+                                $formattedEndTime = $reservation['endTime'];
+                                // If the system formatted it to 01:00 but it was likely 00:00
+                                if (($formattedEndTime === '01:00' || $formattedEndTime === '1:00') && ($endTimeInt % 86400 === 0)) {
+                                    $formattedEndTime = "00:00";
+                                }
+                            }
+                        } else {
+                            $formattedEndTime = "00:00";
+                        }
+                        
+                        // Last resort check for 01:00/1:00 if endTimeInt is 0
+                        if (($formattedEndTime === '01:00' || $formattedEndTime === '1:00') && $endTimeInt === 0) {
+                            $formattedEndTime = "00:00";
+                        }
+                        
+                        if ((int)($reservation['endTime'] ?? -1) === 0) {
+                            $formattedEndTime = "00:00";
+                        }
+
+                        if ($formattedEndTime === '0' || $formattedEndTime === 0) {
+                            $formattedEndTime = '00:00';
+                        }
+                        $c4gNotify->setTokenValue('endTime', $formattedEndTime);
 
                         $c4gNotify->setTokenValue('description', (string)(($reservationObject['description'] ?? '') ?: (($reservationObject['details'] ?? '') ?: (($reservationObject['teaser'] ?? '') ?: ''))));
 
@@ -290,15 +373,16 @@ class C4gReservationConfirmation
                             'woman' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'][0],
                             'various' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['various'][0],
                         ];
-                        $c4gNotify->setTokenValue('salutation', $reservation['salutation'] && $salutation[$reservation['salutation']] ? $salutation[$reservation['salutation']] : '');
-                        $c4gNotify->setTokenValue('title', $reservation['title'] ? $reservation['title'] : '');
-                        $c4gNotify->setTokenValue('organisation', $reservation['organisation'] ? $reservation['organisation'] : '');
-                        $c4gNotify->setTokenValue('firstname', $reservation['firstname'] ? $reservation['firstname'] : '');
-                        $c4gNotify->setTokenValue('lastname', $reservation['lastname'] ? $reservation['lastname'] : '');
-                        $c4gNotify->setTokenValue('phone', $reservation['phone'] ? $reservation['phone'] : '');
-                        $c4gNotify->setTokenValue('address', $reservation['address'] ? $reservation['address'] : '');
-                        $c4gNotify->setTokenValue('postal', $reservation['postal'] ? $reservation['postal'] : '');
-                        $c4gNotify->setTokenValue('city', $reservation['city'] ? $reservation['city'] : '');
+                        $c4gNotify->setTokenValue('salutation', ($reservation['salutation'] && $salutation[$reservation['salutation']]) ? $salutation[$reservation['salutation']] : '');
+                        $c4gNotify->setTokenValue('title', $reservation['title'] ?: '');
+                        $c4gNotify->setTokenValue('organisation', $reservation['organisation'] ?: '');
+                        $c4gNotify->setTokenValue('firstname', $reservation['firstname'] ?: '');
+                        $c4gNotify->setTokenValue('lastname', $reservation['lastname'] ?: '');
+                        $c4gNotify->setTokenValue('email', $reservation['email'] ?: '');
+                        $c4gNotify->setTokenValue('phone', $reservation['phone'] ?: '');
+                        $c4gNotify->setTokenValue('address', $reservation['address'] ?: '');
+                        $c4gNotify->setTokenValue('postal', $reservation['postal'] ?: '');
+                        $c4gNotify->setTokenValue('city', $reservation['city'] ?: '');
                         $c4gNotify->setTokenValue('dateOfBirth', $reservation['dateOfBirth'] ? date($dateFormat, $reservation['dateOfBirth']) : '');
                         $c4gNotify->setTokenValue('salutation2', $reservation['salutation2'] && $salutation[$reservation['salutation2']] ? $salutation[$reservation['salutation2']] : '');
                         $c4gNotify->setTokenValue('title2', $reservation['title2'] ? $reservation['title2'] : '');

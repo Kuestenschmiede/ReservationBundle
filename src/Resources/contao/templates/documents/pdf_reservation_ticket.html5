@@ -28,7 +28,39 @@
 <div class="pdf-ticket" style="text-align: center">
     <h1>TICKET</h1>
     <h2><?php echo $this->fieldData['reservation_title']; ?></h2><br>
-    <?php echo $this->fieldData['beginDate']; ?> <?php echo $this->fieldData['beginTime']; ?> Uhr<br>
+    <?php
+        $beginDate = $this->fieldData['beginDate'];
+        $beginTime = $this->fieldData['beginTime'];
+        if (is_numeric($beginDate)) {
+            echo \Contao\Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], (int)$beginDate);
+        } else {
+            echo $beginDate;
+        }
+    ?> <?php
+        if (isset($beginTime) && $beginTime !== '') {
+            if (is_numeric($beginTime)) {
+                $beginTimeInt = (int)$beginTime;
+                if ($beginTimeInt % 86400 === 0) {
+                    echo "00:00";
+                } else {
+                    $formattedBeginTime = date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $beginTimeInt % 86400) . ' UTC'));
+                    if (($formattedBeginTime === '01:00' || $formattedBeginTime === '1:00') && ($beginTimeInt % 86400 === 0)) {
+                        echo "00:00";
+                    } else {
+                        echo $formattedBeginTime;
+                    }
+                }
+            } else {
+                if (($beginTime === '01:00' || $beginTime === '1:00')) {
+                    echo "00:00";
+                } else {
+                    echo $beginTime;
+                }
+            }
+        } else {
+            echo "00:00";
+        }
+    ?> Uhr<br>
     <?php echo $this->fieldData['location_2-221']; ?><br><br>
     <?php echo $this->fieldData['priceSum']; ?><br>
 

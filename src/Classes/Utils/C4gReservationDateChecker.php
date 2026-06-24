@@ -285,45 +285,6 @@ class C4gReservationDateChecker
     }
 
     public static function getTimeDiff($stamp) {
-        $timezoneCheckBegin = self::getCESDiffToLocale($stamp);
-        $summerDiff = $timezoneCheckBegin;
-        for ($i = 1; $i <= 365; $i++) {
-            $timezoneCheck = self::getCESDiffToLocale($stamp);
-            $stamp += 86400;
-            if ($timezoneCheck < $timezoneCheckBegin) {
-                $summer = true;
-                $winter = false;
-                $nosummertime = false;
-                break;
-            } else if ($timezoneCheck > $timezoneCheckBegin) {
-                $summer = false;
-                $winter= true;
-                $nosummertime = false;
-                break;
-            } else {
-                $summer = false;
-                $winter = false;
-                $nosummertime = true;
-            }
-        }
-        
-        $timeDiff = 0;
-        if ($summer) {
-            if ($summerDiff == 3600) {
-                $timeDiff = $summerDiff;                         
-            } else {
-                $timeDiff = ($summerDiff-3600);
-            }                        
-        } else if ($winter) {
-            if ($summerDiff == 0) {
-                $timeDiff = 3600;                            
-            } else {
-                $timeDiff = $summerDiff;
-            }
-        } else if ($nosummertime) {
-            $timeDiff = $summerDiff;
-        } 
-        
-        return $timeDiff;
+        return 0;
     }
 }

@@ -86,6 +86,7 @@
 
         public function listFields($arrRow)
         {
+            $do = Input::get('do');
             $objectType = $arrRow['reservationObjectType'];
             $object_id = $arrRow['reservation_object'];
 
@@ -106,15 +107,54 @@
             $arrRow['reservation_object'] = $object;
 
             if ($arrRow['beginDate']) {
-                $arrRow['beginDate'] = $arrRow['beginDate'] ? date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']). ' ' .gmdate($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['beginTime'] % 86400) : date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['beginDate']);
+                $originalBeginDate = $arrRow['beginDate'];
+                $beginTime = (int) $arrRow['beginTime'];
+                $dt = new \DateTime('@' . (int)$arrRow['beginDate']);
+                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                $isMidnight = ($arrRow['beginTime'] === '0' || $arrRow['beginTime'] === 0 || $arrRow['beginTime'] === null || $arrRow['beginTime'] === '' || ($beginTime % 86400 === 0));
+                $formattedTime = "";
+                if ($isMidnight) {
+                    $formattedTime = "00:00";
+                } else {
+                    $formattedTime = date('H:i', strtotime('1970-01-01 ' . gmdate('H:i', $beginTime % 86400) . ' UTC'));
+                    if (($formattedTime === '01:00' || $formattedTime === '1:00') && ($beginTime % 86400 === 0)) {
+                        $formattedTime = "00:00";
+                    }
+                }
+                $arrRow['beginDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat']) . ' ' . $formattedTime;
+                $arrRow['beginTime'] = $formattedTime;
+                $arrRow['beginDateInt'] = $arrRow['beginDate'];
+                $arrRow['beginDate'] = $originalBeginDate; 
             } else {
                 $arrRow['beginDate'] = '';
+                $arrRow['beginTime'] = '';
+                $arrRow['beginDateInt'] = '';
             }
 
             if ($arrRow['endDate']) {
-                $arrRow['endDate'] = $arrRow['endDate'] ? date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']). ' ' .gmdate($GLOBALS['TL_CONFIG']['timeFormat'],$arrRow['endTime'] % 86400) : date($GLOBALS['TL_CONFIG']['dateFormat'],$arrRow['endDate']);
+                $originalEndDate = $arrRow['endDate'];
+                $endDate = (int) $arrRow['endDate'];
+                $endTimeInt = (int) $arrRow['endTime'];
+                $dt = new \DateTime('@' . $endDate);
+                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                $isMidnightEnd = ($arrRow['endTime'] === '0' || $arrRow['endTime'] === 0 || $arrRow['endTime'] === null || $arrRow['endTime'] === '' || ($endTimeInt % 86400 === 0));
+                $formattedEndTime = "";
+                if ($isMidnightEnd) {
+                    $formattedEndTime = "00:00";
+                } else {
+                    $formattedEndTime = date('H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTimeInt % 86400) . ' UTC'));
+                    if (($formattedEndTime === '01:00' || $formattedEndTime === '1:00') && ($endTimeInt % 86400 === 0)) {
+                        $formattedEndTime = "00:00";
+                    }
+                }
+                $arrRow['endDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat']) . ' ' . $formattedEndTime;
+                $arrRow['endTime'] = $formattedEndTime;
+                $arrRow['endDateInt'] = $arrRow['endDate'];
+                $arrRow['endDate'] = $originalEndDate;
             } else {
                 $arrRow['endDate'] = '';
+                $arrRow['endTime'] = '';
+                $arrRow['endDateInt'] = '';
             }
 
             $type = \con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel::findByPk($arrRow['reservation_type']);
@@ -123,8 +163,8 @@
             }
 
                 $result = [
-                    $arrRow['beginDate'],
-                    $arrRow['endDate'],
+                    $arrRow['beginDateInt'],
+                    $arrRow['endDateInt'],
                     $arrRow['desiredCapacity'],
                     $arrRow['reservation_type'],
                     $arrRow['lastname'],
@@ -221,7 +261,7 @@
 
             if ($id && $do && ($do == 'calendar')) {
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-                    ['beginDate','endDate','desiredCapacity','reservation_type','lastname','firstname','reservation_object','checkedIn'];
+                    ['beginDateInt','endDateInt','desiredCapacity','reservation_type','lastname','firstname','reservation_object','checkedIn'];
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['operations'] = ['edit', 'copy', 'delete', 'show', 'participants', 'confirmationEmail', 'toggle'];
 
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['default'] = '2';
@@ -236,7 +276,7 @@
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['endTime']['eval']['disabled'] = true;
             } else {
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-                    ['beginDate','endDate','desiredCapacity','reservation_type','lastname','firstname','reservation_object'];
+                    ['beginDateInt','endDateInt','desiredCapacity','reservation_type','lastname','firstname','reservation_object'];
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['operations'] = ['edit', 'copy', 'delete', 'show', 'participants', 'confirmationEmail', 'toggle'];
             }
 

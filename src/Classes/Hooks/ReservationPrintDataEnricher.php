@@ -32,6 +32,7 @@ class ReservationPrintDataEnricher
     public function enrich($module, array &$data): void
     {
         try {
+            // error_log("ReservationPrintDataEnricher DEBUG Data START: " . json_encode($data));
             // Nur arbeiten, wenn das übergebene Modul die benötigten Settings-Funktionen bietet
 
             // 1. Map dynamic keys to standard keys for the helper and template
@@ -43,15 +44,25 @@ class ReservationPrintDataEnricher
             ];
 
             foreach ($keysToSync as $standardKey) {
-                if (!isset($data[$standardKey]) || !$data[$standardKey]) {
+                if (!isset($data[$standardKey]) || $data[$standardKey] === '' || $data[$standardKey] === null) {
                     foreach ($data as $dynamicKey => $value) {
-                        if ((strpos($dynamicKey, $standardKey . '_') === 0 || strpos($dynamicKey, $standardKey . '|') === 0 || strpos($dynamicKey, $standardKey . '-') === 0) && $value) {
+                        if ((strpos($dynamicKey, $standardKey . '_') === 0 || strpos($dynamicKey, $standardKey . '|') === 0 || strpos($dynamicKey, $standardKey . '-') === 0) && ($value !== '' && $value !== null)) {
                             $data[$standardKey] = $value;
+                            // error_log("ReservationPrintDataEnricher DEBUG Synced $standardKey from $dynamicKey: $value");
                             break;
                         }
                     }
                 }
             }
+
+            // Fallback for beginTime if it's still empty and it's a reservation
+            if (!isset($data['beginTime']) || $data['beginTime'] === '' || $data['beginTime'] === null) {
+                if (isset($data['beginTimeInt']) && (int)$data['beginTimeInt'] === 0) {
+                    $data['beginTime'] = '00:00';
+                    // error_log("ReservationPrintDataEnricher DEBUG Fallback beginTime to 00:00 because beginTimeInt is 0");
+                }
+            }
+            // error_log("ReservationPrintDataEnricher DEBUG Data MID: " . json_encode($data));
 
             $reservationTypeId = isset($data['reservation_type']) ? (int) $data['reservation_type'] : 0;
             if ($reservationTypeId <= 0) {
