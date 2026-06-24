@@ -2696,8 +2696,11 @@ class C4gReservationHandler
 
         $output = preg_replace_callback($simpleTokenRegExp, function($matches) use ($formValues) {
             $simpleTokenKey = $matches[1];
-            if(isset($formValues[$simpleTokenKey]))
-                return $formValues[$simpleTokenKey];
+            if(isset($formValues[$simpleTokenKey])) {
+                $val = $formValues[$simpleTokenKey];
+                $val = str_replace(' ', '_', $val);
+                return $val;
+            }
         }, $filename);
 
         $pathinfo = pathinfo($output);
