@@ -2692,7 +2692,7 @@ class C4gReservationHandler
 
     public static function replaceSimpleTokensWithFormValues($filename, $formValues)
     {
-        $simpleTokenRegExp = "/##(\w+)##/";
+        $simpleTokenRegExp = "/##(.+?)##/";
 
         $output = preg_replace_callback($simpleTokenRegExp, function($matches) use ($formValues) {
             $simpleTokenKey = $matches[1];
@@ -2701,6 +2701,7 @@ class C4gReservationHandler
                 $val = str_replace(' ', '_', $val);
                 return $val;
             }
+            return $matches[0];
         }, $filename);
 
         $pathinfo = pathinfo($output);
