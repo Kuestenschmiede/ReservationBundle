@@ -124,7 +124,8 @@ class C4gReservationConfirmation
                             $organizer = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($organizerId)->fetchAssoc();
                         }
 
-                        $c4gNotify->setTokenValue('admin_email', ($GLOBALS['TL_CONFIG']['adminEmail'] ?? '') ?: '');
+                        $adminEmail = \Contao\Config::get('adminEmail') ?? '';
+                        $c4gNotify->setTokenValue('admin_email', $adminEmail);
                         $c4gNotify->setTokenValue('email', ($reservation['email'] ?? '') ?: '');
 
                         if ($organizer) {
@@ -146,6 +147,12 @@ class C4gReservationConfirmation
                         }
 
                         $c4gNotify->setTokenValue('desiredCapacity', ($reservation['desiredCapacity'] ?? '') ?: '');
+                        foreach ($reservation as $key => $val) {
+                            if (str_starts_with($key, 'desiredCapacity_')) {
+                                $c4gNotify->setTokenValue('desiredCapacity', $val ?: '');
+                                $c4gNotify->setTokenValue($key, $val ?: '');
+                            }
+                        }
 
                         $dateFormat = ($GLOBALS['TL_CONFIG']['dateFormat'] ?? '') ?: 'd.m.Y';
                         //$datimFormat = $GLOBALS['TL_CONFIG']['datimFormat'];

@@ -1087,7 +1087,7 @@ foreach ($typelist as $listType) {
     $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
 
     $reservationDesiredCapacity = new C4GNumberField();
-    $reservationDesiredCapacity->setFieldName('desiredCapacity');
+    $reservationDesiredCapacity->setFieldName('desiredCapacity_' . $listType['id']);
 
     if ($maxCapacity && $eventObj && $eventObj->maxParticipants) {
         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
@@ -1226,7 +1226,7 @@ foreach ($typelist as $listType) {
         }
 
         $durationField = new C4GNumberField();
-        $durationField->setFieldName('duration');
+        $durationField->setFieldName('duration_' . $listType['id']);
         $durationField->setTitle($title);
         $durationField->setColumnWidth(10);
         $durationField->setFormField(true);
@@ -1912,7 +1912,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                         $isPartiPerEvent = $typeMaxParti;
                     }
 
-                    $reservationDesiredCapacity->setFieldName('desiredCapacity');
+                    $reservationDesiredCapacity->setFieldName('desiredCapacity_' . $listType['id']);
 
                     if ($maxCapacity) {
                         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
@@ -1989,7 +1989,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $jsOnChange = "setReservationForm(".json_encode((string)$listType['id']).",".json_encode((int)$showDateTime).");";
                     $reservationDesiredCapacity->setCallOnChangeFunction($jsOnChange);
                     $reservationDesiredCapacity->setNotificationField(true);
-                    $reservationDesiredCapacity->setAdditionalID($listType['id']);
                     $reservationDesiredCapacity->setStyleClass('desired-capacity');
 
                     if (!$listType['ignoreCapacity']) {
@@ -2062,6 +2061,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                         $maxParticipants = $type['maxParticipantsPerBooking'];
                     }
 
+                    // Ensure $maxParticipants is at least 1 for events if we want to show fields
+                    if ($eventObj && $maxParticipants < 1) {
+                         $maxParticipants = 1;
+                    }
+
                     $maxCapacity = $maxParticipants ?: 0;
                     $minCapacity = $minParticipants ?: 1;
                     $participantParam = ($eventObj && $eventObj->participant_params) ? StringUtil::deserialize($eventObj->participant_params, true) : null;
@@ -2071,8 +2075,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $maxCapacityCheck = $onlyParticipants ? $maxCapacity > 0 : $maxCapacity > 1;
 
                     $reservationSettingsWithCapacity = $this->reservationSettings->withCapacity;
-                    if (!isset($specialParticipantMechanism) ||
-                        (isset($specialParticipantMechanism) && isset($reservationSettingsWithCapacity)) || (isset($specialParticipantMechanism) && isset($maxCapacityCheck))) {
+                    if ($specialParticipantMechanism || $maxCapacityCheck) {
                         if ($params) {
                             foreach ($params as $paramId) {
                                 if ($paramId) {
@@ -2145,10 +2148,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                         } else {
                             if ($this->reservationSettings->withCapacity) {
                                 $participantCapacity = $maxCapacity && ($maxCapacity < 10) ? $maxCapacity : 10;
-                                if ($participantCapacity > 1) {
+                                if ($participantCapacity >= 1) {
                                     $start = $minCapacity ?: 1;
                                     for ($i = $start; $i <= $participantCapacity; $i++) {
                                         $counter = $onlyParticipants ? $i : $i - 1;
+                                        if ($counter < 1) {
+                                            continue;
+                                        }
                                         $newCondition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $type['id'], $i);
 
                                         //$newCondition[] = $condition;
@@ -2169,7 +2175,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 //                                        $reservationParticipants->setParentFieldList($fieldList);
                                         $reservationParticipants->setDelimiter('§');
                                         $reservationParticipants->setCondition(array($condition, $newCondition));
-                                        $reservationParticipants->setRemoveWithEmptyCondition(true);
+                                        if ($i === $start) {
+                                            $reservationParticipants->setRemoveWithEmptyCondition(false);
+                                        } else {
+                                            $reservationParticipants->setRemoveWithEmptyCondition(true);
+                                        }
                                         $reservationParticipants->setAdditionalID($listType['id'] . '-' . $counter);
                                         $reservationParticipants->setPrintable(true);
 
@@ -2197,15 +2207,18 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
                                 $reservationParticipants->setNotificationField(false);
 
-                                $reservationParticipants->setShowDataSetsByCount($maxCapacity <= 10 ? $maxCapacity : 10);
-                                $reservationParticipants->setParentFieldList($fieldList);
-                                $reservationParticipants->setDelimiter('§');
-                                $reservationParticipants->setCondition(array($condition));
-                                $reservationParticipants->setRemoveWithEmptyCondition(true);
-                                $reservationParticipants->setAdditionalID($listType['id']);
-                                $reservationParticipants->setPrintable(true);
+                                $showCount = $maxCapacity <= 10 ? $maxCapacity : 10;
+                                if ($showCount > 0) {
+                                    $reservationParticipants->setShowDataSetsByCount($showCount);
+                                    $reservationParticipants->setParentFieldList($fieldList);
+                                    $reservationParticipants->setDelimiter('§');
+                                    $reservationParticipants->setCondition(array($condition));
+                                    $reservationParticipants->setRemoveWithEmptyCondition(true);
+                                    $reservationParticipants->setAdditionalID($listType['id']);
+                                    $reservationParticipants->setPrintable(true);
 
-                                $fieldList[] = $reservationParticipants;
+                                    $fieldList[] = $reservationParticipants;
+                                }
 
                             }
                         }
