@@ -124,8 +124,8 @@ class C4gReservationConfirmation
                             $organizer = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($organizerId)->fetchAssoc();
                         }
 
-                        $adminEmail = \Contao\Config::get('adminEmail') ?? '';
-                        $c4gNotify->setTokenValue('admin_email', $adminEmail);
+                        $adminEmail = \Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? '');
+                        $c4gNotify->setTokenValue('admin_email', $adminEmail ?: false);
                         $c4gNotify->setTokenValue('email', ($reservation['email'] ?? '') ?: '');
 
                         if ($organizer) {
@@ -136,7 +136,7 @@ class C4gReservationConfirmation
                             $c4gNotify->setTokenValue('contact_website', ($organizer && isset($organizer['contact_website'])) ? $organizer['contact_website'] : false);
                         }
 
-                        $c4gNotify->setTokenValue('reservation_type', ($type['caption'] ?? '') ?: '');
+                        $c4gNotify->setTokenValue('reservation_type', ($type['caption'] ?? '') ?: ' ');
 
                         $memberId = ($reservationObject['member_id'] ?? '') ?: ($reservation['member_id'] ?? '');
                         if ($memberId) {
@@ -254,7 +254,7 @@ class C4gReservationConfirmation
                                 $includedParamsArr[$param] = $includedParam->caption;
                             }
                         }
-                        $c4gNotify->setTokenValue('included_params', implode($includedParamsArr));
+                        $c4gNotify->setTokenValue('included_params', implode(', ', $includedParamsArr) ?: ' ');
 
                         $params = $reservation['additional_params'] ? \Contao\StringUtil::deserialize($reservation['additional_params']) : [];
                         $additionalParamsArr = [];
@@ -264,25 +264,24 @@ class C4gReservationConfirmation
                                 $additionalParamsArr[$param] = $additionalParam->caption;
                             }
                         }
-                        $c4gNotify->setTokenValue('additional_params', implode($additionalParamsArr));
+                        $c4gNotify->setTokenValue('additional_params', implode(', ', $additionalParamsArr) ?: ' ');
 
                         $participantsArr = [];
                         $participants = $database->prepare('SELECT * FROM tl_c4g_reservation_participants WHERE `pid`=?')->execute($reservation['id'])->fetchAllAssoc();
                         if ($participants && (count($participants) > 0)) {
                             foreach ($participants as $participant) {
-                                //$paramCaption = C4gReservationParamsModel::findByPk($paramId)->caption;
-                                $participantsArr[] = [$participant['lastname'], $participant['firstname'], $participant['email']];
+                                $participantsArr[] = trim($participant['firstname'] . ' ' . $participant['lastname']) . ($participant['email'] ? ' (' . $participant['email'] . ')' : '');
                             }
                         }
 
                         $participants = '';
                         $count = 0;
-                        foreach ($participantsArr as $participantkey => $valueArray) {
+                        foreach ($participantsArr as $val) {
                             $count++;
-                            $participants .= $participants ? '; ' . $count . '. ' . trim(implode(', ', $valueArray)) : $count . '. ' . trim(implode(', ', $valueArray));
+                            $participants .= $participants ? '; ' . $count . '. ' . $val : $count . '. ' . $val;
                         }
 
-                        $c4gNotify->setTokenValue('participantList', $participants);
+                        $c4gNotify->setTokenValue('participantList', $participants ?: ' ');
 
                         if ($reservationObjectType == '2') {
                             $calendarObject = $database->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($reservationObject['pid'])->fetchAssoc();
