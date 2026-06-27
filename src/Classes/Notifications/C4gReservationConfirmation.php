@@ -57,7 +57,7 @@ class C4gReservationConfirmation
                     $notificationSpecialType = StringUtil::deserialize($type['notification_special_type']);
                     \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Notification IDs for ID $reservationId: special=" . (is_array($notificationSpecialType) ? implode(',', $notificationSpecialType) : var_export($notificationSpecialType, true)) . ", confirmation=" . (is_array($notificationConfirmationType) ? implode(',', $notificationConfirmationType) : var_export($notificationConfirmationType, true)) . ", raw_spec=" . var_export($type['notification_special_type'], true) . ", raw_conf=" . var_export($type['notification_confirmation_type'], true));
 
-                    if (($reservationObjectType === '1') || ($reservationObjectType === '3')) {
+                    if (($reservationObjectType === '1') || ($reservationObjectType === '3') || ($reservationObjectType === 1) || ($reservationObjectType === 3)) {
                         $reservationObject = $database->prepare('SELECT * FROM tl_c4g_reservation_object WHERE `id`=? LIMIT 1')->execute($reservation['reservation_object'])->fetchAssoc();
                         \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Loaded reservationObject from tl_c4g_reservation_object (ID: {$reservation['reservation_object']}): " . ($reservationObject ? 'found' : 'not found'));
                     } else {
@@ -102,14 +102,14 @@ class C4gReservationConfirmation
                             'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment',
                             'additional1', 'additional2', 'additional3', 'location', 'contact_name', 'contact_phone', 'contact_street',
                             'contact_postal', 'contact_city', 'reservation_id', 'agreed', 'discountPercent', 'discountCode',
-                            'priceDiscount', 'documentId', 'uploadFile', 'reservation_object', 'reservation_title'
+                            'priceDiscount', 'documentId', 'uploadFile', 'reservation_object', 'reservation_title', 'reservation_type_id'
                         ]);
-                        if ($reservationObjectType == '2') {
-                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['title'] ?? '') ?: '');
-                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['title'] ?? '') ?: '');
+                        if (($reservationObjectType == '2') || ($reservationObjectType == 2)) {
+                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['title'] ?? '') ?: ($reservationObject['caption'] ?? ''));
+                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['title'] ?? '') ?: ($reservationObject['caption'] ?? ''));
                         } else {
-                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['caption'] ?? '') ?: '');
-                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['caption'] ?? '') ?: '');
+                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['caption'] ?? '') ?: ($reservationObject['title'] ?? ''));
+                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['caption'] ?? '') ?: ($reservationObject['title'] ?? ''));
                         }
 
                         $locationId = ($reservationObject['location'] ?? '') ?: ($type['location'] ?? '');
@@ -136,7 +136,16 @@ class C4gReservationConfirmation
                             $c4gNotify->setTokenValue('contact_website', ($organizer && isset($organizer['contact_website'])) ? $organizer['contact_website'] : false);
                         }
 
-                        $c4gNotify->setTokenValue('reservation_type', ($type['caption'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('reservation_type', ($type['caption'] ?? '') ?: ($type['name'] ?? ''));
+                        $c4gNotify->setTokenValue('reservation_type_id', $reservationType);
+
+                        if (($reservationObjectType == '2') || ($reservationObjectType == 2)) {
+                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['title'] ?? '') ?: ($reservationObject['caption'] ?? ''));
+                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['title'] ?? '') ?: ($reservationObject['caption'] ?? ''));
+                        } else {
+                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['caption'] ?? '') ?: ($reservationObject['title'] ?? ''));
+                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['caption'] ?? '') ?: ($reservationObject['title'] ?? ''));
+                        }
 
                         $memberId = ($reservationObject['member_id'] ?? '') ?: ($reservation['member_id'] ?? '');
                         if ($memberId) {
@@ -425,12 +434,9 @@ class C4gReservationConfirmation
                             $c4gNotify->setTokenValue('priceSum', $priceSum);
                         }
 
-                        if ($eventObject && $eventObject['discountCode'] && $eventObject['discountPercent'] && $reservation['discountCode'] &&
-                            ($reservation['discountCode'] == $eventObject['discountCode'])) {
-                            $c4gNotify->setTokenValue('discountPercent', $eventObject['discountPercent']);
-                            $c4gNotify->setTokenValue('discountCode', $reservation['discountCode']);
-                            $c4gNotify->setTokenValue('priceDiscount', $reservation['priceDiscount'] ? $reservation['priceDiscount'] : '');
-                        }
+                        $c4gNotify->setTokenValue('discountPercent', ($reservation['discountPercent'] ?? '') ?: ($eventObject['discountPercent'] ?? ''));
+                        $c4gNotify->setTokenValue('discountCode', ($reservation['discountCode'] ?? '') ?: ($eventObject['discountCode'] ?? ''));
+                        $c4gNotify->setTokenValue('priceDiscount', $reservation['priceDiscount'] ?? '');
 
                         if ($reservationObject['documentId']) {
                             $c4gNotify->setTokenValue('documentId', $reservation['documentId']);
@@ -467,7 +473,7 @@ class C4gReservationConfirmation
                                 'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'agreed',
                                 'description', 'additional1', 'additional2', 'additional3','member_email', 'conferenceLink',
                                 'price','priceTax','priceSum','priceSumTax','priceNet','priceSumNet', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax',
-                                'priceDiscount', 'discountCode', 'discountPercent', 'documentId', 'reservationTaxRate', 'dbkey'
+                                'priceDiscount', 'discountCode', 'discountPercent', 'documentId', 'reservationTaxRate', 'dbkey', 'reservation_type_id'
                             ]
                         );
 
