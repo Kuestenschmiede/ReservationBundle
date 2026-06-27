@@ -406,6 +406,7 @@ function setReservationForm(typeId, showDateTime) {
         }
     }
     handleBrickConditions();
+    checkEventFields();
 
     if (document.getElementsByClassName('c4g__spinner-wrapper')[0]) {
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
@@ -512,6 +513,7 @@ function changeCapacity(typeId, showDateTime) {
         }
     }
     handleBrickConditions();
+    checkEventFields();
 
     if (document.getElementsByClassName('c4g__spinner-wrapper')[0]) {
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
@@ -1219,6 +1221,7 @@ function onObjectChangeFirst(typeId, showDateTime, initialDate) {
     }, 500);
 }
 
+
 function eventFire(el, etype) {
     if (el && typeof el.dispatchEvent === 'function' && typeof etype === 'string' && etype.length > 0) {
         try {
@@ -1245,3 +1248,40 @@ function eventFire(el, etype) {
         }
     }
 }
+
+// Initial call to handle brick conditions after page load
+(function() {
+    function initReservation() {
+        if (typeof handleBrickConditions === 'function') {
+            try {
+                handleBrickConditions();
+            } catch (e) {
+                console.error('Initial handleBrickConditions failed:', e);
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initReservation);
+    } else {
+        initReservation();
+    }
+    
+    // Also try immediately as the script might be injected
+    initReservation();
+    
+    // Also retry after a short delay to account for dynamic content
+    setTimeout(initReservation, 50);
+    setTimeout(initReservation, 100);
+    setTimeout(initReservation, 250);
+    setTimeout(initReservation, 500);
+    setTimeout(initReservation, 1000);
+    setTimeout(initReservation, 2000);
+    setTimeout(initReservation, 3000);
+    setTimeout(initReservation, 5000);
+    
+    // Listen for AJAX reloads from con4gis core
+    jQuery(document).on('c4g:afterAjaxLoad', function() {
+        initReservation();
+    });
+})();

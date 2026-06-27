@@ -604,25 +604,54 @@ class C4gReservationController extends C4GBaseController
                 }
             }
 
+            // EXTRA SECURITY: If we have an event in the URL but NO session yet (e.g. after cache clear)
+            // we should NOT nuke if it's the very first request.
+            $hasSession = (bool)$this->session->getSessionValue('reservationEventCookie');
 
             if (!$typeIdForNuke && !$eventIdUrlForNuke && !$isInitNav) {
                 // No context at all? Safe to nuke old junk.
                 // BUT: If we have an object in POST or GET, it might be a partial update or a direct link
                 $objectIdForNuke = \Contao\Input::get('object') ?: (\Contao\Input::post('reservation_object') ?: 0);
                 if (!$objectIdForNuke) {
-                    $shouldNuke = true;
+                    $shouldNuke = $hasSession; // Only nuke if we actually had something before
                 } else {
                 }
             } else if (($eventIdUrlForNuke || $typeIdForNuke) && !$isInitNav) {
                 // If it's an event or type, we still want to nuke once to prevent bleeding from PREVIOUS events/types.
-                // BUT only if we are NOT in an AJAX update (initnav)
-                $shouldNuke = true;
+                // BUT only if we are NOT in an AJAX update (initnav) AND we already have a session.
+                $shouldNuke = $hasSession;
             }
             
             if ($shouldNuke) {
-                $this->nukeState();
+                C4gLogModel::addLogEntry('reservation', "Nuke state because of missing context or session.");
+                $this->nukeState(true);
+            } else {
+                // If we don't nuke, we still want to ensure eventId is synced from URL to session
+                $eventIdFromUrl = \Contao\Input::get('event') ?: 0;
+                if (!$eventIdFromUrl && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+                    $eventIdFromUrl = $request->attributes->get('event') ?: ($request->attributes->get('auto_item') ?: 0);
+                }
+                if ($eventIdFromUrl) {
+                    $this->session->setSessionValue('reservationEventCookie', $eventIdFromUrl);
+                }
             }
             
+            // SECURITY: Ensure we have the eventId in session if it's available in any way,
+            // even if nukeState just cleared it, but only if we ARE on an event page.
+            $eventIdRescued = \Contao\Input::get('event') ?: 0;
+            if (!$eventIdRescued && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+                $eventIdRescued = $request->attributes->get('event') ?: ($request->attributes->get('auto_item') ?: 0);
+            }
+            
+            C4gLogModel::addLogEntry('reservation', "Nuke check: shouldNuke=" . ($shouldNuke ? "yes" : "no") . ", eventRescued=$eventIdRescued, isInitNav=" . ($isInitNav ? "yes" : "no"));
+
+            if ($eventIdRescued) {
+                $this->session->setSessionValue('reservationEventCookie', $eventIdRescued);
+            } else {
+                // If we don't have an event, check if we have one in session from a previous request (e.g. initial load)
+                $eventIdRescued = $this->session->getSessionValue('reservationEventCookie');
+            }
+
             // Clear "just saved" flag on new GET request
             $this->session->remove('reservationJustSaved');
             
@@ -720,6 +749,9 @@ class C4gReservationController extends C4GBaseController
         } else if ($this->session->getSessionValue('reservationEventCookie')) {
             $eventId = $this->session->getSessionValue('reservationEventCookie');
         }
+
+        // Logs IDs again after all syncing to see final state before loading event
+        C4gLogModel::addLogEntry('reservation', "Final addFields context: event=$eventId, type=$typeId, object=$objectId");
 
         if ($eventId) {
             $this->permalink_name = 'event';
@@ -1100,7 +1132,8 @@ foreach ($typelist as $listType) {
     }
     $reservationDesiredCapacity->setEditable(true);
     $reservationDesiredCapacity->setCondition(array($condition));
-    $reservationDesiredCapacity->setInitialValue($minCapacity);
+    $initialCapacityValue = \Contao\Input::post('desiredCapacity_'.$listType['id']) ?: (\Contao\Input::get('capacity') ?: ($minCapacity ?: 1));
+    $reservationDesiredCapacity->setInitialValue($initialCapacityValue);
     $reservationDesiredCapacity->setMandatory(true);
 
     //TODO add amount of capacity left in the form
@@ -1390,6 +1423,14 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $additionaldatas = [];
         }
 
+        $participantsMandatory = false;
+        foreach ($additionaldatas as $row) {
+            if (($row['additionaldatas'] ?? '') === 'participants') {
+                $participantsMandatory = (bool)($row['binding'] ?? false);
+                break;
+            }
+        }
+
         //check mandatory fields
         $mandatoryFields = ['firstname' => true, 'lastname' => true, 'email' => true];
         foreach ($additionaldatas as $rowdata) {
@@ -1458,7 +1499,14 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         }
 
         $reservationSettings = $this->reservationSettings;
-        $specialParticipantMechanism = $reservationSettings->specialParticipantMechanism;
+        if (!$reservationSettings) {
+             C4gLogModel::addLogEntry('reservation', "CRITICAL: reservationSettings is null in addFields!");
+             // Fallback if settings are missing (e.g. after cache clear before properly initialized)
+             // We try to find the first settings record as a last resort
+             $this->reservationSettings = C4gReservationSettingsModel::findAll() ? C4gReservationSettingsModel::findAll()->current() : null;
+             $reservationSettings = $this->reservationSettings;
+        }
+        $specialParticipantMechanism = $reservationSettings ? $reservationSettings->specialParticipantMechanism : false;
         $hideParticipantsEmail = $reservationSettings->hideParticipantsEmail ?: false;
         $hideReservationKey = $reservationSettings->hideReservationKey ?: false;
         $onlyParticipants = $reservationSettings->onlyParticipants ?: false;
@@ -1976,7 +2024,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     }
                     $reservationDesiredCapacity->setEditable(true);
                     $reservationDesiredCapacity->setCondition(array($condition));
-                    $reservationDesiredCapacity->setInitialValue($minCapacity);
+                    $initialCapacityValue = \Contao\Input::post('desiredCapacity_'.$type['id']) ?: (\Contao\Input::get('capacity') ?: ($minCapacity ?: 1));
+                    $reservationDesiredCapacity->setInitialValue($initialCapacityValue);
                     $reservationDesiredCapacity->setMandatory(true);
 
                     $reservationDesiredCapacity->setMin($minCapacity);
@@ -2012,6 +2061,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $participantsForeign->setFormField(true);
                 $participants = [];
 
+                $rowMandatory = $participantsMandatory;
                 $firstnameField = new C4GTextField();
                 $firstnameField->setFieldName('firstname');
                 $firstnameField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['firstname']);
@@ -2054,16 +2104,22 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $maxParticipants = $type['maxParticipantsPerBooking'];
                     $minParticipants = $type['minParticipantsPerBooking'];
 
-                    //Max participant per booking
+                    // Max participant per booking
                     if ($eventObj && $eventObj->maxParticipantsPerEventBooking) {
                         $maxParticipants = $eventObj->maxParticipantsPerEventBooking;
                     } else if ($type['maxParticipantsPerBooking']){
                         $maxParticipants = $type['maxParticipantsPerBooking'];
+                    } else {
+                        $maxParticipants = 1;
                     }
 
                     // Ensure $maxParticipants is at least 1 for events if we want to show fields
                     if ($eventObj && $maxParticipants < 1) {
                          $maxParticipants = 1;
+                    }
+                    
+                    if (!$maxParticipants && $specialParticipantMechanism) {
+                        $maxParticipants = 10; // Default fallback for special mechanism if nothing is configured
                     }
 
                     $maxCapacity = $maxParticipants ?: 0;
@@ -2072,11 +2128,19 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $params = $participantParam ?: $type['participantParams'];
                     $participantParamsArr = [];
 
-                    $maxCapacityCheck = $onlyParticipants ? $maxCapacity > 0 : $maxCapacity > 1;
+                    $maxCapacityCheck = $specialParticipantMechanism || ($onlyParticipants ? $maxCapacity > 0 : $maxCapacity > 1);
+
+                    if ($specialParticipantMechanism) {
+                        C4gLogModel::addLogEntry('reservation', "Special participant mechanism active for type " . $type['id'] . ", maxCapacity: $maxCapacity");
+                    }
+
+                    C4gLogModel::addLogEntry('reservation', "Capacity check for type " . $type['id'] . ": special=" . ($specialParticipantMechanism ? "yes" : "no") . ", maxCap=$maxCapacity, check=" . ($maxCapacityCheck ? "pass" : "fail"));
 
                     $reservationSettingsWithCapacity = $this->reservationSettings->withCapacity;
                     if ($specialParticipantMechanism || $maxCapacityCheck) {
+                        C4gLogModel::addLogEntry('reservation', "Generating participant fields for type " . $type['id']);
                         if ($params) {
+                            $initialCapacityValue = \Contao\Input::post('desiredCapacity_'.$type['id']) ?: (\Contao\Input::get('capacity') ?: 1);
                             foreach ($params as $paramId) {
                                 if ($paramId) {
                                     $participantParam = C4gReservationParamsModel::feParamsCaptions($paramId, $reservationSettings);
@@ -2115,7 +2179,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                             $participants[] = $participantParamField;
                         }
 
-                        if (!$specialParticipantMechanism) {
+                        if (!$specialParticipantMechanism && !$this->reservationSettings->withCapacity) {
                             $reservationParticipants = new C4GSubDialogField();
                             $reservationParticipants->setFieldName('participants');
                             $reservationParticipants->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['participants']);
@@ -2155,7 +2219,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                         if ($counter < 1) {
                                             continue;
                                         }
-                                        $newCondition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'desiredCapacity_' . $type['id'], $i);
+                                        $newCondition = new C4GBrickCondition(C4GBrickConditionType::GREATEREQUALSWITCH, 'desiredCapacity_' . $type['id'], $i);
 
                                         //$newCondition[] = $condition;
                                         $reservationParticipants = new C4GSubDialogField();
@@ -2171,8 +2235,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                         $reservationParticipants->setMin($minCapacity);
                                         $reservationParticipants->setMax($participantCapacity);
                                         $reservationParticipants->setNotificationField(false);
-                                        $reservationParticipants->setShowDataSetsByCount($counter);
-//                                        $reservationParticipants->setParentFieldList($fieldList);
+                                        $reservationParticipants->setShowDataSetsByCount(1);
+                                        $reservationParticipants->setParentFieldList($fieldList);
                                         $reservationParticipants->setDelimiter('§');
                                         $reservationParticipants->setCondition(array($condition, $newCondition));
                                         if ($i === $start) {
@@ -3386,6 +3450,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
             if ($reservationObject) {
                 $freshTitle = (string)($reservationObject->title ?? '');
+                if (!$freshTitle && $reservationEventObject && $reservationEventObject->title) {
+                    $freshTitle = (string)$reservationEventObject->title;
+                }
                 $beginDateTs = ($reservationObject->startDate ?? 0) ? intval($reservationObject->startDate) : 0;
                 $beginTimeTs = ($reservationObject->startTime ?? 0) ? intval($reservationObject->startTime) : 0;
                 $endDateTs   = (isset($reservationObject->endDate) && $reservationObject->endDate) ? intval($reservationObject->endDate) : 0;
@@ -4155,6 +4222,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
             $putVars['participantList'] = $participants;
 
+            //Token Fallback for participantList with persons count
+            if ($participants && $pCount > 0) {
+                $putVars['participantList (' . $pCount . ' Personen)'] = $participants;
+            }
+
             //ToDo test Fix desiredCapacity
             $putVars['desiredCapacity_'.$reservationType->id] = $pCount;
             $desiredCapacity = $pCount;
@@ -4232,15 +4304,15 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'city' => '',
             'organisation' => '',
             'company' => '',
-            'description' => $putVars['description'] ?? '',
-            'location' => $putVars['location'] ?? '',
-            'desiredCapacity' => $desiredCapacity ?? 1,
-            'reservation_title' => $putVars['reservation_title'] ?? '',
-            'beginDate' => $putVars['beginDate'] ?? '',
-            'beginTime' => $putVars['beginTime'] ?? '',
-            'endDate' => $putVars['endDate'] ?? '',
-            'endTime' => $putVars['endTime'] ?? '',
-            'participantList' => $putVars['participantList'] ?? '',
+            'description' => (isset($putVars['description']) && $putVars['description'] !== '0') ? $putVars['description'] : '',
+            'location' => (isset($putVars['location']) && $putVars['location'] !== '0') ? $putVars['location'] : '',
+            'desiredCapacity' => $desiredCapacity ?: 1,
+            'reservation_title' => (isset($putVars['reservation_title']) && $putVars['reservation_title'] !== '0') ? $putVars['reservation_title'] : '',
+            'beginDate' => (isset($putVars['beginDate']) && $putVars['beginDate'] !== '0') ? $putVars['beginDate'] : '',
+            'beginTime' => (isset($putVars['beginTime']) && $putVars['beginTime'] !== '0') ? $putVars['beginTime'] : '',
+            'endDate' => (isset($putVars['endDate']) && $putVars['endDate'] !== '0') ? $putVars['endDate'] : '',
+            'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '0') ? $putVars['endTime'] : '',
+            'participantList' => (isset($putVars['participantList']) && $putVars['participantList'] !== '0') ? $putVars['participantList'] : '',
             'priceSum' => $putVars['priceSum'] ?? '0,00 €',
             'priceDiscount' => $putVars['priceDiscount'] ?? '0,00 €',
             'discountPercent' => $putVars['discountPercent'] ?? 0,
@@ -4250,7 +4322,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         ];
 
         foreach ($tokenDefaults as $key => $defaultValue) {
-            if (!isset($putVars[$key]) || $putVars[$key] === null || $putVars[$key] === '') {
+            if (!isset($putVars[$key]) || $putVars[$key] === null || $putVars[$key] === '' || $putVars[$key] === 0 || $putVars[$key] === '0') {
                 $putVars[$key] = $defaultValue;
             }
         }
@@ -4802,6 +4874,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $withFreeSeats = $this->reservationSettings->showFreeSeats ?? false;
             $showArrivalAndDeparture = $this->reservationSettings->showArrivalAndDeparture ?? false;
             $times = C4gReservationHandler::getReservationTimes($objects, $type, $wd, $date, $duration, $capacity, $withEndTimes, $withFreeSeats, true, $langCookie, $showArrivalAndDeparture);
+            if ($times === null) {
+                $times = [];
+            }
         }
 //        if (!$times || $times == [] || $times == [0]) {
 //            return true;
