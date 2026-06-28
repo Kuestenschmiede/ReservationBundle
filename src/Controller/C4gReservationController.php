@@ -142,9 +142,17 @@ class C4gReservationController extends C4GBaseController
      * @param ContaoFramework $framework
      */
 
+    private static $instance = null;
+
+    public static function getInstance()
+    {
+        return self::$instance;
+    }
+
     public function __construct(string $rootDir, RequestStack $requestStack, ContaoFramework $framework, ?ModuleModel $model = null)
     {
         parent::__construct($rootDir, $requestStack, $framework, $model);
+        self::$instance = $this;
     }
 
     public function getPutVars()
@@ -1045,16 +1053,29 @@ class C4gReservationController extends C4GBaseController
                 $reservationTypeField->setInitialValue($firstType);
             }
 
-            $reservationTypeField->setPrintable($this->withDefaultPDFContent);
+            $reservationTypeField->setPrintable(true);
+            $reservationTypeField->setNotificationField(true);
 
             $fieldList[] = $reservationTypeField;
         } else {
+            $reservationTypeField = new C4GTextField();
+            $reservationTypeField->setFieldName('reservation_type');
+            $reservationTypeField->setNotificationField(true);
+            $reservationTypeField->setPrintable(true);
+            $fieldList[] = $reservationTypeField;
+
             $info = new C4GInfoTextField();
             $info->setFieldName('info');
             $info->setEditable(false);
             $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
             return [$info];
         }
+
+        $reservationObjectField = new C4GTextField();
+        $reservationObjectField->setFieldName('reservation_object');
+        $reservationObjectField->setNotificationField(true);
+        $reservationObjectField->setPrintable(true);
+        $fieldList[] = $reservationObjectField;
 
         $initialValues = new C4gReservationInitialValues();
         $initialValues->setDate($initialDate);
@@ -1515,6 +1536,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $initialValue = $rowdata['initialValue'];
             $rowMandatory = key_exists('binding', $rowdata) ? $rowdata['binding'] : false;
             $rowPrintable = key_exists('printing', $rowdata) ? $rowdata['printing'] : false;
+            // PDF Fix: Ensure that common fields are printable if withDefaultPDFContent is false (custom template)
+            if (!$this->withDefaultPDFContent && in_array($rowField, ['organisation', 'firstname', 'lastname', 'email', 'phone', 'address', 'postal', 'city', 'title', 'salutation'])) {
+                $rowPrintable = true;
+            }
             $individualLabel = isset($rowdata['individualLabel']) ? str_replace(' ', '&nbsp;&#x200B;',
                 $rowdata['individualLabel']) : "";
             $additionalClass = isset($rowdata['additionalClass']) ? $rowdata['additionalClass'] : "";
@@ -2069,7 +2094,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $firstnameField->setSortColumn(false);
                 $firstnameField->setTableColumn(true);
                 $firstnameField->setMandatory($specialParticipantMechanism ? $rowMandatory : true);
-                $firstnameField->setNotificationField(false);
+                $firstnameField->setNotificationField(true);
                 $firstnameField->setPrintable(true);
                 $participants[] = $firstnameField;
 
@@ -2080,7 +2105,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $lastnameField->setSortColumn(false);
                 $lastnameField->setTableColumn(true);
                 $lastnameField->setMandatory($specialParticipantMechanism ? $rowMandatory : true);
-                $lastnameField->setNotificationField(false);
+                $lastnameField->setNotificationField(true);
                 $lastnameField->setPrintable(true);
                 $participants[] = $lastnameField;
 
@@ -2092,7 +2117,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $emailField->setSortColumn(false);
                     $emailField->setTableColumn(false);
                     $emailField->setMandatory($rowMandatory);
-                    $emailField->setNotificationField(false);
+                    $emailField->setNotificationField(true);
                     $emailField->setPrintable(false);
                     $participants[] = $emailField;
                 }
@@ -2348,7 +2373,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $reservationIdField->setDbUniqueResult('');
         $reservationIdField->setStyleClass('reservation-id');
         $reservationIdField->setHidden($hideReservationKey);
-        $reservationIdField->setPrintable($this->withDefaultPDFContent);
+        $reservationIdField->setPrintable(true);
         $fieldList[] = $reservationIdField;
 
         if ($this->reservationSettings->privacy_policy_text) {
@@ -2410,7 +2435,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $location_name->setFormField(false);
         $location_name->setTableColumn(true);
         $location_name->setNotificationField(true);
-        $location_name->setPrintable($this->withDefaultPDFContent);
+        $location_name->setPrintable(true);
         $fieldList[] = $location_name;
 
         $contact_name = new C4GTextField();
@@ -2419,7 +2444,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_name->setFormField(false);
         $contact_name->setTableColumn(true);
         $contact_name->setNotificationField(true);
-        $contact_name->setPrintable($this->withDefaultPDFContent);
+        $contact_name->setPrintable(true);
         $fieldList[] = $contact_name;
 
         $contact_phone = new C4GTelField();
@@ -2427,7 +2452,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_phone->setFormField(false);
         $contact_phone->setTableColumn(false);
         $contact_phone->setNotificationField(true);
-        $contact_phone->setPrintable($this->withDefaultPDFContent);
+        $contact_phone->setPrintable(true);
         $fieldList[] = $contact_phone;
 
         $contact_email = new C4GEmailField();
@@ -2435,7 +2460,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_email->setTableColumn(false);
         $contact_email->setFormField(false);
         $contact_email->setNotificationField(true);
-        $contact_email->setPrintable($this->withDefaultPDFContent);
+        $contact_email->setPrintable(true);
         $fieldList[] = $contact_email;
 
         $contact_website = new C4GUrlField();
@@ -2443,7 +2468,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_website->setTableColumn(false);
         $contact_website->setFormField(false);
         $contact_website->setNotificationField(true);
-        $contact_website->setPrintable($this->withDefaultPDFContent);
+        $contact_website->setPrintable(true);
         $fieldList[] = $contact_website;
 
         $contact_street = new C4GTextField();
@@ -2451,7 +2476,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_street->setTableColumn(false);
         $contact_street->setFormField(false);
         $contact_street->setNotificationField(true);
-        $contact_street->setPrintable($this->withDefaultPDFContent);
+        $contact_street->setPrintable(true);
         $fieldList[] = $contact_street;
 
 
@@ -2460,7 +2485,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_postal->setFormField(false);
         $contact_postal->setTableColumn(false);
         $contact_postal->setNotificationField(true);
-        $contact_postal->setPrintable($this->withDefaultPDFContent);
+        $contact_postal->setPrintable(true);
         $fieldList[] = $contact_postal;
 
 
@@ -2469,7 +2494,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_city->setTableColumn(false);
         $contact_city->setFormField(false);
         $contact_city->setNotificationField(true);
-        $contact_city->setPrintable($this->withDefaultPDFContent);
+        $contact_city->setPrintable(true);
         $fieldList[] = $contact_city;
 
         $contact_city = new C4GTextField();
@@ -2477,7 +2502,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_city->setTableColumn(false);
         $contact_city->setFormField(false);
         $contact_city->setNotificationField(true);
-        $contact_city->setPrintable($this->withDefaultPDFContent);
+        $contact_city->setPrintable(true);
         $fieldList[] = $contact_city;
 
         $memberId = new C4GTextField();
@@ -2485,7 +2510,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $memberId->setTableColumn(true);
         $memberId->setFormField(false);
         $memberId->setNotificationField(false);
-        $memberId->setPrintable($this->withDefaultPDFContent);
+        $memberId->setPrintable(true);
         $fieldList[] = $memberId;
 
         $formularId = new C4GTextField();
@@ -2493,7 +2518,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $formularId->setTableColumn(true);
         $formularId->setFormField(false);
         $formularId->setNotificationField(false);
-        $formularId->setPrintable($this->withDefaultPDFContent);
+        $formularId->setPrintable(true);
         $fieldList[] = $formularId;
 
         $dbkey = new C4GTextField();
@@ -2501,7 +2526,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $dbkey->setTableColumn(false);
         $dbkey->setFormField(false);
         $dbkey->setNotificationField(true);
-        $dbkey->setPrintable($this->withDefaultPDFContent);
+        $dbkey->setPrintable(true);
         $fieldList[] = $dbkey;
 
         $memberEmail = new C4GTextField();
@@ -2509,7 +2534,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $memberEmail->setTableColumn(false);
         $memberEmail->setFormField(false);
         $memberEmail->setNotificationField(true);
-        $memberEmail->setPrintable($this->withDefaultPDFContent);
+        $memberEmail->setPrintable(true);
         $fieldList[] = $memberEmail;
 
         $groupId = new C4GTextField();
@@ -2517,7 +2542,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $groupId->setTableColumn(true);
         $groupId->setFormField(false);
         $groupId->setNotificationField(false);
-        $groupId->setPrintable($this->withDefaultPDFContent);
+        $groupId->setPrintable(true);
         $fieldList[] = $groupId;
 
         $bookedAt = new C4GTextField();
@@ -2525,7 +2550,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $bookedAt->setTableColumn(true);
         $bookedAt->setFormField(false);
         $bookedAt->setNotificationField(false);
-        $bookedAt->setPrintable($this->withDefaultPDFContent);
+        $bookedAt->setPrintable(true);
         $fieldList[] = $bookedAt;
 
         //price for notification
@@ -2535,7 +2560,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2544,7 +2569,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2553,7 +2578,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2562,7 +2587,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2571,7 +2596,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2580,7 +2605,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2589,7 +2614,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2598,7 +2623,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2607,7 +2632,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2616,7 +2641,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(100);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2625,7 +2650,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(100);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         $priceDBField = new C4GTextField();
@@ -2634,7 +2659,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $priceDBField->setFormField(false);
         $priceDBField->setMax(9999999999999);
         $priceDBField->setNotificationField(true);
-        $priceDBField->setPrintable($this->withDefaultPDFContent);
+        $priceDBField->setPrintable(true);
         $fieldList[] = $priceDBField;
 
         if ($this->reservationSettings->documentIdNext) {
@@ -2720,6 +2745,40 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
 
         $this->fieldList = $fieldList;
+
+        $notificationTokens = [
+            'price', 'priceTax', 'priceSum', 'priceSumTax', 'priceNet', 'priceSumNet',
+            'priceOptionSum', 'priceOptionSumTax', 'priceOptionSumNet', 'priceDiscount',
+            'discountPercent', 'discountCode', 'reservationTaxRate', 'dbkey',
+            'type', 'object', 'reservation_type', 'reservation_object', 'reservation_title',
+            'description', 'location', 'comment', 'internal_comment', 'admin_email',
+            'speaker', 'topic', 'audience', 'conferenceLink', 'documentId'
+        ];
+
+        foreach ($notificationTokens as $token) {
+            $found = false;
+            foreach ($this->fieldList as $f) {
+                if ($f->getFieldName() === $token) {
+                    $f->setNotificationField(true);
+                    $f->setPrintable(true);
+                    $f->setDatabaseField(true); // Must be true as they exist in DCA now
+                    $f->setEditable(true);     // Ensure they are processed during save
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $f = new C4GTextField();
+                $f->setFieldName($token);
+                $f->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation'][$token] ?? $token);
+                $f->setDatabaseField(true); // Must be true as they exist in DCA now
+                $f->setFormField(false);
+                $f->setNotificationField(true);
+                $f->setPrintable(true);
+                $f->setEditable(true);     // Ensure they are processed during save
+                $this->fieldList[] = $f;
+            }
+        }
 
         return $this->fieldList;
     }
@@ -2977,26 +3036,51 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         // Force empty dialog values in session to prevent the framework from "remembering"
         $this->session->setSessionValue('c4g_brick_dialog_values', ['reservation_id' => $putVars['reservation_id']]);
 
-            // Sync back to session if present to avoid restoration of old values from elsewhere
-            $dialogValues = ['reservation_id' => $putVars['reservation_id']];
+        // Sync back to session if present to avoid restoration of old values from elsewhere
+        $dialogValues = ['reservation_id' => $putVars['reservation_id']];
 
-            // Ensure that IDs from current request are used and mirrored
-            if (isset($putVars['reservation_type'])) {
-                $typeId = $putVars['reservation_type'];
-                $this->putVars['reservation_type'] = $typeId;
-                $currentEventInRequest = $putVars['reservation_object_event_' . $typeId] ?? null;
-                if ($currentEventInRequest) {
-                    $this->putVars['reservation_object_event_' . $typeId] = $currentEventInRequest;
-                    $this->session->setSessionValue('reservationEventCookie', $currentEventInRequest);
-                }
-                
-                $currentObjectInRequest = $putVars['reservation_object_' . $typeId] ?? null;
-                if ($currentObjectInRequest) {
-                    $this->putVars['reservation_object_' . $typeId] = $currentObjectInRequest;
+        // Ensure that IDs from current request are used and mirrored
+        if (isset($putVars['reservation_type'])) {
+            $typeId = $putVars['reservation_type'];
+            $this->putVars['reservation_type'] = $typeId;
+            $currentEventInRequest = $putVars['reservation_object_event_' . $typeId] ?? null;
+            if ($currentEventInRequest) {
+                $this->putVars['reservation_object_event_' . $typeId] = $currentEventInRequest;
+                $this->session->setSessionValue('reservationEventCookie', $currentEventInRequest);
+            }
+            
+            $currentObjectInRequest = $putVars['reservation_object_' . $typeId] ?? null;
+            if ($currentObjectInRequest) {
+                $this->putVars['reservation_object_' . $typeId] = $currentObjectInRequest;
+            }
+        }
+        
+        // Mirror all fields before doing anything else
+        $this->mirrorBaseTokens($putVars);
+
+        // --- DISCOUNT RECOVERY ---
+        // Ensure discount code and percent are mapped before allPrices
+        if (isset($putVars['reservation_type'])) {
+            $typeId = $putVars['reservation_type'];
+            foreach (['discountCode', 'discountPercent'] as $dk) {
+                $suffixed = $dk . '_' . $typeId;
+                if (isset($putVars[$suffixed]) && (!isset($putVars[$dk]) || !$putVars[$dk])) {
+                    $putVars[$dk] = $putVars[$suffixed];
+                    $this->putVars[$dk] = $putVars[$suffixed];
                 }
             }
+        }
 
-            $this->session->setSessionValue('c4g_brick_dialog_values', $dialogValues);
+        // Ensure calculation values are in putVars for saving and notifications
+        if (isset($this->putVars['priceSum'])) {
+            foreach (['priceSum', 'priceSumNet', 'priceSumTax', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax', 'priceDiscount', 'priceNet', 'priceTax', 'price'] as $pk) {
+                if (isset($this->putVars[$pk]) && (!isset($putVars[$pk]) || $putVars[$pk] === '0,00 €' || $putVars[$pk] === '0')) {
+                    $putVars[$pk] = $this->putVars[$pk];
+                }
+            }
+        }
+
+        $this->session->setSessionValue('c4g_brick_dialog_values', $dialogValues);
 
         $formId = $this->reservationSettings->id;
         $type = $putVars['reservation_type'] ?? '';
@@ -3053,6 +3137,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $result = [
                     'usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY'] ?? 'Bitte stimmen Sie den Datenschutzbestimmungen zu.'
                 ];
+                $this->mirrorBaseTokens();
                 // Ensure no accidental keys trigger frontend actions
                 unset($result['jump_to_url']);
                 unset($result['jump_after_message']);
@@ -4257,6 +4342,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         if ($isEvent) {
             $putVars['conferenceLink'] = $reservationEventObject->conferenceLink ?: '';
+            $putVars['speaker'] = $reservationEventObject->speaker ? implode(', ', \Contao\StringUtil::deserialize($reservationEventObject->speaker, true)) : '';
+            $putVars['topic'] = $reservationEventObject->topic ? implode(', ', \Contao\StringUtil::deserialize($reservationEventObject->topic, true)) : '';
+            $putVars['audience'] = $reservationEventObject->targetAudience ? implode(', ', \Contao\StringUtil::deserialize($reservationEventObject->targetAudience, true)) : '';
         }
 
         $locationId = 0;
@@ -4326,11 +4414,23 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'endDate' => (isset($putVars['endDate']) && $putVars['endDate'] !== '0' && $putVars['endDate'] !== 0) ? $putVars['endDate'] : ' ',
             'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '0' && $putVars['endTime'] !== 0) ? $putVars['endTime'] : ' ',
             'participantList' => (isset($putVars['participantList']) && $putVars['participantList'] !== '0' && $putVars['participantList'] !== 0) ? $putVars['participantList'] : ' ',
-            'priceSum' => $putVars['priceSum'] ?? '0,00 €',
-            'priceDiscount' => (isset($putVars['priceDiscount']) && $putVars['priceDiscount'] !== '0' && $putVars['priceDiscount'] !== 0) ? $putVars['priceDiscount'] : '0,00 €',
+            'priceSum' => (isset($putVars['priceSum']) && $putVars['priceSum'] !== '' && $putVars['priceSum'] !== '0,00 €') ? $putVars['priceSum'] : '0,00 €',
+            'priceDiscount' => (isset($putVars['priceDiscount']) && $putVars['priceDiscount'] !== '' && $putVars['priceDiscount'] !== '0,00 €') ? $putVars['priceDiscount'] : '0,00 €',
+            'priceNet' => (isset($putVars['priceNet']) && $putVars['priceNet'] !== '' && $putVars['priceNet'] !== '0,00 €') ? $putVars['priceNet'] : '0,00 €',
+            'priceTax' => (isset($putVars['priceTax']) && $putVars['priceTax'] !== '' && $putVars['priceTax'] !== '0,00 €') ? $putVars['priceTax'] : '0,00 €',
+            'priceSumNet' => (isset($putVars['priceSumNet']) && $putVars['priceSumNet'] !== '' && $putVars['priceSumNet'] !== '0,00 €') ? $putVars['priceSumNet'] : '0,00 €',
+            'priceSumTax' => (isset($putVars['priceSumTax']) && $putVars['priceSumTax'] !== '' && $putVars['priceSumTax'] !== '0,00 €') ? $putVars['priceSumTax'] : '0,00 €',
+            'priceOptionSum' => (isset($putVars['priceOptionSum']) && $putVars['priceOptionSum'] !== '' && $putVars['priceOptionSum'] !== '0,00 €') ? $putVars['priceOptionSum'] : '0,00 €',
+            'priceOptionSumNet' => (isset($putVars['priceOptionSumNet']) && $putVars['priceOptionSumNet'] !== '' && $putVars['priceOptionSumNet'] !== '0,00 €') ? $putVars['priceOptionSumNet'] : '0,00 €',
+            'priceOptionSumTax' => (isset($putVars['priceOptionSumTax']) && $putVars['priceOptionSumTax'] !== '' && $putVars['priceOptionSumTax'] !== '0,00 €') ? $putVars['priceOptionSumTax'] : '0,00 €',
             'discountPercent' => (isset($putVars['discountPercent']) && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0) ? $putVars['discountPercent'] : ' ',
             'discountCode' => (isset($putVars['discountCode']) && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0) ? $putVars['discountCode'] : ' ',
             'conferenceLink' => $putVars['conferenceLink'] ?? '',
+            'speaker' => $putVars['speaker'] ?? '',
+            'topic' => $putVars['topic'] ?? '',
+            'audience' => $putVars['audience'] ?? '',
+            'participant_params' => $putVars['participant_params'] ?? ($putVars['participant_params_all'] ?? ''),
+            'internal_comment' => $putVars['internal_comment'] ?? '',
             'documentId' => $putVars['documentId'] ?? '',
         ];
 
@@ -4445,10 +4545,24 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $rIdForIcs);
         $this->putVars['icsFilename'] = $putVars['icsFilename'];
-//        if ($putVars['icsFilename']) {
-//            $putVars['##icsFilename##'] = $putVars['icsFilename'];
-//            $this->putVars['##icsFilename##'] = $putVars['icsFilename'];
-//        }
+
+        $putVars['location'] = ($location ? $location->name : '') ?: ' ';
+        $admin_email = ($organizer && $organizer->admin_email) ? $organizer->admin_email : (($location && $location->admin_email) ? $location->admin_email : (\Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? 'info@con4gis.org')));
+        if (!$admin_email || !strpos($admin_email, '@')) {
+            $admin_email = 'info@con4gis.org';
+        }
+        $putVars['admin_email'] = $admin_email;
+        $putVars['contact_email'] = ($organizer && $organizer->contact_email) ? $organizer->contact_email : (($location && $location->contact_email) ? $location->contact_email : ' ');
+        $putVars['contact_website'] = ($organizer && $organizer->contact_website) ? $organizer->contact_website : (($location && $location->contact_website) ? $location->contact_website : ' ');
+        $putVars['contact_name'] = ($location ? $location->contact_name : '') ?: ' ';
+        $putVars['contact_phone'] = ($location ? $location->contact_phone : '') ?: ' ';
+        $putVars['contact_street'] = ($location ? $location->contact_street : '') ?: ' ';
+        $putVars['contact_postal'] = ($location ? $location->contact_postal : '') ?: ' ';
+        $putVars['contact_city'] = ($location ? $location->contact_city : '') ?: ' ';
+
+        foreach (['location', 'admin_email', 'contact_email', 'contact_website', 'contact_name', 'contact_phone', 'contact_street', 'contact_postal', 'contact_city'] as $fieldKey) {
+            $this->putVars[$fieldKey] = $putVars[$fieldKey];
+        }
 
         $rawData = '';
         foreach ($putVars as $key => $value) {
@@ -4505,6 +4619,27 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $this->setPutVars($putVars);
         }
 
+        // Mirror values BEFORE setting token defaults to ensure mirrored values are used as base
+        $this->mirrorBaseTokens($putVars);
+        $this->mirrorBaseTokens();
+        
+        // Final Mirror to ensure instance and local putVars are in sync
+        foreach ($putVars as $pk => $pv) {
+            if ($pv !== '' && $pv !== null && !isset($this->putVars[$pk])) {
+                $this->putVars[$pk] = $pv;
+            }
+        }
+        
+        // Final Instance Mirror
+        $self = self::getInstance();
+        if ($self && $self !== $this) {
+             foreach ($putVars as $pk => $pv) {
+                if ($pv !== '' && $pv !== null) {
+                    $self->putVars[$pk] = $pv;
+                }
+            }
+        }
+
         // Fix: Ensure basic tokens are always present to avoid template warnings and delivery issues
         $tokenDefaults = [
             'firstname' => '',
@@ -4525,10 +4660,17 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'endDate' => (isset($putVars['endDate']) && $putVars['endDate'] !== '0' && $putVars['endDate'] !== 0) ? $putVars['endDate'] : ' ',
             'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '0' && $putVars['endTime'] !== 0) ? $putVars['endTime'] : ' ',
             'participantList' => (isset($putVars['participantList']) && $putVars['participantList'] !== '0' && $putVars['participantList'] !== 0) ? $putVars['participantList'] : ' ',
-            'priceSum' => $putVars['priceSum'] ?? '0,00 €',
-            'priceDiscount' => (isset($putVars['priceDiscount']) && $putVars['priceDiscount'] !== '0' && $putVars['priceDiscount'] !== 0) ? $putVars['priceDiscount'] : '0,00 €',
-            'discountPercent' => (isset($putVars['discountPercent']) && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0) ? $putVars['discountPercent'] : ' ',
-            'discountCode' => (isset($putVars['discountCode']) && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0) ? $putVars['discountCode'] : ' ',
+            'priceSum' => (!empty($putVars['priceSum']) && $putVars['priceSum'] !== '0,00 €' && $putVars['priceSum'] !== '0 €') ? $putVars['priceSum'] : '0,00 €',
+            'priceNet' => (!empty($putVars['priceNet']) && $putVars['priceNet'] !== '0,00 €' && $putVars['priceNet'] !== '0 €') ? $putVars['priceNet'] : '0,00 €',
+            'priceTax' => (!empty($putVars['priceTax']) && $putVars['priceTax'] !== '0,00 €' && $putVars['priceTax'] !== '0 €') ? $putVars['priceTax'] : '0,00 €',
+            'priceSumNet' => (!empty($putVars['priceSumNet']) && $putVars['priceSumNet'] !== '0,00 €' && $putVars['priceSumNet'] !== '0 €') ? $putVars['priceSumNet'] : '0,00 €',
+            'priceSumTax' => (!empty($putVars['priceSumTax']) && $putVars['priceSumTax'] !== '0,00 €' && $putVars['priceSumTax'] !== '0 €') ? $putVars['priceSumTax'] : '0,00 €',
+            'priceOptionSum' => (!empty($putVars['priceOptionSum']) && $putVars['priceOptionSum'] !== '0,00 €' && $putVars['priceOptionSum'] !== '0 €') ? $putVars['priceOptionSum'] : '0,00 €',
+            'priceOptionSumNet' => (!empty($putVars['priceOptionSumNet']) && $putVars['priceOptionSumNet'] !== '0,00 €' && $putVars['priceOptionSumNet'] !== '0 €') ? $putVars['priceOptionSumNet'] : '0,00 €',
+            'priceOptionSumTax' => (!empty($putVars['priceOptionSumTax']) && $putVars['priceOptionSumTax'] !== '0,00 €' && $putVars['priceOptionSumTax'] !== '0 €') ? $putVars['priceOptionSumTax'] : '0,00 €',
+            'priceDiscount' => (!empty($putVars['priceDiscount']) && $putVars['priceDiscount'] !== '0,00 €' && $putVars['priceDiscount'] !== '0 €') ? $putVars['priceDiscount'] : '0,00 €',
+            'discountPercent' => (!empty($putVars['discountPercent']) && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0) ? $putVars['discountPercent'] : ' ',
+            'discountCode' => (!empty($putVars['discountCode']) && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0) ? $putVars['discountCode'] : ' ',
             'conferenceLink' => $putVars['conferenceLink'] ?? '',
             'documentId' => $putVars['documentId'] ?? '',
             'icsFilename' => $putVars['icsFilename'] ?? '',
@@ -4541,8 +4683,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             // Mirror to instance putVars as well for SaveAction
             $this->putVars[$key] = $putVars[$key];
 
-            $putVars['##' . $key . '##'] = $putVars[$key];
-            $this->putVars['##' . $key . '##'] = $putVars[$key];
+            if ($putVars[$key] !== '') {
+                $putVars['##' . $key . '##'] = $putVars[$key];
+                $this->putVars['##' . $key . '##'] = $putVars[$key];
+            }
 
             // Radical Mirroring for Notification System:
             // Ensure that tokens like 'description' are also present with all possible
@@ -4681,6 +4825,26 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $putVars['endDate'] = (int) $putVars['endDateInt'];
         }
 
+        // Fix: Ensure price fields are strings for database if they were calculated as formatted strings
+        $priceFields = ['price', 'priceTax', 'priceSum', 'priceSumTax', 'priceNet', 'priceSumNet', 'priceOptionSum', 'priceOptionSumTax', 'priceOptionSumNet', 'priceDiscount', 'discountPercent', 'discountCode', 'reservationTaxRate', 'dbkey'];
+        foreach ($priceFields as $pf) {
+            if (isset($putVars[$pf])) {
+                $putVars[$pf] = (string)$putVars[$pf];
+            }
+        }
+
+        $this->putVars = $putVars;
+        
+        // Sync $putVars with $this->putVars to ensure calculated tokens reach the SaveAction
+        foreach ($this->putVars as $tk => $tv) {
+            if ($tv !== '' && $tv !== null && (!isset($putVars[$tk]) || $putVars[$tk] === '' || $putVars[$tk] === null)) {
+                $putVars[$tk] = $tv;
+            }
+        }
+        
+        $this->mirrorBaseTokens($putVars);
+        $this->mirrorBaseTokens(); // for this->putVars
+
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
         $result = $action->run();
@@ -4721,8 +4885,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             unset($result['dialogclose']);
             unset($result['dialogcloseall']);
         }
-        
-        $this->putVars = [];
 
         return $result;
         } catch (\Throwable $e) {
@@ -4740,6 +4902,107 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             unset($errResult['dialogclose']);
             unset($errResult['dialogcloseall']);
             return $errResult;
+        }
+    }
+
+    /**
+     * Mirrors suffixed keys to their base names in $this->putVars.
+     * This ensures that tokens like ##priceSum## are correctly populated
+     * for notifications and PDFs even if the form used suffixed names like priceSum_1.
+     */
+    private function mirrorBaseTokens(&$putVars = null)
+    {
+        $baseTokens = [
+            'priceSum', 'price', 'priceNet', 'priceTax', 'priceOptionSum',
+            'priceOptionSumNet', 'priceOptionSumTax', 'priceDiscount',
+            'discountPercent', 'discountCode', 'priceSumNet', 'priceSumTax',
+            'reservationTaxRate', 'documentId', 'dbkey',
+            'salutation', 'title', 'organisation', 'firstname', 'lastname',
+            'email', 'phone', 'address', 'street', 'postal', 'city', 'dateOfBirth',
+            'salutation2', 'title2', 'organisation2', 'firstname2', 'lastname2',
+            'email2', 'phone2', 'address2', 'street2', 'postal2', 'city2',
+            'beginDate', 'beginTime', 'endDate', 'endTime', 'bookedAt',
+            'reservation_type', 'type', 'reservation_object', 'object', 'reservation_title',
+            'description', 'location', 'comment', 'internal_comment',
+            'speaker', 'topic', 'audience', 'conferenceLink'
+        ];
+        foreach ($baseTokens as $base) {
+            // Priority 1: Check suffixed versions in $this->putVars and mirror if base is empty or zero-like
+            if (!isset($this->putVars[$base]) || $this->putVars[$base] === '' || $this->putVars[$base] === null || $this->putVars[$base] === '0,00 €' || $this->putVars[$base] === 0) {
+                foreach ($this->putVars as $key => $value) {
+                    if ($value !== '' && $value !== null && $value !== ' ') {
+                        if (strpos($key, $base . '_') === 0 || strpos($key, $base . '|') === 0 || strpos($key, $base . '-') === 0) {
+                            $this->putVars[$base] = $value;
+                            break;
+                        }
+                    }
+                }
+            }
+            // Priority 2: If we have an incoming $putVars array, also check there
+            if ($putVars !== null && is_array($putVars)) {
+                if (!isset($putVars[$base]) || $putVars[$base] === '' || $putVars[$base] === null || $putVars[$base] === '0,00 €' || $putVars[$base] === 0) {
+                    foreach ($putVars as $key => $value) {
+                        if ($value !== '' && $value !== null && $value !== ' ') {
+                            if (strpos($key, $base . '_') === 0 || strpos($key, $base . '|') === 0 || strpos($key, $base . '-') === 0) {
+                                $putVars[$base] = $value;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Sync back to this->putVars if base is present in putVars but missing in instance
+                if (isset($putVars[$base]) && (!isset($this->putVars[$base]) || !$this->putVars[$base])) {
+                    $this->putVars[$base] = $putVars[$base];
+                }
+            }
+            
+            // Special cases
+            if ($base === 'reservation_type' && isset($this->putVars[$base])) {
+                $this->putVars['type'] = $this->putVars[$base];
+                if ($putVars !== null) { $putVars['type'] = $this->putVars[$base]; }
+            }
+            if ($base === 'reservation_object' && isset($this->putVars[$base])) {
+                $this->putVars['object'] = $this->putVars[$base];
+                if ($putVars !== null) { $putVars['object'] = $this->putVars[$base]; }
+            }
+        }
+        
+        // Handle address/street alias
+        if (isset($this->putVars['street']) && (!isset($this->putVars['address']) || !$this->putVars['address'])) {
+            $this->putVars['address'] = $this->putVars['street'];
+            if ($putVars !== null) { $putVars['address'] = $this->putVars['street']; }
+        }
+        if (isset($this->putVars['address']) && (!isset($this->putVars['street']) || !$this->putVars['street'])) {
+            $this->putVars['street'] = $this->putVars['address'];
+            if ($putVars !== null) { $putVars['street'] = $this->putVars['address']; }
+        }
+
+        // Additional mapping for type and object if not set via baseTokens loop
+        if (isset($this->putVars['reservation_type']) && (!isset($this->putVars['type']) || !$this->putVars['type'])) {
+            $this->putVars['type'] = $this->putVars['reservation_type'];
+        }
+        if (isset($this->putVars['reservation_object']) && (!isset($this->putVars['object']) || !$this->putVars['object'])) {
+            $this->putVars['object'] = $this->putVars['reservation_object'];
+        }
+
+        // Handle case where type/object might be IDs, try to resolve names if they look like IDs
+        if (isset($this->putVars['type']) && is_numeric($this->putVars['type'])) {
+            $resType = \con4gis\ReservationBundle\Classes\Models\C4gReservationTypeModel::findByPk($this->putVars['type']);
+            if ($resType) {
+                $this->putVars['type'] = $resType->name;
+            }
+        }
+        if (isset($this->putVars['object']) && is_numeric($this->putVars['object'])) {
+            $resObj = \con4gis\ReservationBundle\Classes\Models\C4gReservationObjectModel::findByPk($this->putVars['object']);
+            if ($resObj) {
+                $this->putVars['object'] = $resObj->caption;
+            }
+        }
+
+        // Ensure admin_email is always present to prevent RFC validation errors
+        if (!isset($this->putVars['admin_email']) || !$this->putVars['admin_email'] || $this->putVars['admin_email'] === '##admin_email##') {
+            $this->putVars['admin_email'] = $GLOBALS['TL_CONFIG']['adminEmail'] ?: 'info@kuestenschmiede.de';
         }
     }
 
@@ -4946,15 +5209,16 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $calcTaxes = $settings->showPricesWithTaxes ?: false;
         $showPrices = $settings->showPrices ?: false;
         if ($isEvent) {
-            $desiredCapacity = $desiredCapacity ?: $reservationEventObject->minParticipants;
+            $desiredCapacity = $desiredCapacity ?: ($reservationEventObject->minParticipants ?? 1);
             $resObject = $reservationEventObject;
             $price = $reservationEventObject->price ?? 0;
             $discountCode = $reservationEventObject->discountCode ?? '';
-            if (trim($discountCode) === trim($putVars['discountCode'])) {
+            $inputCode = trim($putVars['discountCode'] ?? $putVars['discountCode_' . ($reservationType->id ?? '')] ?? '');
+            if (trim($discountCode) !== '' && trim($discountCode) === $inputCode) {
                 $putVars['discountPercent'] = $reservationEventObject->discountPercent ?? 0;
             }
         } else {
-            $price = $reservationObject->price;
+            $price = $reservationObject->price ?? 0;
             $resObject = $reservationObject;
         }
 
@@ -5052,6 +5316,19 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
 
+            // Sicherstellen, dass das Event-Objekt für calcPrices korrekt vorbereitet ist
+            if ($isEvent && $reservationEventObject instanceof \Contao\Model) {
+                $objArray = array_merge($objArray, $reservationEventObject->row());
+                // calcPrices erwartet startDate/endDate/startTime/endTime im Objekt für Event-Berechnungen
+                $calEvent = \Contao\CalendarEventsModel::findByPk($reservationEventObject->pid);
+                if ($calEvent) {
+                    $objArray['startDate'] = $calEvent->startDate;
+                    $objArray['startTime'] = $calEvent->startTime;
+                    $objArray['endDate']   = $calEvent->endDate;
+                    $objArray['endTime']   = $calEvent->endTime;
+                }
+            }
+
             $priceArray = false;
             // Sichere Defaults, um spätere Indexzugriffe zu erlauben
             $priceOptionSum = ['priceOptionSum' => 0, 'priceOptionNet' => 0, 'priceOptionTax' => 0];
@@ -5092,13 +5369,24 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
 
             // Participant options
-            $participantParams = $resArray['participant_params'] ?? false;
+            $participantParams = $resArray['participant_params'] ?? $objArray['participant_params'] ?? $typeArray['participant_params'] ?? false;
             $onlyParticipants = $settings->onlyParticipants ?: false;
 
             if ($participantParams) {
+                // Debugging: Log available participant option keys in putVars
+                $participantKeysFound = [];
+                foreach ($putVars as $pk => $pv) {
+                    if (strpos($pk, 'participants_') === 0 || strpos($pk, '§participant_params§') !== false) {
+                        $participantKeysFound[] = $pk;
+                    }
+                }
+                if (!empty($participantKeysFound)) {
+                    C4gLogModel::addLogEntry('reservation', 'Found participant option keys in putVars: ' . implode(', ', $participantKeysFound));
+                }
+
                 // Härtung putVars für calcParticipantOptionPrices
                 foreach ($putVars as $pk => $pv) {
-                    if (is_string($pv) && strpos($pk, 'participants_') === 0) {
+                    if (is_string($pv) && (strpos($pk, 'participants_') === 0 || strpos($pk, '§participant_params§') !== false)) {
                         if ($pv === 'true') { $putVars[$pk] = true; }
                         elseif ($pv === 'false') { $putVars[$pk] = false; }
                         elseif (is_numeric($pv) && (float)$pv == (int)$pv) { $putVars[$pk] = (int)$pv; }
@@ -5116,53 +5404,87 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $optionsPriceSum = $priceOptionSumValue + $priceParticipantOptionSumValue;
             $priceSum = floatval($priceSum) + $optionsPriceSum;
 
-            if ($putVars['discountPercent']) {
-                if ($priceSum) {
-                    $discount = (floatval($priceSum) / 100) * $putVars['discountPercent'];
-                    $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount);
-                    $priceSum = floatval($priceSum) - $discount;
-                }
+            $discount = 0;
+            if (!empty($putVars['discountPercent']) && $priceSum) {
+                $discount = ($priceSum / 100) * floatval($putVars['discountPercent']);
+                $priceSum -= $discount;
             }
 
             if (($priceArray['price'] ?? 0) || $priceSum) {
                 $putVars['price'] = C4gReservationHandler::formatPrice($priceArray['price'] ?? 0) . ($priceArray['priceInfo'] ?? '');
                 $putVars['priceSum'] = C4gReservationHandler::formatPrice($priceSum);
             } else {
-                $putVars['priceSum'] = C4gReservationHandler::formatPrice($price) . ($priceArray['priceInfo'] ?? '');
+                // Fallback, falls priceArray leer, aber $price (Basis) existiert
+                $putVars['priceSum'] = C4gReservationHandler::formatPrice(floatval($price) + $optionsPriceSum - $discount) . ($priceArray['priceInfo'] ?? '');
             }
 
-            if (!isset($putVars['priceDiscount'])) {
-                $putVars['priceDiscount'] = C4gReservationHandler::formatPrice(0);
-            }
-
-            // Summe aller Optionen (Reservierung + Teilnehmer) für Ausgabe
+            $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount);
             $putVars['priceOptionSum'] = C4gReservationHandler::formatPrice($optionsPriceSum);
-
-            if (($putVars['priceDiscount'] ?? 0) && ($putVars['discountPercent'] ?? 0)) {
-                $discount = (floatval($priceSum + $discount) / 100) * $putVars['discountPercent'];
-                $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount);
+            
+            // Mirror results back to instance putVars if possible
+            $self = self::getInstance();
+            if ($self instanceof self) {
+                $self->putVars['priceSum'] = $putVars['priceSum'] ?? $self->putVars['priceSum'] ?? '0,00 €';
+                $self->putVars['priceNet'] = $putVars['priceNet'] ?? $self->putVars['priceNet'] ?? '0,00 €';
+                $self->putVars['priceTax'] = $putVars['priceTax'] ?? $self->putVars['priceTax'] ?? '0,00 €';
+                $self->putVars['priceSumNet'] = $putVars['priceSumNet'] ?? $self->putVars['priceSumNet'] ?? '0,00 €';
+                $self->putVars['priceSumTax'] = $putVars['priceSumTax'] ?? $self->putVars['priceSumTax'] ?? '0,00 €';
+                $self->putVars['priceOptionSum'] = $putVars['priceOptionSum'] ?? '0,00 €';
+                $self->putVars['priceOptionSumNet'] = $putVars['priceOptionSumNet'] ?? $self->putVars['priceOptionSumNet'] ?? '0,00 €';
+                $self->putVars['priceOptionSumTax'] = $putVars['priceOptionSumTax'] ?? $self->putVars['priceOptionSumTax'] ?? '0,00 €';
+                $self->putVars['priceParticipantOptionSum'] = $putVars['priceParticipantOptionSum'] ?? C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSum'] ?? 0);
+                $self->putVars['priceParticipantOptionSumNet'] = $putVars['priceParticipantOptionSumNet'] ?? C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumNet'] ?? 0);
+                $self->putVars['priceParticipantOptionSumTax'] = $putVars['priceParticipantOptionSumTax'] ?? C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumTax'] ?? 0);
+                $self->putVars['priceDiscount'] = $putVars['priceDiscount'] ?? '0,00 €';
+                $self->putVars['price'] = $putVars['price'] ?? $self->putVars['price'] ?? '0,00 €';
+                $self->putVars['admin_email'] = $adminEmail;
+                if (isset($putVars['reservationTaxRate'])) {
+                    $self->putVars['reservationTaxRate'] = $putVars['reservationTaxRate'];
+                }
             }
 
             if ($calcTaxes) {
                 $priceNet = floatval($priceArray['priceNet'] ?? 0);
                 $priceTax = floatval($priceArray['priceTax'] ?? 0);
 
-                $putVars['reservationTaxRate'] = $priceArray['reservationTaxRate'];
+                $putVars['reservationTaxRate'] = $priceArray['reservationTaxRate'] ?? $putVars['reservationTaxRate'] ?? null;
 
                 $putVars['priceNet'] = C4gReservationHandler::formatPrice($priceNet);
                 $putVars['priceTax'] = C4gReservationHandler::formatPrice($priceTax);
 
-                $optNet = floatval($priceOptionSum['priceOptionNet'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSumNet'] ?? 0);
-                $optTax = floatval($priceOptionSum['priceOptionTax'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSumTax'] ?? 0);
+                $optNet = floatval($priceOptionSum['priceOptionNet'] ?? $priceOptionSum['priceOptionSumNet'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSumNet'] ?? 0);
+                $optTax = floatval($priceOptionSum['priceOptionTax'] ?? $priceOptionSum['priceOptionSumTax'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSumTax'] ?? 0);
                 $putVars['priceOptionSumNet'] = C4gReservationHandler::formatPrice($optNet);
                 $putVars['priceOptionSumTax'] = C4gReservationHandler::formatPrice($optTax);
 
-                $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($priceNet + $optNet);
-                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($priceTax + $optTax);
+                // Die Gesamtsummen Netto/Tax müssen ebenfalls den Rabatt berücksichtigen, falls vorhanden.
+                // Hier vereinfacht: proportionaler Abzug vom Gesamtwert, oder einfach Summe der Netto-Werte (Rabatt müsste dann auch netto berechnet werden).
+                // Da discount vom Brutto abgezogen wurde, ziehen wir ihn hier auch proportional von Net/Tax ab, falls gewünscht.
+                // Aber oft reicht die Summe der Brutto-Werte aus.
+                $sumNet = $priceNet + $optNet;
+                $sumTax = $priceTax + $optTax;
+                if ($discount > 0 && ($sumNet + $sumTax) > 0) {
+                    $ratio = $priceSum / ($sumNet + $sumTax);
+                    $sumNet *= $ratio;
+                    $sumTax *= $ratio;
+                }
+
+                $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($sumNet);
+                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($sumTax);
+                
+                $self = self::getInstance();
+                if ($self instanceof self) {
+                    $self->putVars['priceNet'] = $putVars['priceNet'];
+                    $self->putVars['priceTax'] = $putVars['priceTax'];
+                    $self->putVars['priceOptionSumNet'] = $putVars['priceOptionSumNet'];
+                    $self->putVars['priceOptionSumTax'] = $putVars['priceOptionSumTax'];
+                    $self->putVars['priceSumNet'] = $putVars['priceSumNet'];
+                    $self->putVars['priceSumTax'] = $putVars['priceSumTax'];
+                    $self->putVars['reservationTaxRate'] = $putVars['reservationTaxRate'];
+                }
             }
         } else {
-            // Fallback: Berechne Basis + Optionen auch dann, wenn keine Preis-/Anzeige-Flags gesetzt sind,
-            // damit priceSum in putVars stets korrekt inkl. Optionen ankommt.
+            // Fallback: Berechne Basis + Optionen auch dann, wenn keine Preis-/Anzeige-Flags gesetzt sind
 
             // Robuste Normalisierung (wie oben)
             $normalizeToArray = static function ($value) {
@@ -5223,6 +5545,18 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
 
+            // Sicherstellen, dass das Event-Objekt für calcPrices korrekt vorbereitet ist
+            if ($isEvent && $reservationEventObject instanceof \Contao\Model) {
+                // calcPrices erwartet startDate/endDate/startTime/endTime im Objekt für Event-Berechnungen
+                $calEvent = \Contao\CalendarEventsModel::findByPk($reservationEventObject->pid);
+                if ($calEvent) {
+                    $objArray['startDate'] = $calEvent->startDate;
+                    $objArray['startTime'] = $calEvent->startTime;
+                    $objArray['endDate']   = $calEvent->endDate;
+                    $objArray['endTime']   = $calEvent->endTime;
+                }
+            }
+
             // Sichere Defaults vorbereiten
             $priceArray = C4gReservationCalculator::calcPrices($objArray, $typeArray, $isEvent, $desiredCapacity, $duration, '', '', false);
             $priceSum = ($priceArray['priceSum'] ?? 0) ?: ($priceArray['price'] ?? 0);
@@ -5236,7 +5570,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
             // Härtung putVars (Strings zu Booleans/Ints wandeln) für alle Optionstypen
             foreach ($putVars as $pk => $pv) {
-                if (is_string($pv) && (strpos($pk, 'additional_params_') === 0 || strpos($pk, 'participants_') === 0)) {
+                if (is_string($pv) && (strpos($pk, 'additional_params_') === 0 || strpos($pk, 'participants_') === 0 || strpos($pk, '§participant_params§') !== false)) {
                     if ($pv === 'true') { $putVars[$pk] = true; }
                     elseif ($pv === 'false') { $putVars[$pk] = false; }
                     elseif (is_numeric($pv) && (float)$pv == (int)$pv) { $putVars[$pk] = (int)$pv; }
@@ -5252,9 +5586,20 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
 
-            $participantParams = $resArray['participant_params'] ?? false;
+            $participantParams = $resArray['participant_params'] ?? $objArray['participant_params'] ?? $typeArray['participant_params'] ?? false;
             $onlyParticipants = $settings->onlyParticipants ?: false;
             if ($participantParams) {
+                // Debugging: Log available participant option keys in putVars
+                $participantKeysFound = [];
+                foreach ($putVars as $pk => $pv) {
+                    if (strpos($pk, 'participants_') === 0 || strpos($pk, '§participant_params§') !== false) {
+                        $participantKeysFound[] = $pk;
+                    }
+                }
+                if (!empty($participantKeysFound)) {
+                    C4gLogModel::addLogEntry('reservation', 'Found participant option keys in Fallback: ' . implode(', ', $participantKeysFound));
+                }
+
                 $tmpPartOption = C4gReservationCalculator::calcParticipantOptionPrices(intval($desiredCapacity), $putVars, $objArray, $typeArray, false, $onlyParticipants, $settings->specialParticipantMechanism);
                 if (is_array($tmpPartOption)) {
                     $priceParticipantOptionSum = array_merge($priceParticipantOptionSum, $tmpPartOption);
@@ -5265,20 +5610,44 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $priceSum += $optionsPriceSum;
 
             // Rabatt anwenden, falls vorhanden
+            $discount = 0;
             if (!empty($putVars['discountPercent']) && $priceSum) {
-                $discount = (floatval($priceSum) / 100) * floatval($putVars['discountPercent']);
-                $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount);
-                $priceSum = floatval($priceSum) - $discount;
+                $discount = ($priceSum / 100) * floatval($putVars['discountPercent']);
+                $priceSum -= $discount;
+            }
+
+            $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount);
+            if ($self instanceof self) {
+                $self->putVars['priceDiscount'] = $putVars['priceDiscount'];
             }
 
             // Ausgabe-Felder setzen
             $putVars['price'] = C4gReservationHandler::formatPrice($priceArray['price'] ?? 0) . ($priceArray['priceInfo'] ?? '');
             $putVars['priceSum'] = C4gReservationHandler::formatPrice($priceSum);
             $putVars['priceOptionSum'] = C4gReservationHandler::formatPrice($optionsPriceSum);
-            if (!isset($putVars['priceDiscount'])) {
-                $putVars['priceDiscount'] = C4gReservationHandler::formatPrice(0);
+            
+            // Mirror back to instance putVars
+            $self = self::getInstance();
+            if ($self instanceof self) {
+                $self->putVars['priceSum'] = $putVars['priceSum'] ?? $self->putVars['priceSum'] ?? '0,00 €';
+                $self->putVars['priceNet'] = $putVars['priceNet'] ?? $self->putVars['priceNet'] ?? '0,00 €';
+                $self->putVars['priceTax'] = $putVars['priceTax'] ?? $self->putVars['priceTax'] ?? '0,00 €';
+                $self->putVars['priceSumNet'] = $putVars['priceSumNet'] ?? $self->putVars['priceSumNet'] ?? '0,00 €';
+                $self->putVars['priceSumTax'] = $putVars['priceSumTax'] ?? $self->putVars['priceSumTax'] ?? '0,00 €';
+                $self->putVars['priceOptionSum'] = $putVars['priceOptionSum'] ?? '0,00 €';
+                $self->putVars['priceOptionSumNet'] = $putVars['priceOptionSumNet'] ?? $self->putVars['priceOptionSumNet'] ?? '0,00 €';
+                $self->putVars['priceOptionSumTax'] = $putVars['priceOptionSumTax'] ?? $self->putVars['priceOptionSumTax'] ?? '0,00 €';
+                $self->putVars['priceParticipantOptionSum'] = $putVars['priceParticipantOptionSum'] ?? C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSum'] ?? 0);
+                $self->putVars['priceParticipantOptionSumNet'] = $putVars['priceParticipantOptionSumNet'] ?? C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumNet'] ?? 0);
+                $self->putVars['priceParticipantOptionSumTax'] = $putVars['priceParticipantOptionSumTax'] ?? C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumTax'] ?? 0);
+                $self->putVars['priceDiscount'] = $putVars['priceDiscount'] ?? '0,00 €';
+                $self->putVars['price'] = $putVars['price'] ?? $self->putVars['price'] ?? '0,00 €';
+                $self->putVars['admin_email'] = $adminEmail;
+                if (isset($putVars['reservationTaxRate'])) {
+                    $self->putVars['reservationTaxRate'] = $putVars['reservationTaxRate'];
+                }
             }
-
+            
             // Auch im Fallback Steuern berechnen, falls gewünscht
             if ($calcTaxes) {
                 $priceNet = floatval($priceArray['priceNet'] ?? 0);
@@ -5287,13 +5656,32 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $putVars['priceNet'] = C4gReservationHandler::formatPrice($priceNet);
                 $putVars['priceTax'] = C4gReservationHandler::formatPrice($priceTax);
 
-                $optNet = floatval($priceOptionSum['priceOptionNet'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSumNet'] ?? 0);
-                $optTax = floatval($priceOptionSum['priceOptionTax'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSumTax'] ?? 0);
+                $optNet = floatval($priceOptionSum['priceOptionNet'] ?? $priceOptionSum['priceOptionSumNet'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSumNet'] ?? 0);
+                $optTax = floatval($priceOptionSum['priceOptionTax'] ?? $priceOptionSum['priceOptionSumTax'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSumTax'] ?? 0);
                 $putVars['priceOptionSumNet'] = C4gReservationHandler::formatPrice($optNet);
                 $putVars['priceOptionSumTax'] = C4gReservationHandler::formatPrice($optTax);
 
-                $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($priceNet + $optNet);
-                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($priceTax + $optTax);
+                $sumNet = $priceNet + $optNet;
+                $sumTax = $priceTax + $optTax;
+                if ($discount > 0 && ($sumNet + $sumTax) > 0) {
+                    $ratio = $priceSum / ($sumNet + $sumTax);
+                    $sumNet *= $ratio;
+                    $sumTax *= $ratio;
+                }
+
+                $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($sumNet);
+                $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($sumTax);
+                
+                $self = self::getInstance();
+                if ($self instanceof self) {
+                    $self->putVars['priceNet'] = $putVars['priceNet'];
+                    $self->putVars['priceTax'] = $putVars['priceTax'];
+                    $self->putVars['priceOptionSumNet'] = $putVars['priceOptionSumNet'];
+                    $self->putVars['priceOptionSumTax'] = $putVars['priceOptionSumTax'];
+                    $self->putVars['priceSumNet'] = $putVars['priceSumNet'];
+                    $self->putVars['priceSumTax'] = $putVars['priceSumTax'];
+                    $self->putVars['reservationTaxRate'] = $putVars['reservationTaxRate'];
+                }
             }
         }
     }
@@ -5314,6 +5702,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
     public function afterSaveAction($changes, $insertId)
     {
+        $this->mirrorBaseTokens(); // One last time to be sure
         C4gReservationCheckInHelper::removeQRCodeFile();
         
         // Determine if we were dealing with an event

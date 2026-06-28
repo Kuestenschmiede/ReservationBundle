@@ -124,17 +124,15 @@ class C4gReservationConfirmation
                             $organizer = $database->prepare('SELECT * FROM tl_c4g_reservation_location WHERE `id`=? LIMIT 1')->execute($organizerId)->fetchAssoc();
                         }
 
-                        $adminEmail = \Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? '');
-                        $c4gNotify->setTokenValue('admin_email', $adminEmail ?: false);
-                        $c4gNotify->setTokenValue('email', ($reservation['email'] ?? '') ?: '');
-
-                        if ($organizer) {
-                            $c4gNotify->setTokenValue('contact_email', ($organizer && isset($organizer['contact_email'])) ? $organizer['contact_email'] : false);
-                            $c4gNotify->setTokenValue('contact_website', ($organizer && isset($organizer['contact_website'])) ? $organizer['contact_website'] : false);
-                        } else {
-                            $c4gNotify->setTokenValue('contact_email', ($location && isset($location['contact_email'])) ? $location['contact_email'] : false);
-                            $c4gNotify->setTokenValue('contact_website', ($organizer && isset($organizer['contact_website'])) ? $organizer['contact_website'] : false);
+                        $adminEmail = ($reservation['admin_email'] ?? '') ?: (($organizer && ($organizer['admin_email'] ?? '')) ? $organizer['admin_email'] : (($location && ($location['admin_email'] ?? '')) ? $location['admin_email'] : (\Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? ''))));
+                        if (!$adminEmail || !strpos($adminEmail, '@')) {
+                            $adminEmail = \Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? 'info@con4gis.org');
                         }
+                        $c4gNotify->setTokenValue('admin_email', $adminEmail);
+                        $c4gNotify->setTokenValue('email', ($reservation['email'] ?? '') ?: ' ');
+
+                        $c4gNotify->setTokenValue('contact_email', ($reservation['contact_email'] ?? '') ?: (($organizer && ($organizer['contact_email'] ?? '')) ? $organizer['contact_email'] : (($location && ($location['contact_email'] ?? '')) ? $location['contact_email'] : ' ')));
+                        $c4gNotify->setTokenValue('contact_website', ($reservation['contact_website'] ?? '') ?: (($organizer && ($organizer['contact_website'] ?? '')) ? $organizer['contact_website'] : (($location && ($location['contact_website'] ?? '')) ? $location['contact_website'] : ' ')));
 
                         $c4gNotify->setTokenValue('reservation_type', ($type['caption'] ?? '') ?: ($type['name'] ?? ' '));
                         $c4gNotify->setTokenValue('reservation_type_id', $reservationType);
@@ -163,9 +161,55 @@ class C4gReservationConfirmation
                             }
                         }
 
+                        // Map raw database fields to tokens if they are not already set
+                        $fieldMap = [
+                            'salutation', 'title', 'organisation', 'firstname', 'lastname',
+                            'email', 'phone', 'address', 'postal', 'city', 'dateOfBirth',
+                            'salutation2', 'title2', 'organisation2', 'firstname2', 'lastname2',
+                            'email2', 'phone2', 'address2', 'postal2', 'city2',
+                            'price', 'priceNet', 'priceTax', 'priceSum', 'priceSumNet', 'priceSumTax',
+                            'priceDiscount', 'discountPercent', 'discountCode', 'priceOptionSum',
+                            'priceOptionSumNet', 'priceOptionSumTax', 'reservationTaxRate',
+                            'conferenceLink', 'speaker', 'topic', 'audience', 'internal_comment',
+                            'included_params', 'additional_params', 'participant_params',
+                            'documentId', 'dbkey'
+                        ];
+
+                        foreach ($fieldMap as $field) {
+                            if (isset($reservation[$field]) && $reservation[$field] !== '') {
+                                $c4gNotify->setTokenValue($field, $reservation[$field]);
+                            }
+                        }
+
+                        // Also check if admin_email is set in the tokens, if not, set a default
+                        if (!$c4gNotify->getTokenValue('admin_email')) {
+                            $c4gNotify->setTokenValue('admin_email', $GLOBALS['TL_CONFIG']['adminEmail'] ?: 'info@kuestenschmiede.de');
+                        }
+                        
+                        // Map calculated price and discount values explicitly if available in $reservation
+                        $c4gNotify->setTokenValue('priceSum', !empty($reservation['priceSum']) ? $reservation['priceSum'] : ($reservation['priceSum_base'] ?? '0,00 €'));
+                        $c4gNotify->setTokenValue('priceDiscount', (!empty($reservation['priceDiscount']) && $reservation['priceDiscount'] !== '0' && $reservation['priceDiscount'] !== 0) ? $reservation['priceDiscount'] : '0,00 €');
+                        $c4gNotify->setTokenValue('discountPercent', (!empty($reservation['discountPercent']) && $reservation['discountPercent'] !== '0' && $reservation['discountPercent'] !== 0) ? $reservation['discountPercent'] : ' ');
+                        $c4gNotify->setTokenValue('discountCode', (!empty($reservation['discountCode']) && $reservation['discountCode'] !== '0' && $reservation['discountCode'] !== 0) ? $reservation['discountCode'] : ' ');
+                        
+                        $c4gNotify->setTokenValue('price', !empty($reservation['price']) ? $reservation['price'] : ($reservation['price_base'] ?? ' '));
+                        $c4gNotify->setTokenValue('priceNet', !empty($reservation['priceNet']) ? $reservation['priceNet'] : ($reservation['priceNet_base'] ?? ' '));
+                        $c4gNotify->setTokenValue('priceTax', !empty($reservation['priceTax']) ? $reservation['priceTax'] : ($reservation['priceTax_base'] ?? ' '));
+                        $c4gNotify->setTokenValue('priceSumNet', !empty($reservation['priceSumNet']) ? $reservation['priceSumNet'] : ($reservation['priceSumNet_base'] ?? ' '));
+                        $c4gNotify->setTokenValue('priceSumTax', !empty($reservation['priceSumTax']) ? $reservation['priceSumTax'] : ($reservation['priceSumTax_base'] ?? ' '));
+                        $c4gNotify->setTokenValue('reservationTaxRate', !empty($reservation['reservationTaxRate']) ? $reservation['reservationTaxRate'] : ($reservation['reservationTaxRate_base'] ?? ' '));
+                        $c4gNotify->setTokenValue('priceOptionSum', !empty($reservation['priceOptionSum']) ? $reservation['priceOptionSum'] : ($reservation['priceOptionSum_base'] ?? '0,00 €'));
+                        $c4gNotify->setTokenValue('priceOptionSumNet', !empty($reservation['priceOptionSumNet']) ? $reservation['priceOptionSumNet'] : ($reservation['priceOptionSumNet_base'] ?? ' '));
+                        $c4gNotify->setTokenValue('priceOptionSumTax', !empty($reservation['priceOptionSumTax']) ? $reservation['priceOptionSumTax'] : ($reservation['priceOptionSumTax_base'] ?? ' '));
+                        
+                        $c4gNotify->setTokenValue('type', ($reservation['type'] ?? (($reservationType['name'] ?? '') ?: ' ')));
+                        $c4gNotify->setTokenValue('object', ($reservation['object'] ?? (($reservationObject['caption'] ?? '') ?: ' ')));
+
                         $dateFormat = ($GLOBALS['TL_CONFIG']['dateFormat'] ?? '') ?: 'd.m.Y';
-                        //$datimFormat = $GLOBALS['TL_CONFIG']['datimFormat'];
                         $timeFormat = ($GLOBALS['TL_CONFIG']['timeFormat'] ?? '') ?: 'H:i';
+                        $c4gNotify->setTokenValue('beginDate', (($reservation['beginDate'] ?? '') !== '') ? date($dateFormat, (int)$reservation['beginDate']) : ' ');
+                        $c4gNotify->setTokenValue('endDate', (($reservation['endDate'] ?? '') !== '') ? date($dateFormat, (int)$reservation['endDate']) : ' ');
+                        
                         $beginTimeValue = $reservation['beginTime'] ?? 'NOTSET';
                         $beginTimeInt = (int)($reservation['beginTimeInt'] ?? (isset($reservation['beginTime']) && is_numeric($reservation['beginTime']) ? $reservation['beginTime'] : 0));
                         if (isset($reservation['beginTime']) && is_numeric($reservation['beginTime']) && (int)$reservation['beginTime'] === 0) {
@@ -212,7 +256,8 @@ class C4gReservationConfirmation
                         }
                         $c4gNotify->setTokenValue('beginTime', $formattedBeginTime);
 
-                        $c4gNotify->setTokenValue('endDate', (($reservation['endDate'] ?? '') !== '') ? date($dateFormat, (int)$reservation['endDate']) : '');
+                        $c4gNotify->setTokenValue('endDate', (($reservation['endDate'] ?? '') !== '') ? date($dateFormat, (int)$reservation['endDate']) : ' ');
+                        $c4gNotify->setTokenValue('bookedAt', (($reservation['bookedAt'] ?? '') !== '') ? date($dateFormat . ' ' . $timeFormat, (int)$reservation['bookedAt']) : ' ');
                         $endTimeInt = (int)($reservation['endTimeInt'] ?? (isset($reservation['endTime']) && is_numeric($reservation['endTime']) ? $reservation['endTime'] : 0));
                         if (isset($reservation['endTime']) && is_numeric($reservation['endTime']) && (int)$reservation['endTime'] === 0) {
                             $endTimeInt = 0;
@@ -252,6 +297,11 @@ class C4gReservationConfirmation
                             $formattedEndTime = '00:00';
                         }
                         $c4gNotify->setTokenValue('endTime', $formattedEndTime);
+                        
+                        $c4gNotify->setTokenValue('priceSum', !empty($reservation['priceSum']) ? $reservation['priceSum'] : '0,00 €');
+                        $c4gNotify->setTokenValue('priceDiscount', (!empty($reservation['priceDiscount']) && $reservation['priceDiscount'] !== '0' && $reservation['priceDiscount'] !== 0) ? $reservation['priceDiscount'] : '0,00 €');
+                        $c4gNotify->setTokenValue('discountPercent', (!empty($reservation['discountPercent']) && $reservation['discountPercent'] !== '0' && $reservation['discountPercent'] !== 0) ? $reservation['discountPercent'] : ' ');
+                        $c4gNotify->setTokenValue('discountCode', (!empty($reservation['discountCode']) && $reservation['discountCode'] !== '0' && $reservation['discountCode'] !== 0) ? $reservation['discountCode'] : ' ');
 
                         $c4gNotify->setTokenValue('description', (string)(($reservationObject['description'] ?? '') ?: (($reservationObject['details'] ?? '') ?: (($reservationObject['teaser'] ?? '') ?: ''))));
 
@@ -354,33 +404,26 @@ class C4gReservationConfirmation
 
                             }
 
-                            if ($eventObject && $eventObject['conferenceLink']) {
-                                $c4gNotify->setTokenValue('conferenceLink', $eventObject['conferenceLink'] ?: '');
-                            }
+                        if ($eventObject && $eventObject['conferenceLink']) {
+                            $c4gNotify->setTokenValue('conferenceLink', $eventObject['conferenceLink'] ?: ' ');
+                        } else {
+                            $c4gNotify->setTokenValue('conferenceLink', $reservation['conferenceLink'] ?? ' ');
+                        }
 
-                            if (($eventObject && $eventObject['price']) || ($calendarObject && $calendarObject['reservationPrice'])) {
-                                $price = C4gReservationHandler::formatPrice($eventObject && $eventObject['price'] ? $eventObject['price'] : $calendarObject['reservationPrice']);
-                                $priceOptionSum = C4gReservationHandler::formatPrice($eventObject && $eventObject['priceOptionSum']);
-                                $priceSum = C4gReservationHandler::formatPrice($eventObject && $eventObject['priceSum']);
-                                $c4gNotify->setTokenValue('price', $price);
-                                $c4gNotify->setTokenValue('priceOptionSum', $priceOptionSum);
-                                $c4gNotify->setTokenValue('priceSum', $priceSum);
-                            }
-                            //ToDo set dbkey and all price tokens
-                            $c4gNotify->setTokenValue('dbkey', $reservation['id'] ? $reservation['dbkey'] : '');
+                        $c4gNotify->setTokenValue('price', ($reservation['price'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('priceOptionSum', ($reservation['priceOptionSum'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('priceSum', ($reservation['priceSum'] ?? '') ?: '0,00 €');
+                        //ToDo set dbkey and all price tokens
+                        $c4gNotify->setTokenValue('dbkey', $reservation['id'] ? ($reservation['dbkey'] ?: $reservation['id']) : ' ');
 
-                            if ($eventObject && $eventObject['priceSumTax']) {
-                                $c4gNotify->setTokenValue('priceTax', $reservation['priceTax'] ? $reservation['priceTax'] : '');
-                                $c4gNotify->setTokenValue('priceNet', $reservation['priceNet'] ? $reservation['priceNet'] : '');
+                        $c4gNotify->setTokenValue('priceTax', ($reservation['priceTax'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('priceNet', ($reservation['priceNet'] ?? '') ?: '0,00 €');
 
-                                $c4gNotify->setTokenValue('priceOptionSumTax', $reservation['priceOptionSumTax'] ? $reservation['priceOptionSumTax'] : '');
-                                $c4gNotify->setTokenValue('priceOptionSumNet', $reservation['priceOptionSumNet'] ? $reservation['priceOptionSumNet'] : '');
+                        $c4gNotify->setTokenValue('priceOptionSumTax', ($reservation['priceOptionSumTax'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('priceOptionSumNet', ($reservation['priceOptionSumNet'] ?? '') ?: '0,00 €');
 
-                                $c4gNotify->setTokenValue('priceSumNet', $reservation['priceSumNet'] ? $reservation['priceSumNet'] : '');
-                                $c4gNotify->setTokenValue('priceSumTax', $reservation['priceSumTax'] ? $reservation['priceSumTax'] : '');
-
-                                $c4gNotify->setTokenValue('reservationTaxRate', $reservation['reservationTaxRate'] ? $reservation['reservationTaxRate'] : '');
-                            }
+                        $c4gNotify->setTokenValue('priceSumNet', ($reservation['priceSumNet'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('priceSumTax', ($reservation['priceSumTax'] ?? '') ?: '0,00 €');
                         }
 
                         $salutation = [
@@ -388,72 +431,71 @@ class C4gReservationConfirmation
                             'woman' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['woman'][0],
                             'various' => $GLOBALS['TL_LANG']['tl_c4g_reservation']['various'][0],
                         ];
-                        $c4gNotify->setTokenValue('salutation', ($reservation['salutation'] && $salutation[$reservation['salutation']]) ? $salutation[$reservation['salutation']] : '');
-                        $c4gNotify->setTokenValue('title', $reservation['title'] ?: '');
-                        $c4gNotify->setTokenValue('organisation', $reservation['organisation'] ?: '');
-                        $c4gNotify->setTokenValue('firstname', $reservation['firstname'] ?: '');
-                        $c4gNotify->setTokenValue('lastname', $reservation['lastname'] ?: '');
-                        $c4gNotify->setTokenValue('email', $reservation['email'] ?: '');
-                        $c4gNotify->setTokenValue('phone', $reservation['phone'] ?: '');
-                        $c4gNotify->setTokenValue('address', $reservation['address'] ?: '');
-                        $c4gNotify->setTokenValue('postal', $reservation['postal'] ?: '');
-                        $c4gNotify->setTokenValue('city', $reservation['city'] ?: '');
-                        $c4gNotify->setTokenValue('dateOfBirth', $reservation['dateOfBirth'] ? date($dateFormat, $reservation['dateOfBirth']) : '');
-                        $c4gNotify->setTokenValue('salutation2', $reservation['salutation2'] && $salutation[$reservation['salutation2']] ? $salutation[$reservation['salutation2']] : '');
-                        $c4gNotify->setTokenValue('title2', $reservation['title2'] ? $reservation['title2'] : '');
-                        $c4gNotify->setTokenValue('organisation2', $reservation['organisation2'] ? $reservation['organisation2'] : '');
-                        $c4gNotify->setTokenValue('firstname2', $reservation['firstname2'] ? $reservation['firstname2'] : '');
-                        $c4gNotify->setTokenValue('lastname2', $reservation['lastname2'] ? $reservation['lastname2'] : '');
-                        $c4gNotify->setTokenValue('email2', $reservation['email2'] ? $reservation['email2'] : '');
-                        $c4gNotify->setTokenValue('phone2', $reservation['phone2'] ? $reservation['phone2'] : '');
-                        $c4gNotify->setTokenValue('address2', $reservation['address2'] ? $reservation['address2'] : '');
-                        $c4gNotify->setTokenValue('postal2', $reservation['postal2'] ? $reservation['postal2'] : '');
-                        $c4gNotify->setTokenValue('city2', $reservation['city2'] ? $reservation['city2'] : '');
-                        $c4gNotify->setTokenValue('comment', $reservation['comment'] ? \Contao\StringUtil::deserialize($reservation['comment']) : '');
-                        $c4gNotify->setTokenValue('internal_comment', $reservation['internal_comment'] ? \Contao\StringUtil::deserialize($reservation['internal_comment']) : '');
-                        $c4gNotify->setTokenValue('additional1', $reservation['additional1'] ?: '');
-                        $c4gNotify->setTokenValue('additional2', $reservation['additional2'] ?: '');
-                        $c4gNotify->setTokenValue('additional3', $reservation['additional3'] ?: '');
-
-                        $c4gNotify->setTokenValue('location', $location ? $location['name'] : '');
-                        $c4gNotify->setTokenValue('contact_name', $location ? $location['contact_name'] : '');
-                        $c4gNotify->setTokenValue('contact_phone', $location ? $location['contact_phone'] : '');
-                        $c4gNotify->setTokenValue('contact_street', $location ? $location['contact_street'] : '');
-                        $c4gNotify->setTokenValue('contact_postal', $location ? $location['contact_postal'] : '');
-                        $c4gNotify->setTokenValue('contact_city', $location ? $location['contact_city'] : '');
+                        $c4gNotify->setTokenValue('salutation', ($reservation['salutation'] && ($salutation[$reservation['salutation']] ?? '')) ? $salutation[$reservation['salutation']] : ($reservation['salutation'] ?? ' '));
+                        $c4gNotify->setTokenValue('title', ($reservation['title'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('organisation', ($reservation['organisation'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('firstname', ($reservation['firstname'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('lastname', ($reservation['lastname'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('email', ($reservation['email'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('phone', ($reservation['phone'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('address', ($reservation['address'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('postal', ($reservation['postal'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('city', ($reservation['city'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('dateOfBirth', ($reservation['dateOfBirth'] && is_numeric($reservation['dateOfBirth'])) ? date($dateFormat, $reservation['dateOfBirth']) : (($reservation['dateOfBirth'] ?? '') ?: ' '));
+                        $c4gNotify->setTokenValue('salutation2', ($reservation['salutation2'] && ($salutation[$reservation['salutation2']] ?? '')) ? $salutation[$reservation['salutation2']] : ($reservation['salutation2'] ?? ' '));
+                        $c4gNotify->setTokenValue('title2', ($reservation['title2'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('organisation2', ($reservation['organisation2'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('firstname2', ($reservation['firstname2'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('lastname2', ($reservation['lastname2'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('email2', ($reservation['email2'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('phone2', ($reservation['phone2'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('address2', ($reservation['address2'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('postal2', ($reservation['postal2'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('city2', ($reservation['city2'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('additional1', ($reservation['additional1'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('additional2', ($reservation['additional2'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('additional3', ($reservation['additional3'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('comment', ($reservation['comment'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('internal_comment', ($reservation['internal_comment'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('participant_params', ($reservation['participant_params'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('included_params', ($reservation['included_params'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('additional_params', ($reservation['additional_params'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('conferenceLink', ($reservation['conferenceLink'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('speaker', ($reservation['speaker'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('topic', ($reservation['topic'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('audience', ($reservation['audience'] ?? '') ?: ' ');
+ 
+                        $c4gNotify->setTokenValue('location', ($reservation['location'] ?? '') ?: (($location['name'] ?? '') ?: ' '));
+                        $c4gNotify->setTokenValue('contact_name', ($reservation['contact_name'] ?? '') ?: (($location['contact_name'] ?? '') ?: ' '));
+                        $c4gNotify->setTokenValue('contact_phone', ($reservation['contact_phone'] ?? '') ?: (($location['contact_phone'] ?? '') ?: ' '));
+                        $c4gNotify->setTokenValue('contact_street', ($reservation['contact_street'] ?? '') ?: (($location['contact_street'] ?? '') ?: ' '));
+                        $c4gNotify->setTokenValue('contact_postal', ($reservation['contact_postal'] ?? '') ?: (($location['contact_postal'] ?? '') ?: ' '));
+                        $c4gNotify->setTokenValue('contact_city', ($reservation['contact_city'] ?? '') ?: (($location['contact_city'] ?? '') ?: ' '));
 
                         $c4gNotify->setTokenValue('reservation_id', $reservation['reservation_id']);
                         $c4gNotify->setTokenValue('agreed', $reservation['agreed']);
 
-                        if ($reservationObject['price']) {
-                            $price = C4gReservationHandler::formatPrice($reservationObject['price']);
-                            $priceOptionSum = C4gReservationHandler::formatPrice($reservationObject['priceOptionSum']);
-                            $priceSum = C4gReservationHandler::formatPrice($reservationObject['priceSum']);
-                            $c4gNotify->setTokenValue('price', $price);
-                            $c4gNotify->setTokenValue('priceOptionSum', $priceOptionSum);
-                            $c4gNotify->setTokenValue('priceSum', $priceSum);
-                        }
+                        $c4gNotify->setTokenValue('price', ($reservation['price'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('priceOptionSum', ($reservation['priceOptionSum'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('priceSum', ($reservation['priceSum'] ?? '') ?: '0,00 €');
 
                         $c4gNotify->setTokenValue('discountPercent', ($reservation['discountPercent'] ?? '') ?: (($eventObject['discountPercent'] ?? '') ?: ' '));
                         $c4gNotify->setTokenValue('discountCode', ($reservation['discountCode'] ?? '') ?: (($eventObject['discountCode'] ?? '') ?: ' '));
-                        $c4gNotify->setTokenValue('priceDiscount', ($reservation['priceDiscount'] ?? '') ?: ' ');
+                        $c4gNotify->setTokenValue('priceDiscount', ($reservation['priceDiscount'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('reservationTaxRate', ($reservation['reservationTaxRate'] ?? '') ?: ' ');
 
-                        if ($reservationObject['documentId']) {
-                            $c4gNotify->setTokenValue('documentId', $reservation['documentId']);
+                        if ($reservationObject && ($reservationObject['documentId'] ?? '')) {
+                            $c4gNotify->setTokenValue('documentId', ($reservation['documentId'] ?? '') ?: ' ');
                         }
 
-                        if ($reservationObject && $reservationObject['priceSumTax']) {
-                            $c4gNotify->setTokenValue('priceTax', $reservation['priceTax'] ? $reservation['priceTax'] : '');
-                            $c4gNotify->setTokenValue('priceNet', $reservation['priceNet'] ? $reservation['priceNet'] : '');
+                        $c4gNotify->setTokenValue('priceTax', ($reservation['priceTax'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('priceNet', ($reservation['priceNet'] ?? '') ?: '0,00 €');
 
-                            $c4gNotify->setTokenValue('priceOptionSumTax', $reservation['priceOptionSumTax'] ? $reservation['priceOptionSumTax'] : '');
-                            $c4gNotify->setTokenValue('priceOptionSumNet', $reservation['priceOptionSumNet'] ? $reservation['priceOptionSumNet'] : '');
+                        $c4gNotify->setTokenValue('priceOptionSumTax', ($reservation['priceOptionSumTax'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('priceOptionSumNet', ($reservation['priceOptionSumNet'] ?? '') ?: '0,00 €');
 
-                            $c4gNotify->setTokenValue('priceSumNet', $reservation['priceSumNet'] ? $reservation['priceSumNet'] : '');
-                            $c4gNotify->setTokenValue('priceSumTax', $reservation['priceSumTax'] ? $reservation['priceSumTax'] : '');
-
-                            $c4gNotify->setTokenValue('reservationTaxRate', $reservation['reservationTaxRate'] ? $reservation['reservationTaxRate'] : '');
-                        }
+                        $c4gNotify->setTokenValue('priceSumNet', ($reservation['priceSumNet'] ?? '') ?: '0,00 €');
+                        $c4gNotify->setTokenValue('priceSumTax', ($reservation['priceSumTax'] ?? '') ?: '0,00 €');
 
                         $binFileUuid = $reservation['fileUpload'];
                         $filePath = '';

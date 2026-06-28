@@ -37,13 +37,22 @@ class ReservationPrintDataEnricher
 
             // 1. Map dynamic keys to standard keys for the helper and template
             $keysToSync = [
-                'reservation_id', 'priceSum', 'bankName', 'bankIban', 'bankBic', 
+                'reservation_id', 'priceSum', 'priceSumTax', 'priceSumNet', 'bankName', 'bankIban', 'bankBic', 
                 'qrFileName', 'bankQrFileName', 'documentId', 'firstname', 'lastname',
-                'address', 'postal', 'city', 'email', 'beginDate', 'beginTime', 'reservation_type',
-                'reservation_object'
+                'address', 'street', 'postal', 'city', 'email', 'phone', 'organisation', 'title', 'salutation',
+                'firstname2', 'lastname2', 'address2', 'street2', 'postal2', 'city2', 'email2', 'phone2', 'organisation2', 'title2', 'salutation2',
+                'beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_type',
+                'reservation_object', 'price', 'priceTax', 'priceNet', 'priceOptionSum',
+                'priceOptionSumNet', 'priceOptionSumTax', 'priceDiscount', 'discountPercent',
+                'discountCode', 'reservationTaxRate', 'documentId', 'dateOfBirth'
             ];
 
             foreach ($keysToSync as $standardKey) {
+                if ($standardKey === 'reservation_id' && (!isset($data['reservation_id']) || !$data['reservation_id'])) {
+                    if (isset($data['id']) && $data['id']) {
+                        $data['reservation_id'] = $data['id'];
+                    }
+                }
                 if (!isset($data[$standardKey]) || $data[$standardKey] === '' || $data[$standardKey] === null) {
                     foreach ($data as $dynamicKey => $value) {
                         if ((strpos($dynamicKey, $standardKey . '_') === 0 || strpos($dynamicKey, $standardKey . '|') === 0 || strpos($dynamicKey, $standardKey . '-') === 0) && ($value !== '' && $value !== null)) {
@@ -53,6 +62,20 @@ class ReservationPrintDataEnricher
                         }
                     }
                 }
+            }
+
+            // Handle address/street alias
+            if (isset($data['street']) && (!isset($data['address']) || !$data['address'])) {
+                $data['address'] = $data['street'];
+            }
+            if (isset($data['address']) && (!isset($data['street']) || !$data['street'])) {
+                $data['street'] = $data['address'];
+            }
+            if (isset($data['street2']) && (!isset($data['address2']) || !$data['address2'])) {
+                $data['address2'] = $data['street2'];
+            }
+            if (isset($data['address2']) && (!isset($data['street2']) || !$data['street2'])) {
+                $data['street2'] = $data['address2'];
             }
 
             // Fallback for beginTime if it's still empty and it's a reservation
@@ -101,7 +124,13 @@ class ReservationPrintDataEnricher
             }
 
             // 5. Mirror fresh results back to dynamic keys to be absolutely sure the template finds them
-            foreach (['qrFileName', 'bankQrFileName', 'qrContent', 'qrBase64', 'bankQrBase64'] as $ktm) {
+            $fieldsToMirror = [
+                'qrFileName', 'bankQrFileName', 'qrContent', 'qrBase64', 'bankQrBase64',
+                'price', 'priceTax', 'priceSum', 'priceSumTax', 'priceNet', 'priceSumNet',
+                'priceOptionSum', 'priceOptionSumTax', 'priceOptionSumNet', 'priceDiscount',
+                'discountPercent', 'discountCode', 'reservationTaxRate', 'documentId'
+            ];
+            foreach ($fieldsToMirror as $ktm) {
                 if (isset($data[$ktm]) && $data[$ktm]) {
                     foreach ($data as $pk => $pv) {
                         if (strpos($pk, $ktm . '_') === 0 || strpos($pk, $ktm . '|') === 0 || strpos($pk, $ktm . '-') === 0) {
@@ -177,7 +206,8 @@ class ReservationPrintDataEnricher
             foreach ([
                 'price','priceSum','priceOptionSum','priceDiscount',
                 'priceNet','priceTax','priceOptionSumNet','priceOptionSumTax',
-                'priceSumNet','priceSumTax','reservationTaxRate'
+                'priceSumNet','priceSumTax','reservationTaxRate',
+                'priceParticipantOptionSum', 'priceParticipantOptionSumNet', 'priceParticipantOptionSumTax'
             ] as $k) {
                 if (isset($putVars[$k])) {
                     $data[$k] = $putVars[$k];
