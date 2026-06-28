@@ -292,6 +292,7 @@ function hideOptions(typeId, values, showDateTime) {
     }
 
     checkEventFields();
+    checkParticipantsVisibility(typeId);
 }
 
 function checkType(dateField, event) {
@@ -407,6 +408,7 @@ function setReservationForm(typeId, showDateTime) {
     }
     handleBrickConditions();
     checkEventFields();
+    checkParticipantsVisibility(typeId);
 
     if (document.getElementsByClassName('c4g__spinner-wrapper')[0]) {
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
@@ -514,6 +516,7 @@ function changeCapacity(typeId, showDateTime) {
     }
     handleBrickConditions();
     checkEventFields();
+    checkParticipantsVisibility(typeId);
 
     if (document.getElementsByClassName('c4g__spinner-wrapper')[0]) {
         document.getElementsByClassName('c4g__spinner-wrapper')[0].style.display = "none";
@@ -1040,6 +1043,191 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
  *
  * @param object
  */
+/**
+ * Triggers visibility check for participant fields (subdialogs)
+ * @param typeId
+ */
+var isEvaluatingParticipants = false;
+function checkParticipantsVisibility(typeId) {
+    if (isEvaluatingParticipants) return;
+    isEvaluatingParticipants = true;
+    
+    // If we have capacity fields > 0, make sure they are NOT hidden themselves
+    var caps = document.querySelectorAll('input[id*="desiredCapacity"], input[name*="desiredCapacity"]');
+    for(var c=0; c<caps.length; c++) {
+        var capEl = caps[c];
+        var parentGrp = capEl.closest('.c4g__form-group, .form-group, div');
+        if (parentGrp && (parentGrp.style.display === 'none' || parentGrp.classList.contains('c4g_display_none'))) {
+            parentGrp.style.display = 'block';
+            parentGrp.classList.remove('c4g_display_none');
+        }
+    }
+
+    try {
+        if (typeof handleBrickConditions === 'function') {
+            try {
+                handleBrickConditions();
+            } catch (e) {
+                console.error('handleBrickConditions failed in checkParticipantsVisibility:', e);
+            }
+        }
+        
+        // Additional safety check for participant fields that might be stuck in hidden state
+        try {
+            var participantContainers = document.querySelectorAll('.c4gGuiSubDialog, .c4g_sub_dialog_container, .c4g_sub_dialog_set, [id*="participants"], [id*="Participants"], [class*="participants"], [class*="Participants"], [data-condition-name*="desiredCapacity"], [data-condition-name*="participants"], .c4g__form-group');
+            if (participantContainers.length > 0) {
+                for (var i = 0; i < participantContainers.length; i++) {
+                    try {
+                        var container = participantContainers[i];
+                        if (!container) continue;
+                        // Skip if not a participant related field
+                        var cId = container.id || "";
+                        var cClass = container.className || "";
+                        var cData = container.dataset || {};
+                        var condName = cData.conditionName || "";
+                        
+                        var isParticipantRelated = cId.indexOf('participants') !== -1 || 
+                                                  cId.indexOf('Participants') !== -1 || 
+                                                  cClass.indexOf('participants') !== -1 || 
+                                                  cClass.indexOf('Participants') !== -1 ||
+                                                  container.classList.contains('c4gGuiSubDialog') ||
+                                                  container.classList.contains('c4g_sub_dialog_container') ||
+                                                  container.classList.contains('c4g_sub_dialog_set') ||
+                                                  condName.indexOf('participants') !== -1 || 
+                                                  condName.indexOf('desiredCapacity') !== -1 ||
+                                                  cId.indexOf('desiredCapacity') !== -1 ||
+                                                  cClass.indexOf('desiredCapacity') !== -1;
+                        
+                        if (!isParticipantRelated) {
+                            continue;
+                        }
+                        var isHidden = container.style.display === 'none' || container.hidden || container.classList.contains('c4g_display_none') || container.classList.contains('c4g_brick_hidden_field');
+                        
+                        // NEW: Even if not hidden by style, check if it's in a hidden parent
+                        if (!isHidden) {
+                            var p = container.parentElement;
+                            while(p && p.tagName !== 'BODY') {
+                                if (p.style.display === 'none' || p.classList.contains('c4g_display_none') || p.classList.contains('c4g_brick_hidden_field')) {
+                                    isHidden = true;
+                                    // Try to unhide parent immediately if it's blocking
+                                    if (p.classList.contains('c4g_brick_hidden_field')) {
+                                        p.classList.remove('c4g_brick_hidden_field');
+                                        p.style.setProperty('display', 'block', 'important');
+                                    }
+                                    break;
+                                }
+                                p = p.parentElement;
+                            }
+                        }
+
+                        // If it has conditions but is hidden, and it doesn't have the explicit 'c4g_display_none' class
+                        // (which is used for hard-hiding), try to force evaluate its display.
+                        if (isHidden) {
+                            if (typeof C4GCheckConditionField === 'function') {
+                                C4GCheckConditionField(container);
+                            }
+                            
+                            isHidden = container.style.display === 'none' || container.hidden || container.classList.contains('c4g_display_none');
+                            // Final fallback if condition evaluation still thinks it should be hidden but we need it visible
+                            // This is risky but helps if conditions are evaluated too early
+                            if (isHidden) {
+                                 // Check if we can deduce visibility from parent state
+                                 var pField = document.getElementById('c4g_reservation_type') || document.querySelector('select[name*="reservation_type"]');
+                                 if (pField && pField.value && parseInt(pField.value) > 0) {
+                                     // Force visibility if it really should be there based on selected type
+                                     // This is a last resort for the "first load" issue
+                                     var cCondName = container.dataset ? container.dataset.conditionName : '';
+                                     if (cCondName && (cCondName.indexOf('reservation_type') !== -1 || cCondName.indexOf('desiredCapacity') !== -1)) {
+                                         container.style.setProperty('display', 'block', 'important');
+                                         container.style.setProperty('visibility', 'visible', 'important');
+                                         container.hidden = false;
+                                         container.classList.remove('c4g_display_none');
+                                         container.classList.remove('c4g_brick_hidden_field');
+                                         if (typeof C4GCheckConditionClasses === 'function') {
+                                             C4GCheckConditionClasses(container);
+                                         }
+                                     } else if (cId.indexOf('participants') !== -1 || cId.indexOf('Participants') !== -1 ||
+                                                cClass.indexOf('participants') !== -1 || cClass.indexOf('Participants') !== -1 ||
+                                                container.classList.contains('c4gGuiSubDialog')) {
+                                         // Hard force for participants if they are hidden but capacity exists
+                                         var capacityFound = false;
+                                         var caps = document.querySelectorAll('input[id*="desiredCapacity"], input[name*="desiredCapacity"]');
+                                         for(var c=0; c<caps.length; c++) if(parseInt(caps[c].value) > 0) capacityFound = true;
+                                         if (capacityFound) {
+                                             container.style.setProperty('display', 'block', 'important');
+                                             container.style.setProperty('visibility', 'visible', 'important');
+                                             container.hidden = false;
+                                             container.classList.remove('c4g_display_none');
+                                             container.classList.remove('c4g_brick_hidden_field');
+                                             // NEW: Also force parent visibility
+                                             var parent = container.parentElement;
+                                                 while(parent && parent.tagName !== 'BODY') {
+                                                     var pText = (parent.id || "") + (parent.className || "");
+                                                     if (parent.style.display === 'none' || parent.classList.contains('c4g_display_none') || (typeof pText === 'string' && pText.indexOf('hidden') !== -1)) {
+                                                         parent.style.setProperty('display', 'block', 'important');
+                                                         parent.classList.remove('c4g_display_none');
+                                                         parent.classList.remove('c4g_brick_hidden_field');
+                                                         parent.hidden = false;
+                                                         if (parent.style.visibility === 'hidden') parent.style.visibility = 'visible';
+                                                     }
+                                                     parent = parent.parentElement;
+                                                 }
+                                         }
+                                     }
+                                 }
+                            }
+                        }
+                    } catch (innerErr) {
+                        console.error('Error processing container ' + i + ':', innerErr);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Error in participant visibility safety check:', err);
+        }
+        
+        // New: If desiredCapacity is present but participants are still hidden, try to force trigger them
+        // Also added a safety delay to counter subsequent framework hiding
+        setTimeout(function() {
+            try {
+                var capacityFields = document.querySelectorAll('input[id*="c4g_desiredCapacity_"]');
+                for (var k = 0; k < capacityFields.length; k++) {
+                    var field = capacityFields[k];
+                    var fVal = field.value ? parseInt(field.value) : 0;
+                    if (fVal > 0) {
+                        if (typeof C4GCheckConditionField === 'function') {
+                            C4GCheckConditionField(field);
+                        }
+                    }
+                }
+            } catch (reErr) {
+                console.error('Safety re-check failed:', reErr);
+            }
+        }, 500);
+
+        try {
+            var capacityFields = document.querySelectorAll('input[id*="c4g_desiredCapacity_"]');
+            for (var k = 0; k < capacityFields.length; k++) {
+                var capField = capacityFields[k];
+                var capVal = capField.value ? parseInt(capField.value) : 0;
+                if (capVal > 0) {
+                    // If we have a capacity > 0, we expect participants to be potentially visible
+                    // Trigger change event to fire con4gis listeners
+                    // Check if any participant container is still hidden
+                    var hiddenParticipants = document.querySelectorAll('.c4gGuiSubDialog[id*="reservationParticipants"][style*="display: none"], .c4g_sub_dialog_container[id*="reservationParticipants"][style*="display: none"], .c4gGuiSubDialog[id*="participants"][style*="display: none"], .c4g_sub_dialog_container[id*="participants"][style*="display: none"]');
+                    if (hiddenParticipants.length > 0 && typeof eventFire === 'function') {
+                        eventFire(capField, 'change');
+                    }
+                }
+            }
+        } catch (capErr) {
+            console.error('Error triggering capacity fields:', capErr);
+        }
+    } finally {
+        isEvaluatingParticipants = false;
+    }
+}
+
 function checkEventFields(typeId, selectField) {
     if (!typeId) {
         var typeField = document.getElementById("c4g_reservation_type");
@@ -1259,6 +1447,62 @@ function eventFire(el, etype) {
                 console.error('Initial handleBrickConditions failed:', e);
             }
         }
+        
+        var typeField = document.getElementById("c4g_reservation_type");
+        if (typeField && typeField.value) {
+            if (typeof checkParticipantsVisibility === 'function') {
+                checkParticipantsVisibility(typeField.value);
+            }
+        } else {
+            // If no typeField is found, try to run it anyway (it will use document-wide selectors)
+            if (typeof checkParticipantsVisibility === 'function') {
+                checkParticipantsVisibility();
+            }
+        }
+
+        // Ensure conditions for number fields are evaluated
+        var numberFields = document.querySelectorAll('input[type="number"].formdata, input[id*="c4g_desiredCapacity_"], input[name*="desiredCapacity"]');
+        for (var i = 0; i < numberFields.length; i++) {
+            var field = numberFields[i];
+            var fVal = field.value ? parseInt(field.value) : 0;
+            if (fVal > 0) {
+                var fId = field.id || "";
+                var fName = field.name || "";
+                // If it's a desiredCapacity field, it likely controls participant visibility
+                if (fId.indexOf('desiredCapacity') !== -1 || fName.indexOf('desiredCapacity') !== -1) {
+                    if (typeof C4GCheckConditionField === 'function') {
+                        C4GCheckConditionField(field);
+                    }
+                    
+                    // NEW: Directly check visibility after C4GCheckConditionField
+                    if (typeof checkParticipantsVisibility === 'function') {
+                        var typeIdMatch = field.id.match(/\d+$/);
+                        var tId = typeIdMatch ? typeIdMatch[0] : undefined;
+                        checkParticipantsVisibility(tId);
+                    }
+                    
+                    // Trigger change to make sure con4gis logic picks it up
+                    // But only if we are not already evaluating participants to avoid loops
+                    if (!isEvaluatingParticipants && typeof eventFire === 'function') {
+                        eventFire(field, 'change');
+                    }
+                }
+            }
+        }
+
+        // Safety loop for the first few seconds
+        if (!window.c4gSafetyLoopStarted) {
+            window.c4gSafetyLoopStarted = true;
+            var safetyCount = 0;
+            var safetyInterval = setInterval(function() {
+                safetyCount++;
+                var currentType = document.querySelector('select[name*="reservation_type"]');
+                if (typeof checkParticipantsVisibility === 'function') {
+                    checkParticipantsVisibility(currentType ? currentType.value : undefined);
+                }
+                if (safetyCount >= 10) clearInterval(safetyInterval);
+            }, 1000);
+        }
     }
 
     if (document.readyState === 'loading') {
@@ -1271,17 +1515,66 @@ function eventFire(el, etype) {
     initReservation();
     
     // Also retry after a short delay to account for dynamic content
-    setTimeout(initReservation, 50);
     setTimeout(initReservation, 100);
-    setTimeout(initReservation, 250);
     setTimeout(initReservation, 500);
-    setTimeout(initReservation, 1000);
     setTimeout(initReservation, 2000);
-    setTimeout(initReservation, 3000);
     setTimeout(initReservation, 5000);
     
     // Listen for AJAX reloads from con4gis core
     jQuery(document).on('c4g:afterAjaxLoad', function() {
         initReservation();
     });
+
+    // Handle pageshow event to catch back/forward cache (bfcache)
+    window.addEventListener('pageshow', function(event) {
+        initReservation();
+        if (event.persisted) {
+            // If page was loaded from cache, wait a bit longer for all scripts to re-init
+            setTimeout(initReservation, 100);
+            setTimeout(initReservation, 500);
+        }
+    });
+    
+    // Some CMS-specific events or generic ones
+    window.addEventListener('load', initReservation);
+    document.addEventListener('readystatechange', function() {
+        if (document.readyState === 'complete') {
+            initReservation();
+        }
+    });
+    // Watch for dynamic con4gis form changes
+    if (typeof MutationObserver !== 'undefined') {
+        var observer = new MutationObserver(function(mutations) {
+            var needsCheck = false;
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    for(var n=0; n<mutation.addedNodes.length; n++) {
+                        var node = mutation.addedNodes[n];
+                        if (node.nodeType === 1) { // Element node
+                            var nodeText = (node.id || "") + (node.className || "");
+                            var hasCon4gis = typeof nodeText === 'string' && (nodeText.indexOf('c4g') !== -1 || nodeText.indexOf('participants') !== -1 || nodeText.indexOf('Participant') !== -1);
+                            if (hasCon4gis || node.querySelector('[id*="c4g"], [class*="c4g"], [id*="participants"]')) {
+                                needsCheck = true;
+                                break;
+                            }
+                        }
+                    }
+                } else if (mutation.type === 'attributes') {
+                    var target = mutation.target;
+                    var tText = (target.id || "") + (target.className || "");
+                    if (typeof tText === 'string' && (tText.indexOf('c4g') !== -1 || tText.indexOf('participants') !== -1 || tText.indexOf('Participant') !== -1)) {
+                        needsCheck = true;
+                    }
+                }
+                if (needsCheck) return;
+            });
+            if (needsCheck) {
+                setTimeout(function() {
+                    var currentType = document.querySelector('select[name*="reservation_type"]');
+                    checkParticipantsVisibility(currentType ? currentType.value : undefined);
+                }, 100);
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+    }
 })();

@@ -2199,7 +2199,12 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                             }
 
                             $reservationParticipants->setNotificationField(false);
-                            $reservationParticipants->setShowFirstDataSet(true);
+                            if (isset($_GET['event']) && intval($_GET['event']) > 0) {
+                                $reservationParticipants->setShowFirstDataSet(true);
+                                $reservationParticipants->setInitInvisible(false);
+                            } else {
+                                $reservationParticipants->setShowFirstDataSet(true);
+                            }
                             $reservationParticipants->setParentFieldList($fieldList);
                             $reservationParticipants->setDelimiter('§');
                             $reservationParticipants->setWildcard('³'); //ToDo Test
@@ -2239,6 +2244,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                         $reservationParticipants->setParentFieldList($fieldList);
                                         $reservationParticipants->setDelimiter('§');
                                         $reservationParticipants->setCondition(array($condition, $newCondition));
+                                        if (isset($_GET['event']) && intval($_GET['event']) > 0) {
+                                            $reservationParticipants->setShowFirstDataSet(true);
+                                            $reservationParticipants->setInitInvisible(false);
+                                        }
                                         if ($i === $start) {
                                             $reservationParticipants->setRemoveWithEmptyCondition(false);
                                         } else {
@@ -2274,6 +2283,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                 $showCount = $maxCapacity <= 10 ? $maxCapacity : 10;
                                 if ($showCount > 0) {
                                     $reservationParticipants->setShowDataSetsByCount($showCount);
+                                    if (isset($_GET['event']) && intval($_GET['event']) > 0) {
+                                        $reservationParticipants->setShowFirstDataSet(true);
+                                        $reservationParticipants->setInitInvisible(false);
+                                    }
                                     $reservationParticipants->setParentFieldList($fieldList);
                                     $reservationParticipants->setDelimiter('§');
                                     $reservationParticipants->setCondition(array($condition));
@@ -4304,19 +4317,19 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'city' => '',
             'organisation' => '',
             'company' => '',
-            'description' => (isset($putVars['description']) && $putVars['description'] !== '0') ? $putVars['description'] : '',
-            'location' => (isset($putVars['location']) && $putVars['location'] !== '0') ? $putVars['location'] : '',
+            'description' => (isset($putVars['description']) && $putVars['description'] !== '0' && $putVars['description'] !== 0) ? $putVars['description'] : ' ',
+            'location' => (isset($putVars['location']) && $putVars['location'] !== '0' && $putVars['location'] !== 0) ? $putVars['location'] : ' ',
             'desiredCapacity' => $desiredCapacity ?: 1,
-            'reservation_title' => (isset($putVars['reservation_title']) && $putVars['reservation_title'] !== '0') ? $putVars['reservation_title'] : '',
-            'beginDate' => (isset($putVars['beginDate']) && $putVars['beginDate'] !== '0') ? $putVars['beginDate'] : '',
-            'beginTime' => (isset($putVars['beginTime']) && $putVars['beginTime'] !== '0') ? $putVars['beginTime'] : '',
-            'endDate' => (isset($putVars['endDate']) && $putVars['endDate'] !== '0') ? $putVars['endDate'] : '',
-            'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '0') ? $putVars['endTime'] : '',
-            'participantList' => (isset($putVars['participantList']) && $putVars['participantList'] !== '0') ? $putVars['participantList'] : '',
+            'reservation_title' => (isset($putVars['reservation_title']) && $putVars['reservation_title'] !== '0' && $putVars['reservation_title'] !== 0) ? $putVars['reservation_title'] : ' ',
+            'beginDate' => (isset($putVars['beginDate']) && $putVars['beginDate'] !== '0' && $putVars['beginDate'] !== 0) ? $putVars['beginDate'] : ' ',
+            'beginTime' => (isset($putVars['beginTime']) && $putVars['beginTime'] !== '0' && $putVars['beginTime'] !== 0) ? $putVars['beginTime'] : ' ',
+            'endDate' => (isset($putVars['endDate']) && $putVars['endDate'] !== '0' && $putVars['endDate'] !== 0) ? $putVars['endDate'] : ' ',
+            'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '0' && $putVars['endTime'] !== 0) ? $putVars['endTime'] : ' ',
+            'participantList' => (isset($putVars['participantList']) && $putVars['participantList'] !== '0' && $putVars['participantList'] !== 0) ? $putVars['participantList'] : ' ',
             'priceSum' => $putVars['priceSum'] ?? '0,00 €',
-            'priceDiscount' => $putVars['priceDiscount'] ?? '0,00 €',
-            'discountPercent' => $putVars['discountPercent'] ?? 0,
-            'discountCode' => $putVars['discountCode'] ?? '',
+            'priceDiscount' => (isset($putVars['priceDiscount']) && $putVars['priceDiscount'] !== '0' && $putVars['priceDiscount'] !== 0) ? $putVars['priceDiscount'] : '0,00 €',
+            'discountPercent' => (isset($putVars['discountPercent']) && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0) ? $putVars['discountPercent'] : ' ',
+            'discountCode' => (isset($putVars['discountCode']) && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0) ? $putVars['discountCode'] : ' ',
             'conferenceLink' => $putVars['conferenceLink'] ?? '',
             'documentId' => $putVars['documentId'] ?? '',
         ];
@@ -4503,19 +4516,19 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'city' => '',
             'organisation' => '',
             'company' => '',
-            'description' => $putVars['description'] ?? '',
-            'location' => $putVars['location'] ?? '',
+            'description' => (isset($putVars['description']) && $putVars['description'] !== '0' && $putVars['description'] !== 0) ? $putVars['description'] : ' ',
+            'location' => (isset($putVars['location']) && $putVars['location'] !== '0' && $putVars['location'] !== 0) ? $putVars['location'] : ' ',
             'desiredCapacity' => $desiredCapacity ?? 1,
-            'reservation_title' => $putVars['reservation_title'] ?? '',
-            'beginDate' => $putVars['beginDate'] ?? '',
-            'beginTime' => $putVars['beginTime'] ?? '',
-            'endDate' => $putVars['endDate'] ?? '',
-            'endTime' => $putVars['endTime'] ?? '',
-            'participantList' => $putVars['participantList'] ?? '',
+            'reservation_title' => (isset($putVars['reservation_title']) && $putVars['reservation_title'] !== '0' && $putVars['reservation_title'] !== 0) ? $putVars['reservation_title'] : ' ',
+            'beginDate' => (isset($putVars['beginDate']) && $putVars['beginDate'] !== '0' && $putVars['beginDate'] !== 0) ? $putVars['beginDate'] : ' ',
+            'beginTime' => (isset($putVars['beginTime']) && $putVars['beginTime'] !== '0' && $putVars['beginTime'] !== 0) ? $putVars['beginTime'] : ' ',
+            'endDate' => (isset($putVars['endDate']) && $putVars['endDate'] !== '0' && $putVars['endDate'] !== 0) ? $putVars['endDate'] : ' ',
+            'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '0' && $putVars['endTime'] !== 0) ? $putVars['endTime'] : ' ',
+            'participantList' => (isset($putVars['participantList']) && $putVars['participantList'] !== '0' && $putVars['participantList'] !== 0) ? $putVars['participantList'] : ' ',
             'priceSum' => $putVars['priceSum'] ?? '0,00 €',
-            'priceDiscount' => $putVars['priceDiscount'] ?? '0,00 €',
-            'discountPercent' => $putVars['discountPercent'] ?? 0,
-            'discountCode' => $putVars['discountCode'] ?? '',
+            'priceDiscount' => (isset($putVars['priceDiscount']) && $putVars['priceDiscount'] !== '0' && $putVars['priceDiscount'] !== 0) ? $putVars['priceDiscount'] : '0,00 €',
+            'discountPercent' => (isset($putVars['discountPercent']) && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0) ? $putVars['discountPercent'] : ' ',
+            'discountCode' => (isset($putVars['discountCode']) && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0) ? $putVars['discountCode'] : ' ',
             'conferenceLink' => $putVars['conferenceLink'] ?? '',
             'documentId' => $putVars['documentId'] ?? '',
             'icsFilename' => $putVars['icsFilename'] ?? '',

@@ -136,15 +136,15 @@ class C4gReservationConfirmation
                             $c4gNotify->setTokenValue('contact_website', ($organizer && isset($organizer['contact_website'])) ? $organizer['contact_website'] : false);
                         }
 
-                        $c4gNotify->setTokenValue('reservation_type', ($type['caption'] ?? '') ?: ($type['name'] ?? ''));
+                        $c4gNotify->setTokenValue('reservation_type', ($type['caption'] ?? '') ?: ($type['name'] ?? ' '));
                         $c4gNotify->setTokenValue('reservation_type_id', $reservationType);
 
                         if (($reservationObjectType == '2') || ($reservationObjectType == 2)) {
-                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['title'] ?? '') ?: ($reservationObject['caption'] ?? ''));
-                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['title'] ?? '') ?: ($reservationObject['caption'] ?? ''));
+                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['title'] ?? '') ?: (($reservationObject['caption'] ?? '') ?: ' '));
+                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['title'] ?? '') ?: (($reservationObject['caption'] ?? '') ?: ' '));
                         } else {
-                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['caption'] ?? '') ?: ($reservationObject['title'] ?? ''));
-                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['caption'] ?? '') ?: ($reservationObject['title'] ?? ''));
+                            $c4gNotify->setTokenValue('reservation_object', ($reservationObject['caption'] ?? '') ?: (($reservationObject['title'] ?? '') ?: ' '));
+                            $c4gNotify->setTokenValue('reservation_title', ($reservationObject['caption'] ?? '') ?: (($reservationObject['title'] ?? '') ?: ' '));
                         }
 
                         $memberId = ($reservationObject['member_id'] ?? '') ?: ($reservation['member_id'] ?? '');
@@ -434,9 +434,9 @@ class C4gReservationConfirmation
                             $c4gNotify->setTokenValue('priceSum', $priceSum);
                         }
 
-                        $c4gNotify->setTokenValue('discountPercent', ($reservation['discountPercent'] ?? '') ?: ($eventObject['discountPercent'] ?? ''));
-                        $c4gNotify->setTokenValue('discountCode', ($reservation['discountCode'] ?? '') ?: ($eventObject['discountCode'] ?? ''));
-                        $c4gNotify->setTokenValue('priceDiscount', $reservation['priceDiscount'] ?? '');
+                        $c4gNotify->setTokenValue('discountPercent', ($reservation['discountPercent'] ?? '') ?: (($eventObject['discountPercent'] ?? '') ?: ' '));
+                        $c4gNotify->setTokenValue('discountCode', ($reservation['discountCode'] ?? '') ?: (($eventObject['discountCode'] ?? '') ?: ' '));
+                        $c4gNotify->setTokenValue('priceDiscount', ($reservation['priceDiscount'] ?? '') ?: ' ');
 
                         if ($reservationObject['documentId']) {
                             $c4gNotify->setTokenValue('documentId', $reservation['documentId']);
