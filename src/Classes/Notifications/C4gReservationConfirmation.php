@@ -76,7 +76,7 @@ class C4gReservationConfirmation
                             'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment',
                             'additional1', 'additional2', 'additional3', 'location', 'contact_name', 'contact_phone', 'contact_street',
                             'contact_postal', 'contact_city', 'reservation_id', 'agreed', 'discountPercent', 'discountCode',
-                            'priceDiscount', 'documentId', 'uploadFile'
+                            'priceDiscount', 'documentId', 'uploadFile', 'icsFilename'
                         ]
                     ];
                     $c4gNotify = new C4GNotification($configuration);
@@ -102,7 +102,7 @@ class C4gReservationConfirmation
                             'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment',
                             'additional1', 'additional2', 'additional3', 'location', 'contact_name', 'contact_phone', 'contact_street',
                             'contact_postal', 'contact_city', 'reservation_id', 'agreed', 'discountPercent', 'discountCode',
-                            'priceDiscount', 'documentId', 'uploadFile', 'reservation_object', 'reservation_title', 'reservation_type_id'
+                            'priceDiscount', 'documentId', 'uploadFile', 'reservation_object', 'reservation_title', 'reservation_type_id', 'icsFilename'
                         ]);
                         if (($reservationObjectType == '2') || ($reservationObjectType == 2)) {
                             $c4gNotify->setTokenValue('reservation_object', ($reservationObject['title'] ?? '') ?: ($reservationObject['caption'] ?? ''));
@@ -172,7 +172,7 @@ class C4gReservationConfirmation
                             'priceOptionSumNet', 'priceOptionSumTax', 'reservationTaxRate',
                             'conferenceLink', 'speaker', 'topic', 'audience', 'internal_comment',
                             'included_params', 'additional_params', 'participant_params',
-                            'documentId', 'dbkey'
+                            'documentId', 'dbkey', 'icsFilename'
                         ];
 
                         foreach ($fieldMap as $field) {
@@ -515,7 +515,7 @@ class C4gReservationConfirmation
                                 'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'agreed',
                                 'description', 'additional1', 'additional2', 'additional3','member_email', 'conferenceLink',
                                 'price','priceTax','priceSum','priceSumTax','priceNet','priceSumNet', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax',
-                                'priceDiscount', 'discountCode', 'discountPercent', 'documentId', 'reservationTaxRate', 'dbkey', 'reservation_type_id'
+                                'priceDiscount', 'discountCode', 'discountPercent', 'documentId', 'reservationTaxRate', 'dbkey', 'reservation_type_id', 'icsFilename'
                             ]
                         );
 

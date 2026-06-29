@@ -787,6 +787,14 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'eval' => array('rgxp'=>'datim', 'doNotCopy'=>true, 'tl_class'=>'w50', 'disabled'=>true)
         ),
 
+        'icsFilename' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['fe_c4g_reservation']['icsFilename'],
+            'inputType'         => 'text',
+            'sql'               => "varchar(255) NOT NULL default ''",
+            'eval'              => array('doNotCopy'=>true, 'tl_class'=>'w50', 'disabled'=>true)
+        ),
+
         'qrContent' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['qrContent'],

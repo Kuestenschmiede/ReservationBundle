@@ -2498,13 +2498,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $contact_city->setPrintable(true);
         $fieldList[] = $contact_city;
 
-        $contact_city = new C4GTextField();
-        $contact_city->setFieldName('icsFilename');
-        $contact_city->setTableColumn(false);
-        $contact_city->setFormField(false);
-        $contact_city->setNotificationField(true);
-        $contact_city->setPrintable(true);
-        $fieldList[] = $contact_city;
+        $icsFilenameField = new C4GTextField();
+        $icsFilenameField->setFieldName('icsFilename');
+        $icsFilenameField->setTableColumn(true);
+        $icsFilenameField->setFormField(false);
+        $icsFilenameField->setNotificationField(true);
+        $icsFilenameField->setPrintable(true);
+        $fieldList[] = $icsFilenameField;
 
         $memberId = new C4GTextField();
         $memberId->setFieldName('member_id');
@@ -5246,6 +5246,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
     }
 
     public static function allPrices($settings, &$putVars, $reservationObject, $reservationEventObject, $reservationType, $isEvent, $desiredCapacity) {
+        $adminEmail = $putVars['admin_email'] ?? (\Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? ''));
         $calcTaxes = $settings->showPricesWithTaxes ?: false;
         $showPrices = $settings->showPrices ?: false;
         if ($isEvent) {
@@ -6104,7 +6105,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $priceTax = floatval($price) - $priceNet;
                 }
 
-                $putVars['reservationTaxRate'] = $priceArray['reservationTaxRate'];
+                $putVars['reservationTaxRate'] = $priceArray['reservationTaxRate'] ?? $putVars['reservationTaxRate'] ?? 0;
                 $putVars['priceNet'] = C4gReservationHandler::formatPrice($priceNet);
                 $putVars['priceTax'] = C4gReservationHandler::formatPrice($priceTax);
 
