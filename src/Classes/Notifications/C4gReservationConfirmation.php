@@ -126,7 +126,7 @@ class C4gReservationConfirmation
 
                         $adminEmail = ($reservation['admin_email'] ?? '') ?: (($organizer && ($organizer['admin_email'] ?? '')) ? $organizer['admin_email'] : (($location && ($location['admin_email'] ?? '')) ? $location['admin_email'] : (\Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? ''))));
                         if (!$adminEmail || !strpos($adminEmail, '@')) {
-                            $adminEmail = \Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? 'info@con4gis.org');
+                            $adminEmail = \Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? '');
                         }
                         $c4gNotify->setTokenValue('admin_email', $adminEmail);
                         $c4gNotify->setTokenValue('email', ($reservation['email'] ?? '') ?: ' ');
