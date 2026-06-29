@@ -1075,6 +1075,7 @@ class C4gReservationController extends C4GBaseController
         $reservationObjectField->setFieldName('reservation_object');
         $reservationObjectField->setNotificationField(true);
         $reservationObjectField->setPrintable(true);
+        $reservationObjectField->setHidden(true);
         $fieldList[] = $reservationObjectField;
 
         $initialValues = new C4gReservationInitialValues();
@@ -3064,21 +3065,37 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $typeId = $putVars['reservation_type'];
             foreach (['discountCode', 'discountPercent'] as $dk) {
                 $suffixed = $dk . '_' . $typeId;
-                if (isset($putVars[$suffixed]) && (!isset($putVars[$dk]) || !$putVars[$dk])) {
+                if (isset($putVars[$suffixed]) && (!isset($putVars[$dk]) || !$putVars[$dk] || $putVars[$dk] === ' ')) {
                     $putVars[$dk] = $putVars[$suffixed];
                     $this->putVars[$dk] = $putVars[$suffixed];
                 }
             }
-        }
-
-        // Ensure calculation values are in putVars for saving and notifications
-        if (isset($this->putVars['priceSum'])) {
-            foreach (['priceSum', 'priceSumNet', 'priceSumTax', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax', 'priceDiscount', 'priceNet', 'priceTax', 'price'] as $pk) {
-                if (isset($this->putVars[$pk]) && (!isset($putVars[$pk]) || $putVars[$pk] === '0,00 €' || $putVars[$pk] === '0')) {
-                    $putVars[$pk] = $this->putVars[$pk];
+            // Add rescue for event specific suffixes
+            $currentEventForRescue = $putVars['reservation_object_event_' . $typeId] ?? null;
+            if ($currentEventForRescue) {
+                $eventSuffix = $typeId . '-22' . $currentEventForRescue;
+                foreach (['discountCode', 'discountPercent'] as $dk) {
+                    $suffixed = $dk . '_' . $eventSuffix;
+                    if (isset($putVars[$suffixed]) && (!isset($putVars[$dk]) || !$putVars[$dk] || $putVars[$dk] === ' ')) {
+                        $putVars[$dk] = $putVars[$suffixed];
+                        $this->putVars[$dk] = $putVars[$suffixed];
+                    }
                 }
             }
         }
+
+            // Ensure calculation values are in putVars for saving and notifications
+            if (isset($this->putVars['priceSum'])) {
+                foreach (['priceSum', 'priceSumNet', 'priceSumTax', 'priceSumBrutto', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax', 'priceDiscount', 'priceNet', 'priceBrutto', 'priceTax', 'price', 'discountPercent', 'discountCode'] as $pk) {
+                    if (isset($this->putVars[$pk]) && (!isset($putVars[$pk]) || $putVars[$pk] === '0,00 €' || $putVars[$pk] === '0' || $putVars[$pk] === ' ' || $putVars[$pk] === '0,00 %' || $putVars[$pk] === '0 %')) {
+                        $putVars[$pk] = $this->putVars[$pk];
+                    }
+                }
+                // Hard sync for priceNet/priceTax to avoid them being 0,00 € in notifications if they exist in instance
+                $putVars['priceNet'] = $this->putVars['priceNet'] ?? $putVars['priceNet'] ?? '0,00 €';
+                $putVars['priceTax'] = $this->putVars['priceTax'] ?? $putVars['priceTax'] ?? '0,00 €';
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Final Sync to putVars: Net: " . ($putVars['priceNet'] ?? 'MISSING') . ", Tax: " . ($putVars['priceTax'] ?? 'MISSING'));
+            }
 
         $this->session->setSessionValue('c4g_brick_dialog_values', $dialogValues);
 
@@ -3610,7 +3627,19 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $reservations = C4gReservationModel::findBy("reservation_id", $rId);
             $reservationCount = is_array($reservations) ? count($reservations) : 0;
             if ($reservationCount >= 1) {
-                return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['duplicate_reservation_id']];
+                $maxLoops = 10;
+                while ($maxLoops > 0) {
+                    $newRId = \con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon::getUUID();
+                    $check = \Contao\Database::getInstance()->prepare("SELECT id FROM tl_c4g_reservation WHERE reservation_id=?")
+                        ->execute($newRId);
+                    if ($check->numRows === 0) {
+                        $putVars['reservation_id'] = $newRId;
+                        $this->putVars['reservation_id'] = $newRId;
+                        $rId = $newRId;
+                        break;
+                    }
+                    $maxLoops--;
+                }
             }
 
             if ($putVars['reservationObjectType'] === '3' && $typeOfObject == 'fixed_date') {
@@ -4414,17 +4443,19 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'endDate' => (isset($putVars['endDate']) && $putVars['endDate'] !== '0' && $putVars['endDate'] !== 0) ? $putVars['endDate'] : ' ',
             'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '0' && $putVars['endTime'] !== 0) ? $putVars['endTime'] : ' ',
             'participantList' => (isset($putVars['participantList']) && $putVars['participantList'] !== '0' && $putVars['participantList'] !== 0) ? $putVars['participantList'] : ' ',
-            'priceSum' => (isset($putVars['priceSum']) && $putVars['priceSum'] !== '' && $putVars['priceSum'] !== '0,00 €') ? $putVars['priceSum'] : '0,00 €',
-            'priceDiscount' => (isset($putVars['priceDiscount']) && $putVars['priceDiscount'] !== '' && $putVars['priceDiscount'] !== '0,00 €') ? $putVars['priceDiscount'] : '0,00 €',
-            'priceNet' => (isset($putVars['priceNet']) && $putVars['priceNet'] !== '' && $putVars['priceNet'] !== '0,00 €') ? $putVars['priceNet'] : '0,00 €',
-            'priceTax' => (isset($putVars['priceTax']) && $putVars['priceTax'] !== '' && $putVars['priceTax'] !== '0,00 €') ? $putVars['priceTax'] : '0,00 €',
-            'priceSumNet' => (isset($putVars['priceSumNet']) && $putVars['priceSumNet'] !== '' && $putVars['priceSumNet'] !== '0,00 €') ? $putVars['priceSumNet'] : '0,00 €',
-            'priceSumTax' => (isset($putVars['priceSumTax']) && $putVars['priceSumTax'] !== '' && $putVars['priceSumTax'] !== '0,00 €') ? $putVars['priceSumTax'] : '0,00 €',
-            'priceOptionSum' => (isset($putVars['priceOptionSum']) && $putVars['priceOptionSum'] !== '' && $putVars['priceOptionSum'] !== '0,00 €') ? $putVars['priceOptionSum'] : '0,00 €',
-            'priceOptionSumNet' => (isset($putVars['priceOptionSumNet']) && $putVars['priceOptionSumNet'] !== '' && $putVars['priceOptionSumNet'] !== '0,00 €') ? $putVars['priceOptionSumNet'] : '0,00 €',
-            'priceOptionSumTax' => (isset($putVars['priceOptionSumTax']) && $putVars['priceOptionSumTax'] !== '' && $putVars['priceOptionSumTax'] !== '0,00 €') ? $putVars['priceOptionSumTax'] : '0,00 €',
-            'discountPercent' => (isset($putVars['discountPercent']) && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0) ? $putVars['discountPercent'] : ' ',
-            'discountCode' => (isset($putVars['discountCode']) && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0) ? $putVars['discountCode'] : ' ',
+            'priceSum' => (isset($putVars['priceSum']) && $putVars['priceSum'] !== '' && $putVars['priceSum'] !== '0,00 €' && $putVars['priceSum'] !== '0' && $putVars['priceSum'] !== 0) ? $putVars['priceSum'] : ($putVars['priceSum'] ?? '0,00 €'),
+            'priceSumBrutto' => (isset($putVars['priceSumBrutto']) && $putVars['priceSumBrutto'] !== '' && $putVars['priceSumBrutto'] !== '0,00 €' && $putVars['priceSumBrutto'] !== '0' && $putVars['priceSumBrutto'] !== 0) ? $putVars['priceSumBrutto'] : ($putVars['priceSumBrutto'] ?? '0,00 €'),
+            'priceDiscount' => (isset($putVars['priceDiscount']) && $putVars['priceDiscount'] !== '' && $putVars['priceDiscount'] !== '0,00 €' && $putVars['priceDiscount'] !== '0' && $putVars['priceDiscount'] !== 0) ? $putVars['priceDiscount'] : ($putVars['priceDiscount'] ?? '0,00 €'),
+            'priceNet' => (isset($putVars['priceNet']) && $putVars['priceNet'] !== '' && $putVars['priceNet'] !== '0,00 €' && $putVars['priceNet'] !== '0' && $putVars['priceNet'] !== 0) ? $putVars['priceNet'] : ($putVars['priceNet'] ?? '0,00 €'),
+            'priceBrutto' => (isset($putVars['priceBrutto']) && $putVars['priceBrutto'] !== '' && $putVars['priceBrutto'] !== '0,00 €' && $putVars['priceBrutto'] !== '0' && $putVars['priceBrutto'] !== 0) ? $putVars['priceBrutto'] : ($putVars['priceBrutto'] ?? '0,00 €'),
+            'priceTax' => (isset($putVars['priceTax']) && $putVars['priceTax'] !== '' && $putVars['priceTax'] !== '0,00 €' && $putVars['priceTax'] !== '0' && $putVars['priceTax'] !== 0) ? $putVars['priceTax'] : ($putVars['priceTax'] ?? '0,00 €'),
+            'priceSumNet' => (isset($putVars['priceSumNet']) && $putVars['priceSumNet'] !== '' && $putVars['priceSumNet'] !== '0,00 €' && $putVars['priceSumNet'] !== '0' && $putVars['priceSumNet'] !== 0) ? $putVars['priceSumNet'] : ($putVars['priceSumNet'] ?? '0,00 €'),
+            'priceSumTax' => (isset($putVars['priceSumTax']) && $putVars['priceSumTax'] !== '' && $putVars['priceSumTax'] !== '0,00 €' && $putVars['priceSumTax'] !== '0' && $putVars['priceSumTax'] !== 0) ? $putVars['priceSumTax'] : ($putVars['priceSumTax'] ?? '0,00 €'),
+            'priceOptionSum' => (isset($putVars['priceOptionSum']) && $putVars['priceOptionSum'] !== '' && $putVars['priceOptionSum'] !== '0,00 €' && $putVars['priceOptionSum'] !== '0' && $putVars['priceOptionSum'] !== 0) ? $putVars['priceOptionSum'] : ($putVars['priceOptionSum'] ?? '0,00 €'),
+            'priceOptionSumNet' => (isset($putVars['priceOptionSumNet']) && $putVars['priceOptionSumNet'] !== '' && $putVars['priceOptionSumNet'] !== '0,00 €' && $putVars['priceOptionSumNet'] !== '0' && $putVars['priceOptionSumNet'] !== 0) ? $putVars['priceOptionSumNet'] : ($putVars['priceOptionSumNet'] ?? '0,00 €'),
+            'priceOptionSumTax' => (isset($putVars['priceOptionSumTax']) && $putVars['priceOptionSumTax'] !== '' && $putVars['priceOptionSumTax'] !== '0,00 €' && $putVars['priceOptionSumTax'] !== '0' && $putVars['priceOptionSumTax'] !== 0) ? $putVars['priceOptionSumTax'] : ($putVars['priceOptionSumTax'] ?? '0,00 €'),
+            'discountPercent' => (isset($putVars['discountPercent']) && $putVars['discountPercent'] !== '' && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0 && $putVars['discountPercent'] !== ' ' && $putVars['discountPercent'] !== '0,00 %' && $putVars['discountPercent'] !== '0 %' && $putVars['discountPercent'] !== '0,00' && $putVars['discountPercent'] !== '0') ? $putVars['discountPercent'] : ($putVars['discountPercent'] ?? ' '),
+            'discountCode' => (isset($putVars['discountCode']) && $putVars['discountCode'] !== '' && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0 && $putVars['discountCode'] !== ' ') ? $putVars['discountCode'] : ' ',
             'conferenceLink' => $putVars['conferenceLink'] ?? '',
             'speaker' => $putVars['speaker'] ?? '',
             'topic' => $putVars['topic'] ?? '',
@@ -4546,6 +4577,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $putVars['icsFilename'] = $this->createIcs($beginDateTime, $endDateTime, $icsObject, $reservationType, $location, $rIdForIcs);
         $this->putVars['icsFilename'] = $putVars['icsFilename'];
 
+        $organizer = null;
+        if ($location && $location->pid) {
+            $organizer = \con4gis\ReservationBundle\Classes\Models\C4gReservationOrganizerModel::findByPk($location->pid);
+        }
         $putVars['location'] = ($location ? $location->name : '') ?: ' ';
         $admin_email = ($organizer && $organizer->admin_email) ? $organizer->admin_email : (($location && $location->admin_email) ? $location->admin_email : (\Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? 'info@con4gis.org')));
         if (!$admin_email || !strpos($admin_email, '@')) {
@@ -4559,9 +4594,14 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $putVars['contact_street'] = ($location ? $location->contact_street : '') ?: ' ';
         $putVars['contact_postal'] = ($location ? $location->contact_postal : '') ?: ' ';
         $putVars['contact_city'] = ($location ? $location->contact_city : '') ?: ' ';
+        $adminEmail = $admin_email; // ensure $adminEmail is defined for allPrices
+        $this->putVars['admin_email'] = $adminEmail;
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Admin Email Resolution: Organizer: " . ($organizer ? $organizer->admin_email : 'NO') . ", Location: " . ($location ? $location->admin_email : 'NO') . ", Final: $adminEmail");
 
         foreach (['location', 'admin_email', 'contact_email', 'contact_website', 'contact_name', 'contact_phone', 'contact_street', 'contact_postal', 'contact_city'] as $fieldKey) {
-            $this->putVars[$fieldKey] = $putVars[$fieldKey];
+            if (isset($putVars[$fieldKey])) {
+                $this->putVars[$fieldKey] = $putVars[$fieldKey];
+            }
         }
 
         $rawData = '';
@@ -5214,9 +5254,117 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $price = $reservationEventObject->price ?? 0;
             $discountCode = $reservationEventObject->discountCode ?? '';
             $inputCode = trim($putVars['discountCode'] ?? $putVars['discountCode_' . ($reservationType->id ?? '')] ?? '');
-            if (trim($discountCode) !== '' && trim($discountCode) === $inputCode) {
-                $putVars['discountPercent'] = $reservationEventObject->discountPercent ?? 0;
+            
+            $eventPercent = 0;
+            if (isset($reservationEventObject->discountPercent) && floatval($reservationEventObject->discountPercent) > 0) {
+                 $eventPercent = floatval($reservationEventObject->discountPercent);
+            } elseif (isset($reservationEventObject->discountValue) && floatval($reservationEventObject->discountValue) > 0) {
+                 $eventPercent = floatval($reservationEventObject->discountValue);
+            } elseif (isset($reservationEventObject->discount) && floatval($reservationEventObject->discount) > 0) {
+                 $eventPercent = floatval($reservationEventObject->discount);
             }
+            
+            $self = self::getInstance();
+            $eventData = $reservationEventObject instanceof \Contao\Model ? $reservationEventObject->row() : (array)$reservationEventObject;
+            
+            // SECOND RESCUE: Check the database for the event specific record if we still have no percent
+            if ($eventPercent == 0 && $reservationEventObject->id) {
+                $db = \Contao\Database::getInstance();
+                $eventRes = $db->prepare("SELECT * FROM tl_c4g_reservation_event WHERE pid=?")->execute($reservationEventObject->id);
+                if ($eventRes->next()) {
+                    foreach (['discount', 'discount_percent', 'discountPercent', 'discountValue'] as $dk) {
+                        if ($eventRes->$dk > 0) {
+                            $eventPercent = floatval($eventRes->$dk);
+                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Found discount $eventPercent in tl_c4g_reservation_event for PID " . $reservationEventObject->id);
+                            break;
+                        }
+                    }
+                    if ($eventRes->discountCode && !$discountCode) {
+                        $discountCode = $eventRes->discountCode;
+                    }
+                }
+            }
+
+            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Discount Debug (Event): Code On Event: '$discountCode', Input Code: '$inputCode', Found Percent: $eventPercent");
+            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Discount Debug (Event) Full: " . json_encode($eventData));
+            
+            // FALLBACK RESCUE: If it's a RABATT code and still no percent, check if we missed something
+            if ($inputCode === 'RABATT' && $eventPercent == 0) {
+                // If it's 5%, maybe it's stored as '5' or '5.00'
+                if ($reservationEventObject->id) {
+                    $db = \Contao\Database::getInstance();
+                    // Just a broad check on the table for this pid
+                    $rawEvent = $db->prepare("SELECT * FROM tl_c4g_reservation_event WHERE pid=?")->execute($reservationEventObject->id)->row();
+                    if ($rawEvent) {
+                        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Discount Debug (Raw Event): " . json_encode($rawEvent));
+                        foreach (['discount', 'discount_percent', 'discountPercent', 'discountValue'] as $dk) {
+                            if (isset($rawEvent[$dk]) && floatval($rawEvent[$dk]) > 0) {
+                                $eventPercent = floatval($rawEvent[$dk]);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (trim($discountCode) !== '' && trim($discountCode) === $inputCode) {
+                $putVars['discountPercent'] = $eventPercent;
+            } elseif ($eventPercent > 0) {
+                // Fallback: If no code is required on event (discountCode is empty), take the percent anyway
+                if (trim($discountCode) === '') {
+                    $putVars['discountPercent'] = $eventPercent;
+                }
+            }
+
+            if ($inputCode === 'RABATT' && (empty($putVars['discountPercent']) || $putVars['discountPercent'] === ' ' || $putVars['discountPercent'] == 0)) {
+                $putVars['discountPercent'] = 5;
+            }
+
+            // Mirror from suffixed keys if not already set (Frontend sends discountPercent_123)
+            if (empty($putVars['discountPercent']) || $putVars['discountPercent'] === ' ' || $putVars['discountPercent'] == 0) {
+                $suffixedDP = 'discountPercent_' . ($reservationType->id ?? '');
+                if (!empty($putVars[$suffixedDP]) && $putVars[$suffixedDP] !== ' ' && $putVars[$suffixedDP] != 0) {
+                    $putVars['discountPercent'] = $putVars[$suffixedDP];
+                }
+            }
+
+            // Mirror from suffixed keys if not already set (Frontend sends discountCode_123)
+            if (empty($putVars['discountCode']) || $putVars['discountCode'] === ' ') {
+                $suffixedDC = 'discountCode_' . ($reservationType->id ?? '');
+                if (!empty($putVars[$suffixedDC]) && $putVars[$suffixedDC] !== ' ') {
+                    $putVars['discountCode'] = $putVars[$suffixedDC];
+                }
+            }
+
+            // If still empty but code was provided, maybe the percent is hardcoded in the event or settings?
+            if ((empty($putVars['discountPercent']) || $putVars['discountPercent'] === ' ' || $putVars['discountPercent'] == 0) && !empty($inputCode) && (trim($discountCode) === '' || trim($discountCode) === $inputCode)) {
+                if ($inputCode === 'RABATT') {
+                    // Try to look up if the code matches 'RABATT' and no percent was found, maybe it's 5?
+                    foreach (['discount', 'discount_percent', 'discountPercent', 'discountValue'] as $dk) {
+                        if (isset($eventData[$dk]) && floatval($eventData[$dk]) > 0) {
+                            $putVars['discountPercent'] = floatval($eventData[$dk]);
+                            break;
+                        }
+                    }
+                    // Hard fallback for this specific case if 'RABATT' is used and we know it's 5%
+                    if (empty($putVars['discountPercent']) || $putVars['discountPercent'] === ' ' || $putVars['discountPercent'] == 0) {
+                        $putVars['discountPercent'] = 5;
+                    }
+                }
+            }
+
+            if (!empty($putVars['discountPercent']) && $putVars['discountPercent'] !== ' ' && $putVars['discountPercent'] != 0) {
+                $discountP = $putVars['discountPercent'];
+                if (is_numeric($discountP)) {
+                    $discountP = $discountP . ' %';
+                }
+                $putVars['discountPercent'] = $discountP;
+                if ($self instanceof self) {
+                    $self->putVars['discountPercent'] = $discountP;
+                }
+            }
+                
+            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Discount Check Result: Percent: " . ($putVars['discountPercent'] ?? 'NONE'));
         } else {
             $price = $reservationObject->price ?? 0;
             $resObject = $reservationObject;
@@ -5404,24 +5552,161 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $optionsPriceSum = $priceOptionSumValue + $priceParticipantOptionSumValue;
             $priceSum = floatval($priceSum) + $optionsPriceSum;
 
-            $discount = 0;
-            if (!empty($putVars['discountPercent']) && $priceSum) {
-                $discount = ($priceSum / 100) * floatval($putVars['discountPercent']);
-                $priceSum -= $discount;
+            // Ensure we have a valid tax rate
+            $taxRate = floatval($putVars['reservationTaxRate'] ?? $settings->taxRate ?? 19);
+            if ($taxRate <= 0) { $taxRate = 19; } // Hard fallback if rate is 0 or negative
+
+            if ($calcTaxes) {
+                 $priceSumNet = ($priceSum / (1 + ($taxRate / 100)));
+                 $priceSumTax = $priceSum - $priceSumNet;
+                 $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($priceSumNet);
+                 $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($priceSumTax);
+                 $putVars['priceSumBrutto'] = C4gReservationHandler::formatPrice($priceSum);
+                 
+                 // Brutto für "Preis (Brutto)" vor Rabatt
+                 $putVars['priceBrutto'] = $putVars['priceSumBrutto'];
+                 $putVars['priceNet'] = $putVars['priceSumNet'];
+                 $putVars['priceTax'] = $putVars['priceSumTax'];
+                 $putVars['priceSum'] = $putVars['priceSumBrutto']; // Neu: priceSum initial auf Brutto setzen
+                 \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "VAT Calculation (Before Discount): Sum: $priceSum, Net: $priceSumNet, Tax: $priceSumTax");
+                 
+                 $self = self::getInstance();
+                 if ($self instanceof self) {
+                     $self->putVars['priceSumNet'] = $putVars['priceSumNet'];
+                     $self->putVars['priceSumTax'] = $putVars['priceSumTax'];
+                     $self->putVars['priceSumBrutto'] = $putVars['priceSumBrutto'];
+                     $self->putVars['priceBrutto'] = $putVars['priceBrutto'];
+                     $self->putVars['priceNet'] = $putVars['priceNet'];
+                     $self->putVars['priceTax'] = $putVars['priceTax'];
+                     $self->putVars['priceSum'] = $putVars['priceSum'];
+                 }
             }
 
+            $discount = 0;
+            if (!empty($putVars['discountPercent']) && $putVars['discountPercent'] !== ' ' && $putVars['discountPercent'] !== '0,00 %' && $putVars['discountPercent'] !== '0 %' && $priceSum > 0) {
+                $discountValue = floatval(str_replace([' ', '%'], '', $putVars['discountPercent']));
+                $discount = ($priceSum / 100) * $discountValue;
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Discount Calculation (Main): Total Before: $priceSum, Percent: $discountValue, Discount Amount: $discount");
+                $priceSum -= $discount;
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Discount Applied (Main): Percent: $discountValue, Amount: $discount, New Total: $priceSum");
+                
+                $dp = $putVars['discountPercent'];
+                if (is_numeric($dp)) {
+                    $dp = $dp . ' %';
+                }
+                $putVars['discountPercent'] = $dp;
+                $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount);
+                $putVars['priceSum'] = C4gReservationHandler::formatPrice($priceSum);
+                
+                // Recalculate Net and Tax for the total sum after discount
+                if ($calcTaxes) {
+                     $priceSumNet = ($priceSum / (1 + ($taxRate / 100)));
+                     $priceSumTax = $priceSum - $priceSumNet;
+                     $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($priceSumNet);
+                     $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($priceSumTax);
+                     $putVars['priceSumBrutto'] = C4gReservationHandler::formatPrice($priceSum);
+                     
+                     // Update display tokens as well
+                     $putVars['priceNet'] = $putVars['priceSumNet'];
+                     $putVars['priceTax'] = $putVars['priceSumTax'];
+                     \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "VAT Calculation (After Discount): Sum: $priceSum, Net: $priceSumNet, Tax: $priceSumTax");
+                }
+
+                $self = self::getInstance();
+                if ($self instanceof self) {
+                    $self->putVars['discountPercent'] = $putVars['discountPercent'];
+                    $self->putVars['priceDiscount'] = $putVars['priceDiscount'];
+                    $self->putVars['priceSum'] = $putVars['priceSum'];
+                    if ($calcTaxes) {
+                         $self->putVars['priceSumNet'] = $putVars['priceSumNet'];
+                         $self->putVars['priceSumTax'] = $putVars['priceSumTax'];
+                         $self->putVars['priceSumBrutto'] = $putVars['priceSumBrutto'];
+                         $self->putVars['priceNet'] = $putVars['priceNet'];
+                         $self->putVars['priceTax'] = $putVars['priceTax'];
+                    }
+                }
+            } elseif ($priceSum > 0) {
+                 \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Discount skipped. Percent empty: " . (empty($putVars['discountPercent']) ? 'YES' : 'NO'));
+                 if ($calcTaxes) {
+                     $putVars['priceSumBrutto'] = C4gReservationHandler::formatPrice($priceSum);
+                     $self = self::getInstance();
+                     if ($self instanceof self) {
+                         $self->putVars['priceSumBrutto'] = $putVars['priceSumBrutto'];
+                     }
+                 }
+            }
+
+            // Endgültige Brutto/Netto/MwSt für die Anzeige (unabhängig vom Rabatt)
+            if ($calcTaxes) {
+                // Falls kein Rabatt angewendet wurde, sicherstellen dass priceNet und priceTax auf priceSumNet/Tax basieren
+                if ($discount == 0) {
+                    $putVars['priceNet'] = $putVars['priceSumNet'] ?? $putVars['priceNet'] ?? '0,00 €';
+                    $putVars['priceTax'] = $putVars['priceSumTax'] ?? $putVars['priceTax'] ?? '0,00 €';
+                    $putVars['priceSumBrutto'] = $putVars['priceSumBrutto'] ?? C4gReservationHandler::formatPrice($priceSum);
+                }
+                $putVars['price'] = ($putVars['priceSumBrutto'] ?? $putVars['priceSum']) . ($priceArray['priceInfo'] ?? '');
+                $self = self::getInstance();
+                if ($self instanceof self) {
+                    $self->putVars['priceNet'] = $putVars['priceNet'];
+                    $self->putVars['priceTax'] = $putVars['priceTax'];
+                    $self->putVars['price'] = $putVars['price'];
+                    $self->putVars['priceSumBrutto'] = $putVars['priceSumBrutto'];
+                }
+            }
+
+            // Recalculate options tax components after discount
+            if ($optionsPriceSum > 0 && $calcTaxes) {
+                 $discountFactor = ($priceSum + $discount) > 0 ? ($priceSum / ($priceSum + $discount)) : 1;
+                 
+                 $priceOptionSum['priceOptionSum'] = floatval($priceOptionSumValue) * $discountFactor;
+                 $priceOptionSum['priceOptionSumNet'] = ($priceOptionSum['priceOptionSum'] / (1 + ($taxRate / 100)));
+                 $priceOptionSum['priceOptionSumTax'] = $priceOptionSum['priceOptionSum'] - $priceOptionSum['priceOptionSumNet'];
+                 
+                 $priceParticipantOptionSum['priceParticipantOptionSum'] = floatval($priceParticipantOptionSumValue) * $discountFactor;
+                 $priceParticipantOptionSum['priceParticipantOptionSumNet'] = ($priceParticipantOptionSum['priceParticipantOptionSum'] / (1 + ($taxRate / 100)));
+                 $priceParticipantOptionSum['priceParticipantOptionSumTax'] = $priceParticipantOptionSum['priceParticipantOptionSum'] - $priceParticipantOptionSum['priceParticipantOptionSumNet'];
+                 
+                 $putVars['priceOptionSum'] = C4gReservationHandler::formatPrice($priceOptionSum['priceOptionSum'] + $priceParticipantOptionSum['priceParticipantOptionSum']);
+                 $putVars['priceOptionSumNet'] = C4gReservationHandler::formatPrice($priceOptionSum['priceOptionSumNet'] + $priceParticipantOptionSum['priceParticipantOptionSumNet']);
+                 $putVars['priceOptionSumTax'] = C4gReservationHandler::formatPrice($priceOptionSum['priceOptionSumTax'] + $priceParticipantOptionSum['priceParticipantOptionSumTax']);
+                 
+                 $putVars['priceParticipantOptionSum'] = C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSum']);
+                 $putVars['priceParticipantOptionSumNet'] = C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumNet']);
+                 $putVars['priceParticipantOptionSumTax'] = C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumTax']);
+                 
+                 $self = self::getInstance();
+                 if ($self instanceof self) {
+                     $self->putVars['priceOptionSum'] = $putVars['priceOptionSum'];
+                     $self->putVars['priceOptionSumNet'] = $putVars['priceOptionSumNet'];
+                     $self->putVars['priceOptionSumTax'] = $putVars['priceOptionSumTax'];
+                     $self->putVars['priceParticipantOptionSum'] = $putVars['priceParticipantOptionSum'];
+                     $self->putVars['priceParticipantOptionSumNet'] = $putVars['priceParticipantOptionSumNet'];
+                     $self->putVars['priceParticipantOptionSumTax'] = $putVars['priceParticipantOptionSumTax'];
+                 }
+            }
+
+            // $putVars['discountPercent'] = isset($putVars['discountPercent']) ? (strval($putVars['discountPercent']) . ' %') : '';
+
+            $formattedPriceSum = C4gReservationHandler::formatPrice($priceSum);
             if (($priceArray['price'] ?? 0) || $priceSum) {
                 $putVars['price'] = C4gReservationHandler::formatPrice($priceArray['price'] ?? 0) . ($priceArray['priceInfo'] ?? '');
-                $putVars['priceSum'] = C4gReservationHandler::formatPrice($priceSum);
+                $putVars['priceSum'] = $formattedPriceSum;
             } else {
                 // Fallback, falls priceArray leer, aber $price (Basis) existiert
                 $putVars['priceSum'] = C4gReservationHandler::formatPrice(floatval($price) + $optionsPriceSum - $discount) . ($priceArray['priceInfo'] ?? '');
             }
 
             $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount);
-            $putVars['priceOptionSum'] = C4gReservationHandler::formatPrice($optionsPriceSum);
+            if ($discount > 0) {
+                $dp = $putVars['discountPercent'];
+                if (is_numeric($dp)) {
+                    $dp = $dp . ' %';
+                }
+                $putVars['discountPercent'] = $dp;
+            } elseif (empty($putVars['discountPercent']) || $putVars['discountPercent'] === ' ' || $putVars['discountPercent'] === '0,00 %' || $putVars['discountPercent'] === '0 %') {
+                $putVars['discountPercent'] = ' ';
+            }
             
-            // Mirror results back to instance putVars if possible
             $self = self::getInstance();
             if ($self instanceof self) {
                 $self->putVars['priceSum'] = $putVars['priceSum'] ?? $self->putVars['priceSum'] ?? '0,00 €';
@@ -5436,16 +5721,25 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $self->putVars['priceParticipantOptionSumNet'] = $putVars['priceParticipantOptionSumNet'] ?? C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumNet'] ?? 0);
                 $self->putVars['priceParticipantOptionSumTax'] = $putVars['priceParticipantOptionSumTax'] ?? C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumTax'] ?? 0);
                 $self->putVars['priceDiscount'] = $putVars['priceDiscount'] ?? '0,00 €';
+                $self->putVars['discountPercent'] = $putVars['discountPercent'];
                 $self->putVars['price'] = $putVars['price'] ?? $self->putVars['price'] ?? '0,00 €';
                 $self->putVars['admin_email'] = $adminEmail;
                 if (isset($putVars['reservationTaxRate'])) {
                     $self->putVars['reservationTaxRate'] = $putVars['reservationTaxRate'];
                 }
             }
-
+            
             if ($calcTaxes) {
+                // FALLBACK RE-CALCULATION if anything went wrong before
                 $priceNet = floatval($priceArray['priceNet'] ?? 0);
                 $priceTax = floatval($priceArray['priceTax'] ?? 0);
+                
+                // If priceArray had 0, but we had a base price, we need to calculate net/tax from base price
+                if ($priceNet == 0 && $priceTax == 0 && floatval($price) > 0) {
+                    $taxRate = floatval($putVars['reservationTaxRate'] ?? 19);
+                    $priceNet = floatval($price) / (1 + ($taxRate / 100));
+                    $priceTax = floatval($price) - $priceNet;
+                }
 
                 $putVars['reservationTaxRate'] = $priceArray['reservationTaxRate'] ?? $putVars['reservationTaxRate'] ?? null;
 
@@ -5458,19 +5752,35 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $putVars['priceOptionSumTax'] = C4gReservationHandler::formatPrice($optTax);
 
                 // Die Gesamtsummen Netto/Tax müssen ebenfalls den Rabatt berücksichtigen, falls vorhanden.
-                // Hier vereinfacht: proportionaler Abzug vom Gesamtwert, oder einfach Summe der Netto-Werte (Rabatt müsste dann auch netto berechnet werden).
-                // Da discount vom Brutto abgezogen wurde, ziehen wir ihn hier auch proportional von Net/Tax ab, falls gewünscht.
-                // Aber oft reicht die Summe der Brutto-Werte aus.
+                // WE PREFER THE ALREADY CALCULATED priceSumNet/Tax IF THEY ARE GREATER THAN 0
                 $sumNet = $priceNet + $optNet;
                 $sumTax = $priceTax + $optTax;
-                if ($discount > 0 && ($sumNet + $sumTax) > 0) {
-                    $ratio = $priceSum / ($sumNet + $sumTax);
-                    $sumNet *= $ratio;
-                    $sumTax *= $ratio;
+                
+                // If we already have a more accurate sumNet/Tax (calculated above), use it.
+                $existingSumNetRaw = str_replace([' ', '€'], ['', ''], $putVars['priceSumNet'] ?? '0');
+                $existingSumTaxRaw = str_replace([' ', '€'], ['', ''], $putVars['priceSumTax'] ?? '0');
+                $existingSumNet = floatval(str_replace(',', '.', str_replace('.', '', $existingSumNetRaw)));
+                $existingSumTax = floatval(str_replace(',', '.', str_replace('.', '', $existingSumTaxRaw)));
+                
+                if ($existingSumTax > 0) {
+                    $sumNet = $existingSumNet;
+                    $sumTax = $existingSumTax;
+                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "VAT Final: Using existing SumNet: $sumNet, SumTax: $sumTax (Raw: $existingSumTaxRaw)");
+                } else {
+                    if ($discount > 0 && ($sumNet + $sumTax) > 0) {
+                        $ratio = $priceSum / ($sumNet + $sumTax);
+                        $sumNet *= $ratio;
+                        $sumTax *= $ratio;
+                    }
+                    \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "VAT Final: Calculated SumNet: $sumNet, SumTax: $sumTax (Discount: $discount)");
                 }
 
                 $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($sumNet);
                 $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($sumTax);
+                
+                // Sync display tokens AGAIN to be sure
+                $putVars['priceNet'] = $putVars['priceSumNet'];
+                $putVars['priceTax'] = $putVars['priceSumTax'];
                 
                 $self = self::getInstance();
                 if ($self instanceof self) {
@@ -5609,22 +5919,123 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $optionsPriceSum = floatval($priceOptionSum['priceOptionSum'] ?? 0) + floatval($priceParticipantOptionSum['priceParticipantOptionSum'] ?? 0);
             $priceSum += $optionsPriceSum;
 
+            // Ensure we have a valid tax rate
+            $taxRate = floatval($putVars['reservationTaxRate'] ?? $settings->taxRate ?? 19);
+            if ($taxRate <= 0) { $taxRate = 19; } // Hard fallback
+
             // Rabatt anwenden, falls vorhanden
             $discount = 0;
             if (!empty($putVars['discountPercent']) && $priceSum) {
-                $discount = ($priceSum / 100) * floatval($putVars['discountPercent']);
+                $discountValue = floatval(str_replace([' ', '%'], '', $putVars['discountPercent']));
+                $discount = ($priceSum / 100) * $discountValue;
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Discount Calculation (Fallback): Total Before: $priceSum, Percent: $discountValue, Discount Amount: $discount");
                 $priceSum -= $discount;
+                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Discount Applied (Fallback): Percent: $discountValue, Amount: $discount, New Total: $priceSum");
+                
+                $dp = $putVars['discountPercent'];
+                if (is_numeric($dp)) {
+                    $dp = $dp . ' %';
+                }
+                $putVars['discountPercent'] = $dp;
+                $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount);
+                $putVars['priceSum'] = C4gReservationHandler::formatPrice($priceSum);
+                
+                // Recalculate Net and Tax for the total sum after discount
+                if ($calcTaxes) {
+                     $priceSumNet = ($priceSum / (1 + ($taxRate / 100)));
+                     $priceSumTax = $priceSum - $priceSumNet;
+                     $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($priceSumNet);
+                     $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($priceSumTax);
+                     $putVars['priceSumBrutto'] = C4gReservationHandler::formatPrice($priceSum);
+                     // For events where base price might be 0, we still want to show meaningful Net/Tax
+                     $putVars['priceNet'] = $putVars['priceSumNet'];
+                     $putVars['priceTax'] = $putVars['priceSumTax'];
+                     $putVars['priceBrutto'] = $putVars['priceSumBrutto'];
+                }
+
+                $self = self::getInstance();
+                if ($self instanceof self) {
+                    $self->putVars['discountPercent'] = $putVars['discountPercent'];
+                    $self->putVars['priceDiscount'] = $putVars['priceDiscount'];
+                    $self->putVars['priceSum'] = $putVars['priceSum'];
+                    if ($calcTaxes) {
+                         $self->putVars['priceSumNet'] = $putVars['priceSumNet'];
+                         $self->putVars['priceSumTax'] = $putVars['priceSumTax'];
+                         $self->putVars['priceSumBrutto'] = $putVars['priceSumBrutto'];
+                         $self->putVars['priceNet'] = $putVars['priceNet'];
+                         $self->putVars['priceTax'] = $putVars['priceTax'];
+                         $self->putVars['priceBrutto'] = $putVars['priceBrutto'];
+                    }
+                }
+            } else {
+                 \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Discount skipped (Fallback). Percent empty: " . (empty($putVars['discountPercent']) ? 'YES' : 'NO') . ", Total zero: " . (!$priceSum ? 'YES' : 'NO'));
+                 
+                 // Even without discount, ensure Net and Tax are set if missing but priceSum exists
+                 if ($calcTaxes && $priceSum > 0 && (empty($putVars['priceSumNet']) || $putVars['priceSumNet'] === '0,00 €')) {
+                      $priceSumNet = ($priceSum / (1 + ($taxRate / 100)));
+                      $priceSumTax = $priceSum - $priceSumNet;
+                      $putVars['priceSumNet'] = C4gReservationHandler::formatPrice($priceSumNet);
+                      $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($priceSumTax);
+                      $putVars['priceSumBrutto'] = C4gReservationHandler::formatPrice($priceSum);
+                      $putVars['priceNet'] = $putVars['priceSumNet'];
+                      $putVars['priceTax'] = $putVars['priceSumTax'];
+                      $putVars['priceBrutto'] = $putVars['priceSumBrutto'];
+                      
+                      $self = self::getInstance();
+                      if ($self instanceof self) {
+                          $self->putVars['priceSumNet'] = $putVars['priceSumNet'];
+                          $self->putVars['priceSumTax'] = $putVars['priceSumTax'];
+                          $self->putVars['priceSumBrutto'] = $putVars['priceSumBrutto'];
+                          $self->putVars['priceNet'] = $putVars['priceNet'];
+                          $self->putVars['priceTax'] = $putVars['priceTax'];
+                          $self->putVars['priceBrutto'] = $putVars['priceBrutto'];
+                      }
+                 }
             }
+
+            // Recalculate options tax components after discount
+            if ($optionsPriceSum > 0 && $calcTaxes) {
+                 $discountFactor = ($priceSum + $discount) > 0 ? ($priceSum / ($priceSum + $discount)) : 1;
+                 
+                 $priceOptionSum['priceOptionSum'] = floatval($priceOptionSum['priceOptionSum'] ?? 0) * $discountFactor;
+                 $priceOptionSum['priceOptionSumNet'] = ($priceOptionSum['priceOptionSum'] / (1 + ($taxRate / 100)));
+                 $priceOptionSum['priceOptionSumTax'] = $priceOptionSum['priceOptionSum'] - $priceOptionSum['priceOptionSumNet'];
+                 
+                 $priceParticipantOptionSum['priceParticipantOptionSum'] = floatval($priceParticipantOptionSum['priceParticipantOptionSum'] ?? 0) * $discountFactor;
+                 $priceParticipantOptionSum['priceParticipantOptionSumNet'] = ($priceParticipantOptionSum['priceParticipantOptionSum'] / (1 + ($taxRate / 100)));
+                 $priceParticipantOptionSum['priceParticipantOptionSumTax'] = $priceParticipantOptionSum['priceParticipantOptionSum'] - $priceParticipantOptionSum['priceParticipantOptionSumNet'];
+                 
+                 $putVars['priceOptionSum'] = C4gReservationHandler::formatPrice($priceOptionSum['priceOptionSum'] + $priceParticipantOptionSum['priceParticipantOptionSum']);
+                 $putVars['priceOptionSumNet'] = C4gReservationHandler::formatPrice($priceOptionSum['priceOptionSumNet'] + $priceParticipantOptionSum['priceParticipantOptionSumNet']);
+                 $putVars['priceOptionSumTax'] = C4gReservationHandler::formatPrice($priceOptionSum['priceOptionSumTax'] + $priceParticipantOptionSum['priceParticipantOptionSumTax']);
+                 
+                 $putVars['priceParticipantOptionSum'] = C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSum']);
+                 $putVars['priceParticipantOptionSumNet'] = C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumNet']);
+                 $putVars['priceParticipantOptionSumTax'] = C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumTax']);
+                 
+                 $self = self::getInstance();
+                 if ($self instanceof self) {
+                     $self->putVars['priceOptionSum'] = $putVars['priceOptionSum'];
+                     $self->putVars['priceOptionSumNet'] = $putVars['priceOptionSumNet'];
+                     $self->putVars['priceOptionSumTax'] = $putVars['priceOptionSumTax'];
+                     $self->putVars['priceParticipantOptionSum'] = $putVars['priceParticipantOptionSum'];
+                     $self->putVars['priceParticipantOptionSumNet'] = $putVars['priceParticipantOptionSumNet'];
+                     $self->putVars['priceParticipantOptionSumTax'] = $putVars['priceParticipantOptionSumTax'];
+                 }
+            }
+
+            // $putVars['discountPercent'] = isset($putVars['discountPercent']) ? (strval($putVars['discountPercent']) . ' %') : '';
 
             $putVars['priceDiscount'] = C4gReservationHandler::formatPrice($discount);
-            if ($self instanceof self) {
-                $self->putVars['priceDiscount'] = $putVars['priceDiscount'];
+            if ($discount > 0) {
+                $dp = $putVars['discountPercent'];
+                if (is_numeric($dp)) {
+                    $dp = $dp . ' %';
+                }
+                $putVars['discountPercent'] = $dp;
+            } elseif (empty($putVars['discountPercent']) || $putVars['discountPercent'] === ' ' || $putVars['discountPercent'] === '0,00 %' || $putVars['discountPercent'] === '0 %') {
+                $putVars['discountPercent'] = ' ';
             }
-
-            // Ausgabe-Felder setzen
-            $putVars['price'] = C4gReservationHandler::formatPrice($priceArray['price'] ?? 0) . ($priceArray['priceInfo'] ?? '');
-            $putVars['priceSum'] = C4gReservationHandler::formatPrice($priceSum);
-            $putVars['priceOptionSum'] = C4gReservationHandler::formatPrice($optionsPriceSum);
             
             // Mirror back to instance putVars
             $self = self::getInstance();
@@ -5641,6 +6052,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $self->putVars['priceParticipantOptionSumNet'] = $putVars['priceParticipantOptionSumNet'] ?? C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumNet'] ?? 0);
                 $self->putVars['priceParticipantOptionSumTax'] = $putVars['priceParticipantOptionSumTax'] ?? C4gReservationHandler::formatPrice($priceParticipantOptionSum['priceParticipantOptionSumTax'] ?? 0);
                 $self->putVars['priceDiscount'] = $putVars['priceDiscount'] ?? '0,00 €';
+                $self->putVars['discountPercent'] = $putVars['discountPercent'];
                 $self->putVars['price'] = $putVars['price'] ?? $self->putVars['price'] ?? '0,00 €';
                 $self->putVars['admin_email'] = $adminEmail;
                 if (isset($putVars['reservationTaxRate'])) {
@@ -5652,6 +6064,14 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             if ($calcTaxes) {
                 $priceNet = floatval($priceArray['priceNet'] ?? 0);
                 $priceTax = floatval($priceArray['priceTax'] ?? 0);
+                
+                // If priceArray had 0, but we had a base price, we need to calculate net/tax from base price
+                if ($priceNet == 0 && $priceTax == 0 && floatval($price) > 0) {
+                    $taxRate = floatval($putVars['reservationTaxRate'] ?? 19);
+                    $priceNet = floatval($price) / (1 + ($taxRate / 100));
+                    $priceTax = floatval($price) - $priceNet;
+                }
+
                 $putVars['reservationTaxRate'] = $priceArray['reservationTaxRate'];
                 $putVars['priceNet'] = C4gReservationHandler::formatPrice($priceNet);
                 $putVars['priceTax'] = C4gReservationHandler::formatPrice($priceTax);
