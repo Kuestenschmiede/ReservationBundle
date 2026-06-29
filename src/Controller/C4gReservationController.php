@@ -5564,9 +5564,19 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                  $putVars['priceSumBrutto'] = C4gReservationHandler::formatPrice($priceSum);
                  
                  // Brutto für "Preis (Brutto)" vor Rabatt
-                 $putVars['priceBrutto'] = $putVars['priceSumBrutto'];
-                 $putVars['priceNet'] = $putVars['priceSumNet'];
-                 $putVars['priceTax'] = $putVars['priceSumTax'];
+                 // Only set if base price is greater than 0
+                 $basePriceOnly = $priceSum - $optionsPriceSum;
+                 if ($basePriceOnly > 0.001) {
+                     $putVars['priceBrutto'] = C4gReservationHandler::formatPrice($basePriceOnly);
+                     // Recalculate properly
+                     $bpNet = $basePriceOnly / (1 + ($taxRate / 100));
+                     $putVars['priceNet'] = C4gReservationHandler::formatPrice($bpNet);
+                     $putVars['priceTax'] = C4gReservationHandler::formatPrice($basePriceOnly - $bpNet);
+                 } else {
+                     $putVars['priceBrutto'] = ' ';
+                     $putVars['priceNet'] = ' ';
+                     $putVars['priceTax'] = ' ';
+                 }
                  $putVars['priceSum'] = $putVars['priceSumBrutto']; // Neu: priceSum initial auf Brutto setzen
                  \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "VAT Calculation (Before Discount): Sum: $priceSum, Net: $priceSumNet, Tax: $priceSumTax");
                  
@@ -5639,18 +5649,30 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             // Endgültige Brutto/Netto/MwSt für die Anzeige (unabhängig vom Rabatt)
             if ($calcTaxes) {
                 // Falls kein Rabatt angewendet wurde, sicherstellen dass priceNet und priceTax auf priceSumNet/Tax basieren
-                if ($discount == 0) {
-                    $putVars['priceNet'] = $putVars['priceSumNet'] ?? $putVars['priceNet'] ?? '0,00 €';
-                    $putVars['priceTax'] = $putVars['priceSumTax'] ?? $putVars['priceTax'] ?? '0,00 €';
-                    $putVars['priceSumBrutto'] = $putVars['priceSumBrutto'] ?? C4gReservationHandler::formatPrice($priceSum);
+                // BUT only if base price > 0
+                $basePriceOnly = $priceSum + $discount - $optionsPriceSum;
+                if ($basePriceOnly > 0.001) {
+                    if ($discount == 0) {
+                        $bpNet = $basePriceOnly / (1 + ($taxRate / 100));
+                        $putVars['priceNet'] = C4gReservationHandler::formatPrice($bpNet);
+                        $putVars['priceTax'] = C4gReservationHandler::formatPrice($basePriceOnly - $bpNet);
+                        $putVars['priceBrutto'] = C4gReservationHandler::formatPrice($basePriceOnly);
+                    }
+                    $putVars['price'] = ($putVars['priceBrutto'] ?? $putVars['priceSumBrutto'] ?? $putVars['priceSum']) . ($priceArray['priceInfo'] ?? '');
+                } else {
+                    $putVars['priceBrutto'] = ' ';
+                    $putVars['priceNet'] = ' ';
+                    $putVars['priceTax'] = ' ';
+                    $putVars['price'] = '0,00 €' . ($priceArray['priceInfo'] ?? '');
                 }
-                $putVars['price'] = ($putVars['priceSumBrutto'] ?? $putVars['priceSum']) . ($priceArray['priceInfo'] ?? '');
+                
                 $self = self::getInstance();
                 if ($self instanceof self) {
                     $self->putVars['priceNet'] = $putVars['priceNet'];
                     $self->putVars['priceTax'] = $putVars['priceTax'];
                     $self->putVars['price'] = $putVars['price'];
                     $self->putVars['priceSumBrutto'] = $putVars['priceSumBrutto'];
+                    $self->putVars['priceBrutto'] = $putVars['priceBrutto'];
                 }
             }
 
@@ -5779,13 +5801,23 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $putVars['priceSumTax'] = C4gReservationHandler::formatPrice($sumTax);
                 
                 // Sync display tokens AGAIN to be sure
-                $putVars['priceNet'] = $putVars['priceSumNet'];
-                $putVars['priceTax'] = $putVars['priceSumTax'];
+                // Only sync if base price was actually set, otherwise we have options price in base price tokens
+                $basePriceRaw = str_replace([' ', '€'], ['', ''], $putVars['priceBrutto'] ?? '0');
+                $basePriceVal = floatval(str_replace(',', '.', str_replace('.', '', $basePriceRaw)));
+                if ($basePriceVal > 0.001) {
+                    $putVars['priceNet'] = $putVars['priceSumNet'];
+                    $putVars['priceTax'] = $putVars['priceSumTax'];
+                } else {
+                    $putVars['priceBrutto'] = ' ';
+                    $putVars['priceNet'] = ' ';
+                    $putVars['priceTax'] = ' ';
+                }
                 
                 $self = self::getInstance();
                 if ($self instanceof self) {
                     $self->putVars['priceNet'] = $putVars['priceNet'];
                     $self->putVars['priceTax'] = $putVars['priceTax'];
+                    $self->putVars['priceBrutto'] = $putVars['priceBrutto'];
                     $self->putVars['priceOptionSumNet'] = $putVars['priceOptionSumNet'];
                     $self->putVars['priceOptionSumTax'] = $putVars['priceOptionSumTax'];
                     $self->putVars['priceSumNet'] = $putVars['priceSumNet'];
