@@ -125,9 +125,15 @@ class C4gReservationConfirmation
                         }
 
                         $adminEmail = ($reservation['admin_email'] ?? '') ?: (($organizer && ($organizer['admin_email'] ?? '')) ? $organizer['admin_email'] : (($location && ($location['admin_email'] ?? '')) ? $location['admin_email'] : (\Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? ''))));
-                        if (!$adminEmail || !strpos($adminEmail, '@')) {
+                        if (!$adminEmail || (strpos($adminEmail, '@') === false)) {
                             $adminEmail = \Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? '');
                         }
+                        
+                        if (!$adminEmail || (strpos($adminEmail, '@') === false)) {
+                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('C4gReservationConfirmation', "Error: No valid admin email found for reservation $reservationId. Skipping notification.");
+                            return;
+                        }
+                        
                         $c4gNotify->setTokenValue('admin_email', $adminEmail);
                         $c4gNotify->setTokenValue('email', ($reservation['email'] ?? '') ?: ' ');
 
@@ -149,7 +155,7 @@ class C4gReservationConfirmation
                         if ($memberId) {
                             $member = MemberModel::findByPk($memberId);
                             if ($member) {
-                                $c4gNotify->setTokenValue('member_email', $member->email);
+                                $c4gNotify->setTokenValue('member_email', $member->email ?: ' ');
                             }
                         }
 
