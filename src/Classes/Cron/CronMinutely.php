@@ -37,7 +37,7 @@ class CronMinutely
                 $auto_send = $entry['auto_send'];
                 \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('Cron', "Processing type ID {$entry['id']} with auto_send '$auto_send'");
 
-                if ($auto_send === 'minutely' || $auto_send === '1' || $auto_send === 1) {
+                if ($auto_send === 'minutely' || $auto_send === '1' || $auto_send === 1 || $auto_send === 'true') {
                     \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('Cron', "Type ID {$entry['id']} has auto_send enabled, searching for pending reservations...");
                     $reservations = $database->prepare("SELECT id, confirmed, specialNotification, emailConfirmationSend FROM tl_c4g_reservation where `reservation_type` = ? AND (`confirmed` = '1' OR `specialNotification` = '1') AND (emailConfirmationSend IS NULL OR emailConfirmationSend = '' OR emailConfirmationSend = '0')")
                         ->execute($entry['id'])->fetchAllAssoc();
