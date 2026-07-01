@@ -147,6 +147,7 @@ class C4gReservationCheckInController extends C4GBaseController
                         $checkedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? $reservation['checkedIn'] && ($reservation['checkedIn'] >= $reservation['desiredCapacity']): $reservation['checkedIn'];
                         if ($checkedIn) {
                             $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_checkin']['reservation_checkin_exists'];
+                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('CheckIn', "CheckIn failed: already checked in. reservation_id: $reservationKey, current checkedIn: " . $reservation['checkedIn'] . ", capacity: " . $reservation['desiredCapacity']);
                         } else {
                             $persons = intval($reservation['checkedIn']) +1;
                             $checkedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? $persons : 1;

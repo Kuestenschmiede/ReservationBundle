@@ -129,7 +129,11 @@ class C4gReservationDateChecker
         }
 
         if ($time) {
-            $time = date('His', intval($time));
+            if (is_string($time) && strpos($time, ':') !== false) {
+                $time = date('His', strtotime('1970-01-01 ' . $time . ' UTC'));
+            } else {
+                $time = date('His', intval($time));
+            }
         }
 
         if ($date && $time) {

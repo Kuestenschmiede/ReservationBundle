@@ -588,138 +588,82 @@ class C4gReservationCalculator
           $optionList = unserialize($participantParams);
           $participantParamArr = isset($optionList) ? self::getReservationOptions($optionList, [], $calcTaxes) : false;
 
-          $counter = $onlyParticipants ? $desiredCapacity : $desiredCapacity - 1;
           $priceParticipantOptionSum = 0;
           if ($calcTaxes) {
               $priceParticipantOptionSumNet = 0;
               $priceParticipantOptionSumTax = 0;
           }
-
+          
+          $offset = 0;
+          foreach ($putVars as $pk => $pv) {
+              if (strpos($pk, '§participant_params§0') !== false || strpos($pk, '-0§participant_params') !== false) {
+                  $offset = 0;
+                  break;
+              }
+              if (strpos($pk, '§participant_params§1') !== false || strpos($pk, '-1§participant_params') !== false) {
+                  $offset = 1;
+              }
+          }
+          
           for ($i = 0; $i < ($desiredCapacity); $i++) {
-              \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "CALC: Processing participant $i. putVars keys: " . implode(', ', array_keys($putVars)));
+              $pSum = 0;
+              $targetIdx = $i + $offset;
               foreach ($participantParamArr as $key => $value){
-                  if ($mechanism) {
-                      if ($object['participantParamsFieldType'] == 'radio') {
-                          $keyStr = 'participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i;
-                          $chosenParticipantOptions = $putVars[$keyStr] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . $i] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . ($i+1)] ?? $putVars['participants_§participant_params§' . $i] ?? $putVars['participants_§participant_params§' . ($i+1)] ?? null;
-                          
-                          // More aggressive search for radio button values in putVars
-                          if ($chosenParticipantOptions === null) {
-                              foreach ($putVars as $pk => $pv) {
-                                  if (strpos($pk, '§participant_params§' . $i) !== false && !strpos($pk, '|')) {
-                                      $chosenParticipantOptions = $pv;
-                                      break;
-                                  } elseif (strpos($pk, '§participant_params§' . ($i+1)) !== false && !strpos($pk, '|')) {
-                                      $chosenParticipantOptions = $pv;
-                                      break;
-                                  }
-                              }
-                          }
-                          
-                          // Handle cases where the value might be 'true'/'1' but we need the ID
-                          if (($chosenParticipantOptions === true || $chosenParticipantOptions === 'true' || $chosenParticipantOptions === '1') && $object['participantParamsFieldType'] == 'radio') {
-                              $chosenParticipantOptions = $value['id'];
-                          }
-                          
-                          \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "CALC: Radio check $i. keyStr: $keyStr. Found: " . (is_array($chosenParticipantOptions) ? json_encode($chosenParticipantOptions) : $chosenParticipantOptions));
+                  $optionId = $value['id'];
+                  $chosen = false;
 
-                          // Support for radio button groups which might have the ID as the key value in putVars
-                          if ($chosenParticipantOptions === null) {
-                              $radioKey = 'participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id'];
-                              $chosenParticipantOptions = $putVars[$radioKey] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . $i . '|' . $value['id']] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . ($i+1) . '|' . $value['id']] ?? $putVars['participants_§participant_params§' . $i . '|' . $value['id']] ?? $putVars['participants_§participant_params§' . ($i+1) . '|' . $value['id']] ?? null;
-                              if ($chosenParticipantOptions === 'true' || $chosenParticipantOptions === true || strval($chosenParticipantOptions) === '1') {
-                                  $chosenParticipantOptions = $value['id'];
-                              }
+                  // Search for this option for participant $i
+                  foreach ($putVars as $pk => $pv) {
+                      $isParticipantKey = false;
+                      
+                      // Match by middle index (e.g. participants_1001-1§)
+                      if (preg_match('/-(\d+)§/', $pk, $matches)) {
+                          if (intval($matches[1]) === $targetIdx) {
+                              $isParticipantKey = true;
                           }
-
-                          // Check if the ID itself is used as a boolean flag (sometimes happens in certain dialog configurations)
-                          if ($chosenParticipantOptions === null) {
-                              foreach ($putVars as $pk => $pv) {
-                                  if (strpos($pk, '§participant_params§' . $i . '|') !== false && ($pv === true || $pv === 'true' || $pv === '1')) {
-                                      $pkParts = explode('|', $pk);
-                                      if (end($pkParts) == $value['id']) {
-                                          $chosenParticipantOptions = $value['id'];
-                                          break;
-                                      }
-                                  } elseif (strpos($pk, '§participant_params§' . ($i+1) . '|') !== false && ($pv === true || $pv === 'true' || $pv === '1')) {
-                                      $pkParts = explode('|', $pk);
-                                      if (end($pkParts) == $value['id']) {
-                                          $chosenParticipantOptions = $value['id'];
-                                          break;
-                                      }
-                                  }
-                              }
+                      } 
+                      
+                      // Match by suffix index (legacy/non-special mechanism)
+                      // Only if no middle index was found to avoid false positives from other participants
+                      if (!$isParticipantKey && !preg_match('/-(\d+)§/', $pk)) {
+                          if (preg_match('/§participant_params§' . $targetIdx . '(?:\b|\||$)/', $pk)) {
+                              $isParticipantKey = true;
                           }
-
-                          if (strval($chosenParticipantOptions) === strval($value['id']) || (is_array($chosenParticipantOptions) && in_array($value['id'], $chosenParticipantOptions))) {
-                              $chosenParticipantOptions = true;
-                          } else {
-                              // Fallback: If we have multiple radio buttons, sometimes the value is passed in another field
-                              // or the ID is part of the key.
-                              $chosenParticipantOptions = false;
-                          }
-
-                      } else {
-                          $keyStr = 'participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id'];
-                          $chosenParticipantOptions = $putVars[$keyStr] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . $i . '|' . $value['id']] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . ($i+1) . '|' . $value['id']] ?? $putVars['participants_§participant_params§' . $i . '|' . $value['id']] ?? $putVars['participants_§participant_params§' . ($i+1) . '|' . $value['id']] ?? null;
-
-                          if ($chosenParticipantOptions === 'true' || $chosenParticipantOptions === true || strval($chosenParticipantOptions) === '1' || (is_array($chosenParticipantOptions) && in_array($value['id'], $chosenParticipantOptions))) {
-                              $chosenParticipantOptions = true;
-                          } else {
-                              $chosenParticipantOptions = false;
+                          // Handle P1 with no index (only if offset is 0)
+                          elseif ($i === 0 && $offset === 0 && strpos($pk, '§participant_params') !== false && strpos($pk, '§participant_params§') === false) {
+                              $isParticipantKey = true;
                           }
                       }
 
-                      if ($chosenParticipantOptions) {
-                          $priceParticipantOptionSum += floatval($value['price'] ?? 0);
-
-                          if ($calcTaxes) {
-                              $priceParticipantOptionSumNet += floatval($value['priceOptionNet'] ?? 0);
-                              $priceParticipantOptionSumTax += floatval($value['price'] ?? 0) - floatval($value['priceOptionNet'] ?? 0);
-                          }
-                          \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "CALC: Option MATCHED for $i (mech true). ID: " . $value['id'] . ". Price: " . ($value['price'] ?? 0));
-                      }
-                  } else {
-                      if ($object['participantParamsFieldType'] == 'radio') {
-                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '§participant_params§' . $i] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . ($i+1)] ?? $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i] ?? $putVars['participants_§participant_params§' . $i] ?? $putVars['participants_§participant_params§' . ($i+1)] ?? null;
-
-                          // Support for radio button groups (mech false)
-                          if ($chosenParticipantOptions === null) {
-                              $radioKey = 'participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id'];
-                              $chosenParticipantOptions = $putVars[$radioKey] ?? null;
-                              if ($chosenParticipantOptions === 'true' || $chosenParticipantOptions === true || strval($chosenParticipantOptions) === '1') {
-                                  $chosenParticipantOptions = $value['id'];
+                      if ($isParticipantKey) {
+                          // Check if it's a checkbox/radio-with-id format: key|ID = true
+                          if (strpos($pk, '|' . $optionId) !== false) {
+                              if ($pv === true || $pv === 'true' || strval($pv) === '1') {
+                                  $chosen = true;
+                                  break;
                               }
-                          }
-
-                          // Log chosen option for radio group (mechanism false)
-                          C4gLogModel::addLogEntry('reservation', "Checking radio option (mech false). Found value: " . (is_array($chosenParticipantOptions) ? json_encode($chosenParticipantOptions) : $chosenParticipantOptions) . " against expected ID: " . $value['id']);
-
-                          if (strval($chosenParticipantOptions) === strval($value['id'])) {
-                              $chosenParticipantOptions = true;
-                          } else {
-                              $chosenParticipantOptions = false;
-                          }
-                      } else {
-                          $chosenParticipantOptions = $putVars['participants_' . $type['id'] . '§participant_params§' . $i. '|' . $value['id']] ?? $putVars['participants_' . $type['id'] . '§participant_params§' . ($i+1) . '|' . $value['id']] ?? $putVars['participants_' . $type['id'] . '-' . ($counter) . '§participant_params§' . $i . '|' . $value['id']] ?? $putVars['participants_§participant_params§' . $i . '|' . $value['id']] ?? $putVars['participants_§participant_params§' . ($i+1) . '|' . $value['id']] ?? null;
-
-                          if (strval($chosenParticipantOptions) === strval($value['id']) || $chosenParticipantOptions === 'true' || $chosenParticipantOptions === true || strval($chosenParticipantOptions) === '1') {
-                              $chosenParticipantOptions = true;
-                          } else {
-                              $chosenParticipantOptions = false;
-                          }
-                      }
-
-                      if ($chosenParticipantOptions) {
-                          $priceParticipantOptionSum += floatval($value['price'] ?? 0);
-
-                          if ($calcTaxes) {
-                              $priceParticipantOptionSumNet += floatval($value['priceOptionNet'] ?? 0);
-                              $priceParticipantOptionSumTax += floatval($value['price'] ?? 0) - floatval($value['priceOptionNet'] ?? 0);
+                          } 
+                          // Check if it's a radio-group format: key = ID
+                          elseif (strpos($pk, '§participant_params') !== false) {
+                              if (strval($pv) === strval($optionId)) {
+                                  $chosen = true;
+                                  break;
+                              }
                           }
                       }
                   }
+
+                  if ($chosen) {
+                      $priceVal = floatval($value['price'] ?? 0);
+                      $pSum += $priceVal;
+                      $priceParticipantOptionSum += $priceVal;
+                      if ($calcTaxes) {
+                          $priceParticipantOptionSumNet += floatval($value['priceOptionNet'] ?? 0);
+                          $priceParticipantOptionSumTax += floatval($value['price'] ?? 0) - floatval($value['priceOptionNet'] ?? 0);
+                      }
+                  }
               }
+              \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "CALC: Participant $i (offset $offset) options sum: $pSum");
           }
       }
 
