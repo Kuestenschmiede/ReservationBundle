@@ -388,8 +388,8 @@ class C4gReservationConfirmation
                                 }
 
                                 $audience = '';
-                                if (($eventObject && $eventObject['targetAudience']) || ($calendarObject && $calendarObject['reservationTargetAudience'])) {
-                                    $audiences = $eventObject && $eventObject['targetAudience'] ? $eventObject['targetAudience'] : $calendarObject['reservationTargetAudience'];
+                                if (($eventObject && $eventObject['targetAudience']) || ($calendarObject && $calendarObject['reservationtargetAudience'])) {
+                                    $audiences = $eventObject && $eventObject['targetAudience'] ? $eventObject['targetAudience'] : $calendarObject['reservationtargetAudience'];
                                     $audienceList = StringUtil::deserialize($audiences);
                                     foreach ($audienceList as $audienceId) {
                                         $audienceObject = C4gReservationEventAudienceModel::findByPk($audienceId);
@@ -478,7 +478,9 @@ class C4gReservationConfirmation
                         $c4gNotify->setTokenValue('contact_postal', ($reservation['contact_postal'] ?? '') ?: (($location['contact_postal'] ?? '') ?: ' '));
                         $c4gNotify->setTokenValue('contact_city', ($reservation['contact_city'] ?? '') ?: (($location['contact_city'] ?? '') ?: ' '));
 
-                        $c4gNotify->setTokenValue('reservation_id', $reservation['reservation_id']);
+                        $c4gNotify->setTokenValue('reservation_id', (string)$reservationId);
+                        $c4gNotify->setTokenValue('reservationId', (string)$reservationId);
+                        $c4gNotify->setTokenValue('id', (string)$reservationId);
                         $c4gNotify->setTokenValue('agreed', $reservation['agreed']);
 
                         $c4gNotify->setTokenValue('price', ($reservation['price'] ?? '') ?: '0,00 €');
@@ -518,7 +520,7 @@ class C4gReservationConfirmation
                                 'contact_email','contact_website','desiredCapacity', 'endDate', 'endTime', 'included_params', 'additional_params', 'participantList', 'speaker', 'topic',
                                 'audience', 'salutation', 'title', 'organisation', 'phone', 'address', 'postal', 'city', 'dateOfBirth', 'salutation2', 'title2', 'organisation2',
                                 'firstname2', 'lastname2', 'email2', 'phone2', 'address2', 'postal2', 'city2', 'comment', 'internal_comment', 'location', 'contact_name',
-                                'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'agreed',
+                                'contact_phone', 'contact_street', 'contact_postal', 'contact_city', 'uploadFile', 'pdfnc_attachment', 'pdfnc_document', 'reservation_id', 'reservationId', 'id', 'agreed',
                                 'description', 'additional1', 'additional2', 'additional3','member_email', 'conferenceLink',
                                 'price','priceTax','priceSum','priceSumTax','priceNet','priceSumNet', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax',
                                 'priceDiscount', 'discountCode', 'discountPercent', 'documentId', 'reservationTaxRate', 'dbkey', 'reservation_type_id', 'icsFilename'

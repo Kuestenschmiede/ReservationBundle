@@ -4582,9 +4582,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $organizer = \con4gis\ReservationBundle\Classes\Models\C4gReservationOrganizerModel::findByPk($location->pid);
         }
         $putVars['location'] = ($location ? $location->name : '') ?: ' ';
-        $admin_email = ($organizer && $organizer->admin_email) ? $organizer->admin_email : (($location && $location->admin_email) ? $location->admin_email : (\Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? 'info@con4gis.org')));
+        $admin_email = ($organizer && $organizer->admin_email) ? $organizer->admin_email : (($location && $location->admin_email) ? $location->admin_email : (\Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? '')));
         if (!$admin_email || !strpos($admin_email, '@')) {
-            $admin_email = 'info@con4gis.org';
+            $admin_email = \Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? '');
         }
         $putVars['admin_email'] = $admin_email;
         $putVars['contact_email'] = ($organizer && $organizer->contact_email) ? $organizer->contact_email : (($location && $location->contact_email) ? $location->contact_email : ' ');
@@ -4651,6 +4651,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 self::allPrices($settings, $putVars, $reservationObject, '', $reservationType, $isEvent, $cap);
             }
         } catch (\Throwable $t) {
+            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Error in final allPrices call: " . $t->getMessage() . " in " . $t->getFile() . ":" . $t->getLine());
             // still continue – putVars behalten bestehende Werte
         }
 
@@ -4885,9 +4886,12 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $this->mirrorBaseTokens($putVars);
         $this->mirrorBaseTokens(); // for this->putVars
 
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Finalizing reservation data. Preparing SaveAction.");
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Executing SaveAction run().");
         $result = $action->run();
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "SaveAction run() finished. Result: " . (is_array($result) ? "Array with keys: " . implode(', ', array_keys($result)) : gettype($result)));
 
         if (is_array($result) && !isset($result['jump_to_url']) && $this->reservationSettings->reservation_redirect_site) {
             $jumpTo = \Contao\PageModel::findByPk($this->reservationSettings->reservation_redirect_site);
@@ -5042,7 +5046,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         // Ensure admin_email is always present to prevent RFC validation errors
         if (!isset($this->putVars['admin_email']) || !$this->putVars['admin_email'] || $this->putVars['admin_email'] === '##admin_email##') {
-            $this->putVars['admin_email'] = $GLOBALS['TL_CONFIG']['adminEmail'] ?: 'info@kuestenschmiede.de';
+            $this->putVars['admin_email'] = $GLOBALS['TL_CONFIG']['adminEmail'] ?? '';
         }
     }
 
@@ -5246,6 +5250,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
     }
 
     public static function allPrices($settings, &$putVars, $reservationObject, $reservationEventObject, $reservationType, $isEvent, $desiredCapacity) {
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "allPrices started. isEvent: " . ($isEvent ? 'YES' : 'NO') . ", Capacity: $desiredCapacity");
         $adminEmail = $putVars['admin_email'] ?? (\Contao\Config::get('adminEmail') ?: ($GLOBALS['TL_CONFIG']['adminEmail'] ?? ''));
         $calcTaxes = $settings->showPricesWithTaxes ?: false;
         $showPrices = $settings->showPrices ?: false;
@@ -6137,6 +6142,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
         }
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "allPrices finished.");
     }
 
     public static function withDesiredCapacityTitle($min, $max, $showMinMax) {
