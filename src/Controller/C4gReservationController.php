@@ -4329,7 +4329,12 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
             //ToDo test Fix desiredCapacity
             $putVars['desiredCapacity_'.$reservationType->id] = $pCount;
+            $putVars['desiredCapacity'] = $pCount;
             $desiredCapacity = $pCount;
+            $self = self::getInstance();
+            if ($self instanceof self) {
+                $self->putVars['desiredCapacity'] = $pCount;
+            }
         }
 
         if ($isEvent) {
@@ -4941,6 +4946,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'email2', 'phone2', 'address2', 'street2', 'postal2', 'city2',
             'beginDate', 'beginTime', 'endDate', 'endTime', 'bookedAt',
             'reservation_type', 'type', 'reservation_object', 'object', 'reservation_title',
+            'desiredCapacity',
             'description', 'location', 'comment', 'internal_comment',
             'speaker', 'topic', 'audience', 'conferenceLink'
         ];

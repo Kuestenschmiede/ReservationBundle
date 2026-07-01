@@ -144,17 +144,24 @@ class C4gReservationCheckInController extends C4GBaseController
                 if ($count == 1) {
                     $reservation = $reservations[0];
                     if ($reservation) {
-                        $checkedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? $reservation['checkedIn'] && ($reservation['checkedIn'] >= $reservation['desiredCapacity']): $reservation['checkedIn'];
-                        if ($checkedIn) {
+                        $currentCheckedIn = intval($reservation['checkedIn']);
+                        $desiredCapacity = max(1, intval($reservation['desiredCapacity']));
+                        $alreadyCheckedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? 
+                            ($currentCheckedIn >= $desiredCapacity) : 
+                            ($currentCheckedIn > 0);
+                        
+                        if ($alreadyCheckedIn) {
                             $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_checkin']['reservation_checkin_exists'];
-                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('CheckIn', "CheckIn failed: already checked in. reservation_id: $reservationKey, current checkedIn: " . $reservation['checkedIn'] . ", capacity: " . $reservation['desiredCapacity']);
+                            \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('CheckIn', "CheckIn failed: already checked in. reservation_id: $reservationKey, current checkedIn: $currentCheckedIn, capacity: $desiredCapacity");
                         } else {
-                            $persons = intval($reservation['checkedIn']) +1;
-                            $checkedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? $persons : 1;
-                                $stmt = $database->prepare("UPDATE `tl_c4g_reservation` SET tstamp = ?, checkedIn = ? WHERE reservation_id = ?");
-                            $stmt->execute(time(), $checkedIn, $reservationKey);
+                            $newCheckedIn = $this->reservationSettings->paricipantCheckInWithSameCode ? ($currentCheckedIn + 1) : $desiredCapacity;
+                            $stmt = $database->prepare("UPDATE `tl_c4g_reservation` SET tstamp = ?, checkedIn = ? WHERE reservation_id = ?");
+                            $stmt->execute(time(), $newCheckedIn, trim($reservationKey));
 
                             $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_checkin']['reservation_checkin_okay'];
+                            if ($this->reservationSettings->paricipantCheckInWithSameCode) {
+                                $message .= " (" . $newCheckedIn . "/" . $desiredCapacity . ")";
+                            }
                         }
                     } else {
                         $message = $GLOBALS['TL_LANG']['fe_c4g_reservation_checkin']['reservation_checkin_error'];
