@@ -7,30 +7,11 @@
     @page {
       margin: 2cm 1cm 2cm 1cm;
     }
-    .pagenum:before {
-      content: counter(page);
-    }
-    .pagecount:before {
-      content: counter(pages);
-    }
-    .footer {
-      position: fixed;
-      bottom: -1cm;
-      left: 0;
-      right: 0;
-      height: 1cm;
-      text-align: center;
-      font-size: 10pt;
-    }
   </style>
 </head>
-
+    
 <body>
-    <div class="footer">
-      <?php echo $GLOBALS['TL_LANG']['fe_c4g_reservation']['page'] ?: 'Seite'; ?> <span class="pagenum"></span> <?php echo $GLOBALS['TL_LANG']['fe_c4g_reservation']['page_of'] ?: 'von'; ?> <span class="pagecount"></span>
-    </div>
-
-    <div class="pdf-logo" style="text-align: right">
+  <div class="pdf-logo" style="text-align: right">
         <?php
             $src = \Contao\System::getContainer()->getParameter('kernel.project_dir')."/vendor/con4gis/reservation/src/Resources/public/images/test.png";
             if (file_exists($src)) {
@@ -162,7 +143,7 @@
     <br>
     (Computerbrief, auch ohne Unterschrift gültig)<br>
     </div>
-    <div class="pdf-footer" style="margin-top:-0.7cm; width: 100%;">
+    <div class="pdf-footer" style="margin-top:-0.7cm; width: 100%; position: relative;">
     <table style="width: 100%; border: none; margin-bottom: 5px;">
         <tr>
             <td style="width: 70%; vertical-align: bottom;">
