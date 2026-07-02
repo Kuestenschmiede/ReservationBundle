@@ -80,5 +80,27 @@ class C4gReservationParamsModel extends Model
         return null;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
+    public static function getCaptionById($id): string
+    {
+        $param = self::findByPk($id);
+        if ($param) {
+            $feCaptions = StringUtil::deserialize($param->feCaption);
+            if ($feCaptions) {
+                foreach ($feCaptions as $feCaption) {
+                    if (strpos($GLOBALS['TL_LANGUAGE'], $feCaption['language']) !== false && $feCaption['caption']) {
+                        return $feCaption['caption'];
+                    }
+                }
+            }
+            return $param->caption ?: '';
+        }
+
+        return '';
+    }
+
 
 }

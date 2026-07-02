@@ -314,9 +314,9 @@ class C4gReservationConfirmation
                         $params = $reservation['included_params'] ? \Contao\StringUtil::deserialize($reservation['included_params']) : [];
                         $includedParamsArr = [];
                         foreach ($params as $param) {
-                            $includedParam = C4gReservationParamsModel::findByPk($param);
-                            if ($includedParam && $includedParam->caption) {
-                                $includedParamsArr[$param] = $includedParam->caption;
+                            $caption = C4gReservationParamsModel::getCaptionById($param);
+                            if ($caption) {
+                                $includedParamsArr[$param] = $caption;
                             }
                         }
                         $c4gNotify->setTokenValue('included_params', implode(', ', $includedParamsArr) ?: ' ');
@@ -324,9 +324,9 @@ class C4gReservationConfirmation
                         $params = $reservation['additional_params'] ? \Contao\StringUtil::deserialize($reservation['additional_params']) : [];
                         $additionalParamsArr = [];
                         foreach ($params as $param) {
-                            $additionalParam = C4gReservationParamsModel::findByPk($param);
-                            if ($additionalParam && $additionalParam->caption) {
-                                $additionalParamsArr[$param] = $additionalParam->caption;
+                            $caption = C4gReservationParamsModel::getCaptionById($param);
+                            if ($caption) {
+                                $additionalParamsArr[$param] = $caption;
                             }
                         }
                         $c4gNotify->setTokenValue('additional_params', implode(', ', $additionalParamsArr) ?: ' ');

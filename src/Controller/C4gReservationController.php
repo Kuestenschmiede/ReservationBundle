@@ -4212,10 +4212,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                 $keyValue = $keyArr[2];
                                 $keyArr[2] = substr($keyValue,0, $pos);
                                 $paramId = substr($keyValue,$pos+1);
-                                $paramObj = C4gReservationParamsModel::findByPk($paramId);
-                                if ($paramObj) {
-                                    $objValue = $paramObj->caption;
-                                    if ($objValue && isset($participantsArr[$participantKey][$keyArr[1]])) {
+                                $objValue = C4gReservationParamsModel::getCaptionById($paramId);
+                                if ($objValue && isset($participantsArr[$participantKey][$keyArr[1]])) {
                                         $value = $participantsArr[$participantKey][$keyArr[1]] . ', ' . $objValue;
                                     } else if ($objValue) {
                                         $value = $objValue;
@@ -4238,9 +4236,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                             $keyValue = $keyArr[2];
                             $keyArr[2] = substr($keyValue,0, $pos);
                             $paramId = substr($keyValue,$pos+1);
-                            $paramObj = C4gReservationParamsModel::findByPk($paramId);
-                            if ($paramObj) {
-                                $objValue = $paramObj->caption;
+                            $objValue = C4gReservationParamsModel::getCaptionById($paramId);
+                            if ($objValue) {
                                 if ($objValue && isset($participantsArr[$keyArr[2]][$keyArr[1]])) {
                                     $value = $participantsArr[$keyArr[2]][$keyArr[1]] . ', ' . $objValue;
                                 } else if ($objValue) {
@@ -4279,8 +4276,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 if (strpos($key, '|') === false) {
                     $pCount++;
                     if ($valueArray['participant_params'] && is_numeric($valueArray['participant_params'])) {
-                        $paramObj = C4gReservationParamsModel::findByPk($valueArray['participant_params']);
-                        $valueArray['participant_params'] = $paramObj->caption;
+                        $valueArray['participant_params'] = C4gReservationParamsModel::getCaptionById($valueArray['participant_params']);
                     }
 
                     $firstname = $valueArray['firstname'] ?? '';
