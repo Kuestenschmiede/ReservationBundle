@@ -4,9 +4,33 @@
 <!-- this is just a unreadyexample file to generate a ticket with con4gis/reservation -->
 <head>
     <link rel="stylesheet" type="text/css" media="all" href="<?php echo $this->style; ?>">
+    <style>
+        @page {
+            margin: 2cm 1cm 2cm 1cm;
+        }
+        .pagenum:before {
+            content: counter(page);
+        }
+        .pagecount:before {
+            content: counter(pages);
+        }
+        .footer {
+            position: fixed;
+            bottom: -1cm;
+            left: 0;
+            right: 0;
+            height: 1cm;
+            text-align: center;
+            font-size: 10pt;
+        }
+    </style>
 </head>
 
 <body>
+
+<div class="footer">
+    <?php echo $GLOBALS['TL_LANG']['fe_c4g_reservation']['page'] ?: 'Seite'; ?> <span class="pagenum"></span> <?php echo $GLOBALS['TL_LANG']['fe_c4g_reservation']['page_of'] ?: 'von'; ?> <span class="pagecount"></span>
+</div>
 
 <!-- switch to own logo or remove -->
 <div class="pdf-logo" style="text-align: left">
