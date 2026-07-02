@@ -4214,16 +4214,15 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                 $paramId = substr($keyValue,$pos+1);
                                 $objValue = C4gReservationParamsModel::getCaptionById($paramId);
                                 if ($objValue && isset($participantsArr[$participantKey][$keyArr[1]])) {
-                                        $value = $participantsArr[$participantKey][$keyArr[1]] . ', ' . $objValue;
-                                    } else if ($objValue) {
-                                        $value = $objValue;
-                                    }
+                                    $value = $participantsArr[$participantKey][$keyArr[1]] . ', ' . $objValue;
+                                } else if ($objValue) {
+                                    $value = $objValue;
                                 }
                             }
+                        }
 
-                            if ($value !== 'false') {
-                                $participantsArr[$participantKey][$keyArr[1]] = $value;
-                            }
+                        if ($value !== 'false') {
+                            $participantsArr[$participantKey][$keyArr[1]] = $value;
                         }
                     }
                 }
