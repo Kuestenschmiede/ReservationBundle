@@ -16,7 +16,7 @@
         "contao/core-bundle": "^4.13 || ^5.3",
         "contao/calendar-bundle": "^4.13 || ^5.3",
         "con4gis/projects": "^5.0.34",
-        "con4gis/documents": "^1.6.2",
+        "con4gis/documents": "^1.6.3",
         "con4gis/groups": "^2.10"
     },
     "conflict": {
