@@ -377,8 +377,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event'] = array
             'exclude'           => true,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>254, 'fieldType'=>'radio', 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'forum', 'memberLink' => true, 'tl_class'=>'clr w50'),
-            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>2048, 'fieldType'=>'radio', 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'forum', 'memberLink' => true, 'tl_class'=>'clr w50'),
+            'sql'               => array('type' => 'string', 'length' => 2048, 'default' => '')
         ),
 
     )

@@ -212,8 +212,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('maxlength'=>254, 'rgxp'=>'url', 'decodeEntities'=>true,'mandatory'=>false, 'tl_class'=>'long clr'),
-            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('maxlength'=>2048, 'rgxp'=>'url', 'decodeEntities'=>true,'mandatory'=>false, 'tl_class'=>'long clr'),
+            'sql'               => array('type' => 'string', 'length' => 2048, 'default' => '')
         ),
         'contact_street' => array
         (
