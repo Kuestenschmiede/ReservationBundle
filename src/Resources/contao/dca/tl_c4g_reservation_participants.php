@@ -49,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
         'label' => array
         (
             'fields'            => array('id','title','lastname','firstname','email','cancellation'),
-            'label_callback'    => array($cbClass, 'listFields'),
+            'label_callback'    => array($cbClass,'listFields'),
             'showColumns'       => true,
         ),
 
@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_participants']['TOGGLE'],
                 'icon'                => 'visible.gif',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array($cbClass, 'toggleIcon')
+                'button_callback'     => array($cbClass,'toggleIcon')
             )
         )
     ),
@@ -104,7 +104,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{participants_legend}, title, lastname, firstname, email, comment, participant_params, payed, checkedIn, cancellation;',
+        'default'   =>  '{participants_legend}, title, lastname, firstname, email, comment, participant_params, payed, checkedIn, cancellation',
     ),
 
 
@@ -132,7 +132,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
     //        'exclude'           => true,
     //        'inputType'         => 'text',
     //        'search'            => false,
-    //        'eval'              => array('doNotCopy'=>true, 'maxlength'=>128),
+    //        'eval'              => array('doNotCopy'=>true,'maxlength'=>128),
     //        'save_callback'     => array(array('tl_c4g_reservation_participants','generateUuid')),
     //        'sql'               => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
     //    ),
@@ -145,8 +145,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'sorting'                 => true,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'personal','tl_class'=>'clr'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'lastname' => array
@@ -157,8 +157,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'sorting'                 => true,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'clr'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>true,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'personal','tl_class'=>'clr'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'firstname' => array
@@ -169,8 +169,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'sorting'                 => false,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'long'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>true,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'personal','tl_class'=>'long'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'email' => array
@@ -179,8 +179,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'maxlength'=>254,'rgxp'=>'email','decodeEntities'=>true,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'contact','tl_class'=>'long'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'phone' => array
@@ -189,8 +189,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'long'),
-            'sql'                     => array('type' => 'string', 'length' => 64, 'default' => '')
+            'eval'                    => array('maxlength'=>64,'rgxp'=>'phone','decodeEntities'=>true,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'contact','tl_class'=>'long'),
+            'sql'                     => array('type' => 'string','length' => 64,'default' => '')
         ),
        
         'address' => array
@@ -199,8 +199,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'address','tl_class'=>'long'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'postal' => array(
@@ -208,8 +208,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>32, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => array('type' => 'string', 'length' => 32, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'maxlength'=>32,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'address','tl_class'=>'long'),
+            'sql'                     => array('type' => 'string','length' => 32,'default' => '')
 
         ),
 
@@ -220,8 +220,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'address','tl_class'=>'long'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
 
         ),
 
@@ -233,7 +233,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'sorting'                 => false,
             'inputType'               => 'textarea',
             'default'                 => '',
-            'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
+            'eval'                    => array('mandatory'=>false,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'long'),
             'sql'                     => "text NULL"
         ),
 
@@ -243,7 +243,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'exclude'           => true,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_c4g_reservation_params.caption',
-            'eval'              => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
+            'eval'              => array('chosen'=>true,'mandatory'=>false,'multiple'=>true,'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'               => "blob NULL",
         ),
 
@@ -252,7 +252,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
-            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true, 'submitOnChange'=>false),
+            'eval'              => array('tl_class'=>'long clr','feEditable'=>true,'feViewable'=>true,'submitOnChange'=>false),
             'sql'               => "char(1) NOT NULL default ''"
         ),
 
@@ -261,7 +261,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_participants'] = array
             'exclude'           => true,
             'filter'            => true,
             'inputType'         => 'checkbox',
-            'eval'              => array('tl_class'=>'long clr', 'feEditable'=>true, 'feViewable'=>true, 'submitOnChange'=>false),
+            'eval'              => array('tl_class'=>'long clr','feEditable'=>true,'feViewable'=>true,'submitOnChange'=>false),
             'sql'               => "char(1) NOT NULL default ''"
         ),
 

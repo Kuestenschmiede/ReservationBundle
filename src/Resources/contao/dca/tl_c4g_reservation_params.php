@@ -24,7 +24,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
     (
         'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
-        'onsubmit_callback' => [[\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class, 'purgeReservationFormCache']],
+        'onsubmit_callback' => [[\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class,'purgeReservationFormCache']],
         'sql'               => array
         (
             'keys' => array
@@ -41,16 +41,16 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
         'sorting' => array
         (
             'mode'              => 2,
-            'fields'            => array('caption', 'price', 'taxOptions'),
+            'fields'            => array('caption','price','taxOptions'),
             'panelLayout'       => 'filter;sort,search,limit',
 //            'headerFields'      => array('lastname','firstname'),
         ),
 
         'label' => array
         (
-            'fields'            => array('caption', 'price', 'taxOptions'),
+            'fields'            => array('caption','price','taxOptions'),
             //'format'            => '<span class="reservation_date" style="color:#E30518">%s</span><span class="reservation_time" style="color:#E30518">%s</span><span class="reservation_id" style="color:#E30518">%s</span><span class="lastname" style="color:#E30518">%s</span><span class="firstname" style="color:#E30518">%s</span>',
-            //'label_callback'    => array('tl_c4g_reservation', 'listDates'),
+            //'label_callback'    => array('tl_c4g_reservation','listDates'),
             'showColumns'       => true,
         ),
 
@@ -97,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['TOGGLE'],
                 'icon'                => 'visible.gif',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array('tl_c4g_reservation_params', 'toggleIcon')
+                'button_callback'     => array('tl_c4g_reservation_params','toggleIcon')
             )
         )
     ),
@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  'caption, language, feCaption, price, taxOptions, published;'
+        'default'   =>  'caption, language, feCaption, price, taxOptions, published'
     ),
 
 
@@ -128,8 +128,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>true,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
 
         ),
         'feCaption' => array
@@ -153,8 +153,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
                         'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['language'],
                         'exclude'               => true,
                         'inputType'             => 'select',
-                        'options'               => ['de' => 'Deutsch', 'en' => 'Englisch'],
-                        'eval'                  => array('chosen' => false, 'style'=>'width: 200px')
+                        'options'               => ['de' => 'Deutsch','en' => 'Englisch'],
+                        'eval'                  => array('chosen' => false,'style'=>'width: 200px')
                     )
                 ),
                 'tl_class'=>'clr',
@@ -167,10 +167,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'exclude'                 => true,
             'inputType'               => 'radio',
             'default'                 => 'tNone',
-            'options'                 => array( 'tNone', 'tStandard', 'tReduced'),
+            'options'                 => array( 'tNone','tStandard','tReduced'),
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['references'],
-            'eval'                    => array('submitOnChange' => true, 'tl_class' => 'long clr', 'fieldType'=>'radio', 'tl_class'=>'w50 clr'),
-            'sql'                     => array('type' => 'string', 'length' => 50, 'default' => 'tNone')
+            'eval'                    => array('submitOnChange' => true,'tl_class' => 'long clr','fieldType'=>'radio','tl_class'=>'w50 clr'),
+            'sql'                     => array('type' => 'string','length' => 50,'default' => 'tNone')
         ),
         'price' => array(
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_params']['price'],
@@ -178,7 +178,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_params'] = array
             'search'                  => false,
             'inputType'               => 'text',
             'default'                 => '0.00',
-            'eval'                    => array('rgxp'=>'digit','mandatory'=>true, 'maxlength'=>10, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
+            'eval'                    => array('rgxp'=>'digit','mandatory'=>true,'maxlength'=>10,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'w50 clr'),
             'sql'                     => "double(7,2) unsigned default '0'"
 
         ),
@@ -208,7 +208,7 @@ class tl_c4g_reservation_params extends \Contao\Backend
     public function __construct()
     {
         parent::__construct();
-        $this->import(Contao\BackendUser::class, 'User');
+        $this->import(Contao\BackendUser::class,'User');
     }
 
     public function generateUuid($varValue, DataContainer $dc)
@@ -222,7 +222,7 @@ class tl_c4g_reservation_params extends \Contao\Backend
 
     public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
     {
-        $this->import(Contao\BackendUser::class, 'User');
+        $this->import(Contao\BackendUser::class,'User');
 
         if (strlen(Input::get('tid'))) {
             $this->toggleVisibility(Input::get('tid'), (Input::get('state') == ''));
@@ -240,8 +240,8 @@ class tl_c4g_reservation_params extends \Contao\Backend
     public function toggleVisibility($intId, $blnPublished)
     {
         // Check permissions to publish
-        if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_params::published', 'alexf')) {
-            $this->log('Not enough permissions to show/hide record ID "' . $intId . '"', 'tl_c4g_reservation_params toggleVisibility', TL_ERROR);
+        if (!$this->User->isAdmin && !$this->User->hasAccess('tl_c4g_reservation_params::published','alexf')) {
+            $this->log('Not enough permissions to show/hide record ID "' . $intId . '"','tl_c4g_reservation_params toggleVisibility', TL_ERROR);
             $this->redirect(System::getContainer()->get('router')->generate('contao_backend').'?act=error');
         }
 

@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_event_speaker']['toggle'],
                 'icon'                => 'visible.gif',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array($cbClass, 'toggleIcon')
+                'button_callback'     => array($cbClass,'toggleIcon')
             )
         )
     ),
@@ -100,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{speaker_legend},title, firstname, lastname, alias, email, phone, address, postal, city, website, vita, photo, speakerForwarding, sorting, published;'
+        'default'   =>  '{speaker_legend},title, firstname, lastname, alias, email, phone, address, postal, city, website, vita, photo, speakerForwarding, sorting, published'
     ),
 
 
@@ -127,8 +127,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'w50 clr'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'firstname' => array (
@@ -138,8 +138,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => true,
             'sorting'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50 clr'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>true,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'w50 clr'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
 
         ),
 
@@ -150,8 +150,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => true,
             'sorting'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>true,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
 
         ),
 
@@ -161,10 +161,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'long clr'),
+            'eval' => array('rgxp'=>'alias','doNotCopy'=>true,'unique'=>true,'maxlength'=>255,'tl_class'=>'long clr'),
             'save_callback' => array
             (
-                array($cbClass, 'generateAlias')
+                array($cbClass,'generateAlias')
             ),
             'sql' => "varchar(255) BINARY NOT NULL default ''"
         ),
@@ -175,8 +175,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w50 clr'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'maxlength'=>254,'rgxp'=>'email','decodeEntities'=>true,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'contact','tl_class'=>'w50 clr'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'phone' => array
@@ -185,8 +185,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w50'),
-            'sql'                     => array('type' => 'string', 'length' => 64, 'default' => '')
+            'eval'                    => array('maxlength'=>64,'rgxp'=>'phone','decodeEntities'=>true,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'contact','tl_class'=>'w50'),
+            'sql'                     => array('type' => 'string','length' => 64,'default' => '')
         ),
 
         'address' => array
@@ -195,8 +195,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'long clr'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'address','tl_class'=>'long clr'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'postal' => array (
@@ -204,8 +204,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'exclude'                 => true,
             'search'                  => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>32, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'w50 clr'),
-            'sql'                     => array('type' => 'string', 'length' => 32, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'maxlength'=>32,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'address','tl_class'=>'w50 clr'),
+            'sql'                     => array('type' => 'string','length' => 32,'default' => '')
 
         ),
 
@@ -216,8 +216,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'maxlength'=>254, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'w50'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'address','tl_class'=>'w50'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
 
         ),
 
@@ -229,7 +229,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'				  => 'textarea',
-            'eval'                    => ['mandatory'=>false, 'rte'=>'tinyMCE', 'helpwizard'=>true, 'tl_class'=>'long clr'],
+            'eval'                    => ['mandatory'=>false,'rte'=>'tinyMCE','helpwizard'=>true,'tl_class'=>'long clr'],
             'explanation'             => 'insertTags',
             'sql'                     => "text NULL"
         ),
@@ -243,7 +243,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'search'            => false,
             'extensions'        => 'jpg, jpeg, png, tif',
             'exclude'           => true,
-            'eval'              => array('filesOnly'=>true, 'files'=>true, 'fieldType'=>'radio', 'tl_class'=>'long clr', 'extensions'=>Config::get('validImageTypes')),
+            'eval'              => array('filesOnly'=>true,'files'=>true,'fieldType'=>'radio','tl_class'=>'long clr','extensions'=>Config::get('validImageTypes')),
             'sql'               => "blob NULL"
         ),
 
@@ -253,8 +253,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'exclude'                 => true,
             'search'                  => true,
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>2048, 'fieldType'=>'radio', 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'forum', 'memberLink' => true, 'tl_class'=>'clr w50'),
-            'sql'                     => array('type' => 'string', 'length' => 2048, 'default' => '')
+            'eval'                    => array('rgxp'=>'url','decodeEntities'=>true,'maxlength'=>2048,'fieldType'=>'radio','feEditable' => true,'feViewable' => true,'feGroup' => 'forum','memberLink' => true,'tl_class'=>'clr w50'),
+            'sql'                     => array('type' => 'string','length' => 2048,'default' => '')
         ),
 
         'speakerForwarding' => array
@@ -263,9 +263,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'exclude'                 => true,
             'inputType'               => 'pageTree',
             'foreignKey'              => 'tl_page.title',
-            'eval'                    => array('tl_class'=>'w50 wizard','mandatory'=>false, 'fieldType'=>'radio'),
+            'eval'                    => array('tl_class'=>'w50 wizard','mandatory'=>false,'fieldType'=>'radio'),
             'sql'                     => "int(10) unsigned NOT NULL default '0'",
-            'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+            'relation'                => array('type'=>'hasOne','load'=>'eager')
         ),
 
         'sorting' => array
@@ -276,7 +276,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_speaker'] = array
             'sorting'           => true,
             'search'            => false,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'eval'              => array('rgxp'=>'digit','mandatory'=>false,'tl_class'=>'w50 clr'),
             'sql'               => "int(5) unsigned NOT NULL default '0'"
         ),
         'published' => array(

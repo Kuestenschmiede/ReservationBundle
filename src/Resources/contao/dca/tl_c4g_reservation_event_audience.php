@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_audience'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{audience_legend}, targetAudience;'
+        'default'   =>  '{audience_legend}, targetAudience'
     ),
 
 
@@ -115,8 +115,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_audience'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>true,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
 
         )
     )
@@ -135,7 +135,7 @@ class tl_c4g_reservation_event_audience extends Backend
     public function __construct()
     {
         parent::__construct();
-        $this->import(BackendUser::class, 'User');
+        $this->import(BackendUser::class,'User');
     }
 
     public function generateUuid($varValue, DataContainer $dc)

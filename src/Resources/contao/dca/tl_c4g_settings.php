@@ -11,14 +11,14 @@
 $exportExists = class_exists('con4gis\ExportBundle\con4gisExportBundle');
 if ($exportExists) {
     Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-        ->addLegend('c4g_reservation_legend', 'con4gisIoLegend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER, true)
-        ->addField(['reservationForwarding','reservationForwardingButtonCaption','exportSelection', 'taxRateStandard', 'taxRateReduced'], 'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-        ->applyToPalette('default', 'tl_c4g_settings');
+        ->addLegend('c4g_reservation_legend','con4gisIoLegend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER, true)
+        ->addField(['reservationForwarding','reservationForwardingButtonCaption','exportSelection','taxRateStandard','taxRateReduced'],'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+        ->applyToPalette('default','tl_c4g_settings');
 } else {
     Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-        ->addLegend('c4g_reservation_legend', 'con4gisIoLegend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER, true)
-        ->addField(['reservationForwarding','reservationForwardingButtonCaption'], 'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-        ->applyToPalette('default', 'tl_c4g_settings');
+        ->addLegend('c4g_reservation_legend','con4gisIoLegend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER, true)
+        ->addField(['reservationForwarding','reservationForwardingButtonCaption'],'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+        ->applyToPalette('default','tl_c4g_settings');
 }
 
 /**
@@ -30,9 +30,9 @@ $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['reservationForwarding'] = array
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',
-    'eval'                    => array('tl_class'=>'w50 wizard','mandatory'=>false, 'fieldType'=>'radio'),
+    'eval'                    => array('tl_class'=>'w50 wizard','mandatory'=>false,'fieldType'=>'radio'),
     'sql'                     => "int(10) unsigned NOT NULL default '0'",
-    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+    'relation'                => array('type'=>'hasOne','load'=>'eager')
 );
 
 $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['reservationForwardingButtonCaption'] = array (
@@ -42,9 +42,9 @@ $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['reservationForwardingButtonCapt
     'search'                  => false,
     'sorting'                 => false,
     'inputType'               => 'text',
-    'eval'                    => array('mandatory'=>false, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'clr long'),
+    'eval'                    => array('mandatory'=>false,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'clr long'),
     // 'sql'                     => "varchar(254) NOT NULL default ''"
-    'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+    'sql'                     => array('type' => 'string','length' => 254,'default' => '')
 );
 
 if ($exportExists) {
@@ -54,16 +54,16 @@ if ($exportExists) {
         'filter'            => true,
         'exclude'           => true,
         'foreignKey'        => 'tl_c4g_export.title',
-        'eval'              => array('mandatory' => false, 'tl_class' => 'long', 'chosen' => true, 'includeBlankOption' => true),
+        'eval'              => array('mandatory' => false,'tl_class' => 'long','chosen' => true,'includeBlankOption' => true),
         'sql'               => "int(10) unsigned NOT NULL default 0",
-        'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+        'relation'          => array('type' => 'hasOne','load' => 'lazy'),
     );
 $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['taxRateStandard'] = array(
         'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateStandard'],
         'exclude'                 => true,
         'inputType'               => 'text',
         'default'                 => 19.0,
-        'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>10, 'default'=> 19.0, 'feEditable'=>true, 'feViewable'=>true, 'tl_class' => 'w50'),
+        'eval'                    => array('rgxp'=>'digit','mandatory'=>false,'maxlength'=>10,'default'=> 19.0,'feEditable'=>true,'feViewable'=>true,'tl_class' => 'w50'),
         'sql'                     => "double(7,2) unsigned NOT NULL default 19"
 );
 $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['taxRateReduced'] = array(
@@ -71,7 +71,7 @@ $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['taxRateReduced'] = array(
         'exclude'                 => true,
         'inputType'               => 'text',
         'default'                 => 7.0,
-        'eval'                    => array('rgxp'=>'digit','mandatory'=>false, 'maxlength'=>10, 'default'=> 7.0, 'feEditable'=>true, 'feViewable'=>true, 'tl_class' => 'w50'),
+        'eval'                    => array('rgxp'=>'digit','mandatory'=>false,'maxlength'=>10,'default'=> 7.0,'feEditable'=>true,'feViewable'=>true,'tl_class' => 'w50'),
         'sql'                     => "double(7,2) unsigned NOT NULL default 7"
 );
 }

@@ -20,7 +20,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
     (
         'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
-        'onsubmit_callback' => [[\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class, 'purgeReservationFormCache']],
+        'onsubmit_callback' => [[\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class,'purgeReservationFormCache']],
         'sql'               => array
         (
             'keys' => array
@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
     'palettes' => array
     (
         '__selector__' => ['ics'],
-        'default'   =>  '{location_legend}, name, alias, locgeox, locgeoy;{contact_legend},contact_name,contact_phone,contact_email,contact_website,contact_street,contact_postal,contact_city,ics;{bank_legend},bankName,bankIban,bankBic,bankQrFileName;'
+        'default'   =>  '{location_legend}, name, alias, locgeox, locgeoy;{contact_legend},contact_name,contact_phone,contact_email,contact_website,contact_street,contact_postal,contact_city,ics;{bank_legend},bankName,bankIban,bankBic,bankQrFileName'
     ),
 
     'subpalettes' => array
@@ -119,8 +119,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'exclude'           => true,
-            'options_callback'  => array($cbClass, 'loadMemberOptions'),
-            'eval'              => array('mandatory'=>false, 'disabled' => true, 'tl_class' => 'clr long'),
+            'options_callback'  => array($cbClass,'loadMemberOptions'),
+            'eval'              => array('mandatory'=>false,'disabled' => true,'tl_class' => 'clr long'),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
@@ -132,8 +132,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'search'                  => true,
             'sorting'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>true,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
 
         ),
 
@@ -143,10 +143,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+            'eval' => array('rgxp'=>'alias','doNotCopy'=>true,'unique'=>true,'maxlength'=>255,'tl_class'=>'w50'),
             'save_callback' => array
             (
-                array($cbClass, 'generateAlias')
+                array($cbClass,'generateAlias')
             ),
             'sql' => "varchar(255) BINARY NOT NULL default ''"
         ),
@@ -157,10 +157,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude'                 => true,
             'inputType'               => 'c4g_text',
             'default'                 => '',
-            'eval'                    => array('tl_class'=>'w50 wizard', 'require_input'=>true ),
+            'eval'                    => array('tl_class'=>'w50 wizard','require_input'=>true ),
             'save_callback'           => array(array($cbClass,'setCenterLon')),
-            'wizard'                  => [['con4gis\MapsBundle\Classes\GeoPicker', 'getPickerLink']],
-            'sql'                     => array('type' => 'string', 'length' => 20, 'default' => '')
+            'wizard'                  => [['con4gis\MapsBundle\Classes\GeoPicker','getPickerLink']],
+            'sql'                     => array('type' => 'string','length' => 20,'default' => '')
         ),
 
         'locgeoy' => array
@@ -169,10 +169,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude'                 => true,
             'inputType'               => 'c4g_text',
             'default'                 => '',
-            'eval'                    => array('tl_class'=>'w50 wizard', 'require_input'=>true ),
+            'eval'                    => array('tl_class'=>'w50 wizard','require_input'=>true ),
             'save_callback'           => array(array($cbClass,'setCenterLat')),
-            'wizard'                  => [['con4gis\MapsBundle\Classes\GeoPicker', 'getPickerLink']],
-            'sql'                     => array('type' => 'string', 'length' => 20, 'default' => '')
+            'wizard'                  => [['con4gis\MapsBundle\Classes\GeoPicker','getPickerLink']],
+            'sql'                     => array('type' => 'string','length' => 20,'default' => '')
         ),
 
         'contact_name' => array
@@ -184,8 +184,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'sorting'           => true,
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'tl_class'=>'w50 clr'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('mandatory'=>false,'tl_class'=>'w50 clr'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'contact_phone' => array
@@ -194,8 +194,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'mandatory'=>false, 'tl_class'=>'long clr '),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('maxlength'=>64,'rgxp'=>'phone','decodeEntities'=>true,'mandatory'=>false,'tl_class'=>'long clr '),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
         'contact_email' => array
         (
@@ -203,8 +203,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('maxlength'=>254, 'rgxp'=>'email', 'decodeEntities'=>true,'mandatory'=>false, 'tl_class'=>'long clr'),
-            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('maxlength'=>254,'rgxp'=>'email','decodeEntities'=>true,'mandatory'=>false,'tl_class'=>'long clr'),
+            'sql'               => array('type' => 'string','length' => 254,'default' => '')
         ),
         'contact_website' => array
         (
@@ -212,8 +212,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('maxlength'=>2048, 'rgxp'=>'url', 'decodeEntities'=>true,'mandatory'=>false, 'tl_class'=>'long clr'),
-            'sql'               => array('type' => 'string', 'length' => 2048, 'default' => '')
+            'eval'              => array('maxlength'=>2048,'rgxp'=>'url','decodeEntities'=>true,'mandatory'=>false,'tl_class'=>'long clr'),
+            'sql'               => array('type' => 'string','length' => 2048,'default' => '')
         ),
         'contact_street' => array
         (
@@ -221,8 +221,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'tl_class'=>'long clr'),
-            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('mandatory'=>false,'tl_class'=>'long clr'),
+            'sql'               => array('type' => 'string','length' => 254,'default' => '')
         ),
         'contact_postal' => array
         (
@@ -230,8 +230,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'default'           => '',
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit','mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('rgxp'=>'digit','mandatory'=>false,'tl_class'=>'w50'),
+            'sql'               => array('type' => 'string','length' => 254,'default' => '')
         ),
         'contact_city' => array
         (
@@ -242,8 +242,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'sorting'           => true,
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('mandatory'=>false,'tl_class'=>'w50'),
+            'sql'               => array('type' => 'string','length' => 254,'default' => '')
         ),
         'ics' => array
         (
@@ -258,7 +258,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['icsAlert'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'maxval'=> '480', 'mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'eval'              => array('rgxp'=>'digit','maxval'=> '480','mandatory'=>false,'tl_class'=>'w50 clr'),
             'sql'               => "smallint(5) unsigned NOT NULL default 0"
         ),
         'icsPath'  => array
@@ -267,7 +267,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'exclude'           => true,
             'default'           => null,
             'inputType'         => 'fileTree',
-            'eval'              => array('fieldType' => 'radio', 'tl_class' => 'clr', 'mandatory' => true),
+            'eval'              => array('fieldType' => 'radio','tl_class' => 'clr','mandatory' => true),
             'sql'               => "blob NULL"
         ),
         'bankName' => array
@@ -275,31 +275,31 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_location'] = array
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['bankName'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('mandatory'=>false,'tl_class'=>'w50'),
+            'sql'               => array('type' => 'string','length' => 254,'default' => '')
         ),
         'bankIban' => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['bankIban'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('mandatory'=>false,'tl_class'=>'w50'),
+            'sql'               => array('type' => 'string','length' => 254,'default' => '')
         ),
         'bankBic' => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['bankBic'],
             'exclude'           => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('mandatory'=>false,'tl_class'=>'w50'),
+            'sql'               => array('type' => 'string','length' => 254,'default' => '')
         ),
         'bankQrFileName' => array
         (
             'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_location']['bankQrFileName'],
             'exclude'           => true,
             'inputType'         => 'fileTree',
-            'eval'              => array('fieldType' => 'radio', 'filesOnly' => true, 'extensions' => \Contao\Config::get('validImageTypes'), 'mandatory' => false, 'tl_class' => 'clr'),
+            'eval'              => array('fieldType' => 'radio','filesOnly' => true,'extensions' => \Contao\Config::get('validImageTypes'),'mandatory' => false,'tl_class' => 'clr'),
             'sql'               => "binary(16) NULL"
         ),
     )

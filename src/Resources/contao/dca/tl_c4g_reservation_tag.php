@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_tag'] = array
             'exclude'                 => true,
             'search'                  => true,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+            'eval'                    => array('mandatory'=>true,'maxlength'=>255,'tl_class'=>'w50'),
             'sql'                     => "varchar(255) NOT NULL default ''"
         ),
         'icon' => array
@@ -104,7 +104,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_tag'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_tag']['icon'],
             'exclude'                 => true,
             'inputType'               => 'fileTree',
-            'eval'                    => array('filesOnly'=>true, 'extensions'=>\Contao\Config::get('validImageTypes'), 'fieldType'=>'radio', 'mandatory'=>true, 'tl_class'=>'clr'),
+            'eval'                    => array('filesOnly'=>true,'extensions'=>\Contao\Config::get('validImageTypes'),'fieldType'=>'radio','mandatory'=>true,'tl_class'=>'clr'),
             'sql'                     => "binary(16) NULL"
         )
     )

@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_topic'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{topic_legend}, topic;'
+        'default'   =>  '{topic_legend}, topic'
     ),
 
 
@@ -114,8 +114,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_event_topic'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'w50'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>true,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
 
         )
     )
@@ -134,7 +134,7 @@ class tl_c4g_reservation_event_topic extends Backend
     public function __construct()
     {
         parent::__construct();
-        $this->import(BackendUser::class, 'User');
+        $this->import(BackendUser::class,'User');
     }
 
     public function generateUuid($varValue, DataContainer $dc)

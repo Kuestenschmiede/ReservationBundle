@@ -26,34 +26,34 @@ use Contao\Input;
 $str = 'tl_calendar_events';
 
 $GLOBALS['TL_DCA'][$str]['config']['ctable'][] = 'tl_c4g_reservation_event';
-$GLOBALS['TL_DCA'][$str]['config']['onload_callback'][] = ['tl_c4g_reservation_event_bridge', 'c4gLoadReservationData'];
-$GLOBALS['TL_DCA'][$str]['list']['sorting']['child_record_callback'] = ['tl_c4g_reservation_event_bridge', 'loadChildRecord'];
+$GLOBALS['TL_DCA'][$str]['config']['onload_callback'][] = ['tl_c4g_reservation_event_bridge','c4gLoadReservationData'];
+$GLOBALS['TL_DCA'][$str]['list']['sorting']['child_record_callback'] = ['tl_c4g_reservation_event_bridge','loadChildRecord'];
 
 $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gEditEvent'] = [
     'label'               => &$GLOBALS['TL_LANG'][$str]['c4gEditEvent'],
     'icon'                => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_types.svg',
-    'button_callback'     => ['tl_c4g_reservation_event_bridge', 'c4gEditEvent'],
+    'button_callback'     => ['tl_c4g_reservation_event_bridge','c4gEditEvent'],
     'exclude'             => true
 ];
 $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gExportReservations'] = [
     'href'                => 'key=runexport',
     'label'               => &$GLOBALS['TL_LANG'][$str]['c4gExportReservations'],
     'icon'                => 'bundles/con4gisexport/images/be-icons/export.svg',
-    'button_callback'     => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationEvents::class, 'runExport'],
+    'button_callback'     => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationEvents::class,'runExport'],
     'exclude'             => true
 ];
 
 $GLOBALS['TL_DCA'][$str]['list']['operations']['c4g_participant_list'] = [
     'label'               => &$GLOBALS['TL_LANG'][$str]['c4g_participant_list'],
     'icon'                => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation_audience.svg',
-    'button_callback'     => ['tl_c4g_reservation_event_bridge', 'c4gShowAllParticipants'],
+    'button_callback'     => ['tl_c4g_reservation_event_bridge','c4gShowAllParticipants'],
     'exclude'             => true
 ];
 
 $GLOBALS['TL_DCA'][$str]['list']['operations']['c4gEditReservations'] = [
     'label'               => &$GLOBALS['TL_LANG'][$str]['c4gEditReservations'],
     'icon'                => 'bundles/con4gisreservation/images/be-icons/con4gis_reservation.svg',
-    'button_callback'     => ['tl_c4g_reservation_event_bridge', 'c4gShowReservations'],
+    'button_callback'     => ['tl_c4g_reservation_event_bridge','c4gShowReservations'],
     'exclude'             => true
 ];
 
@@ -123,7 +123,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
                 $topicNames[] = $topicElement['topic'];
             }
             if (!empty($topicNames)) {
-                $topics = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'].':</strong></div><div>' . implode(', ',$topicNames) . '</div></div>';
+                $topics = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['topic'].':</strong></div><div>' . implode(',',$topicNames) . '</div></div>';
             }
         }
 
@@ -136,7 +136,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
                 $speakerNames[] = $speakerElement['title'] ? $speakerElement['title'] . ' ' . $speakerElement['firstname'] . ' ' . $speakerElement['lastname'] : $speakerElement['firstname'] .' '.$speakerElement['lastname'];
             }
             if (!empty($speakerNames)) {
-                $speakers = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'].':</strong></div><div>' . implode(', ',$speakerNames) . '</div></div>';
+                $speakers = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['speaker'].':</strong></div><div>' . implode(',',$speakerNames) . '</div></div>';
             }
         }
 
@@ -230,7 +230,7 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
             $result = Database::getInstance()->prepare("SELECT id FROM tl_c4g_reservation_event WHERE `pid`=?")->execute($row['id'])->fetchAllAssoc();
 
             if ($result && count($result) > 1) {
-                C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '. $row['id']);
+                C4gLogModel::addLogEntry('reservation','There are more than one event connections. Check Event: '. $row['id']);
             } else if ($result && count($result) == 1) {
                 $href = System::getContainer()->get('router')->generate('contao_backend')."?do=$do&table=tl_c4g_reservation_event&amp;act=edit&amp;id=".$result[0]['id']."&amp;pid=".$row['id']."&amp;rt=".$rt;
             } else {

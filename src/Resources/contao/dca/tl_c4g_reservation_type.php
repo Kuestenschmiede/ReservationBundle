@@ -34,8 +34,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     (
         'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
-        'onsubmit_callback' => [[\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class, 'purgeReservationFormCache']],
-        'onload_callback'   => [[$cbClass, 'showInfoMessage']],
+        'onsubmit_callback' => [[\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class,'purgeReservationFormCache']],
+        'onload_callback'   => [[$cbClass,'showInfoMessage']],
         'sql'               => array
         (
             'keys' => array
@@ -60,7 +60,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'label' => array
         (
             'fields'            => array('caption','reservationObjectType','periodType','objectCount'),
-            // 'label_callback'    => array($cbClass, 'listTypes'),
+            // 'label_callback'    => array($cbClass,'listTypes'),
             'showColumns'       => true
         ),
 
@@ -107,7 +107,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['TOGGLE'],
                 'icon'                => 'visible.gif',
                 'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array($cbClass, 'toggleIcon')
+                'button_callback'     => array($cbClass,'toggleIcon')
             )
         )
     ),
@@ -116,12 +116,12 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
     'palettes' => array
     (
         '__selector__'  => array('periodType','auto_del','reservationObjectType'),
-        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,ignoreCapacity,almostFullyBookedAt,included_params,additional_params,additionalParamsFieldType,additionalParamsMandatory,participant_params,participantParamsFieldType,participantParamsMandatory,location,location_id,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send;'
+        'default'       =>  '{type_legend},caption,alias,options,description;{object_legend},reservationObjectType,bookRunning,minParticipantsPerBooking,maxParticipantsPerBooking,ignoreCapacity,almostFullyBookedAt,included_params,additional_params,additionalParamsFieldType,additionalParamsMandatory,participant_params,participantParamsFieldType,participantParamsMandatory,location,location_id,published;{notification_legend:hide},notification_type,notification_confirmation_type,notification_special_type;{expert_legend:hide},member_id,group_id,auto_del,auto_send'
     ),
 
     //Subpalettes
    'subpalettes' => array(
-        'auto_del_daily'                => 'del_time;',
+        'auto_del_daily'                => 'del_time',
         'reservationObjectType_1'       => 'cloneObject,periodType,objectCount,min_residence_time,max_residence_time,default_residence_time,severalBookings,directBooking',
         'reservationObjectType_2'       => '',
         'reservationObjectType_3'       => 'cloneObject,periodType,objectCount,min_residence_time,max_residence_time,default_residence_time,severalBookings,directBooking',
@@ -146,9 +146,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'select',
-            'options_callback'  => array($cbClass, 'loadMemberOptions'),
-            'eval'              => array('mandatory'=>false, 'chosen'=>true,
-                'disabled' => false, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId']),
+            'options_callback'  => array($cbClass,'loadMemberOptions'),
+            'eval'              => array('mandatory'=>false,'chosen'=>true,
+                'disabled' => false,'includeBlankOption' => true,'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyMemberId']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
@@ -159,9 +159,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'select',
-            'options_callback'  => array($cbClass, 'loadGroupOptions'),
-            'eval'              => array('mandatory'=>false, 'chosen'=>true,
-                'disabled' => false, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyGroupId']),
+            'options_callback'  => array($cbClass,'loadGroupOptions'),
+            'eval'              => array('mandatory'=>false,'chosen'=>true,
+                'disabled' => false,'includeBlankOption' => true,'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['emptyGroupId']),
             'filter'            => true,
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
@@ -175,8 +175,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'flag'              => 1,
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => array('mandatory' => true, 'tl_class' => 'w50'),
-            'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'              => array('mandatory' => true,'tl_class' => 'w50'),
+            'sql'               => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'alias' => array
@@ -185,13 +185,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'tl_class'=>'w50'),
+            'eval' => array('rgxp'=>'alias','doNotCopy'=>true,'unique'=>true,'tl_class'=>'w50'),
             'save_callback' => array
             (
-                array($cbClass, 'generateAlias')
+                array($cbClass,'generateAlias')
             ),
             // 'sql' => "varchar(255) BINARY NOT NULL default ''"
-            'sql'    => array('type' => 'string', 'length' => 254, 'default' => '')
+            'sql'    => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'options' => array
@@ -215,8 +215,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
                         'label'                 => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['language'],
                         'exclude'               => true,
                         'inputType'             => 'select',
-                        'options'               => ['de' => 'Deutsch', 'en' => 'Englisch'],
-                        'eval'                  => array('chosen' => false, 'style'=>'width: 200px')
+                        'options'               => ['de' => 'Deutsch','en' => 'Englisch'],
+                        'eval'                  => array('chosen' => false,'style'=>'width: 200px')
                     )
                 ),
                 'tl_class'=>'clr',
@@ -234,7 +234,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'options'                 => ['1','3','2'],
             'reference'               => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type']['referencesObjectType'],
             'eval'                    => ['tl_class'=>'clr long','submitOnChange' => true],
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '1')
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '1')
         ),
 
        'periodType' => array
@@ -245,7 +245,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'         => 'select',
             'options'           => array('minute','hour','day','overnight','week'),
             'reference'         => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
-            'eval'              => array('tl_class'=>'w50', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>true, 'submitOnChange' => true),
+            'eval'              => array('tl_class'=>'w50','feEditable'=>true,'feViewable'=>true,'mandatory'=>true,'submitOnChange' => true),
             'sql'               => "char(25) NOT NULL default ''"
        ),
 
@@ -255,7 +255,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'default'           => '0',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'eval'              => array('rgxp'=>'digit','mandatory'=>false,'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NOT NULL default 0"
         ),
         'max_residence_time' => array
@@ -264,7 +264,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'default'           => '0',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'eval'              => array('rgxp'=>'digit','mandatory'=>false,'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NOT NULL default 0"
         ),
         'default_residence_time' => array
@@ -273,7 +273,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'inputType'         => 'text',
             'default'           => '0',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'eval'              => array('rgxp'=>'digit','mandatory'=>false,'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NOT NULL default 0"
         ),
 
@@ -283,7 +283,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'eval'              => array('rgxp'=>'digit','mandatory'=>false,'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NULL default 0"
         ),
 
@@ -294,7 +294,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                 => true,
             'filter'                  => true,
             'inputType'               => 'checkbox',
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50 clr'),
+            'eval'                    => array('mandatory'=>false,'multiple'=>false,'tl_class'=>'w50 clr'),
             'sql'                     => "int(1) unsigned NULL default 0"
         ),
 
@@ -305,7 +305,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                 => true,
             'filter'                  => false,
             'inputType'               => 'checkbox',
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50 clr'),
+            'eval'                    => array('mandatory'=>false,'multiple'=>false,'tl_class'=>'w50 clr'),
             'sql'                     => "int(1) unsigned NULL default 0"
         ),
 
@@ -316,8 +316,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'filter'                  => true,
             'inputType'               => 'select',
             'foreignKey'              => 'tl_c4g_reservation_object.caption',
-            'eval'                    => array('mandatory'=>false, 'includeBlankOption' => true, 'tl_class' => 'long clr', 'multiple'=>false, 'chosen'=>true),
-            'sql'                     => array('type' => 'string', 'length' => 10, 'default' => '')
+            'eval'                    => array('mandatory'=>false,'includeBlankOption' => true,'tl_class' => 'long clr','multiple'=>false,'chosen'=>true),
+            'sql'                     => array('type' => 'string','length' => 10,'default' => '')
         ),
 
         'minParticipantsPerBooking' => array
@@ -326,7 +326,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'default'           => 1,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50 clr'),
+            'eval'              => array('rgxp'=>'digit','mandatory'=>false,'tl_class'=>'w50 clr'),
             'sql'               => "smallint(5) unsigned NULL default 1"
         ),
 
@@ -336,7 +336,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'eval'              => array('rgxp'=>'digit','mandatory'=>false,'tl_class'=>'w50'),
             'sql'               => "smallint(5) unsigned NULL default 0"
         ),
 
@@ -347,7 +347,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                 => true,
             'filter'                  => true,
             'inputType'               => 'checkbox',
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50'),
+            'eval'                    => array('mandatory'=>false,'multiple'=>false,'tl_class'=>'w50'),
             'sql'                     => "int(1) unsigned NULL default 0"
         ),
 
@@ -357,7 +357,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'           => true,
             'default'           => 0,
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'w50'),
+            'eval'              => array('rgxp'=>'digit','mandatory'=>false,'tl_class'=>'w50'),
             'sql'               => "smallint(3) unsigned NULL default 0"
         ),
 
@@ -367,7 +367,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                 => true,
             'filter'                  => true,
             'inputType'               => 'checkbox',
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50 clr'),
+            'eval'                    => array('mandatory'=>false,'multiple'=>false,'tl_class'=>'w50 clr'),
             'sql'                     => "int(1) unsigned NULL default 0"
         ),
 
@@ -378,9 +378,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_c4g_reservation_location.name',
-            'eval'              => array('chosen' => true, 'includeBlankOption' => true, 'mandatory' => false, 'tl_class' => 'long clr'),
+            'eval'              => array('chosen' => true,'includeBlankOption' => true,'mandatory' => false,'tl_class' => 'long clr'),
             'sql'               => "int(10) unsigned NOT NULL default 0",
-            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+            'relation'          => array('type' => 'hasOne','load' => 'lazy'),
         ),
 
         'location_id'  => array
@@ -390,9 +390,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_c4g_reservation_location.name',
-            'eval'              => array('chosen' => true, 'includeBlankOption' => true, 'mandatory' => false, 'tl_class' => 'long clr'),
+            'eval'              => array('chosen' => true,'includeBlankOption' => true,'mandatory' => false,'tl_class' => 'long clr'),
             'sql'               => "int(10) unsigned NOT NULL default 0",
-            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+            'relation'          => array('type' => 'hasOne','load' => 'lazy'),
         ),
 
         'notification_type'  => array
@@ -402,7 +402,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'notification_confirmation_type'  => array
@@ -412,7 +412,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'notification_special_type'  => array
@@ -422,7 +422,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'inputType'               => 'checkbox',
             'foreignKey'              => 'tl_nc_notification.title',
             'eval'                    => array('multiple' => true),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
         'auto_send' => array
         (
@@ -432,7 +432,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'reference'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
             'default'               =>'no_sending',
             'options'               => array('minutely','no_sending'),
-            'eval'                  => array('tl_class'=>'long', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'submitOnChange' => false),
+            'eval'                  => array('tl_class'=>'long','feEditable'=>true,'feViewable'=>true,'mandatory'=>false,'submitOnChange' => false),
             'sql'                   => "char(25) default 'no_sending'"
         ),
         'auto_del' => array
@@ -443,7 +443,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'reference'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_type'],
             'default'               =>'no_delete',
             'options'               => array('daily','no_delete'),
-            'eval'                  => array('tl_class'=>'long', 'feEditable'=>true, 'feViewable'=>true, 'mandatory'=>false, 'submitOnChange' => true),
+            'eval'                  => array('tl_class'=>'long','feEditable'=>true,'feViewable'=>true,'mandatory'=>false,'submitOnChange' => true),
             'sql'                   => "char(25) default 'no_delete'"
         ),
         'del_time' => array
@@ -452,7 +452,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                  =>true,
             'inputType'                =>'text',
             'default'                  =>'30',
-            'eval'                     =>array('rgxp'=>'digit', 'mandatory'=>false, 'tl_class'=>'long wizard'),
+            'eval'                     =>array('rgxp'=>'digit','mandatory'=>false,'tl_class'=>'long wizard'),
             'sql'                      =>"smallint(5) unsigned NULL"
 
         ),
@@ -467,7 +467,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                 => true,
             'inputType'               => 'text',
             'flag'                    => 6,
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>true, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
+            'eval'                    => array('rgxp'=>'date','mandatory'=>true,'doNotCopy'=>true,'datepicker'=>true,'tl_class'=>'w50 wizard'),
             'sql'                     => "int(10) unsigned NULL default 0"
         ),
 
@@ -481,7 +481,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                 => true,
             'inputType'               => 'text',
             'flag'                    => 6,
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>true, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
+            'eval'                    => array('rgxp'=>'date','mandatory'=>true,'doNotCopy'=>true,'datepicker'=>true,'tl_class'=>'w50 wizard'),
             'sql'                     => "int(10) unsigned NULL default 0"
         ),
 
@@ -492,9 +492,9 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'           => 0,
             'inputType'         => 'select',
             'foreignKey'        => 'tl_calendar_events.title',
-            'eval'              => array('mandatory' => false, 'tl_class' => 'long'),
+            'eval'              => array('mandatory' => false,'tl_class' => 'long'),
             'sql'               => "int(10) unsigned NOT NULL default 0",
-            'relation'          => array('type' => 'hasOne', 'load' => 'lazy'),
+            'relation'          => array('type' => 'hasOne','load' => 'lazy'),
         ),
 
         'event_dayBegin' => array
@@ -503,7 +503,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'                 => 0,
             'exclude'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
+            'eval'                    => array('rgxp'=>'date','mandatory'=>false,'doNotCopy'=>true,'datepicker'=>true,'tl_class'=>'w50 wizard'),
             'sql'                     => "int(10) unsigned NULL default 0"
         ),
 
@@ -513,7 +513,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'                 => 0,
             'exclude'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50 wizard', 'datepicker'=>true),
+            'eval'                    => array('rgxp'=>'time','mandatory'=>false,'doNotCopy'=>true,'tl_class'=>'w50 wizard','datepicker'=>true),
             'sql'                     => "int(10) unsigned NULL default 0"
         ),
 
@@ -523,7 +523,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'                 => 0,
             'exclude'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
+            'eval'                    => array('rgxp'=>'date','mandatory'=>false,'doNotCopy'=>true,'datepicker'=>true,'tl_class'=>'w50 wizard'),
             'sql'                     => "int(10) unsigned NULL default 0"
         ),
 
@@ -533,7 +533,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'                 => 0,
             'exclude'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'time', 'mandatory'=>false, 'doNotCopy'=>true, 'tl_class'=>'w50 wizard', 'datepicker'=>true),
+            'eval'                    => array('rgxp'=>'time','mandatory'=>false,'doNotCopy'=>true,'tl_class'=>'w50 wizard','datepicker'=>true),
             'sql'                     => "int(10) unsigned NULL default 0"
         ),
 
@@ -543,7 +543,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                 => true,
             'inputType'               => 'checkboxWizard',
             'foreignKey'              => 'tl_c4g_reservation_params.caption',
-            'eval'                    => array('chosen'=>true, 'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
+            'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true,'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'                     => "blob NULL"
         ),
 
@@ -555,7 +555,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
 //            'default'                 => 'multi',
 //            'reference'               => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type'],
 //            'options'                 => array('multi','radio'),
-//            'eval'                    => array('tl_class'=>'w50','feViewable'=>true, 'mandatory'=>false),
+//            'eval'                    => array('tl_class'=>'w50','feViewable'=>true,'mandatory'=>false),
 //            'sql'                     => "char(25) NOT NULL default 'multi'"
 //        ),
 //
@@ -576,7 +576,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
         'exclude'                 => true,
         'inputType'               => 'checkboxWizard',
         'foreignKey'              => 'tl_c4g_reservation_params.caption',
-        'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
+        'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true,'tl_class'=>'long clr','alwaysSave'=> true),
         'sql'                     => "blob NULL"
         ),
 
@@ -588,7 +588,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'                 => 'multi',
             'reference'               => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type'],
             'options'                 => array('multi','radio'),
-            'eval'                    => array('tl_class'=>'w50','feViewable'=>true, 'mandatory'=>false),
+            'eval'                    => array('tl_class'=>'w50','feViewable'=>true,'mandatory'=>false),
             'sql'                     => "char(25) NOT NULL default 'multi'"
         ),
 
@@ -609,7 +609,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                 => true,
             'inputType'               => 'checkboxWizard',
             'foreignKey'              => 'tl_c4g_reservation_params.caption',
-            'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true, 'tl_class'=>'long clr','alwaysSave'=> true),
+            'eval'                    => array('chosen'=>true,'mandatory'=>false,'multiple'=>true,'tl_class'=>'long clr','alwaysSave'=> true),
             'sql'                     => "blob NULL"
         ),
 
@@ -621,7 +621,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'default'                 => 'multi',
             'reference'               => &$GLOBALS['TL_LANG']['ts_c4g_reservation_type'],
             'options'                 => array('multi','radio'),
-            'eval'                    => array('tl_class'=>'w50','feViewable'=>true, 'mandatory'=>false),
+            'eval'                    => array('tl_class'=>'w50','feViewable'=>true,'mandatory'=>false),
             'sql'                     => "char(25) NOT NULL default 'multi'"
         ),
 
@@ -645,7 +645,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'sorting'                 => false,
             'inputType'               => 'textarea',
             'default'                 => '',
-            'eval'                    => array('mandatory'=>false, 'rte'=>'tinyMCE', 'feEditable'=>true, 'feViewable'=>true, 'tl_class'=>'long'),
+            'eval'                    => array('mandatory'=>false,'rte'=>'tinyMCE','feEditable'=>true,'feViewable'=>true,'tl_class'=>'long'),
             'sql'                     => "text NULL"
         ),
 
@@ -655,7 +655,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_type'] = array
             'exclude'                 => true,
             'filter'                  => true,
             'inputType'               => 'checkbox',
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false,'alwaysSave'=>true),
+            'eval'                    => array('mandatory'=>false,'multiple'=>false,'alwaysSave'=>true),
             'sql'                     => "int(1) unsigned NULL default 1"
         )
     )

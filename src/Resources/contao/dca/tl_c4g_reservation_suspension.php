@@ -18,7 +18,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
     (
         'dataContainer'     => DC_Table::class,
         'enableVersioning'  => true,
-        'onsubmit_callback' => [[\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class, 'purgeReservationFormCache']],
+        'onsubmit_callback' => [[\con4gis\ReservationBundle\Classes\Caches\C4gReservationCacheAutomator::class,'purgeReservationFormCache']],
         'sql'               => array
         (
             'keys' => array
@@ -88,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{suspension_legend}, caption, showCaption, showComment, showCompany; {suspension_dates_legend}, date_range_wizard, suspension_dates;'
+        'default'   =>  '{suspension_legend}, caption, showCaption, showComment, showCompany; {suspension_dates_legend}, date_range_wizard, suspension_dates'
     ),
 
     //Fields
@@ -111,8 +111,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
             'search'                  => true,
             'sorting'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'long'),
-            'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+            'eval'                    => array('mandatory'=>true,'tl_class'=>'long'),
+            'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
         'showCaption' => array (
@@ -122,8 +122,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'checkbox',
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => array('type' => 'boolean', 'default' => false)
+            'eval'                    => array('mandatory'=>false,'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'boolean','default' => false)
         ),
 
         'showComment' => array (
@@ -133,8 +133,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'checkbox',
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => array('type' => 'boolean', 'default' => false)
+            'eval'                    => array('mandatory'=>false,'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'boolean','default' => false)
         ),
 
         'showCompany' => array (
@@ -144,8 +144,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'checkbox',
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => array('type' => 'boolean', 'default' => false)
+            'eval'                    => array('mandatory'=>false,'tl_class'=>'w50'),
+            'sql'                     => array('type' => 'boolean','default' => false)
         ),
 
         'date_range_wizard' => array
@@ -153,7 +153,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['date_range_wizard'],
             'exclude'                 => true,
             'inputType'               => 'text',
-            'input_field_callback'    => array(C4gReservationSuspension::class, 'dateRangeWizard'),
+            'input_field_callback'    => array(C4gReservationSuspension::class,'dateRangeWizard'),
             'eval'                    => array('tl_class' => 'w50 wizard')
         ),
 
@@ -174,21 +174,21 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
                         'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['date'],
                         'exclude'                 => true,
                         'inputType'               => 'text',
-                        'eval'                    => array('rgxp'=>'date', 'datepicker'=>true, 'mandatory'=>true, 'style'=>'width: 140px')
+                        'eval'                    => array('rgxp'=>'date','datepicker'=>true,'mandatory'=>true,'style'=>'width: 140px')
                     ),
                     'comment' => array
                     (
                         'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['comment'],
                         'exclude'                 => true,
                         'inputType'               => 'text',
-                        'eval'                    => array('mandatory'=>false, 'style'=>'width: 300px')
+                        'eval'                    => array('mandatory'=>false,'style'=>'width: 300px')
                     ),
                     'company' => array
                     (
                         'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['company'],
                         'exclude'                 => true,
                         'inputType'               => 'text',
-                        'eval'                    => array('mandatory'=>false, 'style'=>'width: 200px')
+                        'eval'                    => array('mandatory'=>false,'style'=>'width: 200px')
                     )
                 )
             ),

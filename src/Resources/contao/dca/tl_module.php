@@ -24,30 +24,30 @@ use con4gis\ReservationBundle\Controller\C4gReservationCheckInController;
 use con4gis\ReservationBundle\Controller\C4gReservationOccupancyPlanController;
 use Contao\Controller;
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_settings;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_settings';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, selectReservationTypes, showReservationType, showReservationObject, showSignatureField, showPrices, past_day_number, cancellation_redirect_site, login_redirect_site, printTpl;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, selectReservationTypes, showReservationType, showReservationObject, showSignatureField, showPrices, past_day_number, cancellation_redirect_site, login_redirect_site, printTpl';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationOccupancyPlanController::TYPE]  = '{title_legend},name,headline,type;{reservation_legend}, occupancy_reservation_objects, reservation_form_site, show_occupancy_legend;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationOccupancyPlanController::TYPE]  = '{title_legend},name,headline,type;{reservation_legend}, occupancy_reservation_objects, reservation_form_site, show_occupancy_legend';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site, cancellationButtonCaption;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site, cancellationButtonCaption';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,removeListImage,event_redirect_site,speaker_redirect_site;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationSpeakerListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,removeListImage,event_redirect_site,speaker_redirect_site';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationLocationListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,withMap;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationLocationListController::TYPE]  = '{title_legend},name,headline,type;{list_legend},renderMode,withMap';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationObjectsController::TYPE]  = '{title_legend},name,headline,type;{reservation_objects_legend}, reservation_object_types, login_redirect_site, postals, reservation_add_member_location;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationObjectsController::TYPE]  = '{title_legend},name,headline,type;{reservation_objects_legend}, reservation_object_types, login_redirect_site, postals, reservation_add_member_location';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationAddressListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservation_object_types, printTpl';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCheckInController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_settings;';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCheckInController::TYPE]   = '{title_legend},name,headline,type;{reservation_legend},reservation_settings';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_object_types'] = [
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['reservation_object_types'],
     'exclude'                 => true,
     'inputType'               => 'checkbox',
     'foreignKey'              => 'tl_c4g_reservation_type.caption',
-    'eval'                    => array('mandatory'=>true, 'multiple'=>true),
+    'eval'                    => array('mandatory'=>true,'multiple'=>true),
     'sql'                     => "blob NULL"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['occupancy_reservation_objects'] = [
@@ -55,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['occupancy_reservation_objects'] = [
     'exclude'                 => true,
     'inputType'               => 'checkbox',
     'options_callback'        => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationType::class,'getAllObjects'],
-    'eval'                    => array('mandatory'=>true, 'multiple'=>true, 'tl_class' => 'clr'),
+    'eval'                    => array('mandatory'=>true,'multiple'=>true,'tl_class' => 'clr'),
     'sql'                     => "blob NULL"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_settings'] = [
@@ -64,7 +64,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_settings'] = [
     'filter'                  => true,
     'inputType'               => 'select',
     'foreignKey'              => 'tl_c4g_reservation_settings.caption',
-    'eval'                    => array('chosen'=>true,'mandatory'=>true,'multiple'=>false, 'disabled' => false, 'tl_class'=>'long clr'),
+    'eval'                    => array('chosen'=>true,'mandatory'=>true,'multiple'=>false,'disabled' => false,'tl_class'=>'long clr'),
     'sql'                     => "blob NULL'"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['renderMode'] = array
@@ -77,7 +77,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['renderMode'] = array
     'options'           => [C4GBrickRenderMode::TILEBASED,C4GBrickRenderMode::TABLEBASED,C4GBrickRenderMode::LISTBASED],
     'reference'          => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references'],
     // 'sql'               => "varchar(25) NOT NULL default 'tiles'"
-    'sql'               => array('type' => 'string', 'length' => 254, 'default' => 'tiles')
+    'sql'               => array('type' => 'string','length' => 254,'default' => 'tiles')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['event_redirect_site'] = array
 (
@@ -85,9 +85,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['event_redirect_site'] = array
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',
-    'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+    'eval'                    => array('mandatory'=>false,'fieldType'=>'radio'),
     'sql'                     => "int(10) unsigned NOT NULL default '0'",
-    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+    'relation'                => array('type'=>'hasOne','load'=>'eager')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['speaker_redirect_site'] = array
 (
@@ -95,9 +95,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['speaker_redirect_site'] = array
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',
-    'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+    'eval'                    => array('mandatory'=>false,'fieldType'=>'radio'),
     'sql'                     => "int(10) unsigned NOT NULL default '0'",
-    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+    'relation'                => array('type'=>'hasOne','load'=>'eager')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['login_redirect_site'] = array
 (
@@ -105,9 +105,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['login_redirect_site'] = array
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',
-    'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+    'eval'                    => array('mandatory'=>false,'fieldType'=>'radio'),
     'sql'                     => "int(10) unsigned NOT NULL default '0'",
-    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+    'relation'                => array('type'=>'hasOne','load'=>'eager')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['notification_type_contact_request'] = array
 (
@@ -117,7 +117,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['notification_type_contact_request'] =
     'foreignKey'              => 'tl_nc_notification.title',
     'eval'                    => array('multiple' => true),
     // 'sql'                     => "varchar(100) NOT NULL default ''"
-    'sql'                     => array('type' => 'string', 'length' => 254, 'default' => '')
+    'sql'                     => array('type' => 'string','length' => 254,'default' => '')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_form_site'] = array
 (
@@ -125,9 +125,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_form_site'] = array
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',
-    'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+    'eval'                    => array('mandatory'=>false,'fieldType'=>'radio'),
     'sql'                     => "int(10) unsigned NOT NULL default '0'",
-    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+    'relation'                => array('type'=>'hasOne','load'=>'eager')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_redirect_site'] = array
 (
@@ -135,9 +135,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservation_redirect_site'] = array
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',
-    'eval'                    => array('mandatory'=>true, 'fieldType'=>'radio'),
+    'eval'                    => array('mandatory'=>true,'fieldType'=>'radio'),
     'sql'                     => "int(10) unsigned NOT NULL default '0'",
-    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+    'relation'                => array('type'=>'hasOne','load'=>'eager')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['cancellationButtonCaption'] = array
 (
@@ -146,9 +146,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cancellationButtonCaption'] = array
     'sorting'           => true,
     'search'            => true,
     'inputType'         => 'text',
-    'eval'              => array('mandatory' => false, 'tl_class' => 'long', 'maxlength' => 254),
+    'eval'              => array('mandatory' => false,'tl_class' => 'long','maxlength' => 254),
     // 'sql'               => "varchar(100) NOT NULL default ''"
-    'sql'               => array('type' => 'string', 'length' => 254, 'default' => '')
+    'sql'               => array('type' => 'string','length' => 254,'default' => '')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['reservationView'] = array
 (
@@ -160,7 +160,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reservationView'] = array
     'options'           => ['publicview','memberview','member','group'],
     'reference'          => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['references'],
     // 'sql'               => "varchar(25) NOT NULL default 'publicview'"
-    'sql'               => array('type' => 'string', 'length' => 254, 'default' => 'publicview')
+    'sql'               => array('type' => 'string','length' => 254,'default' => 'publicview')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationType'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationType'],
@@ -175,7 +175,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['selectReservationTypes'] = [
     'exclude'                 => true,
     'inputType'               => 'checkbox',
     'options_callback'        => [\con4gis\ReservationBundle\Classes\Callbacks\ReservationType::class,'getAllTypes'],
-    'eval'                    => ['mandatory'=>false, 'multiple'=>true],
+    'eval'                    => ['mandatory'=>false,'multiple'=>true],
     'sql'                     => "blob NULL"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['showReservationObject'] = array
@@ -216,9 +216,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cancellation_redirect_site'] = array
     'exclude'                 => true,
     'inputType'               => 'pageTree',
     'foreignKey'              => 'tl_page.title',
-    'eval'                    => array('mandatory'=>false, 'fieldType'=>'radio'),
+    'eval'                    => array('mandatory'=>false,'fieldType'=>'radio'),
     'sql'                     => "int(10) unsigned NOT NULL default '0'",
-    'relation'                => array('type'=>'hasOne', 'load'=>'eager')
+    'relation'                => array('type'=>'hasOne','load'=>'eager')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['printTpl'] = array
@@ -231,9 +231,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['printTpl'] = array
     {
         return Controller::getTemplateGroup('pdf_');
     },
-    'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'long clr'),
+    'eval'                    => array('includeBlankOption'=>true,'chosen'=>true,'tl_class'=>'long clr'),
     // 'sql'                     => "varchar(64) NOT NULL default 'pdf_c4g_brick'"
-    'sql'                     => array('type' => 'string', 'length' => 254, 'default' => 'pdf_c4g_brick')
+    'sql'                     => array('type' => 'string','length' => 254,'default' => 'pdf_c4g_brick')
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['withMap'] = array
 (   'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['withMap'],
@@ -266,7 +266,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['past_day_number'] = [
     'exclude'           => true,
     'inputType'         => 'text',
     'default'           => '1',
-    'eval'              => array('rgxp'=>'digit', 'mandatory'=>true, 'tl_class'=>'long'),
+    'eval'              => array('rgxp'=>'digit','mandatory'=>true,'tl_class'=>'long'),
     'sql'               => "smallint(3) unsigned NOT NULL default 1"
 ];
 
