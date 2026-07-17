@@ -706,6 +706,75 @@ class C4gReservationController extends C4GBaseController
         }
 
         $fieldList = array();
+        
+        $location_name = new C4GTextField();
+        $location_name->setFieldName('location');
+        $location_name->setSortColumn(false);
+        $location_name->setFormField(false);
+        $location_name->setTableColumn(true);
+        $location_name->setNotificationField(false);
+        $location_name->setPrintable(true);
+        $fieldList[] = $location_name;
+
+        $contact_name = new C4GTextField();
+        $contact_name->setFieldName('contact_name');
+        $contact_name->setSortColumn(false);
+        $contact_name->setFormField(false);
+        $contact_name->setTableColumn(true);
+        $contact_name->setNotificationField(true);
+        $contact_name->setPrintable(true);
+        $fieldList[] = $contact_name;
+
+        $contact_phone = new C4GTelField();
+        $contact_phone->setFieldName('contact_phone');
+        $contact_phone->setFormField(false);
+        $contact_phone->setTableColumn(false);
+        $contact_phone->setNotificationField(true);
+        $contact_phone->setPrintable(true);
+        $fieldList[] = $contact_phone;
+
+        $contact_email = new C4GEmailField();
+        $contact_email->setFieldName('contact_email');
+        $contact_email->setTableColumn(false);
+        $contact_email->setFormField(false);
+        $contact_email->setNotificationField(true);
+        $contact_email->setPrintable(true);
+        $fieldList[] = $contact_email;
+
+        $contact_website = new C4GUrlField();
+        $contact_website->setFieldName('contact_website');
+        $contact_website->setTableColumn(false);
+        $contact_website->setFormField(false);
+        $contact_website->setNotificationField(true);
+        $contact_website->setPrintable(true);
+        $fieldList[] = $contact_website;
+
+        $contact_street = new C4GTextField();
+        $contact_street->setFieldName('contact_street');
+        $contact_street->setTableColumn(false);
+        $contact_street->setFormField(false);
+        $contact_street->setNotificationField(true);
+        $contact_street->setPrintable(true);
+        $fieldList[] = $contact_street;
+
+
+        $contact_postal = new C4GTextField();
+        $contact_postal->setFieldName('contact_postal');
+        $contact_postal->setFormField(false);
+        $contact_postal->setTableColumn(false);
+        $contact_postal->setNotificationField(true);
+        $contact_postal->setPrintable(true);
+        $fieldList[] = $contact_postal;
+
+
+        $contact_city = new C4GTextField();
+        $contact_city->setFieldName('contact_city');
+        $contact_city->setTableColumn(false);
+        $contact_city->setFormField(false);
+        $contact_city->setNotificationField(true);
+        $contact_city->setPrintable(true);
+        $fieldList[] = $contact_city;
+
         $typelist = array();
 
         $initialDate = '';
@@ -2270,6 +2339,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                         $reservationParticipants->setParentFieldList($fieldList);
                                         $reservationParticipants->setDelimiter('§');
                                         $reservationParticipants->setCondition(array($condition, $newCondition));
+                                        $reservationParticipants->setInitInvisible(true);
                                         if (isset($_GET['event']) && intval($_GET['event']) > 0) {
                                             $reservationParticipants->setShowFirstDataSet(true);
                                             $reservationParticipants->setInitInvisible(false);
@@ -2381,8 +2451,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $privacyPolicyText = new C4GTextField();
             $privacyPolicyText->setSimpleTextWithoutEditing(true);
             $privacyPolicyText->setFieldName('privacy_policy_text');
-            $privacyPolicyText->setInitialValue(str_replace(' ', '&nbsp;&#x200B;',
-                C4GUtils::replaceInsertTags($this->reservationSettings->privacy_policy_text)));
+            $privacyPolicyText->setInitialValue(C4GUtils::replaceInsertTags($this->reservationSettings->privacy_policy_text));
             $privacyPolicyText->setSize(4);
             $privacyPolicyText->setTableColumn(false);
             $privacyPolicyText->setEditable(false);
@@ -2429,74 +2498,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $buttonField->setOnClick('clickReservation');
         $buttonField->setWithoutLabel(true);
         $fieldList[] = $buttonField;
-
-        $location_name = new C4GTextField();
-        $location_name->setFieldName('location');
-        $location_name->setSortColumn(false);
-        $location_name->setFormField(false);
-        $location_name->setTableColumn(true);
-        $location_name->setNotificationField(true);
-        $location_name->setPrintable(true);
-        $fieldList[] = $location_name;
-
-        $contact_name = new C4GTextField();
-        $contact_name->setFieldName('contact_name');
-        $contact_name->setSortColumn(false);
-        $contact_name->setFormField(false);
-        $contact_name->setTableColumn(true);
-        $contact_name->setNotificationField(true);
-        $contact_name->setPrintable(true);
-        $fieldList[] = $contact_name;
-
-        $contact_phone = new C4GTelField();
-        $contact_phone->setFieldName('contact_phone');
-        $contact_phone->setFormField(false);
-        $contact_phone->setTableColumn(false);
-        $contact_phone->setNotificationField(true);
-        $contact_phone->setPrintable(true);
-        $fieldList[] = $contact_phone;
-
-        $contact_email = new C4GEmailField();
-        $contact_email->setFieldName('contact_email');
-        $contact_email->setTableColumn(false);
-        $contact_email->setFormField(false);
-        $contact_email->setNotificationField(true);
-        $contact_email->setPrintable(true);
-        $fieldList[] = $contact_email;
-
-        $contact_website = new C4GUrlField();
-        $contact_website->setFieldName('contact_website');
-        $contact_website->setTableColumn(false);
-        $contact_website->setFormField(false);
-        $contact_website->setNotificationField(true);
-        $contact_website->setPrintable(true);
-        $fieldList[] = $contact_website;
-
-        $contact_street = new C4GTextField();
-        $contact_street->setFieldName('contact_street');
-        $contact_street->setTableColumn(false);
-        $contact_street->setFormField(false);
-        $contact_street->setNotificationField(true);
-        $contact_street->setPrintable(true);
-        $fieldList[] = $contact_street;
-
-
-        $contact_postal = new C4GTextField();
-        $contact_postal->setFieldName('contact_postal');
-        $contact_postal->setFormField(false);
-        $contact_postal->setTableColumn(false);
-        $contact_postal->setNotificationField(true);
-        $contact_postal->setPrintable(true);
-        $fieldList[] = $contact_postal;
-
-
-        $contact_city = new C4GTextField();
-        $contact_city->setFieldName('contact_city');
-        $contact_city->setTableColumn(false);
-        $contact_city->setFormField(false);
-        $contact_city->setNotificationField(true);
-        $contact_city->setPrintable(true);
-        $fieldList[] = $contact_city;
 
         $icsFilenameField = new C4GTextField();
         $icsFilenameField->setFieldName('icsFilename');
@@ -4398,6 +4399,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         // Fix: Ensure basic tokens are always present to avoid template warnings and delivery issues
         $tokenDefaults = [
+            'event_number' => ($isEvent && $reservationEventObject) ? ($reservationEventObject->number ?: '') : '',
             'firstname' => '',
             'lastname' => '',
             'email' => '',
@@ -4407,15 +4409,15 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'city' => '',
             'organisation' => '',
             'company' => '',
-            'description' => (isset($putVars['description']) && $putVars['description'] !== '0' && $putVars['description'] !== 0) ? $putVars['description'] : ' ',
-            'location' => (isset($putVars['location']) && $putVars['location'] !== '0' && $putVars['location'] !== 0) ? $putVars['location'] : ' ',
+            'description' => (isset($putVars['description']) && $putVars['description'] !== '0' && $putVars['description'] !== 0) ? $putVars['description'] : '',
+            'location' => (isset($putVars['location']) && $putVars['location'] !== '0' && $putVars['location'] !== 0) ? $putVars['location'] : '',
             'desiredCapacity' => $desiredCapacity ?: 1,
-            'reservation_title' => (isset($putVars['reservation_title']) && $putVars['reservation_title'] !== '0' && $putVars['reservation_title'] !== 0) ? $putVars['reservation_title'] : ' ',
-            'beginDate' => (isset($putVars['beginDate']) && $putVars['beginDate'] !== '0' && $putVars['beginDate'] !== 0) ? $putVars['beginDate'] : ' ',
-            'beginTime' => (isset($putVars['beginTime']) && $putVars['beginTime'] !== '0' && $putVars['beginTime'] !== 0) ? $putVars['beginTime'] : ' ',
-            'endDate' => (isset($putVars['endDate']) && $putVars['endDate'] !== '0' && $putVars['endDate'] !== 0) ? $putVars['endDate'] : ' ',
-            'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '0' && $putVars['endTime'] !== 0) ? $putVars['endTime'] : ' ',
-            'participantList' => (isset($putVars['participantList']) && $putVars['participantList'] !== '0' && $putVars['participantList'] !== 0) ? $putVars['participantList'] : ' ',
+            'reservation_title' => (isset($putVars['reservation_title']) && $putVars['reservation_title'] !== '0' && $putVars['reservation_title'] !== 0) ? $putVars['reservation_title'] : '',
+            'beginDate' => (isset($putVars['beginDate']) && $putVars['beginDate'] !== '0' && $putVars['beginDate'] !== 0) ? $putVars['beginDate'] : '',
+            'beginTime' => (isset($putVars['beginTime']) && $putVars['beginTime'] !== '0' && $putVars['beginTime'] !== 0) ? $putVars['beginTime'] : '',
+            'endDate' => (isset($putVars['endDate']) && $putVars['endDate'] !== '0' && $putVars['endDate'] !== 0) ? $putVars['endDate'] : '',
+            'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '0' && $putVars['endTime'] !== 0) ? $putVars['endTime'] : '',
+            'participantList' => (isset($putVars['participantList']) && $putVars['participantList'] !== '0' && $putVars['participantList'] !== 0) ? $putVars['participantList'] : '',
             'priceSum' => (isset($putVars['priceSum']) && $putVars['priceSum'] !== '' && $putVars['priceSum'] !== '0,00 €' && $putVars['priceSum'] !== '0' && $putVars['priceSum'] !== 0) ? $putVars['priceSum'] : ($putVars['priceSum'] ?? '0,00 €'),
             'priceSumBrutto' => (isset($putVars['priceSumBrutto']) && $putVars['priceSumBrutto'] !== '' && $putVars['priceSumBrutto'] !== '0,00 €' && $putVars['priceSumBrutto'] !== '0' && $putVars['priceSumBrutto'] !== 0) ? $putVars['priceSumBrutto'] : ($putVars['priceSumBrutto'] ?? '0,00 €'),
             'priceDiscount' => (isset($putVars['priceDiscount']) && $putVars['priceDiscount'] !== '' && $putVars['priceDiscount'] !== '0,00 €' && $putVars['priceDiscount'] !== '0' && $putVars['priceDiscount'] !== 0) ? $putVars['priceDiscount'] : ($putVars['priceDiscount'] ?? '0,00 €'),
@@ -4427,8 +4429,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'priceOptionSum' => (isset($putVars['priceOptionSum']) && $putVars['priceOptionSum'] !== '' && $putVars['priceOptionSum'] !== '0,00 €' && $putVars['priceOptionSum'] !== '0' && $putVars['priceOptionSum'] !== 0) ? $putVars['priceOptionSum'] : ($putVars['priceOptionSum'] ?? '0,00 €'),
             'priceOptionSumNet' => (isset($putVars['priceOptionSumNet']) && $putVars['priceOptionSumNet'] !== '' && $putVars['priceOptionSumNet'] !== '0,00 €' && $putVars['priceOptionSumNet'] !== '0' && $putVars['priceOptionSumNet'] !== 0) ? $putVars['priceOptionSumNet'] : ($putVars['priceOptionSumNet'] ?? '0,00 €'),
             'priceOptionSumTax' => (isset($putVars['priceOptionSumTax']) && $putVars['priceOptionSumTax'] !== '' && $putVars['priceOptionSumTax'] !== '0,00 €' && $putVars['priceOptionSumTax'] !== '0' && $putVars['priceOptionSumTax'] !== 0) ? $putVars['priceOptionSumTax'] : ($putVars['priceOptionSumTax'] ?? '0,00 €'),
-            'discountPercent' => (isset($putVars['discountPercent']) && $putVars['discountPercent'] !== '' && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0 && $putVars['discountPercent'] !== ' ' && $putVars['discountPercent'] !== '0,00 %' && $putVars['discountPercent'] !== '0 %' && $putVars['discountPercent'] !== '0,00' && $putVars['discountPercent'] !== '0') ? $putVars['discountPercent'] : ($putVars['discountPercent'] ?? ' '),
-            'discountCode' => (isset($putVars['discountCode']) && $putVars['discountCode'] !== '' && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0 && $putVars['discountCode'] !== ' ') ? $putVars['discountCode'] : ' ',
+            'discountPercent' => (isset($putVars['discountPercent']) && $putVars['discountPercent'] !== '' && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0 && $putVars['discountPercent'] !== ' ' && $putVars['discountPercent'] !== '0,00 %' && $putVars['discountPercent'] !== '0 %' && $putVars['discountPercent'] !== '0,00' && $putVars['discountPercent'] !== '0') ? $putVars['discountPercent'] : ($putVars['discountPercent'] ?? ''),
+            'discountCode' => (isset($putVars['discountCode']) && $putVars['discountCode'] !== '' && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0 && $putVars['discountCode'] !== ' ') ? $putVars['discountCode'] : '',
             'reservationTaxRate' => $putVars['reservationTaxRate'] ?? $settings->taxRate ?? 19,
             'conferenceLink' => $putVars['conferenceLink'] ?? '',
             'speaker' => $putVars['speaker'] ?? '',
