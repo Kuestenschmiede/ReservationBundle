@@ -1210,7 +1210,7 @@ foreach ($typelist as $listType) {
     $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
 
     $reservationDesiredCapacity = new C4GNumberField();
-    $reservationDesiredCapacity->setFieldName('desiredCapacity_' . $listType['id']);
+    $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
     if ($maxCapacity && $eventObj && $eventObj->maxParticipants) {
         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
@@ -1350,7 +1350,7 @@ foreach ($typelist as $listType) {
         }
 
         $durationField = new C4GNumberField();
-        $durationField->setFieldName('duration_' . $listType['id']);
+        $durationField->setFieldName('duration');
         $durationField->setTitle($title);
         $durationField->setColumnWidth(10);
         $durationField->setFormField(true);
@@ -2055,7 +2055,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                         $isPartiPerEvent = $typeMaxParti;
                     }
 
-                    $reservationDesiredCapacity->setFieldName('desiredCapacity_' . $listType['id']);
+                    $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
                     if ($maxCapacity) {
                         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
@@ -2134,6 +2134,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $reservationDesiredCapacity->setCallOnChangeFunction($jsOnChange);
                     $reservationDesiredCapacity->setNotificationField(true);
                     $reservationDesiredCapacity->setStyleClass('desired-capacity');
+                    $reservationDesiredCapacity->setAdditionalID($listType['id']);
 
                     if (!$listType['ignoreCapacity']) {
                         if ($this->reservationSettings->moveCapacity) {
@@ -4260,7 +4261,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $factor = $reservationType->objectCount && ($reservationType->objectCount < $reservationObject->quantity) ? $reservationType->objectCount : $reservationObject->quantity;
         }
 
-        $desiredCapacity =  $reservationObject && $reservationObject->desiredCapacityMax ? ($reservationObject->desiredCapacityMax * $factor) : 0;
+        $maxDesiredCapacity =  $reservationObject && $reservationObject->desiredCapacityMax ? ($reservationObject->desiredCapacityMax * $factor) : 0;
 
         $participants = '';
         $pCount = $this->reservationSettings->onlyParticipants ? 0 : 1;
@@ -4302,14 +4303,14 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
 
-            $possible = $desiredCapacity - $reservationCount;
+            $possible = $maxDesiredCapacity - $reservationCount;
             $maxParticipantsPerBooking = $reservationEventObject->maxParticipantsPerEventBooking ?:$reservationType->maxParticipantsPerBooking;
             $isPartiPerEvent = $reservationEventObject->maxParticipantsPerEventBooking;
 //            if ($isPartiPerEvent){
 //                $possible = $isPartiPerEvent;
 //            }
 
-            if ($desiredCapacity && $possible < $pCount) {
+            if ($maxDesiredCapacity && $possible < $pCount) {
                 return ['usermessage' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['too_many_participants'].$possible];
             }
 
@@ -4330,6 +4331,19 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $self = self::getInstance();
             if ($self instanceof self) {
                 $self->putVars['desiredCapacity'] = $pCount;
+                $self->putVars['desiredCapacity_'.$reservationType->id] = $pCount;
+            }
+        } else {
+            if ($desiredCapacityValue > 0) {
+                $pCount = $desiredCapacityValue;
+            }
+            $putVars['desiredCapacity_'.$reservationType->id] = $pCount;
+            $putVars['desiredCapacity'] = $pCount;
+            $desiredCapacity = $pCount;
+            $self = self::getInstance();
+            if ($self instanceof self) {
+                $self->putVars['desiredCapacity'] = $pCount;
+                $self->putVars['desiredCapacity_'.$reservationType->id] = $pCount;
             }
         }
 
