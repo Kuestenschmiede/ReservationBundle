@@ -2334,7 +2334,7 @@ class C4gReservationHandler
             $reservationAllTypesQuantity = $reservationObject->allTypesQuantity;
 
             $database = Database::getInstance();
-            $currentBookedTimes = $database->prepare("SELECT beginDate, endDate FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
+            $currentBookedTimes = $database->prepare("SELECT beginDate, endDate, desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
             ->execute($typeId,$objectId,$objectType,'1')->fetchAllAssoc();  
             
             $otherObjectsBookedTimes = $database->prepare("SELECT beginDate,endDate,desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`!=? AND `reservationObjectType`=? AND NOT `cancellation`=?") 
@@ -2675,10 +2675,13 @@ class C4gReservationHandler
         foreach ($currentBookedTimes as $currentBookedTime) {
             $bookedBegin = $minDuration ? $currentBookedTime['beginDate'] - (($minDuration-1) * $periodFaktor) : $currentBookedTime['beginDate'];
             $bookedEnd = $currentBookedTime['endDate'];
+            $capacity = max(1, intval($currentBookedTime['desiredCapacity'] ?? 1));
             do {
-                $bookedDates[$i] = $bookedBegin;
+                for ($c = 0; $c < $capacity; $c++) {
+                    $bookedDates[$i] = $bookedBegin;
+                    $i++;
+                }
                 $bookedBegin += $periodFaktor;
-                $i++;
             } while($periodType == 'overnight' ? $bookedBegin < $bookedEnd : $bookedBegin <= $bookedEnd);  
         }
         return $bookedDates;
