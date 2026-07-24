@@ -169,7 +169,7 @@ class C4gReservationInsertTags
                         ->execute()->fetchAllAssoc();
                 }
 
-                if ($reservationObject) {
+                if ($reservationObject || $key === 'caption') {
                     System::loadLanguageFile('fe_c4g_reservation');
 
                     switch ($key) {
@@ -406,7 +406,8 @@ class C4gReservationInsertTags
                             return serialize($additionalParamsArr);
                     }
                 }
-            } elseif (($isEvent || $isObject) && $arrSplit[1] && $arrSplit[2]) {
+                return '';
+            } elseif (($isEvent || $isObject) && isset($arrSplit[1]) && isset($arrSplit[2])) {
                 $pid = $arrSplit[1];
                 $key = $arrSplit[2];
                 $startDate = key_exists(3,$arrSplit) ? $arrSplit[3] : 0;
@@ -1013,6 +1014,7 @@ class C4gReservationInsertTags
                 } else {
                     return '';
                 }
+                return '';
             }
         } elseif ($arrSplit && (($arrSplit[0] == 'c4gspeaker')) && isset($arrSplit[1])) {
             $speakerId = $arrSplit[1];
@@ -1067,7 +1069,9 @@ class C4gReservationInsertTags
                             return $this->getHtmlSkeleton($key, '', $speakerObject->$key, 'c4g_speaker_details');
                         }
                 }
+                return '';
             }
+            return '';
         }
 
         return false;

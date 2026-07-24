@@ -131,5 +131,3 @@ $GLOBALS['TL_HOOKS']['c4gProjectsPreparePrintData'][] = [
     \con4gis\ReservationBundle\Classes\Hooks\ReservationPrintDataEnricher::class,
     'enrich'
 ];
-
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array(\con4gis\ReservationBundle\Classes\InsertTags\C4gReservationInsertTags::class, 'replaceTag');

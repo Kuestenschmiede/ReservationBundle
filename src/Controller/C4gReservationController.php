@@ -4959,7 +4959,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'reservation_type', 'type', 'reservation_object', 'object', 'reservation_title',
             'desiredCapacity',
             'description', 'location', 'comment', 'internal_comment',
-            'speaker', 'topic', 'audience', 'conferenceLink'
+            'speaker', 'topic', 'audience', 'conferenceLink',
+            'included_params', 'additional_params', 'additional2', 'additional3'
         ];
         foreach ($baseTokens as $base) {
             // Priority 1: Check suffixed versions in $this->putVars and mirror if base is empty or zero-like
@@ -5038,6 +5039,16 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         // Ensure admin_email is always present to prevent RFC validation errors
         if (!isset($this->putVars['admin_email']) || !$this->putVars['admin_email'] || $this->putVars['admin_email'] === '##admin_email##') {
             $this->putVars['admin_email'] = $GLOBALS['TL_CONFIG']['adminEmail'] ?? '';
+        }
+
+        // Initialize missing base tokens with empty strings to prevent "unknown simple token" warnings
+        foreach ($baseTokens as $base) {
+            if (!isset($this->putVars[$base])) {
+                $this->putVars[$base] = '';
+            }
+            if ($putVars !== null && is_array($putVars) && !isset($putVars[$base])) {
+                $putVars[$base] = '';
+            }
         }
     }
 
