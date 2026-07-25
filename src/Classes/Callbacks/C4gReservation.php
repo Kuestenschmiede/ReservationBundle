@@ -358,13 +358,6 @@
             if (is_array($title)) {
                 $title = $title[0] ?? '';
             }
-            if (is_array($label)) {
-                $label = $label[0] ?? '';
-            }
-
-            if (is_array($title)) {
-                $title = $title[0] ?? '';
-            }
             $rt = Input::get('rt');
             $do = Input::get('do');
 

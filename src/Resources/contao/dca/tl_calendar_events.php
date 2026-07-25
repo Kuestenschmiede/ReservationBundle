@@ -242,13 +242,6 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
                 $label = $label[0] ?? '';
             }
 
-            if (is_array($title)) {
-                $title = $title[0] ?? '';
-            }
-            if (is_array($label)) {
-                $label = $label[0] ?? '';
-            }
-
         if (is_array($title)) {
             $title = $title[0] ?? '';
         }
@@ -288,13 +281,6 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
      */
     public function c4gShowReservations($row, $href, $label, $title, $icon)
     {
-            if (is_array($title)) {
-                $title = $title[0] ?? '';
-            }
-            if (is_array($label)) {
-                $label = $label[0] ?? '';
-            }
-
             if (is_array($title)) {
                 $title = $title[0] ?? '';
             }
@@ -348,13 +334,6 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
 
     public function c4gShowAllParticipants($row, $href, $label, $title, $icon)
     {
-            if (is_array($title)) {
-                $title = $title[0] ?? '';
-            }
-            if (is_array($label)) {
-                $label = $label[0] ?? '';
-            }
-
             if (is_array($title)) {
                 $title = $title[0] ?? '';
             }

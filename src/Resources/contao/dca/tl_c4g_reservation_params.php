@@ -229,13 +229,6 @@ class tl_c4g_reservation_params extends \Contao\Backend
                 $label = $label[0] ?? '';
             }
 
-            if (is_array($title)) {
-                $title = $title[0] ?? '';
-            }
-            if (is_array($label)) {
-                $label = $label[0] ?? '';
-            }
-
         $this->import(Contao\BackendUser::class,'User');
 
         if (is_array($title)) {
