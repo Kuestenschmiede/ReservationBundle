@@ -351,9 +351,10 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $reservationLocationField->setRemoveWithEmptyCondition(true);
                     $reservationLocationField->setNotificationField(true);
                     $reservationLocationField->setWithoutValidation(true);
-                    $reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-location');
+                    $reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-location');
                     $reservationLocationField->setPrintable($this->module->isWithDefaultPDFContent());
                     $reservationLocationField->setHidden($reservationSettings->hideLocation);
+                    $reservationLocationField->setForceVisible(true);
                     $this->fieldList[] = $reservationLocationField;
                 }
             }
@@ -401,8 +402,9 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $organizerField->setRemoveWithEmptyCondition(true);
                     $organizerField->setNotificationField(true);
                     $organizerField->setWithoutValidation(true);
-                    $organizerField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-organizer');
+                    $organizerField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-organizer');
                     $organizerField->setHidden($reservationSettings->hideOrganizer);
+                    $organizerField->setForceVisible(true);
                     $this->fieldList[] = $organizerField;
                 }
             }
@@ -444,6 +446,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $speakerLinks->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                     $speakerLinks->setRemoveWithEmptyCondition(true);
                     $speakerLinks->setNotificationField(true);
+                    $speakerLinks->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-speaker');
+                    $speakerLinks->setForceVisible(true);
                     $this->fieldList[] = $speakerLinks;
                 }
 
@@ -474,7 +478,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 $topicField->setRemoveWithEmptyCondition(true);
                 $topicField->setNotificationField(true);
                 $topicField->setSimpleTextWithoutEditing(true);
-                $topicField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-topic');
+                $topicField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-topic');
+                $topicField->setForceVisible(true);
                 $this->fieldList[] = $topicField;
 
             }
@@ -504,16 +509,18 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                 $audienceField->setRemoveWithEmptyCondition(true);
                 $audienceField->setNotificationField(true);
                 $audienceField->setSimpleTextWithoutEditing(true);
-                $audienceField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' event-audience');
+                $audienceField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-audience');
+                $audienceField->setForceVisible(true);
                 $this->fieldList[] = $audienceField;
             }
 
             if ($reservationSettings->showDetails) {
-                if ($reservationObject->getDescription() ?: $reservationObject->teaser) {
+                $description = $reservationObject->getDescription();
+                if ($description && (trim($description) !== '')) {
                     $descriptionField = new C4GTrixEditorField();
                     $descriptionField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['description']);
                     $descriptionField->setFieldName('description');
-                    $descriptionField->setInitialValue($reservationObject->getDescription() ?: $reservationObject->teaser);
+                    $descriptionField->setInitialValue($description);
                     $descriptionField->setCondition($objConditionArr);
                     $descriptionField->setFormField(true);
                     $descriptionField->setShowIfEmpty(false);
@@ -523,6 +530,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $descriptionField->setEditable(false);
                     $descriptionField->setNotificationField(true);
                     $descriptionField->setPrintable(false);
+                    $descriptionField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-description');
+                    $descriptionField->setForceVisible(true);
                     $this->fieldList[] = $descriptionField;
                 }
 
@@ -538,6 +547,8 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
                     $imageField->setRemoveWithEmptyCondition(true);
                     $imageField->setDatabaseField(false);
                     $imageField->setLightBoxField(true);
+                    $imageField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-image');
+                    $imageField->setForceVisible(true);
                     $this->fieldList[] = $imageField;
                 }
             }
@@ -628,6 +639,14 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             $additionalParams->setNotificationField(true);
             $additionalParams->setSort(false);
             $this->fieldList[] = $additionalParams;
+        }
+
+        foreach ($this->fieldList as $field) {
+            if ($field->getAdditionalID() && strpos($field->getAdditionalID(), '-22') !== false) {
+                if (!$field->isHidden()) {
+                    $field->setForceVisible(true);
+                }
+            }
         }
 
         return $this->fieldList;

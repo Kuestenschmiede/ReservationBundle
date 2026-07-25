@@ -33,7 +33,19 @@
 
         public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
         {
+            if (is_array($title)) {
+                $title = $title[0] ?? '';
+            }
+            if (is_array($label)) {
+                $label = $label[0] ?? '';
+            }
+
+
             $this->import(BackendUser::class, 'User');
+
+            if (is_array($title)) {
+                $title = $title[0] ?? '';
+            }
             
             if (strlen(Input::get('tid')))
             {
@@ -77,23 +89,29 @@
         {
             $id = intval(Input::get('id'));
             
-            $formularId = Database::getInstance()->prepare("SELECT formular_id FROM tl_c4g_reservation WHERE reservation_object=?")->execute($id)->fetchAssoc();
-            $formularId = intval($formularId['formular_id']);
-            $fieldSelect = Database::getInstance()->prepare("SELECT fieldSelection FROM tl_c4g_reservation_settings WHERE id=?")->execute($formularId)->fetchAllAssoc(); 
+            $formularIdRow = Database::getInstance()->prepare("SELECT formular_id FROM tl_c4g_reservation WHERE reservation_object=?")->execute($id)->fetchAssoc();
+            $formularId = intval($formularIdRow['formular_id'] ?? 0);
+            if (!$formularId) {
+                return;
+            }
+            $fieldSelect = Database::getInstance()->prepare("SELECT fieldSelection FROM tl_c4g_reservation_settings WHERE id=?")->execute($formularId)->fetchAssoc(); 
 
-            $additionaldatas = StringUtil::deserialize($fieldSelect[0]['fieldSelection']);
+            $additionaldatas = StringUtil::deserialize($fieldSelect['fieldSelection'] ?? null);
+            if (!is_array($additionaldatas)) {
+                $additionaldatas = [];
+            }
 
             //Default Labels
-            $firstname = $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['firstname'][0];
-            $lastname = $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['lastname'][0];
-            $email = $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['email'][0];
+            $firstname = $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['firstname'][0] ?? 'Firstname';
+            $lastname = $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['lastname'][0] ?? 'Lastname';
+            $email = $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['email'][0] ?? 'Email';
 
             foreach ($additionaldatas as $rowdata)
             {
                 $rowField = $rowdata['additionaldatas'];
                 
                 switch($rowField) {
-                    case "salutation": $salutation = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['salutation'][0];
+                    case "salutation": $salutation = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : ($GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['salutation'][0] ?? 'Salutation');
                         break;
                     case "firstname": $firstname = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $firstname;
                         break;
@@ -101,29 +119,29 @@
                         break;
                     case "email": $email = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $email;
                         break;
-                    case "dateOfBirth": $dateOfBirth = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['dateOfBirth'][0];
+                    case "dateOfBirth": $dateOfBirth = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : ($GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['dateOfBirth'][0] ?? 'Date of birth');
                         break;
-                    case "phone": $phone = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['phone'][0];
+                    case "phone": $phone = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : ($GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['phone'][0] ?? 'Phone');
                         break;
-                    case "address": $address = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['address'][0];
+                    case "address": $address = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : ($GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['address'][0] ?? 'Address');
                         break;
-                    case "postal": $postal = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['postal'][0];
+                    case "postal": $postal = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : ($GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['postal'][0] ?? 'Postal');
                         break;
-                    case "city": $city = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['city'][0];
+                    case "city": $city = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : ($GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['city'][0] ?? 'City');
                         break;
-                    case "comment": $comment = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['comment'][0];
+                    case "comment": $comment = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : ($GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['comment'][0] ?? 'Comment');
                         break;
-                    case "additional1": $additional1 = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional1'][0];
+                    case "additional1": $additional1 = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : ($GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional1'][0] ?? 'Additional 1');
                         break;
-                    case "additional2": $additional2 = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional2'][0];
+                    case "additional2": $additional2 = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : ($GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional2'][0] ?? 'Additional 2');
                         break;
-                    case "additional3": $additional3 = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : $GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional3'][0];
+                    case "additional3": $additional3 = $rowdata['individualLabel'] ? $rowdata['individualLabel'] : ($GLOBALS['TL_LANG']['tl_c4g_reservation_event_participants']['additional3'][0] ?? 'Additional 3');
                         break;
                 }
             }
 
             $showParticipantInfoFields = Database::getInstance()->prepare("SELECT showParticipantInfoFields FROM tl_c4g_reservation_event WHERE pid=?")->execute($id)->fetchAssoc(); 
-            $additionalFields = StringUtil::deserialize($showParticipantInfoFields['showParticipantInfoFields']);
+            $additionalFields = StringUtil::deserialize($showParticipantInfoFields['showParticipantInfoFields'] ?? null);
 
             $fields = [$lastname,$firstname];
             if (isset($additionalFields)) {
@@ -175,14 +193,16 @@
         {
             $id = $arrRow['pid'];
             $showParticipantInfoFields = Database::getInstance()->prepare("SELECT showParticipantInfoFields FROM tl_c4g_reservation_event WHERE pid=?")->execute($id)->fetchAssoc(); 
-            $additionalFields = StringUtil::deserialize($showParticipantInfoFields['showParticipantInfoFields']);
+            $additionalFields = StringUtil::deserialize($showParticipantInfoFields['showParticipantInfoFields'] ?? null);
 
+            $participant_params = '';
             $participantParams = StringUtil::deserialize($arrRow['participant_params']);
-            if ($participantParams) {
-                $i = 0;
+            if (is_array($participantParams)) {
                 foreach ($participantParams as $p) {
                     $params = Database::getInstance()->prepare("SELECT caption FROM `tl_c4g_reservation_params` WHERE id=?")->execute(intval($p))->fetchAssoc();
-                    $participant_params = $participant_params ? $participant_params . ", " . $params['caption'] : $params['caption']; 
+                    if ($params && isset($params['caption'])) {
+                        $participant_params = $participant_params ? $participant_params . ", " . $params['caption'] : $params['caption'];
+                    }
                 }
             }
 

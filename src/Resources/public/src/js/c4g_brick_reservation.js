@@ -1244,60 +1244,81 @@ function checkEventFields(typeId, selectField) {
     if (eventData) {
         for (var i = 0; i < eventData.length; i++) {
             eventData[i].hidden = true;
+            eventData[i].style.display = "none";
         }
     }
 
     if (selectField && !isSelectHidden) {
         //document.getElementsByClassName("reservation-id").hidden != true;
-        for (var i = 0; i < selectField.options.length; i++) {
-            var option = selectField.options[i];
-            if (option.value && (option.selected || selectField.type !== 'select-one')) {
-                var additional = -1;
-                if (option.value) {
-                    additional = typeId.toString() + "-22" + option.value.toString();
+        var values = [];
+        if (selectField.options) {
+            for (var i = 0; i < selectField.options.length; i++) {
+                var option = selectField.options[i];
+                if (option.value && (option.selected || selectField.type !== 'select-one')) {
+                    values.push(option.value);
+                }
+            }
+        } else if (selectField.value) {
+            values.push(selectField.value);
+        }
 
-                    var eventDataWithType = document.querySelectorAll('.eventdata_' + additional);
-                    if (eventDataWithType) {
-                        for (var k = 0; k < eventDataWithType.length; k++) {
-                            eventDataWithType[k].style.visibility = "hidden";
-                            eventDataWithType[k].hidden = true;
-                        }
+        for (var i = 0; i < values.length; i++) {
+            var val = values[i];
+            var additional = typeId.toString() + "-22" + val.toString();
+
+            var eventDataWithType = document.querySelectorAll('.eventdata_' + additional);
+            if (eventDataWithType) {
+                for (var k = 0; k < eventDataWithType.length; k++) {
+                    eventDataWithType[k].style.visibility = "visible";
+                    eventDataWithType[k].style.display = "block";
+                    eventDataWithType[k].hidden = false;
+                }
+            }
+
+            var dateFields = document.getElementsByClassName('begindate-event');
+            if (dateFields) {
+                for (var j = 0; j < dateFields.length; j++) {
+                    var dateContainer = dateFields[j].querySelector('.c4g__form-date-container');
+                    if (dateContainer && (additional != -1) && dateContainer.querySelector('.c4g_beginDateEvent_' + additional)) {
+                        dateFields[j].style.visibility = "visible";
+                        dateFields[j].style.display = "block";
+                        dateFields[j].hidden = false;
+                    } else {
+                        dateFields[j].hidden = true;
+                        dateFields[j].style.display = "none";
                     }
                 }
+            }
 
-                var dateFields = document.getElementsByClassName('begindate-event');
-                if (dateFields) {
-                    for (var j = 0; j < dateFields.length; j++) {
-                        var dateContainer = dateFields[j].querySelector('.c4g__form-date-container');
-                        if (dateContainer && (additional != -1) && dateContainer.querySelector('.c4g_beginDateEvent_' + additional)) {
-                            dateFields[j].style.visibility = "visible";
-                            dateFields[j].hidden = false;
-                        } else {
-                            dateFields[j].hidden = true;
+            var timeFields = document.getElementsByClassName('reservation_time_event_button');
+            if (timeFields) {
+                for (var j = 0; j < timeFields.length; j++) {
+                    if (timeFields[j].classList.contains('reservation_time_event_button_' + additional)) {
+                        timeFields[j].style.visibility = "visible";
+                        timeFields[j].style.display = "block";
+                        timeFields[j].hidden = false;
+                        var parentNode = timeFields[j].parentNode;
+                        while (parentNode && parentNode.className && (typeof parentNode.className === 'string') && parentNode.className.indexOf('c4g__form-field') === -1) {
+                            parentNode.hidden = false;
+                            parentNode.style.display = "block";
+                            parentNode = parentNode.parentNode;
                         }
-                    }
-                }
-
-                var timeFields = document.getElementsByClassName('reservation_time_event_button');
-                if (timeFields) {
-                    for (var j = 0; j < timeFields.length; j++) {
-                        if (timeFields[j].classList.contains('reservation_time_event_button_' + additional)) {
-                            timeFields[j].style.visibility = "visible";
-                            timeFields[j].hidden = false;
-                            var parentNode = timeFields[j].parentNode;
-                            while (parentNode && parentNode.className && (typeof parentNode.className === 'string') && parentNode.className.indexOf('c4g__form-field') === -1) {
-                                parentNode.hidden = false;
-                                parentNode = parentNode.parentNode;
-                            }
-                            if (parentNode) parentNode.hidden = false;
-                        } else {
-                            timeFields[j].hidden = true;
-                            var parentNode = timeFields[j].parentNode;
-                            while (parentNode && parentNode.className && (typeof parentNode.className === 'string') && parentNode.className.indexOf('c4g__form-field') === -1) {
-                                parentNode.hidden = true;
-                                parentNode = parentNode.parentNode;
-                            }
-                            if (parentNode) parentNode.hidden = true;
+                        if (parentNode) {
+                            parentNode.hidden = false;
+                            parentNode.style.display = "block";
+                        }
+                    } else {
+                        timeFields[j].hidden = true;
+                        timeFields[j].style.display = "none";
+                        var parentNode = timeFields[j].parentNode;
+                        while (parentNode && parentNode.className && (typeof parentNode.className === 'string') && parentNode.className.indexOf('c4g__form-field') === -1) {
+                            parentNode.hidden = true;
+                            parentNode.style.display = "none";
+                            parentNode = parentNode.parentNode;
+                        }
+                        if (parentNode) {
+                            parentNode.hidden = true;
+                            parentNode.style.display = "none";
                         }
                     }
                 }
@@ -1308,6 +1329,7 @@ function checkEventFields(typeId, selectField) {
         if (dateFields) {
             for (var i = 0; i < dateFields.length; i++) {
                 dateFields[i].hidden = true;
+                dateFields[i].style.display = "none";
             }
         }
 
@@ -1315,6 +1337,7 @@ function checkEventFields(typeId, selectField) {
         if (timeFields) {
             for (var i = 0; i < timeFields.length; i++) {
                 timeFields[i].hidden = true;
+                timeFields[i].style.display = "none";
             }
         }
     }

@@ -39,7 +39,19 @@
 
         public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
         {
+            if (is_array($title)) {
+                $title = $title[0] ?? '';
+            }
+            if (is_array($label)) {
+                $label = $label[0] ?? '';
+            }
+
+
             $this->import(BackendUser::class, 'User');
+
+            if (is_array($title)) {
+                $title = $title[0] ?? '';
+            }
 
             if (strlen(Input::get('tid')))
             {
@@ -336,6 +348,23 @@
         }
 
         public function sendNotification($row, $href, $label, $title, $icon) {
+            if (is_array($title)) {
+                $title = $title[0] ?? '';
+            }
+            if (is_array($label)) {
+                $label = $label[0] ?? '';
+            }
+
+            if (is_array($title)) {
+                $title = $title[0] ?? '';
+            }
+            if (is_array($label)) {
+                $label = $label[0] ?? '';
+            }
+
+            if (is_array($title)) {
+                $title = $title[0] ?? '';
+            }
             $rt = Input::get('rt');
             $do = Input::get('do');
 

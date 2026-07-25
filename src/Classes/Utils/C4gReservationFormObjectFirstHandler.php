@@ -255,12 +255,13 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $descriptionField->setCondition($object_condition);
                     $descriptionField->setFormField(true);
                     $descriptionField->setShowIfEmpty(false);
-                    $descriptionField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
+                    $descriptionField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                     $descriptionField->setRemoveWithEmptyCondition(true);
                     $descriptionField->setDatabaseField(false);
                     $descriptionField->setEditable(false);
                     $descriptionField->setNotificationField(true);
                     $descriptionField->setPrintable($this->module->isWithDefaultPDFContent());
+                    $descriptionField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-description');
                     $this->fieldList[] = $descriptionField;
                 }
 
@@ -271,12 +272,13 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $imageField->setCondition($object_condition);
                     $imageField->setFormField(true);
                     $imageField->setShowIfEmpty(false);
-                    $imageField->setAdditionalID($listType['id'] . '-33' . $reservationObject->getId());
+                    $imageField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                     $imageField->setRemoveWithEmptyCondition(true);
                     $imageField->setDatabaseField(false);
                     $imageField->setLightBoxField(true);
                     $imageField->setInitInvisible(true);
                     $imageField->setPrintable($this->module->isWithDefaultPDFContent());
+                    $imageField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-image');
                     $this->fieldList[] = $imageField;
                 }
 
@@ -320,11 +322,11 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                         $reservationLocationField->setCondition($object_condition);
                         $reservationLocationField->setMandatory(false);
                         $reservationLocationField->setShowIfEmpty(false);
-                        $reservationLocationField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+                        $reservationLocationField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                         $reservationLocationField->setRemoveWithEmptyCondition(true);
                         $reservationLocationField->setNotificationField(true);
                         $reservationLocationField->setWithoutValidation(true);
-                        //$reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-' . $reservationObject->getId() . ' event-location');
+                        $reservationLocationField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-location');
                         $reservationLocationField->setPrintable($this->module->isWithDefaultPDFContent());
                         $reservationLocationField->setHidden($reservationSettings->hideLocation);
                         $this->fieldList[] = $reservationLocationField;
@@ -365,10 +367,10 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                         $speakerLinks->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['objectspeaker']);
                         $speakerLinks->setCondition($object_condition);
                         $speakerLinks->setShowIfEmpty(false);
-                        $speakerLinks->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+                        $speakerLinks->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                         $speakerLinks->setRemoveWithEmptyCondition(true);
                         $speakerLinks->setNotificationField(true);
-                        $speakerLinks->setPrintable($this->module->isWithDefaultPDFContent());
+                        $speakerLinks->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-speaker');
                         $this->fieldList[] = $speakerLinks;
                     }
 
@@ -395,12 +397,12 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $topicField->setInitialValue($topicStr);
                     $topicField->setMandatory(false);
                     $topicField->setShowIfEmpty(false);
-                    $topicField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+                    $topicField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                     $topicField->setRemoveWithEmptyCondition(true);
                     $topicField->setNotificationField(true);
                     $topicField->setSimpleTextWithoutEditing(true);
                     $topicField->setPrintable($this->module->isWithDefaultPDFContent());
-                    //$topicField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-' . $reservationObject->getId() . ' event-topic');
+                    $topicField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-topic');
                     $this->fieldList[] = $topicField;
 
                 }
@@ -426,12 +428,12 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
                     $audienceField->setInitialValue($audienceStr);
                     $audienceField->setMandatory(false);
                     $audienceField->setShowIfEmpty(false);
-                    $audienceField->setAdditionalID($listType['id'] . '-' . $reservationObject->getId());
+                    $audienceField->setAdditionalID($listType['id'] . '-22' . $reservationObject->getId());
                     $audienceField->setRemoveWithEmptyCondition(true);
                     $audienceField->setNotificationField(true);
                     $audienceField->setSimpleTextWithoutEditing(true);
                     $audienceField->setPrintable($this->module->isWithDefaultPDFContent());
-                    //$audienceField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-' . $reservationObject->getId() . ' event-audience');
+                    $audienceField->setStyleClass('eventdata eventdata_' . $listType['id'] . '-22' . $reservationObject->getId() . ' eventdata_' . $reservationObject->getId() . ' event-audience');
                     $this->fieldList[] = $audienceField;
                 }
             }
@@ -736,6 +738,14 @@ class C4gReservationFormObjectFirstHandler extends C4gReservationFormHandler
             $additionalParams->setNotificationField(true);
             $additionalParams->setSort(false);
             $this->fieldList[] = $additionalParams;
+        }
+
+        foreach ($this->fieldList as $field) {
+            if ($field->getAdditionalID() && strpos($field->getAdditionalID(), '-22') !== false) {
+                if (!$field->isHidden()) {
+                    $field->setForceVisible(true);
+                }
+            }
         }
 
         return $this->fieldList;

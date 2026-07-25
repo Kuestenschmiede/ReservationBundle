@@ -109,6 +109,47 @@ class C4gReservationController extends C4GBaseController
     protected $loadFontAwesomeResources = true;
     protected $loadTriggerSearchFromOtherModuleResources = false;
     protected $loadFileUploadResources = true; //ToDo Check if needed
+
+    protected function resetStateIfNewRequest()
+    {
+        parent::resetStateIfNewRequest();
+
+        $request = $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
+        if ($request) {
+            $isAjax = $request->query->has('req') || $request->headers->get('X-Requested-With') === 'XMLHttpRequest';
+            $hasPermalink = $request->query->has($this->permalink_name ?: 'item') || $request->query->has('item');
+            if ($this->session && $request->getMethod() === 'GET' && !$isAjax && !$hasPermalink) {
+                // Clear Reservation specific cookies/session values
+                $this->session->remove('reservationEventCookie');
+                $this->session->remove('reservationSettings');
+                $this->session->remove('reservationLangCookie');
+            }
+
+            // Cache reset
+            if (class_exists(C4gReservationHandler::class)) {
+                try {
+                    C4gReservationHandler::resetStaticCaches();
+                } catch (\Throwable $t) {}
+            }
+        }
+    }
+
+    public function getPerformAction($request, $action, $withMemberCheck = true)
+    {
+        $values = explode(':', $action, 5);
+        if (($values[0] == \con4gis\ProjectsBundle\Classes\Actions\C4GBrickActionType::ACTION_BUTTONCLICK) && ($values[1] === 'clickReservation')) {
+            // In reservation, the 3rd value is the event id, but we want to initialize a NEW reservation record.
+            // So we call initBrickModule with -1 to prevent loading a record by the event id.
+            $this->initBrickModule(-1);
+
+            // We must rewrite the action to use -1 as ID for the parent call,
+            // otherwise parent::getPerformAction would call initBrickModule again with the event ID.
+            $values[2] = -1;
+            $action = implode(':', $values);
+        }
+
+        return parent::getPerformAction($request, $action, $withMemberCheck);
+    }
     protected $loadMultiColumnResources = false;
     protected $loadMiniSearchResources = false;
     protected $loadHistoryPushResources = false;
@@ -356,12 +397,34 @@ class C4gReservationController extends C4GBaseController
 
     public function initBrickModule($id)
     {
+        $database = null;
+        if (class_exists('Contao\System') && ($container = \Contao\System::getContainer())) {
+            try {
+                $database = Database::getInstance();
+            } catch (\Throwable $e) {}
+        }
         $moduleTypes = [];
         $doIt = false;
         if ((!property_exists($this,'reservationSettings') || !$this->reservationSettings) && property_exists($this,'reservation_settings') && $this->reservation_settings) {
             $this->session->setSessionValue('reservationSettings', $this->reservation_settings);
             $this->reservationSettings = C4gReservationSettingsModel::findByPk($this->reservation_settings);
             $moduleTypes = StringUtil::deserialize($this->reservationSettings->reservation_types, true);
+        }
+
+        $eventId = Input::get('event') ?: 0;
+        if (!$eventId && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
+            $eventId = $request->attributes->get('event') ?: 0;
+            if (!$eventId && $request->attributes->has('auto_item')) {
+                $eventId = $request->attributes->get('auto_item');
+            }
+
+            // Still no event? Try to parse from the raw URI if possible
+            if (!$eventId) {
+                $uri = $request->getUri();
+                if (preg_match('/\/event\/([^\/\?]+)/', $uri, $matches)) {
+                    $eventId = $matches[1];
+                }
+            }
         }
 
         if ($moduleTypes) {
@@ -371,28 +434,22 @@ class C4gReservationController extends C4GBaseController
             $idList = array_map('intval', (array) $moduleTypes);
             if (!empty($idList)) {
                 $inList = implode(',', $idList);
-                $row = Database::getInstance()
-                    ->prepare("SELECT id FROM $t WHERE published=? AND reservationObjectType=? AND id IN ($inList) LIMIT 1")
-                    ->execute('1', '2')
-                    ->fetchAssoc();
-                if ($row) {
-                    $doIt = false;
+                $dbConnection = null;
+                if (class_exists('Contao\System') && ($container = \Contao\System::getContainer())) {
+                    try {
+                        $dbConnection = $container->get('database_connection');
+                    } catch (\Throwable $e) {}
                 }
-            }
-        }
-
-        $eventId = Input::get('event') ?: 0;
-        if (!$eventId && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
-            $eventId = $request->attributes->get('event') ?: 0;
-            if (!$eventId && $request->attributes->has('auto_item')) {
-                $eventId = $request->attributes->get('auto_item');
-            }
-            
-            // Still no event? Try to parse from the raw URI if possible
-            if (!$eventId) {
-                $uri = $request->getUri();
-                if (preg_match('/\/event\/([^\/\?]+)/', $uri, $matches)) {
-                    $eventId = $matches[1];
+                if ($dbConnection instanceof \Doctrine\DBAL\Connection) {
+                    $row = $dbConnection->fetchAssociative("SELECT id FROM $t WHERE published='1' AND reservationObjectType='2' AND id IN ($inList) LIMIT 1");
+                } else {
+                    $row = Database::getInstance()
+                        ->prepare("SELECT id FROM $t WHERE published=? AND reservationObjectType=? AND id IN ($inList) LIMIT 1")
+                        ->execute('1', '2')
+                        ->fetchAssoc();
+                }
+                if ($row && !$eventId) {
+                    $doIt = false;
                 }
             }
         }
@@ -631,7 +688,6 @@ class C4gReservationController extends C4GBaseController
             }
             
             if ($shouldNuke) {
-                C4gLogModel::addLogEntry('reservation', "Nuke state because of missing context or session.");
                 $this->nukeState(true);
             } else {
                 // If we don't nuke, we still want to ensure eventId is synced from URL to session
@@ -645,13 +701,8 @@ class C4gReservationController extends C4GBaseController
             }
             
             // SECURITY: Ensure we have the eventId in session if it's available in any way,
-            // even if nukeState just cleared it, but only if we ARE on an event page.
+            // Even if nukeState just cleared it, but only if we ARE on an event page.
             $eventIdRescued = \Contao\Input::get('event') ?: 0;
-            if (!$eventIdRescued && $this->requestStack && ($request = $this->requestStack->getCurrentRequest())) {
-                $eventIdRescued = $request->attributes->get('event') ?: ($request->attributes->get('auto_item') ?: 0);
-            }
-            
-            C4gLogModel::addLogEntry('reservation', "Nuke check: shouldNuke=" . ($shouldNuke ? "yes" : "no") . ", eventRescued=$eventIdRescued, isInitNav=" . ($isInitNav ? "yes" : "no"));
 
             if ($eventIdRescued) {
                 $this->session->setSessionValue('reservationEventCookie', $eventIdRescued);
@@ -827,9 +878,6 @@ class C4gReservationController extends C4GBaseController
             $eventId = $this->session->getSessionValue('reservationEventCookie');
         }
 
-        // Logs IDs again after all syncing to see final state before loading event
-        C4gLogModel::addLogEntry('reservation', "Final addFields context: event=$eventId, type=$typeId, object=$objectId");
-
         if ($eventId) {
             $this->permalink_name = 'event';
         }
@@ -852,7 +900,6 @@ class C4gReservationController extends C4GBaseController
         }
 
         if ($eventObj && is_countable($eventObj) && (count($eventObj) > 1)) {
-            C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: ' . $event->id);
         } else {
             $date = Input::get('date') ? Input::get('date') : 0;
             if (!$date && $this->session->getSessionValue('reservationInitialDateCookie')) {
@@ -1591,7 +1638,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
         $reservationSettings = $this->reservationSettings;
         if (!$reservationSettings) {
-             C4gLogModel::addLogEntry('reservation', "CRITICAL: reservationSettings is null in addFields!");
              // Fallback if settings are missing (e.g. after cache clear before properly initialized)
              // We try to find the first settings record as a last resort
              $this->reservationSettings = C4gReservationSettingsModel::findAll() ? C4gReservationSettingsModel::findAll()->current() : null;
@@ -2227,14 +2273,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $maxCapacityCheck = $specialParticipantMechanism || ($onlyParticipants ? $maxCapacity > 0 : $maxCapacity > 1);
 
                     if ($specialParticipantMechanism) {
-                        C4gLogModel::addLogEntry('reservation', "Special participant mechanism active for type " . $type['id'] . ", maxCapacity: $maxCapacity");
+                        // Special participant mechanism active
                     }
-
-                    C4gLogModel::addLogEntry('reservation', "Capacity check for type " . $type['id'] . ": special=" . ($specialParticipantMechanism ? "yes" : "no") . ", maxCap=$maxCapacity, check=" . ($maxCapacityCheck ? "pass" : "fail"));
 
                     $reservationSettingsWithCapacity = $this->reservationSettings->withCapacity;
                     if ($specialParticipantMechanism || $maxCapacityCheck) {
-                        C4gLogModel::addLogEntry('reservation', "Generating participant fields for type " . $type['id']);
                         if ($params) {
                             $initialCapacityValue = \Contao\Input::post('desiredCapacity_'.$type['id']) ?: (\Contao\Input::get('capacity') ?: 1);
                             foreach ($params as $paramId) {
@@ -2765,9 +2808,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $f->setNotificationField(true);
                     $f->setPrintable(true);
                     $f->setDatabaseField(true); // Must be true as they exist in DCA now
-                    $f->setEditable(true);     // Ensure they are processed during save
                     $found = true;
-                    break;
                 }
             }
             if (!$found) {
@@ -2780,6 +2821,34 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $f->setPrintable(true);
                 $f->setEditable(true);     // Ensure they are processed during save
                 $this->fieldList[] = $f;
+            }
+        }
+
+        // MIRROR INITIAL VALUES TO PUTVARS:
+        // This ensures that event details (description, location, etc.) set by the form handlers
+        // are available as tokens and are not overwritten by empty defaults later.
+        foreach ($this->fieldList as $field) {
+            $iv = '';
+            try {
+                $iv = $field->generateInitialValue($this->putVars);
+            } catch (\Throwable $e) {
+                // Emergency fallback if method is still considered protected due to caching
+                $reflection = new \ReflectionMethod($field, 'generateInitialValue');
+                $reflection->setAccessible(true);
+                $iv = $reflection->invoke($field, $this->putVars);
+            }
+            if ($iv && ($iv !== ' ') && $field->isNotificationField()) {
+                $fn = $field->getFieldName();
+                $ai = $field->getAdditionalID();
+                if ($ai) {
+                    $fullKey = $fn . '_' . $ai;
+                    if (!isset($this->putVars[$fullKey]) || $this->putVars[$fullKey] === '' || $this->putVars[$fullKey] === ' ') {
+                        $this->putVars[$fullKey] = $iv;
+                    }
+                }
+                if (!isset($this->putVars[$fn]) || $this->putVars[$fn] === '' || $this->putVars[$fn] === ' ') {
+                    $this->putVars[$fn] = $iv;
+                }
             }
         }
 
@@ -3096,7 +3165,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 // Hard sync for priceNet/priceTax to avoid them being 0,00 € in notifications if they exist in instance
                 $putVars['priceNet'] = $this->putVars['priceNet'] ?? $putVars['priceNet'] ?? '0,00 €';
                 $putVars['priceTax'] = $this->putVars['priceTax'] ?? $putVars['priceTax'] ?? '0,00 €';
-                \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Final Sync to putVars: Net: " . ($putVars['priceNet'] ?? 'MISSING') . ", Tax: " . ($putVars['priceTax'] ?? 'MISSING'));
             }
 
         $this->session->setSessionValue('c4g_brick_dialog_values', $dialogValues);
@@ -3152,7 +3220,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 if (isset($this->session) && is_object($this->session) && method_exists($this->session, 'setSessionValue')) {
                     $this->session->setSessionValue('c4g_brick_dialog_values', null);
                 }
-                C4gLogModel::addLogEntry('reservation', "Mandatory error: Privacy policy not agreed.");
                 $result = [
                     'usermessage' => $GLOBALS['TL_LANG']['FE_C4G_DIALOG']['USERMESSAGE_MANDATORY'] ?? 'Bitte stimmen Sie den Datenschutzbestimmungen zu.'
                 ];
