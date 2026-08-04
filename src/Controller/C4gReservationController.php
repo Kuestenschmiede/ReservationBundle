@@ -2491,6 +2491,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $privacyPolicyText->setSimpleTextWithoutEditing(true);
             $privacyPolicyText->setFieldName('privacy_policy_text');
             $privacyPolicyText->setInitialValue(C4GUtils::replaceInsertTags($this->reservationSettings->privacy_policy_text));
+            $privacyPolicyText->setReplaceInsertTag(true);
             $privacyPolicyText->setSize(4);
             $privacyPolicyText->setTableColumn(false);
             $privacyPolicyText->setEditable(false);
