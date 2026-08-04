@@ -1259,7 +1259,7 @@ foreach ($typelist as $listType) {
     $reservationDesiredCapacity = new C4GNumberField();
     $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
-    if ($maxCapacity && $eventObj && $eventObj->maxParticipants) {
+    if ($maxCapacity && $eventObj) {
         $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
     }
 
@@ -2102,11 +2102,6 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     }
 
                     $reservationDesiredCapacity->setFieldName('desiredCapacity');
-
-                    if ($maxCapacity) {
-                        $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
-                        $currentMaxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
-                    }
 
                     //without max cap for praticipants but max per booking
                     if ($maxCapacity >= $isPartiPerEvent && $isPartiPerEvent) {

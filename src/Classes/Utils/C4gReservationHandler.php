@@ -1743,7 +1743,6 @@ class C4gReservationHandler
                 $conferenceLink = key_exists('conferenceLink', $event) && $event['conferenceLink'] ? $event['conferenceLink'] : '';
 
                 $maxParticipants = $event['maxParticipants'] ?: $calendarObject['reservationMaxParticipants'];
-                $maxParticipants = self::getMaxParticipentsForObject($objectId, $maxParticipants);
 
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
@@ -1828,7 +1827,6 @@ class C4gReservationHandler
 
                         if ($eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > $startTime)) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= $startTime))) {
                             $maxParticipants = $reservationEvent['maxParticipants'] ?: $calendarObject['reservationMaxParticipants'];
-                            $maxParticipants = self::getMaxParticipentsForObject($objectId, $maxParticipants);
 
                             $frontendObject = new C4gReservationFrontendObject();
                             $frontendObject->setType(2);

@@ -437,9 +437,9 @@ class C4gReservationInsertTags
                     $datimFormat = $GLOBALS['TL_CONFIG']['datimFormat'];
                     $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
 
-                    $maxParticipants = $reservationObject ? $reservationObject->maxParticipants : $calendarObject->maxParticipants;
-                    $minReservationDay = $reservationObject ? $reservationObject->min_reservation_day : $calendarObject->min_reservation_day;
-                    $reservationType = $reservationObject ? $reservationObject->reservationType : $calendarObject->reservationType;
+                    $maxParticipants = ($reservationObject && $reservationObject->maxParticipants) ? $reservationObject->maxParticipants : ($calendarObject ? $calendarObject->reservationMaxParticipants : 0);
+                    $minReservationDay = ($reservationObject && $reservationObject->min_reservation_day) ? $reservationObject->min_reservation_day : ($calendarObject ? $calendarObject->reservationMinReservationDay : 0);
+                    $reservationType = ($reservationObject && $reservationObject->reservationType) ? $reservationObject->reservationType : ($calendarObject ? $calendarObject->reservationType : 0);
 
                     $clock = '';
                     if (!strpos($timeFormat, 'A')) {
