@@ -2338,6 +2338,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                 $reservationParticipants->setInitInvisible(false);
                             } else {
                                 $reservationParticipants->setShowFirstDataSet(true);
+                                $reservationParticipants->setInitInvisible(true);
                             }
                             $reservationParticipants->setParentFieldList($fieldList);
                             $reservationParticipants->setDelimiter('§');
@@ -2421,6 +2422,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                                     if (isset($_GET['event']) && intval($_GET['event']) > 0) {
                                         $reservationParticipants->setShowFirstDataSet(true);
                                         $reservationParticipants->setInitInvisible(false);
+                                    } else {
+                                        $reservationParticipants->setInitInvisible(true);
                                     }
                                     $reservationParticipants->setParentFieldList($fieldList);
                                     $reservationParticipants->setDelimiter('§');
