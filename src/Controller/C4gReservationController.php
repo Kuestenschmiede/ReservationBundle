@@ -2836,16 +2836,16 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $reflection->setAccessible(true);
                 $iv = $reflection->invoke($field, $this->putVars);
             }
-            if ($iv && ($iv !== ' ') && $field->isNotificationField()) {
+            if ($iv && (is_string($iv) ? trim($iv) !== '' : $iv) && $field->isNotificationField()) {
                 $fn = $field->getFieldName();
                 $ai = $field->getAdditionalID();
                 if ($ai) {
                     $fullKey = $fn . '_' . $ai;
-                    if (!isset($this->putVars[$fullKey]) || $this->putVars[$fullKey] === '' || $this->putVars[$fullKey] === ' ') {
+                    if (!isset($this->putVars[$fullKey]) || $this->putVars[$fullKey] === '' || (is_string($this->putVars[$fullKey]) && trim($this->putVars[$fullKey]) === '')) {
                         $this->putVars[$fullKey] = $iv;
                     }
                 }
-                if (!isset($this->putVars[$fn]) || $this->putVars[$fn] === '' || $this->putVars[$fn] === ' ') {
+                if (!isset($this->putVars[$fn]) || $this->putVars[$fn] === '' || (is_string($this->putVars[$fn]) && trim($this->putVars[$fn]) === '')) {
                     $this->putVars[$fn] = $iv;
                 }
             }
@@ -3135,7 +3135,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $typeId = $putVars['reservation_type'];
             foreach (['discountCode', 'discountPercent'] as $dk) {
                 $suffixed = $dk . '_' . $typeId;
-                if (isset($putVars[$suffixed]) && (!isset($putVars[$dk]) || !$putVars[$dk] || $putVars[$dk] === ' ')) {
+                if (isset($putVars[$suffixed]) && (!isset($putVars[$dk]) || !$putVars[$dk] || (is_string($putVars[$dk]) && trim($putVars[$dk]) === ''))) {
                     $putVars[$dk] = $putVars[$suffixed];
                     $this->putVars[$dk] = $putVars[$suffixed];
                 }
@@ -3146,7 +3146,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $eventSuffix = $typeId . '-22' . $currentEventForRescue;
                 foreach (['discountCode', 'discountPercent'] as $dk) {
                     $suffixed = $dk . '_' . $eventSuffix;
-                    if (isset($putVars[$suffixed]) && (!isset($putVars[$dk]) || !$putVars[$dk] || $putVars[$dk] === ' ')) {
+                    if (isset($putVars[$suffixed]) && (!isset($putVars[$dk]) || !$putVars[$dk] || (is_string($putVars[$dk]) && trim($putVars[$dk]) === ''))) {
                         $putVars[$dk] = $putVars[$suffixed];
                         $this->putVars[$dk] = $putVars[$suffixed];
                     }
@@ -3157,7 +3157,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             // Ensure calculation values are in putVars for saving and notifications
             if (isset($this->putVars['priceSum'])) {
                 foreach (['priceSum', 'priceSumNet', 'priceSumTax', 'priceSumBrutto', 'priceOptionSum', 'priceOptionSumNet', 'priceOptionSumTax', 'priceDiscount', 'priceNet', 'priceBrutto', 'priceTax', 'price', 'discountPercent', 'discountCode'] as $pk) {
-                    if (isset($this->putVars[$pk]) && (!isset($putVars[$pk]) || $putVars[$pk] === '0,00 €' || $putVars[$pk] === '0' || $putVars[$pk] === ' ' || $putVars[$pk] === '0,00 %' || $putVars[$pk] === '0 %')) {
+                    if (isset($this->putVars[$pk]) && (!isset($putVars[$pk]) || $putVars[$pk] === '0,00 €' || $putVars[$pk] === '0' || (is_string($putVars[$pk]) && trim($putVars[$pk]) === '') || $putVars[$pk] === '0,00 %' || $putVars[$pk] === '0 %')) {
                         $putVars[$pk] = $this->putVars[$pk];
                     }
                 }
@@ -4509,8 +4509,8 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'priceOptionSum' => (isset($putVars['priceOptionSum']) && $putVars['priceOptionSum'] !== '' && $putVars['priceOptionSum'] !== '0,00 €' && $putVars['priceOptionSum'] !== '0' && $putVars['priceOptionSum'] !== 0) ? $putVars['priceOptionSum'] : ($putVars['priceOptionSum'] ?? '0,00 €'),
             'priceOptionSumNet' => (isset($putVars['priceOptionSumNet']) && $putVars['priceOptionSumNet'] !== '' && $putVars['priceOptionSumNet'] !== '0,00 €' && $putVars['priceOptionSumNet'] !== '0' && $putVars['priceOptionSumNet'] !== 0) ? $putVars['priceOptionSumNet'] : ($putVars['priceOptionSumNet'] ?? '0,00 €'),
             'priceOptionSumTax' => (isset($putVars['priceOptionSumTax']) && $putVars['priceOptionSumTax'] !== '' && $putVars['priceOptionSumTax'] !== '0,00 €' && $putVars['priceOptionSumTax'] !== '0' && $putVars['priceOptionSumTax'] !== 0) ? $putVars['priceOptionSumTax'] : ($putVars['priceOptionSumTax'] ?? '0,00 €'),
-            'discountPercent' => (isset($putVars['discountPercent']) && $putVars['discountPercent'] !== '' && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0 && $putVars['discountPercent'] !== ' ' && $putVars['discountPercent'] !== '0,00 %' && $putVars['discountPercent'] !== '0 %' && $putVars['discountPercent'] !== '0,00' && $putVars['discountPercent'] !== '0') ? $putVars['discountPercent'] : ($putVars['discountPercent'] ?? ''),
-            'discountCode' => (isset($putVars['discountCode']) && $putVars['discountCode'] !== '' && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0 && $putVars['discountCode'] !== ' ') ? $putVars['discountCode'] : '',
+            'discountPercent' => (isset($putVars['discountPercent']) && $putVars['discountPercent'] !== '' && trim($putVars['discountPercent']) !== '' && $putVars['discountPercent'] !== '0' && $putVars['discountPercent'] !== 0 && $putVars['discountPercent'] !== '0,00 %' && $putVars['discountPercent'] !== '0 %' && $putVars['discountPercent'] !== '0,00' && $putVars['discountPercent'] !== '0') ? $putVars['discountPercent'] : ($putVars['discountPercent'] ?? ''),
+            'discountCode' => (isset($putVars['discountCode']) && $putVars['discountCode'] !== '' && trim($putVars['discountCode']) !== '' && $putVars['discountCode'] !== '0' && $putVars['discountCode'] !== 0) ? $putVars['discountCode'] : '',
             'reservationTaxRate' => $putVars['reservationTaxRate'] ?? $settings->taxRate ?? 19,
             'conferenceLink' => $putVars['conferenceLink'] ?? '',
             'speaker' => $putVars['speaker'] ?? '',

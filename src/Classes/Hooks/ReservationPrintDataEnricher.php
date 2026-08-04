@@ -53,9 +53,9 @@ class ReservationPrintDataEnricher
                         $data['reservation_id'] = $data['id'];
                     }
                 }
-                if (!isset($data[$standardKey]) || $data[$standardKey] === '' || $data[$standardKey] === null) {
+                if (!isset($data[$standardKey]) || $data[$standardKey] === '' || $data[$standardKey] === null || (is_string($data[$standardKey]) && trim($data[$standardKey]) === '')) {
                     foreach ($data as $dynamicKey => $value) {
-                        if ((strpos($dynamicKey, $standardKey . '_') === 0 || strpos($dynamicKey, $standardKey . '|') === 0 || strpos($dynamicKey, $standardKey . '-') === 0) && ($value !== '' && $value !== null)) {
+                        if ((strpos($dynamicKey, $standardKey . '_') === 0 || strpos($dynamicKey, $standardKey . '|') === 0 || strpos($dynamicKey, $standardKey . '-') === 0) && ($value !== '' && $value !== null && (!is_string($value) || trim($value) !== ''))) {
                             $data[$standardKey] = $value;
                             // error_log("ReservationPrintDataEnricher DEBUG Synced $standardKey from $dynamicKey: $value");
                             break;
@@ -125,11 +125,15 @@ class ReservationPrintDataEnricher
 
             // 5. Mirror fresh results back to dynamic keys to be absolutely sure the template finds them
             $fieldsToMirror = [
-                'qrFileName', 'bankQrFileName', 'qrContent', 'qrBase64', 'bankQrBase64',
                 'price', 'priceTax', 'priceSum', 'priceSumTax', 'priceNet', 'priceSumNet',
                 'priceOptionSum', 'priceOptionSumTax', 'priceOptionSumNet', 'priceDiscount',
                 'discountPercent', 'discountCode', 'reservationTaxRate', 'documentId'
             ];
+            foreach ($fieldsToMirror as $ktm) {
+                if (isset($data[$ktm]) && is_string($data[$ktm])) {
+                    $data[$ktm] = trim($data[$ktm]);
+                }
+            }
             foreach ($fieldsToMirror as $ktm) {
                 if (isset($data[$ktm]) && $data[$ktm]) {
                     foreach ($data as $pk => $pv) {
