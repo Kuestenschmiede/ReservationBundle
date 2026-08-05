@@ -257,10 +257,11 @@ class C4gReservationController extends C4GBaseController
 
     public static function replaceDateTokens(string $text): string
     {
-        $year = date('Y');
-        $year2 = date('y');
-        $month = date('m');
-        $day = date('d');
+        $dt = new \DateTime('now', new \DateTimeZone('Europe/Berlin'));
+        $year = $dt->format('Y');
+        $year2 = $dt->format('y');
+        $month = $dt->format('m');
+        $day = $dt->format('d');
         $text = str_replace('{{year}}', $year, $text);
         $text = str_replace('{{year2}}', $year2, $text);
         $text = str_replace('{{month}}', $month, $text);
@@ -885,23 +886,32 @@ class C4gReservationController extends C4GBaseController
         $database = Database::getInstance();
         $event = false;
         $eventObj = false;
+        $calendarObj = false;
         if ($eventId) {
             $eventResult = $database->prepare("SELECT * FROM tl_calendar_events WHERE id=? AND published='1'")
                 ->execute($eventId);
-            if ($eventResult && $eventResult->id) {
+            if ($eventResult && $eventResult->next()) {
                 $event = $eventResult;
                 // Since we don't have a Model here, we use a manual check for the connection
                 $eventObjResult = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE pid=?")
                     ->execute($event->id);
-                if ($eventObjResult && $eventObjResult->id) {
+                if ($eventObjResult && $eventObjResult->next()) {
                     $eventObj = $eventObjResult;
+                }
+                
+                $calendarResult = $database->prepare("SELECT * FROM tl_calendar WHERE id=?")
+                    ->execute($event->pid);
+                if ($calendarResult && $calendarResult->next()) {
+                    $calendarObj = $calendarResult;
                 }
             }
         }
 
-        if ($eventObj && is_countable($eventObj) && (count($eventObj) > 1)) {
-        } else {
-            $date = Input::get('date') ? Input::get('date') : 0;
+        if ($eventObj) {
+            $eventObj->first(); // Ensure we are at the first record for initialization
+        }
+        
+        $date = Input::get('date') ? Input::get('date') : 0;
             if (!$date && $this->session->getSessionValue('reservationInitialDateCookie')) {
                 $date = $this->session->getSessionValue('reservationInitialDateCookie');
             }
@@ -928,6 +938,7 @@ class C4gReservationController extends C4GBaseController
                 $minReservationDay = $eventObj->min_reservation_day;
                 $currentTimeStamp = time();
                 $minReservationDates =  $currentTimeStamp + ($minReservationDay * 86400);
+                $compareDate = $event->endTime ?: ($event->startTime ?: $startDate);
                 if ($recurring && !($startDate == $actDate)) {
                     $repeatEach = StringUtil::deserialize($event->repeatEach, true);
                     $goodDay = false;
@@ -975,7 +986,7 @@ class C4gReservationController extends C4GBaseController
                         return [$info];
                     }
                 }
-                if (($minReservationDates >= $startDate) && !(key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))){
+                if (($minReservationDates >= $compareDate) && !(key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))){
                     $info = new C4GInfoTextField();
                     $info->setFieldName('info');
                     $info->setEditable(false);
@@ -996,22 +1007,35 @@ class C4gReservationController extends C4GBaseController
 
             if ($time) {
                 $initialTime = strtotime($time);
-                $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'],$initialTime), Date::getFormatFromRgxp('time'));
+                $dt = new \DateTime('@' . (int)$initialTime);
+                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                $formatted = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                $objDate = new \Contao\Date($formatted, \Contao\Date::getFormatFromRgxp('time'));
                 $initialTime = $objDate->tstamp;
             }
-        }
 
         $t = 'tl_c4g_reservation_type';
         $arrValues = array();
         $arrOptions = array('order' => "$t.caption ASC, $t.options ASC",);
 
         if ($eventObj) {
-            $typeId = $eventObj->reservationType;
             $database = Database::getInstance();
-            $sql = "SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?";
-            $params = [$typeId, '1'];
-            $stmt = $database->prepare($sql);
-            $types = $stmt->execute(...$params)->fetchAllAssoc();
+            $typeIds = [];
+            $eventObj->reset();
+            while ($eventObj->next()) {
+                if ($eventObj->reservationType) {
+                    $typeIds[] = $eventObj->reservationType;
+                }
+            }
+            $eventObj->first(); // Restore pointer to the first record
+            if (!empty($typeIds)) {
+                $sql = "SELECT * FROM `tl_c4g_reservation_type` WHERE `id` IN (" . implode(',', $typeIds) . ") AND `published`=?";
+                $params = ['1'];
+                $stmt = $database->prepare($sql);
+                $types = $stmt->execute(...$params)->fetchAllAssoc();
+            } else {
+                $types = [];
+            }
         } else if ($typeId && is_numeric($typeId)) {
             $database = Database::getInstance();
             $sql = "SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published`=?";
@@ -1200,173 +1224,176 @@ class C4gReservationController extends C4GBaseController
         $initialValues->setObject($objectId);
 
         $onlyParticipants = $this->reservationSettings->onlyParticipants ?: false;
-        $isPartiPerEvent = $eventObj != false ? $eventObj->maxParticipantsPerEventBooking : 0;
 
+        $anyTypeAvailable = false;
+        foreach ($typelist as $listType) {
+            if ($eventObj) {
+                $eventObj->reset();
+                $found = false;
+                while ($eventObj->next()) {
+                    if ($eventObj->reservationType == $listType['id']) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $eventObj->first();
+                }
+            }
 
-foreach ($typelist as $listType) {
-    $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
-    $bookingMaxCapacity = $listType['maxParticipantsPerBooking'];
-    
-    $typeOfObject = $listType['objects'][0]->getTypeOfObject();
+            $isPartiPerEvent = $eventObj != false ? $eventObj->maxParticipantsPerEventBooking : 0;
+            $condition = new C4GBrickCondition(C4GBrickConditionType::VALUESWITCH, 'reservation_type', $listType['id']);
+            $bookingMaxCapacity = $listType['maxParticipantsPerBooking'];
+            
+            $typeOfObject = $listType['objects'][0]->getTypeOfObject();
 
-    $objectMaxCapacity = 0;
-    foreach ($listType['objects'] as $object) {
-        $objectMaxCapacity = intval($object->getDesiredCapacity()[1]) > $objectMaxCapacity ? intval($object->getDesiredCapacity()[1]) : $objectMaxCapacity;
-    }
+            $objectMaxCapacity = 0;
+            foreach ($listType['objects'] as $object) {
+                $objectMaxCapacity = intval($object->getDesiredCapacity()[1]) > $objectMaxCapacity ? intval($object->getDesiredCapacity()[1]) : $objectMaxCapacity;
+            }
 
-    $showMinMax = $this->reservationSettings->showMinMaxWithCapacity ? "1" : "0";
+            $showMinMax = $this->reservationSettings->showMinMaxWithCapacity ? "1" : "0";
 
-    if ($listType['maxParticipantsPerBooking'] && $eventObj && !$eventObj->maxParticipants) {
-        $maxParticipants = $listType['maxParticipantsPerBooking'];
-    } else if ($eventObj && $eventObj->maxParticipants) {
-        $maxParticipants = $eventObj->maxParticipants;
-    } else if ($listType['maxParticipantsPerBooking']) {
-        $maxParticipants = $listType['maxParticipantsPerBooking'];
-    }
+            // Determine total capacity of the event/object and calculate remaining capacity
+            $totalCapacity = $objectMaxCapacity ?: 0;
+            if ($eventObj && ($listType['objectType'] == '2')) {
+                // If event max participants is 0 (explicitly unlimited), we treat it as such
+                // unless we want fallback to calendar. Usually 0 means fallback if calendar has value.
+                $totalCapacity = $eventObj->maxParticipants ?: ($calendarObj->reservationMaxParticipants ?? 0);
+            }
 
-    if ($isPartiPerEvent) {
-        $maxParticipants = $isPartiPerEvent;
-        $maxCapacity = $eventObj->maxParticipants ?: 0;
-    } else if ($bookingMaxCapacity && $objectMaxCapacity) {
-        if ($bookingMaxCapacity < $objectMaxCapacity) {
-            $maxCapacity = $bookingMaxCapacity;
-        } else {
-            $maxCapacity = $objectMaxCapacity;
-        }    
-    } else if ($bookingMaxCapacity) {
-        $maxCapacity = $bookingMaxCapacity;
-    } else if ($objectMaxCapacity) {
-        $maxCapacity = $objectMaxCapacity;
-    } else {
-        $maxCapacity = 100;
-    }
+            $noCap = (!$totalCapacity && !$isPartiPerEvent && !$bookingMaxCapacity);
 
-       
-    if (isset($eventObj->minParticipants)) {
-        $minCapacity = $eventObj->minParticipants;
-    } else if (isset($listType['minParticipantsPerBooking'])) {
-        $minCapacity = $listType['minParticipantsPerBooking'];
-    } else {
-        $minCapacity = 1;
-    }
+            if ($totalCapacity > 0 && ($listType['objectType'] == '2')) {
+                $remainingCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, (int)$totalCapacity);
+            } else {
+                $remainingCapacity = $totalCapacity ?: 100;
+            }
 
-    if ($minCapacity && $maxCapacity && $minCapacity > $maxCapacity) {
-        $minCapacity = $maxCapacity;
-    }
+            // Determine limit for THIS booking
+            $bookingLimit = $listType['maxParticipantsPerBooking'] ?: 0;
+            if ($isPartiPerEvent) {
+                $bookingLimit = $isPartiPerEvent;
+            }
 
-    $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
+            if ($bookingLimit > 0) {
+                $maxCapacity = min($remainingCapacity, $bookingLimit);
+            } else {
+                $maxCapacity = $remainingCapacity;
+            }
 
-    $reservationDesiredCapacity = new C4GNumberField();
-    $reservationDesiredCapacity->setFieldName('desiredCapacity');
+            $typeError = 0;
+            if (!$noCap && $maxCapacity <= 0) {
+                $typeError = 1;
+            }
 
-    if ($maxCapacity && $eventObj) {
-        $maxCapacity = C4gReservationHandler::getMaxParticipentsForObject($eventId, $maxCapacity);
-    }
+            if (!$typeError || (key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))) {
+                $anyTypeAvailable = true;
+            }
 
-    if ($listType['ignoreCapacity']) {
-        $reservationDesiredCapacity->setFormField(false);
-    } else {
-        $reservationDesiredCapacity->setFormField(true);
-    }
-    $reservationDesiredCapacity->setEditable(true);
-    $reservationDesiredCapacity->setCondition(array($condition));
-    $initialCapacityValue = \Contao\Input::post('desiredCapacity_'.$listType['id']) ?: (\Contao\Input::get('capacity') ?: ($minCapacity ?: 1));
-    $reservationDesiredCapacity->setInitialValue($initialCapacityValue);
-    $reservationDesiredCapacity->setMandatory(true);
+            // maxParticipants fallback for other parts of the code
+            $maxParticipants = $bookingLimit ?: $totalCapacity;
 
-    //TODO add amount of capacity left in the form
-    $error = 0;
-    if($maxCapacity <= 0) {
-        $error = 1;
-    }
-    if ($minCapacity && $maxCapacity /* && ($minCapacity != $maxCapacity) */ || $isPartiPerEvent) {
-        if ($eventObj && $listType['maxParticipantsPerBooking'] && $listType['maxParticipantsPerBooking'] <= $maxCapacity && !$isPartiPerEvent) {
-            $min = $minCapacity;
-            $max = $listType['maxParticipantsPerBooking'];
-            $reservationDesiredCapacity->setTitle(self::withDesiredCapacityTitle($min,$max,$showMinMax));
-            $reservationDesiredCapacity->setMax($max);
-        } else if ($eventObj && ($eventObj->maxParticipants == 0) || empty($maxCapacity) || $isPartiPerEvent <= $maxCapacity) {
-            if ($isPartiPerEvent && $isPartiPerEvent <= $maxCapacity) {
-                $min = $minCapacity;
-                $max = $isPartiPerEvent;
-                $reservationDesiredCapacity->setTitle(self::withDesiredCapacityTitle($min,$max,$showMinMax));
-                $reservationDesiredCapacity->setMax($max);
-            } else if ($minCapacity && $maxCapacity) {
-                $min = $minCapacity;
-                $max = $maxCapacity;
-                $reservationDesiredCapacity->setTitle(self::withDesiredCapacityTitle($min,$max,$showMinMax));
-                $reservationDesiredCapacity->setMax($maxCapacity);
+            if (isset($eventObj->minParticipants)) {
+                $minCapacity = $eventObj->minParticipants;
+            } else if (isset($listType['minParticipantsPerBooking'])) {
+                $minCapacity = $listType['minParticipantsPerBooking'];
+            } else {
+                $minCapacity = 1;
+            }
+
+            if ($minCapacity && $maxCapacity && $minCapacity > $maxCapacity) {
+                $minCapacity = $maxCapacity > 0 ? $maxCapacity : $minCapacity;
+            }
+
+            $showDateTime = $this->reservationSettings->showDateTime ? "1" : "0";
+
+            $reservationDesiredCapacity = new C4GNumberField();
+            $reservationDesiredCapacity->setFieldName('desiredCapacity');
+
+            if ($listType['ignoreCapacity']) {
+                $reservationDesiredCapacity->setFormField(false);
+            } else {
+                $reservationDesiredCapacity->setFormField(true);
+            }
+            $reservationDesiredCapacity->setEditable(true);
+            $reservationDesiredCapacity->setCondition(array($condition));
+            $initialCapacityValue = \Contao\Input::post('desiredCapacity_'.$listType['id']) ?: (\Contao\Input::get('capacity') ?: ($minCapacity ?: 1));
+            $reservationDesiredCapacity->setInitialValue($initialCapacityValue);
+            $reservationDesiredCapacity->setMandatory(true);
+
+            if ($minCapacity && $maxCapacity /* && ($minCapacity != $maxCapacity) */ || $isPartiPerEvent) {
+                if ($eventObj && $listType['maxParticipantsPerBooking'] && $listType['maxParticipantsPerBooking'] <= $maxCapacity && !$isPartiPerEvent) {
+                    $min = $minCapacity;
+                    $max = $listType['maxParticipantsPerBooking'];
+                    $reservationDesiredCapacity->setTitle(self::withDesiredCapacityTitle($min,$max,$showMinMax));
+                    $reservationDesiredCapacity->setMax($max);
+                } else if ($eventObj && ($eventObj->maxParticipants == 0) || empty($maxCapacity) || $isPartiPerEvent <= $maxCapacity) {
+                    if ($isPartiPerEvent && $isPartiPerEvent <= $maxCapacity) {
+                        $min = $minCapacity;
+                        $max = $isPartiPerEvent;
+                        $reservationDesiredCapacity->setTitle(self::withDesiredCapacityTitle($min,$max,$showMinMax));
+                        $reservationDesiredCapacity->setMax($max);
+                    } else if ($minCapacity && $maxCapacity) {
+                        $min = $minCapacity;
+                        $max = $maxCapacity;
+                        $reservationDesiredCapacity->setTitle(self::withDesiredCapacityTitle($min,$max,$showMinMax));
+                        $reservationDesiredCapacity->setMax($maxCapacity);
+                    } else {
+                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
+                    }
+                    if ($listType['objectType'] == '1' || $listType['objectType'] == '3') {
+                        $reservationDesiredCapacity->setMin($minCapacity);
+                        $reservationDesiredCapacity->setMax($maxCapacity);
+                    } else {
+                        $reservationDesiredCapacity->setMin($minCapacity);
+                        $reservationDesiredCapacity->setMax($isPartiPerEvent ?: $maxCapacity);
+                    }
+
+                 } else if (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
+                    $isPartiPerEvent = $maxCapacity;
+                    $min = $minCapacity;
+                    $max = $maxCapacity;
+                    $reservationDesiredCapacity->setTitle(self::withDesiredCapacityTitle($min,$max,$showMinMax));
+                    $reservationDesiredCapacity->setMax($maxCapacity);
+                    $reservationDesiredCapacity->setMin($minCapacity);
+                } else {
+                    if ($isPartiPerEvent) {
+                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
+                        $reservationDesiredCapacity->setMax($listType['maxParticipantsPerBooking']);
+                    } else {
+                        $reservationDesiredCapacity->setMax($maxCapacity);
+                        $reservationDesiredCapacity->setMin($minCapacity);
+                    }
+                }
             } else {
                 $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
             }
-            if ($listType['objectType'] == '1' || $listType['objectType'] == '3') {
-                $reservationDesiredCapacity->setMin($minCapacity);
-                $reservationDesiredCapacity->setMax($maxCapacity);
-            } else {
-                $reservationDesiredCapacity->setMax($isPartiPerEvent);
+
+            if ((!$maxCapacity && !$listType['maxParticipantsPerBooking']) &&
+                (!$eventObj->maxParticipantsPerBooking) &&
+                (!$eventObj->maxParticipantsPerEventBooking)) {
+                $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
             }
 
-         } else if (empty($maxCapacity) || ($isPartiPerEvent > $maxCapacity)) {
-            $isPartiPerEvent = $maxCapacity;
-            $min = $minCapacity;
-            $max = $maxCapacity;
-            $reservationDesiredCapacity->setTitle(self::withDesiredCapacityTitle($min,$max,$showMinMax));
-            $reservationDesiredCapacity->setMax($maxCapacity);
-            $reservationDesiredCapacity->setMin($minCapacity);
-        } else if($maxCapacity <= 0){
-            $error = 1;
-        } else {
-            if ($isPartiPerEvent) {
-                $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$minCapacity.'-'.$listType['maxParticipantsPerBooking'].')');
-                $reservationDesiredCapacity->setMax($listType['maxParticipantsPerBooking']);
+            $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
+            $reservationDesiredCapacity->setCallOnChange(true);
+            $jsOnChangeCapacity = "setReservationForm(".json_encode((string)$listType['id']).",".json_encode((int)$showDateTime).");";
+            $reservationDesiredCapacity->setCallOnChangeFunction($jsOnChangeCapacity);
+            $reservationDesiredCapacity->setNotificationField(true);
+            $reservationDesiredCapacity->setAdditionalID($listType['id']);
+            $reservationDesiredCapacity->setStyleClass('desired-capacity');
+            if (!$listType['ignoreCapacity']) {
+                $reservationDesiredCapacity->setHidden(!$this->reservationSettings->withCapacity);
             } else {
-                //show current capacity option for the title
-//                        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']. ' ('.$minCapacity.'-'.$maxCapacity.')');
-                $reservationDesiredCapacity->setMax($maxCapacity);
-                $reservationDesiredCapacity->setMin($minCapacity);
+                $reservationDesiredCapacity->setHidden(true);
             }
-        }
 
-        if ($error && !(key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))) {
-            $reservationDesiredCapacity->setMin(0);
-            $reservationDesiredCapacity->setMax(0);
-
-            $info = new C4GInfoTextField();
-            $info->setFieldName('info');
-            $info->setEditable(false);
-            $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
-            return [$info];
-        }
-
-        if ((!$maxCapacity && !$listType['maxParticipantsPerBooking']) &&
-            (!$eventObj->maxParticipantsPerBooking) &&
-            (!$eventObj->maxParticipantsPerEventBooking)) {
-            $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
-        }
-    } else {
-        $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
-
-    }
-
-    $reservationDesiredCapacity->setPattern(C4GBrickRegEx::NUMBERS);
-    $reservationDesiredCapacity->setCallOnChange(true);
-    $jsOnChangeCapacity = "setReservationForm(".json_encode((string)$listType['id']).",".json_encode((int)$showDateTime).");";
-    $reservationDesiredCapacity->setCallOnChangeFunction($jsOnChangeCapacity);
-    //$reservationDesiredCapacity->setCallOnChangeFunction("changeCapacity(".$listType['id'] . "," . $showDateTime . ");");
-    $reservationDesiredCapacity->setNotificationField(true);
-    $reservationDesiredCapacity->setAdditionalID($listType['id']);
-    $reservationDesiredCapacity->setStyleClass('desired-capacity');
-    if (!$listType['ignoreCapacity']) {
-        $reservationDesiredCapacity->setHidden(!$this->reservationSettings->withCapacity);
-    } else {
-        $reservationDesiredCapacity->setHidden(true);
-    }
-
-    if (!$listType['ignoreCapacity']) {
-        if (!$this->reservationSettings->moveCapacity) {
-            $fieldList[] = $reservationDesiredCapacity;
-        }
-    }
+            if (!$listType['ignoreCapacity']) {
+                if (!$this->reservationSettings->moveCapacity) {
+                    $fieldList[] = $reservationDesiredCapacity;
+                }
+            }
 
     $hidden = false;
     if ((intval($listType['min_residence_time']) >= 1) && (intval($listType['max_residence_time']) >= 1)) {
@@ -1446,102 +1473,17 @@ foreach ($typelist as $listType) {
             $formHandler = new C4gReservationFormObjectFirstHandler($this,$fieldList,$listType,$this->getDialogParams(), $initialValues);
             $fieldList = $formHandler->addFields();
             break;
-        default:
-            //ToDo andere Meldung
-            $info = new C4GInfoTextField();
-            $info->setFieldName('info');
-            $info->setEditable(false);
-            $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
-            return [$info];
     }
 }
 
-if (!$typelist || count($typelist) <= 0) {
-    $reservationNoneTypeField = new C4GLabelField();
-    $reservationNoneTypeField->setDatabaseField(false);
-    $reservationNoneTypeField->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
-    $fieldList[] = $reservationNoneTypeField;
+if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))) {
+    $info = new C4GInfoTextField();
+    $info->setFieldName('info');
+    $info->setEditable(false);
+    $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
+    return [$info];
 }
 
-$salutation = [
-    ['id' => 'various', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['various']],
-    ['id' => 'man', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['man']],
-    ['id' => 'woman', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['woman']],
-    ['id' => 'divers', 'name' => $GLOBALS['TL_LANG']['fe_c4g_reservation']['divers']],
-];
-
-$additionaldatas = StringUtil::deserialize($this->reservationSettings->fieldSelection, true);
-if (!$additionaldatas) {
-    $additionaldatas = [];
-}
-
-//check mandatory fields
-$mandatoryFields = ['firstname' => true, 'lastname' => true, 'email' => true];
-foreach ($additionaldatas as $rowdata) {
-    $rowField = $rowdata['additionaldatas'];
-    if ($rowField == 'firstname') {
-        $mandatoryFields['firstname'] = false;
-    } else if ($rowField == 'lastname') {
-        $mandatoryFields['lastname'] = false;
-    } else if ($rowField == 'email') {
-        $mandatoryFields['email'] = false;
-    }
-}
-
-$addMandatoryFields = [];
-foreach ($mandatoryFields as $mandatoryField => $value) {
-    if ($value) {
-        $addMandatoryFields[] = ['additionaldatas' => $mandatoryField, 'initialValue' => '', 'mandatory' => true];
-    }
-}
-
-$additionaldatas = array_merge($addMandatoryFields, $additionaldatas);
-
-$memberArr = [];
-$memberArr['company'] = '';
-$memberArr['firstname'] = '';
-$memberArr['lastname'] = '';
-$memberArr['email'] = '';
-$memberArr['street'] = '';
-$memberArr['postal'] = '';
-$memberArr['city'] = '';
-$memberArr['country'] = '';
-$memberArr['phone'] = '';
-$memberArr['dateOfBirth'] = '';
-$memberArr['gender'] = '';
-
-$hasFrontendUser = System::getContainer()->get('contao.security.token_checker')->hasFrontendUser();
-if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
-    $member = FrontendUser::getInstance();
-    if ($member) {
-        $memberArr['id'] = $member->id ?: '';
-        $memberArr['company'] = $member->company ?: '';
-        $memberArr['firstname'] = $member->firstname ?: '';
-        $memberArr['lastname'] = $member->lastname ?: '';
-        $memberArr['email'] = $member->email ?: '';
-        $memberArr['street'] = $member->street ?: '';
-        $memberArr['postal'] = $member->postal ?: '';
-        $memberArr['city'] = $member->city ?: '';
-        $memberArr['country'] = $member->country ?: '';
-        $memberArr['phone'] = $member->phone ?: '';
-        $memberArr['dateOfBirth'] = $member->dateOfBirth ?: '';
-
-        switch ($member->gender) {
-            case 'male':
-                $memberArr['gender'] = 'man';
-                break;
-            case 'female':
-                $memberArr['gender'] = 'woman';
-                break;
-            case 'other':
-                $memberArr['gender'] = 'divers';
-                break;
-            Default:
-                $memberArr['gender'] = 'various';
-                break;
-        }
-    }
-}
         if (!$typelist || count($typelist) <= 0) {
             $reservationNoneTypeField = new C4GLabelField();
             $reservationNoneTypeField->setDatabaseField(false);
@@ -2091,9 +2033,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 if (!$type['ignoreCapacity'] && $this->reservationSettings->withCapacity && $onlyParticipants) {
                     $reservationDesiredCapacity = new C4GNumberField();
                     $error = 0;
-                    $withEventMaxParti = $eventObj->maxParticipantsPerEventBooking ?:0;
+                    $withEventMaxParti = $eventObj->maxParticipantsPerEventBooking ?: 0;
                     $typeMaxParti = $listType['maxParticipantsPerBooking'] ?: 0;
-                    $noCap = (!$maxCapacity && !$isPartiPerEvent && !$typeMaxParti) ;
+                    // $noCap already defined earlier
 
                     if ($withEventMaxParti) {
                         $isPartiPerEvent = $withEventMaxParti;
@@ -2103,44 +2045,26 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
 
                     $reservationDesiredCapacity->setFieldName('desiredCapacity');
 
-                    //without max cap for praticipants but max per booking
-                    if ($maxCapacity >= $isPartiPerEvent && $isPartiPerEvent) {
-                        $maxCapacity = $isPartiPerEvent;
+                    // Note: Global capacity check happened earlier.
+                    // This block is for the fallback capacity field when moveCapacity is active.
+                    $partiError = 0;
+                    if (!$noCap && ($maxCapacity <= 0) && ($listType['objectType'] == '2')) {
+                        $partiError = 1;
                     }
-
-                    //Max participant per booking
-                    if ($eventObj->maxParticipantsPerEventBooking) {
-                        $maxParticipants = $eventObj->maxParticipantsPerEventBooking;
-                    } else if ($type['maxParticipantsPerBooking']){
-                        $maxParticipants = $type['maxParticipantsPerBooking'];;
-                    }
-
-                    if (!$noCap && ($maxCapacity <= 0) && ($listType['objectType'] == '2') || !$listType['minParticipantsPerBooking']) {
-                        $error = 1;
-                    }
-
-//                    if ($maxCapacity < $eventObj->maxParticipants) {
-//                        $error = 1;
-//                    }
 
                     //for unlimited max cap
                     if ($noCap || (!$maxCapacity && $isPartiPerEvent)) {
-                        $error = 0;
+                        $partiError = 0;
                         $maxCapacity = $isPartiPerEvent;
                         $reservationDesiredCapacity->setMin(1);
                         $reservationDesiredCapacity->setMax(999);
                         $reservationDesiredCapacity->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['desiredCapacity']);
                     }
 
-                    if ($error && !(key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))) {
+                    if ($partiError && !(key_exists('REQUEST_METHOD', $_SERVER) && ($_SERVER['REQUEST_METHOD'] == 'PUT'))) {
                         $reservationDesiredCapacity->setMin(0);
                         $reservationDesiredCapacity->setMax(0);
-
-                        $info = new C4GInfoTextField();
-                        $info->setFieldName('info');
-                        $info->setEditable(false);
-                        $info->setInitialValue($GLOBALS['TL_LANG']['fe_c4g_reservation']['reservation_none']);
-                        return [$info];
+                        $reservationDesiredCapacity->setInitialValue(0);
                     }
 
 
@@ -2259,7 +2183,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                         $maxParticipants = 10; // Default fallback for special mechanism if nothing is configured
                     }
 
-                    $maxCapacity = $maxParticipants ?: 0;
+                    if ($maxParticipants > 0) {
+                        $maxCapacity = min($remainingCapacity, $maxParticipants);
+                    } else {
+                        $maxCapacity = $remainingCapacity;
+                    }
                     $minCapacity = $minParticipants ?: 1;
                     $participantParam = ($eventObj && $eventObj->participant_params) ? StringUtil::deserialize($eventObj->participant_params, true) : null;
                     $params = $participantParam ?: $type['participantParams'];
@@ -3271,12 +3199,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             $isEvent = $reservationType && $reservationType->reservationObjectType && $reservationType->reservationObjectType === '2' ? true : false;
 
         if ($isEvent) {
-            // DEEP CLEAN: Remove any existing event data keys from putVars to prevent state-bleeding.
-            // This ensures that only the fresh values assigned below will be used.
+            // DEEP CLEAN: Only clear base keys, preserve suffixed form inputs
             $keysToClear = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location', 'icsFilename'];
             foreach (array_keys($putVars) as $pk) {
                 foreach ($keysToClear as $baseKey) {
-                    if ($pk === $baseKey || strpos($pk, $baseKey . '_') === 0) {
+                    if ($pk === $baseKey) {
                         unset($putVars[$pk]);
                         unset($this->putVars[$pk]);
                     }
@@ -3327,16 +3254,44 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $endDateTs   = (isset($reservationObject->endDate) && $reservationObject->endDate) ? intval($reservationObject->endDate) : 0;
                     $endTimeTs   = ($reservationObject->endTime ?? 0) ? intval($reservationObject->endTime) : 0;
 
-                    $freshBeginDate = $beginDateTs ? (string)date($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y', $beginDateTs) : '';
-                    $freshBeginTime = $beginTimeTs ? (string)date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', $beginTimeTs) : '';
-                    $freshEndDate = $endDateTs ? (string)date($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y', $endDateTs) : $freshBeginDate;
-                    $freshEndTime = $endTimeTs ? (string)date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', $endTimeTs) : '';
+                    if ($beginDateTs !== null && $beginDateTs !== '') {
+                        $dt = new \DateTime('@' . (int)$beginDateTs);
+                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $freshBeginDate = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+                    } else {
+                        $freshBeginDate = '';
+                    }
+                    if ($beginTimeTs !== null && $beginTimeTs !== '') {
+                        $dt = new \DateTime('@' . (int)$beginTimeTs);
+                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $freshBeginTime = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                    } else {
+                        $freshBeginTime = '';
+                    }
+                    if ($endDateTs !== null && $endDateTs !== '') {
+                        $dt = new \DateTime('@' . (int)$endDateTs);
+                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $freshEndDate = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+                    } else {
+                        $freshEndDate = $freshBeginDate;
+                    }
+                    if ($endTimeTs !== null && $endTimeTs !== '') {
+                        $dt = new \DateTime('@' . (int)$endTimeTs);
+                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $freshEndTime = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                    } else {
+                        $freshEndTime = '';
+                    }
 
                     $dataMapping = [
                         'beginDate' => $freshBeginDate,
                         'beginTime' => $freshBeginTime,
                         'endDate' => $freshEndDate,
                         'endTime' => $freshEndTime,
+                        'beginDateInt' => $beginDateTs,
+                        'beginTimeInt' => $beginTimeTs,
+                        'endDateInt' => $endDateTs,
+                        'endTimeInt' => $endTimeTs,
                         'reservation_title' => $freshTitle
                     ];
 
@@ -3579,12 +3534,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $newFieldList = $finalFieldList;
 
         if ($isEvent) {
-            // DEEP CLEAN: Remove any existing event data keys from putVars to prevent state-bleeding.
-            // This ensures that only the fresh values assigned below will be used.
+            // DEEP CLEAN: Only clear base keys, preserve suffixed form inputs
             $keysToClear = ['beginDate', 'beginTime', 'endDate', 'endTime', 'reservation_title', 'description', 'image', 'location', 'icsFilename'];
             foreach (array_keys($putVars) as $pk) {
                 foreach ($keysToClear as $baseKey) {
-                    if ($pk === $baseKey || strpos($pk, $baseKey . '_') === 0) {
+                    if ($pk === $baseKey) {
                         unset($putVars[$pk]);
                         unset($this->putVars[$pk]);
                     }
@@ -3641,10 +3595,34 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $endDateTs   = (isset($reservationObject->endDate) && $reservationObject->endDate) ? intval($reservationObject->endDate) : 0;
                 $endTimeTs   = ($reservationObject->endTime ?? 0) ? intval($reservationObject->endTime) : 0;
 
-                $freshBeginDate = $beginDateTs ? (string)date($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y', $beginDateTs) : '';
-                $freshBeginTime = $beginTimeTs ? (string)date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', $beginTimeTs) : '';
-                $freshEndDate = $endDateTs ? (string)date($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y', $endDateTs) : $freshBeginDate;
-                $freshEndTime = $endTimeTs ? (string)date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', $endTimeTs) : '';
+                if ($beginDateTs !== null && $beginDateTs !== '') {
+                    $dt = new \DateTime('@' . $beginDateTs);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $freshBeginDate = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+                } else {
+                    $freshBeginDate = '';
+                }
+                if ($beginTimeTs !== null && $beginTimeTs !== '') {
+                    $dt = new \DateTime('@' . (int)$beginTimeTs);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $freshBeginTime = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                } else {
+                    $freshBeginTime = '';
+                }
+                if ($endDateTs !== null && $endDateTs !== '') {
+                    $dt = new \DateTime('@' . (int)$endDateTs);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $freshEndDate = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+                } else {
+                    $freshEndDate = $freshBeginDate;
+                }
+                if ($endTimeTs !== null && $endTimeTs !== '') {
+                    $dt = new \DateTime('@' . (int)$endTimeTs);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $freshEndTime = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                } else {
+                    $freshEndTime = '';
+                }
                 $freshDescription = '';
                 if ($reservationObject instanceof C4gReservationFrontendObject) {
                     $freshDescription = $reservationObject->getDescription();
@@ -3657,6 +3635,10 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     'beginTime' => $freshBeginTime,
                     'endDate' => $freshEndDate,
                     'endTime' => $freshEndTime,
+                    'beginDateInt' => $beginDateTs,
+                    'beginTimeInt' => $beginTimeTs,
+                    'endDateInt' => $endDateTs,
+                    'endTimeInt' => $endTimeTs,
                     'reservation_title' => $freshTitle,
                     'description' => $freshDescription
                 ];
@@ -3916,7 +3898,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $this->putVars['beginDate_'.$type] = $beginDate;
                 } else if (is_numeric($putVars['undefined']) && $putVars['undefined'] > 1000000000) {
                     // Looks like a timestamp
-                    $beginDate = date('d.m.Y', $putVars['undefined']);
+                    $dt = new \DateTime('@' . (int)$putVars['undefined']);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $beginDate = $dt->format('d.m.Y');
                     $putVars['beginDate_'.$type] = $beginDate;
                     $this->putVars['beginDate_'.$type] = $beginDate;
                 }
@@ -3952,23 +3936,25 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 }
             }
             if (isset($beginTime) && $beginTime !== '' && $timeKey) {
-                $formattedBeginTime = ($beginTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $beginTime % 86400) . ' UTC'));
-                if ($formattedBeginTime === '01:00' && ($beginTime % 86400 === 0)) {
-                    $formattedBeginTime = "00:00";
+                if (!is_numeric($beginTime)) {
+                    $formattedBeginTime = $beginTime;
+                } else if (is_numeric($beginTime)) {
+                    $dt = new \DateTime('@' . (int)$beginTime);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $formattedBeginTime = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                 }
-                if (is_numeric($beginTime) && (int)$beginTime === 0) {
-                    $formattedBeginTime = "00:00";
-                }
-                $putVars['beginTime'] = $formattedBeginTime;
+                // The base key 'beginTime' must be an integer for database persistence in tl_c4g_reservation.beginTime
+                $putVars['beginTime'] = is_numeric($beginTime) ? (int)$beginTime : $beginTime;
                 $this->putVars['beginTime'] = $putVars['beginTime'];
                 $this->putVars['beginTimeInt'] = (int) $beginTime;
                 if ($type) {
-                    $putVars['beginTime_'.$type] = $putVars['beginTime'];
-                    $this->putVars['beginTime_'.$type] = $putVars['beginTime'];
+                    // Suffixed keys are for form display/rendering, so they get the formatted string
+                    $putVars['beginTime_'.$type] = $formattedBeginTime;
+                    $this->putVars['beginTime_'.$type] = $formattedBeginTime;
                     
                     if ($reservationType->reservationObjectType === '3' && isset($objectId)) {
-                        $putVars['beginTime_'.$type.'-33'.$objectId] = $putVars['beginTime'];
-                        $this->putVars['beginTime_'.$type.'-33'.$objectId] = $putVars['beginTime'];
+                        $putVars['beginTime_'.$type.'-33'.$objectId] = $formattedBeginTime;
+                        $this->putVars['beginTime_'.$type.'-33'.$objectId] = $formattedBeginTime;
                     }
                 }
             }
@@ -3999,14 +3985,16 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $putVars['endTimeInt'] = (int) $endTime;
             }
 
-            $formattedEndTime = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
-            if ($formattedEndTime === '01:00' && ($endTime % 86400 === 0)) {
-                $formattedEndTime = "00:00";
+            if (!is_numeric($endTime)) {
+                $formattedEndTime = $endTime;
+            } else if (is_numeric($endTime)) {
+                $dt = new \DateTime('@' . (int)$endTime);
+                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                $formattedEndTime = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
             }
-            if (is_numeric($endTime) && (int)$endTime === 0) {
-                $formattedEndTime = "00:00";
-            }
-            $putVars['endTime'] = $formattedEndTime;
+            // Base key 'endTime' must be integer for database persistence
+            $putVars['endTime'] = is_numeric($endTime) ? (int)$endTime : $endTime;
+            $this->putVars['endTime'] = $putVars['endTime'];
 
             if ($reservationType->reservationObjectType === '3' && $timeKey) {
                 $putVars['endDate'] = $putVars['beginDate_'.$type.'-33'.$objectId];
@@ -4022,7 +4010,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $bday = $putVars[$beginDateKey];
                 $nextDay = strtotime("+1 day", strtotime($bday));
                 if (!$reservationType->directBooking && $beginTime >= 86400) {
-                    $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    if ($nextDay > 170000) {
+                        $dt = new \DateTime('@' . $nextDay);
+                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $beginDate = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+                    } else {
+                        $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    }
                     $putVars[$beginDateKey] = $beginDate;
                     $putVars[$timeKey] = ($beginTime-86400);
                 } else {
@@ -4034,7 +4028,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                 $bday = $putVars['beginDate_'.$type];
                 $nextDay = strtotime("+1 day", strtotime($bday));
                 if (!$reservationType->directBooking && $beginTime >= 86400 && $typeOfObject == 'standard') {
-                    $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    if ($nextDay > 170000) {
+                        $dt = new \DateTime('@' . $nextDay);
+                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $beginDate = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+                    } else {
+                        $beginDate = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    }
                     $putVars['beginDate_'.$type] = $beginDate;
                     $putVars[$timeKey] = ($beginTime-86400);
 
@@ -4046,19 +4046,29 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
 
             if (!$reservationType->directBooking && ($endTime > 86400)) {
-                $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime);
-                $formattedEndTime = date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', ($endTime-86400) % 86400) . ' UTC'));
-                if ($formattedEndTime === '01:00' && (($endTime-86400) % 86400 === 0)) {
-                    $formattedEndTime = "00:00";
+                if ($endTime > 170000) {
+                    $dt = new \DateTime('@' . $endTime);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $putVars['endDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+                } else {
+                    $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime);
                 }
-                $putVars['endTime'] = $formattedEndTime;
+                if (is_numeric($endTime)) {
+                    $dt = new \DateTime('@' . (int)($endTime - 86400));
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $formattedEndTime = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                }
+                $putVars['endTime'] = is_numeric($endTime) ? (int)($endTime - 86400) : $endTime;
             } else if (!$reservationType->directBooking && ($endTime == 86400)) {
                 //$putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $endTime-1);
-                $formattedEndTime = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
-                if ($formattedEndTime === '01:00' && ($endTime % 86400 === 0)) {
-                    $formattedEndTime = "00:00";
+                if ($endTime > 0) {
+                    $dt = new \DateTime('@' . (int)$endTime);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $formattedEndTime = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                } else {
+                    $formattedEndTime = '';
                 }
-                $putVars['endTime'] = $formattedEndTime;
+                $putVars['endTime'] = is_numeric($endTime) ? (int)$endTime : $endTime;
             }
 
             if ($typeOfObject == 'fixed_date') {
@@ -4078,33 +4088,29 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     if ($putVars['reservationObjectType'] == '3') {
                         $objectId = $reservationObject ? $reservationObject->id : 0;
                         $putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $timestamp) : $timestamp;
-                        $putVars['beginTime_'.$type.'-33'.$objectId] = ($beginTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $beginTime % 86400) . ' UTC'));
-                        if ($putVars['beginTime_'.$type.'-33'.$objectId] === '01:00' || $putVars['beginTime_'.$type.'-33'.$objectId] === '1:00') {
-                            if ($beginTime % 86400 === 0) {
-                                $putVars['beginTime_'.$type.'-33'.$objectId] = "00:00";
-                            }
+                        if (is_numeric($beginTime)) {
+                            $dt = new \DateTime('@' . (int)$beginTime);
+                            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                            $putVars['beginTime_'.$type.'-33'.$objectId] = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                         }
                         $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
-                        $putVars['endTime'] = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
-                        if ($putVars['endTime'] === '01:00' || $putVars['endTime'] === '1:00') {
-                            if ($endTime % 86400 === 0) {
-                                $putVars['endTime'] = "00:00";
-                            }
+                        if (is_numeric($endTime)) {
+                            $dt = new \DateTime('@' . (int)$endTime);
+                            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                            $putVars['endTime'] = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                         }
                     } else if ($putVars['reservationObjectType'] == '2') {
                         $putVars['beginDate_'.$type] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
-                        $putVars['beginTime'.$type] = $beginTime ? (($beginTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $beginTime % 86400) . ' UTC'))) : $beginTime;
-                        if ($putVars['beginTime'.$type] === '01:00' || $putVars['beginTime'.$type] === '1:00') {
-                            if ($beginTime % 86400 === 0) {
-                                $putVars['beginTime'.$type] = "00:00";
-                            }
+                        if (is_numeric($beginTime)) {
+                            $dt = new \DateTime('@' . (int)$beginTime);
+                            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                            $putVars['beginTime_'.$type] = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                         }
                         $putVars['endDate_'.$type] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
-                        $putVars['endTime_'.$type] = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
-                        if ($putVars['endTime_'.$type] === '01:00' || $putVars['endTime_'.$type] === '1:00') {
-                            if ($endTime % 86400 === 0) {
-                                $putVars['endTime_'.$type] = "00:00";
-                            }
+                        if (is_numeric($endTime)) {
+                            $dt = new \DateTime('@' . (int)$endTime);
+                            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                            $putVars['endTime_'.$type] = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                         }
                     }
 //                $putVars['beginDate'] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
@@ -4123,7 +4129,13 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                             $nextDay = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)) + 86400;
                         }
                     }
-                    $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    if ($nextDay > 170000) {
+                        $dt = new \DateTime('@' . $nextDay);
+                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $putVars['endDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+                    } else {
+                        $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    }
                 } else {
                     $addDuration = $duration;
 
@@ -4143,24 +4155,39 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     } else {
                         $nextDay = strtotime($beginDateToConvert) + $addDuration;
                     }
-                    $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    if ($nextDay > 170000) {
+                        $dt = new \DateTime('@' . $nextDay);
+                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $putVars['endDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+                    } else {
+                        $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay);
+                    }
 
-                    $wd = date("w", strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate)));
+                    $tsForWd = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate));
+                    $dtWd = new \DateTime('@' . $tsForWd);
+                    $dtWd->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $wd = $dtWd->format("w");
                     $endTime = C4gReservationHandler::getEndTimeForMultipleDays($reservationObject, $wd, ($reservationType->periodType == 'overnight'));
 
                     //ToDo test
                     if (($endTime <= $beginTime) || ($reservationType->periodType == 'overnight')) {
-                        $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDay+86400);
+                        $nextDayPlus = $nextDay + 86400;
+                        if ($nextDayPlus > 170000) {
+                            $dt = new \DateTime('@' . $nextDayPlus);
+                            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                            $putVars['endDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+                        } else {
+                            $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'], $nextDayPlus);
+                        }
                     }
 
 
-                        $formattedEndTime = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', intval($endTime % 86400)) . ' UTC'));
-                        if ($formattedEndTime === '01:00' || $formattedEndTime === '1:00') {
-                            if ($endTime % 86400 === 0) {
-                                $formattedEndTime = "00:00";
-                            }
+                        if (is_numeric($endTime)) {
+                            $dt = new \DateTime('@' . (int)$endTime);
+                            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                            $formattedEndTime = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                         }
-                        $putVars['endTime'] = $formattedEndTime;
+                        $putVars['endTime'] = is_numeric($endTime) ? (int)$endTime : $endTime;
                 }
             }
             if ($typeOfObject == 'fixed_date') {
@@ -4192,17 +4219,28 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
                     $putVars['beginDate_'.$type.'-33'.$objectId] = $beginDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $beginDate) : $beginDate;
                     $putVars['beginTimeInt_'.$type.'-33'.$objectId] = $beginTime;
                     $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $endDate; //ToDO Check
-                    $putVars['endTime'] = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
+                    if (is_numeric($endTime)) {
+                        $dt = new \DateTime('@' . (int)$endTime);
+                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $putVars['endTime'] = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                    }
                 }
                 //ToDO Check
                 $putVars['endDate'] = $endDate ? date($GLOBALS['TL_CONFIG']['dateFormat'], $endDate) : $putVars['beginDate'];
-                $putVars['endTime'] = ($endTime % 86400 === 0) ? "00:00" : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTime % 86400) . ' UTC'));
+                if (is_numeric($endTime)) {
+                    $dt = new \DateTime('@' . (int)$endTime);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $putVars['endTime'] = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                }
             }
 
             if ($reservationType->directBooking && $timeKey) {
                 $beginTimeTs = is_numeric($beginTime) ? intval($beginTime) : strtotime($beginTime);
                 if ($beginTimeTs !== false) {
-                    $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], $beginTimeTs), Date::getFormatFromRgxp('time'));
+                    $dt = new \DateTime('@' . (int)$beginTimeTs);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $formatted = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                    $objDate = new \Contao\Date($formatted, \Contao\Date::getFormatFromRgxp('time'));
                     $directTime = $objDate->tstamp;
                     $putVars[$timeKey] = $directTime;
                 }
@@ -4592,20 +4630,69 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         $endTimeRaw   = $endTime   ?? ($putVars['endTime']   ?? 0);
 
         // We preserve formatted strings for display (notifications)
-        $putVars['beginDate'] = is_string($beginDateRaw) && strpos($beginDateRaw, '.') !== false ? $beginDateRaw : date($GLOBALS['TL_CONFIG']['dateFormat'], is_numeric($beginDateRaw) ? (int)$beginDateRaw : time());
-        $putVars['beginTime'] = is_string($beginTimeRaw) && strpos($beginTimeRaw, ':') !== false ? $beginTimeRaw : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', is_numeric($beginTimeRaw) ? (int)$beginTimeRaw : 0) . ' UTC'));
+        if (is_string($beginDateRaw) && (strpos($beginDateRaw, '.') !== false || strpos($beginDateRaw, '-') !== false)) {
+            $putVars['beginDate'] = $beginDateRaw;
+        } else {
+            $ts = is_numeric($beginDateRaw) ? (int)$beginDateRaw : time();
+            $dt = new \DateTime('@' . $ts);
+            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+            $putVars['beginDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+        }
+
+        if (is_string($beginTimeRaw) && strpos($beginTimeRaw, ':') !== false) {
+            $putVars['beginTime'] = $beginTimeRaw;
+        } else if (is_numeric($beginTimeRaw)) {
+            $dt = new \DateTime('@' . (int)$beginTimeRaw);
+            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+            $putVars['beginTime'] = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+        } else {
+            $putVars['beginTime'] = ' ';
+        }
+
         if ($endDateRaw) {
-            $putVars['endDate'] = is_string($endDateRaw) && strpos($endDateRaw, '.') !== false ? $endDateRaw : date($GLOBALS['TL_CONFIG']['dateFormat'], is_numeric($endDateRaw) ? (int)$endDateRaw : time());
+            if (is_string($endDateRaw) && (strpos($endDateRaw, '.') !== false || strpos($endDateRaw, '-') !== false)) {
+                $putVars['endDate'] = $endDateRaw;
+            } else {
+                $ts = is_numeric($endDateRaw) ? (int)$endDateRaw : time();
+                $dt = new \DateTime('@' . $ts);
+                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                $putVars['endDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat'] ?: 'd.m.Y');
+            }
             $endDateInt = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['endDate']));
             $dtEnd = new \DateTime('@' . $endDateInt);
             $dtEnd->setTimezone(new \DateTimeZone('Europe/Berlin'));
             $putVars['endDateInt'] = (int) $dtEnd->getTimestamp();
         }
+
         if ($endTimeRaw) {
-            $putVars['endTime'] = is_string($endTimeRaw) && strpos($endTimeRaw, ':') !== false ? $endTimeRaw : date($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', strtotime('1970-01-01 ' . gmdate('H:i', is_numeric($endTimeRaw) ? (int)$endTimeRaw : 0) . ' UTC'));
+            if (is_string($endTimeRaw) && strpos($endTimeRaw, ':') !== false) {
+                $putVars['endTime'] = $endTimeRaw;
+            } else if (is_numeric($endTimeRaw)) {
+                $dt = new \DateTime('@' . (int)$endTimeRaw);
+                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                $putVars['endTime'] = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+            } else {
+                $putVars['endTime'] = ' ';
+            }
         }
 
-        $beginTimeInt = $beginTimeInt ?? (is_numeric($beginTimeRaw) ? (int)$beginTimeRaw : 0);
+        if (is_numeric($beginTimeRaw)) {
+            $beginTimeInt = (int)$beginTimeRaw;
+        } else if (is_string($beginTimeRaw) && strpos($beginTimeRaw, ':') !== false) {
+            $dt = new \DateTime('1970-01-01 ' . $beginTimeRaw, new \DateTimeZone('Europe/Berlin'));
+            $beginTimeInt = $dt->getTimestamp();
+        } else {
+            $beginTimeInt = 0;
+        }
+
+        if (is_numeric($endTimeRaw)) {
+            $endTimeInt = (int)$endTimeRaw;
+        } else if (is_string($endTimeRaw) && strpos($endTimeRaw, ':') !== false) {
+            $dt = new \DateTime('1970-01-01 ' . $endTimeRaw, new \DateTimeZone('Europe/Berlin'));
+            $endTimeInt = $dt->getTimestamp();
+        } else {
+            $endTimeInt = 0;
+        }
 
         $beginDateInt = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $putVars['beginDate']));
         // We preserve formatted strings for display (notifications) but keep ints for database/logic
@@ -4719,6 +4806,27 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         // Mirror values BEFORE setting token defaults to ensure mirrored values are used as base
         $this->mirrorBaseTokens($putVars);
         $this->mirrorBaseTokens();
+
+        // Final database format check for integer fields (beginTime, endTime, beginDate, endDate)
+        // We do this after mirroring but before applying token defaults, 
+        // to ensure HH:MM strings are correctly converted to integer seconds for the DB.
+        foreach (['beginTime', 'endTime'] as $key) {
+            if (isset($putVars[$key]) && is_string($putVars[$key]) && strpos($putVars[$key], ':') !== false) {
+                // Convert HH:MM to seconds since midnight UTC
+                $putVars[$key] = strtotime('1970-01-01 ' . $putVars[$key] . ' UTC') - strtotime('1970-01-01 00:00:00 UTC');
+            } else if (isset($putVars[$key])) {
+                $putVars[$key] = (int)$putVars[$key];
+            }
+            $this->putVars[$key] = $putVars[$key];
+        }
+        foreach (['beginDate', 'endDate'] as $key) {
+            if (isset($putVars[$key]) && is_string($putVars[$key]) && strpos($putVars[$key], '.') !== false) {
+                $putVars[$key] = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $putVars[$key]));
+            } else if (isset($putVars[$key])) {
+                $putVars[$key] = (int)$putVars[$key];
+            }
+            $this->putVars[$key] = $putVars[$key];
+        }
         
         // Final Mirror to ensure instance and local putVars are in sync
         foreach ($putVars as $pk => $pv) {
@@ -4753,9 +4861,9 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'desiredCapacity' => $desiredCapacity ?? 1,
             'reservation_title' => (isset($putVars['reservation_title']) && $putVars['reservation_title'] !== '0' && $putVars['reservation_title'] !== 0) ? $putVars['reservation_title'] : ' ',
             'beginDate' => (isset($putVars['beginDate']) && $putVars['beginDate'] !== '0' && $putVars['beginDate'] !== 0) ? $putVars['beginDate'] : ' ',
-            'beginTime' => (isset($putVars['beginTime']) && $putVars['beginTime'] !== '0' && $putVars['beginTime'] !== 0) ? $putVars['beginTime'] : ' ',
+            'beginTime' => (isset($putVars['beginTime']) && $putVars['beginTime'] !== '' && $putVars['beginTime'] !== null) ? $putVars['beginTime'] : ' ',
             'endDate' => (isset($putVars['endDate']) && $putVars['endDate'] !== '0' && $putVars['endDate'] !== 0) ? $putVars['endDate'] : ' ',
-            'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '0' && $putVars['endTime'] !== 0) ? $putVars['endTime'] : ' ',
+            'endTime' => (isset($putVars['endTime']) && $putVars['endTime'] !== '' && $putVars['endTime'] !== null) ? $putVars['endTime'] : ' ',
             'participantList' => (isset($putVars['participantList']) && $putVars['participantList'] !== '0' && $putVars['participantList'] !== 0) ? $putVars['participantList'] : ' ',
             'priceSum' => (!empty($putVars['priceSum']) && $putVars['priceSum'] !== '0,00 €' && $putVars['priceSum'] !== '0 €') ? $putVars['priceSum'] : '0,00 €',
             'priceNet' => (!empty($putVars['priceNet']) && $putVars['priceNet'] !== '0,00 €' && $putVars['priceNet'] !== '0 €') ? $putVars['priceNet'] : '0,00 €',
@@ -4941,8 +5049,29 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
         
         $this->mirrorBaseTokens($putVars);
         $this->mirrorBaseTokens(); // for this->putVars
+        
+        // FINAL OVERRIDE FOR DATABASE PERSISTENCE:
+        // Regardless of what mirrorBaseTokens did for notification purposes,
+        // we MUST ensure the base keys that are stored in tl_c4g_reservation
+        // contain the correct integer values for the DatabaseFields.
+        if (isset($beginTimeInt)) {
+            $putVars['beginTime'] = (int) $beginTimeInt;
+            $this->putVars['beginTime'] = (int) $beginTimeInt;
+        }
+        if (isset($endTimeInt)) {
+            $putVars['endTime'] = (int) $endTimeInt;
+            $this->putVars['endTime'] = (int) $endTimeInt;
+        }
+        if (isset($beginDateInt)) {
+            $putVars['beginDate'] = (int) $beginDateInt;
+            $this->putVars['beginDate'] = (int) $beginDateInt;
+        }
+        if (isset($endDateInt)) {
+            $putVars['endDate'] = (int) $endDateInt;
+            $this->putVars['endDate'] = (int) $endDateInt;
+        }
 
-        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Finalizing reservation data. Preparing SaveAction.");
+        \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Finalizing reservation data. Preparing SaveAction. beginTime: " . $putVars['beginTime']);
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
         \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Executing SaveAction run().");
@@ -5029,8 +5158,11 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             'included_params', 'additional_params', 'additional2', 'additional3'
         ];
         foreach ($baseTokens as $base) {
-            // Priority 1: Check suffixed versions in $this->putVars and mirror if base is empty or zero-like
-            if (!isset($this->putVars[$base]) || $this->putVars[$base] === '' || $this->putVars[$base] === null || $this->putVars[$base] === '0,00 €' || $this->putVars[$base] === 0) {
+            // Priority 1: Check suffixed versions in $this->putVars and mirror.
+            // For date/time fields, we always prioritize suffixed keys (actual form input).
+            // For other fields, we only mirror if the base is empty or zero-like.
+            $isTimeKey = in_array($base, ['beginTime', 'endTime', 'beginDate', 'endDate']);
+            if ($isTimeKey || !isset($this->putVars[$base]) || $this->putVars[$base] === '' || $this->putVars[$base] === null || $this->putVars[$base] === '0,00 €' || $this->putVars[$base] === 0) {
                 foreach ($this->putVars as $key => $value) {
                     if ($value !== '' && $value !== null && $value !== ' ') {
                         if (strpos($key, $base . '_') === 0 || strpos($key, $base . '|') === 0 || strpos($key, $base . '-') === 0) {
@@ -5042,7 +5174,7 @@ if ($this->reservationSettings->showMemberData && $hasFrontendUser === true) {
             }
             // Priority 2: If we have an incoming $putVars array, also check there
             if ($putVars !== null && is_array($putVars)) {
-                if (!isset($putVars[$base]) || $putVars[$base] === '' || $putVars[$base] === null || $putVars[$base] === '0,00 €' || $putVars[$base] === 0) {
+                if ($isTimeKey || !isset($putVars[$base]) || $putVars[$base] === '' || $putVars[$base] === null || $putVars[$base] === '0,00 €' || $putVars[$base] === 0) {
                     foreach ($putVars as $key => $value) {
                         if ($value !== '' && $value !== null && $value !== ' ') {
                             if (strpos($key, $base . '_') === 0 || strpos($key, $base . '|') === 0 || strpos($key, $base . '-') === 0) {

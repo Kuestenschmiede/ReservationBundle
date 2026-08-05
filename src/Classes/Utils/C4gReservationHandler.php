@@ -399,7 +399,9 @@ class C4gReservationHandler
         }
         $format = $GLOBALS['TL_CONFIG']['timeFormat'];
         //$begin = date('I', $list['tsdate']) ? date($format, $time+3600).$clock : date($format, $time).$clock; 
-        $begin = date($GLOBALS['TL_CONFIG']['timeFormat'], $time).$clock;
+        $dt = new \DateTime('@' . (int)$time);
+        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+        $begin = $dt->format($GLOBALS['TL_CONFIG']['timeFormat']).$clock;
         $mergedTime = false;
         if (key_exists('mergedTime',$obj) && $obj['mergedTime'] && key_exists('mergedEndTime',$obj) && $obj['mergedEndTime']) {
             $clockEx = $withoutTime ? '' : $clock;
@@ -425,13 +427,17 @@ class C4gReservationHandler
             if ($withEndTimes && $interval) {
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
-                    $end = date($format, $time + $interval).$clock;
+                    $dt = new \DateTime('@' . (int)($time + $interval));
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $end = $dt->format($format).$clock;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.' - '.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
                 if (!$mergedTime) {
-                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
+                    $dt = new \DateTime('@' . (int)$endTime);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $end = $dt->format($GLOBALS['TL_CONFIG']['timeFormat']).$clock;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.' - '.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else {
@@ -442,14 +448,18 @@ class C4gReservationHandler
             if ($withEndTimes && $interval) {
                 $key = $time.'#'.$interval;
                 if (!$mergedTime) {
-                    $end = date($format, $time + $interval).$clock;
+                    $dt = new \DateTime('@' . (int)($time + $interval));
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $end = $dt->format($format).$clock;
                     $stop = 1;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => $interval, 'name' => $begin.' - '.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else if ($endTime && ($endTime != $time)) {
                 $key = $time.'#'.($endTime-$time);
                 if (!$mergedTime) {
-                    $end = date($GLOBALS['TL_CONFIG']['timeFormat'], $endTime).$clock;
+                    $dt = new \DateTime('@' . (int)$endTime);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $end = $dt->format($GLOBALS['TL_CONFIG']['timeFormat']).$clock;
                 }
                 $list['result'][$key] = array('id' => $key, 'time' => $time, 'interval' => ($endTime-$time), 'name' => $begin.' - '.$end, 'objects' => [$obj], 'begin' => $beginStamp, 'description' => $description);
             } else {
@@ -1541,6 +1551,10 @@ class C4gReservationHandler
             }
         }
 
+        if ($maxParticipents <= 0) {
+            return 100; // fallback for unlimited, but at least return a positive number
+        }
+
         return $maxParticipents-$actPersons;
     }
     /**
@@ -1709,7 +1723,7 @@ class C4gReservationHandler
         $database = Database::getInstance();
         $almostFullyBookedAt = $type['almostFullyBookedAt'];
         if ($objectId) {
-            $events = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `pid` = ?")->execute($objectId)->fetchAllAssoc();
+            $events = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `pid` = ? AND `reservationType` = ?")->execute($objectId, $type['id'])->fetchAllAssoc();
             if ($events) {
                 if (count($events) > 1) {
                     C4gLogModel::addLogEntry('reservation', 'There are more than one event connections. Check Event: '.$objectId);
@@ -1729,7 +1743,8 @@ class C4gReservationHandler
             $startTime = $startTime ?: time();
 
             //$eventObject = \CalendarEventsModel::findByPk($objectId);
-            if (($event || $calendarObject) && $eventObject && $eventObject['published'] && (($eventObject['startTime'] && ($eventObject['startTime'] > $startTime)) || (!$eventObject['startTime'] && $eventObject['startDate'] && $eventObject['startDate'] >= $startTime))) {
+            $compareTime = $eventObject['endTime'] ?: ($eventObject['startTime'] ?: $eventObject['startDate']);
+            if (($event || $calendarObject) && $eventObject && $eventObject['published'] && ($compareTime >= $startTime)) {
 
                 $targetAudience = key_exists('targetAudience', $event) && $event['targetAudience'] ? \Contao\StringUtil::deserialize($event['targetAudience'], true) : [];
                 $reservationTargetAudience = key_exists('reservationTargetAudience', $calendarObject) && $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience'], true) : [];
@@ -1747,6 +1762,7 @@ class C4gReservationHandler
                 $frontendObject = new C4gReservationFrontendObject();
                 $frontendObject->setType(2);
                 $frontendObject->setId($eventObject['id']);
+                $frontendObject->setDesiredCapacity([$event['minParticipants'] ?: $calendarObject['reservationMinParticipants'], $maxParticipants]);
                 $eventObject['price'] = $event['price'] ?: $calendarObject['reservationPrice'];
                 $eventObject['priceoption'] = $event['priceoption'] ?: $calendarObject['reservationPriceOption'];
                 $eventObject['taxOptions'] = $event['taxOptions'] ?: $calendarObject['taxOptions'] ?: '';
@@ -1812,7 +1828,7 @@ class C4gReservationHandler
                     if (!$calId) continue;
                     $allEvents = $database->prepare("SELECT * FROM tl_calendar_events WHERE `id` = ?")->execute($calId)->fetchAllAssoc();
                     foreach ($allEvents as $eventObject) {
-                        $reservationEvent = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `id` = ? AND `reservationType` IN $idString")->execute($eventObject['id'])->fetchAssoc();
+                        $reservationEvent = $database->prepare("SELECT * FROM tl_c4g_reservation_event WHERE `pid` = ? AND `reservationType` IN $idString")->execute($eventObject['id'])->fetchAssoc();
 
                         $targetAudience = $reservationEvent['targetAudience'] ? \Contao\StringUtil::deserialize($reservationEvent['targetAudience'], true) : [];
                         $reservationTargetAudience = $calendarObject['reservationTargetAudience'] ? \Contao\StringUtil::deserialize($calendarObject['reservationTargetAudience'], true) : [];

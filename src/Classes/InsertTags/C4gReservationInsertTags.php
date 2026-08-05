@@ -779,9 +779,17 @@ class C4gReservationInsertTags
                             return '';
                         case 'beginDate':
                             if ($startDate) {
-                                $value = is_numeric($startDate) ? date($dateFormat, intval($startDate)) : $startDate;
+                                if (is_numeric($startDate)) {
+                                    $dt = new \DateTime('@' . (int)$startDate);
+                                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                                    $value = $dt->format($dateFormat);
+                                } else {
+                                    $value = $startDate;
+                                }
                             } else {
-                                $value = date($dateFormat, $calendarEvent->startDate);
+                                $dt = new \DateTime('@' . (int)$calendarEvent->startDate);
+                                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                                $value = $dt->format($dateFormat);
                             }
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('beginDate', $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginDateEvent'], $value);
@@ -790,14 +798,28 @@ class C4gReservationInsertTags
                             return $value;
                         case 'beginDate_raw':
                             if ($startDate) {
-                                return is_numeric($startDate) ? date($dateFormat, intval($startDate)) : $startDate;
+                                if (is_numeric($startDate)) {
+                                    $dt = new \DateTime('@' . (int)$startDate);
+                                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                                    return $dt->format($dateFormat);
+                                } else {
+                                    return $startDate;
+                                }
                             } else {
-                                return date($dateFormat, $calendarEvent->startDate);
+                                $dt = new \DateTime('@' . (int)$calendarEvent->startDate);
+                                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                                return $dt->format($dateFormat);
                             }
                         case 'endDate':
                             $value = '';
                             if ($calendarEvent && $calendarEvent->startDate != $calendarEvent->endDate) {
-                                $value = $calendarEvent->endDate ? date($dateFormat, $calendarEvent->endDate) : false;
+                                if ($calendarEvent->endDate) {
+                                    $dt = new \DateTime('@' . (int)$calendarEvent->endDate);
+                                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                                    $value = $dt->format($dateFormat);
+                                } else {
+                                    $value = false;
+                                }
                                 if ($value) {
                                     $value = $this->getHtmlSkeleton('endDate', $GLOBALS['TL_LANG']['fe_c4g_reservation']['endDateEvent'], $value);
                                 }
@@ -806,11 +828,23 @@ class C4gReservationInsertTags
                             return $value ?: '';
                         case 'endDate_raw':
                             if ($calendarEvent && $calendarEvent->startDate != $calendarEvent->endDate) {
-                                return $calendarEvent->endDate ? date($dateFormat, $calendarEvent->endDate) : '';
+                                if ($calendarEvent->endDate) {
+                                    $dt = new \DateTime('@' . (int)$calendarEvent->endDate);
+                                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                                    return $dt->format($dateFormat);
+                                }
+                                return '';
                             }
                             return '';
                         case 'beginTime':
-                            $value = $calendarEvent->startTime && date('H', $calendarEvent->startTime) != '00' ? date($timeFormat, $calendarEvent->startTime) : false;
+                            $value = false;
+                            if ($calendarEvent->startTime) {
+                                $dt = new \DateTime('@' . (int)$calendarEvent->startTime);
+                                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                                if ($dt->format('H:i') != '00:00') {
+                                    $value = $dt->format($timeFormat);
+                                }
+                            }
                             if ($value) {
                                 $value = $this->getHtmlSkeleton('beginTime', $GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent'], $value . ' ' . $clock);
                             } else {
@@ -819,11 +853,24 @@ class C4gReservationInsertTags
 
                             return $value;
                         case 'beginTime_raw':
-                            return $calendarEvent->startTime && date('H', $calendarEvent->startTime) != '00' ? date($timeFormat, $calendarEvent->startTime) : '';
+                            if ($calendarEvent->startTime) {
+                                $dt = new \DateTime('@' . (int)$calendarEvent->startTime);
+                                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                                if ($dt->format('H:i') != '00:00') {
+                                    return $dt->format($timeFormat);
+                                }
+                            }
+                            return '';
                         case 'endTime':
                             $value = '';
                             if ($calendarEvent && (!$calendarEvent->endDate || ($calendarEvent->startDate == $calendarEvent->endDate))) {
-                                $value = $calendarEvent->startTime < $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : false;
+                                if ($calendarEvent->startTime < $calendarEvent->endTime) {
+                                    $dt = new \DateTime('@' . (int)$calendarEvent->endTime);
+                                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                                    $value = $dt->format($timeFormat);
+                                } else {
+                                    $value = false;
+                                }
                                 if ($value) {
                                     $value = $this->getHtmlSkeleton('endTime', $GLOBALS['TL_LANG']['fe_c4g_reservation']['endTimeEvent'], $value . $clock);
                                 }
@@ -832,7 +879,12 @@ class C4gReservationInsertTags
                             return $value ?: '';
                         case 'endTime_raw':
                             if ($calendarEvent && (!$calendarEvent->endDate || ($calendarEvent->startDate == $calendarEvent->endDate))) {
-                                return $calendarEvent->endTime ? date($timeFormat, $calendarEvent->endTime) : '';
+                                if ($calendarEvent->endTime) {
+                                    $dt = new \DateTime('@' . (int)$calendarEvent->endTime);
+                                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                                    return $dt->format($timeFormat);
+                                }
+                                return '';
                             }
 
                             return '';

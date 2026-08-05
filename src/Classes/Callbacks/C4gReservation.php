@@ -123,15 +123,14 @@
                 $beginTime = (int) $arrRow['beginTime'];
                 $dt = new \DateTime('@' . (int)$arrRow['beginDate']);
                 $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                $isMidnight = ($arrRow['beginTime'] === '0' || $arrRow['beginTime'] === 0 || $arrRow['beginTime'] === null || $arrRow['beginTime'] === '' || ($beginTime % 86400 === 0));
-                $formattedTime = "";
-                if ($isMidnight) {
-                    $formattedTime = "00:00";
+                if ($beginTime > 170000) {
+                    $dtTime = new \DateTime('@' . $beginTime);
+                    $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $formattedTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                 } else {
-                    $formattedTime = date('H:i', strtotime('1970-01-01 ' . gmdate('H:i', $beginTime % 86400) . ' UTC'));
-                    if (($formattedTime === '01:00' || $formattedTime === '1:00') && ($beginTime % 86400 === 0)) {
-                        $formattedTime = "00:00";
-                    }
+                    $dtTime = new \DateTime('@' . $beginTime);
+                    $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $formattedTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                 }
                 $arrRow['beginDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat']) . ' ' . $formattedTime;
                 $arrRow['beginTime'] = $formattedTime;
@@ -149,15 +148,14 @@
                 $endTimeInt = (int) $arrRow['endTime'];
                 $dt = new \DateTime('@' . $endDate);
                 $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                $isMidnightEnd = ($arrRow['endTime'] === '0' || $arrRow['endTime'] === 0 || $arrRow['endTime'] === null || $arrRow['endTime'] === '' || ($endTimeInt % 86400 === 0));
-                $formattedEndTime = "";
-                if ($isMidnightEnd) {
-                    $formattedEndTime = "00:00";
+                if ($endTimeInt > 170000) {
+                    $dtTime = new \DateTime('@' . $endTimeInt);
+                    $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $formattedEndTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                 } else {
-                    $formattedEndTime = date('H:i', strtotime('1970-01-01 ' . gmdate('H:i', $endTimeInt % 86400) . ' UTC'));
-                    if (($formattedEndTime === '01:00' || $formattedEndTime === '1:00') && ($endTimeInt % 86400 === 0)) {
-                        $formattedEndTime = "00:00";
-                    }
+                    $dtTime = new \DateTime('@' . $endTimeInt);
+                    $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $formattedEndTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                 }
                 $arrRow['endDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat']) . ' ' . $formattedEndTime;
                 $arrRow['endTime'] = $formattedEndTime;
@@ -224,7 +222,9 @@
                     ->execute();
 
                 while ($events->next()) {
-                    $return[$events->id] = date($GLOBALS['TL_CONFIG']['dateFormat'],$events->startDate).': '.$events->title;
+                    $dt = new \DateTime('@' . (int)$events->startDate);
+                    $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                    $return[$events->id] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat']) . ': ' . $events->title;
                 }
             } else {
                 switch ($reservationObjectType) {
@@ -242,7 +242,9 @@
                             ->execute();
 
                         while ($events->next()) {
-                            $return[$events->id] = date($GLOBALS['TL_CONFIG']['dateFormat'],$events->startDate).': '.$events->title;
+                            $dt = new \DateTime('@' . (int)$events->startDate);
+                            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                            $return[$events->id] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat']) . ': ' . $events->title;
                         }
                         break;
                 }

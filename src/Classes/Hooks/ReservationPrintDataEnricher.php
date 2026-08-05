@@ -32,7 +32,6 @@ class ReservationPrintDataEnricher
     public function enrich($module, array &$data): void
     {
         try {
-            // error_log("ReservationPrintDataEnricher DEBUG Data START: " . json_encode($data));
             // Nur arbeiten, wenn das übergebene Modul die benötigten Settings-Funktionen bietet
 
             // 1. Map dynamic keys to standard keys for the helper and template
@@ -77,14 +76,34 @@ class ReservationPrintDataEnricher
             if (isset($data['address2']) && (!isset($data['street2']) || !$data['street2'])) {
                 $data['street2'] = $data['address2'];
             }
-
-            // Fallback for beginTime if it's still empty and it's a reservation
-            if (!isset($data['beginTime']) || $data['beginTime'] === '' || $data['beginTime'] === null) {
-                if (isset($data['beginTimeInt']) && (int)$data['beginTimeInt'] === 0) {
-                    $data['beginTime'] = '00:00';
-                    // error_log("ReservationPrintDataEnricher DEBUG Fallback beginTime to 00:00 because beginTimeInt is 0");
+ 
+            // Load missing integer fields from database if reservation_id is present
+            $reservationId = (int) ($data['reservation_id'] ?? 0);
+            if ($reservationId > 0) {
+                $db = \Contao\Database::getInstance();
+                $resRow = $db->prepare("SELECT * FROM tl_c4g_reservation WHERE id=?")->execute($reservationId)->row();
+                if ($resRow) {
+                    foreach (['beginTime', 'endTime', 'beginDate', 'endDate', 'dateOfBirth'] as $k) {
+                        if (isset($resRow[$k]) && (!isset($data[$k . 'Int']) || $data[$k . 'Int'] === '' || $data[$k . 'Int'] === null)) {
+                            $data[$k . 'Int'] = $resRow[$k];
+                        }
+                        // Also sync dynamic keys from DB row if not in data
+                        foreach ($resRow as $drk => $drv) {
+                            if (strpos($drk, $k . '_') === 0 && (!isset($data[$drk]) || $data[$drk] === '')) {
+                                $data[$drk] = $drv;
+                            }
+                        }
+                    }
                 }
             }
+ 
+            // Ensure we have numeric variants for dates and times if they are provided as raw numbers
+            foreach (['beginTime', 'endTime', 'beginDate', 'endDate', 'dateOfBirth'] as $k) {
+                if (isset($data[$k]) && is_numeric($data[$k]) && (!isset($data[$k.'Int']) || $data[$k.'Int'] === '' || $data[$k.'Int'] === null)) {
+                    $data[$k.'Int'] = $data[$k];
+                }
+            }
+
             // error_log("ReservationPrintDataEnricher DEBUG Data MID: " . json_encode($data));
 
             $reservationTypeId = isset($data['reservation_type']) ? (int) $data['reservation_type'] : 0;
@@ -123,11 +142,27 @@ class ReservationPrintDataEnricher
                 }
             }
 
-            // 5. Mirror fresh results back to dynamic keys to be absolutely sure the template finds them
+            // 5. Format from integer fields if present - they are more reliable for time calculations
+            // and ensure they use Europe/Berlin timezone for formatting.
+            foreach (['beginTime', 'endTime', 'beginDate', 'endDate', 'dateOfBirth'] as $k) {
+                if (isset($data[$k.'Int']) && $data[$k.'Int'] !== '' && $data[$k.'Int'] !== null) {
+                    try {
+                        $dt = new \DateTime('@' . (int)$data[$k.'Int']);
+                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $format = ($k === 'beginTime' || $k === 'endTime') ?
+                            (($GLOBALS['TL_CONFIG']['timeFormat'] ?? '') ?: 'H:i') :
+                            (($GLOBALS['TL_CONFIG']['dateFormat'] ?? '') ?: 'd.m.Y');
+                        $data[$k] = $dt->format($format);
+                    } catch (\Throwable $t) {}
+                }
+            }
+
+            // 6. Mirror fresh results back to dynamic keys to be absolutely sure the template finds them
             $fieldsToMirror = [
                 'price', 'priceTax', 'priceSum', 'priceSumTax', 'priceNet', 'priceSumNet',
                 'priceOptionSum', 'priceOptionSumTax', 'priceOptionSumNet', 'priceDiscount',
-                'discountPercent', 'discountCode', 'reservationTaxRate', 'documentId'
+                'discountPercent', 'discountCode', 'reservationTaxRate', 'documentId',
+                'beginDate', 'beginTime', 'endDate', 'endTime', 'dateOfBirth'
             ];
             foreach ($fieldsToMirror as $ktm) {
                 if (isset($data[$ktm]) && is_string($data[$ktm])) {

@@ -144,6 +144,18 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
         $reservationEndTimeDBField->setNotificationField(true);
         $reservationEndTimeDBField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationEndTimeDBField;
+ 
+        // Hidden fields for integer variants to ensure they are sent via AJAX for PDF generation
+        foreach (['beginDate', 'beginTime', 'endDate', 'endTime', 'dateOfBirth'] as $k) {
+            $intField = new C4GTextField();
+            $intField->setFieldName($k . 'Int');
+            $intField->setDatabaseField(false);
+            $intField->setFormField(true);
+            $intField->setInitInvisible(true);
+            $intField->setNotificationField(false);
+            $intField->setPrintable(false);
+            $this->fieldList[] = $intField;
+        }
 
 
         //$dateCondition = new C4GBrickCondition(C4GBrickConditionType::BOOLSWITCH, 'beginDate_'.$listType['id']);
@@ -286,7 +298,7 @@ class C4gReservationFormEventHandler extends C4gReservationFormHandler
             }
 
             //ToDo find better solution for empty beginTime
-            if ($reservationObject->getBeginTime() && date('H', $reservationObject->getBeginTime()) != '00') {
+            if ($reservationObject->getBeginTime() !== null && $reservationObject->getBeginTime() !== '') {
                 $reservationBeginTimeField = new C4GRadioGroupField();
                 $reservationBeginTimeField->setFieldName('beginTimeEvent');
                 $reservationBeginTimeField->setTitle($GLOBALS['TL_LANG']['fe_c4g_reservation']['beginTimeEvent']);

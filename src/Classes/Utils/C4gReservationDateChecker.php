@@ -101,7 +101,10 @@ class C4gReservationDateChecker
 
     public static function getStampAsTime($stamp) {
         if ($stamp) {
-            $objDate = new Date(date($GLOBALS['TL_CONFIG']['timeFormat'], $stamp), Date::getFormatFromRgxp('time'));
+            $dt = new \DateTime('@' . (int)$stamp);
+            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+            $formatted = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+            $objDate = new \Contao\Date($formatted, \Contao\Date::getFormatFromRgxp('time'));
             return $objDate->tstamp;
         } else {
             return $stamp;
@@ -277,8 +280,12 @@ class C4gReservationDateChecker
     }
 
     public static function checkDay($day, $date, $timeZone = '') {
-        if ($date && (date('w', $date) == $day)) {
-            return true;
+        if ($date) {
+            $dt = new \DateTime('@' . (int)$date);
+            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+            if ($dt->format('w') == $day) {
+                return true;
+            }
         }
 
         return false;
