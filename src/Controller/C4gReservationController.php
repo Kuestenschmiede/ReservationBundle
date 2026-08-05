@@ -2421,7 +2421,7 @@ if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQ
             $privacyPolicyText = new C4GTextField();
             $privacyPolicyText->setSimpleTextWithoutEditing(true);
             $privacyPolicyText->setFieldName('privacy_policy_text');
-            $privacyPolicyText->setInitialValue(C4GUtils::replaceInsertTags($this->reservationSettings->privacy_policy_text));
+            $privacyPolicyText->setInitialValue($this->reservationSettings->privacy_policy_text);
             $privacyPolicyText->setReplaceInsertTag(true);
             $privacyPolicyText->setSize(4);
             $privacyPolicyText->setTableColumn(false);
