@@ -214,9 +214,10 @@ class C4gReservationConfirmation
                         $dateFormat = ($GLOBALS['TL_CONFIG']['dateFormat'] ?? '') ?: 'd.m.Y';
                         $timeFormat = ($GLOBALS['TL_CONFIG']['timeFormat'] ?? '') ?: 'H:i';
 
+                        $timeZone = new \DateTimeZone(\Contao\Config::get('timeZone') ?: 'Europe/Berlin');
                         if (($reservation['beginDate'] ?? '') !== '') {
                             $dt = new \DateTime('@' . (int)$reservation['beginDate']);
-                            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                            $dt->setTimezone($timeZone);
                             $c4gNotify->setTokenValue('beginDate', $dt->format($dateFormat));
                         } else {
                             $c4gNotify->setTokenValue('beginDate', '');
@@ -225,18 +226,17 @@ class C4gReservationConfirmation
                         $formattedBeginTime = '';
                         if (isset($reservation['beginTime']) && $reservation['beginTime'] !== '') {
                             if (is_numeric($reservation['beginTime'])) {
-                                $dt = new \DateTime('@' . (int)$reservation['beginTime']);
-                                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                                $formattedBeginTime = $dt->format($timeFormat);
+                                $formattedBeginTime = \Contao\Date::parse($timeFormat, (int)$reservation['beginTime']);
                             } else {
                                 $formattedBeginTime = $reservation['beginTime'];
                             }
                         }
                         $c4gNotify->setTokenValue('beginTime', $formattedBeginTime);
+                        $c4gNotify->setTokenValue('##beginTime##', $formattedBeginTime);
 
                         if (($reservation['endDate'] ?? '') !== '') {
                             $dt = new \DateTime('@' . (int)$reservation['endDate']);
-                            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                            $dt->setTimezone($timeZone);
                             $c4gNotify->setTokenValue('endDate', $dt->format($dateFormat));
                         } else {
                             $c4gNotify->setTokenValue('endDate', '');
@@ -244,7 +244,7 @@ class C4gReservationConfirmation
 
                         if (($reservation['bookedAt'] ?? '') !== '') {
                             $dt = new \DateTime('@' . (int)$reservation['bookedAt']);
-                            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                            $dt->setTimezone($timeZone);
                             $c4gNotify->setTokenValue('bookedAt', $dt->format($dateFormat . ' ' . $timeFormat));
                         } else {
                             $c4gNotify->setTokenValue('bookedAt', '');
@@ -253,14 +253,13 @@ class C4gReservationConfirmation
                         $formattedEndTime = '';
                         if (isset($reservation['endTime']) && $reservation['endTime'] !== '') {
                             if (is_numeric($reservation['endTime'])) {
-                                $dt = new \DateTime('@' . (int)$reservation['endTime']);
-                                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                                $formattedEndTime = $dt->format($timeFormat);
+                                $formattedEndTime = \Contao\Date::parse($timeFormat, (int)$reservation['endTime']);
                             } else {
                                 $formattedEndTime = $reservation['endTime'];
                             }
                         }
                         $c4gNotify->setTokenValue('endTime', $formattedEndTime);
+                        $c4gNotify->setTokenValue('##endTime##', $formattedEndTime);
                         
                         $c4gNotify->setTokenValue('priceSum', !empty($reservation['priceSum']) ? $reservation['priceSum'] : '0,00 €');
                         $c4gNotify->setTokenValue('priceDiscount', (!empty($reservation['priceDiscount']) && $reservation['priceDiscount'] !== '0' && $reservation['priceDiscount'] !== 0) ? $reservation['priceDiscount'] : '0,00 €');

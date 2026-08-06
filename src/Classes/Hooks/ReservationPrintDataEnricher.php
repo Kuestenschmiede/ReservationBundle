@@ -147,12 +147,18 @@ class ReservationPrintDataEnricher
             foreach (['beginTime', 'endTime', 'beginDate', 'endDate', 'dateOfBirth'] as $k) {
                 if (isset($data[$k.'Int']) && $data[$k.'Int'] !== '' && $data[$k.'Int'] !== null) {
                     try {
-                        $dt = new \DateTime('@' . (int)$data[$k.'Int']);
-                        $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                        $val = (int)$data[$k.'Int'];
                         $format = ($k === 'beginTime' || $k === 'endTime') ?
                             (($GLOBALS['TL_CONFIG']['timeFormat'] ?? '') ?: 'H:i') :
                             (($GLOBALS['TL_CONFIG']['dateFormat'] ?? '') ?: 'd.m.Y');
-                        $data[$k] = $dt->format($format);
+                        
+                        if ($val > 170000) {
+                            $dt = new \DateTime('@' . $val);
+                            $dt->setTimezone(new \DateTimeZone(\Contao\Config::get('timeZone') ?: 'Europe/Berlin'));
+                            $data[$k] = $dt->format($format);
+                        } else {
+                            $data[$k] = \Contao\Date::parse($format, $val);
+                        }
                     } catch (\Throwable $t) {}
                 }
             }

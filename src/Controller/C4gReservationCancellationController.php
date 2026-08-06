@@ -155,10 +155,39 @@ class C4gReservationCancellationController extends C4GBaseController
         if ($reservation) {
             $putVars['email'] = $reservation->email;
             $putVars['firstname'] = $reservation->firstname;
-            $putVars['beginDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$reservation->beginDate);
-            $putVars['beginTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$reservation->beginTime);
-            $putVars['endDate'] = date($GLOBALS['TL_CONFIG']['dateFormat'],$reservation->endDate);
-            $putVars['endTime'] = date($GLOBALS['TL_CONFIG']['timeFormat'],$reservation->endTime);
+            $dateFormat = $GLOBALS['TL_CONFIG']['dateFormat'];
+            $timeFormat = $GLOBALS['TL_CONFIG']['timeFormat'];
+            
+            $timeZone = new \DateTimeZone(\Contao\Config::get('timeZone') ?: 'Europe/Berlin');
+            // beginDate
+            if ($reservation->beginDate > 170000) {
+                $dt = new \DateTime('@' . (int)$reservation->beginDate);
+                $dt->setTimezone($timeZone);
+                $putVars['beginDate'] = $dt->format($dateFormat);
+            } else {
+                $putVars['beginDate'] = gmdate($dateFormat, $reservation->beginDate);
+            }
+            
+            // beginTime
+            $bTime = (int)$reservation->beginTime;
+            $formattedBeginTime = \Contao\Date::parse($timeFormat, $bTime);
+            $putVars['beginTime'] = $formattedBeginTime;
+            $putVars['##beginTime##'] = $formattedBeginTime;
+            
+            // endDate
+            if ($reservation->endDate > 170000) {
+                $dt = new \DateTime('@' . (int)$reservation->endDate);
+                $dt->setTimezone($timeZone);
+                $putVars['endDate'] = $dt->format($dateFormat);
+            } else {
+                $putVars['endDate'] = gmdate($dateFormat, $reservation->endDate);
+            }
+            
+            // endTime
+            $eTime = (int)$reservation->endTime;
+            $formattedEndTime = \Contao\Date::parse($timeFormat, $eTime);
+            $putVars['endTime'] = $formattedEndTime;
+            $putVars['##endTime##'] = $formattedEndTime;
         }
 
         if (C4gReservationCancellationModel::cancellation($lastname, $key)) {

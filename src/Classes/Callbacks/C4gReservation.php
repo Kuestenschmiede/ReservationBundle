@@ -123,15 +123,9 @@
                 $beginTime = (int) $arrRow['beginTime'];
                 $dt = new \DateTime('@' . (int)$arrRow['beginDate']);
                 $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                if ($beginTime > 170000) {
-                    $dtTime = new \DateTime('@' . $beginTime);
-                    $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                    $formattedTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
-                } else {
-                    $dtTime = new \DateTime('@' . $beginTime);
-                    $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                    $formattedTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
-                }
+                $dtTime = new \DateTime('@' . $beginTime);
+                $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                $formattedTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                 $arrRow['beginDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat']) . ' ' . $formattedTime;
                 $arrRow['beginTime'] = $formattedTime;
                 $arrRow['beginDateInt'] = $arrRow['beginDate'];
@@ -148,15 +142,9 @@
                 $endTimeInt = (int) $arrRow['endTime'];
                 $dt = new \DateTime('@' . $endDate);
                 $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                if ($endTimeInt > 170000) {
-                    $dtTime = new \DateTime('@' . $endTimeInt);
-                    $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                    $formattedEndTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
-                } else {
-                    $dtTime = new \DateTime('@' . $endTimeInt);
-                    $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                    $formattedEndTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
-                }
+                $dtTime = new \DateTime('@' . $endTimeInt);
+                $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
+                $formattedEndTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
                 $arrRow['endDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat']) . ' ' . $formattedEndTime;
                 $arrRow['endTime'] = $formattedEndTime;
                 $arrRow['endDateInt'] = $arrRow['endDate'];
