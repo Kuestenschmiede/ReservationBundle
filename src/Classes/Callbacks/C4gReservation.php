@@ -118,15 +118,15 @@
 
             $arrRow['reservation_object'] = $object;
 
+            $timeFormat = ($GLOBALS['TL_CONFIG']['timeFormat'] ?? '') ?: 'H:i';
+            $dateFormat = ($GLOBALS['TL_CONFIG']['dateFormat'] ?? '') ?: 'd.m.Y';
+
             if ($arrRow['beginDate']) {
                 $originalBeginDate = $arrRow['beginDate'];
-                $beginTime = (int) $arrRow['beginTime'];
-                $dt = new \DateTime('@' . (int)$arrRow['beginDate']);
-                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                $dtTime = new \DateTime('@' . $beginTime);
-                $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                $formattedTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
-                $arrRow['beginDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat']) . ' ' . $formattedTime;
+                $beginTime = $arrRow['beginTime'] ?? 0;
+                $formattedDate = \Contao\Date::parse($dateFormat, (int)$arrRow['beginDate']);
+                $formattedTime = ($beginTime !== 0 && $beginTime !== '' && $beginTime !== null && $beginTime !== '0') ? \Contao\Date::parse($timeFormat, (int)$beginTime) : '';
+                $arrRow['beginDate'] = trim($formattedDate . ' ' . $formattedTime);
                 $arrRow['beginTime'] = $formattedTime;
                 $arrRow['beginDateInt'] = $arrRow['beginDate'];
                 $arrRow['beginDate'] = $originalBeginDate; 
@@ -139,13 +139,10 @@
             if ($arrRow['endDate']) {
                 $originalEndDate = $arrRow['endDate'];
                 $endDate = (int) $arrRow['endDate'];
-                $endTimeInt = (int) $arrRow['endTime'];
-                $dt = new \DateTime('@' . $endDate);
-                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                $dtTime = new \DateTime('@' . $endTimeInt);
-                $dtTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                $formattedEndTime = $dtTime->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
-                $arrRow['endDate'] = $dt->format($GLOBALS['TL_CONFIG']['dateFormat']) . ' ' . $formattedEndTime;
+                $endTimeInt = $arrRow['endTime'] ?? 0;
+                $formattedEndDate = \Contao\Date::parse($dateFormat, $endDate);
+                $formattedEndTime = ($endTimeInt !== 0 && $endTimeInt !== '' && $endTimeInt !== null && $endTimeInt !== '0') ? \Contao\Date::parse($timeFormat, (int)$endTimeInt) : '';
+                $arrRow['endDate'] = trim($formattedEndDate . ' ' . $formattedEndTime);
                 $arrRow['endTime'] = $formattedEndTime;
                 $arrRow['endDateInt'] = $arrRow['endDate'];
                 $arrRow['endDate'] = $originalEndDate;

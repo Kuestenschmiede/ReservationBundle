@@ -320,6 +320,29 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationBeginTimeField->setPrintable($this->module->isWithDefaultPDFContent());
         $this->fieldList[] = $reservationBeginTimeField;
 
+        //save beginDate
+        $reservationBeginDateDBField = new C4GDateField();
+        $reservationBeginDateDBField->setFieldName('beginDate');
+        $reservationBeginDateDBField->setInitialValue(0);
+        $reservationBeginDateDBField->setDatabaseField(true);
+        $reservationBeginDateDBField->setFormField(false);
+        $reservationBeginDateDBField->setMax(999999999999);
+        $reservationBeginDateDBField->setNotificationField(true);
+        $reservationBeginDateDBField->setPattern('');
+        $reservationBeginDateDBField->setPrintable($this->module->isWithDefaultPDFContent());
+        $this->fieldList[] = $reservationBeginDateDBField;
+
+        //save beginTime
+        $reservationBeginTimeDBField = new C4GTimeField();
+        $reservationBeginTimeDBField->setFieldName('beginTime');
+        $reservationBeginTimeDBField->setInitialValue(0);
+        $reservationBeginTimeDBField->setDatabaseField(true);
+        $reservationBeginTimeDBField->setFormField(false);
+        $reservationBeginTimeDBField->setMax(999999999999);
+        $reservationBeginTimeDBField->setNotificationField(true);
+        $reservationBeginTimeDBField->setPrintable($this->module->isWithDefaultPDFContent());
+        $this->fieldList[] = $reservationBeginTimeDBField;
+
         //save endDate
         $reservationEndDateDBField = new C4GDateField();
         $reservationEndDateDBField->setFieldName('endDate');

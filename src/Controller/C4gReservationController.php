@@ -3417,7 +3417,7 @@ if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQ
                     }
                 }
 
-            if (!$isEvent && ($field->getFieldName() == "beginTime")) {
+            if (!$isEvent && ($field->getFieldName() == "beginTime") && $field->getAdditionalId()) {
                 foreach ($putVars as $key => $value) {
                     if (strpos($key, "beginTime_".$type) !== false) {
                         $additionalIdPostParam = substr($key, (strlen("beginTime_".$type)));
@@ -3492,7 +3492,7 @@ if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQ
             }
 
             if ($reservationType->reservationObjectType === '3') {
-                if ((strpos($field->getAdditionalId(), '-33') === false) && (
+                if ($field->isFormField() && (strpos((string)$field->getAdditionalId(), '-33') === false) && (
                         (strpos($field->getFieldName(), 'beginDate') !== false) ||
                         (strpos($field->getFieldName(), 'beginTime') !== false) ||
                         (strpos($field->getFieldName(), 'description') !== false) ||
@@ -4640,14 +4640,16 @@ if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQ
         }
 
         if (is_string($beginTimeRaw) && strpos($beginTimeRaw, ':') !== false) {
-            $putVars['beginTime'] = $beginTimeRaw;
+            $formattedBeginTime = $beginTimeRaw;
         } else if (is_numeric($beginTimeRaw)) {
-            $dt = new \DateTime('@' . (int)$beginTimeRaw);
-            $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
-            $putVars['beginTime'] = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+            $formattedBeginTime = \Contao\Date::parse($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', (int)$beginTimeRaw);
         } else {
-            $putVars['beginTime'] = ' ';
+            $formattedBeginTime = ' ';
         }
+        $putVars['beginTime'] = $formattedBeginTime;
+        $putVars['##beginTime##'] = $formattedBeginTime;
+        $this->putVars['beginTime'] = $formattedBeginTime;
+        $this->putVars['##beginTime##'] = $formattedBeginTime;
 
         if ($endDateRaw) {
             if (is_string($endDateRaw) && (strpos($endDateRaw, '.') !== false || strpos($endDateRaw, '-') !== false)) {
@@ -4666,21 +4668,23 @@ if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQ
 
         if ($endTimeRaw) {
             if (is_string($endTimeRaw) && strpos($endTimeRaw, ':') !== false) {
-                $putVars['endTime'] = $endTimeRaw;
+                $formattedEndTime = $endTimeRaw;
             } else if (is_numeric($endTimeRaw)) {
-                $dt = new \DateTime('@' . (int)$endTimeRaw);
-                $dt->setTimezone(new \DateTimeZone('Europe/Berlin'));
-                $putVars['endTime'] = $dt->format($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i');
+                $formattedEndTime = \Contao\Date::parse($GLOBALS['TL_CONFIG']['timeFormat'] ?: 'H:i', (int)$endTimeRaw);
             } else {
-                $putVars['endTime'] = ' ';
+                $formattedEndTime = ' ';
             }
+            $putVars['endTime'] = $formattedEndTime;
+            $putVars['##endTime##'] = $formattedEndTime;
+            $this->putVars['endTime'] = $formattedEndTime;
+            $this->putVars['##endTime##'] = $formattedEndTime;
         }
 
         if (is_numeric($beginTimeRaw)) {
             $beginTimeInt = (int)$beginTimeRaw;
         } else if (is_string($beginTimeRaw) && strpos($beginTimeRaw, ':') !== false) {
-            $dt = new \DateTime('1970-01-01 ' . $beginTimeRaw, new \DateTimeZone('Europe/Berlin'));
-            $beginTimeInt = $dt->getTimestamp();
+            $timeParts = explode(':', trim($beginTimeRaw));
+            $beginTimeInt = ((int)($timeParts[0] ?? 0) * 3600) + ((int)($timeParts[1] ?? 0) * 60) + ((int)($timeParts[2] ?? 0));
         } else {
             $beginTimeInt = 0;
         }
@@ -4688,8 +4692,8 @@ if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQ
         if (is_numeric($endTimeRaw)) {
             $endTimeInt = (int)$endTimeRaw;
         } else if (is_string($endTimeRaw) && strpos($endTimeRaw, ':') !== false) {
-            $dt = new \DateTime('1970-01-01 ' . $endTimeRaw, new \DateTimeZone('Europe/Berlin'));
-            $endTimeInt = $dt->getTimestamp();
+            $timeParts = explode(':', trim($endTimeRaw));
+            $endTimeInt = ((int)($timeParts[0] ?? 0) * 3600) + ((int)($timeParts[1] ?? 0) * 60) + ((int)($timeParts[2] ?? 0));
         } else {
             $endTimeInt = 0;
         }
@@ -5071,6 +5075,28 @@ if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQ
             $this->putVars['endDate'] = (int) $endDateInt;
         }
 
+        if (is_array($newFieldList)) {
+            foreach ($newFieldList as $field) {
+                $fName = $field->getFieldName();
+                $addId = $field->getAdditionalId();
+                if ($addId && in_array($fName, ['beginTime', 'endTime', 'beginDate', 'endDate'])) {
+                    if ($fName === 'beginTime' && isset($beginTimeInt)) {
+                        $putVars[$fName . '_' . $addId] = (int) $beginTimeInt;
+                        $this->putVars[$fName . '_' . $addId] = (int) $beginTimeInt;
+                    } elseif ($fName === 'endTime' && isset($endTimeInt)) {
+                        $putVars[$fName . '_' . $addId] = (int) $endTimeInt;
+                        $this->putVars[$fName . '_' . $addId] = (int) $endTimeInt;
+                    } elseif ($fName === 'beginDate' && isset($beginDateInt)) {
+                        $putVars[$fName . '_' . $addId] = (int) $beginDateInt;
+                        $this->putVars[$fName . '_' . $addId] = (int) $beginDateInt;
+                    } elseif ($fName === 'endDate' && isset($endDateInt)) {
+                        $putVars[$fName . '_' . $addId] = (int) $endDateInt;
+                        $this->putVars[$fName . '_' . $addId] = (int) $endDateInt;
+                    }
+                }
+            }
+        }
+
         \con4gis\CoreBundle\Resources\contao\models\C4gLogModel::addLogEntry('reservation', "Finalizing reservation data. Preparing SaveAction. beginTime: " . $putVars['beginTime']);
         $action = new C4GSaveAndRedirectDialogAction($this->getDialogParams(), $this->getListParams(), $newFieldList, $putVars, $this->getBrickDatabase());
         $action->setModule($this);
@@ -5200,6 +5226,42 @@ if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQ
                 $this->putVars['object'] = $this->putVars[$base];
                 if ($putVars !== null) { $putVars['object'] = $this->putVars[$base]; }
             }
+
+            // Ensure formatted date and time tokens exist
+            if (in_array($base, ['beginTime', 'endTime'])) {
+                $timeFormat = ($GLOBALS['TL_CONFIG']['timeFormat'] ?? '') ?: 'H:i';
+                $valToCheck = $this->putVars[$base] ?? ($putVars !== null ? ($putVars[$base] ?? '') : '');
+                if ($valToCheck !== '') {
+                    $timeVal = $valToCheck;
+                    if (is_string($timeVal) && strpos($timeVal, '#') !== false) {
+                        $parts = explode('#', $timeVal);
+                        $timeVal = $parts[0];
+                    }
+                    if (is_numeric($timeVal) && $timeVal !== '') {
+                        $formattedTime = \Contao\Date::parse($timeFormat, (int)$timeVal);
+                        $this->putVars['##' . $base . '##'] = $formattedTime;
+                        if ($putVars !== null) { $putVars['##' . $base . '##'] = $formattedTime; }
+                    } elseif (is_string($timeVal) && strpos($timeVal, ':') !== false) {
+                        $this->putVars['##' . $base . '##'] = $timeVal;
+                        if ($putVars !== null) { $putVars['##' . $base . '##'] = $timeVal; }
+                    }
+                }
+            }
+            if (in_array($base, ['beginDate', 'endDate', 'dateOfBirth'])) {
+                $dateFormat = ($GLOBALS['TL_CONFIG']['dateFormat'] ?? '') ?: 'd.m.Y';
+                $valToCheck = $this->putVars[$base] ?? ($putVars !== null ? ($putVars[$base] ?? '') : '');
+                if ($valToCheck !== '') {
+                    $dateVal = $valToCheck;
+                    if (is_numeric($dateVal) && (int)$dateVal > 0) {
+                        $formattedDate = \Contao\Date::parse($dateFormat, (int)$dateVal);
+                        $this->putVars['##' . $base . '##'] = $formattedDate;
+                        if ($putVars !== null) { $putVars['##' . $base . '##'] = $formattedDate; }
+                    } elseif (is_string($dateVal) && (strpos($dateVal, '.') !== false || strpos($dateVal, '-') !== false)) {
+                        $this->putVars['##' . $base . '##'] = $dateVal;
+                        if ($putVars !== null) { $putVars['##' . $base . '##'] = $dateVal; }
+                    }
+                }
+            }
         }
         
         // Handle address/street alias
@@ -5248,6 +5310,77 @@ if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQ
                 $putVars[$base] = '';
             }
         }
+    }
+
+    /**
+     * @param $newId
+     * @param $notifyOnChanges
+     * @param $notification_type
+     * @param $dlgValues
+     * @param $fieldList
+     * @param $changes
+     */
+    public function sendNotifications($newId, $notifyOnChanges, $notification_type, $dlgValues, $fieldList, $changes)
+    {
+        $dateFormat = ($GLOBALS['TL_CONFIG']['dateFormat'] ?? '') ?: 'd.m.Y';
+        $timeFormat = ($GLOBALS['TL_CONFIG']['timeFormat'] ?? '') ?: 'H:i';
+
+        if (is_array($dlgValues)) {
+            // Format time fields and tokens (e.g. beginTime, endTime)
+            foreach (['beginTime', 'endTime'] as $timeKey) {
+                $foundFormatted = '';
+                foreach ($dlgValues as $k => $v) {
+                    if ($k === $timeKey || strpos($k, $timeKey . '_') === 0 || strpos($k, '##' . $timeKey) === 0) {
+                        $valToParse = $v;
+                        if (is_string($valToParse) && strpos($valToParse, '#') !== false) {
+                            $parts = explode('#', $valToParse);
+                            $valToParse = $parts[0];
+                        }
+                        if (is_numeric($valToParse) && $valToParse !== '') {
+                            $formatted = \Contao\Date::parse($timeFormat, (int)$valToParse);
+                            $dlgValues[$k] = $formatted;
+                            if (!$foundFormatted) {
+                                $foundFormatted = $formatted;
+                            }
+                        } elseif (is_string($valToParse) && strpos($valToParse, ':') !== false) {
+                            if (!$foundFormatted) {
+                                $foundFormatted = $valToParse;
+                            }
+                        }
+                    }
+                }
+                if ($foundFormatted) {
+                    $dlgValues[$timeKey] = $foundFormatted;
+                    $dlgValues['##' . $timeKey . '##'] = $foundFormatted;
+                }
+            }
+
+            // Format date fields and tokens (e.g. beginDate, endDate, dateOfBirth)
+            foreach (['beginDate', 'endDate', 'dateOfBirth'] as $dateKey) {
+                $foundFormatted = '';
+                foreach ($dlgValues as $k => $v) {
+                    if ($k === $dateKey || strpos($k, $dateKey . '_') === 0 || strpos($k, '##' . $dateKey) === 0) {
+                        if (is_numeric($v) && $v !== '' && (int)$v > 0) {
+                            $formatted = \Contao\Date::parse($dateFormat, (int)$v);
+                            $dlgValues[$k] = $formatted;
+                            if (!$foundFormatted) {
+                                $foundFormatted = $formatted;
+                            }
+                        } elseif (is_string($v) && (strpos($v, '.') !== false || strpos($v, '-') !== false)) {
+                            if (!$foundFormatted) {
+                                $foundFormatted = $v;
+                            }
+                        }
+                    }
+                }
+                if ($foundFormatted) {
+                    $dlgValues[$dateKey] = $foundFormatted;
+                    $dlgValues['##' . $dateKey . '##'] = $foundFormatted;
+                }
+            }
+        }
+
+        parent::sendNotifications($newId, $notifyOnChanges, $notification_type, $dlgValues, $fieldList, $changes);
     }
 
     /**
