@@ -28,7 +28,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationController::TYPE]   = 
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationListController::TYPE]  = '{list_legend},name,headline,type;{reservation_legend}, reservationView, selectReservationTypes, showReservationType, showReservationObject, showSignatureField, showPrices, past_day_number, cancellation_redirect_site, login_redirect_site, printTpl';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationOccupancyPlanController::TYPE]  = '{title_legend},name,headline,type;{reservation_legend}, occupancy_reservation_objects, reservation_form_site, show_occupancy_legend';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationOccupancyPlanController::TYPE]  = '{title_legend},name,headline,type;{reservation_legend}, occupancy_reservation_objects, reservation_form_site, show_occupancy_legend, jump_to_next_possible_date';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes'][C4gReservationCancellationController::TYPE] = '{title_legend},name,headline,type; {reservation_notification_center_legend}, notification_type_contact_request; {reservation_redirect_legend}, reservation_redirect_site, cancellationButtonCaption';
 
@@ -277,4 +277,13 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['show_occupancy_legend'] = [
     'inputType'         => 'checkbox',
     'default'           => 0,
     'sql'               => "int(1) unsigned NULL default 0"
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['jump_to_next_possible_date'] = [
+    'label'             => &$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['jump_to_next_possible_date'],
+    'exclude'           => true,
+    'filter'            => true,
+    'inputType'         => 'checkbox',
+    'default'           => '1',
+    'sql'               => "char(1) NOT NULL default '1'"
 ];

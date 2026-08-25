@@ -30,6 +30,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationOb
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showSignatureField'] = array("Signature field (group view only)", "Possibility to request a signature. Currently only possible in the group list.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'] = array("Show prices", "If possible, defined prices are shown.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['show_occupancy_legend'] = array('Show occupancy legend', 'Displays a legend for the different occupancy states below the calendar.');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['jump_to_next_possible_date'] = array('Jump to next possible date', 'Automatically jumps to the month with the first available date.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site'] = array('Forwarding page', 'After booking, you will be forwarded here.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['login_redirect_site'] = array('Redirect to login page', 'If the list module is not public.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['event_redirect_site'] = array('Event forwarding', 'Here you can set the forwarding to the event detail page. In case you want to display the events at the referent.');

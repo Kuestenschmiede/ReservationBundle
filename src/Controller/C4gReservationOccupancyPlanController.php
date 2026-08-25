@@ -76,20 +76,39 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             return '';
         }
 
-        $month = Input::get('month') ?: date('m');
-        $year = Input::get('year') ?: date('Y');
+        $jumpToNext = $this->jump_to_next_possible_date === null ? true : (bool)$this->jump_to_next_possible_date;
 
-        $time = strtotime("$year-$month-01");
-        $daysInMonth = date('t', $time);
+        $hasMonthParam = Input::get('month') !== null && Input::get('month') !== '';
+        $hasYearParam = Input::get('year') !== null && Input::get('year') !== '';
+
+        if (!$hasMonthParam && !$hasYearParam && $jumpToNext) {
+            $freeDateMonthYear = $this->findFirstFreeMonth($objects);
+            if ($freeDateMonthYear) {
+                $month = $freeDateMonthYear['month'];
+                $year = $freeDateMonthYear['year'];
+                $reservations = $freeDateMonthYear['reservations'];
+                $occupancy = $freeDateMonthYear['occupancy'];
+            }
+        }
+
+        if (!isset($month) || !isset($year)) {
+            $month = Input::get('month') ?: date('m');
+            $year = Input::get('year') ?: date('Y');
+            $time = strtotime("$year-$month-01");
+            $daysInMonth = date('t', $time);
+            $reservations = $this->getReservations($objects, $month, $year);
+            $occupancy = $this->calculateOccupancy($objects, $reservations, $daysInMonth, $month, $year);
+        } else {
+            $time = strtotime("$year-$month-01");
+            $daysInMonth = date('t', $time);
+        }
+
         $firstWeekday = date('N', $time);
 
         $prevMonth = date('m', strtotime("-1 month", $time));
         $prevYear = date('Y', strtotime("-1 month", $time));
         $nextMonth = date('m', strtotime("+1 month", $time));
         $nextYear = date('Y', strtotime("+1 month", $time));
-
-        $reservations = $this->getReservations($objects, $month, $year);
-        $occupancy = $this->calculateOccupancy($objects, $reservations, $daysInMonth, $month, $year);
 
         $settings = C4gReservationSettingsModel::findAll();
         if ($settings && $settings->current()) {
@@ -216,6 +235,33 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         </style>';
 
         return $style . $html;
+    }
+
+    protected function findFirstFreeMonth($objects, $maxMonths = 60): ?array
+    {
+        $curTime = strtotime(date('Y-m-01'));
+        for ($i = 0; $i < $maxMonths; $i++) {
+            $checkTime = strtotime("+$i month", $curTime);
+            $checkMonth = date('m', $checkTime);
+            $checkYear = date('Y', $checkTime);
+            $daysInMonth = date('t', $checkTime);
+
+            $reservations = $this->getReservations($objects, $checkMonth, $checkYear);
+            $occupancy = $this->calculateOccupancy($objects, $reservations, $daysInMonth, $checkMonth, $checkYear);
+
+            foreach ($occupancy as $dayData) {
+                if (in_array($dayData['status'], ['free', 'partial'], true)) {
+                    return [
+                        'month' => $checkMonth,
+                        'year' => $checkYear,
+                        'reservations' => $reservations,
+                        'occupancy' => $occupancy,
+                    ];
+                }
+            }
+        }
+
+        return null;
     }
 
     protected function getReservations($objects, $month, $year)
