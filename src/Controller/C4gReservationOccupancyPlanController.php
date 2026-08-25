@@ -477,26 +477,27 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                     
                     $bookedCount = count($objReservations);
                     if ($bookedCount >= $objQuantity) {
-                        // Check if they cover the whole day
-                        $coversWholeDay = false;
-                        foreach ($objReservations as $res) {
-                            if ($res['beginDate'] <= $dayStart && $res['endDate'] >= $dayEnd) {
-                                $coversWholeDay = true;
-                                if ($res['organisation'] && !in_array($res['organisation'], $reservationTexts)) {
-                                    $reservationTexts[] = $res['organisation'];
+                        $dayBookedCount++;
+                        if (!empty($this->show_occupancy_name)) {
+                            foreach ($objReservations as $res) {
+                                $org = isset($res['organisation']) ? trim((string)$res['organisation']) : '';
+                                $lastname = isset($res['lastname']) ? trim((string)$res['lastname']) : '';
+                                $name = $org !== '' ? $org : $lastname;
+                                if ($name !== '' && !in_array($name, $reservationTexts, true)) {
+                                    $reservationTexts[] = $name;
                                 }
                             }
                         }
-                        if ($coversWholeDay) {
-                            $dayBookedCount++;
-                        } else {
-                            $dayPartialCount++;
-                        }
                     } elseif ($bookedCount > 0) {
                         $dayPartialCount++;
-                        foreach ($objReservations as $res) {
-                            if ($res['organisation'] && !in_array($res['organisation'], $reservationTexts)) {
-                                $reservationTexts[] = $res['organisation'];
+                        if (!empty($this->show_occupancy_name)) {
+                            foreach ($objReservations as $res) {
+                                $org = isset($res['organisation']) ? trim((string)$res['organisation']) : '';
+                                $lastname = isset($res['lastname']) ? trim((string)$res['lastname']) : '';
+                                $name = $org !== '' ? $org : $lastname;
+                                if ($name !== '' && !in_array($name, $reservationTexts, true)) {
+                                    $reservationTexts[] = $name;
+                                }
                             }
                         }
                     }

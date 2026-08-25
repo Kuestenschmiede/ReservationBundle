@@ -29,6 +29,7 @@ $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showReservationOb
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showSignatureField'] = array("Unterschriftenfeld (nur Gruppenansicht)","Möglichkeit eine Unterschrift abzufragen. Zurzeit nur in der Gruppenliste möglich.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['showPrices'] = array("Preise anzeigen","Wenn möglich werden definierte Preise dargestellt.");
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['show_occupancy_legend'] = array('Belegungs-Legende anzeigen', 'Zeigt unter dem Kalender eine Legende für die verschiedenen Belegungszustände an.');
+$GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['show_occupancy_name'] = array('Name im Belegungsplan anzeigen', 'Zeigt den Namen bzw. Firmennamen der Reservierung im Belegungsplan an.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['jump_to_next_possible_date'] = array('Zum nächstmöglichen Termin springen', 'Springt automatisch in den Monat mit dem ersten freien Termin.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['redirect_site'] = array('Weiterleitungsseite', 'Nach der Buchung wird hierhin weitergeleitet.');
 $GLOBALS['TL_LANG']['tl_module']['c4g_reservation']['fields']['login_redirect_site'] = array('Weiterleitung zur Anmeldeseite', 'Falls das Listenmodul nicht öffentlich ist.');
