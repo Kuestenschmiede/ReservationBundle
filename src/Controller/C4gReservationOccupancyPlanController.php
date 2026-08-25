@@ -238,8 +238,17 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
     {
         $occupancy = [];
         $objectModels = [];
+        $validObjects = [];
         foreach ($objects as $objId) {
-            $objectModels[$objId] = C4gReservationObjectModel::findByPk($objId);
+            $model = C4gReservationObjectModel::findByPk($objId);
+            if ($model) {
+                $objectModels[$objId] = $model;
+                $validObjects[] = $objId;
+            }
+        }
+
+        if (empty($validObjects)) {
+            return [];
         }
 
         $suspensionDates = [];
@@ -345,13 +354,13 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             $dayBookedCount = 0;
             $dayPartialCount = 0;
             if ($isGlobalSuspended) {
-                $dayBookedCount = count($objects);
+                $dayBookedCount = count($validObjects);
                 $occupancy[$day] = [
                     'status' => 'booked',
                     'text' => $suspensionText
                 ];
             } else {
-                foreach ($objects as $objId) {
+                foreach ($validObjects as $objId) {
                     $objModel = $objectModels[$objId];
                     if (!$objModel) continue;
 
@@ -359,7 +368,31 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                     $weekdayMap = [1 => 'oh_monday', 2 => 'oh_tuesday', 3 => 'oh_wednesday', 4 => 'oh_thursday', 5 => 'oh_friday', 6 => 'oh_saturday', 0 => 'oh_sunday'];
                     $currentWeekday = (int)date('w', $dayStart);
                     $weekdayField = $weekdayMap[$currentWeekday];
-                    if (empty($objModel->$weekdayField)) {
+
+                    $openingHours = StringUtil::deserialize($objModel->$weekdayField, true);
+                    $hasOpeningHours = false;
+
+                    if (!empty($openingHours)) {
+                        foreach ($openingHours as $period) {
+                            $timeBegin = (isset($period['time_begin']) && is_numeric($period['time_begin']) && $period['time_begin'] !== '') ? (int)$period['time_begin'] : false;
+                            $timeEnd = (isset($period['time_end']) && is_numeric($period['time_end']) && $period['time_end'] !== '') ? (int)$period['time_end'] : false;
+
+                            if ($timeBegin !== false && $timeEnd !== false && !($timeBegin === 0 && $timeEnd === 0) && ($timeBegin !== $timeEnd)) {
+                                $dateFrom = !empty($period['date_from']) ? (is_numeric($period['date_from']) ? (int)$period['date_from'] : strtotime($period['date_from'])) : 0;
+                                $dateTo = !empty($period['date_to']) ? (is_numeric($period['date_to']) ? (int)$period['date_to'] : strtotime($period['date_to'])) : 0;
+
+                                $fromValid = empty($dateFrom) || $dayEnd >= $dateFrom;
+                                $toValid = empty($dateTo) || $dayStart <= $dateTo;
+
+                                if ($fromValid && $toValid) {
+                                    $hasOpeningHours = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!$hasOpeningHours) {
                         $dayBookedCount++;
                         continue;
                     }
@@ -426,7 +459,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
             if (!isset($occupancy[$day])) {
                 $reservationText = implode(', ', $reservationTexts);
-                if ($dayBookedCount >= count($objects) || $dayEnd < time()) {
+                if ($dayBookedCount >= count($validObjects) || $dayEnd < time()) {
                     $occupancy[$day] = ['status' => 'booked', 'text' => $reservationText];
                 } elseif ($dayBookedCount > 0 || $dayPartialCount > 0) {
                     $occupancy[$day] = ['status' => 'partial', 'text' => $reservationText];

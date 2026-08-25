@@ -763,7 +763,7 @@ class C4gReservationHandler
         $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
         $typeOfObject = $timeObjectParams['object']->getTypeOfObject();
 
-        if (($time_begin !== false) && ($time_end !== false)) {
+        if (($time_begin !== false) && ($time_end !== false) && !($time_begin === 0 && $time_end === 0) && ($time_begin !== $time_end)) {
             $time = $time_begin;
 
             $periodEnd = $time_end - $timeObjectParams['interval'];
@@ -874,7 +874,7 @@ class C4gReservationHandler
             $durationInterval = $durationInterval - 86400; //ToDo first day counts
         }
 
-        if (($time_begin !== false) && ($time_end !== false)) {
+        if (($time_begin !== false) && ($time_end !== false) && !($time_begin === 0 && $time_end === 0) && ($time_begin !== $time_end)) {
             $time = $time_begin;
             $periodEnd = $time_end;
 
@@ -1071,7 +1071,7 @@ class C4gReservationHandler
                                     $timeBegin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
                                     $timeEnd = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
 
-                                    if (($timeEnd !== false) && ($timeBegin !== false)) {
+                                    if (($timeEnd !== false) && ($timeBegin !== false) && !($timeBegin === 0 && $timeEnd === 0) && ($timeBegin !== $timeEnd)) {
                                         $periodEnd = $timeEnd;
                                         if ($periodEnd <= $timeBegin) {
                                             $periodEnd += 86400;
@@ -1240,7 +1240,7 @@ class C4gReservationHandler
                                     $time_begin = is_numeric($period['time_begin']) ? intval($period['time_begin']) : false;
                                     $time_end = is_numeric($period['time_end']) ? intval($period['time_end']) : false;
 
-                                    if (($time_begin === false) || ($time_end === false)) {
+                                    if (($time_begin === false) || ($time_end === false) || ($time_begin === 0 && $time_end === 0) || ($time_begin === $time_end)) {
                                         continue;
                                     }
 
