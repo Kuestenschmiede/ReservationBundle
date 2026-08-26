@@ -165,19 +165,18 @@ class C4gReservationHandler
                 $p = (int)$container->getParameter('c4g_reservation_dates_ttl');
                 if ($p > 0) { $ttl = min($p, 1800); } // cap at 30 minutes
             }
-            if ($cache && is_array($list) && is_array($type) && isset($type['id'])) {
+            $typeId = is_array($type) ? ($type['id'] ?? 0) : (is_numeric($type) ? (int)$type : 0);
+            if ($cache && is_array($list) && $typeId) {
                 $ids = [];
                 foreach ($list as $o) { if (is_object($o) && method_exists($o, 'getId')) { $ids[] = (string)$o->getId(); } }
                 sort($ids);
                 $lang = (string)($GLOBALS['TL_LANGUAGE'] ?? '');
-                $key = 'c4g_res_date_excl_' . md5(implode('|', [ (string)$type['id'], (string)$removeBookedDays, (string)$asArray, $lang, implode(',', $ids) ]));
+                $key = 'c4g_res_date_excl_' . md5(implode('|', [ (string)$typeId, (string)$removeBookedDays, (string)$asArray, $lang, implode(',', $ids) ]));
                 $item = $cache->getItem($key);
                 if ($item->isHit()) {
                     $val = $item->get();
-                    if ($asArray) {
-                        if (is_array($val)) { return $val; }
-                    } else {
-                        if (is_string($val)) { return $val; }
+                    if (is_array($val)) {
+                        return $val;
                     }
                 }
             }
@@ -235,7 +234,7 @@ class C4gReservationHandler
                 $nextDays = 0;
                 while ($i <= $end) {
                     $weekday = date('w', $i);
-                    $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $i);
+                    $timeArr = self::getReservationTimes($list, $typeId, $weekday, $i);
 
                     if (!$timeArr || (count($timeArr) == 0)) {
                         $alldates[$i] = $i;
@@ -302,6 +301,7 @@ class C4gReservationHandler
             if ($asArray) {
                 $result['dates'] = $alldates;
             } else {
+                $result['dates'] = '';
                 foreach ($alldates as $date) {
                     if ($date) {
                         $result['dates'] = self::addComma($result['dates']) . date('d.m.Y'/*$GLOBALS['TL_CONFIG']['dateFormat']*/, $date);
@@ -313,7 +313,7 @@ class C4gReservationHandler
         // Save to cache if possible
         try {
             if (isset($cache) && $cache && isset($item)) {
-                $saveVal = $asArray ? (is_array($result) ? $result : []) : (is_string($result) ? $result : '');
+                $saveVal = is_array($result) ? $result : [];
                 $item->set($saveVal);
                 if (method_exists($item, 'expiresAfter')) { $item->expiresAfter($ttl); }
                 $cache->save($item);
@@ -2511,11 +2511,19 @@ class C4gReservationHandler
         }
         $reservationObjectCount = $reservationObjectCount ? $reservationObjectCount : PHP_INT_MAX;
 
-        $currentBookedTimes = $database->prepare("SELECT beginDate,endDate,desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
-        ->execute($typeId,$objectId,$objectType,'1')->fetchAllAssoc(); 
+        if ($allTypesQuantity) {
+            $currentBookedTimes = $database->prepare("SELECT beginDate,endDate,desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object`=? AND NOT `cancellation`=?")
+            ->execute($objectId,'1')->fetchAllAssoc(); 
 
-        $otherObjectsBookedTimes = $database->prepare("SELECT beginDate,endDate,desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`!=? AND `reservationObjectType`=? AND NOT `cancellation`=?")
-        ->execute($typeId,$objectId,$objectType,'1')->fetchAllAssoc(); 
+            $otherObjectsBookedTimes = $database->prepare("SELECT beginDate,endDate,desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_object`!=? AND NOT `cancellation`=?")
+            ->execute($objectId,'1')->fetchAllAssoc(); 
+        } else {
+            $currentBookedTimes = $database->prepare("SELECT beginDate,endDate,desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`=? AND NOT `cancellation`=?")
+            ->execute($typeId,$objectId,'1')->fetchAllAssoc(); 
+
+            $otherObjectsBookedTimes = $database->prepare("SELECT beginDate,endDate,desiredCapacity FROM `tl_c4g_reservation` WHERE `reservation_type`=? AND `reservation_object`!=? AND NOT `cancellation`=?")
+            ->execute($typeId,$objectId,'1')->fetchAllAssoc(); 
+        }
 
         $result = ['dates' => ''];
         $periodType = $listType['periodType'];

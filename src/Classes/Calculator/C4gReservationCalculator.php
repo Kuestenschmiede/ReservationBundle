@@ -57,24 +57,23 @@ class C4gReservationCalculator
 
             $this->objectListString = $objStr;
 
+            $objectIds = [];
+            foreach ($objectList as $object) {
+                $objectIds[] = (string) $object->getId();
+            }
+
             if ($all) {
-                $set = [$beginDate, $endDate, $beginDate, $endDate, $objectTypeId];
+                $set = [$beginDate, $endDate, $beginDate, $endDate];
                 $result = $database->prepare('SELECT * FROM `tl_c4g_reservation` WHERE ' .
-                    "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) AND `reservationObjectType` =? AND NOT `cancellation`='1'")
-                    ->execute($beginDate, $endDate, $beginDate, $endDate, $objectTypeId)->fetchAllAssoc();
+                    "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) AND NOT `cancellation`='1'")
+                    ->execute($beginDate, $endDate, $beginDate, $endDate)->fetchAllAssoc();
             } else {
-                $set = [$beginDate, $endDate, $beginDate, $endDate, $typeId, $objectTypeId];
-                // Normalize object ids array
-                $objectIds = [];
-                foreach ($objectList as $object) {
-                    $objectIds[] = (string) $object->getId();
-                }
+                $set = [$beginDate, $endDate, $beginDate, $endDate, $typeId];
                 if (count($objectIds) > 0) {
                     $placeholders = implode(',', array_fill(0, count($objectIds), '?'));
                     $sql = 'SELECT * FROM `tl_c4g_reservation` WHERE '
                         . "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?)) "
                         . 'AND `reservation_type` = ? '
-                        . 'AND `reservationObjectType` = ? '
                         . 'AND `reservation_object` IN (' . $placeholders . ") "
                         . "AND NOT `cancellation`='1'";
                     $params = array_merge($set, $objectIds);

@@ -78,8 +78,12 @@ function setObjectId(object, typeid, showDateTime) {
 
     if (selectField && (parseInt(selectField.value) !== -1)) {
         for (var i = 0; i < selectField.options.length; i++) {
-            if ((parseInt(selectField.options[i].value) == -1) && selectField.options[i].style.display != "none") {
+            if (parseInt(selectField.options[i].value) == -1) {
                 selectField.options[i].style.display = "none";
+                selectField.options[i].setAttribute('disabled', 'disabled');
+                selectField.options[i].setAttribute('hidden', 'hidden');
+                selectField.options[i].disabled = true;
+                selectField.options[i].hidden = true;
                 break;
             }
         }
@@ -151,21 +155,28 @@ function hideOptions(typeId, values, showDateTime) {
             if (!foundValue && (option.value != -1)) {
                 option.setAttribute('disabled','disabled');
                 option.setAttribute('hidden','hidden');
+                option.style.display = 'none';
+                option.disabled = true;
+                option.hidden = true;
             } else if (option.value != -1) {
-                option.removeAttribute('disabled');
-                option.removeAttribute ('hidden');
                 if (min && capacity && (capacity > 0)) {
                     if ((capacity < min) || (max && (capacity > max))) {
                         option.setAttribute('disabled','disabled');
                         option.setAttribute('hidden','hidden');
+                        option.style.display = 'none';
+                        option.disabled = true;
+                        option.hidden = true;
                     } else {
                         option.removeAttribute('disabled');
                         option.removeAttribute('hidden');
+                        option.style.display = '';
+                        option.disabled = false;
+                        option.hidden = false;
 
                         if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
                             firstKey = i;
                         } else {
-                            if ((firstKey == -1) && (option.value != -1)) {
+                            if ((firstKey === false || firstKey == -1) && (option.value != -1)) {
                                 firstKey = i;
                             }
                         }
@@ -173,11 +184,14 @@ function hideOptions(typeId, values, showDateTime) {
                 } else {
                     option.removeAttribute('disabled');
                     option.removeAttribute('hidden');
+                    option.style.display = '';
+                    option.disabled = false;
+                    option.hidden = false;
                     if ((firstValueParam >= 0)  && (option.value == firstValueParam)) {
                         firstKey = i;
                     } else {
                         var first = selectField.value;
-                        if ((first == -1) && (option.value != -1)) {
+                        if ((first == -1 || firstKey === false) && (option.value != -1)) {
                             firstKey = i;
                         }
                     }
@@ -270,22 +284,33 @@ function hideOptions(typeId, values, showDateTime) {
             }
         }
 
-        if ((parseInt(firstKey) !== -1) && selectField.options[firstKey]) {
+        if ((firstKey !== false) && (parseInt(firstKey) !== -1) && selectField.options[firstKey]) {
           selectField.value = selectField.options[firstKey].value;
           selectField.options[firstKey].removeAttribute('disabled');
           selectField.options[firstKey].removeAttribute('hidden');
-          if (emptyKey != false) {
+          selectField.options[firstKey].style.display = '';
+          selectField.options[firstKey].disabled = false;
+          selectField.options[firstKey].hidden = false;
+          if (emptyKey !== false && selectField.options[emptyKey]) {
               selectField.options[emptyKey].setAttribute('disabled','disabled');
               selectField.options[emptyKey].setAttribute('hidden','hidden');
+              selectField.options[emptyKey].style.display = 'none';
+              selectField.options[emptyKey].disabled = true;
+              selectField.options[emptyKey].hidden = true;
           }
           selectField.removeAttribute('disabled');
+          selectField.disabled = false;
         } else {
-            if (emptyKey != false) {
+            if (emptyKey !== false && selectField.options[emptyKey]) {
               selectField.options[emptyKey].removeAttribute('disabled');
               selectField.options[emptyKey].removeAttribute('hidden');
+              selectField.options[emptyKey].style.display = '';
+              selectField.options[emptyKey].disabled = false;
+              selectField.options[emptyKey].hidden = false;
             }
             selectField.value = -1;
             selectField.setAttribute('disabled','disabled');
+            selectField.disabled = true;
         }
 
         eventFire(selectField,'change');
@@ -703,6 +728,8 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         }
     }
 
+    var renderedCount = 0;
+
     //add new childs to radioGroup
     Object.keys(times)
     .sort(function(a, b) {
@@ -764,9 +791,11 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         } else {
             disabled = true;
         }
-        if (!callFromChangeCapacity) {
-            
+
+        if (disabled) {
+            return;
         }
+
         for (j = 0; j < objArr.length; j++) {
             if (j == 0) {
                 objstr = objstr + objArr[j];
@@ -774,8 +803,6 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
                 objstr = objstr + '-' + objArr[j];
             }
         }
-
-        if(!callFromChangeCapacity) {}
 
         var c4gFormCheck = document.createElement('div');
         c4gFormCheck.className = "c4g__form-check";
@@ -798,11 +825,6 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         c4gFormCheckInput.setAttribute("value", time+'#'+interval);
         c4gFormCheckInput.setAttribute("data-stamp", begin);
         c4gFormCheckInput.setAttribute("data-desc", description);
-        c4gFormCheckInput.style = "display: block;";
-        if (disabled) {
-            c4gFormCheckInput.setAttribute('disabled', disabled);
-            c4gFormCheckInput.setAttribute('hidden', disabled);
-        }
 
         if (percent > 0) {
             c4gFormCheckInput.className = c4gFormCheckInput.className+" radio_object_hurry_up";
@@ -817,6 +839,7 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
 
         if (radioGroup) {
             radioGroup.appendChild(c4gFormCheck);
+            renderedCount++;
         }
 
         if (radioGroup && radioGroup.parentNode && radioGroup.parentNode.parentNode) {
@@ -827,7 +850,12 @@ function addRadioFieldSet(radioGroup, data, additionalId, capacity, showDateTime
         }
     });
 
-    //return objstr;
+    if (radioGroup && renderedCount === 0) {
+        var clearDiv = document.createElement('div');
+        clearDiv.className = "c4g__form-radio-group_clear";
+        clearDiv.innerText = "Keine Zeiten verfügbar.";
+        radioGroup.appendChild(clearDiv);
+    }
 }
 
 function setTimeset(date, additionalId, showDateTime, objectId) {
@@ -1022,10 +1050,19 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                                 eventFire(selectField,'change');
                                 selectField.disabled = true;
                             }
+                            var timeInput = document.getElementById('c4g_beginTime_'+additionalId);
+                            if (timeInput) {
+                                timeInput.value = '';
+                            }
                         }                                    
                     } else {
                         if (targetButton && !targetButton.disabled && !targetButton.classList.contains("radio_object_disabled")) {
                             targetButton.click();
+                        } else {
+                            var timeInput = document.getElementById('c4g_beginTime_'+additionalId+'-33'+objectId);
+                            if (timeInput) {
+                                timeInput.value = '';
+                            }
                         }
                     }
                 }
