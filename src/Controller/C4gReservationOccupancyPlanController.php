@@ -103,6 +103,9 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             $daysInMonth = date('t', $time);
         }
 
+        $month = sprintf('%02d', (int)$month);
+        $year = (string)(int)$year;
+
         $firstWeekday = date('N', $time);
 
         $prevMonth = date('m', strtotime("-1 month", $time));
@@ -115,11 +118,37 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             $this->session->setSessionValue('reservationSettings', $settings->current()->id);
         }
 
+        $monthLabel = $GLOBALS['TL_LANG']['MSC']['month'] ?? 'Monat';
+        $yearLabel = $GLOBALS['TL_LANG']['MSC']['year'] ?? 'Jahr';
+
         $html = '<div id="c4g_occupancy_plan" class="occupancy-plan">';
         $html .= '<div class="calendar-nav">';
-        $html .= '<a class="c4g-calendar-link" href="' . Controller::addToUrl("month=$prevMonth&year=$prevYear", true, ['date']) . '" data-anchor="#c4g_occupancy_plan">&laquo;</a>';
-        $html .= '<span>' . $GLOBALS['TL_LANG']['MONTHS'][intval($month)-1] . ' ' . $year . '</span>';
-        $html .= '<a class="c4g-calendar-link" href="' . Controller::addToUrl("month=$nextMonth&year=$nextYear", true, ['date']) . '" data-anchor="#c4g_occupancy_plan">&raquo;</a>';
+        $html .= '<a class="c4g-calendar-link nav-prev" href="' . Controller::addToUrl("month=$prevMonth&year=$prevYear", true, ['date']) . '" data-anchor="#c4g_occupancy_plan">&laquo;</a>';
+        
+        $html .= '<div class="calendar-nav-selectors">';
+        $html .= '<select class="c4g-calendar-select month-select" aria-label="' . $monthLabel . '" onchange="if(this.value){window.location.href=this.value;}">';
+        for ($m = 1; $m <= 12; $m++) {
+            $mPadded = sprintf('%02d', $m);
+            $monthName = $GLOBALS['TL_LANG']['MONTHS'][$m - 1] ?? date('F', mktime(0, 0, 0, $m, 1));
+            $url = Controller::addToUrl("month=$mPadded&year=$year", true, ['date']);
+            $selected = ((int)$month === $m) ? ' selected="selected"' : '';
+            $html .= '<option value="' . $url . '"' . $selected . '>' . $monthName . '</option>';
+        }
+        $html .= '</select>';
+
+        $curYear = (int)date('Y');
+        $minYear = min($curYear - 5, (int)$year - 5);
+        $maxYear = max($curYear + 15, (int)$year + 5);
+        $html .= '<select class="c4g-calendar-select year-select" aria-label="' . $yearLabel . '" onchange="if(this.value){window.location.href=this.value;}">';
+        for ($y = $minYear; $y <= $maxYear; $y++) {
+            $url = Controller::addToUrl("month=$month&year=$y", true, ['date']);
+            $selected = ((int)$year === $y) ? ' selected="selected"' : '';
+            $html .= '<option value="' . $url . '"' . $selected . '>' . $y . '</option>';
+        }
+        $html .= '</select>';
+        $html .= '</div>';
+
+        $html .= '<a class="c4g-calendar-link nav-next" href="' . Controller::addToUrl("month=$nextMonth&year=$nextYear", true, ['date']) . '" data-anchor="#c4g_occupancy_plan">&raquo;</a>';
         $html .= '</div>';
 
         $html .= '<table class="calendar">';
@@ -206,7 +235,10 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
         $style = '<style>
             .occupancy-plan { width: 100%; max-width: 800px; }
-            .occupancy-plan .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+            .occupancy-plan .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
+            .occupancy-plan .calendar-nav-selectors { display: flex; gap: 8px; align-items: center; }
+            .occupancy-plan .calendar-nav select { padding: 4px 8px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; }
+            .occupancy-plan .calendar-nav a.c4g-calendar-link { font-size: 1.25rem; text-decoration: none; font-weight: bold; padding: 2px 8px; color: inherit; }
             .occupancy-plan table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
             .occupancy-plan th, .occupancy-plan td { border: 1px solid #ccc; text-align: center; padding: 5px; width: 14.28%; height: 60px; vertical-align: top; overflow: hidden; }
             .occupancy-plan td.free { background-color: #d4edda; color: #155724; }
