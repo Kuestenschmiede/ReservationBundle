@@ -250,7 +250,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                 pointer-events: none;
             }
             .occupancy-plan td .day-num { font-weight: bold; display: block; margin-bottom: 2px; }
-            .occupancy-plan td .day-text { font-size: 0.75em; line-height: 1.1; word-wrap: break-word; }
+            .occupancy-plan td .day-text { hyphens: auto; overflow-wrap: normal; word-break: normal; font-size: .75em; line-height: 1.1; /* word-wrap: break-word; */ }
             .occupancy-plan td a { display: block; text-decoration: none; color: inherit; position: relative; z-index: 1; height: 100%; }
             .occupancy-plan .legend ul { list-style: none; padding: 0; margin: 5px 0 0 0; display: flex; flex-wrap: wrap; gap: 10px; }
             .occupancy-plan .legend li { display: flex; align-items: center; font-size: 0.9em; }
