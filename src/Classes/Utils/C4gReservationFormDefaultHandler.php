@@ -181,6 +181,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             $suspensionDates = C4gReservationHandler::getSuspensionDates($reservationSettings);
             $periodType = $listType['periodType'];
             $bookedDays = "";
+            $fullExcludeDates = "";
             if ($periodType == 'day' || $periodType  == 'overnight' || $periodType == 'week') {
                 $bookedDays = C4gReservationHandler::getBookedDays($listType, $reservationObject);
                 if ($bookedDays) {
@@ -190,6 +191,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                     $bookedDays = $bookedDays ? $bookedDays . ',' . $suspensionDates : $suspensionDates;
                 }
                 $reservationBeginDateField->setExcludeDates($bookedDays);
+                $fullExcludeDates = $bookedDays;
             } else {
                 $commaDates = C4gReservationHandler::getDateExclusionString($reservationObjects, $listType, $reservationSettings->removeBookedDays);
                 if ($commaDates) {
@@ -199,6 +201,46 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                     $commaDates = $commaDates ? $commaDates . ',' . $suspensionDates : $suspensionDates;
                 }
                 $reservationBeginDateField->setExcludeDates($commaDates);
+                $fullExcludeDates = $commaDates;
+            }
+
+            $bookableMinDate = C4gReservationHandler::getBookableMinDate($reservationObjects, $listType);
+            $maxDate = C4gReservationHandler::getMaxDate($reservationObjects);
+            $excludeWeekdays = C4gReservationHandler::getWeekdayExclusionString($reservationObjects);
+
+            // Validate $initialBookingDate against past dates, suspension, weekday & date exclusions
+            $isInitialDateValid = true;
+            if ($initialBookingDate) {
+                $checkTimestamp = is_numeric($initialBookingDate) ? (int)$initialBookingDate : strtotime($initialBookingDate);
+                $todayTimestamp = strtotime(date('Y-m-d'));
+                if ($checkTimestamp < $todayTimestamp) {
+                    $isInitialDateValid = false;
+                }
+                if ($bookableMinDate && $checkTimestamp < strtotime(date('Y-m-d', $bookableMinDate))) {
+                    $isInitialDateValid = false;
+                }
+                if ($maxDate && $checkTimestamp > $maxDate) {
+                    $isInitialDateValid = false;
+                }
+                if ($excludeWeekdays) {
+                    $wDay = (string)date('w', $checkTimestamp);
+                    if (in_array($wDay, explode(',', $excludeWeekdays), true)) {
+                        $isInitialDateValid = false;
+                    }
+                }
+                if ($fullExcludeDates) {
+                    $dExArr = array_map('trim', explode(',', $fullExcludeDates));
+                    $date1 = date('Y-m-d', $checkTimestamp);
+                    $date2 = date('d.m.Y', $checkTimestamp);
+                    $date3 = date('d-m-Y', $checkTimestamp);
+                    if (in_array($date1, $dExArr, true) || in_array($date2, $dExArr, true) || in_array($date3, $dExArr, true)) {
+                        $isInitialDateValid = false;
+                    }
+                }
+            }
+
+            if (!$isInitialDateValid) {
+                $initialBookingDate = null;
             }
 
             $reservationBeginDateField->setFieldName('beginDate');
@@ -213,7 +255,7 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 $objDate = new Date($initialBookingDate, Date::getFormatFromRgxp('date'));
                 $initialBookingDateValue = $objDate->date;
             } else {
-                $initialBookingDateValue = C4gReservationHandler::getBookableMinDate($reservationObjects, $listType);
+                $initialBookingDateValue = $bookableMinDate;
             }
 
             if ($typeOfObject == 'fixed_date') {
@@ -249,12 +291,15 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             if ($initialBookingDate) {
                 $objDate = new Date($initialBookingDate, Date::getFormatFromRgxp('date'));
                 $jsInitialDate = $objDate->date;
+            } else if ($bookableMinDate) {
+                $objDate = new Date($bookableMinDate, Date::getFormatFromRgxp('date'));
+                $jsInitialDate = $objDate->date;
             }
             $jsListId = json_encode((string)$listType['id']);
             $jsDateValue = json_encode((string)$jsInitialDate);
             $jsShowDateTimeVal = json_encode((int)$showDateTime);
-            $jsHasUrlDate = json_encode(!!\Contao\Input::get('date'));
-            $script = "var lid=$jsListId;var dv=$jsDateValue;var sdt=$jsShowDateTimeVal;var hud=$jsHasUrlDate;var up=new URLSearchParams(window.location.search);var ud=up.get('date');if(ud){dv=ud}if(dv){if(typeof window.con4gis_reservation_values==='undefined'){window.con4gis_reservation_values={}}if(hud||!window.con4gis_reservation_values[lid]){window.con4gis_reservation_values[lid]=dv}if(hud){document.cookie='reservationInitialDateCookie='+encodeURIComponent(dv)+'; path=/; SameSite=Lax'}}var df=document.getElementById('c4g_beginDate_'+lid);if(dv&&df&&(hud||!df.value)){df.value=dv}var sd=function(){var d=document.getElementById('c4g_beginDate_'+lid);var v=ud||dv;var p=document.getElementById('c4g_beginDate_'+lid+'_picker');if(v&&p&&p.datepicker&&typeof p.datepicker.setDate==='function'){try{var tv=v;if(v.indexOf('-')!==-1&&v.length===10){var pts=v.split('-');tv=new Date(pts[0],pts[1]-1,pts[2])}p.datepicker.setDate(tv);if(d&&d.value!==v){d.value=v}}catch(e){console.error(e)}}else if(p){setTimeout(sd,100)}};setTimeout(sd,100);if(typeof setTimeset==='function'){setTimeset(dv,lid,sdt,0)}if(typeof handleBrickConditions==='function'){handleBrickConditions()}";
+            $jsHasUrlDate = json_encode($isInitialDateValid && !!\Contao\Input::get('date'));
+            $script = "var lid=$jsListId;var dv=$jsDateValue;var sdt=$jsShowDateTimeVal;var hud=$jsHasUrlDate;var up=new URLSearchParams(window.location.search);var ud=hud?up.get('date'):null;if(ud){dv=ud}if(dv){if(typeof window.con4gis_reservation_values==='undefined'){window.con4gis_reservation_values={}}if(hud||!window.con4gis_reservation_values[lid]){window.con4gis_reservation_values[lid]=dv}if(hud){document.cookie='reservationInitialDateCookie='+encodeURIComponent(dv)+'; path=/; SameSite=Lax'}}var df=document.getElementById('c4g_beginDate_'+lid);if(dv&&df&&(hud||!df.value)){df.value=dv}var sd=function(){var d=document.getElementById('c4g_beginDate_'+lid);var v=ud||dv;var p=document.getElementById('c4g_beginDate_'+lid+'_picker');if(v&&p&&p.datepicker&&typeof p.datepicker.setDate==='function'){try{var tv=v;if(v.indexOf('-')!==-1&&v.length===10){var pts=v.split('-');tv=new Date(pts[0],pts[1]-1,pts[2])}p.datepicker.setDate(tv);if(d&&d.value!==v){d.value=v}}catch(e){console.error(e)}}else if(p){setTimeout(sd,100)}};setTimeout(sd,100);if(typeof setTimeset==='function'){setTimeset(dv,lid,sdt,0)}if(typeof handleBrickConditions==='function'){handleBrickConditions()}";
             $this->getDialogParams()->setOnloadScript($script);
             $this->fieldList[] = $reservationBeginDateField;
         }

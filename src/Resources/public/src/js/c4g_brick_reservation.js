@@ -8,6 +8,7 @@
  */
 
 var callFromChangeCapacity = false;
+var activeTimesetRequests = {};
 
 function setObjectId(object, typeid, showDateTime) {
     if (showDateTime === undefined) { showDateTime = 0; }
@@ -64,7 +65,7 @@ function setObjectId(object, typeid, showDateTime) {
         }
     }
 
-    if (oldValue) {
+    if (!objectParam && oldValue) {
        for (var i = 0; i < selectField.options.length; i++) {
            if (!selectField.options[i].getAttribute('hidden') && !selectField.options[i].getAttribute('disabled')) {
                if (selectField.options[i].value == oldValue) {
@@ -874,7 +875,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
     }
 
     var selectField = document.getElementById("c4g_reservation_object_"+additionalId);
-    if (objectId) {
+    if (objectId && selectField) {
         selectField.setAttribute('value',objectId);
         for (i=0;i<selectField.options.length;i++) {
             var option = selectField.options[i];
@@ -884,9 +885,6 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                 option.removeAttribute("selected");
             }
         }
-    } else if (selectField) {
-        selectField.value = -1;
-        eventFire(selectField, 'change');
     }
 
     var durationNode = document.getElementById("c4g_duration_"+additionalId);
@@ -908,6 +906,14 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
     if (date && additionalId) {
         duration = duration ? duration : -1;
         capacity = capacity ? capacity : -1;
+        objectId = objectId ? objectId : 0;
+
+        var requestKey = String(additionalId) + "_" + String(date) + "_" + String(duration) + "_" + String(capacity) + "_" + String(objectId);
+        if (activeTimesetRequests[additionalId] === requestKey) {
+            return;
+        }
+        activeTimesetRequests[additionalId] = requestKey;
+
         var spinners = document.getElementsByClassName('c4g__spinner-wrapper');
         if (spinners && spinners.length > 0) {
             spinners[0].style.display = "flex";
@@ -1028,13 +1034,6 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                         targetButton = visibleButtons[0];
                     }
 
-                    if (!objectId && selectField) {
-                        setObjectId(0,additionalId,showDateTime);
-                        selectField.value = -1;
-                        eventFire(selectField,'change');
-                        selectField.disabled = true;
-                    }
-
                     if (!objectId) {
                         if (targetButton && !targetButton.disabled && !targetButton.classList.contains("radio_object_disabled")) {
                             targetButton.setAttribute("checked", "checked");
@@ -1067,6 +1066,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                     }
                 }
             }).finally(function() {
+                delete activeTimesetRequests[additionalId];
                 var spinners = document.getElementsByClassName("c4g__spinner-wrapper");
                 if (spinners && spinners.length > 0) {
                     spinners[0].style.display = "none";
@@ -1241,25 +1241,6 @@ function checkParticipantsVisibility(typeId) {
                 console.error('Safety re-check failed:', reErr);
             }
         }, 500);
-
-        try {
-            var capacityFields = document.querySelectorAll('input[id*="c4g_desiredCapacity_"]');
-            for (var k = 0; k < capacityFields.length; k++) {
-                var capField = capacityFields[k];
-                var capVal = capField.value ? parseInt(capField.value) : 0;
-                if (capVal > 0) {
-                    // If we have a capacity > 0, we expect participants to be potentially visible
-                    // Trigger change event to fire con4gis listeners
-                    // Check if any participant container is still hidden
-                    var hiddenParticipants = document.querySelectorAll('.c4gGuiSubDialog[id*="reservationParticipants"][style*="display: none"], .c4g_sub_dialog_container[id*="reservationParticipants"][style*="display: none"], .c4gGuiSubDialog[id*="participants"][style*="display: none"], .c4g_sub_dialog_container[id*="participants"][style*="display: none"]');
-                    if (hiddenParticipants.length > 0 && typeof eventFire === 'function') {
-                        eventFire(capField, 'change');
-                    }
-                }
-            }
-        } catch (capErr) {
-            console.error('Error triggering capacity fields:', capErr);
-        }
     } finally {
         isEvaluatingParticipants = false;
     }
@@ -1539,12 +1520,6 @@ function eventFire(el, etype) {
                         var typeIdMatch = field.id.match(/\d+$/);
                         var tId = typeIdMatch ? typeIdMatch[0] : undefined;
                         checkParticipantsVisibility(tId);
-                    }
-                    
-                    // Trigger change to make sure con4gis logic picks it up
-                    // But only if we are not already evaluating participants to avoid loops
-                    if (!isEvaluatingParticipants && typeof eventFire === 'function') {
-                        eventFire(field, 'change');
                     }
                 }
             }

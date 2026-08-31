@@ -196,7 +196,7 @@
             }
 
             if (!$reservationObjectType) {
-                $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
+                $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object ORDER BY sorting, caption")
                     ->execute();
 
                 while ($objects->next()) {
@@ -215,7 +215,7 @@
                 switch ($reservationObjectType) {
                     case '1':
                     case '3':
-                        $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object")
+                        $objects = $this->Database->prepare("SELECT id,caption FROM tl_c4g_reservation_object ORDER BY sorting, caption")
                             ->execute();
 
                         while ($objects->next()) {

@@ -41,9 +41,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'sorting' => array
         (
             'mode'              => 2,
-            'fields'            => array('caption','quantity','desiredCapacityMin','desiredCapacityMax','viewableTypes','time_interval'),
+            'fields'            => array('sorting', 'caption'),
             'panelLayout'       => 'filter;sort,search,limit',
-            'headerFields'      => array('caption','quantity','desiredCapacityMin','desiredCapacityMax','viewableTypes','time_interval'),
         ),
 
         'label' => array
@@ -51,6 +50,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
             'fields'            => array('caption','quantity','desiredCapacityMin','desiredCapacityMax','viewableTypes:tl_c4g_reservation_type.caption','time_interval'),
             'label_callback'    => array($cbClass,'listFields'),
             'showColumns'       => true,
+            'showFirstOrderBy'  => false,
             'operations'        => ['edit','copy','delete','toggle','show']
         ),
 
@@ -104,8 +104,8 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
     //Palettes
     'palettes' => array(
         '__selector__' => ['typeOfObject'],
-        'default'   =>  '{type_legend}, caption, alias, tags, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, typeOfObject, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location,location_id, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id',
-        'fixed_date' => '{type_legend}, caption, alias, tags, options, quantity, priority, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, typeOfObject, min_reservation_day, max_reservation_day, maxBeginTime;{event_legend},event_selection;{event_legend:hide},location,location_id, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id',
+        'default'   =>  '{type_legend}, caption, alias, tags, options, quantity, priority, sorting, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, typeOfObject, min_reservation_day, max_reservation_day, maxBeginTime;{time_interval_legend},time_interval,duration;{booking_wd_legend}, oh_monday,oh_tuesday, oh_wednesday,oh_thursday, oh_friday,oh_saturday,oh_sunday;{event_legend},event_selection;{exclusion_legend}, days_exclusion;{event_legend:hide},location,location_id, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id',
+        'fixed_date' => '{type_legend}, caption, alias, tags, options, quantity, priority, sorting, description, image, desiredCapacityMin, desiredCapacityMax, viewableTypes, typeOfObject, min_reservation_day, max_reservation_day, maxBeginTime;{event_legend},event_selection;{event_legend:hide},location,location_id, speaker, topic, targetAudience; {price_legend:hide},price,taxOptions,priceoption;{expert_legend:hide},allTypesQuantity, allTypesValidity, allTypesEvents, switchAllTypes, notification_type;{publish_legend}, published, member_id',
     ),
 
     //Subpalettes
@@ -120,6 +120,18 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_object'] = array
         'id' => array
         (
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
+        ),
+
+        'sorting' => array
+        (
+            'label'             => &$GLOBALS['TL_LANG']['tl_c4g_reservation_object']['sorting'],
+            'exclude'           => true,
+            'default'           => 0,
+            'sorting'           => true,
+            'search'            => false,
+            'inputType'         => 'text',
+            'eval'              => array('rgxp' => 'digit', 'mandatory' => false, 'tl_class' => 'w50'),
+            'sql'               => "int(10) unsigned NOT NULL default 0"
         ),
 
         'member_id' => array

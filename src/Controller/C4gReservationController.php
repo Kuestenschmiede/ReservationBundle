@@ -917,7 +917,6 @@ class C4gReservationController extends C4GBaseController
             }
             if ($date) {
                 $initialDate = $date;
-                $this->session->setSessionValue('reservationInitialDateCookie', $initialDate);
                 if (!is_numeric($initialDate)) {
                     $dateTime = \DateTime::createFromFormat('Y-m-d', $initialDate);
                     if ($dateTime !== false) {
@@ -926,6 +925,12 @@ class C4gReservationController extends C4GBaseController
                     } else {
                         $initialDate = strtotime(C4GBrickCommon::getLongDateToConvert($GLOBALS['TL_CONFIG']['dateFormat'], $initialDate));
                     }
+                }
+                if ($initialDate && $initialDate < strtotime(date('Y-m-d'))) {
+                    $initialDate = 0;
+                    $this->session->setSessionValue('reservationInitialDateCookie', 0);
+                } else if ($initialDate) {
+                    $this->session->setSessionValue('reservationInitialDateCookie', $initialDate);
                 }
             }
 

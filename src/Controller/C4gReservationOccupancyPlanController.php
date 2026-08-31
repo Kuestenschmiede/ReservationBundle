@@ -78,6 +78,11 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
         $jumpToNext = $this->jump_to_next_possible_date === null ? true : (bool)$this->jump_to_next_possible_date;
 
+        $planMaxTimestamp = $this->getPlanMaxReservationTimestamp($objects);
+        $planMaxYear = $planMaxTimestamp !== null ? (int)date('Y', $planMaxTimestamp) : null;
+        $planMaxMonth = $planMaxTimestamp !== null ? (int)date('m', $planMaxTimestamp) : null;
+        $planMaxMonthTime = $planMaxTimestamp !== null ? strtotime(date('Y-m-01', $planMaxTimestamp)) : null;
+
         $hasMonthParam = Input::get('month') !== null && Input::get('month') !== '';
         $hasYearParam = Input::get('year') !== null && Input::get('year') !== '';
 
@@ -95,11 +100,29 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             $month = Input::get('month') ?: date('m');
             $year = Input::get('year') ?: date('Y');
             $time = strtotime("$year-$month-01");
+            if ($time < strtotime(date('Y-m-01'))) {
+                $month = date('m');
+                $year = date('Y');
+                $time = strtotime("$year-$month-01");
+            } elseif ($planMaxMonthTime !== null && $time > $planMaxMonthTime) {
+                $month = sprintf('%02d', $planMaxMonth);
+                $year = (string)$planMaxYear;
+                $time = strtotime("$year-$month-01");
+            }
             $daysInMonth = date('t', $time);
             $reservations = $this->getReservations($objects, $month, $year);
             $occupancy = $this->calculateOccupancy($objects, $reservations, $daysInMonth, $month, $year);
         } else {
             $time = strtotime("$year-$month-01");
+            if ($time < strtotime(date('Y-m-01'))) {
+                $month = date('m');
+                $year = date('Y');
+                $time = strtotime("$year-$month-01");
+            } elseif ($planMaxMonthTime !== null && $time > $planMaxMonthTime) {
+                $month = sprintf('%02d', $planMaxMonth);
+                $year = (string)$planMaxYear;
+                $time = strtotime("$year-$month-01");
+            }
             $daysInMonth = date('t', $time);
         }
 
@@ -121,9 +144,19 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         $monthLabel = $GLOBALS['TL_LANG']['MSC']['month'] ?? 'Monat';
         $yearLabel = $GLOBALS['TL_LANG']['MSC']['year'] ?? 'Jahr';
 
+        $curYear = (int)date('Y');
+        $curMonth = (int)date('m');
+        $prevMonthTime = strtotime("$prevYear-$prevMonth-01");
+        $curMonthTime = strtotime(date('Y-m-01'));
+        $nextMonthTime = strtotime("$nextYear-$nextMonth-01");
+
         $html = '<div id="c4g_occupancy_plan" class="occupancy-plan">';
         $html .= '<div class="calendar-nav">';
-        $html .= '<a class="c4g-calendar-link nav-prev" href="' . Controller::addToUrl("month=$prevMonth&year=$prevYear", true, ['date']) . '" data-anchor="#c4g_occupancy_plan">&laquo;</a>';
+        if ($prevMonthTime < $curMonthTime) {
+            $html .= '<span class="c4g-calendar-link nav-prev disabled" aria-disabled="true" style="pointer-events: none; opacity: 0.35;">&laquo;</span>';
+        } else {
+            $html .= '<a class="c4g-calendar-link nav-prev" href="' . Controller::addToUrl("month=$prevMonth&year=$prevYear", true, ['date']) . '" data-anchor="#c4g_occupancy_plan">&laquo;</a>';
+        }
         
         $html .= '<div class="calendar-nav-selectors">';
         $html .= '<select class="c4g-calendar-select month-select" aria-label="' . $monthLabel . '" onchange="if(this.value){window.location.href=this.value;}">';
@@ -132,13 +165,27 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             $monthName = $GLOBALS['TL_LANG']['MONTHS'][$m - 1] ?? date('F', mktime(0, 0, 0, $m, 1));
             $url = Controller::addToUrl("month=$mPadded&year=$year", true, ['date']);
             $selected = ((int)$month === $m) ? ' selected="selected"' : '';
-            $html .= '<option value="' . $url . '"' . $selected . '>' . $monthName . '</option>';
+            $disabled = false;
+            if ((int)$year === $curYear && $m < $curMonth) {
+                $disabled = true;
+            }
+            if ($planMaxYear !== null) {
+                if ((int)$year === $planMaxYear && $m > $planMaxMonth) {
+                    $disabled = true;
+                } elseif ((int)$year > $planMaxYear) {
+                    $disabled = true;
+                }
+            }
+            $disabledAttr = $disabled ? ' disabled="disabled"' : '';
+            $html .= '<option value="' . $url . '"' . $selected . $disabledAttr . '>' . $monthName . '</option>';
         }
         $html .= '</select>';
 
-        $curYear = (int)date('Y');
-        $minYear = min($curYear - 5, (int)$year - 5);
-        $maxYear = max($curYear + 15, (int)$year + 5);
+        $minYear = $curYear;
+        $maxYear = $planMaxYear !== null ? $planMaxYear : max($curYear + 15, (int)$year + 5);
+        if ($maxYear < $minYear) {
+            $maxYear = $minYear;
+        }
         $html .= '<select class="c4g-calendar-select year-select" aria-label="' . $yearLabel . '" onchange="if(this.value){window.location.href=this.value;}">';
         for ($y = $minYear; $y <= $maxYear; $y++) {
             $url = Controller::addToUrl("month=$month&year=$y", true, ['date']);
@@ -148,7 +195,11 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         $html .= '</select>';
         $html .= '</div>';
 
-        $html .= '<a class="c4g-calendar-link nav-next" href="' . Controller::addToUrl("month=$nextMonth&year=$nextYear", true, ['date']) . '" data-anchor="#c4g_occupancy_plan">&raquo;</a>';
+        if ($planMaxMonthTime !== null && $nextMonthTime > $planMaxMonthTime) {
+            $html .= '<span class="c4g-calendar-link nav-next disabled" aria-disabled="true" style="pointer-events: none; opacity: 0.35;">&raquo;</span>';
+        } else {
+            $html .= '<a class="c4g-calendar-link nav-next" href="' . Controller::addToUrl("month=$nextMonth&year=$nextYear", true, ['date']) . '" data-anchor="#c4g_occupancy_plan">&raquo;</a>';
+        }
         $html .= '</div>';
 
         $html .= '<table class="calendar">';
@@ -171,14 +222,20 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             }
 
             $dateStr = sprintf('%04d-%02d-%02d', $year, $month, $day);
-            $dateFormatted = Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], strtotime($dateStr));
+            $dayTimestamp = strtotime($dateStr);
+            $dayWeekday = (int)date('N', $dayTimestamp);
+            $isWeekend = ($dayWeekday === 6 || $dayWeekday === 7);
+
+            $dateFormatted = Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], $dayTimestamp);
             // Ensure no leading/trailing whitespace which might trip up the regex
             $dateFormatted = trim($dateFormatted);
             $occData = $occupancy[$day];
             $status = $occData['status']; // 'free', 'booked', 'partial'
             $text = $occData['text'];
+            $splitClass = !empty($occData['split']) ? ' ' . $occData['split'] : '';
+            $weekendClass = $isWeekend ? ' weekend' : '';
             
-            $class = "day $status";
+            $class = "day $status" . $weekendClass . $splitClass;
             $link = '';
             if (($status === 'free' || $status === 'partial') && $this->reservation_form_site) {
                 $page = PageModel::findByPk($this->reservation_form_site);
@@ -189,9 +246,14 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                 }
             }
 
-            $html .= '<td class="' . $class . '">';
+            $customStyle = '';
+            if (!empty($occData['color'])) {
+                $customStyle = ' style="background-color: ' . htmlspecialchars($this->formatColor($occData['color'])) . ' !important;"';
+            }
+
+            $html .= '<td class="' . $class . '"' . $customStyle . '>';
             if ($link) {
-                $html .= '<a class="c4g-calendar-link" href="' . $link . '" data-anchor="' . $anchor . '"><span class="day-num">' . $day . '</span>';
+                $html .= '<a class="c4g-calendar-link" href="' . $link . '" data-date="' . $dateFormatted . '" data-anchor="' . $anchor . '"><span class="day-num">' . $day . '</span>';
             } else {
                 $html .= '<span><span class="day-num">' . $day . '</span>';
             }
@@ -206,7 +268,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                 $html .= '</span>';
             }
 
-            if ($status === 'partial') {
+            if ($status === 'partial' && empty($occData['split'])) {
                 $html .= '<div class="triangle"></div>';
             }
             $html .= '</td>';
@@ -233,12 +295,18 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
         $html .= '</div>';
 
+        $weekendCss = '';
+        if (!empty($this->colorize_weekends)) {
+            $wColor = !empty($this->weekend_color) ? $this->formatColor($this->weekend_color) : '#eaeaea';
+            $weekendCss = ".occupancy-plan td.weekend, .occupancy-plan td.weekend.free, .occupancy-plan td.weekend.booked { background-color: {$wColor}; }";
+        }
+
         $style = '<style>
             .occupancy-plan { width: 100%; max-width: 800px; }
             .occupancy-plan .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
             .occupancy-plan .calendar-nav-selectors { display: flex; gap: 8px; align-items: center; }
             .occupancy-plan .calendar-nav select { padding: 4px 8px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; }
-            .occupancy-plan .calendar-nav a.c4g-calendar-link { font-size: 1.25rem; text-decoration: none; font-weight: bold; padding: 2px 8px; color: inherit; }
+            .occupancy-plan .calendar-nav a.c4g-calendar-link, .occupancy-plan .calendar-nav span.c4g-calendar-link { font-size: 1.25rem; text-decoration: none; font-weight: bold; padding: 2px 8px; color: inherit; }
             .occupancy-plan table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
             .occupancy-plan th, .occupancy-plan td { border: 1px solid #ccc; text-align: center; padding: 5px; width: 14.28%; height: 60px; vertical-align: top; overflow: hidden; }
             .occupancy-plan td.free { background-color: #d4edda; color: #155724; }
@@ -249,6 +317,15 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                 border-style: solid; border-width: 0 20px 20px 0; border-color: transparent #f8d7da transparent transparent;
                 pointer-events: none;
             }
+            .occupancy-plan td.split-morning-booked {
+                background: linear-gradient(135deg, #f8d7da 50%, #d4edda 50%) !important;
+                color: #155724;
+            }
+            .occupancy-plan td.split-afternoon-booked {
+                background: linear-gradient(135deg, #d4edda 50%, #f8d7da 50%) !important;
+                color: #155724;
+            }
+            ' . $weekendCss . '
             .occupancy-plan td .day-num { font-weight: bold; display: block; margin-bottom: 2px; }
             .occupancy-plan td .day-text { hyphens: auto; overflow-wrap: normal; word-break: normal; font-size: .75em; line-height: 1.1; /* word-wrap: break-word; */ }
             .occupancy-plan td a { display: block; text-decoration: none; color: inherit; position: relative; z-index: 1; height: 100%; }
@@ -266,14 +343,77 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             }
         </style>';
 
-        return $style . $html;
+        $script = '<script>
+        (function() {
+            function initOccupancyPlanLinks() {
+                var container = document.getElementById("c4g_occupancy_plan");
+                if (!container) return;
+                var links = container.querySelectorAll("td a.c4g-calendar-link");
+                links.forEach(function(link) {
+                    link.addEventListener("click", function(e) {
+                        var dateVal = link.getAttribute("data-date");
+                        if (!dateVal) return;
+                        var formInputs = document.querySelectorAll(\'input[id^="c4g_beginDate_"]:not([id$="_picker"])\');
+                        if (formInputs && formInputs.length > 0) {
+                            e.preventDefault();
+                            formInputs.forEach(function(input) {
+                                input.value = dateVal;
+                                var pickerId = input.id + "_picker";
+                                var picker = document.getElementById(pickerId);
+                                if (picker && picker.datepicker && typeof picker.datepicker.setDate === "function") {
+                                    var tv = dateVal;
+                                    if (dateVal.indexOf("-") !== -1 && dateVal.length === 10) {
+                                        var pts = dateVal.split("-");
+                                        tv = new Date(pts[0], pts[1] - 1, pts[2]);
+                                    }
+                                    picker.datepicker.setDate(tv);
+                                }
+                                var listId = input.id.replace("c4g_beginDate_", "");
+                                if (typeof setTimeset === "function") {
+                                    setTimeset(dateVal, listId, 1, 0);
+                                } else {
+                                    var evt = new Event("change", { bubbles: true });
+                                    input.dispatchEvent(evt);
+                                }
+                            });
+                            if (window.history && window.history.pushState) {
+                                var newUrl = new URL(window.location.href);
+                                newUrl.searchParams.set("date", dateVal);
+                                window.history.pushState({ date: dateVal }, "", newUrl.toString());
+                            }
+                            var target = document.getElementById("c4g_reservation_form") || formInputs[0];
+                            if (target) {
+                                target.scrollIntoView({ behavior: "smooth", block: "start" });
+                                if (typeof target.focus === "function") {
+                                    target.focus({ preventScroll: true });
+                                }
+                            }
+                        }
+                    });
+                });
+            }
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", initOccupancyPlanLinks);
+            } else {
+                initOccupancyPlanLinks();
+            }
+        })();
+        </script>';
+
+        return $style . $html . $script;
     }
 
     protected function findFirstFreeMonth($objects, $maxMonths = 60): ?array
     {
+        $planMaxTimestamp = $this->getPlanMaxReservationTimestamp($objects);
+        $planMaxMonthTime = $planMaxTimestamp !== null ? strtotime(date('Y-m-01', $planMaxTimestamp)) : null;
+
         $curTime = strtotime(date('Y-m-01'));
         for ($i = 0; $i < $maxMonths; $i++) {
             $checkTime = strtotime("+$i month", $curTime);
+            if ($planMaxMonthTime !== null && $checkTime > $planMaxMonthTime) {
+                break;
+            }
             $checkMonth = date('m', $checkTime);
             $checkYear = date('Y', $checkTime);
             $daysInMonth = date('t', $checkTime);
@@ -329,7 +469,24 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             return [];
         }
 
+        usort($validObjects, function($a, $b) use ($objectModels) {
+            $modelA = $objectModels[$a];
+            $modelB = $objectModels[$b];
+            $sortA = (int)($modelA->sorting ?? 0);
+            $sortB = (int)($modelB->sorting ?? 0);
+            if ($sortA !== $sortB) {
+                return $sortA <=> $sortB;
+            }
+            $captionCmp = strcmp((string)($modelA->caption ?? ''), (string)($modelB->caption ?? ''));
+            if ($captionCmp !== 0) {
+                return $captionCmp;
+            }
+            return (int)$a <=> (int)$b;
+        });
+
         $suspensionDates = [];
+        $suspensionModels = [];
+
         $settings = C4gReservationSettingsModel::findAll();
         if ($settings) {
             foreach ($settings as $setting) {
@@ -338,32 +495,49 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                     $models = C4gReservationSuspensionModel::findMultipleByIds($listIds);
                     if ($models) {
                         foreach ($models as $suspension) {
-                            if ($suspension->suspension_dates) {
-                                $dates = StringUtil::deserialize($suspension->suspension_dates, true);
-                                foreach ($dates as $dateEntry) {
-                                    if ($dateEntry['date']) {
-                                        $dateStartStr = is_numeric($dateEntry['date']) ? date('Y-m-d', (int)$dateEntry['date']) : $dateEntry['date'];
-                                        $exStart = strtotime($dateStartStr . ' 00:00:00');
-                                        if (isset($dateEntry['date_end']) && $dateEntry['date_end']) {
-                                            $dateEndStr = is_numeric($dateEntry['date_end']) ? date('Y-m-d', (int)$dateEntry['date_end']) : $dateEntry['date_end'];
-                                            $exEnd = strtotime($dateEndStr . ' 23:59:59');
-                                        } else {
-                                            $exEnd = strtotime($dateStartStr . ' 23:59:59');
-                                        }
-                                        $suspensionDates[] = [
-                                            'start' => $exStart,
-                                            'end' => $exEnd,
-                                            'caption' => $suspension->caption,
-                                            'showCaption' => (bool)$suspension->showCaption,
-                                            'showComment' => (bool)$suspension->showComment,
-                                            'showCompany' => (bool)$suspension->showCompany,
-                                            'comment' => $dateEntry['comment'] ?? '',
-                                            'company' => $dateEntry['company'] ?? '',
-                                            'priority' => 10
-                                        ];
-                                    }
-                                }
-                            }
+                            $suspensionModels[$suspension->id] = $suspension;
+                        }
+                    }
+                }
+            }
+        }
+
+        $allSuspensions = C4gReservationSuspensionModel::findAll();
+        if ($allSuspensions) {
+            foreach ($allSuspensions as $suspension) {
+                $suspensionModels[$suspension->id] = $suspension;
+            }
+        }
+
+        foreach ($suspensionModels as $suspension) {
+            if ($suspension->suspension_dates) {
+                $dates = StringUtil::deserialize($suspension->suspension_dates, true);
+                foreach ($dates as $dateEntry) {
+                    if (!empty($dateEntry['date'])) {
+                        $exStart = $this->parseDateToTimestamp($dateEntry['date'], false);
+                        if (!empty($dateEntry['date_end'])) {
+                            $exEnd = $this->parseDateToTimestamp($dateEntry['date_end'], true);
+                        } else {
+                            $exEnd = $this->parseDateToTimestamp($dateEntry['date'], true);
+                        }
+
+                        if ($exStart !== null && $exEnd !== null) {
+                            $comment = trim((string)($dateEntry['comment'] ?? ''));
+                            $company = trim((string)($dateEntry['company'] ?? ''));
+                            $caption = trim((string)($suspension->caption ?? ''));
+
+                            $suspensionDates[] = [
+                                'start' => $exStart,
+                                'end' => $exEnd,
+                                'caption' => $caption,
+                                'showCaption' => (bool)$suspension->showCaption,
+                                'showComment' => (bool)$suspension->showComment,
+                                'showCompany' => (bool)$suspension->showCompany,
+                                'comment' => $comment,
+                                'company' => $company,
+                                'color' => !empty($dateEntry['color']) ? $dateEntry['color'] : (!empty($suspension->suspension_color) ? $suspension->suspension_color : ''),
+                                'priority' => 10
+                            ];
                         }
                     }
                 }
@@ -373,27 +547,34 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         foreach ($objectModels as $objId => $objModel) {
             if ($objModel && $objModel->days_exclusion) {
                 $exclusions = StringUtil::deserialize($objModel->days_exclusion, true);
+                $exclusionText = trim((string)($objModel->days_exclusion_text ?? ''));
                 foreach ($exclusions as $exclusion) {
-                    if ($exclusion['date_exclusion']) {
-                        $dateStartStr = is_numeric($exclusion['date_exclusion']) ? date('Y-m-d', (int)$exclusion['date_exclusion']) : $exclusion['date_exclusion'];
-                        $exStart = strtotime($dateStartStr . ' 00:00:00');
-                        if (isset($exclusion['date_exclusion_end']) && $exclusion['date_exclusion_end']) {
-                            $dateEndStr = is_numeric($exclusion['date_exclusion_end']) ? date('Y-m-d', (int)$exclusion['date_exclusion_end']) : $exclusion['date_exclusion_end'];
-                            $exEnd = strtotime($dateEndStr . ' 23:59:59');
+                    if (!empty($exclusion['date_exclusion'])) {
+                        $exStart = $this->parseDateToTimestamp($exclusion['date_exclusion'], false);
+                        if (!empty($exclusion['date_exclusion_end'])) {
+                            $exEnd = $this->parseDateToTimestamp($exclusion['date_exclusion_end'], true);
                         } else {
-                            $exEnd = strtotime($dateStartStr . ' 23:59:59');
+                            $exEnd = $this->parseDateToTimestamp($exclusion['date_exclusion'], true);
                         }
-                        $suspensionDates[] = [
-                            'start' => $exStart,
-                            'end' => $exEnd,
-                            'caption' => $exclusion['reason_exclusion'] ?? '',
-                            'showCaption' => true,
-                            'showComment' => false,
-                            'showCompany' => false,
-                            'comment' => '',
-                            'company' => '',
-                            'priority' => 5
-                        ];
+
+                        if ($exStart !== null && $exEnd !== null) {
+                            $reason = trim((string)($exclusion['reason_exclusion'] ?? ($exclusion['text'] ?? ($exclusion['comment'] ?? $exclusionText))));
+                            if ($reason === '') {
+                                $reason = $exclusionText ?: 'Gesperrt';
+                            }
+                            $suspensionDates[] = [
+                                'start' => $exStart,
+                                'end' => $exEnd,
+                                'caption' => $reason,
+                                'showCaption' => true,
+                                'showComment' => true,
+                                'showCompany' => false,
+                                'comment' => $reason,
+                                'company' => '',
+                                'color' => '',
+                                'priority' => 5
+                            ];
+                        }
                     }
                 }
             }
@@ -406,22 +587,38 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
             $isGlobalSuspended = false;
             $suspensionText = '';
+            $suspensionColor = '';
             $reservationTexts = [];
             $maxPriority = -1;
+            $maxColorPriority = -1;
             foreach ($suspensionDates as $sDate) {
                 if ($dayStart <= $sDate['end'] && $dayEnd >= $sDate['start']) {
                     $isGlobalSuspended = true;
-                    if ($sDate['priority'] > $maxPriority) {
+                    if (!empty($sDate['color']) && $sDate['priority'] > $maxColorPriority) {
+                        $suspensionColor = $sDate['color'];
+                        $maxColorPriority = $sDate['priority'];
+                    }
+                    if ($sDate['priority'] > $maxPriority || ($sDate['priority'] === $maxPriority && empty($suspensionText))) {
                         $currentText = '';
-                        if ($sDate['showComment'] && $sDate['comment']) {
+                        if ($sDate['showComment'] && !empty($sDate['comment'])) {
                             $currentText = $sDate['comment'];
-                        } elseif ($sDate['showCompany'] && $sDate['company']) {
+                        } elseif ($sDate['showCompany'] && !empty($sDate['company'])) {
                             $currentText = $sDate['company'];
-                        } elseif ($sDate['showCaption'] && $sDate['caption']) {
+                        } elseif ($sDate['showCaption'] && !empty($sDate['caption'])) {
                             $currentText = $sDate['caption'];
                         }
 
-                        if ($currentText) {
+                        if ($currentText === '') {
+                            if (!empty($sDate['comment'])) {
+                                $currentText = $sDate['comment'];
+                            } elseif (!empty($sDate['caption'])) {
+                                $currentText = $sDate['caption'];
+                            } elseif (!empty($sDate['company'])) {
+                                $currentText = $sDate['company'];
+                            }
+                        }
+
+                        if ($currentText !== '') {
                             $suspensionText = $currentText;
                             $maxPriority = $sDate['priority'];
                         }
@@ -431,11 +628,15 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
             $dayBookedCount = 0;
             $dayPartialCount = 0;
+            $objectBookedMap = [];
+
             if ($isGlobalSuspended) {
                 $dayBookedCount = count($validObjects);
                 $occupancy[$day] = [
                     'status' => 'booked',
-                    'text' => $suspensionText
+                    'text' => $suspensionText,
+                    'color' => $suspensionColor,
+                    'split' => ''
                 ];
             } else {
                 foreach ($validObjects as $objId) {
@@ -472,6 +673,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
                     if (!$hasOpeningHours) {
                         $dayBookedCount++;
+                        $objectBookedMap[$objId] = true;
                         continue;
                     }
 
@@ -499,7 +701,28 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
                     if ($isObjectExcluded) {
                         $dayBookedCount++;
+                        $objectBookedMap[$objId] = true;
                         continue;
+                    }
+
+                    $maxDays = isset($objModel->max_reservation_day) && is_numeric($objModel->max_reservation_day) ? (int)$objModel->max_reservation_day : 0;
+                    if ($maxDays > 0) {
+                        $objMaxDate = strtotime("+$maxDays days", strtotime(date('Y-m-d 23:59:59')));
+                        if ($dayStart > $objMaxDate) {
+                            $dayBookedCount++;
+                            $objectBookedMap[$objId] = true;
+                            continue;
+                        }
+                    }
+
+                    $minDays = isset($objModel->min_reservation_day) && is_numeric($objModel->min_reservation_day) ? (int)$objModel->min_reservation_day : 0;
+                    if ($minDays > 0) {
+                        $objMinDate = strtotime("+$minDays days", strtotime(date('Y-m-d 00:00:00')));
+                        if ($dayEnd < $objMinDate) {
+                            $dayBookedCount++;
+                            $objectBookedMap[$objId] = true;
+                            continue;
+                        }
                     }
 
                     $objQuantity = $objModel->quantity ?: 1;
@@ -510,6 +733,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                     $bookedCount = count($objReservations);
                     if ($bookedCount >= $objQuantity) {
                         $dayBookedCount++;
+                        $objectBookedMap[$objId] = true;
                         if (!empty($this->show_occupancy_name)) {
                             foreach ($objReservations as $res) {
                                 $org = isset($res['organisation']) ? trim((string)$res['organisation']) : '';
@@ -522,6 +746,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                         }
                     } elseif ($bookedCount > 0) {
                         $dayPartialCount++;
+                        $objectBookedMap[$objId] = false;
                         if (!empty($this->show_occupancy_name)) {
                             foreach ($objReservations as $res) {
                                 $org = isset($res['organisation']) ? trim((string)$res['organisation']) : '';
@@ -532,22 +757,98 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                                 }
                             }
                         }
+                    } else {
+                        $objectBookedMap[$objId] = false;
                     }
                 }
             }
 
             if (!isset($occupancy[$day])) {
-                $reservationText = implode(', ', $reservationTexts);
+                $reservationText = $suspensionText ?: implode(', ', $reservationTexts);
+                $split = '';
+                if (count($validObjects) === 2 && count($objectBookedMap) === 2) {
+                    $firstId = $validObjects[0];
+                    $secondId = $validObjects[1];
+                    $firstBooked = !empty($objectBookedMap[$firstId]);
+                    $secondBooked = !empty($objectBookedMap[$secondId]);
+                    if ($firstBooked && !$secondBooked) {
+                        $split = 'split-morning-booked';
+                    } elseif (!$firstBooked && $secondBooked) {
+                        $split = 'split-afternoon-booked';
+                    }
+                }
+
                 if ($dayBookedCount >= count($validObjects) || $dayEnd < time()) {
-                    $occupancy[$day] = ['status' => 'booked', 'text' => $reservationText];
-                } elseif ($dayBookedCount > 0 || $dayPartialCount > 0) {
-                    $occupancy[$day] = ['status' => 'partial', 'text' => $reservationText];
+                    $occupancy[$day] = ['status' => 'booked', 'text' => $reservationText, 'color' => $suspensionColor, 'split' => ''];
+                } elseif ($dayBookedCount > 0 || $dayPartialCount > 0 || $split !== '') {
+                    $occupancy[$day] = ['status' => 'partial', 'text' => $reservationText, 'color' => $suspensionColor, 'split' => $split];
                 } else {
-                    $occupancy[$day] = ['status' => 'free', 'text' => ''];
+                    $occupancy[$day] = ['status' => 'free', 'text' => $reservationText, 'color' => $suspensionColor, 'split' => ''];
                 }
             }
         }
 
         return $occupancy;
+    }
+
+    protected function formatColor($color): string
+    {
+        $color = trim((string)$color);
+        if ($color === '') {
+            return '';
+        }
+        if (preg_match('/^[0-9a-fA-F]{3,8}$/', $color)) {
+            return '#' . $color;
+        }
+        return $color;
+    }
+
+    protected function parseDateToTimestamp($rawDate, bool $isEndOfDay = false): ?int
+    {
+        if (empty($rawDate)) {
+            return null;
+        }
+        if (is_numeric($rawDate)) {
+            $dateStr = date('Y-m-d', (int)$rawDate);
+        } else {
+            $rawDate = trim((string)$rawDate);
+            if (preg_match('/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/', $rawDate, $m)) {
+                $dateStr = sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+            } else {
+                $ts = strtotime($rawDate);
+                if ($ts === false) {
+                    return null;
+                }
+                $dateStr = date('Y-m-d', $ts);
+            }
+        }
+        $timeStr = $isEndOfDay ? '23:59:59' : '00:00:00';
+        $res = strtotime($dateStr . ' ' . $timeStr);
+        return $res !== false ? $res : null;
+    }
+
+    protected function getPlanMaxReservationTimestamp(array $objects): ?int
+    {
+        $todayEnd = strtotime(date('Y-m-d 23:59:59'));
+        $maxTimestamps = [];
+        $hasUnrestricted = false;
+
+        foreach ($objects as $objId) {
+            $model = C4gReservationObjectModel::findByPk($objId);
+            if ($model) {
+                $maxDays = isset($model->max_reservation_day) && is_numeric($model->max_reservation_day) ? (int)$model->max_reservation_day : 0;
+                if ($maxDays > 0) {
+                    $maxTimestamps[] = strtotime("+$maxDays days", $todayEnd);
+                } else {
+                    $hasUnrestricted = true;
+                }
+            }
+        }
+
+        if (empty($maxTimestamps) || $hasUnrestricted) {
+            return null;
+        }
+
+        return max($maxTimestamps);
     }
 }

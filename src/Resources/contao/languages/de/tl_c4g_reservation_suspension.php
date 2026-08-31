@@ -11,6 +11,7 @@
 $str = 'tl_c4g_reservation_suspension';
 
 $GLOBALS['TL_LANG'][$str]['caption'] = array("Bezeichnung", "Geben Sie eine Bezeichnung für die Sperrtage-Liste ein.");
+$GLOBALS['TL_LANG'][$str]['suspension_color'] = array("Farbe im Belegungsplan", "Wählen Sie eine Hintergrundfarbe für alle Sperrtage dieses Datensatzes im Belegungsplan (kann bei einzelnen Terminen überschrieben werden).");
 $GLOBALS['TL_LANG'][$str]['showCaption'] = array("Bezeichnung im Belegungsplan anzeigen", "Zeigt die Bezeichnung im Belegungsplan an.");
 $GLOBALS['TL_LANG'][$str]['showComment'] = array("Kommentare im Belegungsplan anzeigen", "Zeigt die Kommentare zu den Sperrtagen im Belegungsplan an.");
 $GLOBALS['TL_LANG'][$str]['showCompany'] = array("Firmenname im Belegungsplan anzeigen", "Zeigt den Firmennamen im Belegungsplan an.");
@@ -18,6 +19,7 @@ $GLOBALS['TL_LANG'][$str]['suspension_dates'] = array("Sperrtage", "Fügen Sie h
 $GLOBALS['TL_LANG'][$str]['date'] = array("Datum", "");
 $GLOBALS['TL_LANG'][$str]['comment'] = array("Kommentar", "Optionaler Kommentar (z.B. Grund der Sperrung).");
 $GLOBALS['TL_LANG'][$str]['company'] = array("Firmenname", "Geben Sie hier den Firmennamen ein.");
+$GLOBALS['TL_LANG'][$str]['color'] = array("Farbe", "Optionale abweichende Farbe für diesen einzelnen Sperrtag im Belegungsplan.");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['suspension_legend'] = "Allgemeine Einstellungen";

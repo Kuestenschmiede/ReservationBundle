@@ -1942,13 +1942,13 @@ class C4gReservationHandler
         System::loadLanguageFile('fe_c4g_reservation', $GLOBALS['TL_LANGUAGE']);
 
         if ($objectId && is_numeric($objectId)) {
-            $sql = "SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND id = ? ORDER BY caption";
+            $sql = "SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND id = ? ORDER BY sorting, caption";
             $allObjects = $database->prepare($sql)->execute('1', $objectId)->fetchAllAssoc();
         } else if ($objectId && is_string($objectId)) {
-            $sql = "SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND alias = ? ORDER BY caption";
+            $sql = "SELECT * FROM tl_c4g_reservation_object WHERE published = ? AND alias = ? ORDER BY sorting, caption";
             $allObjects = $database->prepare($sql)->execute('1', $objectId)->fetchAllAssoc();
         } else {
-            $sql = "SELECT * FROM tl_c4g_reservation_object WHERE published = ? ORDER BY caption";
+            $sql = "SELECT * FROM tl_c4g_reservation_object WHERE published = ? ORDER BY sorting, caption";
             $allObjects = $database->prepare($sql)->execute('1')->fetchAllAssoc();
         }
 

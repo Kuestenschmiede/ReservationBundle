@@ -11,6 +11,7 @@
 $str = 'tl_c4g_reservation_suspension';
 
 $GLOBALS['TL_LANG'][$str]['caption'] = array("Description", "Enter a description for the suspension list.");
+$GLOBALS['TL_LANG'][$str]['suspension_color'] = array("Color in occupancy plan", "Choose a background color for all suspension dates in this record (can be overridden on individual dates).");
 $GLOBALS['TL_LANG'][$str]['showCaption'] = array("Show description in occupancy plan", "Shows the description in the occupancy plan.");
 $GLOBALS['TL_LANG'][$str]['showComment'] = array("Show comments in occupancy plan", "Shows the comments for the suspension dates in the occupancy plan.");
 $GLOBALS['TL_LANG'][$str]['showCompany'] = array("Show company name in occupancy plan", "Shows the company name in the occupancy plan.");
@@ -18,6 +19,7 @@ $GLOBALS['TL_LANG'][$str]['suspension_dates'] = array("Suspension dates", "Add t
 $GLOBALS['TL_LANG'][$str]['date'] = array("Date", "");
 $GLOBALS['TL_LANG'][$str]['comment'] = array("Comment", "Optional comment (e.g. reason for suspension).");
 $GLOBALS['TL_LANG'][$str]['company'] = array("Company name", "Enter the company name here.");
+$GLOBALS['TL_LANG'][$str]['color'] = array("Color", "Optional individual color for this date in the occupancy plan.");
 
 /** LEGENDS **/
 $GLOBALS['TL_LANG'][$str]['suspension_legend'] = "General settings";

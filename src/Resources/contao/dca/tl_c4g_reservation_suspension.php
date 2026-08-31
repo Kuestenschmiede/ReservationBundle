@@ -88,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
     //Palettes
     'palettes' => array
     (
-        'default'   =>  '{suspension_legend}, caption, showCaption, showComment, showCompany; {suspension_dates_legend}, date_range_wizard, suspension_dates'
+        'default'   =>  '{suspension_legend}, caption, suspension_color, showCaption, showComment, showCompany; {suspension_dates_legend}, date_range_wizard, suspension_dates'
     ),
 
     //Fields
@@ -111,8 +111,19 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
             'search'                  => true,
             'sorting'                 => true,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true,'tl_class'=>'long'),
+            'eval'                    => array('mandatory'=>true,'tl_class'=>'w50'),
             'sql'                     => array('type' => 'string','length' => 254,'default' => '')
+        ),
+
+        'suspension_color' => array (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['suspension_color'],
+            'exclude'                 => true,
+            'filter'                  => false,
+            'search'                  => false,
+            'sorting'                 => false,
+            'inputType'               => 'text',
+            'eval'                    => array('maxlength'=>64, 'colorpicker'=>true, 'isHexColor'=>true, 'decodeEntities'=>true, 'tl_class'=>'w50 wizard'),
+            'sql'                     => "varchar(64) NOT NULL default ''"
         ),
 
         'showCaption' => array (
@@ -122,7 +133,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
             'search'                  => false,
             'sorting'                 => false,
             'inputType'               => 'checkbox',
-            'eval'                    => array('mandatory'=>false,'tl_class'=>'w50'),
+            'eval'                    => array('mandatory'=>false,'tl_class'=>'w50 clr'),
             'sql'                     => array('type' => 'boolean','default' => false)
         ),
 
@@ -189,6 +200,13 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation_suspension'] = array
                         'exclude'                 => true,
                         'inputType'               => 'text',
                         'eval'                    => array('mandatory'=>false,'style'=>'width: 200px')
+                    ),
+                    'color' => array
+                    (
+                        'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation_suspension']['color'],
+                        'exclude'                 => true,
+                        'inputType'               => 'text',
+                        'eval'                    => array('maxlength'=>64, 'colorpicker'=>true, 'isHexColor'=>true, 'decodeEntities'=>true, 'style'=>'width: 120px')
                     )
                 )
             ),
