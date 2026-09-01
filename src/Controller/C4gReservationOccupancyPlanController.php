@@ -179,7 +179,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         }
         
         $html .= '<div class="calendar-nav-selectors">';
-        $html .= '<select class="c4g-calendar-select month-select" aria-label="' . $monthLabel . '" onchange="if(this.value){window.location.href=this.value;}">';
+        $html .= '<select class="c4g-calendar-select month-select" aria-label="' . $monthLabel . '" onchange="if(this.value){if(typeof c4gLoadOccupancyPlanMonth===\'function\'){c4gLoadOccupancyPlanMonth(this.value);}else{window.location.href=this.value;}}">';
         for ($m = 1; $m <= 12; $m++) {
             $mPadded = sprintf('%02d', $m);
             $monthName = $GLOBALS['TL_LANG']['MONTHS'][$m - 1] ?? date('F', mktime(0, 0, 0, $m, 1));
@@ -206,7 +206,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         if ($maxYear < $minYear) {
             $maxYear = $minYear;
         }
-        $html .= '<select class="c4g-calendar-select year-select" aria-label="' . $yearLabel . '" onchange="if(this.value){window.location.href=this.value;}">';
+        $html .= '<select class="c4g-calendar-select year-select" aria-label="' . $yearLabel . '" onchange="if(this.value){if(typeof c4gLoadOccupancyPlanMonth===\'function\'){c4gLoadOccupancyPlanMonth(this.value);}else{window.location.href=this.value;}}">';
         for ($y = $minYear; $y <= $maxYear; $y++) {
             $url = Controller::addToUrl("month=$month&year=$y", true, ['date']);
             $selected = ((int)$year === $y) ? ' selected="selected"' : '';
@@ -368,9 +368,46 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
         $script = '<script>
         (function() {
-            function initOccupancyPlanLinks() {
+            window.c4gLoadOccupancyPlanMonth = function(url, skipPushState) {
+                if (!url) return;
+                var container = document.getElementById("c4g_occupancy_plan");
+                if (!container) {
+                    window.location.href = url;
+                    return;
+                }
+                container.style.opacity = "0.5";
+                container.style.pointerEvents = "none";
+                fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+                    .then(function(res) {
+                        if (!res.ok) throw new Error("Network response was not ok");
+                        return res.text();
+                    })
+                    .then(function(html) {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(html, "text/html");
+                        var newContainer = doc.getElementById("c4g_occupancy_plan");
+                        if (newContainer && container.parentNode) {
+                            container.parentNode.replaceChild(newContainer, container);
+                            if (!skipPushState && window.history && window.history.pushState) {
+                                window.history.pushState({ c4g_occupancy_url: url }, "", url);
+                            }
+                            initOccupancyPlan();
+                        } else {
+                            window.location.href = url;
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error("Error loading occupancy plan month:", err);
+                        window.location.href = url;
+                    });
+            };
+
+            function initOccupancyPlan() {
                 var container = document.getElementById("c4g_occupancy_plan");
                 if (!container) return;
+                container.style.opacity = "1";
+                container.style.pointerEvents = "auto";
+
                 var links = container.querySelectorAll("td a.c4g-calendar-link");
                 links.forEach(function(link) {
                     link.addEventListener("click", function(e) {
@@ -416,11 +453,32 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                         }
                     });
                 });
+
+                var navLinks = container.querySelectorAll(".calendar-nav a.nav-prev, .calendar-nav a.nav-next");
+                navLinks.forEach(function(link) {
+                    link.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        var targetUrl = link.getAttribute("href");
+                        if (targetUrl) {
+                            window.c4gLoadOccupancyPlanMonth(targetUrl);
+                        }
+                    });
+                });
             }
+
+            if (!window.c4gOccupancyPlanPopstateBound) {
+                window.c4gOccupancyPlanPopstateBound = true;
+                window.addEventListener("popstate", function(e) {
+                    if (e.state && e.state.c4g_occupancy_url) {
+                        window.c4gLoadOccupancyPlanMonth(e.state.c4g_occupancy_url, true);
+                    }
+                });
+            }
+
             if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", initOccupancyPlanLinks);
+                document.addEventListener("DOMContentLoaded", initOccupancyPlan);
             } else {
-                initOccupancyPlanLinks();
+                initOccupancyPlan();
             }
         })();
         </script>';
