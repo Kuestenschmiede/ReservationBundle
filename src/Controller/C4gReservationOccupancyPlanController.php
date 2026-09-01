@@ -86,8 +86,24 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         $hasMonthParam = Input::get('month') !== null && Input::get('month') !== '';
         $hasYearParam = Input::get('year') !== null && Input::get('year') !== '';
 
-        if (!$hasMonthParam && !$hasYearParam && $jumpToNext) {
-            $freeDateMonthYear = $this->findFirstFreeMonth($objects);
+        if (!$hasMonthParam && !$hasYearParam) {
+            $dateParam = Input::get('date');
+            if ($dateParam) {
+                $dateParamStr = is_numeric($dateParam) ? date('Y-m-d', (int)$dateParam) : trim((string)$dateParam);
+                if (preg_match('/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/', $dateParamStr, $m)) {
+                    $month = sprintf('%02d', (int)$m[2]);
+                    $year = (string)(int)$m[3];
+                } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $dateParamStr, $m)) {
+                    $month = sprintf('%02d', (int)$m[2]);
+                    $year = (string)(int)$m[1];
+                }
+            }
+        }
+
+        $meta = $this->prepareOccupancyMetadata($objects);
+
+        if (!$hasMonthParam && !$hasYearParam && !isset($month) && $jumpToNext) {
+            $freeDateMonthYear = $this->findFirstFreeMonth($objects, 12, $meta);
             if ($freeDateMonthYear) {
                 $month = $freeDateMonthYear['month'];
                 $year = $freeDateMonthYear['year'];
@@ -111,7 +127,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             }
             $daysInMonth = date('t', $time);
             $reservations = $this->getReservations($objects, $month, $year);
-            $occupancy = $this->calculateOccupancy($objects, $reservations, $daysInMonth, $month, $year);
+            $occupancy = $this->calculateOccupancy($objects, $reservations, $daysInMonth, $month, $year, $meta);
         } else {
             $time = strtotime("$year-$month-01");
             if ($time < strtotime(date('Y-m-01'))) {
@@ -124,6 +140,10 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                 $time = strtotime("$year-$month-01");
             }
             $daysInMonth = date('t', $time);
+            if (!isset($occupancy)) {
+                $reservations = $this->getReservations($objects, $month, $year);
+                $occupancy = $this->calculateOccupancy($objects, $reservations, $daysInMonth, $month, $year, $meta);
+            }
         }
 
         $month = sprintf('%02d', (int)$month);
@@ -204,7 +224,10 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
 
         $html .= '<table class="calendar">';
         $html .= '<thead><tr>';
-        $daysShort = $GLOBALS['TL_LANG']['DAYS_SHORT'];
+        if (empty($GLOBALS['TL_LANG']['DAYS_SHORT'])) {
+            Controller::loadLanguageFile('default');
+        }
+        $daysShort = $GLOBALS['TL_LANG']['DAYS_SHORT'] ?? ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
         $daysShort[] = array_shift($daysShort);
         foreach ($daysShort as $dayShort) {
             $html .= '<th>' . $dayShort . '</th>';
@@ -369,8 +392,10 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                                     picker.datepicker.setDate(tv);
                                 }
                                 var listId = input.id.replace("c4g_beginDate_", "");
-                                if (typeof setTimeset === "function") {
-                                    setTimeset(dateVal, listId, 1, 0);
+                                if (typeof input.onchange === "function") {
+                                    input.onchange();
+                                } else if (typeof setTimeset === "function") {
+                                    setTimeset(dateVal, listId, 0, 0);
                                 } else {
                                     var evt = new Event("change", { bubbles: true });
                                     input.dispatchEvent(evt);
@@ -403,9 +428,16 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         return $style . $html . $script;
     }
 
-    protected function findFirstFreeMonth($objects, $maxMonths = 60): ?array
+    protected function findFirstFreeMonth($objects, $maxMonths = 12, ?array $meta = null): ?array
     {
-        $planMaxTimestamp = $this->getPlanMaxReservationTimestamp($objects);
+        if ($meta === null) {
+            $meta = $this->prepareOccupancyMetadata($objects);
+        }
+        if (empty($meta['validObjects'])) {
+            return null;
+        }
+
+        $planMaxTimestamp = $this->getPlanMaxReservationTimestamp($objects, $meta['objectModels']);
         $planMaxMonthTime = $planMaxTimestamp !== null ? strtotime(date('Y-m-01', $planMaxTimestamp)) : null;
 
         $curTime = strtotime(date('Y-m-01'));
@@ -419,7 +451,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
             $daysInMonth = date('t', $checkTime);
 
             $reservations = $this->getReservations($objects, $checkMonth, $checkYear);
-            $occupancy = $this->calculateOccupancy($objects, $reservations, $daysInMonth, $checkMonth, $checkYear);
+            $occupancy = $this->calculateOccupancy($objects, $reservations, $daysInMonth, $checkMonth, $checkYear, $meta);
 
             foreach ($occupancy as $dayData) {
                 if (in_array($dayData['status'], ['free', 'partial'], true)) {
@@ -452,9 +484,8 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         return $res->fetchAllAssoc();
     }
 
-    protected function calculateOccupancy($objects, $reservations, $daysInMonth, $month, $year)
+    protected function prepareOccupancyMetadata(array $objects): array
     {
-        $occupancy = [];
         $objectModels = [];
         $validObjects = [];
         foreach ($objects as $objId) {
@@ -466,7 +497,7 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         }
 
         if (empty($validObjects)) {
-            return [];
+            return ['validObjects' => [], 'objectModels' => [], 'suspensionDates' => []];
         }
 
         usort($validObjects, function($a, $b) use ($objectModels) {
@@ -579,6 +610,29 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
                 }
             }
         }
+
+        return [
+            'validObjects' => $validObjects,
+            'objectModels' => $objectModels,
+            'suspensionDates' => $suspensionDates,
+        ];
+    }
+
+    protected function calculateOccupancy($objects, $reservations, $daysInMonth, $month, $year, ?array $meta = null)
+    {
+        if ($meta === null) {
+            $meta = $this->prepareOccupancyMetadata($objects);
+        }
+
+        $validObjects = $meta['validObjects'];
+        $objectModels = $meta['objectModels'];
+        $suspensionDates = $meta['suspensionDates'];
+
+        if (empty($validObjects)) {
+            return [];
+        }
+
+        $occupancy = [];
 
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $dateYmd = sprintf('%04d-%02d-%02d', $year, $month, $day);
@@ -827,14 +881,14 @@ class C4gReservationOccupancyPlanController extends C4GBaseController
         return $res !== false ? $res : null;
     }
 
-    protected function getPlanMaxReservationTimestamp(array $objects): ?int
+    protected function getPlanMaxReservationTimestamp(array $objects, array $objectModels = []): ?int
     {
         $todayEnd = strtotime(date('Y-m-d 23:59:59'));
         $maxTimestamps = [];
         $hasUnrestricted = false;
 
         foreach ($objects as $objId) {
-            $model = C4gReservationObjectModel::findByPk($objId);
+            $model = $objectModels[$objId] ?? C4gReservationObjectModel::findByPk($objId);
             if ($model) {
                 $maxDays = isset($model->max_reservation_day) && is_numeric($model->max_reservation_day) ? (int)$model->max_reservation_day : 0;
                 if ($maxDays > 0) {

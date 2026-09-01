@@ -19,6 +19,9 @@ class C4gReservationHandler
     protected static array $captionCache = [];      // key: objectId_lang
     protected static ?string $langLower = null;     // normalized current language
     protected static array $weekdaysCache = [];     // key: signature(opening_hours + periodType)
+    protected static array $reservationTypesCache = []; // key: typeId
+    protected static array $dateExclusionCache = [];    // key: memoKey
+    protected static array $bookableMinDateCache = [];  // key: memoKey
 
     public static function resetStaticCaches(): void
     {
@@ -155,6 +158,18 @@ class C4gReservationHandler
      */
     public static function getDateExclusionString($list, $type, $removeBookedDays=1, $asArray=0)
     {
+        $typeId = is_array($type) ? ($type['id'] ?? 0) : (is_numeric($type) ? (int)$type : 0);
+        $ids = [];
+        if (is_array($list)) {
+            foreach ($list as $o) { if (is_object($o) && method_exists($o, 'getId')) { $ids[] = (string)$o->getId(); } }
+        }
+        sort($ids);
+        $lang = (string)($GLOBALS['TL_LANGUAGE'] ?? '');
+        $memoKey = md5(implode('|', [ (string)$typeId, (string)$removeBookedDays, (string)$asArray, $lang, implode(',', $ids) ]));
+        if (isset(self::$dateExclusionCache[$memoKey])) {
+            return self::$dateExclusionCache[$memoKey];
+        }
+
         // Short cross-request cache to avoid repeated heavy computations
         try {
             $cache = null; $ttl = 900; // 15 minutes default
@@ -165,17 +180,13 @@ class C4gReservationHandler
                 $p = (int)$container->getParameter('c4g_reservation_dates_ttl');
                 if ($p > 0) { $ttl = min($p, 1800); } // cap at 30 minutes
             }
-            $typeId = is_array($type) ? ($type['id'] ?? 0) : (is_numeric($type) ? (int)$type : 0);
             if ($cache && is_array($list) && $typeId) {
-                $ids = [];
-                foreach ($list as $o) { if (is_object($o) && method_exists($o, 'getId')) { $ids[] = (string)$o->getId(); } }
-                sort($ids);
-                $lang = (string)($GLOBALS['TL_LANGUAGE'] ?? '');
-                $key = 'c4g_res_date_excl_' . md5(implode('|', [ (string)$typeId, (string)$removeBookedDays, (string)$asArray, $lang, implode(',', $ids) ]));
+                $key = 'c4g_res_date_excl_' . $memoKey;
                 $item = $cache->getItem($key);
                 if ($item->isHit()) {
                     $val = $item->get();
                     if (is_array($val)) {
+                        self::$dateExclusionCache[$memoKey] = $val;
                         return $val;
                     }
                 }
@@ -230,6 +241,29 @@ class C4gReservationHandler
                 $begin = C4gReservationDateChecker::getBeginOfDate(time())+($minDate*86400);
                 $end   = C4gReservationDateChecker::getEndOfDate(time())+($maxDate*86400);
 
+                // PERFORMANCE: Preload all reservations in the entire window [begin, end] in ONE query
+                try {
+                    $database = Database::getInstance();
+                    $objIds = [];
+                    foreach ($list as $obj) {
+                        if ($obj instanceof C4gReservationFrontendObject) {
+                            $objIds[] = $obj->getId();
+                        }
+                    }
+                    if (!empty($objIds)) {
+                        $placeholders = implode(',', array_fill(0, count($objIds), '?'));
+                        $sql = "SELECT * FROM `tl_c4g_reservation` WHERE "
+                            . "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?) OR (`beginDate` < ? AND `endDate` > ?)) "
+                            . "AND `reservation_object` IN ($placeholders) "
+                            . "AND NOT `cancellation`='1'";
+                        $params = array_merge([$begin, $end, $begin, $end, $begin, $end], $objIds);
+                        $allRes = $database->prepare($sql)->execute(...$params)->fetchAllAssoc();
+                        \con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator::setPreloadedReservations($allRes);
+                    }
+                } catch (\Throwable $e) {
+                    \con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator::setPreloadedReservations(null);
+                }
+
                 $i = $begin;
                 $nextDays = 0;
                 while ($i <= $end) {
@@ -282,17 +316,10 @@ class C4gReservationHandler
                         $nextDays = ($nextDays > 0) ? $nextDays-- : 0;
                     }
 
-//                    if (!$alldates[$i]) {
-//                        foreach ($excludePeriodArr as $period) {
-//                            if ($i >= $period['begin'] && $i <= $period['end']) {
-//                                $alldates[$i] = $i;
-//                                break;
-//                            }
-//                        }
-//                    }
-
                     $i = $i+86400;
                 }
+
+                \con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator::setPreloadedReservations(null);
             }
 
             $result = [];
@@ -311,9 +338,11 @@ class C4gReservationHandler
         }
 
         // Save to cache if possible
+        self::$dateExclusionCache[$memoKey] = $result;
         try {
-            if (isset($cache) && $cache && isset($item)) {
+            if (isset($cache) && $cache) {
                 $saveVal = is_array($result) ? $result : [];
+                $item = $cache->getItem('c4g_res_date_excl_' . $memoKey);
                 $item->set($saveVal);
                 if (method_exists($item, 'expiresAfter')) { $item->expiresAfter($ttl); }
                 $cache->save($item);
@@ -501,6 +530,17 @@ class C4gReservationHandler
      * @return float|int|mixed
      */
     public static function getBookableMinDate($list, $type) {
+        $typeId = is_array($type) ? ($type['id'] ?? 0) : (is_numeric($type) ? (int)$type : 0);
+        $ids = [];
+        if (is_array($list)) {
+            foreach ($list as $o) { if (is_object($o) && method_exists($o, 'getId')) { $ids[] = (string)$o->getId(); } }
+        }
+        sort($ids);
+        $memoKey = $typeId . '_' . implode(',', $ids);
+        if (isset(self::$bookableMinDateCache[$memoKey])) {
+            return self::$bookableMinDateCache[$memoKey];
+        }
+
         $result = self::getMinDate($list);
 
         if ($list) {
@@ -551,11 +591,34 @@ class C4gReservationHandler
             $begin = C4gReservationDateChecker::getBeginOfDate(time())+($minDate*86400);
             $end   = C4gReservationDateChecker::getEndOfDate(time())+($maxDate*86400);
 
+            // PERFORMANCE: Preload all reservations in the entire window [begin, end] in ONE query
+            try {
+                $database = Database::getInstance();
+                $objIds = [];
+                foreach ($list as $obj) {
+                    if ($obj instanceof C4gReservationFrontendObject) {
+                        $objIds[] = $obj->getId();
+                    }
+                }
+                if (!empty($objIds)) {
+                    $placeholders = implode(',', array_fill(0, count($objIds), '?'));
+                    $sql = "SELECT * FROM `tl_c4g_reservation` WHERE "
+                        . "((`beginDate` BETWEEN ? AND ?) OR (`endDate` BETWEEN ? AND ?) OR (`beginDate` < ? AND `endDate` > ?)) "
+                        . "AND `reservation_object` IN ($placeholders) "
+                        . "AND NOT `cancellation`='1'";
+                    $params = array_merge([$begin, $end, $begin, $end, $begin, $end], $objIds);
+                    $allRes = $database->prepare($sql)->execute(...$params)->fetchAllAssoc();
+                    \con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator::setPreloadedReservations($allRes);
+                }
+            } catch (\Throwable $e) {
+                \con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator::setPreloadedReservations(null);
+            }
+
             $i = $begin;
             $nextDays = 0;
             while ($i <= $end) {
                 $weekday = date('w', $i);
-                $timeArr = self::getReservationTimes($list, $type['id'], $weekday, $i);
+                $timeArr = self::getReservationTimes($list, $typeId, $weekday, $i);
 
                 if (!$timeArr || (count($timeArr) == 0)) {
                     $alldates[$i] = $i;
@@ -582,30 +645,33 @@ class C4gReservationHandler
 
                     if ($excludeTime) {
                         $alldates[$i] = $i;
-                    }
+                    } else {
+                        $hitIt = true;
+                        foreach ($excludePeriodArr as $period) {
+                            if ($i >= $period['begin'] && $i <= $period['end']) {
+                                $hitIt = false;
+                                break;
+                            }
+                        }
 
-                   $nextDays = ($nextDays > 0) ? $nextDays-- : 0;
-                }
-
-                $alldates[$i] = $i;
-                if (!$alldates[$i]) {
-                    $hitIt = true;
-                    foreach ($excludePeriodArr as $period) {
-                        if ($i >= $period['begin'] && $i <= $period['end']) {
-                            $hitIt = false;
-                            break;
+                        if ($hitIt) {
+                            $minFound = ($i > $result) ? $i : $result;
+                            self::$bookableMinDateCache[$memoKey] = $minFound;
+                            \con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator::setPreloadedReservations(null);
+                            return $minFound;
                         }
                     }
 
-                    if ($hitIt) {
-                        return ($i > $result) ? $i : $result;
-                    }
+                    $nextDays = ($nextDays > 0) ? $nextDays-- : 0;
                 }
 
                 $i = $i + 86400;
             }
+
+            \con4gis\ReservationBundle\Classes\Calculator\C4gReservationCalculator::setPreloadedReservations(null);
         }
 
+        self::$bookableMinDateCache[$memoKey] = $result;
         return $result;
     }
 
@@ -1035,9 +1101,14 @@ class C4gReservationHandler
             if (!$timeParams['typeId']) {
                 return [];
             }
-            $database = Database::getInstance();
-            $timeParams['type'] = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published` = ?")
-                ->execute($timeParams['typeId'], '1')->fetchAssoc();
+            if (isset(self::$reservationTypesCache[$timeParams['typeId']])) {
+                $timeParams['type'] = self::$reservationTypesCache[$timeParams['typeId']];
+            } else {
+                $database = Database::getInstance();
+                $timeParams['type'] = $database->prepare("SELECT * FROM `tl_c4g_reservation_type` WHERE `id`=? AND `published` = ?")
+                    ->execute($timeParams['typeId'], '1')->fetchAssoc();
+                self::$reservationTypesCache[$timeParams['typeId']] = $timeParams['type'];
+            }
 
             if (!$timeParams['type']) {
                 return [];

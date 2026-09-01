@@ -9,6 +9,47 @@
 
 var callFromChangeCapacity = false;
 var activeTimesetRequests = {};
+var lastLoadedTimeset = {};
+
+function onReservationObjectChange(typeId, showDateTime) {
+    if (!typeId) return;
+    var selectField = document.getElementById("c4g_reservation_object_" + typeId);
+    if (!selectField) return;
+    var objVal = selectField.value;
+    if (objVal && parseInt(objVal) > 0) {
+        var radioButtons = document.querySelectorAll('.radio-group-beginTime_' + typeId + ' input[type="radio"]');
+        for (var i = 0; i < radioButtons.length; i++) {
+            var rb = radioButtons[i];
+            if (rb && !rb.disabled && !rb.classList.contains("radio_object_disabled")) {
+                var dataObj = rb.getAttribute('data-object') || '';
+                var objs = dataObj.split('-');
+                if (objs.indexOf(String(objVal)) !== -1) {
+                    for (var j = 0; j < radioButtons.length; j++) {
+                        radioButtons[j].removeAttribute('checked');
+                        radioButtons[j].checked = false;
+                    }
+                    rb.checked = true;
+                    rb.setAttribute('checked', 'checked');
+                    var timeField = document.getElementById('c4g_beginTime_' + typeId);
+                    if (timeField) {
+                        timeField.value = rb.value;
+                    }
+                    var desc = rb.getAttribute('data-desc');
+                    if (desc && rb.parentNode && rb.parentNode.parentNode && rb.parentNode.parentNode.parentNode) {
+                        var descElement = rb.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.c4g__form-description');
+                        if (descElement) {
+                            descElement.innerHTML = desc;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    if (typeof handleBrickConditions === 'function') {
+        handleBrickConditions();
+    }
+}
 
 function setObjectId(object, typeid, showDateTime) {
     if (showDateTime === undefined) { showDateTime = 0; }
@@ -17,7 +58,6 @@ function setObjectId(object, typeid, showDateTime) {
     var selectField = document.getElementById("c4g_reservation_object_"+typeId);
     var reservationObjects = document.getElementsByClassName('displayReservationObjects');
     var objects = null;
-    var values = '';
     var oldValue = false;
 
     if (selectField) {
@@ -36,7 +76,7 @@ function setObjectId(object, typeid, showDateTime) {
             var breakDance = false;
             for (var i=0; i < objects.length; i++) {
                 for (var j = 0; j < selectField.options.length; j++) {
-                    if (!selectField.options[j].getAttribute('hidden')) {
+                    if (!selectField.options[j].getAttribute('hidden') && !selectField.options[j].disabled) {
                         if (selectField.options[j].value == objects[i]) {
                             selectField.value = objects[i];
                             handleBrickConditions();
@@ -49,15 +89,12 @@ function setObjectId(object, typeid, showDateTime) {
                     break;
                 }
             }
-
-            values = objects ? objects : values
         }
     }
 
-    hideOptions(typeId, values, showDateTime);
     if (object) {
         var desc = object.getAttribute('data-desc');
-        if (desc) {
+        if (desc && object.parentNode && object.parentNode.parentNode && object.parentNode.parentNode.parentNode) {
             var descElement = object.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.c4g__form-description');
             if (descElement) {
                 descElement.innerHTML = desc;
@@ -67,7 +104,7 @@ function setObjectId(object, typeid, showDateTime) {
 
     if (!objectParam && oldValue) {
        for (var i = 0; i < selectField.options.length; i++) {
-           if (!selectField.options[i].getAttribute('hidden') && !selectField.options[i].getAttribute('disabled')) {
+           if (!selectField.options[i].getAttribute('hidden') && !selectField.options[i].getAttribute('disabled') && !selectField.options[i].disabled) {
                if (selectField.options[i].value == oldValue) {
                    selectField.value = oldValue;
                    handleBrickConditions();
@@ -282,11 +319,29 @@ function hideOptions(typeId, values, showDateTime) {
                         }
                     }
                 }
+            } else if (!showDateTime && (option.value != -1)) {
+                var text = option.textContent;
+                var pos = text.lastIndexOf('\u00A0(');
+                if (pos !== -1) {
+                    option.textContent = text.substr(0, pos);
+                }
             }
         }
 
         if ((firstKey !== false) && (parseInt(firstKey) !== -1) && selectField.options[firstKey]) {
-          selectField.value = selectField.options[firstKey].value;
+          var currentVal = selectField.value;
+          var keepCurrent = false;
+          if (currentVal && currentVal !== "-1") {
+              for (var optIdx = 0; optIdx < selectField.options.length; optIdx++) {
+                  if (selectField.options[optIdx].value == currentVal && !selectField.options[optIdx].disabled && !selectField.options[optIdx].hidden && selectField.options[optIdx].style.display !== 'none') {
+                      keepCurrent = true;
+                      break;
+                  }
+              }
+          }
+          if (!keepCurrent) {
+              selectField.value = selectField.options[firstKey].value;
+          }
           selectField.options[firstKey].removeAttribute('disabled');
           selectField.options[firstKey].removeAttribute('hidden');
           selectField.options[firstKey].style.display = '';
@@ -909,7 +964,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
         objectId = objectId ? objectId : 0;
 
         var requestKey = String(additionalId) + "_" + String(date) + "_" + String(duration) + "_" + String(capacity) + "_" + String(objectId);
-        if (activeTimesetRequests[additionalId] === requestKey) {
+        if (activeTimesetRequests[additionalId] === requestKey || lastLoadedTimeset[additionalId] === requestKey) {
             return;
         }
         activeTimesetRequests[additionalId] = requestKey;
@@ -940,6 +995,7 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                 return response.json();
             })
             .then(function(data) {
+                lastLoadedTimeset[additionalId] = requestKey;
                 var addId = additionalId;
                 if (objectId) {
                     addId += '-33'+objectId;
@@ -983,6 +1039,25 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                     resIdContainers[0].style.display = "block";
                 }
 
+                var availableObjects = [];
+                if (data && data.times) {
+                    for (var timeKey in data.times) {
+                        if (data.times.hasOwnProperty(timeKey) && data.times[timeKey] && data.times[timeKey].objects) {
+                            var timeObjs = data.times[timeKey].objects;
+                            for (var oIdx = 0; oIdx < timeObjs.length; oIdx++) {
+                                var oId = parseInt(timeObjs[oIdx].id);
+                                if (oId > 0 && availableObjects.indexOf(String(oId)) === -1) {
+                                    availableObjects.push(String(oId));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!objectId) {
+                    hideOptions(additionalId, availableObjects, showDateTime);
+                }
+
                 var timeButtons = document.getElementsByClassName('reservation_time_button_'+addId);
 
                 if (objCaptions && objCaptions[objectId]) {
@@ -1021,11 +1096,11 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                         for (z = 0; z < radioButton.length; z++) {
                             var button = radioButton[z];
                             if (button && !button.getAttribute('disabled') && !button.getAttribute('hidden')) {
-                if (timeValue && button.value === timeValue) {
-                    targetButton = button;
-                } else if (button.value && !timeValue && (!visibleButtons || (visibleButtons.indexOf(button) === -1))) {
-                    visibleButtons.push(button);
-                }
+                                if (timeValue && button.value === timeValue) {
+                                    targetButton = button;
+                                } else if (button.value && !timeValue && (!visibleButtons || (visibleButtons.indexOf(button) === -1))) {
+                                    visibleButtons.push(button);
+                                }
                             }
                         }
                     }
@@ -1035,14 +1110,42 @@ function setTimeset(date, additionalId, showDateTime, objectId) {
                     }
 
                     if (!objectId) {
-                        if (targetButton && !targetButton.disabled && !targetButton.classList.contains("radio_object_disabled")) {
-                            targetButton.setAttribute("checked", "checked");
-                            document.getElementById('c4g_beginTime_'+additionalId).value=targetButton.value;
-                            setObjectId(targetButton,additionalId,showDateTime);
+                        if (availableObjects.length > 0) {
+                            var currentObjVal = selectField ? String(selectField.value) : '';
+                            var matchingButton = null;
+                            if (currentObjVal && currentObjVal !== '-1' && radioButton && radioButton.length) {
+                                for (z = 0; z < radioButton.length; z++) {
+                                    var btn = radioButton[z];
+                                    if (btn && !btn.getAttribute('disabled') && !btn.getAttribute('hidden') && !btn.classList.contains("radio_object_disabled")) {
+                                        var dataObj = btn.getAttribute('data-object') || '';
+                                        var objs = dataObj.split('-');
+                                        if (objs.indexOf(currentObjVal) !== -1) {
+                                            matchingButton = btn;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (!matchingButton && targetButton) {
+                                matchingButton = targetButton;
+                            }
+
+                            if (matchingButton && !matchingButton.disabled && !matchingButton.classList.contains("radio_object_disabled")) {
+                                for (z = 0; z < radioButton.length; z++) {
+                                    radioButton[z].removeAttribute("checked");
+                                    radioButton[z].checked = false;
+                                }
+                                matchingButton.checked = true;
+                                matchingButton.setAttribute("checked", "checked");
+                                var timeInput = document.getElementById('c4g_beginTime_'+additionalId);
+                                if (timeInput) {
+                                    timeInput.value = matchingButton.value;
+                                }
+                                setObjectId(matchingButton, additionalId, showDateTime);
+                            }
                         } else {
                             for (z=0; z<visibleButtons.length; z++) {
                                 visibleButtons[z].removeAttribute("checked");
-
                             }
                             if (selectField) {
                                 selectField.value = -1;
@@ -1444,7 +1547,6 @@ function onObjectChangeFirst(typeId, showDateTime, initialDate) {
                         }
                     }
                     if (typeof eventFire === 'function') { eventFire(retryField, 'change'); }
-                    if (typeof setTimeset === 'function') { setTimeset(String(retryDateValue || ''), String(typeId), parseInt(showDateTime || 0), String(actValue || '')); }
                 }
         } catch(e3){console.error(e3);}
     }, 500);
@@ -1524,20 +1626,6 @@ function eventFire(el, etype) {
                 }
             }
         }
-
-        // Safety loop for the first few seconds
-        if (!window.c4gSafetyLoopStarted) {
-            window.c4gSafetyLoopStarted = true;
-            var safetyCount = 0;
-            var safetyInterval = setInterval(function() {
-                safetyCount++;
-                var currentType = document.querySelector('select[name*="reservation_type"]');
-                if (typeof checkParticipantsVisibility === 'function') {
-                    checkParticipantsVisibility(currentType ? currentType.value : undefined);
-                }
-                if (safetyCount >= 10) clearInterval(safetyInterval);
-            }, 1000);
-        }
     }
 
     if (document.readyState === 'loading') {
@@ -1552,8 +1640,6 @@ function eventFire(el, etype) {
     // Also retry after a short delay to account for dynamic content
     setTimeout(initReservation, 100);
     setTimeout(initReservation, 500);
-    setTimeout(initReservation, 2000);
-    setTimeout(initReservation, 5000);
     
     // Listen for AJAX reloads from con4gis core
     jQuery(document).on('c4g:afterAjaxLoad', function() {

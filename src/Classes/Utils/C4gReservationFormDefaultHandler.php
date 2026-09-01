@@ -174,9 +174,13 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
             }
 
             $reservationBeginDateField = new C4GDateField();
-            $reservationBeginDateField->setMinDate(C4gReservationHandler::getBookableMinDate($reservationObjects, $listType));
-            $reservationBeginDateField->setMaxDate(C4gReservationHandler::getMaxDate($reservationObjects));
-            $reservationBeginDateField->setExcludeWeekdays(C4gReservationHandler::getWeekdayExclusionString($reservationObjects));
+            $bookableMinDate = C4gReservationHandler::getBookableMinDate($reservationObjects, $listType);
+            $maxDate = C4gReservationHandler::getMaxDate($reservationObjects);
+            $excludeWeekdays = C4gReservationHandler::getWeekdayExclusionString($reservationObjects);
+
+            $reservationBeginDateField->setMinDate($bookableMinDate);
+            $reservationBeginDateField->setMaxDate($maxDate);
+            $reservationBeginDateField->setExcludeWeekdays($excludeWeekdays);
 
             $suspensionDates = C4gReservationHandler::getSuspensionDates($reservationSettings);
             $periodType = $listType['periodType'];
@@ -203,10 +207,6 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
                 $reservationBeginDateField->setExcludeDates($commaDates);
                 $fullExcludeDates = $commaDates;
             }
-
-            $bookableMinDate = C4gReservationHandler::getBookableMinDate($reservationObjects, $listType);
-            $maxDate = C4gReservationHandler::getMaxDate($reservationObjects);
-            $excludeWeekdays = C4gReservationHandler::getWeekdayExclusionString($reservationObjects);
 
             // Validate $initialBookingDate against past dates, suspension, weekday & date exclusions
             $isInitialDateValid = true;
@@ -438,7 +438,9 @@ class C4gReservationFormDefaultHandler extends C4gReservationFormHandler
         $reservationObjectField->setCondition([$condition]);
         $reservationObjectField->setRemoveWithEmptyCondition(true);
         $reservationObjectField->setCallOnChange(true);
-        $jsOnChange = "if(typeof handleBrickConditions==='function'){handleBrickConditions();}";
+        $jsListId = json_encode((string)$listType['id']);
+        $jsShowDT = json_encode((int)$showDateTime);
+        $jsOnChange = "if(typeof onReservationObjectChange==='function'){onReservationObjectChange($jsListId,$jsShowDT);}else if(typeof handleBrickConditions==='function'){handleBrickConditions();}";
         $reservationObjectField->setCallOnChangeFunction($jsOnChange);
         $reservationObjectField->setAdditionalID($listType["id"]);
         $reservationObjectField->setHidden($reservationSettings->objectHide);

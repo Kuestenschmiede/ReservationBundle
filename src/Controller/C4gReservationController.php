@@ -348,12 +348,6 @@ class C4gReservationController extends C4GBaseController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        if (Input::get('date')) {
-            $request->attributes->set('_no_cache', true);
-            $GLOBALS['TL_NO_CACHE'] = true;
-            $this->nukeState();
-        }
-
         $eventId = Input::get('event') ?: 0;
         if (!$eventId && $request->attributes->has('auto_item')) {
             $eventId = $request->attributes->get('auto_item');
@@ -373,25 +367,9 @@ class C4gReservationController extends C4GBaseController
         $response->setSharedMaxAge(0);
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private, proxy-revalidate');
         $response->headers->set('Surrogate-Control', 'no-store');
-        if (Input::get('date')) {
-            $response->setVary('*');
-        } else {
-            $response->setVary(['Cookie', 'Accept-Encoding', 'X-Requested-With']);
-        }
+        $response->setVary(['Cookie', 'Accept-Encoding', 'X-Requested-With']);
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');
-        
-        // Clear server-side cache if requested (e.g. via Contao internal mechanisms)
-        if (Input::get('date') && class_exists('Contao\System')) {
-            try {
-                $container = \Contao\System::getContainer();
-                if ($container->has('contao.cache.entity_cache')) {
-                    $container->get('contao.cache.entity_cache')->clear();
-                }
-            } catch (\Exception $e) {
-                // Ignore if cache clearing fails
-            }
-        }
 
         return $response;
     }
@@ -1593,7 +1571,7 @@ if ($typelist && count($typelist) > 0 && !$anyTypeAvailable && !(key_exists('REQ
         $specialParticipantMechanism = $reservationSettings ? $reservationSettings->specialParticipantMechanism : false;
         $hideParticipantsEmail = $reservationSettings->hideParticipantsEmail ?: false;
         $hideReservationKey = $reservationSettings->hideReservationKey ?: false;
-        $onlyParticipants = $reservationSettings->onlyParticipants ?: false;
+        $onlyParticipants = $reservationSettings ? ($reservationSettings->onlyParticipants ?: false) : false;
         foreach ($additionaldatas as $rowdata) {
             $rowField = $rowdata['additionaldatas'];
             $initialValue = $rowdata['initialValue'];
