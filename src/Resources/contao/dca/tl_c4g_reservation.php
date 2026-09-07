@@ -15,6 +15,7 @@
 use con4gis\ReservationBundle\Classes\Callbacks\C4gReservation;
 use con4gis\ProjectsBundle\Classes\Common\C4GBrickCommon;
 use Contao\Controller;
+use Contao\DataContainer;
 use Contao\Input;
 use Contao\DC_Table;
 
@@ -245,7 +246,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'default'                 => time(),
             'filter'                  => true,
             'sorting'                 => true,
-            'flag'                    => 6,
+            'flag'                    => DataContainer::SORT_MONTH_BOTH,
             'search'                  => false,
             'exclude'                 => true,
             'inputType'               => 'text',
