@@ -12,12 +12,12 @@ $exportExists = class_exists('con4gis\ExportBundle\con4gisExportBundle');
 if ($exportExists) {
     Contao\CoreBundle\DataContainer\PaletteManipulator::create()
         ->addLegend('c4g_reservation_legend','con4gisIoLegend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER, true)
-        ->addField(['reservationForwarding','reservationForwardingButtonCaption','exportSelection','taxRateStandard','taxRateReduced'],'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+        ->addField(['reservationForwarding','reservationForwardingButtonCaption','exportSelection','showOrganisationInsteadOfName','formSettingsSelection','taxRateStandard','taxRateReduced'],'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
         ->applyToPalette('default','tl_c4g_settings');
 } else {
     Contao\CoreBundle\DataContainer\PaletteManipulator::create()
         ->addLegend('c4g_reservation_legend','con4gisIoLegend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER, true)
-        ->addField(['reservationForwarding','reservationForwardingButtonCaption'],'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+        ->addField(['reservationForwarding','reservationForwardingButtonCaption','showOrganisationInsteadOfName','formSettingsSelection'],'c4g_reservation_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
         ->applyToPalette('default','tl_c4g_settings');
 }
 
@@ -45,6 +45,26 @@ $GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['reservationForwardingButtonCapt
     'eval'                    => array('mandatory'=>false,'feEditable'=>true,'feViewable'=>true,'tl_class'=>'clr long'),
     // 'sql'                     => "varchar(254) NOT NULL default ''"
     'sql'                     => array('type' => 'string','length' => 254,'default' => '')
+);
+
+$GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['showOrganisationInsteadOfName'] = array
+(
+    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_settings']['showOrganisationInsteadOfName'],
+    'exclude'                 => true,
+    'inputType'               => 'checkbox',
+    'eval'                    => array('tl_class'=>'w50'),
+    'sql'                     => "char(1) NOT NULL default ''"
+);
+
+$GLOBALS['TL_DCA']['tl_c4g_settings']['fields']['formSettingsSelection'] = array
+(
+    'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_settings']['formSettingsSelection'],
+    'inputType'               => 'select',
+    'exclude'                 => true,
+    'foreignKey'              => 'tl_c4g_reservation_settings.caption',
+    'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50', 'chosen'=>true, 'includeBlankOption'=>true),
+    'sql'                     => "int(10) unsigned NOT NULL default 0",
+    'relation'                => array('type'=>'hasOne', 'load'=>'lazy')
 );
 
 if ($exportExists) {

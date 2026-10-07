@@ -322,6 +322,10 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_c4g_reservation']['organisation'],
             'exclude'                 => true,
+            'search'                  => true,
+            'filter'                  => true,
+            'sorting'                 => true,
+            'flag'                    => 1,
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'personal','tl_class'=>'long clr'),
             'sql'                     => array('type' => 'string','length' => 254,'default' => '')

@@ -11,6 +11,8 @@
 $GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwarding'] = ["Weiterleitung zum Modul", "Wählen Sie die Seite aus, auf der sich das Reservierungsmodul befindet."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['reservationForwardingButtonCaption'] = ["Buttonbeschriftung Weiterleitung", "Beschriftung des Weiterleitungsbutton zur Reservierung. Standard: leer. Es greifen die Einträge aus den Sprachdateien."];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['exportSelection'] = ["Export auswählen", "Wählen Sie den Export aus, der an den Events vorausgewählt sein soll."];
+$GLOBALS['TL_LANG']['tl_c4g_settings']['showOrganisationInsteadOfName'] = ['"Firma" anstelle von Vor- und Nachname als Tabellenspalte anzeigen', 'Zeigt in der Übersicht der Reservierungen die Firma statt Vor- und Nachname an.'];
+$GLOBALS['TL_LANG']['tl_c4g_settings']['formSettingsSelection'] = ['Benennungen aus den Formulareinstellungen übernehmen', 'Wählen Sie einen Datensatz aus den Formulareinstellungen aus, um dessen individuelle Feldbezeichnungen im Backend-Formular zu verwenden.'];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['c4g_reservation_legend'] = "Einstellungen zu den Reservierungen";
 $GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateStandard'] = ['Normaler Steuersatz (MwSt.)', 'Damit wird der normale Steuersatz für die Preisberechnung festgelegt.'];
 $GLOBALS['TL_LANG']['tl_c4g_settings']['fields']['taxRateReduced'] = ['Ermäßigter Steuersatz (MwSt.)', 'Damit wird der ermäßigte Steuersatz für die Preisberechnung festgelegt.'];

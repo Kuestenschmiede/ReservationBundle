@@ -157,6 +157,26 @@
                 $arrRow['reservation_type'] = $type->caption;
             }
 
+            $showOrganisation = false;
+            if (Database::getInstance()->tableExists('tl_c4g_settings')) {
+                $settingsFields = Database::getInstance()->listFields('tl_c4g_settings');
+                $fieldNames = array_column($settingsFields, 'name');
+                if (in_array('showOrganisationInsteadOfName', $fieldNames, true)) {
+                    $settings = Database::getInstance()->prepare("SELECT showOrganisationInsteadOfName FROM tl_c4g_settings")->execute()->fetchAssoc();
+                    $showOrganisation = !empty($settings['showOrganisationInsteadOfName']);
+                }
+            }
+
+            if ($showOrganisation) {
+                $result = [
+                    $arrRow['beginDateInt'],
+                    $arrRow['endDateInt'],
+                    $arrRow['desiredCapacity'],
+                    $arrRow['reservation_type'],
+                    $arrRow['organisation'] ?? '',
+                    $arrRow['reservation_object']
+                ];
+            } else {
                 $result = [
                     $arrRow['beginDateInt'],
                     $arrRow['endDateInt'],
@@ -166,13 +186,14 @@
                     $arrRow['firstname'],
                     $arrRow['reservation_object']
                 ];
-                if ($do && ($do == 'calendar')) {
-                    $checkedInYes = 'Ja';
-                    if ($arrRow['checkedIn'] && $arrRow['checkedIn'] > 1) {
-                        $checkedInYes = 'Ja ('.$arrRow['checkedIn'].')';
-                    }
-                    $result[] = $arrRow['checkedIn'] ? $checkedInYes : 'nein';
+            }
+            if ($do && ($do == 'calendar')) {
+                $checkedInYes = 'Ja';
+                if ($arrRow['checkedIn'] && $arrRow['checkedIn'] > 1) {
+                    $checkedInYes = 'Ja ('.$arrRow['checkedIn'].')';
                 }
+                $result[] = $arrRow['checkedIn'] ? $checkedInYes : 'nein';
+            }
 
             return $result;
         }
@@ -256,11 +277,36 @@
             $do = Input::get('do');
             $id = Input::get('id');
             
+            $showOrganisation = false;
+            $formSettingsId = 0;
 
+            if (Database::getInstance()->tableExists('tl_c4g_settings')) {
+                $settingsFields = Database::getInstance()->listFields('tl_c4g_settings');
+                $fieldNames = array_column($settingsFields, 'name');
+
+                $selectFields = [];
+                if (in_array('showOrganisationInsteadOfName', $fieldNames, true)) {
+                    $selectFields[] = 'showOrganisationInsteadOfName';
+                }
+                if (in_array('formSettingsSelection', $fieldNames, true)) {
+                    $selectFields[] = 'formSettingsSelection';
+                }
+
+                if (!empty($selectFields)) {
+                    $settings = Database::getInstance()->prepare("SELECT " . implode(',', $selectFields) . " FROM tl_c4g_settings")->execute()->fetchAssoc();
+                    $showOrganisation = !empty($settings['showOrganisationInsteadOfName']);
+                    $formSettingsId = intval($settings['formSettingsSelection'] ?? 0);
+                }
+            }
 
             if ($id && $do && ($do == 'calendar')) {
-                $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-                    ['beginDateInt','endDateInt','desiredCapacity','reservation_type','lastname','firstname','reservation_object','checkedIn'];
+                if ($showOrganisation) {
+                    $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
+                        ['beginDateInt','endDateInt','desiredCapacity','reservation_type','organisation','reservation_object','checkedIn'];
+                } else {
+                    $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
+                        ['beginDateInt','endDateInt','desiredCapacity','reservation_type','lastname','firstname','reservation_object','checkedIn'];
+                }
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['operations'] = ['edit', 'copy', 'delete', 'show', 'participants', 'confirmationEmail', 'toggle'];
 
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['reservationObjectType']['default'] = '2';
@@ -274,9 +320,39 @@
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['endDate']['eval']['disabled'] = true;
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields']['endTime']['eval']['disabled'] = true;
             } else {
-                $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
-                    ['beginDateInt','endDateInt','desiredCapacity','reservation_type','lastname','firstname','reservation_object'];
+                if ($showOrganisation) {
+                    $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
+                        ['beginDateInt','endDateInt','desiredCapacity','reservation_type','organisation','reservation_object'];
+                } else {
+                    $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['fields'] =
+                        ['beginDateInt','endDateInt','desiredCapacity','reservation_type','lastname','firstname','reservation_object'];
+                }
                 $GLOBALS['TL_DCA']['tl_c4g_reservation']['list']['label']['operations'] = ['edit', 'copy', 'delete', 'show', 'participants', 'confirmationEmail', 'toggle'];
+            }
+
+            if (!$formSettingsId && $id && $do !== 'calendar' && Database::getInstance()->tableExists('tl_c4g_reservation') && Database::getInstance()->fieldExists('formular_id', 'tl_c4g_reservation')) {
+                $resRow = Database::getInstance()->prepare("SELECT formular_id FROM tl_c4g_reservation WHERE id=?")->execute($id)->fetchAssoc();
+                if (!empty($resRow['formular_id'])) {
+                    $formSettingsId = intval($resRow['formular_id']);
+                }
+            }
+
+            if ($formSettingsId > 0 && Database::getInstance()->tableExists('tl_c4g_reservation_settings')) {
+                $fieldSelect = Database::getInstance()->prepare("SELECT fieldSelection FROM tl_c4g_reservation_settings WHERE id=?")->execute($formSettingsId)->fetchAssoc();
+                if ($fieldSelect && !empty($fieldSelect['fieldSelection'])) {
+                    $additionaldatas = StringUtil::deserialize($fieldSelect['fieldSelection'], true);
+                    if (is_array($additionaldatas)) {
+                        foreach ($additionaldatas as $rowdata) {
+                            $rowField = $rowdata['additionaldatas'] ?? '';
+                            $individualLabel = trim($rowdata['individualLabel'] ?? '');
+                            if ($rowField && $individualLabel !== '' && isset($GLOBALS['TL_DCA']['tl_c4g_reservation']['fields'][$rowField])) {
+                                $origLabel = $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields'][$rowField]['label'] ?? null;
+                                $desc = is_array($origLabel) ? ($origLabel[1] ?? '') : '';
+                                $GLOBALS['TL_DCA']['tl_c4g_reservation']['fields'][$rowField]['label'] = [$individualLabel, $desc];
+                            }
+                        }
+                    }
+                }
             }
 
             // Check current action
