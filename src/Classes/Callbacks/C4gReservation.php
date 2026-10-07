@@ -205,13 +205,13 @@
         public function getActObjects($dc)
         {
             $return = [];
-            if (!$dc->activeRecord) {
-                return $return;
-            }
-            if ($dc instanceof DataContainer && $dc->activeRecord->reservationObjectType) {
+            if ($dc instanceof DataContainer) {
+                if (!$dc->activeRecord) {
+                    return $return;
+                }
                 $reservationObjectType = $dc->activeRecord->reservationObjectType;
             } elseif (is_array($dc)) {
-                $reservationObjectType = $dc['reservationObjectType'];
+                $reservationObjectType = $dc['reservationObjectType'] ?? false;
             } else {
                 $reservationObjectType = false;
             }
