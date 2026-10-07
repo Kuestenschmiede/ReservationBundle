@@ -364,7 +364,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => true,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'personal','tl_class'=>'clr'),
+            'eval'                    => array('mandatory'=>false,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'personal','tl_class'=>'clr'),
             'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
@@ -376,7 +376,7 @@ $GLOBALS['TL_DCA']['tl_c4g_reservation'] = array
             'sorting'                 => false,
             'flag'                    => 1,
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'personal','tl_class'=>'long'),
+            'eval'                    => array('mandatory'=>false,'maxlength'=>254,'feEditable'=>true,'feViewable'=>true,'feGroup'=>'personal','tl_class'=>'long'),
             'sql'                     => array('type' => 'string','length' => 254,'default' => '')
         ),
 
