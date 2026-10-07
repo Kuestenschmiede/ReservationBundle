@@ -93,15 +93,8 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
 
     public function loadChildRecord(array $row) {
         System::loadLanguageFile('fe_c4g_reservation');
-        $arrChildRow = Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event WHERE pid=?')->execute($row['id'])->fetchAssoc();
-        $calendarRow =  Database::getInstance()->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($row['pid'])->fetchAssoc();
-
-        if (!$arrChildRow && !$calendarRow) {
-            return '';
-        }
 
         $span = Calendar::calculateSpan($row['startTime'], $row['endTime']);
-
         if ($span > 0)
         {
             $date = Date::parse(Config::get(($row['addTime'] ? 'datimFormat' : 'dateFormat')), $row['startTime']) . '' . ' - ' . Date::parse(Config::get(($row['addTime'] ? 'datimFormat' : 'dateFormat')), $row['endTime']) . '';
@@ -114,9 +107,10 @@ class tl_c4g_reservation_event_bridge extends tl_calendar_events
         {
             $date = Date::parse(Config::get('dateFormat'), $row['startTime']) . ($row['addTime'] ? ' ' . Date::parse(Config::get('timeFormat'), $row['startTime']) . ' - ' . Date::parse(Config::get('timeFormat'), $row['endTime']) . ' ' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['clock'] : '');
         }
-        if ($date) {
-            $event = '<div style="clear:both"><div style="float:left;width:150px"><strong>'.$GLOBALS['TL_LANG']['fe_c4g_reservation']['event'].':</strong></div><div>' . $date . '</div></div>';
-        }
+        $event = ($date) ? ('<div style="clear:both"><div style="float:left;width:150px"><strong>' . $GLOBALS['TL_LANG']['fe_c4g_reservation']['event'] . ':</strong></div><div>' . $date . '</div></div>') : '';
+
+        $arrChildRow = Database::getInstance()->prepare('SELECT * FROM tl_c4g_reservation_event WHERE pid=?')->execute($row['id'])->fetchAssoc();
+        $calendarRow = Database::getInstance()->prepare('SELECT * FROM tl_calendar WHERE id=? AND activateEventReservation="1"')->execute($row['pid'])->fetchAssoc();
 
         //topics
         $topics = '';
