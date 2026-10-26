@@ -101,6 +101,9 @@ class C4gReservationListController extends C4GBaseController
 
     protected $withPermissionCheck = false;
 
+    protected $showPrices = false;
+    protected $showPricesWithTaxes = false;
+
     /**
      * @param string $rootDir
      * @param RequestStack $requestStack
@@ -336,7 +339,9 @@ class C4gReservationListController extends C4GBaseController
             $fieldList[] = $reservationTypeField;
 
             $startTime = time() - (($this->past_day_number ?: 1) * 86400);
-            $reservationObjects = C4gReservationHandler::getReservationObjectList($selectTypes, 0, $this->showPrices, $this->showPricesWithTaxes,true, 0, 0, '', $startTime);
+            $showPrices = $this->showPrices ?? false;
+            $showPricesWithTaxes = $this->showPricesWithTaxes ?? false;
+            $reservationObjects = C4gReservationHandler::getReservationObjectList($selectTypes, 0, $showPrices, $showPricesWithTaxes, true, 0, 0, '', $startTime);
             $objects = [];
 
             foreach ($reservationObjects as $objectType=>$objList) {
